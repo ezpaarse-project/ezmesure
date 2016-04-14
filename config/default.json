@@ -1,0 +1,11 @@
+{
+  "port": 3000,
+  "elasticsearch": {
+    "port": 9200,
+    "host": "localhost"
+  },
+  "logs": {
+    "app": { "Console": { "timestamp": true, "colorize": true } },
+    "http": { "Console": { "timestamp": true, "colorize": true } }
+  }
+}
