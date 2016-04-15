@@ -45,3 +45,20 @@ or simply open your brower and navigate to http://localhost:3000/logs to get the
 
 The last step is accessing the Kibana instance on http://localhost:5601 and building dashboards (soon to be documented).
 
+## Routes
+<table>
+<tbody>
+  <tr>
+    <td>GET /logs</td>
+    <td>list current indixes</td>
+  </tr>
+  <tr>
+    <td>POST /logs/:index</td>
+    <td>insert a CSV file into an index</td>
+  </tr>
+  <tr>
+    <td>DELETE /logs/:index</td>
+    <td>delete an index</td>
+  </tr>
+</tbody>
+</table>
