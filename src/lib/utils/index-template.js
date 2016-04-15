@@ -25,7 +25,24 @@ export default {
           "type": "date",
           "format": "epoch_millis"
         },
+        "els-publication-date": {
+          "type": "date"
+        },
+        "els-publication-date-year": {
+          "type": "date",
+          "format": "year"
+        },
+        "doi-publication-date": {
+          "type": "date"
+        },
+        "doi-publication-date-year": {
+          "type": "date",
+          "format": "year"
+        },
         "size": {
+          "type": "integer"
+        },
+        "status": {
           "type": "integer"
         },
         "geoip-latitude": {
