@@ -1,0 +1,22 @@
+elastic:
+  image: elasticsearch:2.3
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+  environment:
+    - http_proxy
+    - https_proxy
+  volumes:
+    - "./var/log:/usr/share/elasticsearch/log"
+    - "./var/data:/usr/share/elasticsearch/data"
+  command: --cluster.name="ezCluster"
+
+kibana:
+  image: kibana:4.5
+  links:
+    - elastic:elasticsearch
+  ports:
+    - "5601:5601"
+  environment:
+    - http_proxy
+    - https_proxy
