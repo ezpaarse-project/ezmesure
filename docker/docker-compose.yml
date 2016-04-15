@@ -16,7 +16,7 @@ kibana:
   links:
     - elastic:elasticsearch
   ports:
-    - "5601:5601"
+    - "3000:5601"
   environment:
     - http_proxy
     - https_proxy
