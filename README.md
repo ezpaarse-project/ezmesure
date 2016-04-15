@@ -5,9 +5,8 @@ A recent version of NodeJS and npm should be installed.
 See the [official documentation](https://nodejs.org/en/download/package-manager/).
 
 ## Install
-Clone !
 ```bash
-  git clone ...
+  git clone https://github.com/ezpaarse-project/ezmesure.git
   cd ezmesure
 ```
 
@@ -26,6 +25,11 @@ Then, you install and run ezmesure:
   npm start
 ```
 
+You should be greeted with something like:
+```bash
+  2016-04-15T09:03:29.595Z - info: API server listening on port 3000
+```
+
 ## Usage
 
 To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /logs/{index_name} route. For example:
@@ -39,5 +43,5 @@ You can then issue a GET request on the /logs route to list your index(es)
 ```
 or simply open your brower and navigate to http://localhost:3000/logs to get the same information
 
-The last step is to access the Kibana instance on http://localhost:5601 and build dashboards (to be documented).
+The last step is accessing the Kibana instance on http://localhost:5601 and building dashboards (soon to be documented).
 
