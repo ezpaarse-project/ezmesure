@@ -62,6 +62,11 @@ function readStream(stream, orgName) {
           }
         }
 
+        // remove useless empty values
+        for (const p in ec) {
+          if (!ec[p]) { ec[p] = undefined; }
+        }
+
         buffer.push({ index:  { _index: orgName, _type: 'event' } });
         buffer.push(ec);
       }
