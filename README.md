@@ -17,11 +17,10 @@ First, you have to start dockerized versions of elasticsearch and kibana:
   docker-compose up -d
 ```
 
-Then, you install and run ezmesure: 
+Then, you install and run ezmesure:
 ```bash
   cd ..
   npm install
-  npm run build
   npm start
 ```
 
