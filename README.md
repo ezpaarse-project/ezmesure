@@ -33,7 +33,7 @@ You should be greeted with something like:
 
 To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /logs/{index_name} route. For example:
 ```bash
-  curl -v -X POST http://localhost:3010/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
+  curl -v -X POST http://localhost:3010/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
 ```
 
 You can then issue a GET request on the /logs route to list your index(es)
