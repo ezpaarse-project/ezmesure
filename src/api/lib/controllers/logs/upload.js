@@ -7,7 +7,9 @@ const bulkSize = 1000;
 export default function* upload(orgName) {
   if (!this.request.is('multipart/*')) {
     const nbEC = yield readStream(this.req, orgName);
-    return this.body = `Read ${nbEC} ECs\n`;
+    this.type = 'json';
+    this.body = { read: nbEC };
+    return;
   }
 
   let nbEC = 0;
