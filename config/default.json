@@ -1,5 +1,5 @@
 {
-  "port": 3010,
+  "port": 3000,
   "elasticsearch": {
     "port": 9200,
     "host": "localhost"

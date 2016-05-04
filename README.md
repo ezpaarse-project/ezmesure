@@ -27,21 +27,21 @@ Then, you install and run ezmesure:
 
 You should be greeted with something like:
 ```bash
-  2016-04-15T09:03:29.595Z - info: API server listening on port 3010
+  2016-04-15T09:03:29.595Z - info: API server listening on port 3000
 ```
 
 ## Usage
 
 To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /logs/{index_name} route. For example:
 ```bash
-  curl -v -X POST http://localhost:3010/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
+  curl -v -X POST http://localhost:3000/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
 ```
 
 You can then issue a GET request on the /logs route to list your index(es)
 ```bash
-  curl -X GET http://localhost:3010/logs
+  curl -X GET http://localhost:3000/logs
 ```
-or simply open your brower and navigate to http://localhost:3010/logs to get the same information
+or simply open your brower and navigate to http://localhost:3000/logs to get the same information
 
 The last step is accessing the Kibana instance on http://localhost:3000 and building dashboards (soon to be documented).
 
