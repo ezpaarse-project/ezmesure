@@ -51,12 +51,12 @@ To use your token, add the following header to your requests: `Authorization: Be
 
 To upload an EC result file in elastic-search, you need to POST it on the /api/logs/{index_name} route. For example:
 ```bash
-  curl -v -X POST https://localhost/api/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv" -H "Authorization: Bearer token"
+  curl -v -X POST https://localhost/api/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv" -H "Authorization: Bearer <token>"
 ```
 
 You can then issue a GET request on the /api/logs route to list your index(es)
 ```bash
-  curl -X GET https://localhost/api/logs -H "Authorization: Bearer token"
+  curl -X GET https://localhost/api/logs -H "Authorization: Bearer <token>"
 ```
 
 ### Visualize your data
