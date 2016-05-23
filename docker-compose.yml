@@ -35,6 +35,7 @@ services:
       - https_proxy
       - EZMESURE_ELASTIC_HOST=elastic
       - EZMESURE_AUTH_SECRET
+      - NODE_ENV
     links:
       - elastic
     volumes:
