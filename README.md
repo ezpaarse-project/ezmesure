@@ -41,18 +41,27 @@ You should be greeted with something like:
 
 ## Usage
 
-To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /api/logs/{index_name} route. For example:
+### Get and use your token
+
+You will need a token in order to use the API. Start by browsing https://localhost/login and log in with your identity provider. Once logged, you should get a JSON with your token.
+
+To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
+
+### Upload a file
+
+To upload an EC result file in elastic-search, you need to POST it on the /api/logs/{index_name} route. For example:
 ```bash
-  curl -v -X POST http://localhost:3000/api/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
+  curl -v -X POST https://localhost/api/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv" -H "Authorization: Bearer token"
 ```
 
 You can then issue a GET request on the /api/logs route to list your index(es)
 ```bash
-  curl -X GET http://localhost:3000/api/logs
+  curl -X GET https://localhost/api/logs -H "Authorization: Bearer token"
 ```
-or simply open your brower and navigate to http://localhost:3000/api/logs to get the same information
 
-The last step is accessing the Kibana instance on http://localhost:3000 and building dashboards (soon to be documented).
+### Visualize your data
+
+Now you can access the Kibana instance on https://localhost and start building dashboards (soon to be documented).
 
 ## Routes
 <table>
