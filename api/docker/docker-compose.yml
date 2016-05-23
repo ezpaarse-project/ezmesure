@@ -1,0 +1,40 @@
+version: '2'
+services:
+  elastic:
+    image: elasticsearch:2.3
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - http_proxy
+      - https_proxy
+    volumes:
+      - "./var/log:/usr/share/elasticsearch/log"
+      - "./var/data:/usr/share/elasticsearch/data"
+    command: --cluster.name="ezCluster"
+
+  kibana:
+    image: kibana:4.5
+    links:
+      - elastic
+    ports:
+      - "5601:5601"
+    environment:
+      - http_proxy
+      - https_proxy
+      - ELASTICSEARCH_URL=http://elastic:9200
+
+  api:
+    image: node:4-wheezy
+    ports:
+      - "3000:3000"
+    environment:
+      - http_proxy
+      - https_proxy
+      - ELASTIC_HOST=elastic
+    links:
+      - elastic
+    volumes:
+      - ..:/app
+    working_dir: /app
+    command: npm start

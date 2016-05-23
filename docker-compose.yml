@@ -1,0 +1,66 @@
+version: '2'
+services:
+  elastic:
+    image: elasticsearch:2.3
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - http_proxy
+      - https_proxy
+    volumes:
+      - "./data/elastic/log:/usr/share/elasticsearch/log"
+      - "./data/elastic/data:/usr/share/elasticsearch/data"
+    command: --cluster.name="ezCluster"
+    restart: always
+
+  kibana:
+    image: kibana:4.5
+    links:
+      - elastic
+    ports:
+      - "5601:5601"
+    environment:
+      - http_proxy
+      - https_proxy
+      - ELASTICSEARCH_URL=http://elastic:9200
+    restart: always
+
+  api:
+    image: node:4-wheezy
+    ports:
+      - "3000:3000"
+    environment:
+      - http_proxy
+      - https_proxy
+      - EZMESURE_ELASTIC_HOST=elastic
+      - EZMESURE_AUTH_SECRET
+    links:
+      - elastic
+    volumes:
+      - ./api:/app
+    working_dir: /app
+    command: npm start
+    restart: always
+
+  rp:
+    build:
+      context: ./rp
+      args:
+        - http_proxy
+        - https_proxy
+    ports:
+      - 443:443
+    environment:
+      - http_proxy
+      - https_proxy
+      - APPLI_APACHE_SERVERNAME
+      - APPLI_APACHE_SERVERADMIN
+      - APPLI_APACHE_LOGLEVEL
+    working_dir: /var/www/html
+    volumes:
+      - ./rp/shibboleth:/etc/shibboleth
+      - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
+      - ./rp/apache2/sites-available:/etc/apache2/sites-available
+      - ./rp/sp-log/:/var/log/shibboleth/
+    restart: always

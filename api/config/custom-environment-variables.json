@@ -1,0 +1,10 @@
+{
+  "port": "EZMESURE_PORT",
+  "elasticsearch": {
+    "port": "EZMESURE_ELASTIC_PORT",
+    "host": "EZMESURE_ELASTIC_HOST"
+  },
+  "auth": {
+    "secret": "EZMESURE_AUTH_SECRET"
+  }
+}

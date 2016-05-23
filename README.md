@@ -5,23 +5,33 @@ A recent version of NodeJS and npm should be installed.
 See the [official documentation](https://nodejs.org/en/download/package-manager/).
 
 ## Install
+
+### Clone !
+
 ```bash
   git clone https://github.com/ezpaarse-project/ezmesure.git
-  cd ezmesure
+```
+
+### Configuration
+
+1) Put the private key (``server.key``) and the certificate (``server.crt``) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.
+**NB**: the private key is critical and should not be shared.
+
+2) Set the following environment variables :
+- APPLI_APACHE_SERVERNAME
+- APPLI_APACHE_SERVERADMIN
+- APPLI_APACHE_LOGLEVEL
+- SHIBBOLETH_SP_URL
+- SHIBBOLETH_DS_URL
+
+3) Install
+```bash
+  make install
 ```
 
 ## Start
-First, you have to start dockerized versions of elasticsearch and kibana:
 ```bash
-  cd docker
   docker-compose up -d
-```
-
-Then, you install and run ezmesure:
-```bash
-  cd ..
-  npm install
-  npm start
 ```
 
 You should be greeted with something like:
@@ -31,16 +41,16 @@ You should be greeted with something like:
 
 ## Usage
 
-To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /logs/{index_name} route. For example:
+To upload an EC result file in elastic-search with ezmesure, you need to POST it on the /api/logs/{index_name} route. For example:
 ```bash
-  curl -v -X POST http://localhost:3000/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
+  curl -v -X POST http://localhost:3000/api/logs/test-index -H "Accept:text/csv" -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv"
 ```
 
-You can then issue a GET request on the /logs route to list your index(es)
+You can then issue a GET request on the /api/logs route to list your index(es)
 ```bash
-  curl -X GET http://localhost:3000/logs
+  curl -X GET http://localhost:3000/api/logs
 ```
-or simply open your brower and navigate to http://localhost:3000/logs to get the same information
+or simply open your brower and navigate to http://localhost:3000/api/logs to get the same information
 
 The last step is accessing the Kibana instance on http://localhost:3000 and building dashboards (soon to be documented).
 
@@ -48,16 +58,20 @@ The last step is accessing the Kibana instance on http://localhost:3000 and buil
 <table>
 <tbody>
   <tr>
-    <td>GET /logs</td>
+    <td>GET /api/logs</td>
     <td>list current indixes</td>
   </tr>
   <tr>
-    <td>POST /logs/:index</td>
+    <td>POST /api/logs/:index</td>
     <td>insert a CSV file into an index</td>
   </tr>
   <tr>
-    <td>DELETE /logs/:index</td>
+    <td>DELETE /api/logs/:index</td>
     <td>delete an index</td>
+  </tr>
+  <tr>
+    <td>GET /login</td>
+    <td>login over shibboleth</td>
   </tr>
 </tbody>
 </table>
