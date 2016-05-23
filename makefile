@@ -5,7 +5,7 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 install: config ## install node dependencies and configure Shibboleth
-	cd ./api && npm install
+	docker run --rm -e http_proxy -e https_proxy -v `pwd`/api:/app -w /app node:4-wheezy npm install --loglevel=warn
 
 config: ## patch shibboleth2.xml config file service provider entityID
 	sed -e "s|{{SHIBBOLETH_SP_URL}}|${SHIBBOLETH_SP_URL}|" \
