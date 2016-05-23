@@ -19,4 +19,5 @@ run-dev: cleanup-docker config ## run ezMESURE for https://ezmesure-preprod.coup
 	. ./dev.env.sh ; docker-compose up -d
 
 cleanup-docker: ## remove docker image (needed for updating it)
+	docker-compose stop
 	docker-compose rm -f
