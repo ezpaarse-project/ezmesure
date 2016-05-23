@@ -1,8 +1,10 @@
 'use strict';
 
 import koa from 'koa';
+import jwt from 'koa-jwt';
 import route from 'koa-route';
 import mount from 'koa-mount';
+import { auth } from 'config';
 
 import login from './login';
 import logs from './logs';
@@ -16,6 +18,7 @@ app.use(route.get('/', function* main() {
   this.body = 'OK';
 }));
 
+app.use(jwt({ secret: auth.secret }));
 
 app.use(mount('/logs', logs));
 
