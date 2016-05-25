@@ -53,6 +53,9 @@ export default {
         },
         "location": {
           "type": "geo_point"
+        },
+        "index_name": {
+          "type": "string"
         }
       }
     }

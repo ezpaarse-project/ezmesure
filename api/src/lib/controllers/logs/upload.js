@@ -57,6 +57,8 @@ function readStream(stream, orgName) {
       while (ec = parser.read()) {
         nbEC++;
 
+        ec.index_name = orgName;
+
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
           ec.location = {
             lat: parseFloat(ec['geoip-latitude']),
