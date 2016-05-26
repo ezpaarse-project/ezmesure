@@ -55,7 +55,8 @@ export default {
           "type": "geo_point"
         },
         "index_name": {
-          "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         }
       }
     }
