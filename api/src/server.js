@@ -86,3 +86,11 @@ server.setTimeout(1000 * 60 * 30);
 
 appLogger.info(`API server listening on port ${config.port}`);
 appLogger.info('Press CTRL+C to stop server');
+
+process.on('SIGINT', closeApp);
+process.on('SIGTERM', closeApp);
+
+function closeApp() {
+  appLogger.info(`Got Signal, closing the server`);
+  server.close(() => { process.exit(0); });
+}
