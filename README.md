@@ -24,9 +24,9 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
 - SHIBBOLETH_SP_URL
 - SHIBBOLETH_DS_URL
 
-3) Install
+3) Configure shibboleth
 ```bash
-  make install
+  make config
 ```
 
 ## Start
