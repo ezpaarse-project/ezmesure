@@ -8,4 +8,4 @@ COPY package.json /usr/src/app/
 RUN npm install
 COPY . /usr/src/app
 
-CMD [ "npm", "start" ]
+ENTRYPOINT [ "node", "./src/index.js" ]
