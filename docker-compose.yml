@@ -3,8 +3,8 @@ services:
   elastic:
     image: elasticsearch:2.3
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - 9200:9200
+      - 9300:9300
     environment:
       - http_proxy
       - https_proxy
@@ -19,7 +19,7 @@ services:
     links:
       - elastic
     ports:
-      - "5601:5601"
+      - 5601:5601
     environment:
       - http_proxy
       - https_proxy
@@ -27,9 +27,13 @@ services:
     restart: always
 
   api:
-    image: node:4-wheezy
+    build:
+      context: ./api
+      args:
+        - http_proxy
+        - https_proxy
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
       - http_proxy
       - https_proxy
@@ -38,10 +42,6 @@ services:
       - NODE_ENV
     links:
       - elastic
-    volumes:
-      - ./api:/app
-    working_dir: /app
-    command: npm start
     restart: always
 
   rp:
