@@ -6,6 +6,7 @@ const bulkSize = 1000;
 
 export default function* upload(orgName) {
   if (!this.request.is('multipart/*')) {
+
     const nbEC = yield readStream(this.req, orgName);
     this.type = 'json';
     this.body = { read: nbEC };
@@ -41,7 +42,7 @@ function readStream(stream, orgName) {
 
   return new Promise((resolve, reject) => {
     parser.on('readable', read);
-    parser.on('error', err => { throw err });
+    parser.on('error', err => { reject(err); });
     parser.on('finish', () => {
       elasticsearch.bulk({ body: buffer }, err => {
         if (err) { return reject(err); }
