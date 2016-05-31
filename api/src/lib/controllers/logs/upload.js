@@ -1,13 +1,23 @@
 import csv from 'csv';
 import parse from 'co-busboy';
+import zlib from 'zlib';
 import elasticsearch from '../../services/elastic';
 
 const bulkSize = 1000;
 
 export default function* upload(orgName) {
   if (!this.request.is('multipart/*')) {
+    const encoding = this.request.headers['content-encoding'];
+    const isGzip   = encoding && encoding.toLowerCase().includes('gzip');
 
-    const nbEC = yield readStream(this.req, orgName);
+    let stream = this.req;
+
+    if (isGzip) {
+      stream = zlib.createGunzip();
+      this.req.pipe(stream);
+    }
+
+    const nbEC = yield readStream(stream, orgName);
     this.type = 'json';
     this.body = { read: nbEC };
     return;
@@ -21,7 +31,16 @@ export default function* upload(orgName) {
   while (part = yield parts) {
     if (part.length) { return; }
 
-    nbEC += yield readStream(part, orgName);
+    const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
+
+    let stream = part;
+
+    if (isGzip) {
+      stream = zlib.createGunzip();
+      part.pipe(stream);
+    }
+
+    nbEC += yield readStream(stream, orgName);
   }
 
   this.type = 'json';
@@ -49,6 +68,7 @@ function readStream(stream, orgName) {
         resolve(nbEC);
       });
     });
+    stream.on('error', err => { reject(err); });
     stream.pipe(parser);
 
     function read() {
