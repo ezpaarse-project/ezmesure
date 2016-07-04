@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Connexion requise</title>
+  </head>
+  <body>
+    <h1>Connextion requise</h1>
+    <p>Vous allez être redirigé vers la page de connexion. Si rien ne se passe, <a id="authlink" href="/login">cliquez ici</a>.</p>
+
+    <script>
+      var redirectUrl = '/login?origin=' + encodeURIComponent(window.location.href);
+      document.getElementById('#authlink').href = window.location.href = redirectUrl;
+    </script>
+  </body>
+</html>

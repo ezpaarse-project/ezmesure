@@ -18,12 +18,27 @@ services:
     image: kibana:4.5
     links:
       - elastic
-    ports:
-      - 5601:5601
     environment:
       - http_proxy
       - https_proxy
       - ELASTICSEARCH_URL=http://elastic:9200
+    restart: always
+
+  jwtproxy:
+    build:
+      context: ./jwt-rp
+      args:
+        - http_proxy
+        - https_proxy
+    ports:
+      - 5601:3030
+    environment:
+      - http_proxy
+      - https_proxy
+      - TARGET_URL=http://kibana:5601
+      - JWT_SECRET=${EZMESURE_AUTH_SECRET}
+    links:
+      - kibana
     restart: always
 
   api:
