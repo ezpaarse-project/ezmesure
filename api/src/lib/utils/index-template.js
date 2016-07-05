@@ -17,7 +17,7 @@ export default {
       "properties": {
         "date": {
           "type": "date",
-	  "format":  "dd/MM/YYYY||dd-MM-YYYY"
+	        "format": "dd/MM/YYYY||dd-MM-YYYY"
         },
         "datetime": {
           "type": "date"
