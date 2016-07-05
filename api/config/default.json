@@ -9,6 +9,7 @@
     "http": { "Console": { "timestamp": true, "colorize": true } }
   },
   "auth": {
-    "secret": "some-secret"
+    "secret": "some-secret",
+    "cookie": "eztoken"
   }
 }

@@ -5,6 +5,7 @@
     "host": "EZMESURE_ELASTIC_HOST"
   },
   "auth": {
-    "secret": "EZMESURE_AUTH_SECRET"
+    "secret": "EZMESURE_AUTH_SECRET",
+    "cookie": "EZMESURE_AUTH_COOKIE"
   }
 }
