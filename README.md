@@ -23,6 +23,7 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
 - APPLI_APACHE_LOGLEVEL
 - SHIBBOLETH_SP_URL
 - SHIBBOLETH_DS_URL
+- EZMESURE_AUTH_SECRET
 
 3) Configure shibboleth
 ```bash
@@ -43,7 +44,7 @@ You should be greeted with something like:
 
 ### Get and use your token
 
-You will need a token in order to use the API. Start by browsing https://localhost/login and log in with your identity provider. Once logged, you should get a JSON with your token.
+You will need a token in order to use the API and Kibana. Start by browsing https://localhost/login and log in with your identity provider. Once logged, a cookie will be stored so that you can browse kibana right away. Browse https://localhost/api/auth/token to get a token that you can use with the API.
 
 To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
 
@@ -79,8 +80,16 @@ Now you can access the Kibana instance on https://localhost and start building d
     <td>delete an index</td>
   </tr>
   <tr>
-    <td>GET /login</td>
-    <td>login over shibboleth</td>
+  <td>GET /login</td>
+  <td>login over shibboleth</td>
+  </tr>
+  <tr>
+    <td>GET /api/auth</td>
+    <td>get the profile associated with a token</td>
+  </tr>
+  <tr>
+    <td>GET /api/auth/token</td>
+    <td>get a token</td>
   </tr>
 </tbody>
 </table>
