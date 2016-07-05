@@ -33,6 +33,7 @@ const server = http.createServer((req, res) => {
 
   if (!token) {
     res.statusCode = 401;
+    res.setHeader('Content-Type', 'text/html');
     return res.end(redirectPage);
   }
 
@@ -42,6 +43,7 @@ const server = http.createServer((req, res) => {
       case 'TokenExpiredError':
       case 'JsonWebTokenError':
         res.statusCode = 401;
+        res.setHeader('Content-Type', 'text/html');
         res.end(redirectPage);
       default:
         res.statusCode = 500;
