@@ -11,7 +11,7 @@ services:
     volumes:
       - "./data/elastic/log:/usr/share/elasticsearch/log"
       - "./data/elastic/data:/usr/share/elasticsearch/data"
-    command: --cluster.name="ezCluster"
+    command: --cluster.name="ezCluster" --script.inline=true
     restart: always
 
   kibana:

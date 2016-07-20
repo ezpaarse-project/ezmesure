@@ -1,6 +1,20 @@
 export default {
   "template": "*",
   "mappings": {
+    "meta": {
+      "dynamic_templates": [
+        {
+          "strings": {
+            "match": "*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+      ]
+    },
     "event": {
       "dynamic_templates": [
         {
