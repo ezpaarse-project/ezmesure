@@ -5,7 +5,10 @@ import co from 'co';
 export default { check, register, load, list, remove }
 
 /**
- * Apply all providers
+ * Find all providers and apply them
+ * @return {Promise} return an object with a number of update by index, and eventually a message
+ *                   ex: { updated: { "some-index": 1000 } }
+ *                   ex: { updated: {}, message: "no meta provider" }
  */
 function check() {
   return co(function* () {
@@ -23,12 +26,11 @@ function check() {
       const index  = providers[i]._index;
       const config = providers[i]._source;
 
-      const aggregations = yield aggregate(
+      const { buckets } = yield aggregate(
         config.target.index,
         config.target.field,
         config.condition
       );
-      const buckets = aggregations && aggregations.agg && aggregations.agg.buckets;
 
       response.updated[config.target.index] = 0;
 
@@ -52,18 +54,16 @@ function check() {
 
     return response;
   });
-  // .then(() => {
-  //   setTimeout(check, 600000);
-  // }).catch(err => {
-  //   console.error(err);
-  //   setTimeout(check, 600000);
-  // });
 }
 
+/**
+ * Update all documents matching a search
+ * @param  {String} index  the index pattern for the search
+ * @param  {Object} search the search query
+ * @param  {Object} doc    the document used for the update
+ * @return {Promise}       raw reponse of an ES update by query
+ */
 function update(index, search, doc) {
-  const query = { term: {} };
-  query.term[search.key] = search.value;
-
   let script = '';
 
   for (const p in doc) {
@@ -75,7 +75,9 @@ function update(index, search, doc) {
     "type": "event",
     "body": {
       "conflicts": "proceed",
-      "query": query,
+      "query": {
+        "term": { [search.key]: search.value }
+      },
       "script" : {
         "lang": "groovy",
         "inline": script,
@@ -85,20 +87,34 @@ function update(index, search, doc) {
   });
 }
 
+/**
+ * Search documents with a specific key matching a value
+ * @param  {String} index the index to search
+ * @param  {String} key   the key to search
+ * @param  {String} value the value that the key must match
+ * @return {Promise}      return the documents matching the query
+ */
 function search(index, key, value) {
-  const query = { term: {} };
-  query.term[key] = value;
-
   return elastic.search({
     "index": index,
     "type": "meta",
     "body": {
       "size": 1,
-      "query": query
+      "query": {
+        "term": { [key]: value }
+      }
     }
   }).then(response => response.hits.hits[0]);
 }
 
+/**
+ * Get documents aggregated by a specific field
+ * @param  {String} index     the index to search
+ * @param  {String} aggField  the field that should be aggregated
+ * @param  {String} condition field name, documents with it won't be aggregated
+ * @return {Promise}          return the 'aggregations' field from the
+ *                            raw response of an ES aggregation query
+ */
 function aggregate(index, aggField, condition) {
   return elastic.search({
     "index": index,
@@ -121,19 +137,19 @@ function aggregate(index, aggField, condition) {
         }
       }
     }
-  }).then(response => response.aggregations);
+  }).then(response => response.aggregations.agg);
 }
 
 /**
  * Register a meta provider
- * @param  {Object} options  name       used to name the index
- *                           key        key field used for the matching
+ * @param  {String} providerName  used to name the index
+ * @param  {Object} options  key        key field used for the matching
  *                           condition  field name, no enrichment if it exists
  *                           target     index pattern that will be enriched
  *                           field      field to use for key matching
  */
-function register(options) {
-  const indexName = `.meta-${options.name}`;
+function register(providerName, options) {
+  const indexName = `.meta-${providerName}`;
 
   if (indexName.includes('*')) { throw new Error('* not allowed in name'); }
 
@@ -155,6 +171,12 @@ function register(options) {
   });
 }
 
+/**
+ * Load data in a meta provider
+ * @param  {String} providerName
+ * @param  {Array<Object>} data  objects used as metadata
+ * @return {Promise} raw response of an ES bulk query
+ */
 function load(providerName, data) {
   const indexName = `.meta-${providerName}`;
 
@@ -169,13 +191,23 @@ function load(providerName, data) {
   return elastic.bulk({ body });
 }
 
-function list() {
+/**
+ * Get all config documents from providers
+ * @param  {String} providerName  (optional) provider name
+ * @return {Promise} raw response of an ES search query
+ */
+function list(providerName) {
   return elastic.search({
-    "index": ".meta-*",
+    "index": `.meta-${providerName || '*'}`,
     "type": "config"
   });
 }
 
+/**
+ * Delete a provider index
+ * @param  {String} providerName
+ * @return {Promise} raw response of an ES delete query
+ */
 function remove(providerName) {
   const indexName = `.meta-${providerName}`;
 

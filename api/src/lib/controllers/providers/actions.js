@@ -10,6 +10,11 @@ export function* list() {
   this.body = yield providers.list();
 };
 
+export function* find(providerName) {
+  this.type = 'json';
+  this.body = yield providers.list(providerName);
+};
+
 export function* del(providerName) {
   this.type = 'json';
   this.body = yield providers.remove(providerName);
@@ -29,7 +34,7 @@ export function* register(providerName) {
   }
 
   options.name = providerName;
-  this.body    = yield providers.register(options);
+  this.body    = yield providers.register(providerName, options);
 }
 
 export function* load(providerName) {
