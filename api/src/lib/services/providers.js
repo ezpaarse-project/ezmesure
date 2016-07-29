@@ -37,7 +37,7 @@ function check() {
       if (!buckets) { continue; }
 
       for (const j in buckets) {
-        const bucket = buckets[j];
+        const bucket   = buckets[j];
         const metadata = yield search(index, config.key, bucket.key);
 
         if (!metadata || !metadata._source) { continue; }
@@ -132,7 +132,7 @@ function aggregate(index, aggField, condition) {
         "agg": {
           "terms": {
             "field": aggField,
-            "size": 50
+            "size": 100
           }
         }
       }
