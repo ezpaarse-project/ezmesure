@@ -29,7 +29,7 @@ export default function* upload(orgName) {
   const parts = parse(this);
 
   while (part = yield parts) {
-    if (part.length) { return; }
+    if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
 
