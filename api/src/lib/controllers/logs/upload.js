@@ -3,7 +3,7 @@ import parse from 'co-busboy';
 import zlib from 'zlib';
 import elasticsearch from '../../services/elastic';
 
-const bulkSize = 1000;
+const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
 export default function* upload(orgName) {
   if (!this.request.is('multipart/*')) {
