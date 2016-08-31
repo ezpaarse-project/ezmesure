@@ -14,7 +14,7 @@ services:
       - http_proxy
       - https_proxy
     volumes:
-      - "./data/elastic/log:/usr/share/elasticsearch/log"
+      - "./data/elastic/logs:/usr/share/elasticsearch/logs"
       - "./data/elastic/data:/usr/share/elasticsearch/data"
     command: --cluster.name="ezCluster" --script.inline=true
     restart: always
