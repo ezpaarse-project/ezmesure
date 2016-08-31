@@ -2,6 +2,11 @@ version: '2'
 services:
   elastic:
     image: elasticsearch:2.3
+    build:
+      context: ./elasticsearch
+      args:
+        - http_proxy
+        - https_proxy
     ports:
       - 9200:9200
       - 9300:9300
@@ -66,7 +71,7 @@ services:
         - http_proxy
         - https_proxy
     ports:
-      - 443:443
+      - 8443:443
     environment:
       - http_proxy
       - https_proxy
