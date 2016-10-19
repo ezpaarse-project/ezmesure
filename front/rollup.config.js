@@ -33,6 +33,9 @@ const plugins = [
 const config = {
   entry: './src/app.js',
   dest: './public/assets/js/app.js',
+  format: 'iife',
+  moduleName: 'AppBundle',
+  useStrict: false,
   sourceMap: true,
   plugins: plugins
 }
