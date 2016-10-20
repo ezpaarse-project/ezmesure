@@ -36,16 +36,13 @@
 <script>
   import auth from '../auth'
 
+  auth.checkAuth();
+
   export default {
     data() {
       return {
         auth,
         redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`
-      }
-    },
-    methods: {
-      checkAuth() {
-        auth.checkAuth(this)
       }
     }
   }
