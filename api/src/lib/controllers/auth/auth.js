@@ -5,6 +5,7 @@ export function* renaterLogin() {
   const headers = this.request.header;
 
   const user = {
+    idp: headers['shib-identity-provider'],
     uid: headers.uid,
     username: headers.displayname,
     mail: headers.mail,
