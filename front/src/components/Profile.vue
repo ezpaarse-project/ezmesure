@@ -22,7 +22,6 @@
           <label for="org">Organization</label>
           <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organization">
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
       </form>
     </div>
 
