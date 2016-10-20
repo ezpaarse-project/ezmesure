@@ -7,10 +7,10 @@
     </div>
     <ul class="nav navbar-nav">
       <router-link tag="li" to="/" exact>
-        <a>Home</a>
+        <a>Accueil</a>
       </router-link>
       <router-link tag="li" to="/profile" exact>
-        <a>Profile</a>
+        <a>Profil</a>
       </router-link>
     </ul>
   </nav>

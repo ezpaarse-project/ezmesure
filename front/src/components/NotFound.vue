@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1 class="page-header">Not found...</h1>
-    <p class="lead">Sorry :(</p>
+    <h1 class="page-header">Page introuvable...</h1>
+    <p class="lead">Désolé :(</p>
   </div>
 </template>
 
