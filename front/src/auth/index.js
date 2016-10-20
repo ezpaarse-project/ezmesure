@@ -24,7 +24,7 @@ export default {
         this.user = data;
       })
     }, err => {
-      context.authError = err
+      // context.authError = err
       this.user = null;
     })
   },

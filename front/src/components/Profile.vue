@@ -22,7 +22,6 @@
           <label for="org">Organization</label>
           <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organization">
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
       </form>
     </div>
 
@@ -30,6 +29,8 @@
       <p>You are <strong>not</strong> authenticated.</p>
       <a v-bind:href="redirectUrl">Sign in</a>
     </div>
+
+    <button v-on:click="checkAuth">Check auth</button>
   </div>
 </template>
 
@@ -43,6 +44,11 @@
       return {
         auth,
         redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`
+      }
+    },
+    methods: {
+      checkAuth() {
+        auth.checkAuth()
       }
     }
   }
