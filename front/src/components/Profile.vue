@@ -29,26 +29,17 @@
       <p>You are <strong>not</strong> authenticated.</p>
       <a v-bind:href="redirectUrl">Sign in</a>
     </div>
-
-    <button v-on:click="checkAuth">Check auth</button>
   </div>
 </template>
 
 <script>
   import auth from '../auth'
 
-  auth.checkAuth();
-
   export default {
     data() {
       return {
         auth,
         redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`
-      }
-    },
-    methods: {
-      checkAuth() {
-        auth.checkAuth()
       }
     }
   }

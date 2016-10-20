@@ -12,6 +12,11 @@ Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.component('navigation', Navigation)
 
+export var http = Vue.http
+
+import auth from './auth'
+auth.checkAuth()
+
 const routes = [
   { path: '/', component: Home },
   { path: '/profile', component: Profile },
@@ -30,5 +35,3 @@ new Vue({
   router,
   render: h => h(App)
 })
-
-export var http = Vue.http

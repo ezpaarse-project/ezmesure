@@ -1,4 +1,4 @@
-import { router, http } from '../app'
+import { http } from '../app'
 
 const PROFILE_URL = '/api/auth'
 const TOKEN_URL   = '/api/auth/token'
@@ -7,12 +7,6 @@ export default {
 
   authenticated: false,
   user: null,
-
-  logout() {
-    localStorage.removeItem('token')
-    this.authenticated = false
-    this.user = null
-  },
 
   checkAuth() {
     // this.authenticated = !!localStorage.getItem('token')
@@ -27,6 +21,12 @@ export default {
       // context.authError = err
       this.user = null;
     })
+  },
+
+  logout() {
+    localStorage.removeItem('token')
+    this.authenticated = false
+    this.user = null
   },
 
   getAuthHeader() {
