@@ -30,6 +30,8 @@
       <p>You are <strong>not</strong> authenticated.</p>
       <a v-bind:href="redirectUrl">Sign in</a>
     </div>
+
+    <button v-on:click="checkAuth">Check auth</button>
   </div>
 </template>
 
@@ -45,7 +47,7 @@
     },
     methods: {
       checkAuth() {
-        auth.checkAuth(this)
+        auth.checkAuth()
       }
     }
   }

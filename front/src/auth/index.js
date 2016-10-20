@@ -14,7 +14,7 @@ export default {
     this.user = null
   },
 
-  checkAuth(context) {
+  checkAuth() {
     // this.authenticated = !!localStorage.getItem('token')
 
     http.get(PROFILE_URL).then(response => {
@@ -24,7 +24,7 @@ export default {
         this.user = data;
       })
     }, err => {
-      context.authError = err
+      // context.authError = err
       this.user = null;
     })
   },
