@@ -9,8 +9,8 @@
       <router-link tag="li" to="/" exact>
         <a>Home</a>
       </router-link>
-      <router-link tag="li" to="/register" exact>
-        <a>Register</a>
+      <router-link tag="li" to="/profile" exact>
+        <a>Profile</a>
       </router-link>
     </ul>
   </nav>
