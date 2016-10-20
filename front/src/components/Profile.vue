@@ -30,8 +30,6 @@
       <p>You are <strong>not</strong> authenticated.</p>
       <a v-bind:href="redirectUrl">Sign in</a>
     </div>
-
-    <button v-on:click="checkAuth()">pouet</button>
   </div>
 </template>
 
