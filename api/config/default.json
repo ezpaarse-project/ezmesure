@@ -1,5 +1,10 @@
 {
   "port": 3000,
+  "mongo": {
+    "port": 27017,
+    "host": "localhost",
+    "db": "ezmesure"
+  },
   "elasticsearch": {
     "port": 9200,
     "host": "localhost"

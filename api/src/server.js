@@ -11,6 +11,7 @@ import config from 'config';
 
 import logger from './lib/services/logger';
 import elasticsearch from './lib/services/elastic';
+import mongo from './lib/services/mongo';
 import controller from './lib/controllers';
 
 const appLogger  = logger(config.get('logs.app'));
@@ -81,6 +82,15 @@ app.on('error', (err, ctx = {}) => {
 
 app.use(mount('/', controller));
 
+const mongoCfg = config.get('mongo');
+
+mongo.connect(`mongodb://${mongoCfg.host}:${mongoCfg.port}/${mongoCfg.db}`, err => {
+  if (err) {
+    appLogger.error('Couldn\'t connect to Mongodb');
+    process.exit(1);
+  }
+});
+
 const server = app.listen(config.port);
 server.setTimeout(1000 * 60 * 30);
 
@@ -92,5 +102,10 @@ process.on('SIGTERM', closeApp);
 
 function closeApp() {
   appLogger.info(`Got Signal, closing the server`);
-  server.close(() => { process.exit(0); });
+  server.close(() => {
+    mongo.disconnect(() => {
+      process.exit(0);
+    });
+  });
 }
+

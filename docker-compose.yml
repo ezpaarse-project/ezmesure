@@ -46,6 +46,13 @@ services:
       - kibana
     restart: unless-stopped
 
+  mongodb:
+    image: mongo:3.3.15
+    volumes:
+      - "./data/mongo:/data/db"
+    command: --smallfiles
+    restart: unless-stopped
+
   api:
     build:
       context: ./api
@@ -58,11 +65,12 @@ services:
       - http_proxy
       - https_proxy
       - EZMESURE_ELASTIC_HOST=elastic
-      - EZMESURE_MONGO_HOST=mongo
+      - EZMESURE_MONGO_HOST=mongodb
       - EZMESURE_AUTH_SECRET
       - NODE_ENV
     links:
       - elastic
+      - mongodb
     restart: unless-stopped
 
   front:
@@ -74,7 +82,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - EZMESURE_API_HOST=api
+      - EZMESURE_API_URL=/api
     restart: unless-stopped
 
   rp:
