@@ -11,8 +11,8 @@
           <input v-model="auth.user.idp" type="text" class="form-control" id="idp" placeholder="IDP" readonly>
         </div>
         <div class="form-group">
-          <label for="username">Nom</label>
-          <input v-model="auth.user.username" type="text" class="form-control" id="username" placeholder="Nom">
+          <label for="name">Nom</label>
+          <input v-model="auth.user.name" type="text" class="form-control" id="name" placeholder="Nom">
         </div>
         <div class="form-group">
           <label for="email">Email</label>
@@ -21,6 +21,10 @@
         <div class="form-group">
           <label for="org">Organisation</label>
           <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organisation">
+        </div>
+        <div class="form-group">
+          <label for="unit">Unité</label>
+          <input v-model="auth.user.unit" type="text" class="form-control" id="unit" placeholder="Unité">
         </div>
       </form>
     </div>
