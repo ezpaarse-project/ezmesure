@@ -27,6 +27,10 @@
           <input v-model="auth.user.unit" type="text" class="form-control" id="unit" placeholder="Unité">
         </div>
       </form>
+
+      <h2>Token</h2>
+      <p>Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes : <code>Authorization: Bearer {insérez le token ici}</code></p>
+      <textarea class="form-control" rows="3" v-model="auth.token" placeholder="Token" readonly></textarea>
     </div>
 
     <div v-else>
