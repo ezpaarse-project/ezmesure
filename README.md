@@ -47,7 +47,7 @@ You should be greeted with something like:
 
 ### Get and use your token
 
-You will need a token in order to use the API and Kibana. Start by browsing https://localhost/login and log in with your identity provider. Once logged, a cookie will be stored so that you can browse kibana right away. Browse https://localhost/api/auth/token to get a token that you can use with the API.
+You will need a token in order to use the API and Kibana. Start by browsing the profile page at https://localhost/front/#/profile and log in with your identity provider. Once logged, your token will appear and a cookie will be stored so that you can browse kibana right away.
 
 To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
 
@@ -67,7 +67,7 @@ You can then issue a GET request on the /api/logs route to list your index(es)
 
 Now you can access the Kibana instance on https://localhost and start building dashboards (soon to be documented).
 
-## Routes
+## API routes
 <table>
 <tbody>
   <tr>
@@ -83,15 +83,15 @@ Now you can access the Kibana instance on https://localhost and start building d
     <td>delete an index</td>
   </tr>
   <tr>
-  <td>GET /login</td>
-  <td>login over shibboleth</td>
+    <td>GET /login</td>
+    <td>login over shibboleth</td>
   </tr>
   <tr>
-    <td>GET /api/auth</td>
+    <td>GET /api/profile</td>
     <td>get the profile associated with a token</td>
   </tr>
   <tr>
-    <td>GET /api/auth/token</td>
+    <td>GET /api/profile/token</td>
     <td>get a token</td>
   </tr>
 </tbody>
