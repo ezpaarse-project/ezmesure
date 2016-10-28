@@ -1,5 +1,8 @@
 # ezmesure
 
+Platform aggregating suscribed electronic ressources usage statistics of the French reasearcher organizations.
+https://ezmesure.couperin.org
+
 ## Prerequisite
 A recent version of NodeJS and npm should be installed.
 See the [official documentation](https://nodejs.org/en/download/package-manager/).
