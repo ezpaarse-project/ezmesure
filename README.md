@@ -17,7 +17,7 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
 
 ### Configuration
 
-1) Put the private key (``server.key``) and the certificate (``server.crt``) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.
+1) Put the private key (``server.key``) and the certificate (``server.crt``) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
 **NB**: the private key is critical and should not be shared.
 
 2) Set the following environment variables :
