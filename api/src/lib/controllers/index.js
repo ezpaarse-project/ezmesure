@@ -22,7 +22,7 @@ app.use(route.get('/', function* main() {
 
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
 
-app.use(mount('/auth', authorize));
+app.use(mount('/profile', authorize));
 app.use(mount('/logs', logs));
 app.use(mount('/providers', providers));
 

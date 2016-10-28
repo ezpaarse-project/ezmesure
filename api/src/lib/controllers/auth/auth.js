@@ -33,7 +33,7 @@ export function* renaterLogin() {
     }
   }
 
-  this.cookies.set('eztoken', jwt.sign(user, auth.secret), { httpOnly: true });
+  this.cookies.set('eztoken', generateToken(user), { httpOnly: true });
   this.redirect(decodeURIComponent(this.query.origin || '/'));
 };
 
@@ -48,9 +48,9 @@ export function* getUser() {
   this.body   = user;
 };
 
-export function* generateToken() {
+export function* getToken() {
   this.status = 200;
-  this.body   = jwt.sign(this.state.user, auth.secret);
+  this.body   = generateToken(this.state.user);
 };
 
 function findUser(props) {
@@ -75,4 +75,11 @@ function findUser(props) {
   }
 
   return mongo.db.collection('users').findOne(query);
+}
+
+function generateToken(user) {
+  if (!user) { return null; }
+
+  const { _id, name, mail } = user;
+  return jwt.sign({ _id, name, mail }, auth.secret);
 }

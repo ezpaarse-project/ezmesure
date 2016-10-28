@@ -1,11 +1,11 @@
 import koa from 'koa';
 import route from 'koa-route';
 
-import { generateToken, getUser } from './auth';
+import { getToken, getUser } from './auth';
 
 const app = koa();
 
 app.use(route.get('/', getUser));
-app.use(route.get('/token', generateToken));
+app.use(route.get('/token', getToken));
 
 export default app;
