@@ -58,8 +58,13 @@ function findUser(props) {
 
   const query = { $or: [] };
 
-  if (_id)          { query.$or.push({ _id }); }
-  if (persistentId) { query.$or.push({ persistentId }); }
+  if (_id && mongo.ObjectID.isValid(_id)) {
+    query.$or.push({ _id: mongo.ObjectID(_id) });
+  }
+
+  if (persistentId) {
+    query.$or.push({ persistentId });
+  }
 
   if (idp) {
     const ids = [];

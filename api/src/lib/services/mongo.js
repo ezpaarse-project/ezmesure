@@ -1,7 +1,7 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectID } from 'mongodb';
 import config from 'config';
 
-const mongo = {};
+const mongo = { ObjectID };
 
 mongo.connect = function (url, callback) {
   if (mongo.db) { return callback(null, mongo.db); }
