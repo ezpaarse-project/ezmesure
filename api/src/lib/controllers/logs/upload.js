@@ -57,7 +57,11 @@ function readStream(stream, orgName) {
   let nbEC = 0;
   let busy = false;
 
-  const parser = csv.parse({ delimiter: ';', columns: true });
+  const parser = csv.parse({
+    'delimiter': ';',
+    'columns': true,
+    'relax_column_count': true
+  });
 
   return new Promise((resolve, reject) => {
     parser.on('readable', read);
