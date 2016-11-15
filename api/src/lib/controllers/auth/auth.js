@@ -24,6 +24,8 @@ export function* renaterLogin() {
   let user = yield findUser(props);
 
   if (!user) {
+    props.createdAt = props.updatedAt = new Date();
+
     const result = yield mongo.db.collection('users').insert(props);
 
     user = result && result.ops && result.ops[0];
