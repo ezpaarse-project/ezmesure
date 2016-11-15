@@ -17,13 +17,13 @@ export default function* upload(orgName) {
       this.req.pipe(stream);
     }
 
-    const nbEC = yield readStream(stream, orgName);
     this.type = 'json';
-    this.body = { read: nbEC };
-    return;
+    return this.body = yield readStream(stream, orgName);
   }
 
-  let nbEC = 0;
+  let inserted = 0;
+  let failed   = 0;
+  let errors   = [];
   let part;
 
   const parts = parse(this);
@@ -40,11 +40,18 @@ export default function* upload(orgName) {
       part.pipe(stream);
     }
 
-    nbEC += yield readStream(stream, orgName);
+    const result = yield readStream(stream, orgName);
+
+    inserted += result.inserted;
+    failed   += result.failed;
+
+    if (errors.length < 10) {
+      errors = errors.concat(result.errors.splice(0, 10 - errors.length));
+    }
   }
 
   this.type = 'json';
-  this.body = { read: nbEC };
+  this.body = { inserted, failed, errors };
 };
 
 /**
@@ -54,7 +61,11 @@ export default function* upload(orgName) {
  */
 function readStream(stream, orgName) {
   const buffer = [];
-  let nbEC = 0;
+  const result = {
+    inserted: 0,
+    failed: 0,
+    errors: []
+  };
   let busy = false;
 
   const parser = csv.parse({
@@ -67,10 +78,10 @@ function readStream(stream, orgName) {
     parser.on('readable', read);
     parser.on('error', err => { reject(err); });
     parser.on('finish', () => {
-      elasticsearch.bulk({ body: buffer }, err => {
+      bulkInsert(err => {
         if (err) { return reject(err); }
-        resolve(nbEC);
-      });
+        resolve(result);
+      }, true);
     });
     stream.on('error', err => { reject(err); });
     stream.pipe(parser);
@@ -80,8 +91,6 @@ function readStream(stream, orgName) {
 
       let ec;
       while (ec = parser.read()) {
-        nbEC++;
-
         ec.index_name = orgName;
 
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
@@ -111,11 +120,25 @@ function readStream(stream, orgName) {
       });
     }
 
-    function bulkInsert(callback) {
-      if (buffer.length < bulkSize) { return callback(); }
+    function bulkInsert(callback, flush) {
+      if (buffer.length < bulkSize && !(flush && buffer.length > 0)) {
+        return callback();
+      }
 
-      elasticsearch.bulk({ body: buffer.splice(0, bulkSize) }, err => {
+      elasticsearch.bulk({ body: buffer.splice(0, bulkSize) }, (err, resp) => {
         if (err) { return callback(err); }
+
+        (resp.items || []).forEach(i => {
+          if (!i.create) { return result.failed++; }
+          if (!i.create.error) { return result.inserted++; }
+
+          if (result.errors.length < 10) {
+            result.errors.push(i.create.error);
+          }
+
+          result.failed++;
+        });
+
         bulkInsert(callback);
       });
     }
