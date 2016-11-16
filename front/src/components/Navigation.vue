@@ -12,6 +12,9 @@
       <router-link tag="li" to="/profile" exact>
         <a>Profil</a>
       </router-link>
+      <li>
+        <a href="/kibana/">Tableaux de bord</a>
+      </li>
     </ul>
   </nav>
 </template>
