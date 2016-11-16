@@ -1,7 +1,6 @@
 version: '2'
 services:
   elastic:
-    image: elasticsearch:2.3
     build:
       context: ./elasticsearch
       args:
@@ -27,6 +26,7 @@ services:
       - http_proxy
       - https_proxy
       - ELASTICSEARCH_URL=http://elastic:9200
+    command: --server.basePath="/kibana"
     restart: unless-stopped
 
   jwtproxy:
