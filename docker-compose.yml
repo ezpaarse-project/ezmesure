@@ -19,7 +19,11 @@ services:
     restart: unless-stopped
 
   kibana:
-    image: kibana:4.5
+    build:
+      context: ./elasticsearch
+      args:
+        - http_proxy
+        - https_proxy
     links:
       - elastic
     environment:
