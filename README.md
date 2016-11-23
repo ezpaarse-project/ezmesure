@@ -76,6 +76,12 @@ Now you can access the Kibana instance on https://localhost and start building d
 
 ### Authentication
 <table>
+<thead>
+  <tr>
+    <th>URL</th>
+    <th>Action</th>
+  </tr>
+</thead>
 <tbody>
   <tr>
     <td>GET /login</td>
@@ -94,6 +100,12 @@ Now you can access the Kibana instance on https://localhost and start building d
 
 ### Logs
 <table>
+<thead>
+  <tr>
+    <th>URL</th>
+    <th>Action</th>
+  </tr>
+</thead>
 <tbody>
   <tr>
     <td>GET /api/logs</td>
