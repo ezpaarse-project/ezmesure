@@ -33,6 +33,11 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
   make config
 ```
 
+4) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
+```
+127.0.0.1 ezmesure-preprod.couperin.org
+```
+
 ## Start
 ```bash
   docker-compose up -d
