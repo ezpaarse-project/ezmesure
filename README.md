@@ -143,6 +143,11 @@ Now you can access the Kibana instance on https://localhost and start building d
     <td></td>
   </tr>
   <tr>
+    <td>DELETE /api/providers/:providerName</td>
+    <td>Delete a provider</td>
+    <td></td>
+  </tr>
+  <tr>
     <td>PUT /api/providers/:providerName</td>
     <td>Create a data provider</td>
     <td> JSON
