@@ -147,10 +147,10 @@ Now you can access the Kibana instance on https://localhost and start building d
     <td>Create a data provider</td>
     <td> JSON
       <ul>
-        <li>`target`: the index that should be enriched</li>
-        <li>`field`: the field of the index used for matching</li>
-        <li>`key`: the field of the enrichment data used for matching</li>
-        <li>`condition`: the field of the index that will be used to consider each line enriched</li>
+      <li><strong>target</strong>: the index that should be enriched</li>
+        <li><strong>field</strong>: the field of the index used for matching</li>
+        <li><strong>key</strong>: the field of the enrichment data used for matching</li>
+        <li><strong>condition</strong>: the field of the index that will be used to consider each line enriched</li>
       </ul>
     </td>
   </tr>
