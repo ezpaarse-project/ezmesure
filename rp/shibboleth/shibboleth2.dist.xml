@@ -123,6 +123,13 @@
         -->
         <MetadataProvider type="Chaining">
 
+
+            <!-- Metadonnées de la fédération RENATER apres le 5/12/16 -->
+	    <MetadataProvider type="XML" uri="https://metadata.federation.renater.fr/renater/main/main-idps-renater-metadata.xml"
+                backingFilePath="main-idps-renater-metadata.xml" reloadInterval="3600">
+              <MetadataFilter type="Signature" certificate="renater-metadata-signing-cert-2016.pem"/>
+            </MetadataProvider>
+
             <!-- Metadonnées de la fédération RENATER -->
             <MetadataProvider type="XML" uri="http://federation.renater.fr/renater/idps-renater-metadata.xml"
                   backingFilePath="idps-renater-metadata.xml" reloadInterval="3600" id="idps-renater">
