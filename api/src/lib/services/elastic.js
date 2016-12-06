@@ -3,7 +3,8 @@ import config from 'config';
 import template from '../utils/index-template';
 
 const elastic = new elasticsearch.Client({
-  host: `${config.get('elasticsearch.host')}:${config.get('elasticsearch.port')}`
+  host: `${config.get('elasticsearch.host')}:${config.get('elasticsearch.port')}`,
+  httpAuth: 'elastic:changeme'
 });
 
 elastic.indices.putTemplate({
