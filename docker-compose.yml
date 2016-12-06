@@ -12,15 +12,15 @@ services:
     environment:
       - http_proxy
       - https_proxy
+      - cluster.name="ezCluster"
+      - script.inline=true
     volumes:
-      - "./data/elastic/logs:/usr/share/elasticsearch/logs"
       - "./data/elastic/data:/usr/share/elasticsearch/data"
-    command: --cluster.name="ezCluster" --script.inline=true
     restart: unless-stopped
 
   kibana:
     build:
-      context: ./elasticsearch
+      context: ./kibana
       args:
         - http_proxy
         - https_proxy
@@ -30,7 +30,8 @@ services:
       - http_proxy
       - https_proxy
       - ELASTICSEARCH_URL=http://elastic:9200
-    command: --server.basePath="/kibana"
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
 
   jwtproxy:
