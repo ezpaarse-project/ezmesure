@@ -14,7 +14,7 @@ import elasticsearch from './lib/services/elastic';
 import mongo from './lib/services/mongo';
 import controller from './lib/controllers';
 
-const appLogger  = logger(config.get('logs.app'));
+export const appLogger = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
 
 const app = koa();
@@ -108,4 +108,3 @@ function closeApp() {
     });
   });
 }
-

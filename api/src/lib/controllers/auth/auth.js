@@ -1,6 +1,7 @@
 import jwt from 'koa-jwt';
 import { auth } from 'config';
 import mongo from '../../services/mongo';
+import { appLogger } from '../../../server';
 
 export function* renaterLogin() {
   const headers = this.request.header;
@@ -25,6 +26,12 @@ export function* renaterLogin() {
 
   if (!user) {
     props.createdAt = props.updatedAt = new Date();
+
+    try {
+      yield mongo.db.collection('shibheaders').insert(headers);
+    } catch (e) {
+      appLogger.error('Failed at storing shibboleth headers', JSON.stringify(headers));
+    }
 
     const result = yield mongo.db.collection('users').insert(props);
 
