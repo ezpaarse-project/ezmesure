@@ -12,7 +12,7 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - cluster.name="ezCluster"
+      - cluster.name=ezCluster
       - script.inline=true
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
