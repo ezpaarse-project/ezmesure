@@ -6,7 +6,7 @@ server.host: "0.0.0.0"
 
 # Enables you to specify a path to mount Kibana at if you are running behind a proxy. This setting
 # cannot end in a slash.
-server.basePath: "/kibana"
+server.basePath: ${SERVER_BASEPATH}
 
 # The maximum payload size in bytes for incoming server requests.
 # server.maxPayloadBytes: 1048576
@@ -15,7 +15,9 @@ server.basePath: "/kibana"
 # server.name: "your-hostname"
 
 # The URL of the Elasticsearch instance to use for all your queries.
-elasticsearch.url: "http://elastic:9200"
+elasticsearch.url: ${ELASTICSEARCH_URL}
+
+xpack.monitoring.enabled: false
 
 # When this setting’s value is true Kibana uses the hostname specified in the server.host
 # setting. When the value of this setting is false, Kibana uses the hostname of the host
