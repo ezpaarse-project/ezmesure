@@ -19,6 +19,11 @@ elasticsearch.url: ${ELASTICSEARCH_URL}
 
 xpack.monitoring.enabled: false
 
+# Required to keep sessions when kibana restarts
+xpack.security.encryptionKey: "e558e233df22145278e760c7b26ea9e9c9f72102"
+# Required to prevent pending reports from failing when kibana restarts
+xpack.reporting.encryptionKey: "e558e233df22145278e760c7b26ea9e9c9f72102"
+
 # When this setting’s value is true Kibana uses the hostname specified in the server.host
 # setting. When the value of this setting is false, Kibana uses the hostname of the host
 # that connects to this Kibana instance.
