@@ -1,4 +1,4 @@
-FROM docker.elastic.co/kibana/kibana:5.0.1
+FROM docker.elastic.co/kibana/kibana:5.1.1
 
 USER root
 RUN chown -R kibana:kibana /usr/share/kibana
