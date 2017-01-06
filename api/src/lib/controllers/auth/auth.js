@@ -3,15 +3,21 @@ import { auth } from 'config';
 import mongo from '../../services/mongo';
 import { appLogger } from '../../../server';
 
+function decode(value) {
+  if (typeof value !== 'string') { return value; }
+
+  return Buffer.from(value, 'binary').toString('utf8');
+}
+
 export function* renaterLogin() {
   const headers = this.request.header;
   const props   = {
     idp:          headers['shib-identity-provider'],
     uid:          headers.uid,
-    name:         headers.displayname || headers.cn || headers.givenname,
-    mail:         headers.mail,
-    org:          headers.o,
-    unit:         headers.ou,
+    name:         decode(headers.displayname || headers.cn || headers.givenname),
+    mail:         decode(headers.mail),
+    org:          decode(headers.o),
+    unit:         decode(headers.ou),
     eppn:         headers.eppn,
     remoteUser:   headers.remote_user,
     persistentId: headers['persistent-id'] || headers['targeted-id'],
