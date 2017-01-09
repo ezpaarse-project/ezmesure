@@ -1,5 +1,7 @@
+import config from 'config';
+
 export default {
-  "template": "*",
+  "template": `${config.elasticsearch.indicePrefix}*`,
   "mappings": {
     "event": {
       "properties": {

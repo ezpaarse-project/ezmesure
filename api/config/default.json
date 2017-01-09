@@ -7,7 +7,8 @@
   },
   "elasticsearch": {
     "port": 9200,
-    "host": "localhost"
+    "host": "localhost",
+    "indicePrefix": "ez_"
   },
   "logs": {
     "app": { "Console": { "timestamp": true, "colorize": true } },
