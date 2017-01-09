@@ -67,7 +67,7 @@ function update(index, search, doc) {
   let script = '';
 
   for (const p in doc) {
-    script += `ctx._source['${p}'] = ${p};`;
+    script += `ctx._source['${p}'] = params['${p}'];`;
   }
 
   return elastic.updateByQuery({
@@ -79,7 +79,7 @@ function update(index, search, doc) {
         "term": { [search.key]: search.value }
       },
       "script" : {
-        "lang": "groovy",
+        "lang": "painless",
         "inline": script,
         "params": doc
       }

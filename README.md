@@ -37,6 +37,18 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
 ```
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
+4bis) Adjust memory for elastic search
+To avoid out of memory exception problems you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
+
+```
+sudo vi /etc/sysctl.conf
+```
+
+and add the lines :
+```
+# configuration needed for elastic search
+vm.max_map_count=262144
+```
 
 ## Start
 ```bash

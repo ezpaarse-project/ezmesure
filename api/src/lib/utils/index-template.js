@@ -1,33 +1,9 @@
+import config from 'config';
+
 export default {
-  "template": "*",
+  "template": `${config.elasticsearch.indicePrefix}*`,
   "mappings": {
-    "meta": {
-      "dynamic_templates": [
-        {
-          "strings": {
-            "match": "*",
-            "match_mapping_type": "string",
-            "mapping": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          }
-        }
-      ]
-    },
     "event": {
-      "dynamic_templates": [
-        {
-          "strings": {
-            "match": "*",
-            "match_mapping_type": "string",
-            "mapping": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          }
-        }
-      ],
       "properties": {
         "date": {
           "type": "date",
@@ -70,8 +46,7 @@ export default {
           "type": "geo_point"
         },
         "index_name": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     }

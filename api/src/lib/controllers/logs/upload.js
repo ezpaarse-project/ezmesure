@@ -1,11 +1,19 @@
 import csv from 'csv';
 import parse from 'co-busboy';
 import zlib from 'zlib';
+import config from 'config';
 import elasticsearch from '../../services/elastic';
 
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
+const prefix   = config.elasticsearch.indicePrefix;
 
 export default function* upload(orgName) {
+  const exists = yield elasticsearch.indices.exists({ index: orgName });
+
+  if (!exists) {
+    yield createIndex(orgName);
+  }
+
   if (!this.request.is('multipart/*')) {
     const encoding = this.request.headers['content-encoding'];
     const isGzip   = encoding && encoding.toLowerCase().includes('gzip');
@@ -141,6 +149,22 @@ function readStream(stream, orgName) {
 
         bulkInsert(callback);
       });
+    }
+  });
+}
+
+/**
+ * Create an index with a prefix and an alias without it
+ * @param  {String}  indexName
+ * @return {Promise}
+ */
+function createIndex(indexName) {
+  return elasticsearch.indices.create({
+    index: `${prefix}${indexName}`,
+    body: {
+      aliases: {
+        [indexName]: {}
+      }
     }
   });
 }

@@ -1,32 +1,34 @@
 version: '2'
 services:
   elastic:
-    build:
-      context: ./elasticsearch
-      args:
-        - http_proxy
-        - https_proxy
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
     ports:
       - 9200:9200
       - 9300:9300
     environment:
       - http_proxy
       - https_proxy
+      - CLUSTER_NAME=ezmesure
     volumes:
-      - "./data/elastic/logs:/usr/share/elasticsearch/logs"
       - "./data/elastic/data:/usr/share/elasticsearch/data"
-    command: --cluster.name="ezCluster" --script.inline=true
+      - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
     restart: unless-stopped
 
   kibana:
-    image: kibana:4.5
+    build:
+      context: ./kibana
+      args:
+        - http_proxy
+        - https_proxy
     links:
       - elastic
     environment:
       - http_proxy
       - https_proxy
+      - SERVER_BASEPATH=/kibana
       - ELASTICSEARCH_URL=http://elastic:9200
-    command: --server.basePath="/kibana"
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
 
   jwtproxy:
