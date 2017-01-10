@@ -107,6 +107,10 @@ function findUser(props) {
     }
   }
 
+  if (query.$or.length === 0) {
+    return Promise.resolve(null);
+  }
+
   return mongo.db.collection('users').findOne(query);
 }
 
