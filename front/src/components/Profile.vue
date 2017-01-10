@@ -5,7 +5,7 @@
     </div>
 
     <div v-if="auth.user">
-      <p><a v-bind:href="refreshUrl">Cliquez ici</a> pour mettre à jour votre profil.</p>
+      <p><a v-bind:href="refreshUrl">Cliquez ici</a> pour actualiser votre profil.</p>
 
       <form>
         <div class="form-group">
