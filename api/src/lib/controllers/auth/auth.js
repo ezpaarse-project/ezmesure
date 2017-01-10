@@ -10,6 +10,7 @@ function decode(value) {
 }
 
 export function* renaterLogin() {
+  const query   = this.request.query;
   const headers = this.request.header;
   const props   = {
     idp:          headers['shib-identity-provider'],
@@ -45,6 +46,18 @@ export function* renaterLogin() {
 
     if (!user) {
       return this.throw('Failed to save user data', 500);
+    }
+  } else if (query.refresh) {
+    props.updatedAt = new Date();
+    props.createdAt = user.createdAt;
+    props._id       = user._id;
+
+    const result = yield mongo.db.collection('users').replaceOne({ _id: user._id }, props);
+
+    user = result && result.ops && result.ops[0];
+
+    if (!user) {
+      return this.throw('Failed to update user data', 500);
     }
   }
 
