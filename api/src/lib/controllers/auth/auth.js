@@ -6,7 +6,7 @@ import { appLogger } from '../../../server';
 function decode(value) {
   if (typeof value !== 'string') { return value; }
 
-  return Buffer.from(value, 'binary').toString('utf8');
+  return new Buffer(value, 'binary').toString('utf8');
 }
 
 export function* renaterLogin() {
