@@ -1,10 +1,12 @@
 <template>
   <div>
     <div class="page-header">
-        <h1>Profil</h1>
+      <h1>Profil</h1>
     </div>
 
     <div v-if="auth.user">
+      <p><a v-bind:href="refreshUrl">Cliquez ici</a> pour mettre à jour votre profil.</p>
+
       <form>
         <div class="form-group">
           <label for="idp">IDP</label>
@@ -12,19 +14,19 @@
         </div>
         <div class="form-group">
           <label for="name">Nom</label>
-          <input v-model="auth.user.name" type="text" class="form-control" id="name" placeholder="Nom">
+          <input v-model="auth.user.name" type="text" class="form-control" id="name" placeholder="Nom" readonly>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="auth.user.mail" type="email" class="form-control" id="email" placeholder="Email">
+          <input v-model="auth.user.mail" type="email" class="form-control" id="email" placeholder="Email" readonly>
         </div>
         <div class="form-group">
           <label for="org">Organisation</label>
-          <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organisation">
+          <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organisation" readonly>
         </div>
         <div class="form-group">
           <label for="unit">Unité</label>
-          <input v-model="auth.user.unit" type="text" class="form-control" id="unit" placeholder="Unité">
+          <input v-model="auth.user.unit" type="text" class="form-control" id="unit" placeholder="Unité" readonly>
         </div>
       </form>
 
@@ -47,7 +49,8 @@
     data() {
       return {
         auth,
-        redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`
+        redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`,
+        refreshUrl: `/login?refresh=1&origin=${encodeURIComponent(window.location.href)}`
       }
     }
   }
