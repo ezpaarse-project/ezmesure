@@ -137,11 +137,11 @@ function readStream(stream, orgName) {
         if (err) { return callback(err); }
 
         (resp.items || []).forEach(i => {
-          if (!i.create) { return result.failed++; }
-          if (!i.create.error) { return result.inserted++; }
+          if (!i.index) { return result.failed++; }
+          if (i.index.created) { return result.inserted++; }
 
-          if (result.errors.length < 10) {
-            result.errors.push(i.create.error);
+          if (i.index.error && result.errors.length < 10) {
+            result.errors.push(i.index.error);
           }
 
           result.failed++;
