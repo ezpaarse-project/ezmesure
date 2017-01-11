@@ -1,4 +1,4 @@
-FROM node:4-wheezy
+FROM node:6.9.4-wheezy
 MAINTAINER ezTEAM <ezpaarse@couperin.org>
 
 RUN mkdir -p /usr/src/app
