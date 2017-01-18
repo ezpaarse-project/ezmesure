@@ -15,6 +15,9 @@
       <li>
         <a href="/kibana/">Tableaux de bord</a>
       </li>
+      <router-link tag="li" to="/partners" exact>
+        <a>Partenaires</a>
+      </router-link>
     </ul>
   </nav>
 </template>

@@ -7,6 +7,7 @@ import Home from './components/Home.vue'
 import Profile from './components/Profile.vue'
 import Navigation from './components/Navigation.vue'
 import NotFound from './components/NotFound.vue'
+import Partners from './components/Partners.vue'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
@@ -20,6 +21,7 @@ auth.checkAuth()
 const routes = [
   { path: '/', component: Home },
   { path: '/profile', component: Profile },
+  { path: '/partners', component: Partners },
   { path: '*', component: NotFound }
 ]
 
