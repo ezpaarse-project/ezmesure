@@ -1,7 +1,7 @@
 version: '2'
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.0
     ports:
       - 9200:9200
       - 9300:9300
@@ -94,7 +94,7 @@ services:
         - http_proxy
         - https_proxy
     ports:
-      - 443:443
+      - 8443:443
     environment:
       - http_proxy
       - https_proxy

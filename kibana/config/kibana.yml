@@ -17,7 +17,9 @@ server.basePath: ${SERVER_BASEPATH}
 # The URL of the Elasticsearch instance to use for all your queries.
 elasticsearch.url: ${ELASTICSEARCH_URL}
 
-xpack.monitoring.enabled: false
+xpack.monitoring.enabled: true
+
+#xpack.security.enabled: false
 
 # Required to keep sessions when kibana restarts
 xpack.security.encryptionKey: "e558e233df22145278e760c7b26ea9e9c9f72102"
@@ -34,7 +36,7 @@ xpack.reporting.encryptionKey: "e558e233df22145278e760c7b26ea9e9c9f72102"
 # kibana.index: ".kibana"
 
 # The default application to load.
-# kibana.defaultAppId: "discover"
+kibana.defaultAppId: "dashboard/homepage"
 
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana
