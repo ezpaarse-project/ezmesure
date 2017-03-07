@@ -30,6 +30,7 @@ export default function* upload(orgName) {
   }
 
   let inserted = 0;
+  let updated  = 0;
   let failed   = 0;
   let errors   = [];
   let part;
@@ -51,6 +52,7 @@ export default function* upload(orgName) {
     const result = yield readStream(stream, orgName);
 
     inserted += result.inserted;
+    updated  += result.updated;
     failed   += result.failed;
 
     if (errors.length < 10) {
@@ -71,6 +73,7 @@ function readStream(stream, orgName) {
   const buffer = [];
   const result = {
     inserted: 0,
+    updated: 0,
     failed: 0,
     errors: []
   };
@@ -101,6 +104,18 @@ function readStream(stream, orgName) {
       while (ec = parser.read()) {
         ec.index_name = orgName;
 
+        if (!ec.datetime) {
+          addError({ reason: 'datetime field missing' });
+          return result.failed++;
+        }
+
+        const docID = new Date(ec.datetime).getTime();
+
+        if (isNaN(docID)) {
+          addError({ reason: `invalid datetime: ${ec.datetime}` });
+          return result.failed++;
+        }
+
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
           ec.location = {
             lat: parseFloat(ec['geoip-latitude']),
@@ -113,7 +128,7 @@ function readStream(stream, orgName) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index:  { _index: orgName, _type: 'event' } });
+        buffer.push({ index: { _id: docID, _index: orgName, _type: 'event' } });
         buffer.push(ec);
       }
 
@@ -138,10 +153,12 @@ function readStream(stream, orgName) {
 
         (resp.items || []).forEach(i => {
           if (!i.index) { return result.failed++; }
-          if (i.index.created) { return result.inserted++; }
 
-          if (i.index.error && result.errors.length < 10) {
-            result.errors.push(i.index.error);
+          if (i.index.result === 'created') { return result.inserted++; };
+          if (i.index.result === 'updated') { return result.updated++; };
+
+          if (i.index.error) {
+            addError(i.index.error);
           }
 
           result.failed++;
@@ -151,6 +168,12 @@ function readStream(stream, orgName) {
       });
     }
   });
+
+  function addError(err) {
+    if (result.errors.length < 10) {
+      result.errors.push(err);
+    }
+  }
 }
 
 /**
