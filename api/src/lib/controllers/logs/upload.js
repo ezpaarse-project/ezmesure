@@ -104,15 +104,8 @@ function readStream(stream, orgName) {
       while (ec = parser.read()) {
         ec.index_name = orgName;
 
-        if (!ec.datetime) {
-          addError({ reason: 'datetime field missing' });
-          return result.failed++;
-        }
-
-        const docID = new Date(ec.datetime).getTime();
-
-        if (isNaN(docID)) {
-          addError({ reason: `invalid datetime: ${ec.datetime}` });
+        if (!ec.id) {
+          addError({ reason: 'id field missing' });
           return result.failed++;
         }
 
@@ -128,7 +121,7 @@ function readStream(stream, orgName) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index: { _id: docID, _index: orgName, _type: 'event' } });
+        buffer.push({ index: { _id: ec.id, _index: orgName, _type: 'event' } });
         buffer.push(ec);
       }
 
