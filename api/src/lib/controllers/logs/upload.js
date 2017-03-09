@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import csv from 'csv';
 import parse from 'co-busboy';
 import zlib from 'zlib';
@@ -104,10 +105,26 @@ function readStream(stream, orgName) {
       while (ec = parser.read()) {
         ec.index_name = orgName;
 
-        if (!ec.id) {
-          addError({ reason: 'id field missing' });
+        if (!ec.datetime) {
+          addError({ reason: 'datetime is missing' });
           return result.failed++;
         }
+
+        const timestamp = new Date(ec.datetime).getTime();
+
+        if (isNaN(timestamp)) {
+          addError({ reason: `invalid datetime: ${ec.datetime}` });
+          return result.failed++;
+        }
+
+        if (!ec.url) {
+          addError({ reason: 'url is missing' });
+          return result.failed++;
+        }
+
+        const ecID = crypto.createHash('sha1')
+                           .update(`${timestamp}${ec.url}${ec.login || ''}`)
+                           .digest('hex');
 
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
           ec.location = {
@@ -121,7 +138,7 @@ function readStream(stream, orgName) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index: { _id: ec.id, _index: orgName, _type: 'event' } });
+        buffer.push({ index: { _id: ecID, _index: orgName, _type: 'event' } });
         buffer.push(ec);
       }
 
