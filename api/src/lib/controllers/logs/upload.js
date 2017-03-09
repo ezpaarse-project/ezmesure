@@ -110,21 +110,25 @@ function readStream(stream, orgName) {
           return result.failed++;
         }
 
-        const timestamp = new Date(ec.datetime).getTime();
+        let docID = ec.id;
 
-        if (isNaN(timestamp)) {
-          addError({ reason: `invalid datetime: ${ec.datetime}` });
-          return result.failed++;
+        if (!docID) {
+          const timestamp = new Date(ec.datetime).getTime();
+
+          if (isNaN(timestamp)) {
+            addError({ reason: `invalid datetime: ${ec.datetime}` });
+            return result.failed++;
+          }
+
+          if (!ec.url) {
+            addError({ reason: 'url is missing' });
+            return result.failed++;
+          }
+
+          docID = crypto.createHash('sha1')
+                        .update(`${timestamp}${ec.url}${ec.login || ''}`)
+                        .digest('hex');
         }
-
-        if (!ec.url) {
-          addError({ reason: 'url is missing' });
-          return result.failed++;
-        }
-
-        const ecID = crypto.createHash('sha1')
-                           .update(`${timestamp}${ec.url}${ec.login || ''}`)
-                           .digest('hex');
 
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
           ec.location = {
@@ -138,7 +142,7 @@ function readStream(stream, orgName) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index: { _id: ecID, _index: orgName, _type: 'event' } });
+        buffer.push({ index: { _id: docID, _index: orgName, _type: 'event' } });
         buffer.push(ec);
       }
 
