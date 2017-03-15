@@ -87,13 +87,18 @@ function readStream(stream, orgName) {
   });
 
   return new Promise((resolve, reject) => {
+    let doneReading = false;
+
     parser.on('readable', read);
     parser.on('error', err => { reject(err); });
     parser.on('finish', () => {
+      doneReading = true;
+      if (busy) { return; }
+
       bulkInsert(err => {
         if (err) { return reject(err); }
         resolve(result);
-      }, true);
+      });
     });
     stream.on('error', err => { reject(err); });
     stream.pipe(parser);
@@ -153,12 +158,17 @@ function readStream(stream, orgName) {
       bulkInsert(err => {
         if (err) { return reject(err); }
         busy = false;
-        read();
+
+        if (!doneReading) {
+          return read();
+        }
+
+        resolve(result);
       });
     }
 
-    function bulkInsert(callback, flush) {
-      if (buffer.length < bulkSize && !(flush && buffer.length > 0)) {
+    function bulkInsert(callback) {
+      if (buffer.length < bulkSize && !(doneReading && buffer.length > 0)) {
         return callback();
       }
 
