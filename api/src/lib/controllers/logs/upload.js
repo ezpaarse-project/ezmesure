@@ -30,6 +30,7 @@ export default function* upload(orgName) {
     return this.body = yield readStream(stream, orgName);
   }
 
+  let total    = 0;
   let inserted = 0;
   let updated  = 0;
   let failed   = 0;
@@ -52,6 +53,7 @@ export default function* upload(orgName) {
 
     const result = yield readStream(stream, orgName);
 
+    total    += result.total;
     inserted += result.inserted;
     updated  += result.updated;
     failed   += result.failed;
@@ -62,7 +64,7 @@ export default function* upload(orgName) {
   }
 
   this.type = 'json';
-  this.body = { inserted, failed, errors };
+  this.body = { total, inserted, failed, errors };
 };
 
 /**
@@ -73,6 +75,7 @@ export default function* upload(orgName) {
 function readStream(stream, orgName) {
   const buffer = [];
   const result = {
+    total: 0,
     inserted: 0,
     updated: 0,
     failed: 0,
@@ -108,6 +111,7 @@ function readStream(stream, orgName) {
 
       let ec;
       while (ec = parser.read()) {
+        result.total++;
         ec.index_name = orgName;
 
         if (!ec.datetime) {
