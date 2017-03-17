@@ -119,7 +119,8 @@ function readStream(stream, orgName) {
 
         if (!ec.datetime) {
           addError({ reason: 'datetime is missing' });
-          return result.failed++;
+          result.failed++;
+          continue;
         }
 
         let docID = ec.id;
@@ -129,12 +130,14 @@ function readStream(stream, orgName) {
 
           if (isNaN(timestamp)) {
             addError({ reason: `invalid datetime: ${ec.datetime}` });
-            return result.failed++;
+            result.failed++;
+            continue;
           }
 
           if (!ec.url) {
             addError({ reason: 'url is missing' });
-            return result.failed++;
+            result.failed++;
+            continue;
           }
 
           docID = crypto.createHash('sha1')
