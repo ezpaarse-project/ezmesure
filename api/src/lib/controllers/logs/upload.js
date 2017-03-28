@@ -123,7 +123,7 @@ function readStream(stream, orgName) {
           continue;
         }
 
-        let docID = ec.id;
+        let docID = ec['log_id'];
 
         if (!docID) {
           const timestamp = new Date(ec.datetime).getTime();
