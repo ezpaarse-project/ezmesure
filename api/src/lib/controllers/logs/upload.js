@@ -130,9 +130,9 @@ function readStream(stream, orgName) {
 
           if (isNaN(timestamp)) {
             addError({
-              reason: ec.timestamp
-                ? `invalid timestamp: ${ec.timestamp}`
-                : `invalid datetime: ${ec.datetime}`
+              reason: ec.datetime
+                ? `invalid datetime: ${ec.datetime}`
+                : `invalid timestamp: ${ec.timestamp}`
             });
             result.failed++;
             continue;
