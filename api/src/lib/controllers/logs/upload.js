@@ -117,8 +117,8 @@ function readStream(stream, orgName) {
         result.total++;
         ec.index_name = orgName;
 
-        if (!ec.datetime) {
-          addError({ reason: 'datetime is missing' });
+        if (!ec.datetime && !ec.timestamp) {
+          addError({ reason: 'missing datetime or timestamp' });
           result.failed++;
           continue;
         }
@@ -126,10 +126,14 @@ function readStream(stream, orgName) {
         let docID = ec['log_id'];
 
         if (!docID) {
-          const timestamp = new Date(ec.datetime).getTime();
+          const timestamp = parseInt(ec.timestamp) || new Date(ec.datetime).getTime();
 
           if (isNaN(timestamp)) {
-            addError({ reason: `invalid datetime: ${ec.datetime}` });
+            addError({
+              reason: ec.timestamp
+                ? `invalid timestamp: ${ec.timestamp}`
+                : `invalid datetime: ${ec.datetime}`
+            });
             result.failed++;
             continue;
           }
