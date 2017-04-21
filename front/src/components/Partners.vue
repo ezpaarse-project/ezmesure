@@ -95,8 +95,8 @@
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-        <a class="thumbnail" href="#">
-          <img alt="Université Orleans" src="https://cloud.githubusercontent.com/assets/5325656/25232178/bcc08032-25da-11e7-8140-0d40209ebc89.png" class="size70">
+        <a class="thumbnail" href="https://scd.univ-orleans.fr/">
+          <img alt="Bibliothèque de l'université d'Orleans" src="https://cloud.githubusercontent.com/assets/5325656/25232178/bcc08032-25da-11e7-8140-0d40209ebc89.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
