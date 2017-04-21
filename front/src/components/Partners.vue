@@ -26,12 +26,12 @@
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
       <a class="thumbnail" href="https://www.unilim.fr/">
-        <img  alt="Université Limoges" src="https://cloud.githubusercontent.com/assets/5325656/25232162/bc829812-25da-11e7-9a40-9cfa3013aa12.jpg" class="size70">
+        <img  alt="Université de Limoges" src="https://cloud.githubusercontent.com/assets/5325656/25232162/bc829812-25da-11e7-9a40-9cfa3013aa12.jpg" class="size70">
       </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
       <a class="thumbnail" href="http://www.biu-montpellier.fr/florabium/servlet/LoginServlet">
-        <img  alt="bibliotheque interuniversitaire montepellier" src="https://cloud.githubusercontent.com/assets/5325656/25232160/bc80f3cc-25da-11e7-94bc-35ea7555817c.png" class="size70">
+        <img  alt="Bibliothèque inter-universitaire Montpellier" src="https://cloud.githubusercontent.com/assets/5325656/25232160/bc80f3cc-25da-11e7-94bc-35ea7555817c.png" class="size70">
       </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
@@ -41,12 +41,12 @@
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-lorraine.fr/">
-          <img alt="Université Lorraine" src="https://cloud.githubusercontent.com/assets/5325656/25232164/bc86a5c4-25da-11e7-990e-2909eecee3b1.png" class="size70">
+          <img alt="Université de Lorraine" src="https://cloud.githubusercontent.com/assets/5325656/25232164/bc86a5c4-25da-11e7-990e-2909eecee3b1.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-tlse3.fr/">
-          <img alt="Université Toulouse 3" src="https://cloud.githubusercontent.com/assets/5325656/25232161/bc8141f6-25da-11e7-9162-8c82b32a9ff8.png" class="size70">
+          <img alt="Université de Toulouse 3" src="https://cloud.githubusercontent.com/assets/5325656/25232161/bc8141f6-25da-11e7-9162-8c82b32a9ff8.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
@@ -66,32 +66,32 @@
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="https://www.unistra.fr/index.php?id=accueil&utm_source=unistra_fr&utm_medium=unistra_fr_homepage">
-          <img alt="Université Strasbourg" src="https://cloud.githubusercontent.com/assets/5325656/25232173/bcb272a8-25da-11e7-8fca-a9e6fdd5711e.png" class="size70">
+          <img alt="Université de Strasbourg" src="https://cloud.githubusercontent.com/assets/5325656/25232173/bcb272a8-25da-11e7-8fca-a9e6fdd5711e.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-fcomte.fr/">
-          <img alt="Université Franche Compté" src="https://cloud.githubusercontent.com/assets/5325656/25232171/bcab2cbe-25da-11e7-9101-42172f83157d.jpg" class="size70">
+          <img alt="Université de Franche Comté" src="https://cloud.githubusercontent.com/assets/5325656/25232171/bcab2cbe-25da-11e7-9101-42172f83157d.jpg" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.umontpellier.fr/">
-          <img alt="Université montepellier" src="https://cloud.githubusercontent.com/assets/5325656/25232175/bcb3b53c-25da-11e7-8cb5-66809d9b0a54.png" class="size70">
+          <img alt="Université Montpellier" src="https://cloud.githubusercontent.com/assets/5325656/25232175/bcb3b53c-25da-11e7-8cb5-66809d9b0a54.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-montp3.fr/">
-          <img alt="Université montepellier 3 " src="https://cloud.githubusercontent.com/assets/5325656/25232172/bcae60aa-25da-11e7-84ec-fd9dc0b86977.png" class="size70">
+          <img alt="Université Montpellier 3 " src="https://cloud.githubusercontent.com/assets/5325656/25232172/bcae60aa-25da-11e7-84ec-fd9dc0b86977.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="https://www.univ-brest.fr/">
-          <img alt="Université Brest" src="https://cloud.githubusercontent.com/assets/5325656/25232177/bcb642fc-25da-11e7-8d14-205420131d80.png" class="size70">
+          <img alt="Université de Brest" src="https://cloud.githubusercontent.com/assets/5325656/25232177/bcb642fc-25da-11e7-8d14-205420131d80.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-grenoble-alpes.fr/">
-          <img alt="Université Grenoble" src="https://cloud.githubusercontent.com/assets/5325656/25232174/bcb32e96-25da-11e7-87a6-296391241f3a.png" class="size70">
+          <img alt="Université de Grenoble" src="https://cloud.githubusercontent.com/assets/5325656/25232174/bcb32e96-25da-11e7-87a6-296391241f3a.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
@@ -106,17 +106,17 @@
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.upf.pf/fr">
-          <img alt="Université Polynesie Française" src="https://cloud.githubusercontent.com/assets/5325656/25232182/bccae5cc-25da-11e7-8808-64e7fe9968c5.png" class="size70">
+          <img alt="Université de Polynesie Française" src="https://cloud.githubusercontent.com/assets/5325656/25232182/bccae5cc-25da-11e7-8808-64e7fe9968c5.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.univ-reims.fr/">
-          <img alt="Université Reims" src="https://cloud.githubusercontent.com/assets/5325656/25232181/bcca7b1e-25da-11e7-99e7-f7a57479e072.png" class="size70">
+          <img alt="Université de Reims" src="https://cloud.githubusercontent.com/assets/5325656/25232181/bcca7b1e-25da-11e7-99e7-f7a57479e072.png" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.upmc.fr/fr/universite/sorbonne_universites.html">
-          <img alt="Sorbonne universites" src="https://cloud.githubusercontent.com/assets/5325656/25232180/bcc8b36a-25da-11e7-97e1-576c5e7acc10.gif" class="size70">
+          <img alt="Sorbonne Universités" src="https://cloud.githubusercontent.com/assets/5325656/25232180/bcc8b36a-25da-11e7-97e1-576c5e7acc10.gif" class="size70">
         </a>
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
@@ -126,7 +126,7 @@
     </div>
     <div class="col-lg-3 col-md-4 col-xs-6 thumb">
         <a class="thumbnail" href="http://www.utbm.fr/">
-          <img alt="Université de technologie Belfort-Montbellard" src="https://cloud.githubusercontent.com/assets/5325656/25232184/bcd78bce-25da-11e7-9b6e-9b48b81b01b7.png" class="size70">
+          <img alt="Université de technologie Belfort-Montbelliard" src="https://cloud.githubusercontent.com/assets/5325656/25232184/bcd78bce-25da-11e7-9b6e-9b48b81b01b7.png" class="size70">
         </a>
     </div>
    </div>
@@ -138,7 +138,7 @@
    <div class="row space">
       <div class="col-lg-4 col-md-4 col-xs-6 thumb">
           <a class="thumbnail" href="http://www.couperin.org">
-            <img class="size100" alt="couperin" src="assets/images/logo-couperin.png" >
+            <img class="size100" alt="Couperin" src="assets/images/logo-couperin.png" >
           </a>
         </div>
         <div class="col-lg-4 col-md-4 col-xs-6 thumb">
