@@ -94,7 +94,7 @@ services:
         - http_proxy
         - https_proxy
     ports:
-      - 8443:443
+      - 443:443
     environment:
       - http_proxy
       - https_proxy
