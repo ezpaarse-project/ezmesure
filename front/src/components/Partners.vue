@@ -129,6 +129,12 @@
           <img alt="Université de technologie Belfort-Montbelliard" src="https://cloud.githubusercontent.com/assets/5325656/25232184/bcd78bce-25da-11e7-9b6e-9b48b81b01b7.png" class="size70">
         </a>
     </div>
+    <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+        <a class="thumbnail" href="http://www.univ-lyon1.fr/">
+          <img alt="Université de Lyon 1" src="https://cloud.githubusercontent.com/assets/5325656/25330085/a8f28800-28de-11e7-9a0d-ad86024ef1b5.png" class="size70">
+        </a>
+    </div>
+
    </div>
 
 
