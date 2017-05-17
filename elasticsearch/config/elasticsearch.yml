@@ -1,5 +1,6 @@
 cluster.name: ${CLUSTER_NAME}
 network.host: 0.0.0.0
+network.publish_host: "${PUBLISH_IP}"
 script.inline: true
 xpack.monitoring.enabled: true
 #xpack.security.enabled: false
@@ -8,3 +9,5 @@ xpack.monitoring.enabled: true
 # set to 1 to allow single node clusters
 # Details: https://github.com/elastic/elasticsearch/pull/17288
 discovery.zen.minimum_master_nodes: 1
+node.master: ${NODE_MASTER}
+
