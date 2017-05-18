@@ -9,6 +9,7 @@ services:
       - http_proxy
       - https_proxy
       - CLUSTER_NAME=ezmesure
+      - NODE_MASTER=false
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"

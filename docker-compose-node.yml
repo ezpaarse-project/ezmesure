@@ -9,9 +9,10 @@ services:
       - http_proxy
       - https_proxy
       - CLUSTER_NAME=ezmesure
-      - ${EZMESURE_ES_PUBLISH}
-      - ${EZMESURE_ES_DISCOVERY}
+      - "network.publish_host=${EZMESURE_ES_PUBLISH}"
+      - "node.name=${EZMESURE_ES_NODE_NAME}"
       - NODE_MASTER=false
+      - ${EZMESURE_ES_DISCOVERY}
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
