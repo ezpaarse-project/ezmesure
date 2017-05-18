@@ -7,5 +7,4 @@ export SHIBBOLETH_SP_URL="https://ezmesure-preprod.couperin.org/sp"
 export SHIBBOLETH_DS_URL="https://discovery.renater.fr/renater"
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 export EZMESURE_ES_PUBLISH="PUBLISH_IP=`hostname -i`"
-export EZMESURE_ES_DISCOVERY="discovery.zen.ping.unicast.hosts=192.168.128.85:9300"
 
