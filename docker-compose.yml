@@ -9,7 +9,10 @@ services:
       - http_proxy
       - https_proxy
       - CLUSTER_NAME=ezmesure
-      - NODE_MASTER=false
+      - "network.publish_host=${EZMESURE_ES_PUBLISH}"
+      - "node.name=${EZMESURE_ES_NODE_NAME}"
+      - NODE_MASTER=true
+      - ${EZMESURE_ES_DISCOVERY}
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
@@ -26,8 +29,8 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - SERVER_BASEPATH=/kibana
       - ELASTICSEARCH_URL=http://elastic:9200
+      - SERVER_BASEPATH=/kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
