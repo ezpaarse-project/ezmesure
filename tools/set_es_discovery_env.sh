@@ -1,8 +1,7 @@
 # set local EZMESURE_ES_DISCOVERY variable 
 # should contain all ES cluster IP host except local IP address
+# needs EZMESURE_MASTER and EZMESURE_NODES in environment
 
-EZMESURE_MASTER="192.168.128.85"
-EZMESURE_NODES="192.168.128.86 192.168.128.87"
 EZMESURE_ES_DISCOVERY="discovery.zen.ping.unicast.hosts=${EZMESURE_MASTER}:9300"
 EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -i`
