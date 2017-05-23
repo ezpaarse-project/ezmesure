@@ -9,11 +9,14 @@ export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 
 if [[ -f master-nodes.env.sh ]] ; then
 	source master-nodes.env.sh
+	# set ezmesure Domain
+	export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}.couperin.org"
+	export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
 	# set local EZMESURE_ES_DISCOVERY variable
 	# should contain all ES cluster IP host except local IP address
 	# needs EZMESURE_MASTER and EZMESURE_NODES in environment
 
-	EZMESURE_ES_DISCOVERY="discovery.zen.ping.unicast.hosts=${EZMESURE_MASTER}:9300"
+	EZMESURE_ES_DISCOVERY="${EZMESURE_MASTER}:9300"
 	EZMESURE_NODE_NAME=`hostname`
 	THIS_HOST=`hostname -i`
 

@@ -12,10 +12,11 @@ services:
       - "network.publish_host=${EZMESURE_ES_PUBLISH}"
       - "node.name=${EZMESURE_ES_NODE_NAME}"
       - NODE_MASTER=true
-      - ${EZMESURE_ES_DISCOVERY}
+      - "discovery.zen.ping.unicast.hosts=${EZMESURE_ES_DISCOVERY}"
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+#      - "./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties"
     restart: unless-stopped
 
   kibana:

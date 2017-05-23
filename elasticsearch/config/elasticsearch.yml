@@ -9,4 +9,6 @@ xpack.monitoring.enabled: true
 # Details: https://github.com/elastic/elasticsearch/pull/17288
 discovery.zen.minimum_master_nodes: 1
 node.master: ${NODE_MASTER}
+#bootstrap.memory_lock: true
+path.logs: /usr/share/elasticsearch/logs
 
