@@ -7,6 +7,12 @@ export SHIBBOLETH_SP_URL="https://ezmesure-preprod.couperin.org/sp"
 export SHIBBOLETH_DS_URL="https://discovery.renater.fr/renater"
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 
+EZMESURE_NODE_NAME=`hostname`
+THIS_HOST=`hostname -i`
+export EZMESURE_ES_DISCOVERY="${EZMESURE_MASTER}:9300"
+export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
+export EZMESURE_ES_PUBLISH="${THIS_HOST}"
+
 if [[ -f master-nodes.env.sh ]] ; then
 	source master-nodes.env.sh
 	# set ezmesure Domain
@@ -17,8 +23,6 @@ if [[ -f master-nodes.env.sh ]] ; then
 	# needs EZMESURE_MASTER and EZMESURE_NODES in environment
 
 	EZMESURE_ES_DISCOVERY="${EZMESURE_MASTER}:9300"
-	EZMESURE_NODE_NAME=`hostname`
-	THIS_HOST=`hostname -i`
 
 	for node in ${EZMESURE_NODES} ; do
         	if [[ ! $node = $THIS_HOST ]] ; then
