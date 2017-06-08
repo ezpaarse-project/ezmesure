@@ -25,32 +25,18 @@ services:
       args:
         - http_proxy
         - https_proxy
+    ports:
+      - 5601:5601
     links:
       - elastic
     environment:
       - http_proxy
       - https_proxy
+      - no_proxy
       - ELASTICSEARCH_URL=http://elastic:9200
       - SERVER_BASEPATH=/kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
-    restart: unless-stopped
-
-  jwtproxy:
-    build:
-      context: ./jwt-rp
-      args:
-        - http_proxy
-        - https_proxy
-    ports:
-      - 5601:3030
-    environment:
-      - http_proxy
-      - https_proxy
-      - TARGET_URL=http://kibana:5601
-      - JWT_SECRET=${EZMESURE_AUTH_SECRET}
-    links:
-      - kibana
     restart: unless-stopped
 
   mongodb:
