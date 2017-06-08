@@ -18,6 +18,21 @@ server.basePath: ${SERVER_BASEPATH}
 elasticsearch.url: ${ELASTICSEARCH_URL}
 
 xpack.monitoring.enabled: true
+xpack.reporting.kibanaServer.protocol: "https"
+xpack.reporting.kibanaServer.hostname: "192.168.128.47"
+xpack.reporting.kibanaServer.port: 443
+xpack.reporting.kibanaApp: "/app/kibana"
+
+xpack.notification.email.account:
+  local_account:
+    email_defaults:
+      from: xpack@inist.fr
+    profile: standard
+    smtp:
+      host: 127.0.0.1
+      port: 25
+
+logging.verbose: true
 
 #xpack.security.enabled: false
 
