@@ -23,6 +23,8 @@ if [[ -f master-nodes.env.sh ]] ; then
 	# needs EZMESURE_MASTER and EZMESURE_NODES in environment
 
 	EZMESURE_ES_DISCOVERY="${EZMESURE_MASTER}:9300"
+	EZMESURE_NODE_NAME=`hostname`
+	THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
 	for node in ${EZMESURE_NODES} ; do
         	if [[ ! $node = $THIS_HOST ]] ; then
