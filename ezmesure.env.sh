@@ -15,6 +15,10 @@ export EZMESURE_ES_PUBLISH="${THIS_HOST}"
 
 if [[ -f master-nodes.env.sh ]] ; then
 	source master-nodes.env.sh
+	if [[ -z ${EZMESURE_MASTER} || -z ${EZMESURE_NODES} ]] ; then 
+		echo "Variables EZMESURE_MASTER/EZMESURE_NODES mandatory"
+		exit 1;
+	fi 
 	# set ezmesure Domain
 	export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}.couperin.org"
 	export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
