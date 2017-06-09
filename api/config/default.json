@@ -8,7 +8,9 @@
   "elasticsearch": {
     "port": 9200,
     "host": "localhost",
-    "indicePrefix": "ez_"
+    "indicePrefix": "ez_",
+    "user": "elastic",
+    "password": "changeme"
   },
   "logs": {
     "app": { "Console": { "timestamp": true, "colorize": true } },
