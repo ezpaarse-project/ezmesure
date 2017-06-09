@@ -35,6 +35,7 @@ services:
       - no_proxy
       - ELASTICSEARCH_URL=http://elastic:9200
       - SERVER_BASEPATH=/kibana
+      - EZMESURE_ES_PWD
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -61,6 +62,7 @@ services:
       - EZMESURE_MONGO_HOST=mongodb
       - EZMESURE_AUTH_SECRET
       - NODE_ENV
+      - EZMESURE_ES_PWD
     links:
       - elastic
       - mongodb
