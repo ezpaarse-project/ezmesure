@@ -10,15 +10,18 @@ xpack.notification.email.account:
       from: xpack@inist.fr
     profile: standard
     smtp:
-      host: smtpout.intra.inist.fr
+      host: ${SMTPOUT}
       port: 25
 
 
 # minimum_master_nodes need to be explicitly set when bound on a public IP
 # set to 1 to allow single node clusters
 # Details: https://github.com/elastic/elasticsearch/pull/17288
-discovery.zen.minimum_master_nodes: 1
-node.master: ${NODE_MASTER}
+discovery.zen.minimum_master_nodes: ${EZMESURE_ES_MIMMASTER}
+node.master: ${EZMESURE_ES_NODE_MASTER}
+node.data: ${EZMESURE_ES_NODE_DATA}
+node.ingest: ${EZMESURE_ES_NODE_INGEST}
+search.remote.connect: ${EZMESURE_ES_SEARCH_REMOTE}
 #bootstrap.memory_lock: true
 path.logs: /usr/share/elasticsearch/logs
 
