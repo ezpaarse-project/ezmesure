@@ -23,7 +23,7 @@ export NODE_ENV="dev"
 export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
 export EZMESURE_ES_NODE_INGEST="true"
-export EZMESURE_ES_NODE_SARCH_REMOTE="true"
+export EZMESURE_ES_NODE_SEARCH_REMOTE="true"
 
 if [[ -f status-nodes.env.sh ]] ; then
 	source status-nodes.env.sh
