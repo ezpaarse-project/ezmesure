@@ -9,14 +9,15 @@ services:
       - http_proxy
       - https_proxy
       - CLUSTER_NAME=ezmesure
-      - "network.publish_host=${EZMESURE_ES_PUBLISH}"
-      - "node.name=${EZMESURE_ES_NODE_NAME}"
+      - EZMESURE_ES_PUBLISH
+      - EZMESURE_ES_NODE_NAME
+      - EZMESURE_ES_DISCOVERY
       - EZMESURE_ES_NODE_MASTER
       - EZMESURE_ES_NODE_DATA
       - EZMESURE_ES_NODE_INGEST
       - EZMESURE_ES_NODE_SEARCH_REMOTE
       - EZMESURE_ES_MINMASTER
-      - "discovery.zen.ping.unicast.hosts=${EZMESURE_ES_DISCOVERY}"
+      - EZMESURE_SMTPOUT
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"

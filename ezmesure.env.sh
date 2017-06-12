@@ -7,7 +7,7 @@ export SHIBBOLETH_SP_URL="https://ezmesure-preprod.couperin.org/sp"
 export SHIBBOLETH_DS_URL="https://discovery.renater.fr/renater"
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 export EZMESURE_ES_PWD="changeme"
-export SMTPOUT="127.0.0.1"
+export EZMESURE_SMTPOUT="127.0.0.1"
 
 EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -I | cut -d ' ' -f1`
@@ -23,7 +23,7 @@ export NODE_ENV="dev"
 export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
 export EZMESURE_ES_NODE_INGEST="true"
-export EZMESURE_ES_SEARCH_REMOTE="true"
+export EZMESURE_ES_NODE_SARCH_REMOTE="true"
 
 if [[ -f status-nodes.env.sh ]] ; then
 	source status-nodes.env.sh
