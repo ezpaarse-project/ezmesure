@@ -7,7 +7,9 @@
   },
   "elasticsearch": {
     "port": "EZMESURE_ELASTIC_PORT",
-    "host": "EZMESURE_ELASTIC_HOST"
+    "host": "EZMESURE_ELASTIC_HOST",
+    "user": "EZMESURE_ELASTIC_USER",
+    "password": "EZMESURE_ES_PWD"
   },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
