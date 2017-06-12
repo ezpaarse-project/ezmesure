@@ -68,7 +68,6 @@ services:
       - EZMESURE_ES_PWD
       - EZMESURE_AUTH_SECRET
       - NODE_ENV
-      - EZMESURE_ES_PWD
     links:
       - elastic
       - mongodb
