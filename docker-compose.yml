@@ -64,6 +64,7 @@ services:
       - https_proxy
       - EZMESURE_ELASTIC_HOST=elastic
       - EZMESURE_MONGO_HOST=mongodb
+      - EZMESURE_ES_PWD
       - EZMESURE_AUTH_SECRET
       - NODE_ENV
       - EZMESURE_ES_PWD
