@@ -1,7 +1,7 @@
 version: '2'
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.4.2
     ports:
       - 9200:9200
       - 9300:9300
@@ -18,6 +18,14 @@ services:
       - EZMESURE_ES_NODE_SEARCH_REMOTE
       - EZMESURE_ES_MINMASTER
       - EZMESURE_SMTPOUT
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms3g -Xmx3g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 6g
+
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
@@ -25,11 +33,7 @@ services:
     restart: unless-stopped
 
   kibana:
-    build:
-      context: ./kibana
-      args:
-        - http_proxy
-        - https_proxy
+    image: docker.elastic.co/kibana/kibana:5.4.2
     ports:
       - 5601:5601
     links:
@@ -38,9 +42,14 @@ services:
       - http_proxy
       - https_proxy
       - no_proxy
-      - ELASTICSEARCH_URL=http://elastic:9200
-      - SERVER_BASEPATH=/kibana
-      - EZMESURE_ES_PWD
+      - ELASTICSEARCH_PASSWORD
+      - SERVER_BASEPATH
+      - SERVER_HOST
+      - SERVER_PORT
+      - ELASTICSEARCH_URL
+      - XPACK_MONITORING_ENABLED
+      - KIBANA_DEFAULTAPPID
+      - EZMESURE_ES_REPORTING_HOSTNAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -66,6 +75,7 @@ services:
       - EZMESURE_ELASTIC_HOST=elastic
       - EZMESURE_MONGO_HOST=mongodb
       - EZMESURE_ES_PWD
+      - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - NODE_ENV
     links:
