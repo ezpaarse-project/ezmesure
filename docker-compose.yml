@@ -19,12 +19,12 @@ services:
       - EZMESURE_ES_MINMASTER
       - EZMESURE_SMTPOUT
       - bootstrap.memory_lock=true
-      - ES_JAVA_OPTS=-Xms3g -Xmx3g
+      - ES_JAVA_OPTS
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    mem_limit: 6g
+    mem_limit: ${EZMESURE_ES_MEM_LIMIT}
 
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"

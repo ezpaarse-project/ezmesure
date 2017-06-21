@@ -35,6 +35,9 @@ export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
 export EZMESURE_ES_NODE_INGEST="true"
 export EZMESURE_ES_NODE_SEARCH_REMOTE="true"
+export ES_JAVA_OPTS="-Xms2g -Xmx2g"
+export EZMESURE_ES_MEM_LIMIT="4g"
+
 
 if [[ -f status-nodes.env.sh ]] ; then
 	source status-nodes.env.sh
