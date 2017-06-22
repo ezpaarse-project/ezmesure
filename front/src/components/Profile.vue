@@ -10,23 +10,23 @@
       <form>
         <div class="form-group">
           <label for="idp">IDP</label>
-          <input v-model="auth.user.idp" type="text" class="form-control" id="idp" placeholder="IDP" readonly>
+          <input v-model="auth.user.metadata.idp" type="text" class="form-control" id="idp" placeholder="IDP" readonly>
         </div>
         <div class="form-group">
           <label for="name">Nom</label>
-          <input v-model="auth.user.name" type="text" class="form-control" id="name" placeholder="Nom" readonly>
+          <input v-model="auth.user.full_name" type="text" class="form-control" id="name" placeholder="Nom" readonly>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="auth.user.mail" type="email" class="form-control" id="email" placeholder="Email" readonly>
+          <input v-model="auth.user.email" type="email" class="form-control" id="email" placeholder="Email" readonly>
         </div>
         <div class="form-group">
           <label for="org">Organisation</label>
-          <input v-model="auth.user.org" type="text" class="form-control" id="org" placeholder="Organisation" readonly>
+          <input v-model="auth.user.metadata.org" type="text" class="form-control" id="org" placeholder="Organisation" readonly>
         </div>
         <div class="form-group">
           <label for="unit">Unité</label>
-          <input v-model="auth.user.unit" type="text" class="form-control" id="unit" placeholder="Unité" readonly>
+          <input v-model="auth.user.metadata.unit" type="text" class="form-control" id="unit" placeholder="Unité" readonly>
         </div>
       </form>
 

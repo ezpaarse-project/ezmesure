@@ -1,60 +1,53 @@
+import crypto from 'crypto';
 import jwt from 'koa-jwt';
 import { auth } from 'config';
-import mongo from '../../services/mongo';
+import elastic from '../../services/elastic';
 import { appLogger } from '../../../server';
-
-function decode(value) {
-  if (typeof value !== 'string') { return value; }
-
-  return Buffer.from(value, 'binary').toString('utf8');
-}
 
 export function* renaterLogin() {
   const query   = this.request.query;
   const headers = this.request.header;
   const props   = {
-    idp:          headers['shib-identity-provider'],
-    uid:          headers.uid,
-    name:         decode(headers.displayname || headers.cn || headers.givenname),
-    mail:         decode(headers.mail),
-    org:          decode(headers.o),
-    unit:         decode(headers.ou),
-    eppn:         headers.eppn,
-    remoteUser:   headers.remote_user,
-    persistentId: headers['persistent-id'] || headers['targeted-id'],
-    affiliation:  headers.affiliation
+    full_name: decode(headers.displayname || headers.cn || headers.givenname),
+    email:     decode(headers.mail),
+    roles: [],
+    metadata: {
+      idp:          headers['shib-identity-provider'],
+      uid:          headers.uid,
+      org:          decode(headers.o),
+      unit:         decode(headers.ou),
+      eppn:         headers.eppn,
+      remoteUser:   headers.remote_user,
+      persistentId: headers['persistent-id'] || headers['targeted-id'],
+      affiliation:  headers.affiliation
+    }
   };
 
-  if (!props.idp) {
+  if (!props.metadata.idp) {
     return this.throw('IDP not found in Shibboleth headers', 400);
   }
 
-  let user = yield findUser(props);
+  if (!props.email) {
+    return this.throw('email not found in Shibboleth headers', 400);
+  }
+
+  const username = props.email.split('@')[0];
+  let user = yield elastic.findUser(username);
 
   if (!user) {
-    props.createdAt = props.updatedAt = new Date();
+    props.metadata.createdAt = props.metadata.updatedAt = new Date();
+    props.password = yield randomString();
 
-    try {
-      yield mongo.db.collection('shibheaders').insert(headers);
-    } catch (e) {
-      appLogger.error('Failed at storing shibboleth headers', JSON.stringify(headers));
-    }
-
-    const result = yield mongo.db.collection('users').insert(props);
-
-    user = result && result.ops && result.ops[0];
+    user = yield elastic.updateUser(username, props);
 
     if (!user) {
       return this.throw('Failed to save user data', 500);
     }
   } else if (query.refresh) {
-    props.updatedAt = new Date();
-    props.createdAt = user.createdAt;
-    props._id       = user._id;
+    props.metadata.updatedAt = new Date();
+    props.metadata.createdAt = user.metadata.createdAt;
 
-    const result = yield mongo.db.collection('users').replaceOne({ _id: user._id }, props);
-
-    user = result && result.ops && result.ops[0];
+    user = yield elastic.updateUser(username, props);
 
     if (!user) {
       return this.throw('Failed to update user data', 500);
@@ -66,7 +59,7 @@ export function* renaterLogin() {
 };
 
 export function* getUser() {
-  const user = yield findUser(this.state.user);
+  const user = yield elastic.findUser(this.state.user.username);
 
   if (!user) {
     return this.throw('Unable to fetch user data, please log in again', 401);
@@ -81,42 +74,24 @@ export function* getToken() {
   this.body   = generateToken(this.state.user);
 };
 
-function findUser(props) {
-  const { _id, mail, idp, eppn, persistentId, uid, remoteUser } = props;
-
-  const query = { $or: [] };
-
-  if (_id && mongo.ObjectID.isValid(_id)) {
-    query.$or.push({ _id: mongo.ObjectID(_id) });
-  }
-
-  if (persistentId) {
-    query.$or.push({ persistentId });
-  }
-
-  if (idp) {
-    const ids = [];
-
-    if (mail)       { ids.push({ mail }); }
-    if (eppn)       { ids.push({ eppn }); }
-    if (uid)        { ids.push({ uid }); }
-    if (remoteUser) { ids.push({ remoteUser }); }
-
-    if (ids.length > 0) {
-      query.$or.push({ idp, $or: ids });
-    }
-  }
-
-  if (query.$or.length === 0) {
-    return Promise.resolve(null);
-  }
-
-  return mongo.db.collection('users').findOne(query);
-}
-
 function generateToken(user) {
   if (!user) { return null; }
 
-  const { _id, name, mail } = user;
-  return jwt.sign({ _id, name, mail }, auth.secret);
+  const { username, email } = user;
+  return jwt.sign({ username, email }, auth.secret);
+}
+
+function decode(value) {
+  if (typeof value !== 'string') { return value; }
+
+  return Buffer.from(value, 'binary').toString('utf8');
+}
+
+function randomString () {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(25, (err, buffer) => {
+      if (err) { return reject(err); }
+      resolve(buffer.toString('hex'));
+    });
+  });
 }

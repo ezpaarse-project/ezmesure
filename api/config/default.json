@@ -10,7 +10,8 @@
     "host": "localhost",
     "indicePrefix": "ez_",
     "user": "elastic",
-    "password": "changeme"
+    "password": "changeme",
+    "apiVersion": "5.4"
   },
   "logs": {
     "app": { "Console": { "timestamp": true, "colorize": true } },
