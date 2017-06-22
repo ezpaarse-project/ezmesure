@@ -76,6 +76,8 @@ services:
       - EZMESURE_MONGO_HOST=mongodb
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
+      - EZMESURE_SMTP_HOST
+      - EZMESURE_SMTP_PORT
       - NODE_ENV
     links:
       - elastic

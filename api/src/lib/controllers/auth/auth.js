@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import jwt from 'koa-jwt';
 import { auth } from 'config';
 import elastic from '../../services/elastic';
+import sendMail from '../../services/mail';
 import { appLogger } from '../../../server';
 
 export function* renaterLogin() {
@@ -10,7 +11,7 @@ export function* renaterLogin() {
   const props   = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
     email:     decode(headers.mail),
-    roles: [],
+    roles: ['kibana_user'],
     metadata: {
       idp:          headers['shib-identity-provider'],
       uid:          headers.uid,
@@ -32,24 +33,33 @@ export function* renaterLogin() {
   }
 
   const username = props.email.split('@')[0];
+
   let user = yield elastic.findUser(username);
 
   if (!user) {
     props.metadata.createdAt = props.metadata.updatedAt = new Date();
     props.password = yield randomString();
 
-    user = yield elastic.updateUser(username, props);
+    yield elastic.updateUser(username, props);
+    user = yield elastic.findUser(username);
 
     if (!user) {
       return this.throw('Failed to save user data', 500);
+    }
+
+    try {
+      yield sendWelcomeMail(user, props.password);
+    } catch (err) {
+      appLogger.error('Failed to send mail', err);
     }
   } else if (query.refresh) {
     props.metadata.updatedAt = new Date();
     props.metadata.createdAt = user.metadata.createdAt;
 
-    user = yield elastic.updateUser(username, props);
-
-    if (!user) {
+    try {
+      yield elastic.updateUser(username, props);
+      user = props;
+    } catch (e) {
       return this.throw('Failed to update user data', 500);
     }
   }
@@ -89,9 +99,45 @@ function decode(value) {
 
 function randomString () {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(25, (err, buffer) => {
+    crypto.randomBytes(5, (err, buffer) => {
       if (err) { return reject(err); }
       resolve(buffer.toString('hex'));
     });
+  });
+}
+
+function sendWelcomeMail(user, password) {
+  return sendMail({
+    from: 'ezMESURE',
+    to: user.email,
+    subject: 'Bienvenue sur ezMESURE !',
+    text: `
+      Bienvenue ${user.full_name},
+      Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder au tableaux de bord :
+
+      Nom d'utilisateur: ${user.username}
+      Mot de passe: ${password}
+
+      Cordialement,
+      L'équipe ezMESURE.
+    `,
+    html: `
+      <h1>Bienvenue ${user.full_name},</h1>
+      <p>Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder au tableaux de bord :</p>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Nom d'utilisateur</strong></td>
+            <td>${user.username}</td>
+          </tr>
+          <tr>
+            <td><strong>Mot de passe</strong></td>
+            <td>${password}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    `
   });
 }

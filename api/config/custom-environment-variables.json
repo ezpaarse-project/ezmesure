@@ -12,6 +12,10 @@
     "password": "ELASTICSEARCH_PASSWORD",
     "apiVersion": "EZMESURE_ELASTIC_VERSION"
   },
+  "smtp": {
+    "host": "EZMESURE_SMTP_HOST",
+    "port": "EZMESURE_SMTP_PORT"
+  },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE"

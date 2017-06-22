@@ -43,6 +43,7 @@
     "koa-qs": "^2.0.0",
     "koa-route": "^2.4.2",
     "mongodb": "^2.2.10",
+    "nodemailer": "^4.0.1",
     "winston": "^2.2.0"
   }
 }
