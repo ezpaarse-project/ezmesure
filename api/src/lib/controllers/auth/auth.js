@@ -55,6 +55,7 @@ export function* renaterLogin() {
   } else if (query.refresh) {
     props.metadata.updatedAt = new Date();
     props.metadata.createdAt = user.metadata.createdAt;
+    props.username           = username;
 
     try {
       yield elastic.updateUser(username, props);
@@ -67,6 +68,35 @@ export function* renaterLogin() {
   this.cookies.set('eztoken', generateToken(user), { httpOnly: true });
   this.redirect(decodeURIComponent(this.query.origin || '/'));
 };
+
+export function* resetPassword() {
+  const user = yield elastic.findUser(this.state.user.username);
+
+  if (!user) {
+    return this.throw('Unable to fetch user data, please log in again', 401);
+  }
+
+  const newPassword = yield randomString();
+
+  yield elastic.updateUserPassword(this.state.user.username, newPassword);
+  yield sendNewPassword(user, newPassword);
+  this.status = 204;
+}
+
+export function* updatePassword() {
+  const { currentPassword, newPassword, confirmPassword } = this.request.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return this.throw('missing field, you must specify: currentPassword, newPassword, confirmPassword', 400);
+  }
+
+  if (newPassword !== confirmPassword) {
+    return this.throw('confirmation password mismatch', 400);
+  }
+
+  yield elastic.updateUserPassword(this.state.user.username, newPassword);
+  this.status = 204;
+}
 
 export function* getUser() {
   const user = yield elastic.findUser(this.state.user.username);
@@ -136,6 +166,45 @@ function sendWelcomeMail(user, password) {
           </tr>
         </tbody>
       </table>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    `
+  });
+}
+
+function sendNewPassword(user, password) {
+  return sendMail({
+    from: 'ezMESURE',
+    to: user.email,
+    subject: 'Votre nouveau mot de passe',
+    text: `
+      Bonjour ${user.full_name},
+      Votre mot de passe a été réinitialisé. Voici vos identifiants :
+
+      Nom d'utilisateur: ${user.username}
+      Mot de passe: ${password}
+
+      Par souci de sécurité, nous vous invitons à le changer rapidement via votre page de profil.
+
+      Cordialement,
+      L'équipe ezMESURE.
+    `,
+    html: `
+      <h1>Bonjour ${user.full_name},</h1>
+      <p>Votre mot de passe a été réinitialisé. Voici vos identifiants :</p>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Nom d'utilisateur</strong></td>
+            <td>${user.username}</td>
+          </tr>
+          <tr>
+            <td><strong>Mot de passe</strong></td>
+            <td>${password}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Par souci de sécurité, nous vous invitons à le changer rapidement via votre page de profil.</p>
       <p>Cordialement,</p>
       <p>L'équipe ezMESURE.</p>
     `
