@@ -1,6 +1,6 @@
-import winston from 'winston';
+const winston = require('winston');
 
-export default function logger(loggersConfig) {
+module.exports = function logger(loggersConfig) {
   const transports = [];
 
   for (const key in loggersConfig) {

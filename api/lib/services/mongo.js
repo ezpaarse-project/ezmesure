@@ -1,5 +1,5 @@
-import { MongoClient, ObjectID } from 'mongodb';
-import config from 'config';
+const { MongoClient, ObjectID } = require('mongodb');
+const config = require('config');
 
 const mongo = { ObjectID };
 
@@ -27,4 +27,4 @@ mongo.get = function (col) {
   return (mongo.db ? mongo.db.collection(col) : null);
 };
 
-export default mongo;
+module.exports = mongo;

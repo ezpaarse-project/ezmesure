@@ -1,6 +1,6 @@
-import elasticsearch from 'elasticsearch';
-import config from 'config';
-import template from '../utils/index-template';
+const elasticsearch = require('elasticsearch');
+const config = require('config');
+const template = require('../utils/index-template');
 
 const apiVersion = config.get('elasticsearch.apiVersion');
 const api = elasticsearch.Client.apis[apiVersion];
@@ -62,4 +62,4 @@ elastic.indices.putTemplate({
   body: template
 });
 
-export default elastic;
+module.exports = elastic;

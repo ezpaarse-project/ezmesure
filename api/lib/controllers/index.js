@@ -1,15 +1,15 @@
 'use strict';
 
-import koa from 'koa';
-import jwt from 'koa-jwt';
-import route from 'koa-route';
-import mount from 'koa-mount';
-import { auth } from 'config';
+const koa = require('koa');
+const jwt = require('koa-jwt');
+const route = require('koa-route');
+const mount = require('koa-mount');
+const { auth } = require('config');
 
-import { renaterLogin } from './auth/auth';
-import logs from './logs';
-import authorize from './auth';
-import providers from './providers';
+const { renaterLogin } = require('./auth/auth');
+const logs = require('./logs');
+const authorize = require('./auth');
+const providers = require('./providers');
 
 const app = koa();
 
@@ -32,4 +32,4 @@ app.use(mount('/profile', authorize));
 app.use(mount('/logs', logs));
 app.use(mount('/providers', providers));
 
-export default app;
+module.exports = app;

@@ -1,15 +1,16 @@
-import crypto from 'crypto';
-import csv from 'csv';
-import parse from 'co-busboy';
-import zlib from 'zlib';
-import config from 'config';
-import elasticsearch from '../../services/elastic';
-import { appLogger } from '../../../server';
+const crypto = require('crypto');
+const csv    = require('csv');
+const parse  = require('co-busboy');
+const zlib   = require('zlib');
+const config = require('config');
+
+const elasticsearch = require('../../services/elastic');
+const { appLogger } = require('../../../server');
 
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 const prefix   = config.elasticsearch.indicePrefix;
 
-export default function* upload(orgName) {
+module.exports = function* upload(orgName) {
   const username = this.state.user.username;
   const result   = yield elasticsearch.hasPrivileges(username, [orgName], ['write']);
   const canWrite = result && result.index && result.index[orgName] && result.index[orgName].write;
