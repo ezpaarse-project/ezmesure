@@ -1,0 +1,66 @@
+version: '2'
+services:
+  elastic:
+    extends:
+      file: docker-compose.yml
+      service: elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.4.2
+    ports:
+      - 5601:5601
+    links:
+      - elastic
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy
+      - ELASTICSEARCH_PASSWORD
+      - SERVER_BASEPATH
+      - SERVER_HOST
+      - SERVER_PORT
+      - ELASTICSEARCH_URL
+      - XPACK_MONITORING_ENABLED
+      - KIBANA_DEFAULTAPPID
+      - EZMESURE_ES_REPORTING_HOSTNAME
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    restart: unless-stopped
+
+  mongodb:
+    extends:
+      file: docker-compose.yml
+      service: mongodb
+
+  rp:
+    extends:
+      file: docker-compose.yml
+      service: rp
+
+  api:
+    image: node:6.9.4-wheezy
+    ports:
+      - 3000:3000
+    volumes:
+      - "./api:/app"
+    working_dir: /app
+    environment:
+      - http_proxy
+      - https_proxy
+      - EZMESURE_ELASTIC_HOST=elastic
+      - EZMESURE_MONGO_HOST=mongodb
+      - ELASTICSEARCH_PASSWORD
+      - EZMESURE_AUTH_SECRET
+      - EZMESURE_SMTP_HOST
+      - EZMESURE_SMTP_PORT
+      - NODE_ENV
+    links:
+      - elastic
+      - mongodb
+    restart: "no"
+    command: npm run dev
+
+  front:
+    extends:
+      file: docker-compose.yml
+      service: front
