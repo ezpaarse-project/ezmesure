@@ -13,7 +13,7 @@ const logger     = require('./lib/services/logger');
 const appLogger  = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
 
-module.exports = { appLogger }
+module.exports = { appLogger };
 
 const elasticsearch = require('./lib/services/elastic');
 const mongo         = require('./lib/services/mongo');
