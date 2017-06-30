@@ -10,6 +10,14 @@ const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 const prefix   = config.elasticsearch.indicePrefix;
 
 export default function* upload(orgName) {
+  const username = this.state.user.username;
+  const result   = yield elasticsearch.hasPrivileges(username, [orgName], ['write']);
+  const canWrite = result && result.index && result.index[orgName] && result.index[orgName].write;
+
+  if (!canWrite) {
+    return this.throw(`you don't have permission to write in ${orgName}`, 403);
+  }
+
   const exists = yield elasticsearch.indices.exists({ index: orgName });
 
   if (!exists) {
@@ -28,7 +36,7 @@ export default function* upload(orgName) {
     }
 
     this.type = 'json';
-    this.body = yield readStream(stream, orgName);
+    this.body = yield readStream(stream, orgName, username);
     return appLogger.info(`Insert into [${orgName}]`, this.body);
   }
 
@@ -53,7 +61,7 @@ export default function* upload(orgName) {
       part.pipe(stream);
     }
 
-    const result = yield readStream(stream, orgName);
+    const result = yield readStream(stream, orgName, username);
 
     total    += result.total;
     inserted += result.inserted;
@@ -75,7 +83,7 @@ export default function* upload(orgName) {
  * @param  {stream}   stream
  * @return {Promise}
  */
-function readStream(stream, orgName) {
+function readStream(stream, orgName, username) {
   const buffer = [];
   const result = {
     total: 0,
@@ -186,7 +194,10 @@ function readStream(stream, orgName) {
         return callback();
       }
 
-      elasticsearch.bulk({ body: buffer.splice(0, bulkSize) }, (err, resp) => {
+      elasticsearch.bulk({
+        body: buffer.splice(0, bulkSize),
+        headers: { 'es-security-runas-user': username }
+      }, (err, resp) => {
         if (err) { return callback(err); }
 
         (resp.items || []).forEach(i => {

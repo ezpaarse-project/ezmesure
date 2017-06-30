@@ -21,6 +21,12 @@ app.use(route.get('/', function* main() {
 }));
 
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
+app.use(function* (next) {
+  if (!this.state.user || !this.state.user.username) {
+    return this.throw('no username in the token', 401);
+  }
+  yield next;
+});
 
 app.use(mount('/profile', authorize));
 app.use(mount('/logs', logs));

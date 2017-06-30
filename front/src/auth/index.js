@@ -1,7 +1,9 @@
 import { http } from '../app'
 
-const PROFILE_URL = '/api/profile'
-const TOKEN_URL   = '/api/profile/token'
+const PROFILE_URL  = '/api/profile'
+const TOKEN_URL    = '/api/profile/token'
+const PASSWORD_URL = '/api/profile/password'
+const RESET_URL    = '/api/profile/password/reset'
 
 export default {
 
@@ -10,8 +12,6 @@ export default {
   token: null,
 
   checkAuth() {
-    // this.authenticated = !!localStorage.getItem('token')
-
     http.get(PROFILE_URL)
     .then(response => response.json())
     .then(data => {
@@ -27,6 +27,18 @@ export default {
     .catch(err => {
       this.user = null;
     });
+  },
+
+  updatePassword(options) {
+    return http.put(PASSWORD_URL, {
+      currentPassword: options.currentPassword,
+      newPassword: options.newPassword,
+      confirmPassword: options.confirmPassword
+    })
+  },
+
+  resetPassword() {
+    return http.put(RESET_URL)
   },
 
   logout() {

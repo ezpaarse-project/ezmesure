@@ -1,62 +1,66 @@
+import crypto from 'crypto';
 import jwt from 'koa-jwt';
 import { auth } from 'config';
-import mongo from '../../services/mongo';
+import elastic from '../../services/elastic';
+import sendMail from '../../services/mail';
 import { appLogger } from '../../../server';
-
-function decode(value) {
-  if (typeof value !== 'string') { return value; }
-
-  return Buffer.from(value, 'binary').toString('utf8');
-}
 
 export function* renaterLogin() {
   const query   = this.request.query;
   const headers = this.request.header;
   const props   = {
-    idp:          headers['shib-identity-provider'],
-    uid:          headers.uid,
-    name:         decode(headers.displayname || headers.cn || headers.givenname),
-    mail:         decode(headers.mail),
-    org:          decode(headers.o),
-    unit:         decode(headers.ou),
-    eppn:         headers.eppn,
-    remoteUser:   headers.remote_user,
-    persistentId: headers['persistent-id'] || headers['targeted-id'],
-    affiliation:  headers.affiliation
+    full_name: decode(headers.displayname || headers.cn || headers.givenname),
+    email:     decode(headers.mail),
+    roles: ['kibana_user'],
+    metadata: {
+      idp:          headers['shib-identity-provider'],
+      uid:          headers.uid,
+      org:          decode(headers.o),
+      unit:         decode(headers.ou),
+      eppn:         headers.eppn,
+      remoteUser:   headers.remote_user,
+      persistentId: headers['persistent-id'] || headers['targeted-id'],
+      affiliation:  headers.affiliation
+    }
   };
 
-  if (!props.idp) {
+  if (!props.metadata.idp) {
     return this.throw('IDP not found in Shibboleth headers', 400);
   }
 
-  let user = yield findUser(props);
+  if (!props.email) {
+    return this.throw('email not found in Shibboleth headers', 400);
+  }
+
+  const username = props.email.split('@')[0];
+
+  let user = yield elastic.findUser(username);
 
   if (!user) {
-    props.createdAt = props.updatedAt = new Date();
+    props.metadata.createdAt = props.metadata.updatedAt = new Date();
+    props.password = yield randomString();
 
-    try {
-      yield mongo.db.collection('shibheaders').insert(headers);
-    } catch (e) {
-      appLogger.error('Failed at storing shibboleth headers', JSON.stringify(headers));
-    }
-
-    const result = yield mongo.db.collection('users').insert(props);
-
-    user = result && result.ops && result.ops[0];
+    yield elastic.updateUser(username, props);
+    user = yield elastic.findUser(username);
 
     if (!user) {
       return this.throw('Failed to save user data', 500);
     }
+
+    try {
+      yield sendWelcomeMail(user, props.password);
+    } catch (err) {
+      appLogger.error('Failed to send mail', err);
+    }
   } else if (query.refresh) {
-    props.updatedAt = new Date();
-    props.createdAt = user.createdAt;
-    props._id       = user._id;
+    props.metadata.updatedAt = new Date();
+    props.metadata.createdAt = user.metadata.createdAt;
+    props.username           = username;
 
-    const result = yield mongo.db.collection('users').replaceOne({ _id: user._id }, props);
-
-    user = result && result.ops && result.ops[0];
-
-    if (!user) {
+    try {
+      yield elastic.updateUser(username, props);
+      user = props;
+    } catch (e) {
       return this.throw('Failed to update user data', 500);
     }
   }
@@ -65,8 +69,37 @@ export function* renaterLogin() {
   this.redirect(decodeURIComponent(this.query.origin || '/'));
 };
 
+export function* resetPassword() {
+  const user = yield elastic.findUser(this.state.user.username);
+
+  if (!user) {
+    return this.throw('Unable to fetch user data, please log in again', 401);
+  }
+
+  const newPassword = yield randomString();
+
+  yield elastic.updateUserPassword(this.state.user.username, newPassword);
+  yield sendNewPassword(user, newPassword);
+  this.status = 204;
+}
+
+export function* updatePassword() {
+  const { currentPassword, newPassword, confirmPassword } = this.request.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return this.throw('missing field, you must specify: currentPassword, newPassword, confirmPassword', 400);
+  }
+
+  if (newPassword !== confirmPassword) {
+    return this.throw('confirmation password mismatch', 400);
+  }
+
+  yield elastic.updateUserPassword(this.state.user.username, newPassword);
+  this.status = 204;
+}
+
 export function* getUser() {
-  const user = yield findUser(this.state.user);
+  const user = yield elastic.findUser(this.state.user.username);
 
   if (!user) {
     return this.throw('Unable to fetch user data, please log in again', 401);
@@ -81,42 +114,99 @@ export function* getToken() {
   this.body   = generateToken(this.state.user);
 };
 
-function findUser(props) {
-  const { _id, mail, idp, eppn, persistentId, uid, remoteUser } = props;
-
-  const query = { $or: [] };
-
-  if (_id && mongo.ObjectID.isValid(_id)) {
-    query.$or.push({ _id: mongo.ObjectID(_id) });
-  }
-
-  if (persistentId) {
-    query.$or.push({ persistentId });
-  }
-
-  if (idp) {
-    const ids = [];
-
-    if (mail)       { ids.push({ mail }); }
-    if (eppn)       { ids.push({ eppn }); }
-    if (uid)        { ids.push({ uid }); }
-    if (remoteUser) { ids.push({ remoteUser }); }
-
-    if (ids.length > 0) {
-      query.$or.push({ idp, $or: ids });
-    }
-  }
-
-  if (query.$or.length === 0) {
-    return Promise.resolve(null);
-  }
-
-  return mongo.db.collection('users').findOne(query);
-}
-
 function generateToken(user) {
   if (!user) { return null; }
 
-  const { _id, name, mail } = user;
-  return jwt.sign({ _id, name, mail }, auth.secret);
+  const { username, email } = user;
+  return jwt.sign({ username, email }, auth.secret);
+}
+
+function decode(value) {
+  if (typeof value !== 'string') { return value; }
+
+  return Buffer.from(value, 'binary').toString('utf8');
+}
+
+function randomString () {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(5, (err, buffer) => {
+      if (err) { return reject(err); }
+      resolve(buffer.toString('hex'));
+    });
+  });
+}
+
+function sendWelcomeMail(user, password) {
+  return sendMail({
+    from: 'ezMESURE',
+    to: user.email,
+    subject: 'Bienvenue sur ezMESURE !',
+    text: `
+      Bienvenue ${user.full_name},
+      Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder au tableaux de bord :
+
+      Nom d'utilisateur: ${user.username}
+      Mot de passe: ${password}
+
+      Cordialement,
+      L'équipe ezMESURE.
+    `,
+    html: `
+      <h1>Bienvenue ${user.full_name},</h1>
+      <p>Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder au tableaux de bord :</p>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Nom d'utilisateur</strong></td>
+            <td>${user.username}</td>
+          </tr>
+          <tr>
+            <td><strong>Mot de passe</strong></td>
+            <td>${password}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    `
+  });
+}
+
+function sendNewPassword(user, password) {
+  return sendMail({
+    from: 'ezMESURE',
+    to: user.email,
+    subject: 'Votre nouveau mot de passe',
+    text: `
+      Bonjour ${user.full_name},
+      Votre mot de passe a été réinitialisé. Voici vos identifiants :
+
+      Nom d'utilisateur: ${user.username}
+      Mot de passe: ${password}
+
+      Par souci de sécurité, nous vous invitons à le changer rapidement via votre page de profil.
+
+      Cordialement,
+      L'équipe ezMESURE.
+    `,
+    html: `
+      <h1>Bonjour ${user.full_name},</h1>
+      <p>Votre mot de passe a été réinitialisé. Voici vos identifiants :</p>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Nom d'utilisateur</strong></td>
+            <td>${user.username}</td>
+          </tr>
+          <tr>
+            <td><strong>Mot de passe</strong></td>
+            <td>${password}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Par souci de sécurité, nous vous invitons à le changer rapidement via votre page de profil.</p>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    `
+  });
 }

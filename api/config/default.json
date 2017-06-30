@@ -10,7 +10,12 @@
     "host": "localhost",
     "indicePrefix": "ez_",
     "user": "elastic",
-    "password": "changeme"
+    "password": "changeme",
+    "apiVersion": "5.4"
+  },
+  "smtp": {
+    "host": "localhost",
+    "port": 25
   },
   "logs": {
     "app": { "Console": { "timestamp": true, "colorize": true } },
