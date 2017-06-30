@@ -6,7 +6,6 @@ import upload from './upload';
 
 const app = koa();
 
-
 app.use(route.get('/', list));
 app.use(route.delete('/:orgName', del));
 app.use(route.post('/:orgName', upload));

@@ -39,6 +39,17 @@ api.deleteUser = function (name) {
   });
 };
 
+api.hasPrivileges = function (username, names, privileges) {
+  return this.transport.request({
+    method: 'POST',
+    path: '/_xpack/security/user/_has_privileges',
+    headers: { 'es-security-runas-user': username },
+    body: {
+      'index': [{ names, privileges }]
+    }
+  });
+};
+
 const elastic = new elasticsearch.Client({
   host: `${config.get('elasticsearch.host')}:${config.get('elasticsearch.port')}`,
   httpAuth: `${config.get('elasticsearch.user')}:${config.get('elasticsearch.password')}`,
