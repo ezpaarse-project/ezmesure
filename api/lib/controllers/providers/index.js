@@ -1,8 +1,8 @@
-import koa from 'koa';
-import route from 'koa-route';
-import bodyParser from 'koa-bodyparser';
+const koa = require('koa');
+const route = require('koa-route');
+const bodyParser = require('koa-bodyparser');
 
-import { list, find, register, load, del, check } from './actions';
+const { list, find, register, load, del, check } = require('./actions');
 
 const app = koa();
 
@@ -14,4 +14,4 @@ app.use(route.delete('/:providerName', del));
 app.use(route.put('/:providerName', register));
 app.use(route.post('/:providerName', load));
 
-export default app;
+module.exports = app;

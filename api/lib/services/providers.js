@@ -1,8 +1,8 @@
-import elastic from './elastic.js';
-import config from 'config';
-import co from 'co';
+const elastic = require('./elastic.js');
+const config = require('config');
+const co = require('co');
 
-export default { check, register, load, list, remove }
+module.exports = { check, register, load, list, remove };
 
 /**
  * Find all providers and apply them

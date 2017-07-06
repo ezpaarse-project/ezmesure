@@ -1,8 +1,8 @@
-import koa from 'koa';
-import route from 'koa-route';
-import bodyParser from 'koa-bodyparser';
+const koa = require('koa');
+const route = require('koa-route');
+const bodyParser = require('koa-bodyparser');
 
-import { updatePassword, resetPassword, getToken, getUser } from './auth';
+const { updatePassword, resetPassword, getToken, getUser } = require('./auth');
 
 const app = koa();
 
@@ -12,4 +12,4 @@ app.use(bodyParser());
 app.use(route.put('/password', updatePassword));
 app.use(route.put('/password/reset', resetPassword));
 
-export default app;
+module.exports = app;

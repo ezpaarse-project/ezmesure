@@ -2,20 +2,22 @@
 
 const env = process.env.NODE_ENV || 'development';
 
-import path from 'path';
-import koa from 'koa';
-import mount from 'koa-mount';
-import cors from 'koa-cors';
-import qs from 'koa-qs';
-import config from 'config';
+const path   = require('path');
+const koa    = require('koa');
+const mount  = require('koa-mount');
+const cors   = require('koa-cors');
+const qs     = require('koa-qs');
+const config = require('config');
 
-import logger from './lib/services/logger';
-import elasticsearch from './lib/services/elastic';
-import mongo from './lib/services/mongo';
-import controller from './lib/controllers';
-
-export const appLogger = logger(config.get('logs.app'));
+const logger     = require('./lib/services/logger');
+const appLogger  = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
+
+module.exports = { appLogger };
+
+const elasticsearch = require('./lib/services/elastic');
+const mongo         = require('./lib/services/mongo');
+const controller    = require('./lib/controllers');
 
 const app = koa();
 qs(app);

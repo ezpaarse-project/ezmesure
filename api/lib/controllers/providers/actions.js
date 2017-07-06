@@ -1,26 +1,26 @@
-import providers from '../../services/providers';
+const providers = require('../../services/providers');
 
-export function* check() {
+exports.check = function* () {
   this.type = 'json';
   this.body = yield providers.check();
 };
 
-export function* list() {
+exports.list = function* () {
   this.type = 'json';
   this.body = yield providers.list();
 };
 
-export function* find(providerName) {
+exports.find = function* (providerName) {
   this.type = 'json';
   this.body = yield providers.list(providerName);
 };
 
-export function* del(providerName) {
+exports.del = function* (providerName) {
   this.type = 'json';
   this.body = yield providers.remove(providerName);
 };
 
-export function* register(providerName) {
+exports.register = function* (providerName) {
   const options = this.request.body;
   const mandatory = ['key', 'condition', 'target', 'field'];
 
@@ -37,7 +37,7 @@ export function* register(providerName) {
   this.body    = yield providers.register(providerName, options);
 }
 
-export function* load(providerName) {
+exports.load = function* (providerName) {
   this.type = 'json';
   this.body = yield providers.load(providerName, this.request.body);
 }

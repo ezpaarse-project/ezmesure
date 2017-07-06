@@ -1,6 +1,6 @@
-import elasticsearch from '../../services/elastic';
+const elasticsearch = require('../../services/elastic');
 
-export function* list() {
+exports.list = function* () {
   this.type = 'json';
   this.body = yield elasticsearch.indices.stats({
     metric: 'docs',
@@ -8,7 +8,7 @@ export function* list() {
   });
 };
 
-export function* del(index) {
+exports.del = function* (index) {
   const username  = this.state.user.username;
   const perm      = yield elasticsearch.hasPrivileges(username, [index], ['delete_index']);
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];

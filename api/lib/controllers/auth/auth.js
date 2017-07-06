@@ -1,11 +1,11 @@
-import crypto from 'crypto';
-import jwt from 'koa-jwt';
-import { auth } from 'config';
-import elastic from '../../services/elastic';
-import sendMail from '../../services/mail';
-import { appLogger } from '../../../server';
+const crypto = require('crypto');
+const jwt = require('koa-jwt');
+const { auth } = require('config');
+const elastic = require('../../services/elastic');
+const sendMail = require('../../services/mail');
+const { appLogger } = require('../../../server');
 
-export function* renaterLogin() {
+exports.renaterLogin = function* () {
   const query   = this.request.query;
   const headers = this.request.header;
   const props   = {
@@ -69,7 +69,7 @@ export function* renaterLogin() {
   this.redirect(decodeURIComponent(this.query.origin || '/'));
 };
 
-export function* resetPassword() {
+exports.resetPassword = function* () {
   const user = yield elastic.findUser(this.state.user.username);
 
   if (!user) {
@@ -83,7 +83,7 @@ export function* resetPassword() {
   this.status = 204;
 }
 
-export function* updatePassword() {
+exports.updatePassword = function* () {
   const { currentPassword, newPassword, confirmPassword } = this.request.body;
 
   if (!currentPassword || !newPassword || !confirmPassword) {
@@ -98,7 +98,7 @@ export function* updatePassword() {
   this.status = 204;
 }
 
-export function* getUser() {
+exports.getUser = function* () {
   const user = yield elastic.findUser(this.state.user.username);
 
   if (!user) {
@@ -109,7 +109,7 @@ export function* getUser() {
   this.body   = user;
 };
 
-export function* getToken() {
+exports.getToken = function* () {
   this.status = 200;
   this.body   = generateToken(this.state.user);
 };
