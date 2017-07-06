@@ -47,6 +47,57 @@ module.exports = {
         },
         "index_name": {
           "type": "keyword"
+        },
+        "log_id": {
+          "type": "keyword"
+        },
+        "domain": {
+          "type": "keyword"
+        },
+        "subject": {
+          "type": "keyword"
+        },
+        "print_identifier": {
+          "type": "keyword"
+        },
+        "online_identifier": {
+          "type": "keyword"
+        },
+        "doi": {
+          "type": "keyword"
+        },
+        "publication_title": {
+          "type": "keyword"
+        },
+        "login": {
+          "type": "keyword"
+        },
+        "rtype": {
+          "type": "keyword"
+        },
+        "mime": {
+          "type": "keyword"
+        },
+        "on_campus": {
+          "type": "keyword"
+        },
+        "platform": {
+          "type": "keyword"
+        },
+        "platform_name": {
+          "type": "keyword"
+        },
+        "publisher_name": {
+          "type": "keyword"
+        },
+        "title_id": {
+          "type": "keyword"
+        },
+        "unitid": {
+          "type": "keyword"
+        },
+        "url": {
+          "type": "keyword"
         }
       }
     }
