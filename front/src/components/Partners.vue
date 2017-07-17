@@ -134,6 +134,11 @@
           <img alt="Université de Lyon 1" src="https://cloud.githubusercontent.com/assets/5325656/25330085/a8f28800-28de-11e7-9a0d-ad86024ef1b5.png" class="size70">
         </a>
     </div>
+    <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+        <a class="thumbnail" href="http://www.sciencespo-grenoble.fr/">
+          <img alt="Sciences Po Grenoble" src="https://user-images.githubusercontent.com/2981650/28271866-18bfde36-6b0a-11e7-9072-517b84321f65.png" class="size70">
+        </a>
+    </div>
 
    </div>
 
