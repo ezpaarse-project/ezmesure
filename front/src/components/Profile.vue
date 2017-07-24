@@ -43,6 +43,7 @@
       <p class="bg-danger" v-if="passwordError" v-text="passwordError"></p>
       <p class="bg-success" v-if="resetSuccess">Un nouveau mot de passe vous a été envoyé par mail.</p>
 
+      <p>Pour changer votre mot de passe, accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.</p>
       <p>Mot de passe oublié ? <a href="javascript:void(0)" v-on:click="resetPassword">Cliquez-ici</a> pour le réinitialiser.</p>
     </div>
 
