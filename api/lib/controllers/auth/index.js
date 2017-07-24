@@ -9,7 +9,6 @@ const app = koa();
 app.use(route.get('/', getUser));
 app.use(route.get('/token', getToken));
 app.use(bodyParser());
-app.use(route.put('/password', updatePassword));
 app.use(route.put('/password/reset', resetPassword));
 
 module.exports = app;

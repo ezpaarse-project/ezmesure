@@ -40,27 +40,9 @@
         <input v-model="auth.user.username" type="text" class="form-control" id="kibana-id" placeholder="Identifiant Kibana" readonly>
       </div>
 
-      <h3>Mot de passe</h3>
-
       <p class="bg-danger" v-if="passwordError" v-text="passwordError"></p>
-      <p class="bg-success" v-if="passwordSuccess">Mot de passe mis à jour.</p>
       <p class="bg-success" v-if="resetSuccess">Un nouveau mot de passe vous a été envoyé par mail.</p>
 
-      <form v-on:submit.prevent="updatePassword">
-        <div class="form-group">
-          <label for="unit">Mot de passe actuel</label>
-          <input type="password" v-model="currentPassword" class="form-control" placeholder="Mot de passe actuel">
-        </div>
-        <div class="form-group">
-          <label for="unit">Nouveau mot de passe</label>
-          <input type="password" v-model="newPassword" class="form-control" placeholder="Nouveau mot de passe">
-        </div>
-        <div class="form-group">
-          <label for="unit">Confirmation mot de passe</label>
-          <input type="password" v-model="confirmPassword" class="form-control" placeholder="Confirmation mot de passe">
-        </div>
-        <input class="btn btn-default" type="submit" value="Mettre à jour">
-      </form>
       <p>Mot de passe oublié ? <a href="javascript:void(0)" v-on:click="resetPassword">Cliquez-ici</a> pour le réinitialiser.</p>
     </div>
 
@@ -81,7 +63,6 @@
         newPassword: '',
         confirmPassword: '',
         resetSuccess: false,
-        passwordSuccess: false,
         passwordError: null,
         auth,
         redirectUrl: `/login?origin=${encodeURIComponent(window.location.href)}`,
@@ -89,23 +70,6 @@
       }
     },
     methods: {
-      updatePassword () {
-        this.passwordError = null
-        this.passwordSuccess = false
-
-        auth.updatePassword({
-          currentPassword: this.currentPassword,
-          newPassword: this.newPassword,
-          confirmPassword: this.confirmPassword
-        })
-        .then(() => { this.passwordSuccess = true })
-        .catch((e) => {
-          if (e.status >= 400 && e.status < 500) {
-            return this.passwordError = e.body
-          }
-          this.passwordError = e.statusText
-        });
-      },
       resetPassword () {
         this.passwordError = null
         this.resetSuccess = false

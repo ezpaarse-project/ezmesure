@@ -29,14 +29,6 @@ export default {
     });
   },
 
-  updatePassword(options) {
-    return http.put(PASSWORD_URL, {
-      currentPassword: options.currentPassword,
-      newPassword: options.newPassword,
-      confirmPassword: options.confirmPassword
-    })
-  },
-
   resetPassword() {
     return http.put(RESET_URL)
   },
