@@ -14,4 +14,4 @@ COPY package.json /usr/src/app/
 RUN yarn install && yarn cache clean
 COPY . /usr/src/app
 
-ENTRYPOINT [ "node", "./src/index.js" ]
+ENTRYPOINT [ "node", "./server.js" ]
