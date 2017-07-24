@@ -10,7 +10,7 @@ xpack.notification.email.account:
       from: xpack@inist.fr
     profile: standard
     smtp:
-      host: ${EZMESURE_SMTPOUT}
+      host: ${EZMESURE_SMTP_HOST}
       port: 25
 
 

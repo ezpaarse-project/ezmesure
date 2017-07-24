@@ -17,7 +17,7 @@ services:
       - EZMESURE_ES_NODE_INGEST
       - EZMESURE_ES_NODE_SEARCH_REMOTE
       - EZMESURE_ES_MINMASTER
-      - EZMESURE_SMTPOUT
+      - EZMESURE_SMTP_HOST
       - bootstrap.memory_lock=true
       - ES_JAVA_OPTS
     ulimits:

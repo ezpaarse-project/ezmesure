@@ -11,7 +11,7 @@ THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
 # kibana env settings
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
-export EZMESURE_SMTPOUT="127.0.0.1"
+export EZMESURE_SMTP_HOST="127.0.0.1"
 export ELASTICSEARCH_PASSWORD="changeme"
 export SERVER_BASEPATH=/kibana
 export SERVER_HOST="0.0.0.0"
@@ -41,10 +41,10 @@ export EZMESURE_ES_MEM_LIMIT="4g"
 
 if [[ -f status-nodes.env.sh ]] ; then
 	source status-nodes.env.sh
-	if [[ -z ${EZMESURE_NODES} ]] ; then 
+	if [[ -z ${EZMESURE_NODES} ]] ; then
 		echo "Variable EZMESURE_NODES mandatory"
 		exit 1;
-	fi 
+	fi
 	# set ezmesure Domain
 	export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}.couperin.org"
 	export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
