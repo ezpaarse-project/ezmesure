@@ -1,4 +1,4 @@
-FROM node:6.9.4-wheezy
+FROM node:8.5.0-wheezy
 MAINTAINER ezTEAM <ezpaarse@couperin.org>
 
 RUN mkdir -p /usr/src/app
@@ -9,4 +9,4 @@ RUN npm install
 COPY . /usr/src/app
 RUN npm run build
 
-ENTRYPOINT ["./node_modules/.bin/http-server", "public", "-p", "8080"]
+ENTRYPOINT ["npm", "start"]
