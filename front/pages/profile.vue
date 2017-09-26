@@ -9,36 +9,6 @@
             Actualiser
           </v-btn>
         </v-toolbar>
-<!--
-        <v-list two-line>
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ user.full_name }}</v-list-tile-title>
-              <v-list-tile-sub-title>{{ user.email }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ user.metadata.idp }}</v-list-tile-title>
-              <v-list-tile-sub-title>IDP</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ user.metadata.org }}</v-list-tile-title>
-              <v-list-tile-sub-title>Organisation</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ user.metadata.unit }}</v-list-tile-title>
-              <v-list-tile-sub-title>Unité</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list> -->
 
         <v-card-text>
             <div class="mb-3">

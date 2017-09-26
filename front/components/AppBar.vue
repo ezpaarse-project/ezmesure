@@ -17,9 +17,6 @@
       </v-btn>
       <v-list>
         <v-subheader>Naviguer vers</v-subheader>
-        <v-list-tile v-for="tile in tiles" :key="tile.title" @click="sheet = false">
-          <v-list-tile-title>{{ tile.title }}</v-list-tile-title>
-        </v-list-tile>
 
         <v-list-tile @click="sheet = false" exact to="/">
           <v-list-tile-title>Accueil</v-list-tile-title>
