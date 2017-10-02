@@ -28,6 +28,7 @@
     "config": "^1.20.1",
     "csv": "^0.4.6",
     "elasticsearch": "^13.1.1",
+    "fs-extra": "^4.0.2",
     "koa": "^1.2.0",
     "koa-bodyparser": "^2.2.0",
     "koa-cors": "0.0.16",

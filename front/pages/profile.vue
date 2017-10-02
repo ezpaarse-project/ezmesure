@@ -5,8 +5,8 @@
         <v-toolbar card>
           <v-toolbar-title>Profil</v-toolbar-title>
           <v-spacer/>
-          <v-btn flat :href="refreshUrl">
-            Actualiser
+          <v-btn icon :href="refreshUrl" v-tooltip:left="{ html: 'Actualiser' }">
+            <v-icon>refresh</v-icon>
           </v-btn>
         </v-toolbar>
 
@@ -23,17 +23,17 @@
 
             <div class="mb-3">
               <div class="grey--text">IDP</div>
-              <div>{{ user.metadata.idp }}</div>
+              <div>{{ metadata.idp }}</div>
             </div>
 
             <div class="mb-3">
               <div class="grey--text">Organisation</div>
-              <div>{{ user.metadata.org }}</div>
+              <div>{{ metadata.org }}</div>
             </div>
 
             <div class="mb-3">
               <div class="grey--text">Unité</div>
-              <div>{{ user.metadata.unit }}</div>
+              <div>{{ metadata.unit }}</div>
             </div>
         </v-card-text>
       </v-card>
@@ -54,6 +54,8 @@
           <p>Mot de passe oublié ? <a href="javascript:void(0)" v-on:click="resetPassword">Cliquez-ici</a> pour le réinitialiser.</p>
         </v-card-text>
       </v-card>
+
+      <FileList class="mb-4" />
 
       <v-card class="mb-4">
         <v-toolbar card>
@@ -77,7 +79,12 @@
 </template>
 
 <script>
+  import FileList from '~/components/FileList'
+
   export default {
+    components: {
+      FileList
+    },
     async fetch ({ store }) {
       await store.dispatch('auth/checkAuth')
     },
@@ -92,6 +99,7 @@
     },
     computed: {
       user () { return this.$store.state.auth.user },
+      metadata () { return (this.user && this.user.metadata) || {} },
       token () { return this.$store.state.auth.token }
     },
     methods: {

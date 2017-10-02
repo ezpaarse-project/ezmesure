@@ -38,7 +38,7 @@ services:
       service: rp
 
   api:
-    image: node:6.9.4-wheezy
+    image: node:8.5.0-wheezy
     ports:
       - 3000:3000
     volumes:
