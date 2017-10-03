@@ -57,6 +57,8 @@ services:
     links:
       - elastic
       - mongodb
+    volumes:
+      - "./data/api/storage:/usr/src/app/storage"
     restart: "no"
     command: npm run dev
 
