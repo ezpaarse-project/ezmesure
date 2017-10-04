@@ -42,8 +42,9 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - "./api:/app"
-    working_dir: /app
+      - "./api:/usr/src/app"
+      - "./data/api/storage:/usr/src/app/storage"
+    working_dir: /usr/src/app
     environment:
       - http_proxy
       - https_proxy
@@ -57,8 +58,6 @@ services:
     links:
       - elastic
       - mongodb
-    volumes:
-      - "./data/api/storage:/usr/src/app/storage"
     restart: "no"
     command: npm run dev
 
@@ -67,8 +66,8 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "./front:/app"
-    working_dir: /app
+      - "./front:/usr/src/app"
+    working_dir: /usr/src/app
     environment:
       - EZMESURE_API_URL=/api
       - HOST=0.0.0.0
