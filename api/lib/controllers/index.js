@@ -8,8 +8,10 @@ const { auth } = require('config');
 
 const { renaterLogin } = require('./auth/auth');
 const logs = require('./logs');
+const files = require('./files');
 const authorize = require('./auth');
 const providers = require('./providers');
+const partners = require('./partners');
 
 const app = koa();
 
@@ -19,6 +21,8 @@ app.use(route.get('/', function* main() {
   this.status = 200;
   this.body   = 'OK';
 }));
+
+app.use(mount('/partners', partners));
 
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
 app.use(function* (next) {
@@ -30,6 +34,7 @@ app.use(function* (next) {
 
 app.use(mount('/profile', authorize));
 app.use(mount('/logs', logs));
+app.use(mount('/files', files));
 app.use(mount('/providers', providers));
 
 module.exports = app;

@@ -38,12 +38,13 @@ services:
       service: rp
 
   api:
-    image: node:6.9.4-wheezy
+    image: node:8.5.0-wheezy
     ports:
       - 3000:3000
     volumes:
-      - "./api:/app"
-    working_dir: /app
+      - "./api:/usr/src/app"
+      - "./data/api/storage:/usr/src/app/storage"
+    working_dir: /usr/src/app
     environment:
       - http_proxy
       - https_proxy
@@ -53,6 +54,8 @@ services:
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST
       - EZMESURE_SMTP_PORT
+      - EZMESURE_GOOGLE_EMAIL
+      - EZMESURE_GOOGLE_PRIVATE_KEY
       - NODE_ENV
     links:
       - elastic
@@ -65,8 +68,8 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "./front:/app"
-    working_dir: /app
+      - "./front:/usr/src/app"
+    working_dir: /usr/src/app
     environment:
       - EZMESURE_API_URL=/api
       - HOST=0.0.0.0

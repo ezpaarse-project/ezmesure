@@ -1,4 +1,6 @@
-{
+const path = require('path');
+
+module.exports = {
   "port": 3000,
   "mongo": {
     "port": 27017,
@@ -24,5 +26,8 @@
   "auth": {
     "secret": "some-secret",
     "cookie": "eztoken"
+  },
+  "storage": {
+    "path": path.resolve(__dirname, '../storage')
   }
-}
+};

@@ -11,7 +11,12 @@ export const actions = {
 
   async checkAuth ({ commit }) {
     try {
-      const user = await this.$axios.$get(PROFILE_URL)
+      let user = await this.$axios.$get(PROFILE_URL)
+
+      if (typeof user !== 'object') {
+        user = null
+      }
+
       commit('setUser', user)
     } catch (e) {
       commit('setUser', null)

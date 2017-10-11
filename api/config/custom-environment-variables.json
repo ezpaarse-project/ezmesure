@@ -19,5 +19,12 @@
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE"
+  },
+  "storage": {
+    "path": "EZMESURE_STORAGE_PATH"
+  },
+  "googleAPI": {
+    "clientEmail": "EZMESURE_GOOGLE_EMAIL",
+    "privateKey": "EZMESURE_GOOGLE_PRIVATE_KEY"
   }
 }

@@ -78,10 +78,14 @@ services:
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST
       - EZMESURE_SMTP_PORT
+      - EZMESURE_GOOGLE_EMAIL
+      - EZMESURE_GOOGLE_PRIVATE_KEY
       - NODE_ENV
     links:
       - elastic
       - mongodb
+    volumes:
+      - "./data/api/storage:/usr/src/app/storage"
     restart: unless-stopped
 
   front:
