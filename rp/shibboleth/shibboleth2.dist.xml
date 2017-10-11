@@ -130,20 +130,6 @@
               <MetadataFilter type="Signature" certificate="renater-metadata-signing-cert-2016.pem"/>
             </MetadataProvider>
 
-            <!-- Metadonnées de la fédération RENATER -->
-            <MetadataProvider type="XML" uri="http://federation.renater.fr/renater/idps-renater-metadata.xml"
-                  backingFilePath="idps-renater-metadata.xml" reloadInterval="3600" id="idps-renater">
-                <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/>
-                <MetadataFilter type="Signature" certificate="metadata-federation-renater.crt"/>
-            </MetadataProvider>
-
-            <!-- Metadonnées de la fédération RENATER de test -->
-            <MetadataProvider type="XML" uri="http://federation.renater.fr/test/renater-test-metadata.xml"
-                  backingFilePath="renater-test-metadata.xml" reloadInterval="3600" id="renater-test">
-                <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/>
-                <MetadataFilter type="Signature" certificate="metadata-federation-renater.crt"/>
-            </MetadataProvider>
-
             <!-- Metadonnées de TestShib https://www.testshib.org/configure.html -->
             <MetadataProvider type="XML" uri="http://www.testshib.org/metadata/testshib-providers.xml"
                   backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
