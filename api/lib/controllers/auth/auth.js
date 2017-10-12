@@ -134,6 +134,7 @@ function sendWelcomeMail(user, password) {
       Mot de passe: ${password}
 
       Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.
+      Si ce n'est pas déjà fait, nous vous invitons également à vous rapprocher de l'équipe afin de déterminer vos droits d'accès, sans quoi vous ne pourrez visualiser vos données.
 
       Cordialement,
       L'équipe ezMESURE.
@@ -154,6 +155,7 @@ function sendWelcomeMail(user, password) {
         </tbody>
       </table>
       <p>Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.</p>
+      <p>Si ce n'est pas déjà fait, nous vous invitons également à vous rapprocher de l'équipe afin de déterminer vos droits d'accès, sans quoi vous ne pourrez visualiser vos données.</p>
       <p>Cordialement,</p>
       <p>L'équipe ezMESURE.</p>
     `
