@@ -63,7 +63,7 @@
         </v-toolbar>
 
         <v-card-text>
-          <p>Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes : <code>Authorization: Bearer {insérez le token ici}</code></p>
+          <p>Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : <code>Authorization: Bearer {insérez le token ici}</code></p>
           <v-text-field label="Token" textarea v-model="token" readonly></v-text-field>
         </v-card-text>
       </v-card>
