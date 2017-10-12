@@ -166,10 +166,10 @@ function sendNewPassword(user, password) {
   return sendMail({
     from: 'ezMESURE',
     to: user.email,
-    subject: 'Votre nouveau mot de passe',
+    subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
     text: `
       Bonjour ${user.full_name},
-      Votre mot de passe a été réinitialisé. Voici vos nouveaux identifiants Kibana :
+      Votre mot de passe ezMESURE/Kibana a été réinitialisé. Voici vos nouveaux identifiants Kibana :
 
       Nom d'utilisateur: ${user.username}
       Mot de passe: ${password}
