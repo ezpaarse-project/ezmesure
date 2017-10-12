@@ -10,7 +10,14 @@
           <div class="headline mb-4 text-xs-center">Qu'est-ce qu'ezMESURE ?</div>
 
           <p>
-            ezMESURE est un entrepôt centralisant au niveau national les statistiques d'usage de la documentation scientifique numérique des établissements de l'enseignement supérieur et de la recherche (ESR). ezMESURE propose une interface en ligne de visualisation dynamique, consolidée et comparative des données de consultation. Ces données sont produites par les instances d’<a href="http://ezpaarse.couperin.org">ezPAARSE</a> installées dans les différents établissements de l’ESR puis aggrégées dans ezMESURE. 
+            ezMESURE est un entrepôt centralisant au niveau national les statistiques d'usage 
+            de la documentation scientifique numérique des établissements de l'enseignement 
+            supérieur et de la recherche (ESR).
+            ezMESURE propose une interface en ligne de visualisation dynamique, consolidée et
+            comparative des données de consultation.
+            Ces données sont produites par les instances 
+            d’<a href="http://ezpaarse.couperin.org">ezPAARSE</a> installées dans les différents
+            établissements de l’ESR puis aggrégées dans ezMESURE. 
           </p>
         </v-card-text>
       </v-card>
