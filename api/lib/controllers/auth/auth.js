@@ -33,7 +33,7 @@ exports.renaterLogin = function* () {
     return this.throw('email not found in Shibboleth headers', 400);
   }
 
-  const username = props.email.split('@')[0];
+  const username = props.email.split('@')[0].toLowerCase();
 
   let user = yield elastic.findUser(username);
 
