@@ -2,6 +2,8 @@ const config = require('config');
 const fse = require('fs-extra');
 const path = require('path');
 
+const notifications = require('../../services/notifications');
+
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
 
@@ -21,6 +23,8 @@ exports.upload = function* (fileName) {
     stream.on('error', reject);
     stream.on('finish', resolve);
   });
+
+  notifications.newFile(filePath);
 
   this.status = 204;
   return appLogger.info(`Saved file [${filePath}]`);

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('koa-jwt');
 const { auth } = require('config');
+const notifications = require('../../services/notifications');
 const elastic = require('../../services/elastic');
 const sendMail = require('../../services/mail');
 const { appLogger } = require('../../../server');
@@ -46,6 +47,8 @@ exports.renaterLogin = function* () {
     if (!user) {
       return this.throw('Failed to save user data', 500);
     }
+
+    notifications.newUser(user);
 
     try {
       yield sendWelcomeMail(user, props.password);

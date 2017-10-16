@@ -29,5 +29,8 @@ module.exports = {
   },
   "storage": {
     "path": path.resolve(__dirname, '../storage')
+  },
+  "notifications": {
+    "cron": "0 0 0 * * *"
   }
 };
