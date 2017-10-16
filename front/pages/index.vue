@@ -15,9 +15,9 @@
             supérieur et de la recherche (ESR).
             ezMESURE propose une interface en ligne de visualisation dynamique, consolidée et
             comparative des données de consultation.
-            Ces données sont produites par les instances 
-            d’<a href="http://www.ezpaarse.org">ezPAARSE</a> installées dans les différents
-            établissements de l’ESR puis aggrégées dans ezMESURE. 
+            Ces données sont produites par les installations 
+            <a href="http://www.ezpaarse.org">ezPAARSE</a> des différents
+            établissements de l’ESR puis elles sont aggrégées dans ezMESURE. 
           </p>
         </v-card-text>
       </v-card>
