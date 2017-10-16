@@ -17,7 +17,7 @@
             comparative des données de consultation.
             Ces données sont produites par les installations 
             <a href="http://www.ezpaarse.org">ezPAARSE</a> des
-            établissements de l’ESR puis elles sont aggrégées dans ezMESURE. 
+            établissements de l’ESR puis elles sont agrégées dans ezMESURE. 
           </p>
         </v-card-text>
       </v-card>
