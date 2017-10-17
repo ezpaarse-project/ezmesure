@@ -1,10 +1,13 @@
 const crypto = require('crypto');
 const jwt = require('koa-jwt');
-const { auth } = require('config');
+const config = require('config');
 const notifications = require('../../services/notifications');
 const elastic = require('../../services/elastic');
 const sendMail = require('../../services/mail');
 const { appLogger } = require('../../../server');
+
+const secret = config.get('auth.secret');
+const sender = config.get('notifications.sender');
 
 exports.renaterLogin = function* () {
   const query   = this.request.query;
@@ -106,7 +109,7 @@ function generateToken(user) {
   if (!user) { return null; }
 
   const { username, email } = user;
-  return jwt.sign({ username, email }, auth.secret);
+  return jwt.sign({ username, email }, secret);
 }
 
 function decode(value) {
@@ -126,7 +129,7 @@ function randomString () {
 
 function sendWelcomeMail(user, password) {
   return sendMail({
-    from: 'ezMESURE',
+    from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
     text: `

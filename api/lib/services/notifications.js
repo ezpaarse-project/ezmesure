@@ -2,7 +2,7 @@ const config = require('config');
 const CronJob = require('cron').CronJob;
 const sendMail = require('./mail');
 const { appLogger } = require('../../server');
-const { recipients, cron } = config.get('notifications');
+const { sender, recipients, cron } = config.get('notifications');
 
 let newFiles = [];
 let newUsers = [];
@@ -66,7 +66,7 @@ function sendNotifications () {
   }
 
   return sendMail({
-    from: 'ezMESURE',
+    from: sender,
     to: recipients,
     subject: 'Activité ezMESURE',
     text,
