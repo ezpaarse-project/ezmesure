@@ -16,6 +16,11 @@
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT"
   },
+  "notifications": {
+    "cron": "EZMESURE_NOTIFICATIONS_CRON",
+    "sender": "EZMESURE_NOTIFICATIONS_SENDER",
+    "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS"
+  },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE"

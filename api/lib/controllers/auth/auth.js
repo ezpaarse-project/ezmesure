@@ -1,17 +1,21 @@
 const crypto = require('crypto');
 const jwt = require('koa-jwt');
-const { auth } = require('config');
+const config = require('config');
+const notifications = require('../../services/notifications');
 const elastic = require('../../services/elastic');
 const sendMail = require('../../services/mail');
 const { appLogger } = require('../../../server');
+
+const secret = config.get('auth.secret');
+const sender = config.get('notifications.sender');
 
 exports.renaterLogin = function* () {
   const query   = this.request.query;
   const headers = this.request.header;
   const props   = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
-    email: decode(headers.mail),
-    roles: [],
+    email:     decode(headers.mail),
+    roles: ['kibana_user'],
     metadata: {
       idp:          headers['shib-identity-provider'],
       uid:          headers.uid,
@@ -32,7 +36,7 @@ exports.renaterLogin = function* () {
     return this.throw('email not found in Shibboleth headers', 400);
   }
 
-  const username = props.email.split('@')[0];
+  const username = props.email.split('@')[0].toLowerCase();
 
   let user = yield elastic.findUser(username);
 
@@ -46,6 +50,8 @@ exports.renaterLogin = function* () {
     if (!user) {
       return this.throw('Failed to save user data', 500);
     }
+
+    notifications.newUser(user);
 
     try {
       yield sendWelcomeMail(user, props.password);
@@ -103,7 +109,7 @@ function generateToken(user) {
   if (!user) { return null; }
 
   const { username, email } = user;
-  return jwt.sign({ username, email }, auth.secret);
+  return jwt.sign({ username, email }, secret);
 }
 
 function decode(value) {
@@ -123,7 +129,7 @@ function randomString () {
 
 function sendWelcomeMail(user, password) {
   return sendMail({
-    from: 'ezMESURE',
+    from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
     text: `

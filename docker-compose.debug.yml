@@ -52,14 +52,18 @@ services:
       - EZMESURE_MONGO_HOST=mongodb
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
-      - EZMESURE_SMTP_HOST
-      - EZMESURE_SMTP_PORT
+      - EZMESURE_SMTP_HOST=maildev
+      - EZMESURE_SMTP_PORT=25
       - EZMESURE_GOOGLE_EMAIL
       - EZMESURE_GOOGLE_PRIVATE_KEY
+      - EZMESURE_NOTIFICATIONS_SENDER
+      - EZMESURE_NOTIFICATIONS_CRON
+      - EZMESURE_NOTIFICATIONS_RECIPIENTS
       - NODE_ENV
     links:
       - elastic
       - mongodb
+      - maildev
     restart: "no"
     command: npm run dev
 
@@ -76,3 +80,8 @@ services:
       - PORT=8080
     command: npm run dev
     restart: "no"
+
+  maildev:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80

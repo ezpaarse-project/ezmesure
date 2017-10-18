@@ -29,5 +29,9 @@ module.exports = {
   },
   "storage": {
     "path": path.resolve(__dirname, '../storage')
+  },
+  "notifications": {
+    "sender": "ezMESURE",
+    "cron": "0 0 0 * * *"
   }
 };
