@@ -15,6 +15,14 @@ const httpLogger = logger(config.get('logs.http'));
 
 module.exports = { appLogger };
 
+const mailSender = config.get('notifications.sender');
+
+if (mailSender) {
+  appLogger.info(`Sender address for mails: ${mailSender}`);
+} else {
+  appLogger.error('Missing sender address for mails, please configure <notifications.sender>');
+}
+
 const elasticsearch = require('./lib/services/elastic');
 const mongo         = require('./lib/services/mongo');
 const controller    = require('./lib/controllers');
