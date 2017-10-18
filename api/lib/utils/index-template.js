@@ -4,6 +4,16 @@ module.exports = {
   "template": `${config.elasticsearch.indicePrefix}*`,
   "mappings": {
     "event": {
+      "dynamic_templates": [
+        {
+          "strings_as_keywords": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
       "properties": {
         "date": {
           "type": "date",
