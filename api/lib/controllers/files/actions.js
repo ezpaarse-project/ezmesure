@@ -12,9 +12,12 @@ exports.upload = function* (fileName) {
     return this.throw(400, 'unsupported file type');
   }
 
-  const user     = this.state.user;
-  const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const filePath = path.resolve(userDir, fileName);
+  const user   = this.state.user;
+  const domain = user.email.split('@')[1];
+
+  const relativePath = path.join(domain, user.username, fileName);
+  const userDir      = path.resolve(storagePath, domain, user.username);
+  const filePath     = path.resolve(userDir, fileName);
 
   yield fse.ensureDir(userDir);
 
@@ -24,7 +27,7 @@ exports.upload = function* (fileName) {
     stream.on('finish', resolve);
   });
 
-  notifications.newFile(filePath);
+  notifications.newFile(relativePath);
 
   this.status = 204;
   return appLogger.info(`Saved file [${filePath}]`);
