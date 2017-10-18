@@ -68,7 +68,7 @@ function sendNotifications () {
   return sendMail({
     from: sender,
     to: recipients,
-    subject: 'Activité ezMESURE',
+    subject: '[Admin] Activité ezMESURE',
     text,
     html
   });
