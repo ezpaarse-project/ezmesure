@@ -18,6 +18,7 @@
   },
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
+    "sender": "EZMESURE_NOTIFICATIONS_SENDER",
     "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS"
   },
   "auth": {
