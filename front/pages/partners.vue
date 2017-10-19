@@ -26,11 +26,11 @@
             <div class="body-2">Correspondants</div>
             <div>Documentaire :
               <span v-if="partner.correspondantDocumentaireNom">{{ partner.correspondantDocumentaireNom }} {{ partner.correspondantDocumentairePrenom }}</span>
-              <span v-else>aucun</span>
+              <span v-else>non confirmé</span>
             </div>
             <div>Technique :
               <span v-if="partner.correspondantTechniqueNom">{{ partner.correspondantTechniqueNom }} {{ partner.correspondantTechniquePrenom }}</span>
-              <span v-else>aucun</span>
+              <span v-else>non confirmé</span>
             </div>
           </v-card-text>
         </v-card>
