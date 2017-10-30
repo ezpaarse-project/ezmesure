@@ -32,6 +32,9 @@
               <span v-if="partner.correspondantTechniqueNom">{{ partner.correspondantTechniqueNom }} {{ partner.correspondantTechniquePrenom }}</span>
               <span v-else>non confirmé</span>
             </div>
+            <div>
+              <span v-if="partner.nbreECsDansIndex">{{ partner.nbreECsDansIndex }} ECs chargés dans l'index</span>
+            </div>
           </v-card-text>
         </v-card>
       </v-flex>
