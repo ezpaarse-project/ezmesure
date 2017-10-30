@@ -33,7 +33,7 @@
               <span v-else>non confirmé</span>
             </div>
             <div>
-              <span v-if="partner.nbreECsDansIndex">{{ partner.nbreECsDansIndex }} ECs chargés dans l'index</span>
+              <span v-if="partner.nbreECsDansIndex">{{ partner.nbreECsDansIndex }} <abbr title="Evénements de Consultations">ECs</abbr> chargés dans ezMESURE</span>
             </div>
           </v-card-text>
         </v-card>
