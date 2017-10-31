@@ -34,6 +34,15 @@
             </div>
             <div>
               <span v-if="partner.nbreECsDansIndex">{{ partner.nbreECsDansIndex }} <abbr title="Evénements de Consultations">ECs</abbr> chargés dans ezMESURE</span>
+              <span v-if="partner.automatisationRapport">
+              <v-btn
+                class="blue lighten-2"
+                dark
+                large
+                href="http://blog.ezpaarse.org/?s=automatiser"
+              >Automatisé
+              </v-btn>
+              </span>
             </div>
           </v-card-text>
         </v-card>
