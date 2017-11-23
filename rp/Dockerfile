@@ -1,6 +1,5 @@
 FROM debian:jessie
-
-MAINTAINER ezTEAM <ezpaarse@couperin.org>
+LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
 RUN apt-get update \
   && apt-get -y install apache2 libapache2-mod-shib2 \

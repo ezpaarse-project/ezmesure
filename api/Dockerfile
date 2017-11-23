@@ -1,5 +1,5 @@
 FROM node:8.5.0-wheezy
-MAINTAINER ezTEAM <ezpaarse@couperin.org>
+LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
