@@ -5,9 +5,12 @@
         <v-toolbar card>
           <v-toolbar-title>Profil</v-toolbar-title>
           <v-spacer/>
-          <v-btn icon :href="refreshUrl" v-tooltip:left="{ html: 'Actualiser' }">
-            <v-icon>refresh</v-icon>
-          </v-btn>
+          <v-tooltip left>
+            <v-btn slot="activator" icon :href="refreshUrl">
+              <v-icon>refresh</v-icon>
+            </v-btn>
+            <span>Actualiser</span>
+          </v-tooltip>
         </v-toolbar>
 
         <v-card-text>
@@ -48,8 +51,8 @@
 
           <v-text-field label="Nom d'utilisateur" v-model="user.username" readonly></v-text-field>
 
-          <v-alert dismissible error v-model="passwordError">{{ passwordErrorText }}</v-alert>
-          <v-alert dismissible success v-model="resetSuccess">Un nouveau mot de passe vous a été envoyé par mail.</v-alert>
+          <v-alert dismissible color="error" v-model="passwordError">{{ passwordErrorText }}</v-alert>
+          <v-alert dismissible color="success" v-model="resetSuccess">Un nouveau mot de passe vous a été envoyé par mail.</v-alert>
           <p>Pour changer votre mot de passe, accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.</p>
           <p>Mot de passe oublié ? <a href="javascript:void(0)" v-on:click="resetPassword">Cliquez-ici</a> pour le réinitialiser.</p>
         </v-card-text>

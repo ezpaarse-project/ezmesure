@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar fixed dark>
+  <v-toolbar app fixed dark>
     <v-toolbar-title>
       ezMESURE
     </v-toolbar-title>

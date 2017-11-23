@@ -2,9 +2,9 @@
   <v-app light>
     <AppBar/>
 
-    <main>
+    <v-content>
       <nuxt />
-    </main>
+    </v-content>
   </v-app>
 </template>
 

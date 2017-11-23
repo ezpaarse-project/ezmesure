@@ -5,15 +5,24 @@
 
       <v-spacer/>
 
-      <v-btn icon @click="deleteSelected" :disabled="noFileSelected" v-tooltip:left="{ html: 'Supprimer' }">
-        <v-icon>delete</v-icon>
-      </v-btn>
-      <v-btn icon @click="clearCompletedUploads" :disabled="noUploads" v-tooltip:left="{ html: 'Vider chargements terminés' }">
-        <v-icon>clear_all</v-icon>
-      </v-btn>
-      <v-btn icon @click="fetchHostedFiles" v-tooltip:left="{ html: 'Actualiser' }">
-        <v-icon>refresh</v-icon>
-      </v-btn>
+      <v-tooltip left>
+        <v-btn slot="activator" icon @click="deleteSelected" :disabled="noFileSelected">
+          <v-icon>delete</v-icon>
+        </v-btn>
+        <span>Supprimer</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" icon @click="clearCompletedUploads" :disabled="noUploads">
+          <v-icon>clear_all</v-icon>
+        </v-btn>
+        <span>Vider chargements terminés</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn slot="activator" icon @click="fetchHostedFiles">
+          <v-icon>refresh</v-icon>
+        </v-btn>
+        <span>Actualiser</span>
+      </v-tooltip>
     </v-toolbar>
 
     <v-tabs centered>
