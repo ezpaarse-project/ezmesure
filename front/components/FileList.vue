@@ -39,7 +39,7 @@
             :headers="headers"
             :loading="loading"
             v-model="selected"
-            selected-key="name"
+            item-key="name"
             select-all
             no-data-text="Aucun fichier"
             no-results-text="Aucun fichier"
@@ -79,8 +79,8 @@
 
                   <v-flex>
                     <v-progress-circular
-                      :indeterminate="!upload.progress"
-                      :value="upload.progress"
+                      :indeterminate="!upload.error && !upload.progress"
+                      :value="upload.error ? 100 : upload.progress"
                       :class="upload.error ? 'red--text' : 'teal--text'"
                       size="50"
                     >
@@ -101,6 +101,7 @@
                       </span>
                       <span v-else-if="upload.done">Chargé</span>
                       <span v-else-if="upload.progress">Chargement en cours</span>
+                      <span v-else-if="upload.validating">Validation du fichier...</span>
                       <span v-else>En attente</span>
                     </div>
                   </v-flex>
@@ -131,6 +132,7 @@
 <script>
 import FileInput from './FileInput'
 import prettyBytes from 'pretty-bytes'
+import Papa from 'papaparse'
 import { CancelToken, isCancel } from 'axios'
 
 export default {
@@ -204,30 +206,120 @@ export default {
         return this.fetchHostedFiles()
       }
 
-      const source = CancelToken.source()
-
-      upload.cancel = () => { source.cancel() }
-
+      upload.validating = true
       try {
-        upload.req = this.$axios.put(`/files/${upload.file.name}`, upload.file, {
-          cancelToken: source.token,
-          onUploadProgress: (event) => {
-            if (event.lengthComputable) {
-              upload.progress = Math.floor(event.loaded / event.total * 100)
-            }
-          }
-        })
+        await this.validateFile(upload.file)
+      } catch (err) {
+        upload.error = err
+        upload.errorMessage = err.message
+      }
+      upload.validating = false
 
-        await upload.req
-      } catch (e) {
-        const data = e.response && e.response.data
-        upload.error = e
-        upload.errorMessage = isCancel(e) ? 'Annulé' : data || e.statusText
+      if (!upload.error) {
+        const source = CancelToken.source()
+        upload.cancel = () => { source.cancel() }
+
+        try {
+          upload.req = this.$axios.put(`/files/${upload.file.name}`, upload.file, {
+            cancelToken: source.token,
+            onUploadProgress: (event) => {
+              if (event.lengthComputable) {
+                upload.progress = Math.floor(event.loaded / event.total * 100)
+              }
+            }
+          })
+
+          await upload.req
+        } catch (e) {
+          const data = e.response && e.response.data
+          upload.error = e
+          upload.errorMessage = isCancel(e) ? 'Annulé' : data || e.statusText
+        }
       }
 
       upload.done = true
-
       setTimeout(() => this.uploadNextFile(), 500)
+    },
+
+    async validateFile (file) {
+      return new Promise((resolve, reject) => {
+        if (typeof FileReader === 'undefined') { return resolve() }
+        if (/\.csv\.gz$/i.test(file.name)) { return resolve() }
+
+        if (!/\.csv$/i.test(file.name)) {
+          return reject(new Error('Le fichier n\'est pas un CSV'))
+        }
+
+        const mandatoryFields = new Set([
+          'datetime',
+          'log_id',
+          'rtype',
+          'mime',
+          'title_id',
+          'doi'
+        ])
+
+        let lineNumber = 0
+        let readLimit = 50
+        let columns
+        let err
+
+        Papa.parse(file, {
+          delimiter: ';',
+          error: err => reject(err),
+          step: ({ data, errors }, parser) => {
+            if (++lineNumber > readLimit) {
+              return parser.abort()
+            }
+            const row = data[0]
+
+            if (errors.length > 0) {
+              err = errors[0]
+
+              if (err.type === 'Quotes') {
+                err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`
+              }
+
+              return parser.abort()
+            }
+
+            if (typeof columns === 'undefined') {
+              columns = row
+
+              for (const field of mandatoryFields) {
+                if (!columns.includes(field)) {
+                  err = new Error(`Le champ "${field}" est manquant`)
+                  return parser.abort()
+                }
+              }
+              return
+            }
+
+            const obj = {}
+
+            columns.forEach((colName, index) => {
+              obj[colName] = row[index]
+            })
+
+            if (!obj.log_id) {
+              err = new Error(`Ligne #${lineNumber}: champ "log_id" vide`)
+            } else if (!obj.datetime) {
+              err = new Error(`Ligne #${lineNumber}: champ "datetime" vide`)
+            } else if (isNaN(Date.parse(obj.datetime))) {
+              err = new Error(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`)
+            } else if (obj.date && !/^\d{4}-\d{2}-\d{2}$/.test(obj.date)) {
+              err = new Error(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`)
+            }
+
+            if (err) {
+              parser.abort()
+            }
+          },
+          complete: () => {
+            if (err) { reject(err) } else { resolve() }
+          }
+        })
+      })
     },
 
     removeUpload (id) {
