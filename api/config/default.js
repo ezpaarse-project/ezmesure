@@ -10,7 +10,6 @@ module.exports = {
   "elasticsearch": {
     "port": 9200,
     "host": "localhost",
-    "indicePrefix": "ez_",
     "user": "elastic",
     "password": "changeme",
     "apiVersion": "5.4"

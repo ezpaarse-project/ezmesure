@@ -1,6 +1,5 @@
 const elasticsearch = require('elasticsearch');
 const config = require('config');
-const template = require('../utils/index-template');
 
 const apiVersion = config.get('elasticsearch.apiVersion');
 const api = elasticsearch.Client.apis[apiVersion];
@@ -45,7 +44,7 @@ api.hasPrivileges = function (username, names, privileges) {
     path: '/_xpack/security/user/_has_privileges',
     headers: { 'es-security-runas-user': username },
     body: {
-      'index': [{ names, privileges }]
+      index: [{ names, privileges }]
     }
   });
 };
@@ -54,12 +53,6 @@ const elastic = new elasticsearch.Client({
   host: `${config.get('elasticsearch.host')}:${config.get('elasticsearch.port')}`,
   httpAuth: `${config.get('elasticsearch.user')}:${config.get('elasticsearch.password')}`,
   apiVersion
-});
-
-elastic.indices.putTemplate({
-  name: 'main',
-  order: '0',
-  body: template
 });
 
 module.exports = elastic;

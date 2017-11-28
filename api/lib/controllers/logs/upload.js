@@ -5,10 +5,10 @@ const zlib   = require('zlib');
 const config = require('config');
 
 const elasticsearch = require('../../services/elastic');
+const mappings = require('../../utils/index-mappings');
 const { appLogger } = require('../../../server');
 
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
-const prefix   = config.elasticsearch.indicePrefix;
 
 module.exports = function* upload(orgName) {
   const username = this.state.user.username;
@@ -227,17 +227,13 @@ function readStream(stream, orgName, username) {
 }
 
 /**
- * Create an index with a prefix and an alias without it
- * @param  {String}  indexName
+ * Create an index with a default mapping
+ * @param  {String}  index
  * @return {Promise}
  */
-function createIndex(indexName) {
+function createIndex(index) {
   return elasticsearch.indices.create({
-    index: `${prefix}${indexName}`,
-    body: {
-      aliases: {
-        [indexName]: {}
-      }
-    }
+    index,
+    body: { mappings }
   });
 }
