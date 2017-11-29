@@ -39,24 +39,21 @@ export ES_JAVA_OPTS="-Xms2g -Xmx2g"
 export EZMESURE_ES_MEM_LIMIT="4g"
 
 
-if [[ -f status-nodes.env.sh ]] ; then
-	source status-nodes.env.sh
-	if [[ -z ${EZMESURE_NODES} ]] ; then
-		echo "Variable EZMESURE_NODES mandatory"
-		exit 1;
-	fi
+if [[ -f ezmesure.local.env.sh ]] ; then
+	source ezmesure.local.env.sh
 	# set ezmesure Domain
 	export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}.couperin.org"
 	export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
 	# set local EZMESURE_ES_DISCOVERY variable
 	# should contain all ES cluster IP host except local IP address
 	# needs EZMESURE_MASTER and EZMESURE_NODES in environment
-
-	for node in ${EZMESURE_NODES} ; do
-        	if [[ ! $node = $THIS_HOST ]] ; then
-               		EZMESURE_ES_DISCOVERY="${EZMESURE_ES_DISCOVERY},${node}:9300"
-        	fi
-	done
+	if [[ -z ${EZMESURE_NODES} ]] ; then
+        	for node in ${EZMESURE_NODES} ; do
+        		if [[ ! $node = $THIS_HOST ]] ; then
+               			EZMESURE_ES_DISCOVERY="${EZMESURE_ES_DISCOVERY},${node}:9300"
+        		fi
+		done
+	fi
 	export EZMESURE_ES_PUBLISH="${THIS_HOST}"
 	export EZMESURE_ES_DISCOVERY="${EZMESURE_ES_DISCOVERY}"
 	export EZMESURE_ES_MINMASTER="2"

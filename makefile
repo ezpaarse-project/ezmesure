@@ -9,11 +9,17 @@ config: ## patch shibboleth2.xml config file with SP/DS URLs
 	    -e "s|{{SHIBBOLETH_DS_URL}}|${SHIBBOLETH_DS_URL}|" \
 			./rp/shibboleth/shibboleth2.dist.xml > ./rp/shibboleth/shibboleth2.xml
 
-run-prod: cleanup-docker config ## run ezMESURE using environment variables
-	docker-compose up -d rp
+run: cleanup-docker config ## run ezMESURE using environment variables
+	. ./ezmesure.env.sh ; docker-compose up -d
 
-run-dev: cleanup-docker config ## run ezMESURE for https://ezmesure-preprod.couperin.org
-	. ./dev.env.sh ; docker-compose up -d
+run-node: cleanup-docker config ## run ezMESURE elastic node(s) only (with ezmesure.local.env.sh)
+	. ./ezmesure.env.sh ; docker-compose up -d elastic
+
+run-debug: cleanup-docker config ## run ezMESURE debug mode 
+	. ./ezmesure.env.sh ; docker-compose -f docker-compose.debug.yml up -d
+
+stop: ## stop ezMESURE using environment variables
+	. ./ezmesure.env.sh ; docker-compose stop
 
 cleanup-docker: ## remove docker image (needed for updating it)
 	docker-compose stop
