@@ -170,7 +170,7 @@ function sendWelcomeMail(user, password) {
 
 function sendNewPassword(user, password) {
   return sendMail({
-    from: 'ezMESURE',
+    from: sender,
     to: user.email,
     subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
     text: `
