@@ -24,7 +24,6 @@ if (mailSender) {
 }
 
 const elasticsearch = require('./lib/services/elastic');
-const mongo         = require('./lib/services/mongo');
 const controller    = require('./lib/controllers');
 
 const app = koa();
@@ -92,15 +91,6 @@ app.on('error', (err, ctx = {}) => {
 
 app.use(mount('/', controller));
 
-const mongoCfg = config.get('mongo');
-
-mongo.connect(`mongodb://${mongoCfg.host}:${mongoCfg.port}/${mongoCfg.db}`, err => {
-  if (err) {
-    appLogger.error('Couldn\'t connect to Mongodb');
-    process.exit(1);
-  }
-});
-
 const server = app.listen(config.port);
 server.setTimeout(1000 * 60 * 30);
 
@@ -113,8 +103,6 @@ process.on('SIGTERM', closeApp);
 function closeApp() {
   appLogger.info(`Got Signal, closing the server`);
   server.close(() => {
-    mongo.disconnect(() => {
-      process.exit(0);
-    });
+    process.exit(0);
   });
 }
