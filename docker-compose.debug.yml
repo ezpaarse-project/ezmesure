@@ -27,11 +27,6 @@ services:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
 
-  mongodb:
-    extends:
-      file: docker-compose.yml
-      service: mongodb
-
   rp:
     extends:
       file: docker-compose.yml
@@ -49,7 +44,6 @@ services:
       - http_proxy
       - https_proxy
       - EZMESURE_ELASTIC_HOST=elastic
-      - EZMESURE_MONGO_HOST=mongodb
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST=maildev
@@ -62,7 +56,6 @@ services:
       - NODE_ENV
     links:
       - elastic
-      - mongodb
       - maildev
     restart: "no"
     command: npm run dev
