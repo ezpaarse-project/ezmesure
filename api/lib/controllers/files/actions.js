@@ -1,6 +1,8 @@
 const config = require('config');
 const fse = require('fs-extra');
 const path = require('path');
+const zlib = require('zlib');
+const Papa = require('papaparse');
 
 const notifications = require('../../services/notifications');
 
@@ -28,9 +30,16 @@ exports.upload = function* (fileName) {
   });
 
   notifications.newFile(relativePath);
+  appLogger.info(`Saved file [${filePath}]`);
 
-  this.status = 204;
-  return appLogger.info(`Saved file [${filePath}]`);
+  const result = yield validateFile(filePath);
+
+  if (result instanceof Error) {
+    yield fse.unlink(filePath);
+    this.throw(400, result.message);
+  } else {
+    this.status = 204;
+  }
 };
 
 exports.list = function* () {
@@ -39,7 +48,7 @@ exports.list = function* () {
 
   let fileList;
   try {
-    fileList = yield fse.readdir(userDir)
+    fileList = yield fse.readdir(userDir);
   } catch (e) {
     if (e.code !== 'ENOENT') { throw e; }
     fileList = [];
@@ -88,3 +97,85 @@ exports.deleteMany = function* () {
 
   this.status = 204;
 };
+
+/**
+ * Validate a file, assuming it's a CSV file
+ * @param {String} filePath
+ */
+function validateFile (filePath) {
+  return new Promise((resolve, reject) => {
+    const mandatoryFields = new Set([
+      'datetime',
+      'log_id',
+      'rtype',
+      'mime',
+      'title_id',
+      'doi'
+    ])
+
+    let lineNumber = 0
+    let readLimit = 50
+    let columns
+    let err
+
+    let stream = fse.createReadStream(filePath);
+
+    if (filePath.endsWith('gz')) {
+      stream = stream.pipe(zlib.createGunzip());
+    }
+
+    Papa.parse(stream, {
+      delimiter: ';',
+      complete: () => resolve(err),
+      error: error => reject(error),
+      step: ({ data, errors }, parser) => {
+        if (++lineNumber > readLimit) {
+          return parser.abort()
+        }
+        const row = data[0]
+
+        if (errors.length > 0) {
+          err = errors[0]
+
+          if (err.type === 'Quotes') {
+            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`
+          }
+
+          return parser.abort()
+        }
+
+        if (typeof columns === 'undefined') {
+          columns = row
+
+          for (const field of mandatoryFields) {
+            if (!columns.includes(field)) {
+              err = new Error(`Le champ "${field}" est manquant`)
+              return parser.abort()
+            }
+          }
+          return
+        }
+
+        const obj = {}
+
+        columns.forEach((colName, index) => {
+          obj[colName] = row[index]
+        })
+
+        if (!obj.log_id) {
+          err = new Error(`Ligne #${lineNumber}: champ "log_id" vide`)
+        } else if (!obj.datetime) {
+          err = new Error(`Ligne #${lineNumber}: champ "datetime" vide`)
+        } else if (isNaN(Date.parse(obj.datetime))) {
+          err = new Error(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`)
+        } else if (obj.date && !/^\d{4}-\d{2}-\d{2}$/.test(obj.date)) {
+          err = new Error(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`)
+        }
+
+        if (err) {
+          parser.abort()
+        }
+      }
+    })
+  })
+}
