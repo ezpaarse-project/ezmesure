@@ -146,6 +146,7 @@ export default {
     return {
       uploadId: 1,
       uploads: [],
+      uploading: false,
       hostedFiles: [],
       selected: [],
       loading: false,
@@ -197,14 +198,19 @@ export default {
         })
       })
 
-      await this.uploadNextFile()
+      if (!this.uploading) {
+        await this.uploadNextFile()
+      }
     },
 
     async uploadNextFile () {
       const upload = this.uploads.find(u => !u.done)
       if (!upload) {
+        this.uploading = false
         return this.fetchHostedFiles()
       }
+
+      this.uploading = true
 
       upload.validating = true
       try {
