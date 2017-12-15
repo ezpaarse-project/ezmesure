@@ -62,12 +62,19 @@
 
       <v-card class="mb-4">
         <v-toolbar card>
-          <v-toolbar-title>Token</v-toolbar-title>
+          <v-toolbar-title>Token d'authentification</v-toolbar-title>
         </v-toolbar>
 
         <v-card-text>
           <p>Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : <code>Authorization: Bearer {insérez le token ici}</code></p>
-          <v-text-field label="Token" textarea v-model="token" readonly></v-text-field>
+
+          <p class="text-xs-center">
+            <v-btn v-if="!showToken" @click="showToken = true">
+              <v-icon left>visibility</v-icon> Afficher mon token
+            </v-btn>
+          </p>
+
+          <v-text-field v-if="showToken" label="Token" textarea v-model="token" readonly></v-text-field>
         </v-card-text>
       </v-card>
     </template>
@@ -93,6 +100,7 @@
     },
     data () {
       return {
+        showToken: false,
         resetSuccess: false,
         passwordError: null,
         passwordErrorText: '',
