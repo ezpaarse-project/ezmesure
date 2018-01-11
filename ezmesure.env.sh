@@ -12,6 +12,7 @@ THIS_HOST=`hostname -I | cut -d ' ' -f1`
 # kibana env settings
 export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 export EZMESURE_SMTP_HOST="127.0.0.1"
+export ELASTICSEARCH_USERNAME="elastic"
 export ELASTICSEARCH_PASSWORD="changeme"
 export SERVER_BASEPATH=/kibana
 export SERVER_HOST="0.0.0.0"
