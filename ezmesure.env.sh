@@ -30,7 +30,8 @@ export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
 export EZMESURE_ES_PUBLISH="${THIS_HOST}"
 export EZMESURE_ES_MINMASTER="1"
 export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
-# this values are overwrited by status-nodes.env.sh values
+# these values are overwriten by ezmesure.local.env.sh values
+
 export NODE_ENV="dev"
 export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
@@ -48,7 +49,8 @@ if [[ -f ezmesure.local.env.sh ]] ; then
 	# set local EZMESURE_ES_DISCOVERY variable
 	# should contain all ES cluster IP host except local IP address
 	# needs EZMESURE_MASTER and EZMESURE_NODES in environment
-	if [[ -z ${EZMESURE_NODES} ]] ; then
+
+	if [[ ! -z ${EZMESURE_NODES} ]] ; then
         	for node in ${EZMESURE_NODES} ; do
         		if [[ ! $node = $THIS_HOST ]] ; then
                			EZMESURE_ES_DISCOVERY="${EZMESURE_ES_DISCOVERY},${node}:9300"
