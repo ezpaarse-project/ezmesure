@@ -5,7 +5,7 @@ const zlib   = require('zlib');
 const config = require('config');
 
 const elasticsearch = require('../../services/elastic');
-const mappings = require('../../utils/index-mappings');
+const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../../server');
 
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
@@ -234,6 +234,6 @@ function readStream(stream, orgName, username) {
 function createIndex(index) {
   return elasticsearch.indices.create({
     index,
-    body: { mappings }
+    body: { indexTemplate }
   });
 }
