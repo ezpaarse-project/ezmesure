@@ -79,6 +79,9 @@ module.exports = {
         "publication_title": {
           "type": "keyword"
         },
+        "publication_date": {
+          "type": "keyword"
+        },
         "login": {
           "type": "keyword"
         },
