@@ -234,6 +234,6 @@ function readStream(stream, orgName, username) {
 function createIndex(index) {
   return elasticsearch.indices.create({
     index,
-    body: { indexTemplate }
+    body: indexTemplate
   });
 }
