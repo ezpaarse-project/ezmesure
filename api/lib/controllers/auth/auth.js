@@ -15,7 +15,7 @@ exports.renaterLogin = function* () {
   const props   = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
     email:     decode(headers.mail),
-    roles: ['kibana_user'],
+    roles: ['kibana_dashboard_only_user'],
     metadata: {
       idp:          headers['shib-identity-provider'],
       uid:          headers.uid,
