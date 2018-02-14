@@ -26,11 +26,10 @@ services:
         soft: -1
         hard: -1
     mem_limit: ${EZMESURE_ES_MEM_LIMIT}
-
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
-#      - "./elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties"
+      - "./elasticsearch/config/certificates:/usr/share/elasticsearch/config/x-pack/certificates"
     restart: unless-stopped
 
   kibana:
