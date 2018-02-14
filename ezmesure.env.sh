@@ -29,7 +29,6 @@ export EZMESURE_ES_DISCOVERY="${THIS_HOST}:9300"
 export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
 export EZMESURE_ES_PUBLISH="${THIS_HOST}"
 export EZMESURE_ES_MINMASTER="1"
-export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
 # these values are overwriten by ezmesure.local.env.sh values
 
 export NODE_ENV="dev"
