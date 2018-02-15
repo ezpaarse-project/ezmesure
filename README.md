@@ -28,16 +28,23 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
 - SHIBBOLETH_DS_URL
 - EZMESURE_AUTH_SECRET
 
+**NB**: you can set them in `ezmesure.local.env.sh` and source `ezmesure.env.sh`.
+
 3) Configure shibboleth
 ```bash
   make config
 ```
+4) For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. If you don't have them yet, you can generate certificates by following these steps :
+  - Open the `certs` directory.
+  - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file.
+  - Run `docker-compose -f create-certs.yml up`.
+  - A `certificates` directory should be created, you can just put it in `elasticsearch/config/`. (**NB**: you may need to `chown` it)
 
-4) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
+5) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
 ```
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
-4bis) Adjust memory for elastic search
+6) Adjust memory for elastic search
 To avoid out of memory exception problems you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
 
 ```
