@@ -1,0 +1,18 @@
+version: '2.2'
+services:
+  create_certs:
+    container_name: create_certs
+    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:6.2.1
+    command: >
+      bash -c '
+        if [[ ! -d config/x-pack/certificates/certificates ]]; then
+          mkdir config/x-pack/certificates/certificates;
+        fi;
+        if [[ ! -f /local/certs/bundle.zip ]]; then
+          bin/x-pack/certutil cert --pem --silent --in config/x-pack/certificates/instances.yml --out config/x-pack/certificates/certificates/bundle.zip;
+          unzip config/x-pack/certificates/certificates/bundle.zip -d config/x-pack/certificates/certificates;
+        fi;
+        chgrp -R 0 config/x-pack/certificates/certificates
+      '
+    working_dir: /usr/share/elasticsearch
+    volumes: ['.:/usr/share/elasticsearch/config/x-pack/certificates']
