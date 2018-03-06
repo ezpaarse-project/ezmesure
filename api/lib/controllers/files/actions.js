@@ -5,6 +5,7 @@ const zlib = require('zlib');
 const Papa = require('papaparse');
 
 const notifications = require('../../services/notifications');
+const validator = require('../../services/validator');
 
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
@@ -104,15 +105,6 @@ exports.deleteMany = function* () {
  */
 function validateFile (filePath) {
   return new Promise((resolve, reject) => {
-    const mandatoryFields = new Set([
-      'datetime',
-      'log_id',
-      'rtype',
-      'mime',
-      'title_id',
-      'doi'
-    ])
-
     let lineNumber = 0
     let readLimit = 50
     let columns
@@ -145,34 +137,26 @@ function validateFile (filePath) {
         }
 
         if (typeof columns === 'undefined') {
-          columns = row
+          columns = row;
 
-          for (const field of mandatoryFields) {
-            if (!columns.includes(field)) {
-              err = new Error(`Le champ "${field}" est manquant`)
-              return parser.abort()
-            }
+          try {
+            return validator.validateColumns(columns);
+          } catch (e) {
+            err = e
+            return parser.abort()
           }
-          return
         }
 
-        const obj = {}
+        const ec = {}
 
         columns.forEach((colName, index) => {
-          obj[colName] = row[index]
+          ec[colName] = row[index]
         })
 
-        if (!obj.log_id) {
-          err = new Error(`Ligne #${lineNumber}: champ "log_id" vide`)
-        } else if (!obj.datetime) {
-          err = new Error(`Ligne #${lineNumber}: champ "datetime" vide`)
-        } else if (isNaN(Date.parse(obj.datetime))) {
-          err = new Error(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`)
-        } else if (obj.date && !/^\d{4}-\d{2}-\d{2}$/.test(obj.date)) {
-          err = new Error(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`)
-        }
-
-        if (err) {
+        try {
+          validator.validateEvent(ec)
+        } catch (e) {
+          err = e;
           parser.abort()
         }
       }

@@ -4,6 +4,7 @@ const parse  = require('co-busboy');
 const zlib   = require('zlib');
 const config = require('config');
 
+const validator     = require('../../services/validator');
 const elasticsearch = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../../server');
@@ -37,7 +38,12 @@ module.exports = function* upload(orgName) {
     }
 
     this.type = 'json';
-    this.body = yield readStream(stream, orgName, username);
+
+    try {
+      this.body = yield readStream(stream, orgName, username);
+    } catch (e) {
+      return this.throw(e.message, e.type === 'validation' ? 400 : 500);
+    }
     return appLogger.info(`Insert into [${orgName}]`, this.body);
   }
 
@@ -62,7 +68,12 @@ module.exports = function* upload(orgName) {
       part.pipe(stream);
     }
 
-    const result = yield readStream(stream, orgName, username);
+    let result;
+    try {
+      result = yield readStream(stream, orgName, username);
+    } catch (e) {
+      return this.throw(e.message, e.type === 'validation' ? 400 : 500);
+    }
 
     total    += result.total;
     inserted += result.inserted;
@@ -95,14 +106,21 @@ function readStream(stream, orgName, username) {
   };
   let busy = false;
 
-  const parser = csv.parse({
-    'delimiter': ';',
-    'columns': true,
-    'relax_column_count': true
-  });
-
   return new Promise((resolve, reject) => {
     let doneReading = false;
+
+    const parser = csv.parse({
+      'delimiter': ';',
+      'columns': columns => {
+        try {
+          validator.validateColumns(columns);
+        } catch (e) {
+          return reject(e);
+        }
+        return columns;
+      },
+      'relax_column_count': true
+    });
 
     parser.on('readable', read);
     parser.on('error', err => { reject(err); });
@@ -115,6 +133,7 @@ function readStream(stream, orgName, username) {
         resolve(result);
       });
     });
+
     stream.on('error', err => { reject(err); });
     stream.pipe(parser);
 
@@ -123,6 +142,15 @@ function readStream(stream, orgName, username) {
 
       let ec;
       while (ec = parser.read()) {
+
+        if (result.total < 50) {
+          try {
+            validator.validateEvent(ec);
+          } catch (e) {
+            return reject(e);
+          }
+        }
+
         result.total++;
         ec.index_name = orgName;
 
@@ -135,27 +163,9 @@ function readStream(stream, orgName, username) {
         let docID = ec['log_id'];
 
         if (!docID) {
-          const timestamp = parseInt(ec.timestamp) || new Date(ec.datetime).getTime();
-
-          if (isNaN(timestamp)) {
-            addError({
-              reason: ec.datetime
-                ? `invalid datetime: ${ec.datetime}`
-                : `invalid timestamp: ${ec.timestamp}`
-            });
-            result.failed++;
-            continue;
-          }
-
-          if (!ec.url) {
-            addError({ reason: 'url is missing' });
-            result.failed++;
-            continue;
-          }
-
-          docID = crypto.createHash('sha1')
-                        .update(`${timestamp}${ec.url}${ec.login || ''}`)
-                        .digest('hex');
+          addError({ reason: 'log_id is missing' });
+          result.failed++;
+          continue;
         }
 
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
