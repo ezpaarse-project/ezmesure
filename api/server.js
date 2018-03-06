@@ -64,7 +64,7 @@ app.use(function *(next) {
     if (this.headerSent || !this.writable) { return; }
 
     if (env !== 'development') {
-      return this.body = error.message;
+      return this.body = { error: error.message };
     }
 
     // respond with the error details
