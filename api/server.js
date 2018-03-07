@@ -3,10 +3,9 @@
 const env = process.env.NODE_ENV || 'development';
 
 const path   = require('path');
-const koa    = require('koa');
+const Koa    = require('koa');
 const mount  = require('koa-mount');
 const cors   = require('koa-cors');
-const qs     = require('koa-qs');
 const config = require('config');
 
 const logger     = require('./lib/services/logger');
@@ -26,8 +25,7 @@ if (mailSender) {
 const elasticsearch = require('./lib/services/elastic');
 const controller    = require('./lib/controllers');
 
-const app = koa();
-qs(app);
+const app = new Koa();
 
 app.use(cors({
   origin: '*',
@@ -36,40 +34,40 @@ app.use(cors({
 }));
 
 // Server logs
-app.use(function* logHttp(next) {
-  this.httpLog = {
-    method: this.request.method,
-    url: this.request.url,
-    remoteIP: this.request.ip,
-    userAgent: this.request.headers['user-agent']
+app.use(async (ctx, next) => {
+  ctx.httpLog = {
+    method: ctx.request.method,
+    url: ctx.request.url,
+    remoteIP: ctx.request.ip,
+    userAgent: ctx.request.headers['user-agent']
   };
 
-  yield next;
+  await next();
 
   // Static files
-  if (['.css', '.js', '.woff'].indexOf(path.extname(this.request.url)) !== -1) { return; }
+  if (['.css', '.js', '.woff'].indexOf(path.extname(ctx.request.url)) !== -1) { return; }
 
-  this.httpLog.status = this.status;
-  httpLogger.log('info', this.httpLog);
+  ctx.httpLog.status = ctx.status;
+  httpLogger.log('info', ctx.httpLog);
 });
 
 // Error handler
-app.use(function *(next) {
+app.use(async (ctx, next) => {
   try {
-    yield next;
+    await next();
   } catch (error) {
-    this.status = error.status || 500;
-    this.app.emit('error', error, this);
+    ctx.status = error.status || 500;
+    ctx.app.emit('error', error, ctx);
 
-    if (this.headerSent || !this.writable) { return; }
+    if (ctx.headerSent || !ctx.writable) { return; }
 
     if (env !== 'development') {
-      return this.body = { error: error.message };
+      return ctx.body = { error: error.message };
     }
 
     // respond with the error details
-    this.type = 'json';
-    this.body = {
+    ctx.type = 'json';
+    ctx.body = {
       error: error.message,
       stack: error.stack,
       code: error.code

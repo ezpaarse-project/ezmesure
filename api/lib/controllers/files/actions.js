@@ -10,22 +10,22 @@ const validator = require('../../services/validator');
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
 
-exports.upload = function* (fileName) {
+exports.upload = async function (ctx, fileName) {
   if (!/\.(csv|gz)$/i.test(fileName)) {
-    return this.throw(400, 'unsupported file type');
+    return ctx.throw(400, 'unsupported file type');
   }
 
-  const user   = this.state.user;
+  const user   = ctx.state.user;
   const domain = user.email.split('@')[1];
 
   const relativePath = path.join(domain, user.username, fileName);
   const userDir      = path.resolve(storagePath, domain, user.username);
   const filePath     = path.resolve(userDir, fileName);
 
-  yield fse.ensureDir(userDir);
+  await fse.ensureDir(userDir);
 
-  yield new Promise((resolve, reject) => {
-    const stream = this.req.pipe(fse.createWriteStream(filePath));
+  await new Promise((resolve, reject) => {
+    const stream = ctx.req.pipe(fse.createWriteStream(filePath));
     stream.on('error', reject);
     stream.on('finish', resolve);
   });
@@ -33,23 +33,23 @@ exports.upload = function* (fileName) {
   notifications.newFile(relativePath);
   appLogger.info(`Saved file [${filePath}]`);
 
-  const result = yield validateFile(filePath);
+  const result = await validateFile(filePath);
 
   if (result instanceof Error) {
-    yield fse.unlink(filePath);
-    this.throw(400, result.message);
+    await fse.unlink(filePath);
+    ctx.throw(400, result.message);
   } else {
-    this.status = 204;
+    ctx.status = 204;
   }
 };
 
-exports.list = function* () {
-  const user    = this.state.user;
+exports.list = async function (ctx) {
+  const user    = ctx.state.user;
   const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
 
   let fileList;
   try {
-    fileList = yield fse.readdir(userDir);
+    fileList = await fse.readdir(userDir);
   } catch (e) {
     if (e.code !== 'ENOENT') { throw e; }
     fileList = [];
@@ -58,45 +58,45 @@ exports.list = function* () {
   fileList = fileList.map(name => { return { name }; })
 
   for (const file of fileList) {
-    const stat = yield fse.stat(path.resolve(userDir, file.name));
+    const stat = await fse.stat(path.resolve(userDir, file.name));
     file.size = stat.size;
     file.createdAt = stat.ctime;
     file.lastModified = stat.mtime;
   }
 
-  this.body = fileList;
+  ctx.body = fileList;
 };
 
-exports.deleteOne = function* (fileName) {
-  const user     = this.state.user;
+exports.deleteOne = async function (ctx, fileName) {
+  const user     = ctx.state.user;
   const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
   const filePath = path.resolve(userDir, name);
 
-  yield fse.remove(filePath);
+  await fse.remove(filePath);
 
-  this.status = 204;
+  ctx.status = 204;
 };
 
-exports.deleteMany = function* () {
-  const user      = this.state.user;
+exports.deleteMany = async function (ctx) {
+  const user      = ctx.state.user;
   const userDir   = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const body      = this.request.body;
+  const body      = ctx.request.body;
   const fileNames = body && body.entries
 
   if (!fileNames) {
-    return this.throw(400, 'missing required field: entries');
+    return ctx.throw(400, 'missing required field: entries');
   }
 
   if (!Array.isArray(fileNames)) {
-    return this.throw(400, 'entries should be an array of file names');
+    return ctx.throw(400, 'entries should be an array of file names');
   }
 
   for (name of fileNames) {
     const filePath = path.resolve(userDir, name);
-    yield fse.remove(filePath);
+    await fse.remove(filePath);
   }
 
-  this.status = 204;
+  ctx.status = 204;
 };
 
 /**

@@ -9,9 +9,9 @@ const { appLogger } = require('../../../server');
 const secret = config.get('auth.secret');
 const sender = config.get('notifications.sender');
 
-exports.renaterLogin = function* () {
-  const query   = this.request.query;
-  const headers = this.request.header;
+exports.renaterLogin = async function (ctx) {
+  const query   = ctx.request.query;
+  const headers = ctx.request.header;
   const props   = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
     email:     decode(headers.mail),
@@ -29,32 +29,32 @@ exports.renaterLogin = function* () {
   };
 
   if (!props.metadata.idp) {
-    return this.throw('IDP not found in Shibboleth headers', 400);
+    return ctx.throw('IDP not found in Shibboleth headers', 400);
   }
 
   if (!props.email) {
-    return this.throw('email not found in Shibboleth headers', 400);
+    return ctx.throw('email not found in Shibboleth headers', 400);
   }
 
   const username = props.email.split('@')[0].toLowerCase();
 
-  let user = yield elastic.findUser(username);
+  let user = await elastic.findUser(username);
 
   if (!user) {
     props.metadata.createdAt = props.metadata.updatedAt = new Date();
-    props.password = yield randomString();
+    props.password = await randomString();
 
-    yield elastic.updateUser(username, props);
-    user = yield elastic.findUser(username);
+    await elastic.updateUser(username, props);
+    user = await elastic.findUser(username);
 
     if (!user) {
-      return this.throw('Failed to save user data', 500);
+      return ctx.throw('Failed to save user data', 500);
     }
 
     notifications.newUser(user);
 
     try {
-      yield sendWelcomeMail(user, props.password);
+      await sendWelcomeMail(user, props.password);
     } catch (err) {
       appLogger.error('Failed to send mail', err);
     }
@@ -64,45 +64,45 @@ exports.renaterLogin = function* () {
     props.username           = username;
 
     try {
-      yield elastic.updateUser(username, props);
+      await elastic.updateUser(username, props);
       user = props;
     } catch (e) {
-      return this.throw('Failed to update user data', 500);
+      return ctx.throw('Failed to update user data', 500);
     }
   }
 
-  this.cookies.set('eztoken', generateToken(user), { httpOnly: true });
-  this.redirect(decodeURIComponent(this.query.origin || '/'));
+  ctx.cookies.set('eztoken', generateToken(user), { httpOnly: true });
+  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
-exports.resetPassword = function* () {
-  const user = yield elastic.findUser(this.state.user.username);
+exports.resetPassword = async function (ctx) {
+  const user = await elastic.findUser(ctx.state.user.username);
 
   if (!user) {
-    return this.throw('Unable to fetch user data, please log in again', 401);
+    return ctx.throw('Unable to fetch user data, please log in again', 401);
   }
 
-  const newPassword = yield randomString();
+  const newPassword = await randomString();
 
-  yield elastic.updateUserPassword(this.state.user.username, newPassword);
-  yield sendNewPassword(user, newPassword);
-  this.status = 204;
+  await elastic.updateUserPassword(ctx.state.user.username, newPassword);
+  await sendNewPassword(user, newPassword);
+  ctx.status = 204;
 }
 
-exports.getUser = function* () {
-  const user = yield elastic.findUser(this.state.user.username);
+exports.getUser = async function (ctx) {
+  const user = await elastic.findUser(ctx.state.user.username);
 
   if (!user) {
-    return this.throw('Unable to fetch user data, please log in again', 401);
+    return ctx.throw('Unable to fetch user data, please log in again', 401);
   }
 
-  this.status = 200;
-  this.body   = user;
+  ctx.status = 200;
+  ctx.body   = user;
 };
 
-exports.getToken = function* () {
-  this.status = 200;
-  this.body   = generateToken(this.state.user);
+exports.getToken = async function (ctx) {
+  ctx.status = 200;
+  ctx.body   = generateToken(ctx.state.user);
 };
 
 function generateToken(user) {

@@ -11,40 +11,40 @@ const { appLogger } = require('../../../server');
 
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
-module.exports = function* upload(orgName) {
-  const username = this.state.user.username;
-  const result   = yield elasticsearch.hasPrivileges(username, [orgName], ['write']);
+module.exports = async function upload(ctx, orgName) {
+  const username = ctx.state.user.username;
+  const result   = await elasticsearch.hasPrivileges(username, [orgName], ['write']);
   const canWrite = result && result.index && result.index[orgName] && result.index[orgName].write;
 
   if (!canWrite) {
-    return this.throw(`you don't have permission to write in ${orgName}`, 403);
+    return ctx.throw(`you don't have permission to write in ${orgName}`, 403);
   }
 
-  const exists = yield elasticsearch.indices.exists({ index: orgName });
+  const exists = await elasticsearch.indices.exists({ index: orgName });
 
   if (!exists) {
-    yield createIndex(orgName);
+    await createIndex(orgName);
   }
 
-  if (!this.request.is('multipart/*')) {
-    const encoding = this.request.headers['content-encoding'];
+  if (!ctx.request.is('multipart/*')) {
+    const encoding = ctx.request.headers['content-encoding'];
     const isGzip   = encoding && encoding.toLowerCase().includes('gzip');
 
-    let stream = this.req;
+    let stream = ctx.req;
 
     if (isGzip) {
       stream = zlib.createGunzip();
-      this.req.pipe(stream);
+      ctx.req.pipe(stream);
     }
 
-    this.type = 'json';
+    ctx.type = 'json';
 
     try {
-      this.body = yield readStream(stream, orgName, username);
+      ctx.body = await readStream(stream, orgName, username);
     } catch (e) {
-      return this.throw(e.message, e.type === 'validation' ? 400 : 500);
+      return ctx.throw(e.message, e.type === 'validation' ? 400 : 500);
     }
-    return appLogger.info(`Insert into [${orgName}]`, this.body);
+    return appLogger.info(`Insert into [${orgName}]`, ctx.body);
   }
 
   let total    = 0;
@@ -54,9 +54,9 @@ module.exports = function* upload(orgName) {
   let errors   = [];
   let part;
 
-  const parts = parse(this);
+  const parts = parse(ctx);
 
-  while (part = yield parts) {
+  while (part = await parts) {
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
@@ -70,9 +70,9 @@ module.exports = function* upload(orgName) {
 
     let result;
     try {
-      result = yield readStream(stream, orgName, username);
+      result = await readStream(stream, orgName, username);
     } catch (e) {
-      return this.throw(e.message, e.type === 'validation' ? 400 : 500);
+      return ctx.throw(e.message, e.type === 'validation' ? 400 : 500);
     }
 
     total    += result.total;
@@ -85,9 +85,9 @@ module.exports = function* upload(orgName) {
     }
   }
 
-  this.type = 'json';
-  this.body = { total, inserted, failed, errors };
-  return appLogger.info(`Insert into [${orgName}]`, this.body);
+  ctx.type = 'json';
+  ctx.body = { total, inserted, failed, errors };
+  return appLogger.info(`Insert into [${orgName}]`, ctx.body);
 };
 
 /**

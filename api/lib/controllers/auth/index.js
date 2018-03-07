@@ -1,9 +1,9 @@
-const koa = require('koa');
+const Koa = require('koa');
 const route = require('koa-route');
 
 const { updatePassword, resetPassword, getToken, getUser } = require('./auth');
 
-const app = koa();
+const app = new Koa();
 
 app.use(route.get('/', getUser));
 app.use(route.get('/token', getToken));

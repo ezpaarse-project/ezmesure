@@ -1,9 +1,9 @@
-const koa = require('koa');
+const Koa = require('koa');
 const route = require('koa-route');
 
 const { list } = require('./actions');
 
-const app = koa();
+const app = new Koa();
 
 app.use(route.get('/', list));
 

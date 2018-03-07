@@ -1,6 +1,6 @@
 'use strict';
 
-const koa = require('koa');
+const Koa = require('koa');
 const jwt = require('koa-jwt');
 const route = require('koa-route');
 const mount = require('koa-mount');
@@ -13,23 +13,23 @@ const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
 
-const app = koa();
+const app = new Koa();
 
 app.use(route.get('/login', renaterLogin));
 
-app.use(route.get('/', function* main() {
-  this.status = 200;
-  this.body   = 'OK';
+app.use(route.get('/', async ctx => {
+  ctx.status = 200;
+  ctx.body   = 'OK';
 }));
 
 app.use(mount('/partners', partners));
 
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
-app.use(function* (next) {
-  if (!this.state.user || !this.state.user.username) {
-    return this.throw('no username in the token', 401);
+app.use(async (ctx, next) => {
+  if (!ctx.state.user || !ctx.state.user.username) {
+    return ctx.throw('no username in the token', 401);
   }
-  yield next;
+  await next();
 });
 
 app.use(mount('/profile', authorize));
