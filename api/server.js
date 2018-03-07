@@ -79,10 +79,12 @@ app.use(async (ctx, next) => {
 app.on('error', (err, ctx = {}) => {
   const errorDetails = {
     status: ctx.status,
-    error: err.message,
-    stack: err.stack,
-    err
+    error: err.message
   };
+
+  if (!err.expose) {
+    errorDetails.stack = err.stack;
+  }
 
   appLogger.log('error', ctx.request ? ctx.request.originalUrl : '', errorDetails);
 });
