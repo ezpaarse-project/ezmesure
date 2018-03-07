@@ -29,11 +29,11 @@ exports.renaterLogin = async function (ctx) {
   };
 
   if (!props.metadata.idp) {
-    return ctx.throw('IDP not found in Shibboleth headers', 400);
+    return ctx.throw(400, 'IDP not found in Shibboleth headers');
   }
 
   if (!props.email) {
-    return ctx.throw('email not found in Shibboleth headers', 400);
+    return ctx.throw(400, 'email not found in Shibboleth headers');
   }
 
   const username = props.email.split('@')[0].toLowerCase();
@@ -48,7 +48,7 @@ exports.renaterLogin = async function (ctx) {
     user = await elastic.findUser(username);
 
     if (!user) {
-      return ctx.throw('Failed to save user data', 500);
+      return ctx.throw(500, 'Failed to save user data');
     }
 
     notifications.newUser(user);
@@ -67,7 +67,7 @@ exports.renaterLogin = async function (ctx) {
       await elastic.updateUser(username, props);
       user = props;
     } catch (e) {
-      return ctx.throw('Failed to update user data', 500);
+      return ctx.throw(500, 'Failed to update user data');
     }
   }
 
@@ -79,7 +79,7 @@ exports.resetPassword = async function (ctx) {
   const user = await elastic.findUser(ctx.state.user.username);
 
   if (!user) {
-    return ctx.throw('Unable to fetch user data, please log in again', 401);
+    return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
   const newPassword = await randomString();
@@ -93,7 +93,7 @@ exports.getUser = async function (ctx) {
   const user = await elastic.findUser(ctx.state.user.username);
 
   if (!user) {
-    return ctx.throw('Unable to fetch user data, please log in again', 401);
+    return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
   ctx.status = 200;

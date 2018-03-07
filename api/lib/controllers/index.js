@@ -27,7 +27,7 @@ app.use(mount('/partners', partners));
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
 app.use(async (ctx, next) => {
   if (!ctx.state.user || !ctx.state.user.username) {
-    return ctx.throw('no username in the token', 401);
+    return ctx.throw(401, 'no username in the token');
   }
   await next();
 });

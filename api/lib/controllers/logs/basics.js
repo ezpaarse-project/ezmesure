@@ -14,7 +14,7 @@ exports.del = async function (ctx, index) {
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
 
   if (!canDelete) {
-    return ctx.throw(`you don't have permission to delete ${index}`, 403);
+    return ctx.throw(403, `you don't have permission to delete ${index}`);
   }
 
   ctx.type = 'json';

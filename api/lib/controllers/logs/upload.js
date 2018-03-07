@@ -17,7 +17,7 @@ module.exports = async function upload(ctx, orgName) {
   const canWrite = result && result.index && result.index[orgName] && result.index[orgName].write;
 
   if (!canWrite) {
-    return ctx.throw(`you don't have permission to write in ${orgName}`, 403);
+    return ctx.throw(403, `you don't have permission to write in ${orgName}`);
   }
 
   const exists = await elasticsearch.indices.exists({ index: orgName });
@@ -42,7 +42,7 @@ module.exports = async function upload(ctx, orgName) {
     try {
       ctx.body = await readStream(stream, orgName, username);
     } catch (e) {
-      return ctx.throw(e.message, e.type === 'validation' ? 400 : 500);
+      return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
     return appLogger.info(`Insert into [${orgName}]`, ctx.body);
   }
@@ -72,7 +72,7 @@ module.exports = async function upload(ctx, orgName) {
     try {
       result = await readStream(stream, orgName, username);
     } catch (e) {
-      return ctx.throw(e.message, e.type === 'validation' ? 400 : 500);
+      return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
 
     total    += result.total;
