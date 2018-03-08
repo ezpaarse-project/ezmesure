@@ -122,18 +122,19 @@
         http_proxy et https_proxy doivent etre positionnees.
         -->
         <MetadataProvider type="Chaining">
-
-
             <!-- Metadonnées de la fédération RENATER apres le 5/12/16 -->
-	    <MetadataProvider type="XML" uri="https://metadata.federation.renater.fr/renater/main/main-idps-renater-metadata.xml"
+	        <MetadataProvider type="XML" uri="https://metadata.federation.renater.fr/renater/main/main-idps-renater-metadata.xml"
                 backingFilePath="main-idps-renater-metadata.xml" reloadInterval="3600">
-              <MetadataFilter type="Signature" certificate="renater-metadata-signing-cert-2016.pem"/>
+                <MetadataFilter type="Signature" certificate="renater-metadata-signing-cert-2016.pem"/>
             </MetadataProvider>
 
             <!-- Metadonnées de TestShib https://www.testshib.org/configure.html -->
             <MetadataProvider type="XML" uri="http://www.testshib.org/metadata/testshib-providers.xml"
-                  backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
+                backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
 
+            <!-- Metadonnées des comptes CRU https://services.renater.fr/federation/participants/sac/faq -->
+            <MetadataProvider type="XML" uri="https://cru.renater.fr/idp/profile/Metadata/SAML"
+                backingFilePath="sac-metadata.xml" reloadInterval="7200" />
         </MetadataProvider>
 
 
