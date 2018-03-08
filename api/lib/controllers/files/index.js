@@ -1,10 +1,10 @@
-const koa   = require('koa');
+const Koa   = require('koa');
 const route = require('koa-route');
 const bodyParser = require('koa-bodyparser');
 
 const { list, deleteOne, deleteMany, upload } = require('./actions');
 
-const app = koa();
+const app = new Koa();
 
 app.use(route.get('/', list));
 app.use(route.put('/:fileName', upload));

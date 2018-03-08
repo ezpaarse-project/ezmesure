@@ -14,10 +14,10 @@ const jwtClient = new google.auth.JWT(
   null
 );
 
-exports.list = function* () {
-  this.type = 'json';
+exports.list = async function (ctx) {
+  ctx.type = 'json';
 
-  yield new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     jwtClient.authorize(function (err, tokens) {
       if (err) { return reject(err); }
       resolve();
@@ -25,9 +25,9 @@ exports.list = function* () {
   });
 
   if (cached && (Date.now() - cachedAt) < twentyMinutes) {
-    this.body = cached;
+    ctx.body = cached;
   } else {
-    this.body = cached = yield getPartners(jwtClient);
+    ctx.body = cached = await getPartners(jwtClient);
     cachedAt = Date.now();
   }
 };

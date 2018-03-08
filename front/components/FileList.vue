@@ -239,7 +239,7 @@ export default {
         } catch (e) {
           const data = e.response && e.response.data
           upload.error = e
-          upload.errorMessage = isCancel(e) ? 'Annulé' : data || e.statusText
+          upload.errorMessage = isCancel(e) ? 'Annulé' : (data && data.error) || e.statusText
         }
       }
 

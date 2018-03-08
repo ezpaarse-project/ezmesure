@@ -1,10 +1,10 @@
-const koa   = require('koa');
+const Koa   = require('koa');
 const route = require('koa-route');
 
 const { list, del } = require('./basics');
 const upload = require('./upload');
 
-const app = koa();
+const app = new Koa();
 
 app.use(route.get('/', list));
 app.use(route.delete('/:orgName', del));

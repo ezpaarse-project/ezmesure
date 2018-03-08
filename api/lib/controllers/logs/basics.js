@@ -1,24 +1,24 @@
 const elasticsearch = require('../../services/elastic');
 
-exports.list = function* () {
-  this.type = 'json';
-  this.body = yield elasticsearch.indices.stats({
+exports.list = async function (ctx) {
+  ctx.type = 'json';
+  ctx.body = await elasticsearch.indices.stats({
     metric: 'docs',
-    headers: { 'es-security-runas-user': this.state.user.username }
+    headers: { 'es-security-runas-user': ctx.state.user.username }
   });
 };
 
-exports.del = function* (index) {
-  const username  = this.state.user.username;
-  const perm      = yield elasticsearch.hasPrivileges(username, [index], ['delete_index']);
+exports.del = async function (ctx, index) {
+  const username  = ctx.state.user.username;
+  const perm      = await elasticsearch.hasPrivileges(username, [index], ['delete_index']);
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
 
   if (!canDelete) {
-    return this.throw(`you don't have permission to delete ${index}`, 403);
+    return ctx.throw(403, `you don't have permission to delete ${index}`);
   }
 
-  this.type = 'json';
-  this.body = yield elasticsearch.indices.delete({
+  ctx.type = 'json';
+  ctx.body = await elasticsearch.indices.delete({
     index,
     headers: { 'es-security-runas-user': username }
   });
