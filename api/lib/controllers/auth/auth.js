@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const jwt = require('koa-jwt');
+const jwt = require('jsonwebtoken');
 const config = require('config');
 const notifications = require('../../services/notifications');
 const elastic = require('../../services/elastic');
