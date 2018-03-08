@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs     = require('fs-extra');
+const path   = require('path');
 const csv    = require('csv');
 const parse  = require('co-busboy');
 const zlib   = require('zlib');
@@ -9,12 +11,16 @@ const elasticsearch = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../../server');
 
+const storagePath = config.get('storage.path');
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
 module.exports = async function upload(ctx, orgName) {
-  const username = ctx.state.user.username;
-  const result   = await elasticsearch.hasPrivileges(username, [orgName], ['write']);
-  const canWrite = result && result.index && result.index[orgName] && result.index[orgName].write;
+  const { username, email } = ctx.state.user;
+
+  const query     = ctx.request.query;
+  const result    = await elasticsearch.hasPrivileges(username, [orgName], ['write']);
+  const canWrite  = result && result.index && result.index[orgName] && result.index[orgName].write;
+  const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
   if (!canWrite) {
     return ctx.throw(403, `you don't have permission to write in ${orgName}`);
@@ -26,9 +32,20 @@ module.exports = async function upload(ctx, orgName) {
     await createIndex(orgName);
   }
 
+  const domain  = email.split('@')[1];
+  const userDir = path.resolve(storagePath, domain, username);
+
   if (!ctx.request.is('multipart/*')) {
+    const now      = new Date();
     const encoding = ctx.request.headers['content-encoding'];
     const isGzip   = encoding && encoding.toLowerCase().includes('gzip');
+    const filePath = path.resolve(userDir, `${now.toISOString()}.csv`);
+
+    if (storeFile) {
+      const fileStream = fs.createWriteStream(filePath);
+      fileStream.on('error', err => ctx.app.emit('error', err));
+      ctx.req.pipe(fileStream);
+    }
 
     let stream = ctx.req;
 
@@ -42,6 +59,11 @@ module.exports = async function upload(ctx, orgName) {
     try {
       ctx.body = await readStream(stream, orgName, username);
     } catch (e) {
+      try {
+        await fs.remove(filePath);
+      } catch (e) {
+        ctx.app.emit('error', e);
+      }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
     return appLogger.info(`Insert into [${orgName}]`, ctx.body);
@@ -56,10 +78,17 @@ module.exports = async function upload(ctx, orgName) {
 
   const parts = parse(ctx);
 
-  while (part = await parts) {
+  while (part = await parts()) {
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
+    const filePath = path.resolve(userDir, part.filename);
+
+    if (storeFile) {
+      const fileStream = fs.createWriteStream(filePath);
+      fileStream.on('error', err => ctx.app.emit('error', err));
+      ctx.req.pipe(fileStream);
+    }
 
     let stream = part;
 
@@ -72,6 +101,11 @@ module.exports = async function upload(ctx, orgName) {
     try {
       result = await readStream(stream, orgName, username);
     } catch (e) {
+      try {
+        await fs.remove(filePath);
+      } catch (e) {
+        ctx.app.emit('error', e);
+      }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
 
@@ -86,7 +120,7 @@ module.exports = async function upload(ctx, orgName) {
   }
 
   ctx.type = 'json';
-  ctx.body = { total, inserted, failed, errors };
+  ctx.body = { total, inserted, updated, failed, errors };
   return appLogger.info(`Insert into [${orgName}]`, ctx.body);
 };
 
