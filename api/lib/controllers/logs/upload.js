@@ -82,7 +82,7 @@ module.exports = async function upload(ctx, orgName) {
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
-    const filePath = path.resolve(userDir, part.filename);
+    const filePath = path.resolve(userDir, part.filename.replace(/\s/g, '_'));
 
     if (storeFile) {
       const fileStream = fs.createWriteStream(filePath);

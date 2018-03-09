@@ -15,6 +15,8 @@ exports.upload = async function (ctx, fileName) {
     return ctx.throw(400, 'unsupported file type');
   }
 
+  fileName = fileName.replace(/\s/g, '_');
+
   const user   = ctx.state.user;
   const domain = user.email.split('@')[1];
 
