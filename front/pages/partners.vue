@@ -1,6 +1,6 @@
 <template>
   <v-container grid-list-lg>
-    <h1 class="display-1">Nos Partenaires</h1>
+    <h1 class="display-1">Nos {{ partners.length }} partenaires</h1>
 
     <v-layout row wrap align-center>
       <v-flex xs12 md6 lg4 v-for="(partner, index) in partners" :key="index">
