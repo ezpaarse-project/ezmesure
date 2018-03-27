@@ -112,10 +112,10 @@ exports.deleteMany = async function (ctx) {
  */
 function validateFile (filePath) {
   return new Promise((resolve, reject) => {
-    let lineNumber = 0
-    let readLimit = 50
-    let columns
-    let err
+    let lineNumber = 0;
+    let readLimit = 50;
+    let columns;
+    let err;
 
     let stream = fse.createReadStream(filePath);
 
@@ -129,7 +129,7 @@ function validateFile (filePath) {
       error: error => reject(error),
       step: ({ data, errors }, parser) => {
         if (++lineNumber > readLimit) {
-          return parser.abort()
+          return parser.abort();
         }
         const row = data[0]
 
@@ -150,21 +150,21 @@ function validateFile (filePath) {
             return validator.validateColumns(columns);
           } catch (e) {
             err = e
-            return parser.abort()
+            return parser.abort();
           }
         }
 
         const ec = {}
 
         columns.forEach((colName, index) => {
-          ec[colName] = row[index]
+          ec[colName] = row[index];
         })
 
         try {
-          validator.validateEvent(ec)
+          validator.validateEvent(ec, lineNumber);
         } catch (e) {
           err = e;
-          parser.abort()
+          parser.abort();
         }
       }
     })

@@ -180,7 +180,7 @@ function readStream(stream, orgName, username) {
 
         if (result.total < 50) {
           try {
-            validator.validateEvent(ec);
+            validator.validateEvent(ec, result.total + 1);
           } catch (e) {
             return reject(e);
           }

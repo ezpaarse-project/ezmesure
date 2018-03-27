@@ -29,7 +29,7 @@ exports.validateColumns = function (columns) {
  * Validate an EC
  * @param {Object} ec
  */
-exports.validateEvent = function (ec) {
+exports.validateEvent = function (ec, lineNumber) {
   if (!ec.log_id) {
     throw validationError(`Ligne #${lineNumber}: champ "log_id" vide`);
   }
