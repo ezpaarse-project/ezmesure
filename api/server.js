@@ -8,6 +8,7 @@ const mount  = require('koa-mount');
 const cors   = require('koa-cors');
 const config = require('config');
 
+const metrics    = require('./lib/services/metrics');
 const logger     = require('./lib/services/logger');
 const appLogger  = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
@@ -35,20 +36,50 @@ app.use(cors({
 
 // Server logs
 app.use(async (ctx, next) => {
-  ctx.httpLog = {
+  const request = {
     method: ctx.request.method,
     url: ctx.request.url,
     remoteIP: ctx.request.ip,
     userAgent: ctx.request.headers['user-agent']
   };
 
+  const start = Date.now();
   await next();
+  const responseTime = Date.now() - start;
 
-  // Static files
-  if (['.css', '.js', '.woff'].indexOf(path.extname(ctx.request.url)) !== -1) { return; }
+  request.user = ctx.state && ctx.state.user && ctx.state.user.username;
 
-  ctx.httpLog.status = ctx.status;
-  httpLogger.log('info', ctx.httpLog);
+  httpLogger.log('info', {
+    ...request,
+    status: ctx.status
+  });
+
+  request.query = ctx.request.query;
+
+  if (ctx.action) {
+    let body = typeof ctx.body === 'object' ? ctx.body : null;
+
+    switch (ctx.action) {
+    case 'indices/list':
+    case 'file/list':
+      body = null;
+    }
+
+    try {
+      await metrics.save({
+        datetime: start,
+        action: ctx.action,
+        responseTime,
+        request,
+        response: {
+          status: ctx.status,
+          body
+        }
+      })
+    } catch (e) {
+      ctx.app.emit('error', e, ctx);
+    }
+  }
 });
 
 // Error handler
@@ -57,7 +88,10 @@ app.use(async (ctx, next) => {
     await next();
   } catch (error) {
     ctx.status = error.status || 500;
-    ctx.app.emit('error', error, ctx);
+
+    if (ctx.status >= 500) {
+      ctx.app.emit('error', error, ctx, false);
+    }
 
     if (ctx.headerSent || !ctx.writable) { return; }
 
@@ -65,7 +99,7 @@ app.use(async (ctx, next) => {
       return ctx.body = { error: error.message };
     }
 
-    // respond with the error details
+    // respond with the error details in dev env
     ctx.type = 'json';
     ctx.body = {
       error: error.message,
@@ -79,12 +113,9 @@ app.use(async (ctx, next) => {
 app.on('error', (err, ctx = {}) => {
   const errorDetails = {
     status: ctx.status,
-    error: err.message
+    error: err.message,
+    stack: err.stack
   };
-
-  if (!err.expose) {
-    errorDetails.stack = err.stack;
-  }
 
   appLogger.log('error', ctx.request ? ctx.request.originalUrl : '', errorDetails);
 });

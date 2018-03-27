@@ -11,6 +11,8 @@ const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
 
 exports.upload = async function (ctx, fileName) {
+  ctx.action = 'file/upload';
+
   if (!/\.(csv|gz)$/i.test(fileName)) {
     return ctx.throw(400, 'unsupported file type');
   }
@@ -46,6 +48,7 @@ exports.upload = async function (ctx, fileName) {
 };
 
 exports.list = async function (ctx) {
+  ctx.action = 'file/list';
   const user    = ctx.state.user;
   const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
 
@@ -70,6 +73,7 @@ exports.list = async function (ctx) {
 };
 
 exports.deleteOne = async function (ctx, fileName) {
+  ctx.action = 'file/delete';
   const user     = ctx.state.user;
   const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
   const filePath = path.resolve(userDir, name);
@@ -80,6 +84,7 @@ exports.deleteOne = async function (ctx, fileName) {
 };
 
 exports.deleteMany = async function (ctx) {
+  ctx.action = 'file/delete-many';
   const user      = ctx.state.user;
   const userDir   = path.resolve(storagePath, user.email.split('@')[1], user.username);
   const body      = ctx.request.body;
