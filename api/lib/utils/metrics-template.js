@@ -21,13 +21,20 @@ module.exports = {
         },
         "responseTime": { "type": "integer" },
         "action": { "type": "keyword" },
+        "index": { "type": "keyword" },
+        "user":{
+          "properties": {
+            "name":  { "type": "keyword" },
+            "roles": { "type": "keyword" },
+            "idp":   { "type": "keyword" }
+          },
+        },
         "request": {
           "properties": {
             "method":    { "type": "keyword" },
             "url":       { "type": "keyword" },
             "remoteIP":  { "type": "keyword" },
             "userAgent": { "type": "keyword" },
-            "user":      { "type": "keyword" },
             "query": {
               "properties": {
                 "nostore": { "type": "keyword" }

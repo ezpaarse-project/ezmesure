@@ -11,6 +11,7 @@ exports.list = async function (ctx) {
 
 exports.del = async function (ctx, index) {
   ctx.action = 'indices/delete';
+  ctx.index = index;
   const username  = ctx.state.user.username;
   const perm      = await elasticsearch.hasPrivileges(username, [index], ['delete_index']);
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];

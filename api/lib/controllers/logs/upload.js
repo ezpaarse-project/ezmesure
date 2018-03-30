@@ -16,6 +16,7 @@ const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
 module.exports = async function upload(ctx, orgName) {
   ctx.action = 'indices/insert';
+  ctx.index = orgName;
   const { username, email } = ctx.state.user;
 
   const query     = ctx.request.query;

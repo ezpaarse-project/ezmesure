@@ -36,46 +36,28 @@ app.use(cors({
 
 // Server logs
 app.use(async (ctx, next) => {
-  const request = {
+  ctx.httpLog = {
     method: ctx.request.method,
     url: ctx.request.url,
     remoteIP: ctx.request.ip,
     userAgent: ctx.request.headers['user-agent']
   };
 
-  const start = Date.now();
+  ctx.startTime = Date.now();
   await next();
-  const responseTime = Date.now() - start;
-
-  request.user = ctx.state && ctx.state.user && ctx.state.user.username;
+  ctx.responseTime = Date.now() - ctx.startTime;
 
   httpLogger.log('info', {
-    ...request,
+    ...ctx.httpLog,
+    user: ctx.state && ctx.state.user && ctx.state.user.username,
     status: ctx.status
   });
 
-  request.query = ctx.request.query;
+  ctx.httpLog.query = ctx.request.query;
 
   if (ctx.action) {
-    let body = typeof ctx.body === 'object' ? ctx.body : null;
-
-    switch (ctx.action) {
-    case 'indices/list':
-    case 'file/list':
-      body = null;
-    }
-
     try {
-      await metrics.save({
-        datetime: start,
-        action: ctx.action,
-        responseTime,
-        request,
-        response: {
-          status: ctx.status,
-          body
-        }
-      })
+      await metrics.save(ctx);
     } catch (e) {
       ctx.app.emit('error', e, ctx);
     }
