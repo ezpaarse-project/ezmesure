@@ -42,6 +42,7 @@ exports.renaterLogin = async function (ctx) {
 
   if (!user) {
     props.metadata.createdAt = props.metadata.updatedAt = new Date();
+    props.metadata.acceptedTerms = false;
     props.password = await randomString();
 
     await elastic.updateUser(username, props);
@@ -61,7 +62,8 @@ exports.renaterLogin = async function (ctx) {
   } else if (query.refresh) {
     props.metadata.updatedAt = new Date();
     props.metadata.createdAt = user.metadata.createdAt;
-    props.username           = username;
+    props.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
+    props.username = username;
 
     try {
       await elastic.updateUser(username, props);
@@ -74,6 +76,19 @@ exports.renaterLogin = async function (ctx) {
   ctx.cookies.set('eztoken', generateToken(user), { httpOnly: true });
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
+
+exports.acceptTerms = async function (ctx) {
+  const user = await elastic.findUser(ctx.state.user.username);
+
+  if (!user) {
+    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+  }
+
+  user.metadata.acceptedTerms = true;
+  await elastic.updateUser(user.username, user);
+
+  ctx.status = 204;
+}
 
 exports.resetPassword = async function (ctx) {
   const user = await elastic.findUser(ctx.state.user.username);

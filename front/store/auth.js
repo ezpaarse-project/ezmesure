@@ -1,6 +1,7 @@
 const PROFILE_URL = '/profile'
 const TOKEN_URL = '/profile/token'
 const RESET_URL = '/profile/password/reset'
+const TERMS_URL = '/profile/terms/accept'
 
 export const state = () => ({
   user: null,
@@ -28,6 +29,10 @@ export const actions = {
     } catch (e) {
       commit('setToken', null)
     }
+  },
+
+  async acceptTerms () {
+    await this.$axios.$post(TERMS_URL)
   },
 
   async resetPassword () {

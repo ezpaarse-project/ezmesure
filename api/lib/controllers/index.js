@@ -13,6 +13,8 @@ const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
 
+const elastic = require('../services/elastic');
+
 const app = new Koa();
 
 app.use(route.get('/login', renaterLogin));
@@ -33,6 +35,24 @@ app.use(async (ctx, next) => {
 });
 
 app.use(mount('/profile', authorize));
+
+/**
+ * Any route below requires the user to accept the terms of use
+ */
+app.use(async (ctx, next) => {
+  const user = await elastic.findUser(ctx.state.user.username);
+
+  if (!user) {
+    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+  }
+
+  if (!user.metadata.acceptedTerms) {
+    return ctx.throw(403, 'You must accept the terms of use before using this service');
+  }
+
+  await next();
+});
+
 app.use(mount('/logs', logs));
 app.use(mount('/files', files));
 app.use(mount('/providers', providers));

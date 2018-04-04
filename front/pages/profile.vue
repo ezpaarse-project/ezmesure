@@ -95,8 +95,13 @@
     components: {
       FileList
     },
-    async fetch ({ store }) {
+    async fetch ({ store, redirect }) {
       await store.dispatch('auth/checkAuth')
+      const user = store.state.auth.user
+
+      if (user && !user.metadata.acceptedTerms) {
+        redirect('/terms')
+      }
     },
     data () {
       return {
