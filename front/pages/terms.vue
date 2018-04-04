@@ -13,7 +13,7 @@
           Veuillez accepter les conditions d'utilisation.
         </v-alert>
 
-        <p>Afin d'utiliser ce service, vous vous engagez à respecter le règlement général sur la protection des données.</p>
+        <p>Afin d'utiliser ce service, vous vous engagez à respecter le <a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees" target="_blank">règlement général sur la protection des données</a>.</p>
 
         <p class="text-xs-center">
           <v-checkbox
