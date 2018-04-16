@@ -20,7 +20,6 @@
 ##xpack.monitoring.enabled: true
 xpack.reporting.kibanaServer.protocol: "https"
 # this value must be hard set
-xpack.reporting.kibanaServer.hostname: ${THIS_HOST}
 xpack.reporting.kibanaServer.port: 443
 xpack.reporting.kibanaApp: "/app/kibana"
 

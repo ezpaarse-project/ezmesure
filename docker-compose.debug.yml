@@ -24,7 +24,7 @@ services:
       - ELASTICSEARCH_URL
       - XPACK_MONITORING_ENABLED
       - KIBANA_DEFAULTAPPID
-      - EZMESURE_ES_REPORTING_HOSTNAME
+      - XPACK_REPORTING_KIBANASERVER_HOSTNAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
