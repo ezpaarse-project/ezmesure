@@ -93,7 +93,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - API_URL_BROWSER=/api
+      - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
       - PORT=8080
       - HOST=0.0.0.0
     restart: unless-stopped

@@ -70,7 +70,7 @@ services:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
-      - API_URL_BROWSER=/api
+      - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
       - HOST=0.0.0.0
       - PORT=8080
     command: npm run dev
