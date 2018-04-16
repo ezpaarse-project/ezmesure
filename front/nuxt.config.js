@@ -20,9 +20,15 @@ module.exports = {
   ],
   mode: 'spa',
   modules: [
+    ['@nuxtjs/proxy', {
+      pathRewrite: {
+        '/api': process.env.API_URL
+      }
+    }],
     ['@nuxtjs/axios', {
       prefix: '/api',
-      credentials: true
+      credentials: true,
+      proxy: true
     }]
   ],
   /*
