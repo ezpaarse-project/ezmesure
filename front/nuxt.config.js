@@ -20,7 +20,10 @@ module.exports = {
   ],
   mode: 'spa',
   modules: [
-    '@nuxtjs/axios'
+    ['@nuxtjs/axios', {
+      prefix: '/api',
+      credentials: true
+    }]
   ],
   /*
   ** Customize the progress-bar color

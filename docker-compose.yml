@@ -92,7 +92,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - EZMESURE_API_URL=/api
+      - API_URL_BROWSER=/api
       - PORT=8080
       - HOST=0.0.0.0
     restart: unless-stopped

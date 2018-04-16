@@ -1,156 +1,64 @@
 <template>
-  <v-card>
-    <v-toolbar card>
-      <v-toolbar-title>Mes fichiers</v-toolbar-title>
+  <div>
+    <p class="text-xs-right">
+      <v-btn small @click="deleteSelected" :disabled="noFileSelected">
+        <v-icon left>delete</v-icon> Supprimer
+      </v-btn>
+      <v-btn small @click="refreshFiles">
+        <v-icon left>refresh</v-icon> Actualiser
+      </v-btn>
+    </p>
 
-      <v-spacer/>
+    <v-data-table
+      :items="files"
+      :headers="headers"
+      :loading="loading"
+      v-model="selected"
+      item-key="name"
+      select-all
+      no-data-text="Aucun fichier"
+      no-results-text="Aucun fichier"
+      rows-per-page-text="Lignes par page"
+    >
+      <template slot="headerCell" slot-scope="props">
+        {{ props.header.text }}
+      </template>
 
-      <v-tooltip left>
-        <v-btn slot="activator" icon @click="deleteSelected" :disabled="noFileSelected">
-          <v-icon>delete</v-icon>
-        </v-btn>
-        <span>Supprimer</span>
-      </v-tooltip>
-      <v-tooltip left>
-        <v-btn slot="activator" icon @click="clearCompletedUploads" :disabled="noUploads">
-          <v-icon>clear_all</v-icon>
-        </v-btn>
-        <span>Vider chargements terminés</span>
-      </v-tooltip>
-      <v-tooltip left>
-        <v-btn slot="activator" icon @click="fetchHostedFiles">
-          <v-icon>refresh</v-icon>
-        </v-btn>
-        <span>Actualiser</span>
-      </v-tooltip>
-    </v-toolbar>
+      <template slot="items" slot-scope="props">
+        <td>
+          <v-checkbox
+            primary
+            hide-details
+            v-model="props.selected"
+          ></v-checkbox>
+        </td>
 
-    <v-tabs centered>
-      <v-tabs-bar class="grey lighten-4">
-        <v-tabs-slider></v-tabs-slider>
-        <v-tabs-item href="#tab-list">Liste</v-tabs-item>
-        <v-tabs-item href="#tab-upload">Charger</v-tabs-item>
-      </v-tabs-bar>
+        <td class="nowrap">{{ props.item.name }}</td>
+        <td class="nowrap">{{ props.item.prettySize }}</td>
+        <td class="nowrap">{{ props.item.prettyLastModified }}</td>
+      </template>
 
-      <v-tabs-items>
-        <v-tabs-content id="tab-list">
-          <v-data-table
-            :items="files"
-            :headers="headers"
-            :loading="loading"
-            v-model="selected"
-            item-key="name"
-            select-all
-            no-data-text="Aucun fichier"
-            no-results-text="Aucun fichier"
-            rows-per-page-text="Lignes par page"
-          >
-            <template slot="headerCell" scope="props">
-              {{ props.header.text }}
-            </template>
-
-            <template slot="items" scope="props">
-              <td>
-                <v-checkbox
-                  primary
-                  hide-details
-                  v-model="props.selected"
-                ></v-checkbox>
-              </td>
-
-              <td class="nowrap">{{ props.item.name }}</td>
-              <td class="nowrap">{{ props.item.prettySize }}</td>
-              <td class="nowrap">{{ props.item.prettyLastModified }}</td>
-            </template>
-
-            <template slot="pageText" scope="props">
-              {{ props.pageStart }}-{{ props.pageStop }} sur {{ props.itemsLength }}
-            </template>
-          </v-data-table>
-        </v-tabs-content>
-
-        <v-tabs-content id="tab-upload">
-          <v-container>
-            <FileInput @change="addFilesToUpload"/>
-
-            <v-card class="my-3" v-for="upload in uploads" :key="upload.id">
-              <v-container fluid grid-list-lg>
-                <v-layout row align-center>
-
-                  <v-flex>
-                    <v-progress-circular
-                      :indeterminate="!upload.error && !upload.progress"
-                      :value="upload.error ? 100 : upload.progress"
-                      :class="upload.error ? 'red--text' : 'teal--text'"
-                      size="50"
-                    >
-                      <v-scale-transition origin="center center" mode="out-in">
-                        <v-icon key="error" class="red--text" v-if="upload.error">error</v-icon>
-                        <v-icon key="done" class="teal--text" v-else-if="upload.done">done</v-icon>
-                        <span key="progress" v-else>{{ upload.progress }}%</span>
-                      </v-scale-transition>
-                    </v-progress-circular>
-                  </v-flex>
-
-                  <v-flex class="grow">
-                    <div class="body-2">{{ upload.file.name }}</div>
-
-                    <div class="grey--text">
-                      <span v-if="upload.error" class="red--text">
-                        {{ upload.errorMessage || 'Erreur' }}
-                      </span>
-                      <span v-else-if="upload.done">Chargé</span>
-                      <span v-else-if="upload.progress">Chargement en cours</span>
-                      <span v-else-if="upload.validating">Validation du fichier...</span>
-                      <span v-else>En attente</span>
-                    </div>
-                  </v-flex>
-
-                  <v-flex>
-                    <v-scale-transition origin="center center" mode="out-in">
-                      <v-btn key="delete" v-if="upload.done" icon ripple @click="removeUpload(upload.id)">
-                        <v-icon>delete</v-icon>
-                      </v-btn>
-                      <v-btn key="clear" v-else icon ripple @click="upload.cancel()">
-                        <v-icon>clear</v-icon>
-                      </v-btn>
-                    </v-scale-transition>
-                  </v-flex>
-
-                </v-layout>
-              </v-container>
-            </v-card>
-          </v-container>
-        </v-tabs-content>
-
-      </v-tabs-items>
-    </v-tabs>
-
-  </v-card>
+      <template slot="pageText" slot-scope="props">
+        {{ props.pageStart }}-{{ props.pageStop }} sur {{ props.itemsLength }}
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script>
-import FileInput from './FileInput'
 import prettyBytes from 'pretty-bytes'
-import Papa from 'papaparse'
-import { CancelToken, isCancel } from 'axios'
 
 export default {
-  components: {
-    FileInput
-  },
   async mounted () {
-    this.fetchHostedFiles()
+    this.refreshFiles()
   },
   data () {
     return {
+      selectedTab: 'tab-list',
       uploadId: 1,
-      uploads: [],
-      uploading: false,
       hostedFiles: [],
       selected: [],
       loading: false,
-      showUploader: false,
       headers: [
         { align: 'left', text: 'Nom', value: 'name', class: 'grow' },
         { align: 'left', text: 'Taille', value: 'size' },
@@ -169,13 +77,10 @@ export default {
     },
     noFileSelected () {
       return this.selected.length === 0
-    },
-    noUploads () {
-      return this.uploads.length === 0
     }
   },
   methods: {
-    async fetchHostedFiles () {
+    async refreshFiles () {
       this.loading = true
 
       try {
@@ -185,155 +90,6 @@ export default {
       }
 
       this.loading = false
-    },
-
-    async addFilesToUpload (files) {
-      files.forEach(file => {
-        this.uploads.push({
-          file,
-          id: this.uploadId++,
-          progress: 0,
-          done: false,
-          req: null
-        })
-      })
-
-      if (!this.uploading) {
-        await this.uploadNextFile()
-      }
-    },
-
-    async uploadNextFile () {
-      const upload = this.uploads.find(u => !u.done)
-      if (!upload) {
-        this.uploading = false
-        return this.fetchHostedFiles()
-      }
-
-      this.uploading = true
-
-      upload.validating = true
-      try {
-        await this.validateFile(upload.file)
-      } catch (err) {
-        upload.error = err
-        upload.errorMessage = err.message
-      }
-      upload.validating = false
-
-      if (!upload.error) {
-        const source = CancelToken.source()
-        upload.cancel = () => { source.cancel() }
-
-        try {
-          upload.req = this.$axios.put(`/files/${upload.file.name}`, upload.file, {
-            cancelToken: source.token,
-            onUploadProgress: (event) => {
-              if (event.lengthComputable) {
-                upload.progress = Math.floor(event.loaded / event.total * 100)
-              }
-            }
-          })
-
-          await upload.req
-        } catch (e) {
-          const data = e.response && e.response.data
-          upload.error = e
-          upload.errorMessage = isCancel(e) ? 'Annulé' : (data && data.error) || e.statusText
-        }
-      }
-
-      upload.done = true
-      setTimeout(() => this.uploadNextFile(), 500)
-    },
-
-    async validateFile (file) {
-      return new Promise((resolve, reject) => {
-        if (typeof FileReader === 'undefined') { return resolve() }
-        if (/\.csv\.gz$/i.test(file.name)) { return resolve() }
-
-        if (!/\.csv$/i.test(file.name)) {
-          return reject(new Error('Le fichier n\'est pas un CSV'))
-        }
-
-        const mandatoryFields = new Set([
-          'datetime',
-          'log_id',
-          'rtype',
-          'mime',
-          'title_id',
-          'doi'
-        ])
-
-        let lineNumber = 0
-        let readLimit = 50
-        let columns
-        let err
-
-        Papa.parse(file, {
-          delimiter: ';',
-          error: err => reject(err),
-          step: ({ data, errors }, parser) => {
-            if (++lineNumber > readLimit) {
-              return parser.abort()
-            }
-            const row = data[0]
-
-            if (errors.length > 0) {
-              err = errors[0]
-
-              if (err.type === 'Quotes') {
-                err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`
-              }
-
-              return parser.abort()
-            }
-
-            if (typeof columns === 'undefined') {
-              columns = row
-
-              for (const field of mandatoryFields) {
-                if (!columns.includes(field)) {
-                  err = new Error(`Le champ "${field}" est manquant`)
-                  return parser.abort()
-                }
-              }
-              return
-            }
-
-            const obj = {}
-
-            columns.forEach((colName, index) => {
-              obj[colName] = row[index]
-            })
-
-            if (!obj.log_id) {
-              err = new Error(`Ligne #${lineNumber}: champ "log_id" vide`)
-            } else if (!obj.datetime) {
-              err = new Error(`Ligne #${lineNumber}: champ "datetime" vide`)
-            } else if (isNaN(Date.parse(obj.datetime))) {
-              err = new Error(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`)
-            } else if (obj.date && !/^\d{4}-\d{2}-\d{2}$/.test(obj.date)) {
-              err = new Error(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`)
-            }
-
-            if (err) {
-              parser.abort()
-            }
-          },
-          complete: () => {
-            if (err) { reject(err) } else { resolve() }
-          }
-        })
-      })
-    },
-
-    removeUpload (id) {
-      this.uploads = this.uploads.filter(upload => upload.id !== id)
-    },
-
-    clearCompletedUploads () {
-      this.uploads = this.uploads.filter(u => !u.done)
     },
 
     async deleteSelected () {
@@ -348,7 +104,8 @@ export default {
         console.error(e)
       }
 
-      await this.fetchHostedFiles()
+      this.selected = []
+      await this.refreshFiles()
       this.loading = false
     }
   }
@@ -367,5 +124,8 @@ export default {
 }
 .flex.grow {
   flex-grow: 1;
+}
+p {
+  text-align: justify;
 }
 </style>

@@ -7,7 +7,7 @@
     <v-toolbar-items class="hidden-xs-only">
       <v-btn flat exact to="/">Accueil</v-btn>
       <v-btn flat href="/kibana/">Tableaux de bord</v-btn>
-      <v-btn flat exact to="/profile">Profil</v-btn>
+      <v-btn flat exact to="/myspace">Mon espace</v-btn>
       <v-btn flat exact to="/partners">Nos partenaires</v-btn>
     </v-toolbar-items>
 
@@ -24,7 +24,7 @@
         <v-list-tile @click="sheet = false" href="/kibana/">
           <v-list-tile-title>Tableaux de bord</v-list-tile-title>
         </v-list-tile>
-        <v-list-tile @click="sheet = false" exact to="/profile">
+        <v-list-tile @click="sheet = false" exact to="/myspace">
           <v-list-tile-title>Profil</v-list-tile-title>
         </v-list-tile>
         <v-list-tile @click="sheet = false" exact to="/partners">

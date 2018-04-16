@@ -54,7 +54,7 @@
 
         try {
           await this.$store.dispatch('auth/acceptTerms')
-          this.$router.replace({ path: '/profile' })
+          this.$router.replace({ path: '/myspace' })
         } catch (e) {
           this.error = true
         }

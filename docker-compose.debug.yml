@@ -69,7 +69,7 @@ services:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
-      - EZMESURE_API_URL=/api
+      - API_URL_BROWSER=/api
       - HOST=0.0.0.0
       - PORT=8080
     command: npm run dev
