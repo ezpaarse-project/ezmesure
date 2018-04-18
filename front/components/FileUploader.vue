@@ -5,6 +5,7 @@
       Veuillez noter que le chargement n'est <strong>pas</strong> immédiat, et sera effectué par nos soins dès que possible.
       Nous vous invitons à lire nos <a href="http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/">règles de bonnes pratiques</a> afin de faciliter le processus,
       et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements.
+      Les données chargées ne sont pas accessibles aux autres déposants.
     </p>
 
     <FileInput @change="addFilesToUpload"/>
