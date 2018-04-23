@@ -1,7 +1,7 @@
 <template>
   <v-toolbar app fixed dark>
     <v-toolbar-title>
-      ezMESURE
+      ezMESURE - Plateforme des tableaux de bord ezPAARSE de l’ESR
     </v-toolbar-title>
     <v-spacer/>
     <v-toolbar-items class="hidden-xs-only">
