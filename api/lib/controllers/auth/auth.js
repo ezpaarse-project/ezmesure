@@ -63,6 +63,7 @@ exports.renaterLogin = async function (ctx) {
     props.metadata.updatedAt = new Date();
     props.metadata.createdAt = user.metadata.createdAt;
     props.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
+    props.roles = user.roles;
     props.username = username;
 
     try {
