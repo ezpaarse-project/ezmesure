@@ -10,7 +10,7 @@
           <div class="headline mb-4 text-xs-center">Qu'est-ce qu'ezMESURE ?</div>
 
           <p class="ezmesure-description">
-            ezMESURE est un entrepôt centralisant au niveau national les statistiques d'usage 
+            ezMESURE est un entrepôt national centralisant les statistiques d'usage 
             de la documentation scientifique numérique des établissements de l'enseignement 
             supérieur et de la recherche (ESR).
             ezMESURE propose une interface en ligne de visualisation dynamique, consolidée et
