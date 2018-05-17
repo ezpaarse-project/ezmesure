@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const fs     = require('fs-extra');
+const fse    = require('fs-extra');
 const path   = require('path');
 const csv    = require('csv');
 const parse  = require('co-busboy');
@@ -37,6 +37,8 @@ module.exports = async function upload(ctx, orgName) {
   const domain  = email.split('@')[1];
   const userDir = path.resolve(storagePath, domain, username);
 
+  await fse.ensureDir(userDir);
+
   if (!ctx.request.is('multipart/*')) {
     const now      = new Date();
     const encoding = ctx.request.headers['content-encoding'];
@@ -44,7 +46,7 @@ module.exports = async function upload(ctx, orgName) {
     const filePath = path.resolve(userDir, `${now.toISOString()}.csv`);
 
     if (storeFile) {
-      const fileStream = fs.createWriteStream(filePath);
+      const fileStream = fse.createWriteStream(filePath);
       fileStream.on('error', err => ctx.app.emit('error', err));
       ctx.req.pipe(fileStream);
     }
@@ -62,7 +64,7 @@ module.exports = async function upload(ctx, orgName) {
       ctx.body = await readStream(stream, orgName, username);
     } catch (e) {
       try {
-        await fs.remove(filePath);
+        await fse.remove(filePath);
       } catch (e) {
         ctx.app.emit('error', e);
       }
@@ -87,7 +89,7 @@ module.exports = async function upload(ctx, orgName) {
     const filePath = path.resolve(userDir, part.filename.replace(/\s/g, '_'));
 
     if (storeFile) {
-      const fileStream = fs.createWriteStream(filePath);
+      const fileStream = fse.createWriteStream(filePath);
       fileStream.on('error', err => ctx.app.emit('error', err));
       ctx.req.pipe(fileStream);
     }
@@ -104,7 +106,7 @@ module.exports = async function upload(ctx, orgName) {
       result = await readStream(stream, orgName, username);
     } catch (e) {
       try {
-        await fs.remove(filePath);
+        await fse.remove(filePath);
       } catch (e) {
         ctx.app.emit('error', e);
       }
