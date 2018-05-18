@@ -12,6 +12,7 @@ const files = require('./files');
 const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
+const metrics = require('./metrics');
 
 const elastic = require('../services/elastic');
 
@@ -25,6 +26,7 @@ app.use(route.get('/', async ctx => {
 }));
 
 app.use(mount('/partners', partners));
+app.use(mount('/metrics', metrics));
 
 app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
 app.use(async (ctx, next) => {
