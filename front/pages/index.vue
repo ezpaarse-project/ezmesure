@@ -63,9 +63,9 @@ export default {
           link: 'http://www.couperin.org/'
         },
         {
-          name: 'MENESR',
-          src: '/images/logo-MENESR.jpg',
-          link: 'http://www.enseignementsup-recherche.gouv.fr/cid20078/informations-pratiques-mesr.html'
+          name: 'MESRI',
+          src: '/images/logo-mesri.jpg',
+          link: 'http://www.enseignementsup-recherche.gouv.fr/'
         },
         {
           name: 'BSN',
