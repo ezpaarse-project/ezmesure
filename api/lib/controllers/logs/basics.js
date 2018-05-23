@@ -54,7 +54,7 @@ exports.tops = async function (ctx, index) {
     max: now
   };
 
-  switch (ctx.query.period) {
+  switch (ctx.query.period || 'all') {
     case 'today':
       dateRange.min = new Date(currentYear, currentMonth, currentDate);
       break;
