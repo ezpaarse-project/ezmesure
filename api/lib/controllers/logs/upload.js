@@ -14,24 +14,24 @@ const { appLogger } = require('../../../server');
 const storagePath = config.get('storage.path');
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
-module.exports = async function upload(ctx, orgName) {
+module.exports = async function upload(ctx, index) {
   ctx.action = 'indices/insert';
-  ctx.index = orgName;
+  ctx.index = index;
   const { username, email } = ctx.state.user;
 
   const query     = ctx.request.query;
-  const result    = await elasticsearch.hasPrivileges(username, [orgName], ['write']);
-  const canWrite  = result && result.index && result.index[orgName] && result.index[orgName].write;
+  const result    = await elasticsearch.hasPrivileges(username, [index], ['write']);
+  const canWrite  = result && result.index && result.index[index] && result.index[index].write;
   const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
   if (!canWrite) {
-    return ctx.throw(403, `you don't have permission to write in ${orgName}`);
+    return ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
-  const exists = await elasticsearch.indices.exists({ index: orgName });
+  const exists = await elasticsearch.indices.exists({ index });
 
   if (!exists) {
-    await createIndex(orgName);
+    await createIndex(index);
   }
 
   const domain  = email.split('@')[1];
@@ -61,7 +61,7 @@ module.exports = async function upload(ctx, orgName) {
     ctx.type = 'json';
 
     try {
-      ctx.body = await readStream(stream, orgName, username);
+      ctx.body = await readStream(stream, index, username);
     } catch (e) {
       try {
         await fse.remove(filePath);
@@ -70,7 +70,7 @@ module.exports = async function upload(ctx, orgName) {
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
-    return appLogger.info(`Insert into [${orgName}]`, ctx.body);
+    return appLogger.info(`Insert into [${index}]`, ctx.body);
   }
 
   let total    = 0;
@@ -103,7 +103,7 @@ module.exports = async function upload(ctx, orgName) {
 
     let result;
     try {
-      result = await readStream(stream, orgName, username);
+      result = await readStream(stream, index, username);
     } catch (e) {
       try {
         await fse.remove(filePath);
@@ -125,7 +125,7 @@ module.exports = async function upload(ctx, orgName) {
 
   ctx.type = 'json';
   ctx.body = { total, inserted, updated, failed, errors };
-  return appLogger.info(`Insert into [${orgName}]`, ctx.body);
+  return appLogger.info(`Insert into [${index}]`, ctx.body);
 };
 
 /**
@@ -133,7 +133,7 @@ module.exports = async function upload(ctx, orgName) {
  * @param  {stream}   stream
  * @return {Promise}
  */
-function readStream(stream, orgName, username) {
+function readStream(stream, index, username) {
   const buffer = [];
   const result = {
     total: 0,
@@ -190,7 +190,7 @@ function readStream(stream, orgName, username) {
         }
 
         result.total++;
-        ec.index_name = orgName;
+        ec.index_name = index;
 
         if (!ec.datetime && !ec.timestamp) {
           addError({ reason: 'missing datetime or timestamp' });
@@ -218,7 +218,7 @@ function readStream(stream, orgName, username) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index: { _id: docID, _index: orgName, _type: 'event' } });
+        buffer.push({ index: { _id: docID, _index: index, _type: 'event' } });
         buffer.push(ec);
       }
 
