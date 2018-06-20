@@ -39,6 +39,17 @@ module.exports = async function upload(ctx, index) {
 
   await fse.ensureDir(userDir);
 
+  const splitHeader = ctx.request.headers['split-fields']
+  const splitReg = new RegExp('([^()]+?)\\((.+?)\\)', 'ig')
+  const splittedFields = []
+
+  if (splitHeader) {
+    let match
+    while (match = splitReg.exec(splitHeader)) {
+      splittedFields.push({ field: match[1].trim(), delimiter: match[2] })
+    }
+  }
+
   if (!ctx.request.is('multipart/*')) {
     const now      = new Date();
     const encoding = ctx.request.headers['content-encoding'];
@@ -61,7 +72,7 @@ module.exports = async function upload(ctx, index) {
     ctx.type = 'json';
 
     try {
-      ctx.body = await readStream(stream, index, username);
+      ctx.body = await readStream(stream, index, username, splittedFields);
     } catch (e) {
       try {
         await fse.remove(filePath);
@@ -103,7 +114,7 @@ module.exports = async function upload(ctx, index) {
 
     let result;
     try {
-      result = await readStream(stream, index, username);
+      result = await readStream(stream, index, username, splittedFields);
     } catch (e) {
       try {
         await fse.remove(filePath);
@@ -133,7 +144,7 @@ module.exports = async function upload(ctx, index) {
  * @param  {stream}   stream
  * @return {Promise}
  */
-function readStream(stream, index, username) {
+function readStream(stream, index, username, splittedFields) {
   const buffer = [];
   const result = {
     total: 0,
@@ -180,6 +191,11 @@ function readStream(stream, index, username) {
 
       let ec;
       while (ec = parser.read()) {
+        splittedFields.forEach(split => {
+          if (typeof ec[split.field] === 'string') {
+            ec[split.field] = ec[split.field].split(split.delimiter)
+          }
+        })
 
         if (result.total < 50) {
           try {
