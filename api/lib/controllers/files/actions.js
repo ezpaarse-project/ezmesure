@@ -76,7 +76,7 @@ exports.deleteOne = async function (ctx, fileName) {
   ctx.action = 'file/delete';
   const user     = ctx.state.user;
   const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const filePath = path.resolve(userDir, name);
+  const filePath = path.resolve(userDir, fileName);
 
   await fse.remove(filePath);
 
