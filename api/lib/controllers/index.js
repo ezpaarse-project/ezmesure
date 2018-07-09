@@ -15,6 +15,7 @@ const partners = require('./partners');
 const metrics = require('./metrics');
 
 const elastic = require('../services/elastic');
+const openapi = require('./openapi.json');
 
 const app = new Koa();
 
@@ -23,6 +24,12 @@ app.use(route.get('/login', renaterLogin));
 app.use(route.get('/', async ctx => {
   ctx.status = 200;
   ctx.body   = 'OK';
+}));
+
+app.use(route.get('/openapi.json', async ctx => {
+  ctx.status = 200;
+  ctx.type = 'json';
+  ctx.body = openapi;
 }));
 
 app.use(mount('/partners', partners));

@@ -16,7 +16,8 @@ module.exports = {
   },
   plugins: ['~/plugins/vuetify.js'],
   css: [
-    '~/assets/style/app.styl'
+    '~/assets/style/app.styl',
+    'swagger-ui/dist/swagger-ui.css'
   ],
   mode: 'spa',
   modules: [
