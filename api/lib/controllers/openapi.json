@@ -432,6 +432,15 @@
             },
             "description": "the index where the data should be inserted",
             "required": true
+          },
+          {
+            "in": "header",
+            "name": "Split-Fields",
+            "schema": {
+              "type": "string",
+              "pattern": "^([^()]+?\\([^()]+?\\))+$"
+            },
+            "description": "a list of multivalued fields, formatted as __\"fieldname(delimitor)\"__, and separated with whitespaces. Example: __\"ezproxy-groups(+) subjects(,)\"__"
           }
         ],
         "requestBody": {
