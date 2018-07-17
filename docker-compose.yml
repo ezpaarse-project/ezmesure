@@ -118,4 +118,5 @@ services:
       - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
       - ./rp/apache2/sites-available:/etc/apache2/sites-available
       - ./rp/sp-log/:/var/log/shibboleth/
+      - ./rp/sp-cache:/var/cache/shibboleth
     restart: unless-stopped
