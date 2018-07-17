@@ -9,6 +9,7 @@
       <v-btn flat href="/kibana/">Tableaux de bord</v-btn>
       <v-btn flat exact to="/myspace">Mon espace</v-btn>
       <v-btn flat exact to="/partners">Nos partenaires</v-btn>
+      <v-btn flat exact to="/api">API</v-btn>
     </v-toolbar-items>
 
     <v-bottom-sheet v-model="sheet" class="hidden-sm-and-up">
@@ -29,6 +30,9 @@
         </v-list-tile>
         <v-list-tile @click="sheet = false" exact to="/partners">
           <v-list-tile-title>Nos partenaires</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile @click="sheet = false" exact to="/api">
+          <v-list-tile-title>API</v-list-tile-title>
         </v-list-tile>
       </v-list>
     </v-bottom-sheet>
