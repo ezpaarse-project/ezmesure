@@ -245,6 +245,34 @@
           }
         }
       },
+      "IndexRemove": {
+        "type": "object",
+        "properties": {
+          "took": { "type": "integer" },
+          "total": { "type": "integer" },
+          "deleted": { "type": "integer" },
+          "batches": { "type": "integer" },
+          "timed_out": { "type": "boolean" },
+          "version_conflicts": { "type": "integer" },
+          "noops": { "type": "integer" },
+          "throttled_millis": { "type": "integer" },
+          "requests_per_second": { "type": "integer" },
+          "throttled_until_millis": { "type": "integer" },
+          "retries": {
+            "type": "object",
+            "properties": {
+              "bulk": { "type": "integer" },
+              "search": { "type": "integer" }
+            }
+          },
+          "failures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Metrics": {
         "type": "object",
         "properties": {
@@ -499,6 +527,64 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IndexInsert"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/logs/{index}/events": {
+      "delete": {
+        "tags": [
+          "Indices"
+        ],
+        "summary": "Remove data from an index",
+        "description": "Remove consultation events into an index. Defaults to everything no conditions provided.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar"
+            },
+            "description": "the index where the data should be removed",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2018-01-24T12:00:00",
+            "description": "Minimum date of the events that should be removed. Can be either a date or datetime in ISO format."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2018-01-25T12:00:00",
+            "description": "Maximum date of the events that should be removed. Can be either a date or datetime in ISO format."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexRemove"
                 }
               }
             }
