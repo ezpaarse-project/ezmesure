@@ -7,6 +7,7 @@
 # Enables you to specify a path to mount Kibana at if you are running behind a proxy. This setting
 # cannot end in a slash.
 ##server.basePath: ${SERVER_BASEPATH}
+server.rewriteBasePath: false
 
 # The maximum payload size in bytes for incoming server requests.
 # server.maxPayloadBytes: 1048576
@@ -21,7 +22,6 @@
 xpack.reporting.kibanaServer.protocol: "https"
 # this value must be hard set
 xpack.reporting.kibanaServer.port: 443
-xpack.reporting.kibanaApp: "/app/kibana"
 
 #logging.verbose: true
 
