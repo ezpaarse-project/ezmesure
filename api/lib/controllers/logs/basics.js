@@ -92,7 +92,7 @@ exports.tops = async function (ctx, index) {
     case 'today':
       dateRange.min = new Date(currentYear, currentMonth, currentDate);
       break;
-    case 'yersteday':
+    case 'yesterday':
       dateRange.min = new Date(currentYear, currentMonth, currentDate - 2);
       dateRange.max = new Date(currentYear, currentMonth, currentDate - 1);
       break;
