@@ -38,14 +38,14 @@ See the [official documentation](https://nodejs.org/en/download/package-manager/
   - Open the `certs` directory.
   - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file.
   - Run `docker-compose -f create-certs.yml up`.
-  - A `certificates` directory should be created, you can just put it in `elasticsearch/config/`. (**NB**: you may need to `chown` it)
+  - A `certificates` directory should be created, you can just put it in both `elasticsearch/config/` and `kibana/config/`. (**NB**: you may need to `chown` it)
 
 5) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
 ```
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
 6) Adjust memory for elastic search
-To avoid out of memory exception problems you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
+To avoid out of memory exception problems, you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
 
 ```
 sudo vi /etc/sysctl.conf
@@ -55,6 +55,11 @@ and add the lines :
 ```
 # configuration needed for elastic search
 vm.max_map_count=262144
+```
+
+then apply the changes :
+```
+sysctl -p
 ```
 
 ## Start
