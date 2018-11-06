@@ -4,6 +4,7 @@ const google = require('googleapis');
 const spreadsheetId = '1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU';
 const twentyMinutes = 1200000;
 let cached;
+let cachedAt;
 
 const jwtClient = new google.auth.JWT(
   googleAPI.clientEmail,
