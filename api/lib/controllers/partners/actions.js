@@ -1,6 +1,5 @@
 const { googleAPI } = require('config');
 const google = require('googleapis');
-const googleAuth = require('google-auth-library');
 
 const spreadsheetId = '1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU';
 const twentyMinutes = 1200000;

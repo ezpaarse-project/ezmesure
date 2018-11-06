@@ -8,5 +8,5 @@ module.exports = function logger(loggersConfig) {
     transports.push(new (winston.transports[key])(loggersConfig[key]));
   }
 
-  return new (winston.Logger)({ transports });
+  return winston.createLogger({ transports });
 }

@@ -1,4 +1,5 @@
 const path = require('path');
+const { format } = require('winston');
 
 module.exports = {
   "port": 3000,
@@ -19,8 +20,17 @@ module.exports = {
     "port": 25
   },
   "logs": {
-    "app": { "Console": { "timestamp": true, "colorize": true } },
-    "http": { "Console": { "timestamp": true, "colorize": true } }
+    "app": { "Console": { "format": format.combine(
+        format.colorize(),
+        format.timestamp(),
+        format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+    )}},
+    "http": { "Console": { "format": format.combine(
+      format.colorize(),
+      format.metadata(),
+      format.timestamp(),
+      format.printf(info => `${info.timestamp} ${info.level}: ${Object.entries(info.metadata).map(entry => entry.join('=')).join(' ')}`)
+    )}},
   },
   "auth": {
     "secret": "some-secret",
