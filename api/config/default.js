@@ -42,5 +42,8 @@ module.exports = {
   "notifications": {
     "sender": "ezMESURE",
     "cron": "0 0 0 * * *"
+  },
+  "spreadsheets": {
+    "depositors": "1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU"
   }
 };

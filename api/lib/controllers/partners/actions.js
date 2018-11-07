@@ -1,33 +1,18 @@
-const { googleAPI } = require('config');
-const google = require('googleapis');
+const config = require('config');
+const { sheets } = require('../../services/google');
 
-const spreadsheetId = '1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU';
+const spreadsheetId = config.get('spreadsheets.depositors');
 const twentyMinutes = 1200000;
 let cached;
 let cachedAt;
 
-const jwtClient = new google.auth.JWT(
-  googleAPI.clientEmail,
-  null,
-  googleAPI.privateKey,
-  ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-  null
-);
-
 exports.list = async function (ctx) {
   ctx.type = 'json';
-
-  await new Promise((resolve, reject) => {
-    jwtClient.authorize(function (err, tokens) {
-      if (err) { return reject(err); }
-      resolve();
-    });
-  });
 
   if (cached && (Date.now() - cachedAt) < twentyMinutes) {
     ctx.body = cached;
   } else {
-    ctx.body = cached = await getPartners(jwtClient);
+    ctx.body = cached = await getPartners();
     cachedAt = Date.now();
   }
 };
@@ -36,12 +21,11 @@ exports.list = async function (ctx) {
 /**
  * Extract partners from the google spreadsheet
  */
-function getPartners(auth) {
+function getPartners() {
   return new Promise((resolve, reject) => {
-    const { spreadsheets } = google.sheets('v4');
+    const { spreadsheets } = sheets;
 
     spreadsheets.values.get({
-      auth: auth,
       spreadsheetId,
       range: 'ezmesure-correspondants!A:N',
     }, function(err, response) {
