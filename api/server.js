@@ -93,13 +93,9 @@ app.use(async (ctx, next) => {
 
 // Error logging
 app.on('error', (err, ctx = {}) => {
-  const errorDetails = {
-    status: ctx.status,
-    error: err.message,
-    stack: err.stack
-  };
+  const url = ctx.request ? ctx.request.originalUrl : '';
 
-  appLogger.log('error', ctx.request ? ctx.request.originalUrl : '', errorDetails);
+  appLogger.error(`url=${url}, status=${ctx.status}, error=${err.message}, stack=${err.stack}`);
 });
 
 app.use(mount('/', controller));

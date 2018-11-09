@@ -9,7 +9,7 @@ let newUsers = [];
 
 const job = new CronJob(cron, () => {
   sendNotifications().catch(err => {
-    appLogger.error('Failed to send mail', err);
+    appLogger.error(`Failed to send mail : ${err}`);
   });
 });
 
