@@ -9,12 +9,12 @@
             <v-layout row align-center>
               <v-flex xs7>
                 <div>
-                  <div class="title">{{ partner.organisme }}</div>
+                  <div class="title">{{ partner.organisation.name }}</div>
                 </div>
               </v-flex>
               <v-flex xs5>
                 <v-card-media
-                  :src="partner.logo"
+                  :src="partner.organisation.logoUrl"
                   height="100px"
                   contain
                 ></v-card-media>
@@ -25,15 +25,15 @@
           <v-card-text>
             <div class="body-2">Correspondants</div>
             <div>Documentaire :
-              <span v-if="partner.correspondantDocumentaireNom">{{ partner.correspondantDocumentaireNom }} {{ partner.correspondantDocumentairePrenom }}</span>
+              <span v-if="partner.contact.doc">{{ partner.contact.doc.lastName }} {{ partner.contact.doc.firstName }}</span>
               <span v-else>non confirmé</span>
             </div>
             <div>Technique :
-              <span v-if="partner.correspondantTechniqueNom">{{ partner.correspondantTechniqueNom }} {{ partner.correspondantTechniquePrenom }}</span>
+              <span v-if="partner.contact.tech">{{ partner.contact.tech.lastName }} {{ partner.contact.tech.firstName }}</span>
               <span v-else>non confirmé</span>
             </div>
             <div>
-              <span v-if="partner.nbreECsDansIndex">{{ partner.nbreECsDansIndex }} <abbr title="Evénements de Consultations">ECs</abbr> chargés dans ezMESURE</span>
+              <span v-if="partner.index.count">{{ partner.index.count }} <abbr title="Événements de Consultation">ECs</abbr> chargés dans ezMESURE</span>
             </div>
           </v-card-text>
         </v-card>

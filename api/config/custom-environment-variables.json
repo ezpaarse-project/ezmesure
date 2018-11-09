@@ -31,5 +31,10 @@
   "googleAPI": {
     "clientEmail": "EZMESURE_GOOGLE_EMAIL",
     "privateKey": "EZMESURE_GOOGLE_PRIVATE_KEY"
+  },
+  "depositors": {
+    "index": "EZMESURE_DEPOSITORS_INDEX",
+    "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",
+    "cron": "EZMESURE_DEPOSITORS_CRON"
   }
 }

@@ -43,7 +43,9 @@ module.exports = {
     "sender": "ezMESURE",
     "cron": "0 0 0 * * *"
   },
-  "spreadsheets": {
-    "depositors": "1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU"
+  "depositors": {
+    "index": "depositors",
+    "spreadsheetId": "1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU",
+    "cron": "0 0 0 * * *"
   }
 };
