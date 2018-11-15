@@ -35,6 +35,10 @@
     {
       "name": "Metrics",
       "description": "Get metrics from indices"
+    },
+    {
+      "name": "Depositors",
+      "description": "Manage depositors"
     }
   ],
   "components": {
@@ -152,6 +156,139 @@
                 "type": "string",
                 "example": "doo.john.6@universe.org"
               }
+            }
+          }
+        }
+      },
+      "Depositors": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "object",
+            "properties": {
+              "prefix": {
+                "type": "string",
+                "example": "univ-foobar"
+              },
+              "count": {
+                "type": "integer",
+                "example": "8542"
+              }
+            }
+          },
+          "organisation": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "University of Foobar"
+              },
+              "label": {
+                "type": "string",
+                "example": "University of Foobar"
+              },
+              "city": {
+                "type": "string",
+                "example": "Paris"
+              },
+              "logoUrl": {
+                "type": "string",
+                "example": "https://foobar.univ.fr/assets/logo.jpg"
+              },
+              "uai": {
+                "type": "string",
+                "example": "0362917P"
+              }
+            }
+          },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "confirmed": {
+                "type": "boolean"
+              },
+              "tech": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doo"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "example": "john.doo@univ-foo.fr"
+                  }
+                }
+              },
+              "doc": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doo"
+                  },
+                  "mail": {
+                    "type": "string",
+                    "example": "john.doo@univ-foo.fr"
+                  }
+                }
+              }
+            }
+          },
+          "auto": {
+            "type": "object",
+            "properties": {
+              "ezmesure": { "type": "boolean" },
+              "ezpaarse": { "type": "boolean" },
+              "report": { "type": "boolean" }
+            }
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "lon": { "type": "number" },
+              "lar": { "type": "number" }
+            }
+          }
+        }
+      },
+      "DepositorsRefresh": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "University of Foobar"
+                },
+                "prefix": {
+                  "type": "string",
+                  "example": "univ-foobar"
+                },
+                "count": {
+                  "type": "integer",
+                  "example": 8542
+                },
+                "result": {
+                  "type": "string",
+                  "example": "created"
+                }
+              }
+
             }
           }
         }
@@ -772,6 +909,55 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Metrics"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/partners": {
+      "get": {
+        "tags": [
+          "Depositors"
+        ],
+        "summary": "Get depositors",
+        "description": "Get a list of our depositors.",
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Depositors"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/partners/refresh": {
+      "post": {
+        "tags": [
+          "Depositors"
+        ],
+        "summary": "Refresh depositors",
+        "description": "Refresh depositors.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositorsRefresh"
                 }
               }
             }
