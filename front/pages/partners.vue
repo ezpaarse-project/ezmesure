@@ -9,7 +9,7 @@
             <v-layout row align-center>
               <v-flex xs7>
                 <div>
-                  <div class="title">{{ partner.organisation.name }}</div>
+                  <div class="title">{{ partner.organisation.label || partner.organisation.name }}</div>
                 </div>
               </v-flex>
               <v-flex xs5>
