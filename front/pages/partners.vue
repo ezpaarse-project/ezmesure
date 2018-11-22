@@ -33,7 +33,7 @@
               <span v-else>non confirmé</span>
             </div>
             <div>
-              <span v-if="partner.index.count">{{ partner.index.count }} <abbr title="Événements de Consultation">ECs</abbr> chargés dans ezMESURE</span>
+              <span v-if="partner.index.count">{{ partner.index.count | toLocaleString }} <abbr title="Événements de Consultation">ECs</abbr> chargés dans ezMESURE</span>
             </div>
           </v-card-text>
         </v-card>
@@ -47,6 +47,14 @@
     async asyncData ({ app }) {
       return {
         partners: await app.$axios.$get('/partners')
+      }
+    },
+
+    filters: {
+      toLocaleString (value) {
+        const n = parseInt(value)
+        if (isNaN(n)) { return 0 }
+        return n.toLocaleString()
       }
     }
   }
