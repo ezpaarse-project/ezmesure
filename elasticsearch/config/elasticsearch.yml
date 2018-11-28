@@ -32,3 +32,5 @@ search.remote.connect: ${EZMESURE_ES_NODE_SEARCH_REMOTE}
 #bootstrap.memory_lock: true
 path.logs: /usr/share/elasticsearch/logs
 
+# Disallow searches with too many agregations
+search.max_buckets: 10000
