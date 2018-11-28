@@ -27,8 +27,11 @@ exports.save = async function (ctx) {
 
   switch (ctx.action) {
   case 'indices/list':
+  case 'indices/search':
   case 'file/list':
-    metric.response.body = null;
+    if (metric.response.body && !metric.response.body.error) {
+      metric.response.body = null;
+    }
   }
 
   const username = ctx.state && ctx.state.user && ctx.state.user.username;
