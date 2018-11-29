@@ -804,6 +804,62 @@
         }
       }
     },
+    "/logs/{index}/search": {
+      "post": {
+        "tags": [
+          "Indices"
+        ],
+        "summary": "Search in indices",
+        "description": "Perform search in indices using Elasticsearch Search API.",
+        "security": [{ "bearerAuth": [] }],
+        "externalDocs": {
+          "description": "More about Elasticsearch Query DSL and aggregations can be found here",
+          "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html"
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar"
+            },
+            "description": "the index to search",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Elasticsearch query",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "size": 0,
+                  "query": {
+                    "term" : { "platform" : "npg" }
+                  },
+                  "aggs" : {
+                    "rtypes" : {
+                      "terms" : {
+                        "field" : "rtype",
+                        "size": 5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
     "/files": {
       "get": {
         "tags": [
