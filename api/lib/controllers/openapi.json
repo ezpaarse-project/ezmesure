@@ -104,7 +104,7 @@
           },
           "email": {
             "type": "string",
-            "example": "doo.john@universe.org"
+            "example": "doo.john@ezpaarse.org"
           },
           "enabled": {
             "type": "boolean"
@@ -126,7 +126,7 @@
               },
               "persistentId": {
                 "type": "string",
-                "example": "https://universe.org/idp!https://ezmesure.couperin.org/sp!XJ3AGRS5J74DD6PMGS7UD4M5UOGIWQPN"
+                "example": "https://ezpaarse.org/idp!https://ezmesure.couperin.org/sp!XJ3AGRS5J74DD6PMGS7UD4M5UOGIWQPN"
               },
               "uid": {
                 "type": "string",
@@ -138,15 +138,15 @@
               },
               "idp": {
                 "type": "string",
-                "example": "https://universe.org/idp"
+                "example": "https://ezpaarse.org/idp"
               },
               "org": {
                 "type": "string",
-                "example": "UNIVERSE"
+                "example": "EZPAARSE"
               },
               "affiliation": {
                 "type": "string",
-                "example": "employee@universe.org"
+                "example": "employee@ezpaarse.org"
               },
               "acceptedTerms": {
                 "type": "boolean",
@@ -154,7 +154,7 @@
               },
               "eppn": {
                 "type": "string",
-                "example": "doo.john.6@universe.org"
+                "example": "doo.john.6@ezpaarse.org"
               }
             }
           }
@@ -451,7 +451,7 @@
     "/": {
       "get": {
         "summary": "Ping the API",
-        "description": "This route just serve as a ping for now.",
+        "description": "This route is currently only used to send a ping to the API.",
         "responses": {
           "200": {
             "description": "200 response",
@@ -498,11 +498,11 @@
           "Authentication"
         ],
         "summary": "Get an authorization token",
-        "description": "Actually requires a JWT token (typically stored in cookies). This route is used to provide a token from the user space.",
+        "description": "Actually requires a JWT token (typically stored in cookies). This route provides you with a token from the user space.",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "Token generated successfuly",
+            "description": "Token generated successfully",
             "content": {
               "text/plain": {
                 "schema": {
@@ -524,11 +524,11 @@
           "Authentication"
         ],
         "summary": "Accept terms of service",
-        "description": "Accept terms of service. You should read them first !",
+        "description": "Accept terms of service. You should read them first!",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
-            "description": "Terms accepted successfuly"
+            "description": "Terms accepted successfully"
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
@@ -541,12 +541,12 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Reset kibana password",
-        "description": "Reset kibana password of the authenticated user.",
+        "summary": "Reset Kibana password",
+        "description": "Reset Kibana password of the authenticated user.",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
-            "description": "Password successfuly reset"
+            "description": "Password successfully reset"
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
@@ -560,7 +560,7 @@
           "Indices"
         ],
         "summary": "List existing indices",
-        "description": "List the existing indices that you can access.",
+        "description": "List the existing indices you are allowed to see.",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -585,7 +585,7 @@
           "Indices"
         ],
         "summary": "Insert data into an index",
-        "description": "Insert consultation events into an index.",
+        "description": "Insert access events into an index.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -683,7 +683,7 @@
           "Indices"
         ],
         "summary": "Remove data from an index",
-        "description": "Remove consultation events into an index. Defaults to everything no conditions provided.",
+        "description": "Remove access events from an index. Defaults to everything if no condition provided.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -703,7 +703,7 @@
               "type": "string"
             },
             "example": "2018-01-24T12:00:00",
-            "description": "Minimum date of the events that should be removed. Can be either a date or datetime in ISO format."
+            "description": "Earliest date of the events that should be removed. Can be either a date or datetime in ISO format."
           },
           {
             "in": "query",
@@ -712,7 +712,7 @@
               "type": "string"
             },
             "example": "2018-01-25T12:00:00",
-            "description": "Maximum date of the events that should be removed. Can be either a date or datetime in ISO format."
+            "description": "Latest date of the events that should be removed. Can be either a date or datetime in ISO format."
           }
         ],
         "responses": {
@@ -751,19 +751,19 @@
               "type": "string",
               "example": "univ-foobar"
             },
-            "description": "the index to get tops from",
+            "description": "The index to get tops from.",
             "required": true
           },
           {
             "in": "query",
             "name": "period",
-            "description": "The covered period.",
+            "description": "The time span covered.",
             "required": false,
             "schema": {
               "type": "string",
               "enum": [
                 "today",
-                "yersteday",
+                "yesterday",
                 "current_week",
                 "last_week",
                 "current_month",
@@ -813,7 +813,7 @@
         "description": "Perform search in indices using Elasticsearch Search API.",
         "security": [{ "bearerAuth": [] }],
         "externalDocs": {
-          "description": "More about Elasticsearch Query DSL and aggregations can be found here",
+          "description": "More about Elasticsearch Query DSL and aggregations can be found on",
           "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html"
         },
         "parameters": [
@@ -890,8 +890,8 @@
         "tags": [
           "Files"
         ],
-        "summary": "Remove a file from your hosted files",
-        "description": "Remove a file from your hosted files.",
+        "summary": "Remove one file from your hosted files",
+        "description": "Remove one file from your hosted files.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -901,13 +901,13 @@
               "type": "string",
               "example": "univ-foobar_2017-08-17.csv"
             },
-            "description": "the file to be removed",
+            "description": "The file to be removed.",
             "required": true
           }
         ],
         "responses": {
           "204": {
-            "description": "File successfuly removed"
+            "description": "File successfully removed"
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
@@ -943,7 +943,7 @@
         },
         "responses": {
           "204": {
-            "description": "File successfuly removed"
+            "description": "List of files successfully removed"
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
@@ -957,7 +957,7 @@
           "Metrics"
         ],
         "summary": "Get general metrics",
-        "description": "Get general metrics from data hosted on ezMESURE.",
+        "description": "Get general metrics about the data hosted on ezMESURE.",
         "responses": {
           "200": {
             "description": "200 response",
