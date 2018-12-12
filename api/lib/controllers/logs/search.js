@@ -9,6 +9,7 @@ module.exports = async function (ctx, index) {
 
   ctx.body = await elasticsearch.search({
     index,
+    type: 'event',
     body,
     timeout: '30s',
     headers: { 'es-security-runas-user': ctx.state.user.username }
