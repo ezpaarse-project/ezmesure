@@ -78,6 +78,7 @@ services:
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
       - NODE_ENV
+      - NODE_CONFIG
     links:
       - elastic
     volumes:
