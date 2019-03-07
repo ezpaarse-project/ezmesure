@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const notifications = require('../../services/notifications');
 const elastic = require('../../services/elastic');
 const sendMail = require('../../services/mail');
 const { appLogger } = require('../../../server');
@@ -41,6 +40,9 @@ exports.renaterLogin = async function (ctx) {
   let user = await elastic.findUser(username);
 
   if (!user) {
+    ctx.action   = 'user/register';
+    ctx.metadata = { username };
+
     props.metadata.createdAt = props.metadata.updatedAt = new Date();
     props.metadata.acceptedTerms = false;
     props.password = await randomString();
@@ -52,14 +54,15 @@ exports.renaterLogin = async function (ctx) {
       return ctx.throw(500, 'Failed to save user data');
     }
 
-    notifications.newUser(user);
-
     try {
       await sendWelcomeMail(user, props.password);
     } catch (err) {
       appLogger.error('Failed to send mail', err);
     }
   } else if (query.refresh) {
+    ctx.action   = 'user/refresh';
+    ctx.metadata = { username };
+
     props.metadata.updatedAt = new Date();
     props.metadata.createdAt = user.metadata.createdAt;
     props.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
@@ -72,6 +75,9 @@ exports.renaterLogin = async function (ctx) {
     } catch (e) {
       return ctx.throw(500, 'Failed to update user data');
     }
+  } else {
+    ctx.action   = 'user/connection';
+    ctx.metadata = { username };
   }
 
   ctx.cookies.set('eztoken', generateToken(user), { httpOnly: true });

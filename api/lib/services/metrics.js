@@ -18,6 +18,7 @@ exports.save = async function (ctx) {
     action: ctx.action,
     index: ctx.index,
     responseTime: ctx.responseTime,
+    metadata: ctx.metadata,
     request: ctx.httpLog,
     response: {
       status: ctx.status,
@@ -39,7 +40,7 @@ exports.save = async function (ctx) {
   if (username) {
     const user = await elastic.findUser(username);
 
-    metric.user = {
+    metric.user = !user ? null : {
       name: user.username,
       roles: user.roles,
       idp: user.metadata && user.metadata.idp
@@ -47,7 +48,7 @@ exports.save = async function (ctx) {
   }
 
   return elastic.index({
-    index: '.ezmesure-metrics',
+    index,
     type: '_doc',
     body: metric
   });

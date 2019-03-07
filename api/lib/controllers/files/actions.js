@@ -4,7 +4,6 @@ const path = require('path');
 const zlib = require('zlib');
 const Papa = require('papaparse');
 
-const notifications = require('../../services/notifications');
 const validator = require('../../services/validator');
 
 const storagePath = config.get('storage.path');
@@ -26,6 +25,8 @@ exports.upload = async function (ctx, fileName) {
   const userDir      = path.resolve(storagePath, domain, user.username);
   const filePath     = path.resolve(userDir, fileName);
 
+  ctx.metadata = { path: relativePath };
+
   await fse.ensureDir(userDir);
 
   await new Promise((resolve, reject) => {
@@ -34,7 +35,6 @@ exports.upload = async function (ctx, fileName) {
     stream.on('finish', resolve);
   });
 
-  notifications.newFile(relativePath);
   appLogger.info(`Saved file [${filePath}]`);
 
   const result = await validateFile(filePath);

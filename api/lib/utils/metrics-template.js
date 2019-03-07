@@ -58,6 +58,12 @@ module.exports = {
             }
           }
         },
+        "metadata": {
+          "properties": {
+            "username": { "type": "keyword" },
+            "path": { "type": "keyword" }
+          }
+        },
       }
     }
   }

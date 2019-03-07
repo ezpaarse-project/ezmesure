@@ -2,16 +2,16 @@
 
 const env = process.env.NODE_ENV || 'development';
 
-const path   = require('path');
 const Koa    = require('koa');
 const mount  = require('koa-mount');
 const cors   = require('koa-cors');
 const config = require('config');
 
-const metrics    = require('./lib/services/metrics');
-const logger     = require('./lib/services/logger');
-const appLogger  = logger(config.get('logs.app'));
-const httpLogger = logger(config.get('logs.http'));
+const metrics       = require('./lib/services/metrics');
+const logger        = require('./lib/services/logger');
+const notifications = require('./lib/services/notifications');
+const appLogger     = logger(config.get('logs.app'));
+const httpLogger    = logger(config.get('logs.http'));
 
 module.exports = { appLogger };
 
@@ -23,8 +23,9 @@ if (mailSender) {
   appLogger.error('Missing sender address for mails, please configure <notifications.sender>');
 }
 
-const elasticsearch = require('./lib/services/elastic');
-const controller    = require('./lib/controllers');
+notifications.start(appLogger);
+
+const controller = require('./lib/controllers');
 
 const app = new Koa();
 
