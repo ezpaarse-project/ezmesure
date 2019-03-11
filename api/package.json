@@ -40,6 +40,7 @@
     "koa-route": "^3.2.0",
     "mongodb": "^3.1.9",
     "nodemailer": "^4.6.8",
+    "nunjucks": "^3.2.0",
     "papaparse": "^4.6.1",
     "winston": "^3.1.0"
   },

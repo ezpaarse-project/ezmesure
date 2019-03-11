@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const elastic = require('../../services/elastic');
-const sendMail = require('../../services/mail');
+const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../../server');
 
 const secret = config.get('auth.secret');
@@ -154,39 +154,7 @@ function sendWelcomeMail(user, password) {
     from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
-    text: `
-      Bienvenue ${user.full_name},
-      Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder aux tableaux de bord :
-
-      Nom d'utilisateur: ${user.username}
-      Mot de passe: ${password}
-
-      Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.
-      Si ce n'est pas déjà fait, nous vous invitons également à vous rapprocher de l'équipe afin de déterminer vos droits d'accès, sans quoi vous ne pourrez visualiser vos données.
-
-      Cordialement,
-      L'équipe ezMESURE.
-    `,
-    html: `
-      <h1>Bienvenue ${user.full_name},</h1>
-      <p>Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder aux tableaux de bord :</p>
-      <table>
-        <tbody>
-          <tr>
-            <td><strong>Nom d'utilisateur</strong></td>
-            <td>${user.username}</td>
-          </tr>
-          <tr>
-            <td><strong>Mot de passe</strong></td>
-            <td>${password}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.</p>
-      <p>Si ce n'est pas déjà fait, nous vous invitons également à vous rapprocher de l'équipe afin de déterminer vos droits d'accès, sans quoi vous ne pourrez visualiser vos données.</p>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
-    `
+    ...generateMail('welcome', { user, password })
   });
 }
 
@@ -195,36 +163,6 @@ function sendNewPassword(user, password) {
     from: sender,
     to: user.email,
     subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
-    text: `
-      Bonjour ${user.full_name},
-      Votre mot de passe ezMESURE/Kibana a été réinitialisé. Voici vos nouveaux identifiants Kibana :
-
-      Nom d'utilisateur: ${user.username}
-      Mot de passe: ${password}
-
-      Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.
-
-      Cordialement,
-      L'équipe ezMESURE.
-    `,
-    html: `
-      <h1>Bonjour ${user.full_name},</h1>
-      <p>Votre mot de passe a été réinitialisé. Voici vos nouveaux identifiants Kibana :</p>
-      <table>
-        <tbody>
-          <tr>
-            <td><strong>Nom d'utilisateur</strong></td>
-            <td>${user.username}</td>
-          </tr>
-          <tr>
-            <td><strong>Mot de passe</strong></td>
-            <td>${password}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.</p>
-      <p>Cordialement,</p>
-      <p>L'équipe ezMESURE.</p>
-    `
+    ...generateMail('new-password', { user, password })
   });
 }

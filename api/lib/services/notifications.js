@@ -1,6 +1,6 @@
 const config = require('config');
 const CronJob = require('cron').CronJob;
-const sendMail = require('./mail');
+const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const { sender, recipients, cron } = config.get('notifications');
 
@@ -55,55 +55,19 @@ async function sendNotifications () {
     .filter(a => a._source.action === 'file/upload')
     .map(a => a._source.metadata.path)
   );
-  const users = uniq(actions
-    .filter(a => a._source.action === 'user/register')
-    .map(a => a._source.metadata.username)
+
+  const users = await Promise.all(
+    uniq(actions
+      .filter(a => a._source.action === 'user/register')
+      .map(a => a._source.metadata.username)
+    ).map(username => elastic.findUser(username))
   );
-
-  const fileItems = files.sort().map(file => `<li>${file}</li>`);
-  const userItems = await Promise.all(
-    users.sort().map(username => {
-      return elastic.findUser(username).then(user => user ? `<li>${user.full_name} (${user.email})</li>` : '');
-    }
-  ));
-
-  let text = '';
-  let html = '';
-
-  if (users.length > 0) {
-    text += `
-      Nouveaux utilisateurs enregistrés :
-      ${users.join('\n')}
-    `;
-
-    html += `
-      <p>Nouveaux utilisateurs enregistrés :</p>
-      <ul>
-        ${userItems.join('\n')}
-      </ul>
-    `;
-  }
-
-  if (files.length > 0) {
-    text += `
-      Nouveaux fichiers déposés :
-      ${files.join('\n')}
-    `;
-
-    html += `
-      <p>Nouveaux fichiers déposés :</p>
-      <ul>
-        ${fileItems.join('\n')}
-      </ul>
-    `;
-  }
 
   await sendMail({
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    text,
-    html
+    ...generateMail('recent-activity', { files, users })
   });
 
   return setBroadcasted(actions);

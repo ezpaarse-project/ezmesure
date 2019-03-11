@@ -1,0 +1,13 @@
+{% if users.length %}
+Nouveaux utilisateurs enregistrés :
+  {% for user in users %}
+  {{ user.full_name }} ({{ user.email }})
+  {% endfor %}
+{% endif %}
+
+{% if files.length %}
+Nouveaux fichiers déposés :
+  {% for file in files %}
+  {{ path }}
+  {% endfor %}
+{% endif %}
