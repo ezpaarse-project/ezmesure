@@ -1,21 +1,21 @@
 <template>
   <v-container>
-    <div id="swagger"></div>
+    <div id="swagger" />
   </v-container>
 </template>
 
 <script>
-import SwaggerUI from 'swagger-ui'
+import SwaggerUI from 'swagger-ui';
 
 export default {
-  mounted () {
+  mounted() {
     SwaggerUI({
       url: '/api/openapi.json',
       dom_id: '#swagger',
-      deepLinking: false
-    })
-  }
-}
+      deepLinking: false,
+    });
+  },
+};
 </script>
 
 <style>

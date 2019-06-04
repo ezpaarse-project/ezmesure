@@ -1,16 +1,28 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parserOptions: {
+    parser: 'babel-eslint',
+    ecmaVersion: 2017,
+    sourceType: 'module'
+  },
   env: {
     browser: true,
     node: true
   },
-  extends: 'standard',
+  extends: [
+    'airbnb-base',
+    'plugin:vue/recommended'
+  ],
   // required to lint *.vue files
   plugins: [
-    'html'
+    'vue'
   ],
   // add your custom rules here
-  rules: {},
+  rules: {
+    'import/no-unresolved': 'off',
+    'vue/max-attributes-per-line': 'off',
+    'vue/order-in-components': 'off',
+    'no-param-reassign': 'off'
+  },
   globals: {}
 }

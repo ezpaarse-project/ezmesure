@@ -1,6 +1,6 @@
 <template>
   <v-app light>
-    <AppBar/>
+    <AppBar />
 
     <v-content>
       <nuxt />
@@ -9,11 +9,11 @@
 </template>
 
 <script>
-  import AppBar from '~/components/AppBar'
+import AppBar from '~/components/AppBar';
 
-  export default {
-    components: {
-      AppBar
-    }
-  }
+export default {
+  components: {
+    AppBar,
+  },
+};
 </script>

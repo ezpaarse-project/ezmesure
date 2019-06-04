@@ -2,41 +2,44 @@
   <v-card :raised="drag" class="dropzone">
     <v-card-text class="text-xs-center grey--text">
       <v-layout column>
-        <v-flex><v-icon medium class="grey--text">file_upload</v-icon></v-flex>
+        <v-flex>
+          <v-icon medium class="grey--text">
+            file_upload
+          </v-icon>
+        </v-flex>
         <v-flex>Cliquez ou glissez-déposez vos fichiers ici</v-flex>
       </v-layout>
     </v-card-text>
 
     <input
-      @dragenter="drag = true"
-      @dragleave="drag = false"
-      @drop="drag = false"
       ref="fileInput"
       type="file"
       accept=".csv,.gz"
       multiple
       :disabled="false"
+      @dragenter="drag = true"
+      @dragleave="drag = false"
+      @drop="drag = false"
       @change="onFileChange"
-    />
+    >
   </v-card>
 </template>
 
 <script>
 export default {
-  props: ['Files'],
-  data () {
+  data() {
     return {
-      drag: false
-    }
+      drag: false,
+    };
   },
   methods: {
-    onFileChange ($event) {
-      const files = $event.target.files || $event.dataTransfer.files
-      this.$emit('change', Array.from(files))
-      this.$refs.fileInput.value = null
-    }
-  }
-}
+    onFileChange($event) {
+      const files = $event.target.files || $event.dataTransfer.files;
+      this.$emit('change', Array.from(files));
+      this.$refs.fileInput.value = null;
+    },
+  },
+};
 </script>
 
 <style scoped>
