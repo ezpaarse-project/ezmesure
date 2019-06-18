@@ -133,7 +133,7 @@
                 backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
 
             <!-- Metadonnées des comptes CRU https://services.renater.fr/federation/participants/sac/faq -->
-            <MetadataProvider type="XML" uri="https://cru.renater.fr/idp/profile/Metadata/SAML"
+            <MetadataProvider type="XML" url="https://cru.renater.fr/idp/shibboleth"
                 backingFilePath="sac-metadata.xml" reloadInterval="7200" />
         </MetadataProvider>
 
