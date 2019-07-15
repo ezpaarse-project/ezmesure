@@ -19,35 +19,35 @@ export default function (kibana) {
           description: 'ezMESURE',
         },
       ],
-      // replaceInjectedVars(injectedVars, request, server) {
-      //   const hiddenApps = [
-      //     'kibana:discover',
-      //     'kibana:visualize',
-      //     'kibana:dashboard',
-      //     'kibana:dev_tools',
-      //     'kibana:management',
-      //     'timelion',
-      //     'canvas',
-      //     'infra:home',
-      //     'infra:logs',
-      //     'maps',
-      //     'apm',
-      //     'uptime',
-      //     'monitoring',
-      //   ];
-      //   injectedVars.hiddenAppIds = hiddenApps;
+      replaceInjectedVars(injectedVars, request, server) {
+        const hiddenApps = [
+          // 'kibana:discover',
+          // 'kibana:visualize',
+          // 'kibana:dashboard',
+          // 'kibana:dev_tools',
+          // 'kibana:management',
+          // 'timelion',
+          // 'canvas',
+          // 'infra:home',
+          // 'infra:logs',
+          // 'maps',
+          // 'apm',
+          // 'uptime',
+          // 'monitoring',
+        ];
+        injectedVars.hiddenAppIds = hiddenApps;
 
-      //   hiddenApps.forEach((ha) => {
-      //     if (request.path.match('(.*/app/' + ha + '.*)|(.*/api/' + ha + '.*)')) {
-      //       forbid = true;
-      //     }
-      //   });
+        hiddenApps.forEach((ha) => {
+          if (request.path.match('(.*/app/' + ha + '.*)|(.*/api/' + ha + '.*)')) {
+            forbid = true;
+          }
+        });
   
-      //   return injectedVars;
-      // },
-      // hacks: [
-      //   'plugins/navbar/hacks/hideMenu'
-      // ],
+        return injectedVars;
+      },
+      hacks: [
+        'plugins/navbar/hacks/menu'
+      ],
     },
 
     config(Joi) {
