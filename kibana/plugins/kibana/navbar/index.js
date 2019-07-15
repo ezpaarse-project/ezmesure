@@ -3,7 +3,7 @@ export default function (kibana) {
   let ezmesureLink = 'https://ezmesure-preprod.couperin.org';
 
   return new kibana.Plugin({
-    name: 'ezmesure_home',
+    name: 'ezmesure_plugin',
 
     require: ['kibana', 'elasticsearch'],
 
@@ -19,6 +19,35 @@ export default function (kibana) {
           description: 'ezMESURE',
         },
       ],
+      // replaceInjectedVars(injectedVars, request, server) {
+      //   const hiddenApps = [
+      //     'kibana:discover',
+      //     'kibana:visualize',
+      //     'kibana:dashboard',
+      //     'kibana:dev_tools',
+      //     'kibana:management',
+      //     'timelion',
+      //     'canvas',
+      //     'infra:home',
+      //     'infra:logs',
+      //     'maps',
+      //     'apm',
+      //     'uptime',
+      //     'monitoring',
+      //   ];
+      //   injectedVars.hiddenAppIds = hiddenApps;
+
+      //   hiddenApps.forEach((ha) => {
+      //     if (request.path.match('(.*/app/' + ha + '.*)|(.*/api/' + ha + '.*)')) {
+      //       forbid = true;
+      //     }
+      //   });
+  
+      //   return injectedVars;
+      // },
+      // hacks: [
+      //   'plugins/navbar/hacks/hideMenu'
+      // ],
     },
 
     config(Joi) {
