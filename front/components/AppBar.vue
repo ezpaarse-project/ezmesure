@@ -12,7 +12,7 @@
         Tableaux de bord
       </v-btn>
       <v-btn flat exact to="/myspace">
-        Mon espace
+        Mon compte
       </v-btn>
       <v-btn flat exact to="/partners">
         Nos partenaires
