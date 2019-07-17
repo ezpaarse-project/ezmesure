@@ -1,6 +1,6 @@
 export default function (kibana) {
 
-  let ezmesureLink = 'https://ezmesure-preprod.couperin.org';
+  let ezmesureLink = 'https://ezmesure.couperin.org';
 
   return new kibana.Plugin({
     name: 'ezmesure_plugin',
