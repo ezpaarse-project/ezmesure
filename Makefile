@@ -7,7 +7,10 @@ help:
 config: ## patch shibboleth2.xml config file with SP/DS URLs
 	sed -e "s|{{SHIBBOLETH_SP_URL}}|${SHIBBOLETH_SP_URL}|" \
 	    -e "s|{{SHIBBOLETH_DS_URL}}|${SHIBBOLETH_DS_URL}|" \
-			./rp/shibboleth/shibboleth2.dist.xml > ./rp/shibboleth/shibboleth2.xml
+			./rp/shibboleth/shibboleth2.dist.xml > ./rp/shibboleth/shibboleth2.xml && \
+	sed -i "s|https://ezmesure.couperin.org|${APPLI_APACHE_SERVERNAME}|" ./kibana/plugins/kibana/navbar/index.js && \
+	cd ./kibana/plugins && \
+	zip -r ./kibana.zip ./kibana \
 
 run: cleanup-docker config ## run ezMESURE using environment variables
 	. ./ezmesure.env.sh ; docker-compose up -d
@@ -24,3 +27,5 @@ stop: ## stop ezMESURE using environment variables
 cleanup-docker: ## remove docker image (needed for updating it)
 	docker-compose stop
 	docker-compose rm -f
+
+
