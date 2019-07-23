@@ -1,4 +1,4 @@
-const elasticsearch = require('../../services/elastic');
+const elastic = require('../../services/elastic');
 
 /**
  * Return global aggregated metrics
@@ -6,10 +6,10 @@ const elasticsearch = require('../../services/elastic');
 exports.overall = async function (ctx, index) {
   ctx.type = 'json';
 
-  const result = await elasticsearch.search({
-    type: 'event',
+  const { body: result } = await elastic.search({
     body: {
       size: 0,
+      track_total_hits: true,
       aggs : {
         indices   : { cardinality: { field: '_index' } },
         titles    : { cardinality: { field: 'publication_title' } },
@@ -42,7 +42,7 @@ exports.overall = async function (ctx, index) {
 
   ctx.body = {
     took,
-    docs: hits.total,
+    docs: hits.total && hits.total.value,
     dateCoverage: {
       min: minDate.value,
       max: maxDate.value

@@ -26,7 +26,7 @@ module.exports = {
  * Send a mail containing new files and users
  */
 async function sendNotifications () {
-  const result = await elastic.search({
+  const { body: result } = await elastic.search({
     index: '.ezmesure-metrics',
     size: 1000,
     body: {
@@ -60,7 +60,7 @@ async function sendNotifications () {
     uniq(actions
       .filter(a => a._source.action === 'user/register')
       .map(a => a._source.metadata.username)
-    ).map(username => elastic.findUser(username))
+    ).map(username => elastic.security.findUser({ username }))
   );
 
   await sendMail({

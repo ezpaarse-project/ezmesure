@@ -7,7 +7,7 @@ const zlib   = require('zlib');
 const config = require('config');
 
 const validator     = require('../../services/validator');
-const elasticsearch = require('../../services/elastic');
+const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../../server');
 
@@ -18,17 +18,23 @@ module.exports = async function upload(ctx, index) {
   ctx.action = 'indices/insert';
   ctx.index = index;
   const { username, email } = ctx.state.user;
-
-  const query     = ctx.request.query;
-  const result    = await elasticsearch.hasPrivileges(username, [index], ['write']);
-  const canWrite  = result && result.index && result.index[index] && result.index[index].write;
+  const query = ctx.request.query;
+  const { body: perm } = await elastic.security.hasPrivileges({
+    username,
+    body: {
+      index: [{ names: [index], privileges: ['write'] }]
+    }
+  }, {
+    headers: { 'es-security-runas-user': username }
+  });
+  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
   const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
   if (!canWrite) {
     return ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
-  const exists = await elasticsearch.indices.exists({ index });
+  const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
     await createIndex(index);
@@ -234,7 +240,7 @@ function readStream(stream, index, username, splittedFields) {
           if (!ec[p]) { ec[p] = undefined; }
         }
 
-        buffer.push({ index: { _id: docID, _index: index, _type: 'event' } });
+        buffer.push({ index: { _id: docID, _index: index } });
         buffer.push(ec);
       }
 
@@ -259,13 +265,14 @@ function readStream(stream, index, username, splittedFields) {
         return callback();
       }
 
-      elasticsearch.bulk({
-        body: buffer.splice(0, bulkSize),
+      elastic.bulk({
+        body: buffer.splice(0, bulkSize)
+      }, {
         headers: { 'es-security-runas-user': username }
-      }, (err, resp) => {
+      }, (err, { body }) => {
         if (err) { return callback(err); }
 
-        (resp.items || []).forEach(i => {
+        (body.items || []).forEach(i => {
           if (!i.index) { return result.failed++; }
 
           if (i.index.result === 'created') { return result.inserted++; };
@@ -296,8 +303,8 @@ function readStream(stream, index, username, splittedFields) {
  * @return {Promise}
  */
 function createIndex(index) {
-  return elasticsearch.indices.create({
+  return elastic.indices.create({
     index,
     body: indexTemplate
-  });
+  }).then(res => res.body);
 }

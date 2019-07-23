@@ -14,7 +14,7 @@ export EZMESURE_AUTH_SECRET="d7a8c699c63836b837af086cfb3441cbcfcf1a02"
 export EZMESURE_SMTP_HOST="127.0.0.1"
 export ELASTICSEARCH_USERNAME="elastic"
 export ELASTICSEARCH_PASSWORD="changeme"
-export ELASTICSEARCH_URL="http://elastic:9200"
+export ELASTICSEARCH_HOSTS="http://elastic:9200"
 export SERVER_BASEPATH="/kibana"
 export SERVER_HOST="0.0.0.0"
 export SERVER_PORT="5601"
@@ -25,9 +25,10 @@ export KIBANA_DEFAULTAPPID="dashboard/homepage"
 
 # default values for elastic.yml or kibana.yml configuration
 export EZMESURE_ES_DISCOVERY=""
+export EZMESURE_ES_DISCOVERY_TYPE="single-node"
 export EZMESURE_ES_NODE_NAME="${EZMESURE_NODE_NAME}"
 export EZMESURE_ES_PUBLISH="${THIS_HOST}"
-export EZMESURE_ES_MINMASTER="1"
+export EZMESURE_ES_INITIAL_MASTER_NODES=""
 
 # these values are overwriten by ezmesure.local.env.sh values
 export NODE_ENV="dev"
@@ -48,7 +49,7 @@ export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
 
 # set local EZMESURE_ES_DISCOVERY variable
 # should contain all ES cluster IP host except local IP address
-# needs EZMESURE_MASTER and EZMESURE_NODES in environment
+# needs EZMESURE_NODES in environment
 
 if [[ ! -z ${EZMESURE_NODES} ]] ; then
   for node in ${EZMESURE_NODES} ; do
@@ -56,4 +57,8 @@ if [[ ! -z ${EZMESURE_NODES} ]] ; then
       EZMESURE_ES_DISCOVERY="${EZMESURE_ES_DISCOVERY},${node}:9300"
     fi
   done
+fi
+
+if [[ ! -z ${EZMESURE_ES_DISCOVERY} ]] ; then
+  EZMESURE_ES_DISCOVERY_TYPE="zen"
 fi

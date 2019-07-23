@@ -37,7 +37,7 @@ exports.renaterLogin = async function (ctx) {
 
   const username = props.email.split('@')[0].toLowerCase();
 
-  let user = await elastic.findUser(username);
+  let user = await elastic.security.findUser({ username });
 
   if (!user) {
     ctx.action   = 'user/register';
@@ -47,8 +47,8 @@ exports.renaterLogin = async function (ctx) {
     props.metadata.acceptedTerms = false;
     props.password = await randomString();
 
-    await elastic.updateUser(username, props);
-    user = await elastic.findUser(username);
+    await elastic.security.putUser({ username: username, body: props });
+    user = await elastic.security.findUser({ username });
 
     if (!user) {
       return ctx.throw(500, 'Failed to save user data');
@@ -70,7 +70,7 @@ exports.renaterLogin = async function (ctx) {
     props.username = username;
 
     try {
-      await elastic.updateUser(username, props);
+      await elastic.security.putUser({ username: username, body: props });
       user = props;
     } catch (e) {
       return ctx.throw(500, 'Failed to update user data');
@@ -85,20 +85,20 @@ exports.renaterLogin = async function (ctx) {
 };
 
 exports.acceptTerms = async function (ctx) {
-  const user = await elastic.findUser(ctx.state.user.username);
+  let user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
   user.metadata.acceptedTerms = true;
-  await elastic.updateUser(user.username, user);
+  await elastic.security.putUser({ username: user.username, body: user });
 
   ctx.status = 204;
 }
 
 exports.resetPassword = async function (ctx) {
-  const user = await elastic.findUser(ctx.state.user.username);
+  let user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
@@ -106,13 +106,18 @@ exports.resetPassword = async function (ctx) {
 
   const newPassword = await randomString();
 
-  await elastic.updateUserPassword(ctx.state.user.username, newPassword);
+  await elastic.security.changePassword({
+    username: ctx.state.user.username,
+    body: {
+      password: newPassword
+    }
+  });
   await sendNewPassword(user, newPassword);
   ctx.status = 204;
 }
 
 exports.getUser = async function (ctx) {
-  const user = await elastic.findUser(ctx.state.user.username);
+  let user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');

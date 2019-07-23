@@ -16,7 +16,7 @@ server.rewriteBasePath: false
 # server.name: "your-hostname"
 
 # The URL of the Elasticsearch instance to use for all your queries.
-##elasticsearch.url: ${ELASTICSEARCH_URL}
+# elasticsearch.hosts: ${ELASTICSEARCH_URL}
 
 ##xpack.monitoring.enabled: true
 xpack.reporting.kibanaServer.protocol: "https"
@@ -25,7 +25,7 @@ xpack.reporting.kibanaServer.port: 443
 
 #logging.verbose: true
 
-#xpack.security.enabled: false
+xpack.security.enabled: true
 
 # Required to keep sessions when kibana restarts
 ##xpack.security.encryptionKey: "e558e233df22145278e760c7b26ea9e9c9f72102"

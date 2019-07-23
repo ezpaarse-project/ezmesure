@@ -4,7 +4,7 @@ const indexTemplate = require('../utils/metrics-template');
 const index = '.ezmesure-metrics';
 
 exports.save = async function (ctx) {
-  const exists = await elastic.indices.exists({ index });
+  const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
     await elastic.indices.create({
@@ -38,7 +38,7 @@ exports.save = async function (ctx) {
   const username = ctx.state && ctx.state.user && ctx.state.user.username;
 
   if (username) {
-    const user = await elastic.findUser(username);
+    let user = await elastic.security.findUser({ username });
 
     metric.user = !user ? null : {
       name: user.username,
@@ -49,7 +49,6 @@ exports.save = async function (ctx) {
 
   return elastic.index({
     index,
-    type: '_doc',
     body: metric
-  });
+  }).then(res => res.body);
 };

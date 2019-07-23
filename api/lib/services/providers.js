@@ -184,7 +184,7 @@ function load(providerName, data) {
 
   const body = [];
   data.forEach(m => {
-    body.push({ index:  { _index: indexName, _type: 'meta' } });
+    body.push({ index:  { _index: indexName } });
     body.push(m);
   });
 

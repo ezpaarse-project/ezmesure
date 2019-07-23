@@ -49,7 +49,7 @@ app.use(mount('/profile', authorize));
  * Any route below requires the user to accept the terms of use
  */
 app.use(async (ctx, next) => {
-  const user = await elastic.findUser(ctx.state.user.username);
+  const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');

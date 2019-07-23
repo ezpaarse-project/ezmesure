@@ -104,7 +104,7 @@
               </v-alert>
               <p>
                 Pour changer votre mot de passe,
-                accédez à votre<a href="/kibana/app/kibana#/account">compte Kibana</a>.
+                accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.
               </p>
               <p>
                 Mot de passe oublié ?
