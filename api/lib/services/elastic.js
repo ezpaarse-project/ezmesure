@@ -1,13 +1,20 @@
 const { Client } = require('@elastic/elasticsearch')
 const config = require('config');
+const { URL } = require('url');
 
-const user     = config.get('elasticsearch.user');
+const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
 const host     = config.get('elasticsearch.host');
 const port     = config.get('elasticsearch.port');
 
 const client = new Client({
-  node: `http://${user}:${password}@${host}:${port}`
+  node: {
+    url: new URL(`http://${host}:${port}`),
+    auth: {
+      username,
+      password
+    }
+  }
 });
 
 client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => {
