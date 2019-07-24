@@ -214,13 +214,12 @@ export default {
         Papa.parse(file, {
           delimiter: ';',
           error: e => reject(e),
-          step: ({ data, errors }, parser) => {
+          step: ({ data: row, errors }, parser) => {
             lineNumber += 1;
             if (lineNumber > readLimit) {
               parser.abort();
               return;
             }
-            const row = data[0];
 
             if (errors.length > 0) {
               // eslint-disable-next-line prefer-destructuring
