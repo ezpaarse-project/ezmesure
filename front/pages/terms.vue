@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="mb-4">
+    <v-card class="mb-6">
       <v-toolbar card>
         <v-toolbar-title>Conditions d'utilisation</v-toolbar-title>
       </v-toolbar>
@@ -15,7 +15,7 @@
 
         <p>Afin d'utiliser ce service, vous vous engagez à respecter le <a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees" target="_blank">règlement général sur la protection des données</a>.</p>
 
-        <p class="text-xs-center">
+        <p class="text-center">
           <v-checkbox
             v-model="accepted"
             label="J'ai lu et j'accepte les conditions d'utilisation"

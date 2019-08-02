@@ -15,17 +15,15 @@
     "nuxt": "^2.8.1",
     "papaparse": "^5.0.1",
     "pretty-bytes": "^5.2.0",
-    "swagger-ui": "^3.23.1",
-    "vuetify": "1.0.13"
+    "swagger-ui": "^3.23.1"
   },
   "devDependencies": {
+    "@nuxtjs/vuetify": "^1.1.1",
     "babel-eslint": "^10.0.2",
-    "eslint": "^6.1.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-loader": "^2.2.1",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-vue": "^5.2.3",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2"
+    "eslint-plugin-vue": "^5.2.3"
   }
 }

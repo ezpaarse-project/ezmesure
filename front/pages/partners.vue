@@ -1,59 +1,48 @@
 <template>
-  <v-container grid-list-lg>
-    <h1 class="display-1">
+  <v-container fluid grid-list-lg>
+    <h1 class="display-1 text-center my-4">
       Nos {{ partners.length }} partenaires
     </h1>
 
-    <v-layout row wrap align-center>
-      <v-flex v-for="(partner, index) in partners" :key="index" xs12 md6 lg4>
-        <v-card>
-          <v-container fluid grid-list-lg>
-            <v-layout row align-center>
-              <v-flex xs7>
-                <div>
-                  <div class="title">
-                    {{ partner.organisation.label || partner.organisation.name }}
-                  </div>
-                </div>
-              </v-flex>
-              <v-flex xs5>
-                <v-card-media
-                  :src="partner.organisation.logoUrl"
-                  height="100px"
-                  contain
-                />
-              </v-flex>
-            </v-layout>
-          </v-container>
+    <v-card max-width="800" class="mx-auto">
+      <v-list three-line>
+        <template v-for="(partner, index) in partners">
+          <v-list-item :key="index">
+            <v-list-item-avatar v-if="partner.organisation.logoUrl" tile size="80">
+              <v-img :src="partner.organisation.logoUrl" contain />
+            </v-list-item-avatar>
 
-          <v-card-text>
-            <div class="body-2">
-              Correspondants
-            </div>
-            <div>
-              Documentaire :
-              <span v-if="partner.contact.doc">
-                {{ partner.contact.doc.lastName }} {{ partner.contact.doc.firstName }}
-              </span>
-              <span v-else>non confirmé</span>
-            </div>
-            <div>
-              Technique :
-              <span v-if="partner.contact.tech">
-                {{ partner.contact.tech.lastName }} {{ partner.contact.tech.firstName }}
-              </span>
-              <span v-else>non confirmé</span>
-            </div>
-            <div>
-              <span v-if="partner.index.count">
-                {{ partner.index.count | toLocaleString }}
-                <abbr title="Événements de Consultation">ECs</abbr> chargés dans ezMESURE
-              </span>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ partner.organisation.label || partner.organisation.name }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                <v-chip v-if="partner.contact.doc" outlined label>
+                  <v-icon left>
+                    mdi-book
+                  </v-icon>
+                  {{ partner.contact.doc.lastName }} {{ partner.contact.doc.firstName }}
+                </v-chip>
+                <v-chip v-if="partner.contact.tech" outlined label>
+                  <v-icon left>
+                    mdi-wrench
+                  </v-icon>
+                  {{ partner.contact.tech.lastName }} {{ partner.contact.tech.firstName }}
+                </v-chip>
+                <v-chip v-if="partner.index.count" outlined label>
+                  <v-icon left>
+                    mdi-cloud-upload
+                  </v-icon>
+                  {{ partner.index.count | toLocaleString }}
+                </v-chip>
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-divider :key="index" />
+        </template>
+      </v-list>
+    </v-card>
   </v-container>
 </template>
 
