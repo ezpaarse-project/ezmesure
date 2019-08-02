@@ -1,4 +1,4 @@
-FROM node:8.5.0-wheezy
+FROM node:10.15.3
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
 RUN mkdir -p /usr/src/app
