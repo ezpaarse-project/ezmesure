@@ -18,7 +18,7 @@
 
     <v-divider />
 
-    <v-card-text class="text-center contacts">
+    <v-card-text class="text-center">
       <div class="subtitle-1">
         Correspondants
       </div>
@@ -75,8 +75,5 @@ export default {
 <style>
 .flexCard {
   display: flex; flex-direction: column;
-}
-.contacts {
-  min-height: 130px;
 }
 </style>
