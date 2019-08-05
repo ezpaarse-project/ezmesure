@@ -1,11 +1,10 @@
 <template>
-  <v-card width="350" height="100%">
-    <v-card-text class="text-center">
+  <v-card width="350" height="100%" class="flexCard">
+    <v-card-text class="text-center grow">
       <v-img
         :src="logoUrl"
         contain
-        max-height="100"
-        max-width="100%"
+        height="100"
         class="mb-3"
       />
 
@@ -17,25 +16,25 @@
       </div>
     </v-card-text>
 
-    <template v-if="docName || techName">
-      <v-divider />
+    <v-divider />
 
-      <v-card-text class="text-center">
-        <div class="subtitle-1">
-          Correspondants
-        </div>
+    <v-card-text class="text-center contacts">
+      <div class="subtitle-1">
+        Correspondants
+      </div>
 
-        <div v-if="docName">
-          Documentaire :
-          <span class="text--primary">{{ docName }}</span>
-        </div>
+      <div>
+        Documentaire :
+        <span v-if="docName" class="text--primary">{{ docName }}</span>
+        <span v-else>non confirmé</span>
+      </div>
 
-        <div v-if="techName">
-          Technique :
-          <span class="text--primary">{{ techName }}</span>
-        </div>
-      </v-card-text>
-    </template>
+      <div>
+        Technique :
+        <span v-if="techName" class="text--primary">{{ techName }}</span>
+        <span v-else>non confirmé</span>
+      </div>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -72,3 +71,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.flexCard {
+  display: flex; flex-direction: column;
+}
+.contacts {
+  min-height: 130px;
+}
+</style>
