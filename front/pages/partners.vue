@@ -1,64 +1,70 @@
 <template>
   <v-container fluid grid-list-lg>
-    <h1 class="display-1 text-center my-4">
-      Nos {{ partners.length }} partenaires
-    </h1>
+    <v-layout column>
+      <v-icon size="100" color="pink">
+        mdi-charity
+      </v-icon>
 
-    <v-card max-width="800" class="mx-auto">
-      <v-list three-line>
-        <template v-for="(partner, index) in partners">
-          <v-list-item :key="index">
-            <v-list-item-avatar v-if="partner.organisation.logoUrl" tile size="80">
-              <v-img :src="partner.organisation.logoUrl" contain />
-            </v-list-item-avatar>
+      <h1 class="display-1 text-center mb-2">
+        Nos {{ partners.length }} partenaires
+      </h1>
+    </v-layout>
 
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ partner.organisation.label || partner.organisation.name }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                <v-chip v-if="partner.contact.doc" outlined label>
-                  <v-icon left>
-                    mdi-book
-                  </v-icon>
-                  {{ partner.contact.doc.lastName }} {{ partner.contact.doc.firstName }}
-                </v-chip>
-                <v-chip v-if="partner.contact.tech" outlined label>
-                  <v-icon left>
-                    mdi-wrench
-                  </v-icon>
-                  {{ partner.contact.tech.lastName }} {{ partner.contact.tech.firstName }}
-                </v-chip>
-                <v-chip v-if="partner.index.count" outlined label>
-                  <v-icon left>
-                    mdi-cloud-upload
-                  </v-icon>
-                  {{ partner.index.count | toLocaleString }}
-                </v-chip>
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
+    <v-layout row justify-center align-center>
+      <v-flex xs12 sm8 md6 lg4>
+        <v-text-field
+          v-model="search"
+          label="Recherche"
+          solo
+          max-width="200"
+          append-icon="mdi-magnify"
+        />
+      </v-flex>
+    </v-layout>
 
-          <v-divider :key="index" />
-        </template>
-      </v-list>
-    </v-card>
+    <v-layout row wrap justify-center>
+      <v-flex v-for="(partner, index) in filteredPartners" :key="index" shrink>
+        <PartnerCard :partner="partner" />
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
 <script>
+import PartnerCard from '~/components/PartnerCard.vue';
+
 export default {
+  components: {
+    PartnerCard,
+  },
   async asyncData({ app }) {
     return {
       partners: await app.$axios.$get('/partners'),
+      search: '',
     };
   },
 
-  filters: {
-    toLocaleString(value) {
-      const n = parseInt(value, 10);
-      if (Number.isNaN(n)) { return 0; }
-      return n.toLocaleString();
+  computed: {
+    filteredPartners() {
+      if (!this.search) { return this.partners; }
+
+      const lowerSearch = this.search.toLowerCase();
+
+      return this.partners.filter(({ organisation = {}, contact = {} }) => {
+        const orgName = organisation.name;
+
+        if (orgName && orgName.toLowerCase().includes(lowerSearch)) { return true; }
+        if (!contact.confirmed) { return false; }
+
+        const { doc = {}, tech = {} } = contact;
+
+        if (typeof doc.firstName === 'string' && doc.firstName.toLowerCase().includes(lowerSearch)) { return true; }
+        if (typeof doc.lastName === 'string' && doc.lastName.toLowerCase().includes(lowerSearch)) { return true; }
+        if (typeof tech.firstName === 'string' && tech.firstName.toLowerCase().includes(lowerSearch)) { return true; }
+        if (typeof tech.lastName === 'string' && tech.lastName.toLowerCase().includes(lowerSearch)) { return true; }
+
+        return false;
+      });
     },
   },
 };
