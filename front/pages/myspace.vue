@@ -40,6 +40,19 @@
 
             <v-card flat class="mx-auto" max-width="800px">
               <v-card-text>
+                <v-alert
+                  type="info"
+                  prominent
+                  :value="hasNoRole"
+                >
+                  <div class="headline">
+                    Aucun rôle n'est encore associé à votre compte.
+                  </div>
+                  <div>
+                    Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe
+                    ou le correspondant ezMESURE de votre établissement.
+                  </div>
+                </v-alert>
                 <v-text-field
                   :value="user.full_name"
                   label="Nom"
@@ -316,6 +329,7 @@ export default {
     metadata() { return (this.user && this.user.metadata) || {}; },
     token() { return this.$store.state.auth.token; },
     nbSelectedFiles() { return this.selectedFiles.length; },
+    hasNoRole() { return !Array.isArray(this.user.roles) || this.user.roles.length === 0; },
     clipboardAvailable() {
       return navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
     },
