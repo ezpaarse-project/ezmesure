@@ -36,7 +36,7 @@ services:
       service: rp
 
   api:
-    image: node:8.5.0-wheezy
+    image: node:10.15.3
     ports:
       - 3000:3000
     volumes:
@@ -65,7 +65,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:8.5.0-wheezy
+    image: node:10.15.3
     ports:
       - 8080:8080
     volumes:
