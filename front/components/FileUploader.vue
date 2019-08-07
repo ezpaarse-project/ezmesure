@@ -14,73 +14,86 @@
 
     <FileInput @change="addFilesToUpload" />
 
-    <p class="ma-2 text-xs-right">
-      <v-btn v-if="!noUploads" small @click="clearCompletedUploads">
-        <v-icon left>
-          clear_all
-        </v-icon>
-        Supprimer terminés
-      </v-btn>
-    </p>
-
-    <v-card v-for="upload in uploads" :key="upload.id" class="my-3">
-      <v-container fluid grid-list-lg>
-        <v-layout row align-center>
-          <v-flex>
-            <v-progress-circular
-              :indeterminate="!upload.error && !upload.progress"
-              :value="upload.error ? 100 : upload.progress"
-              :class="upload.error ? 'red--text' : 'teal--text'"
-              size="50"
+    <v-container fluid grid-list-md class="px-0">
+      <v-layout column>
+        <v-flex>
+          <div class="text-right">
+            <v-btn v-if="!noUploads" @click="clearCompletedUploads">
+              <v-icon left>
+                mdi-notification-clear-all
+              </v-icon>
+              Supprimer terminés
+            </v-btn>
+          </div>
+        </v-flex>
+        <v-flex v-for="upload in uploads" :key="upload.id">
+          <v-card>
+            <v-container
+              fluid
+              grid-list-md
+              pa-2
             >
-              <v-scale-transition origin="center center" mode="out-in">
-                <v-icon v-if="upload.error" key="error" class="red--text">
-                  error
-                </v-icon>
-                <v-icon v-else-if="upload.done" key="done" class="teal--text">
-                  done
-                </v-icon>
-                <span v-else key="progress">
-                  {{ upload.progress }}%
-                </span>
-              </v-scale-transition>
-            </v-progress-circular>
-          </v-flex>
+              <v-layout row align-center>
+                <v-flex shrink>
+                  <v-scale-transition origin="center center" mode="out-in">
+                    <v-icon v-if="upload.error" size="50" class="error--text">
+                      mdi-alert-circle-outline
+                    </v-icon>
+                    <v-icon v-else-if="upload.done" size="50" class="success--text">
+                      mdi-check
+                    </v-icon>
 
-          <v-flex class="grow">
-            <div class="body-2">
-              {{ upload.file.name }}
-            </div>
+                    <v-progress-circular
+                      v-else
+                      :indeterminate="!upload.error && !upload.progress"
+                      :value="upload.error ? 100 : upload.progress"
+                      :class="upload.error ? 'error--text' : 'primary--text'"
+                      size="50"
+                      width="3"
+                    >
+                      {{ upload.progress }}%
+                    </v-progress-circular>
+                  </v-scale-transition>
+                </v-flex>
 
-            <div class="grey--text">
-              <span v-if="upload.error" class="red--text">
-                {{ upload.errorMessage || 'Erreur' }}
-              </span>
-              <span v-else-if="upload.done">Chargé</span>
-              <span v-else-if="upload.progress">Chargement en cours</span>
-              <span v-else-if="upload.validating">Validation du fichier...</span>
-              <span v-else>En attente</span>
-            </div>
-          </v-flex>
+                <v-flex grow>
+                  <div class="body-1 grey--text text--darken-3">
+                    {{ upload.file.name }}
+                  </div>
 
-          <v-flex>
-            <v-scale-transition origin="center center" mode="out-in">
-              <v-btn v-if="upload.done" key="delete" icon ripple @click="removeUpload(upload.id)">
-                <v-icon>delete</v-icon>
-              </v-btn>
-              <v-btn v-else key="clear" icon ripple @click="upload.cancel()">
-                <v-icon>clear</v-icon>
-              </v-btn>
-            </v-scale-transition>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-card>
+                  <div class="grey--text">
+                    <span v-if="upload.error" class="error--text">
+                      {{ upload.errorMessage || 'Erreur' }}
+                    </span>
+                    <span v-else-if="upload.done">Chargé</span>
+                    <span v-else-if="upload.progress">Chargement en cours</span>
+                    <span v-else-if="upload.validating">Validation du fichier...</span>
+                    <span v-else>En attente</span>
+                  </div>
+                </v-flex>
+
+                <v-flex shrink>
+                  <v-scale-transition origin="center center" mode="out-in">
+                    <v-btn v-if="upload.done" icon ripple @click="removeUpload(upload.id)">
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                    <v-btn v-else icon ripple @click="upload.cancel()">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </v-scale-transition>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </v-container>
 </template>
 
 <script>
 import Papa from 'papaparse';
+import prettyBytes from 'pretty-bytes';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CancelToken, isCancel } from 'axios';
 import FileInput from './FileInput';
@@ -130,6 +143,7 @@ export default {
       files.forEach((file) => {
         this.uploads.push({
           file,
+          prettySize: prettyBytes(file.size),
           id: this.uploadId += 1,
           progress: 0,
           done: false,
@@ -146,7 +160,7 @@ export default {
       const upload = this.uploads.find(u => !u.done);
       if (!upload) {
         this.uploading = false;
-        if (typeof this.onUpload === 'function') { this.onUpload(); }
+        this.$emit('upload');
         return;
       }
 
@@ -282,18 +296,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.grow {
-  width: 100%;
-}
-.nowrap {
-  white-space: nowrap;
-}
-.flex {
-  flex: 0 1 auto;
-}
-.flex.grow {
-  flex-grow: 1;
-}
-</style>

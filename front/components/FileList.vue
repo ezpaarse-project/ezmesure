@@ -1,60 +1,22 @@
 <template>
-  <div>
-    <p class="text-xs-right">
-      <v-btn small :disabled="noFileSelected" @click="deleteSelected">
-        <v-icon left>
-          delete
-        </v-icon>
-        Supprimer
-      </v-btn>
-      <v-btn small @click="refreshFiles">
-        <v-icon left>
-          refresh
-        </v-icon>
-        Actualiser
-      </v-btn>
-    </p>
+  <v-data-table
+    v-model="selected"
+    :items="files"
+    :headers="headers"
+    :loading="loading"
+    item-key="name"
+    show-select
+    no-data-text="Aucun fichier"
+    no-results-text="Aucun fichier"
+  >
+    <template v-slot:item.lastModified="{ item }">
+      {{ item.prettyLastModified }}
+    </template>
 
-    <v-data-table
-      v-model="selected"
-      :items="files"
-      :headers="headers"
-      :loading="loading"
-      item-key="name"
-      select-all
-      no-data-text="Aucun fichier"
-      no-results-text="Aucun fichier"
-      rows-per-page-text="Lignes par page"
-    >
-      <template slot="headerCell" slot-scope="props">
-        {{ props.header.text }}
-      </template>
-
-      <template slot="items" slot-scope="props">
-        <td>
-          <v-checkbox
-            v-model="props.selected"
-            primary
-            hide-details
-          />
-        </td>
-
-        <td class="nowrap">
-          {{ props.item.name }}
-        </td>
-        <td class="nowrap">
-          {{ props.item.prettySize }}
-        </td>
-        <td class="nowrap">
-          {{ props.item.prettyLastModified }}
-        </td>
-      </template>
-
-      <template slot="pageText" slot-scope="props">
-        {{ props.pageStart }}-{{ props.pageStop }} sur {{ props.itemsLength }}
-      </template>
-    </v-data-table>
-  </div>
+    <template v-slot:item.size="{ item }">
+      {{ item.prettySize }}
+    </template>
+  </v-data-table>
 </template>
 
 <script>
@@ -76,15 +38,16 @@ export default {
           align: 'left',
           text: 'Nom',
           value: 'name',
-          class: 'grow',
-        }, {
-          align: 'left',
-          text: 'Taille',
-          value: 'size',
         }, {
           align: 'left',
           text: 'Modifié',
           value: 'lastModified',
+          width: '220px',
+        }, {
+          align: 'left',
+          text: 'Taille',
+          value: 'size',
+          width: '120px',
         },
       ],
     };
@@ -102,14 +65,23 @@ export default {
       return this.selected.length === 0;
     },
   },
+  watch: {
+    selected() {
+      this.$emit('select', this.selected);
+    },
+  },
   methods: {
+    deselectAll() {
+      this.selected = [];
+    },
+
     async refreshFiles() {
       this.loading = true;
 
       try {
         this.hostedFiles = (await this.$axios.get('/files')).data;
       } catch (e) {
-        console.error(e);
+        this.$store.dispatch('snacks/error', 'La mise à jour de la liste a échoué');
       }
 
       this.loading = false;
@@ -124,7 +96,7 @@ export default {
       try {
         await this.$axios.post('/files/delete_batch', { entries });
       } catch (e) {
-        console.error(e);
+        this.$store.dispatch('snacks/error', 'La suppression des fichiers a échoué');
       }
 
       this.selected = [];
@@ -134,21 +106,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.grow {
-  width: 100%;
-}
-.nowrap {
-  white-space: nowrap;
-}
-.flex {
-  flex: 0 1 auto;
-}
-.flex.grow {
-  flex-grow: 1;
-}
-p {
-  text-align: justify;
-}
-</style>

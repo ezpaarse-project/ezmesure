@@ -1,9 +1,9 @@
 <template>
-  <v-app light>
+  <v-app>
     <AppBar />
 
     <main>
-      <v-container fluid class="text-xs-center">
+      <v-container fluid class="text-center">
         <h1 v-if="error.statusCode === 404" class="display-1">
           Page introuvable
         </h1>
