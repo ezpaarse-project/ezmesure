@@ -43,7 +43,7 @@
                 <v-alert
                   type="info"
                   prominent
-                  :value="hasNoRole"
+                  :value="!hasRoles"
                 >
                   <div class="headline">
                     Aucun rôle n'est encore associé à votre compte.
@@ -87,6 +87,30 @@
                   readonly
                   outlined
                 />
+
+                <v-card v-if="hasRoles" outlined>
+                  <v-card-text>
+                    <div class="title">
+                      Vos rôles
+                    </div>
+                    <div class="mb-2">
+                      Ces rôles définissent vos droits d'accès aux données
+                      et aux tableaux de bord hébergés sur ezMESURE.
+                    </div>
+                    <div>
+                      <v-chip
+                        v-for="role in user.roles"
+                        :key="role"
+                        class="mr-2"
+                        label
+                        outlined
+                        color="accent"
+                      >
+                        {{ role }}
+                      </v-chip>
+                    </div>
+                  </v-card-text>
+                </v-card>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -329,7 +353,7 @@ export default {
     metadata() { return (this.user && this.user.metadata) || {}; },
     token() { return this.$store.state.auth.token; },
     nbSelectedFiles() { return this.selectedFiles.length; },
-    hasNoRole() { return !Array.isArray(this.user.roles) || this.user.roles.length === 0; },
+    hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
     clipboardAvailable() {
       return navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
     },
