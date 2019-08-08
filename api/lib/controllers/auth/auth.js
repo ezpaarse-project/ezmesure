@@ -85,11 +85,7 @@ exports.renaterLogin = async function (ctx) {
 };
 
 exports.acceptTerms = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
-
-  if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
-  }
+  const user = ctx.state.user;
 
   user.metadata.acceptedTerms = true;
   await elastic.security.putUser({ username: user.username, body: user });
@@ -98,12 +94,6 @@ exports.acceptTerms = async function (ctx) {
 }
 
 exports.resetPassword = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
-
-  if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
-  }
-
   const newPassword = await randomString();
 
   await elastic.security.changePassword({
@@ -112,19 +102,13 @@ exports.resetPassword = async function (ctx) {
       password: newPassword
     }
   });
-  await sendNewPassword(user, newPassword);
+  await sendNewPassword(ctx.state.user, newPassword);
   ctx.status = 204;
 }
 
 exports.getUser = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
-
-  if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
-  }
-
   ctx.status = 200;
-  ctx.body   = user;
+  ctx.body   = ctx.state.user;
 };
 
 exports.getToken = async function (ctx) {

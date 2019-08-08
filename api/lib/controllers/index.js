@@ -43,10 +43,8 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-app.use(mount('/profile', authorize));
-
 /**
- * Any route below requires the user to accept the terms of use
+ * Any route below requires an authenticated user
  */
 app.use(async (ctx, next) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
@@ -55,7 +53,20 @@ app.use(async (ctx, next) => {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
-  if (!user.metadata.acceptedTerms) {
+  ctx.state.user = user;
+
+  await next();
+});
+
+app.use(mount('/profile', authorize));
+
+/**
+ * Any route below requires the user to accept the terms of use
+ */
+app.use(async (ctx, next) => {
+  const { metadata = {} } = ctx.state.user;
+
+  if (!metadata.acceptedTerms) {
     return ctx.throw(403, 'You must accept the terms of use before using this service');
   }
 
