@@ -1,6 +1,6 @@
-import elasticsearch from 'elasticsearch';
 import { uiModules } from 'ui/modules';
 import uiRoutes from 'ui/routes';
+import $jQ from 'jquery';
 import 'ui/autoload/all';
 
 import reportingTemplate from './reporting/templates/index.html';
@@ -18,15 +18,24 @@ uiRoutes
 uiModules
   .get('app/reporting')
   .controller('ezMesureReportingController', ['$scope', '$http', '$route', ($scope, $http, $route) => {
+    const currentUrl = $jQ(location).attr('pathname');
+    let space = '';
+    if (/^\/kibana\/s\/([a-z0-9\-]+)/i.test(currentUrl)) {
+      space = currentUrl.split('/')[3];
+    }
+
     $scope.title = 'Reporting ezMESURE';
 
     $scope.loadData = () => {
-      $http.get('../api/ezmesure/dashboards').then((response) => {
-        const { data: dashboards, status } = response;
+      $http.get(`../api/ezmesure/reporting/list/${space}`).then((response) => {
+        const { data, status } = response;
         $scope.status = status === 200;
-        $scope.dashboards = dashboards;
+        $scope.dashboardsList = data.dashboardsList;
+        $scope.reportingList = data.reportingList;
 
-        $scope.times = [
+        $scope.flyoutOpened = false;
+
+        $scope.timesSpan = [
           'Hebdomadaire',
           'Bihebdomadaire',
           'Mensuelle',
@@ -35,22 +44,15 @@ uiModules
           'Semestrielle',
           'Annuelle',
         ];
-        $scope.errorTime = false;
 
-        $scope.updateReporting = (dashboard) => {
-          if (dashboard) {
-            if (!dashboard.time || dashboard.time.length <= 0) {
-              $scope.errorTime = true;
-              dashboard.reporting = false;
-            }
-            if (dashboard.time || dashboard.time.length > 0) {
-              $scope.errorTime = false;
+        $scope.reportingData = {
+          dashboardId: null,
+          timeSpan: null,
+          emails: null,
+        };
 
-              $http.post('../api/ezmesure/reporting', dashboard).then((response) => {
-                console.log(response.data)
-              });
-            }
-          }
+        $scope.saveReporting = () => {
+          console.log($scope.reportingData);
         };
       });
     };

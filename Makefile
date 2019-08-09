@@ -26,6 +26,7 @@ cleanup-docker: ## remove docker image (needed for updating it)
 	docker-compose rm -f
 
 plugins: ## initiailize kibana plugins
-	sed -i "s|https://ezmesure.couperin.org|${APPLI_APACHE_SERVERNAME}|" ./kibana/plugins/kibana/ezmesure/index.js && \
+	sed -e "s|{{EZMESURE_URL}}|${APPLI_APACHE_SERVERNAME}|" \
+		./kibana/plugins/kibana/ezmesure/index.dist.js > ./kibana/plugins/kibana/ezmesure/index.js && \
 		cd ./kibana/plugins && \
 		zip -r ./kibana.zip ./kibana
