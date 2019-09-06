@@ -12,6 +12,7 @@ services:
       - 5601:5601
     links:
       - elastic
+      - api
     environment:
       - http_proxy
       - https_proxy
@@ -28,6 +29,7 @@ services:
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana/plugins/kibana:/usr/share/kibana/plugins
     restart: unless-stopped
 
   rp:

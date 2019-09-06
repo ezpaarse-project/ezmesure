@@ -2,7 +2,7 @@
   <div class="euiPageBody" ng-controller="ezMesureReportingController">
 
     <div role="dialog" ng-if="flyoutOpened" class="euiFlyout euiFlyout--medium" tabindex="0" aria-labelledby="flyoutTitle">
-      <button ng-click="flyoutOpened = false" class="euiButtonIcon euiButtonIcon--text euiFlyout__closeButton" type="button" aria-label="Fermer" data-test-subj="euiFlyoutCloseButton">
+      <button ng-click="closeFlyout()" class="euiButtonIcon euiButtonIcon--text euiFlyout__closeButton" type="button" aria-label="Fermer" data-test-subj="euiFlyoutCloseButton">
         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="euiIcon euiIcon--medium euiIcon-isLoaded euiButtonIcon__icon" focusable="false" aria-hidden="true">
           <path d="M7.293 8L3.146 3.854a.5.5 0 1 1 .708-.708L8 7.293l4.146-4.147a.5.5 0 0 1 .708.708L8.707 8l4.147 4.146a.5.5 0 0 1-.708.708L8 8.707l-4.146 4.147a.5.5 0 0 1-.708-.708L7.293 8z"></path>
         </svg>
@@ -17,11 +17,11 @@
             <div class="euiFlexItem">
               <div class="euiFormControlLayout euiFormControlLayout--fullWidth">
                 <div class="euiFormControlLayout__childrenWrapper">
-                  <select id="dashboardsList" class="euiSelect euiSelect--resizeVertical euiSelect--fullWidth" ng-model="reportingData.dashboardId">
+                  <select id="dashboardsList" ng-disabled="edit" class="euiSelect euiSelect--resizeVertical euiSelect--fullWidth" ng-model="reportingData.dashboard.id">
                     <option value="" disabled hidden style="display:none">Tableau de board</option>
                     <option
-                      ng-repeat="dashboard in dashboardsList"
-                      value="{{ dashboard.id }}">{{ dashboard.name }}</option>
+                      ng-repeat="element in dashboardsList"
+                      ng-value="{{ element.dashboard.id }}">{{ element.dashboard.name }}</option>
                   </select>
                   <div class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right">
                     <span class="euiFormControlLayoutCustomIcon">
@@ -39,11 +39,11 @@
             <div class="euiFlexItem">
               <div class="euiFormControlLayout euiFormControlLayout--fullWidth">
                 <div class="euiFormControlLayout__childrenWrapper">
-                  <select id="timePeriod" class="euiSelect euiSelect--resizeVertical euiSelect--fullWidth" ng-model="reportingData.timeSpan">
+                  <select id="timePeriod" class="euiSelect euiSelect--resizeVertical euiSelect--fullWidth" ng-model="reportingData.reporting.timeSpan">
                     <option value="" disabled hidden style="display:none">Sélectionner une période</option>
                     <option
                       ng-repeat="timeSpan in timesSpan"
-                      value="{{ timeSpan }}">{{ timeSpan }}</option>
+                      value="{{ timeSpan.value }}">{{ timeSpan.text }}</option>
                   </select>
                   <div class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right">
                     <span class="euiFormControlLayoutCustomIcon">
@@ -62,7 +62,7 @@
               <div class="euiFormControlLayout euiFormControlLayout--fullWidth">
                 <div class="euiFormControlLayout__childrenWrapper">
                   <label class="euiFormLabel" for="emailsList">Adresses électroniques destinataires :</label>
-                  <textarea ng-model="reportingData.emails" class="euiTextArea euiTextArea--resizeVertical euiTextArea--fullWidth" rows="6" id="emailsList" 
+                  <textarea ng-model="reportingData.reporting.emails" class="euiTextArea euiTextArea--resizeVertical euiTextArea--fullWidth" rows="6" id="emailsList" 
                     placeholder="Adresses électroniques destinataires, séparés par une virgule (ex john@doe.com,jane@doe.com)"></textarea>
                 </div>
               </div>
@@ -94,7 +94,7 @@
               <svg class="euiIcon euiIcon--medium euiButton__icon" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882z"></path>
               </svg>
-              <span class="euiButton__text" ng-click="flyoutOpened = true">Créer une nouvelle tâche</span>
+              <span class="euiButton__text" ng-click="createNewTask()">Créer une nouvelle tâche</span>
             </span>
           </button>
         </div>
@@ -115,19 +115,26 @@
       </div>
 
       <div class="euiPageContentBody" ng-if="status">
-        <div ng-if="errorTime">
-          <div class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" 
-                  class="euiIcon euiIcon--medium euiIcon-isLoaded" focusable="false">
-                  <path fill-rule="evenodd" d="M7.59 10.059L7.35 5.18h1.3L8.4 10.06h-.81zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184zM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2zm0-1h12L8 2 2 13z"></path>
-                </svg>
-              <span class="euiCallOutHeader__title">Veuillez choisir une période</span>
-              </div>
-            </div>
+        <div ng-if="alert" class="euiCallOut euiCallOut--{{ alert }}">
+          <div class="euiCallOutHeader">
+            <span class="euiTextAlign euiTextAlign--right">
+              <span class="euiLoadingSpinner euiLoadingSpinner--medium"></span>
+            </span>
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" class="euiIcon euiIcon--medium euiIcon-isLoaded euiCallOutHeader__icon" focusable="false" aria-hidden="true">
+              <g fill-rule="evenodd">
+                <path ng-if="alert === 'success'" fill-rule="evenodd" d="M6.5 12a.502.502 0 0 1-.354-.146l-4-4a.502.502 0 0 1 .708-.708L6.5 10.793l6.646-6.647a.502.502 0 0 1 .708.708l-7 7A.502.502 0 0 1 6.5 12"></path>
+                <path ng-if="alert === 'error'" fill-rule="evenodd" d="M7.59 10.059L7.35 5.18h1.3L8.4 10.06h-.81zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184zM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2zm0-1h12L8 2 2 13z"></path>
+              </g>
+            </svg>
+            <span class="euiCallOutHeader__title">
+              {{ alertMessage }}
+            </span>
           </div>
         </div>
-
+        <p
+          i18n-id="ezmesure.reporting.timeSpan"
+          i18n-default-message="Text with an emphasized."
+        ></p>
         <table class="euiTable euiTable--responsive" ng-if="status">
           <caption role="status" aria-relevant="text" aria-live="polite" class="euiScreenReaderOnly"></caption>
           <thead>
@@ -149,34 +156,51 @@
               </th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="euiTableRow euiTableRow-isSelectable" ng-repeat="(index, reporting) in reportingList">
+          <tbody ng-if="dashboardsList.length > 0">
+            <tr class="euiTableRow euiTableRow-isSelectable" ng-repeat="(index, element) in dashboardsList" ng-if="element.reporting">
               <td class="euiTableRowCell euiTableRowCell--hideForMobile">
                 <div class="euiTableCellContent">
                   <span class="euiTableCellContent__text">
-                    <a class="euiLink euiLink--primary" href="#/dashboard/{{ reporting.id }}">{{ reporting.name }}</a>
+                    <a class="euiLink euiLink--primary" ng-href="#/dashboard/{{ element.dashboard.id }}">{{ element.dashboard.name }}</a>
                   </span>
                 </div>
               </td>
               <td class="euiTableRowCell euiTableRowCell--hideForMobile">
                 <div class="euiTableCellContent">
                   <span class="euiTableCellContent__text">
-                    {{ reporting.time }}
+                    {{ getTimeSpan(element.reporting.timeSpan).text }}
                   </span>
                 </div>
               </td>
               <td class="euiTableRowCell euiTableRowCell--hasActions">
                 <div class="euiTableCellContent euiTableCellContent--alignRight euiTableCellContent--showOnHover euiTableCellContent--overflowingContent">
                   <span class="euiToolTipAnchor">
-                    <button class="euiButtonIcon euiButtonIcon--primary euiTableCellContent__hoverItem" type="button" aria-label="Editer">
-                      <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                        <defs>
-                          <path id="pencil-a" d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z"></path>
-                        </defs>
-                        <use xlink:href="#pencil-a"></use>
+                    <button ng-click="removeReporting(element)" class="euiButtonIcon euiButtonIcon--danger euiTableCellContent__hoverItem" type="button" aria-label="Delete">
+                      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="euiIcon euiIcon--medium euiIcon-isLoaded euiButtonIcon__icon" focusable="false" aria-hidden="true">
+                        <path d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z"></path>
                       </svg>
                     </button>
                   </span>
+                  <span class="euiToolTipAnchor">
+                    <button ng-click="editReporting(element)" class="euiButtonIcon euiButtonIcon--primary euiTableCellContent__hoverItem" type="button" aria-label="Editer">
+                      <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+                        <path d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z"></path>                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody ng-if="dashboardsList.length <= 0">
+            <tr class="euiTableRow euiTableRow-isSelectable">
+              <td class="euiTableRowCell euiTableRowCell--hideForMobile" colspan="3">
+                <div class="euiCallOut euiCallOut--primary">
+                  <div class="euiCallOutHeader">
+                    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="euiIcon euiIcon--medium euiIcon-isLoaded" focusable="false">
+                      <path fill-rule="evenodd" d="M8 11h4.5a.5.5 0 1 0 0-1h-10a.5.5 0 0 0 0 1H7v4.25c0 .414.224.75.5.75s.5-.336.5-.75V11zM4 4h1v6H4V4zm6 0h1v6h-1V4zM4.286 2C4.08 2 4 2.063 4 2v1c0-.063.08 0 .286 0h6.428C10.92 3 11 2.937 11 3V2c0 .063-.08 0-.286 0H4.286zm0-1h6.428C11.424 1 12 1.448 12 2v1c0 .552-.576 1-1.286 1H4.286C3.576 4 3 3.552 3 3V2c0-.552.576-1 1.286-1z"></path>
+                    </svg>
+                    <span class="euiCallOutHeader__title">Vous n'avez aucune tâche en cours</span>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -184,6 +208,5 @@
         </table>
       </div>
     </div>
-
   </div>
 </div>

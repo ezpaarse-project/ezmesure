@@ -5,7 +5,7 @@ import api from './server/routes';
 
 export default function (kibana) {
 
-  const ezmesureLink = '{{EZMESURE_URL}}';
+  const ezmesureLink = 'https://ezmesure-preprod.couperin.org';
 
   return new kibana.Plugin({
     name: 'ezmesure',

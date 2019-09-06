@@ -1,61 +1,37 @@
+import React from 'react';
 import { uiModules } from 'ui/modules';
-import uiRoutes from 'ui/routes';
-import $jQ from 'jquery';
-import 'ui/autoload/all';
+import chrome from 'ui/chrome';
+import { render, unmountComponentAtNode } from 'react-dom';
+import { I18nProvider } from '@kbn/i18n/react';
 
-import reportingTemplate from './reporting/templates/index.html';
+import 'ui/autoload/styles';
+import { Main } from './components/main';
 
-document.title = 'Reporting ezMESURE - Kibana';
+const app = uiModules.get('apps/ezmesure');
 
-uiRoutes.enable();
-
-uiRoutes
-  .when('/', {
-    template: reportingTemplate,
-    controller: 'ezMesureReportingController',
+app.config($locationProvider => {
+  $locationProvider.html5Mode({
+    enabled: false,
+    requireBase: false,
+    rewriteLinks: false
   });
+});
 
-uiModules
-  .get('app/reporting')
-  .controller('ezMesureReportingController', ['$scope', '$http', '$route', ($scope, $http, $route) => {
-    const currentUrl = $jQ(location).attr('pathname');
-    let space = '';
-    if (/^\/kibana\/s\/([a-z0-9\-]+)/i.test(currentUrl)) {
-      space = currentUrl.split('/')[3];
-    }
+app.config(stateManagementConfigProvider => stateManagementConfigProvider.disable());
 
-    $scope.title = 'Reporting ezMESURE';
+function RootController($scope, $element, $http) {
+  const domNode = $element[0];
 
-    $scope.loadData = () => {
-      $http.get(`../api/ezmesure/reporting/list/${space}`).then((response) => {
-        const { data, status } = response;
-        $scope.status = status === 200;
-        $scope.dashboardsList = data.dashboardsList;
-        $scope.reportingList = data.reportingList;
+  render(
+    <I18nProvider>
+      <Main title="ezMESURE Reporting" httpClient={$http} />
+    </I18nProvider>,
+    domNode
+  );
 
-        $scope.flyoutOpened = false;
+  $scope.$on('$destroy', () => {
+    unmountComponentAtNode(domNode);
+  });
+}
 
-        $scope.timesSpan = [
-          'Hebdomadaire',
-          'Bihebdomadaire',
-          'Mensuelle',
-          'Bimestrielle',
-          'Trimestrielle',
-          'Semestrielle',
-          'Annuelle',
-        ];
-
-        $scope.reportingData = {
-          dashboardId: null,
-          timeSpan: null,
-          emails: null,
-        };
-
-        $scope.saveReporting = () => {
-          console.log($scope.reportingData);
-        };
-      });
-    };
-
-    $scope.loadData();
-  }]);
+chrome.setRootController('ezMesure', RootController);

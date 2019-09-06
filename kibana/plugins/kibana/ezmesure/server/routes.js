@@ -1,68 +1,73 @@
 import axios from 'axios';
-import Boom from 'boom';
+import jwt from 'jsonwebtoken';
 
 export default function (server) {
   const config = server.config();
 
+  const { callWithRequest } = server.plugins.elasticsearch.getCluster('data');
+
+  const apiUrl = 'http://api:3000';
+
   const api = axios.create({
-    auth: {
-      username: 'elastic',
-      password: 'ezTEAM#54514',
-    },
+    baseURL: apiUrl,
     timeout: 5000,
-    headers: { 'kbn-xsrf': 'true' },
     proxy: false,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZXZlbi53aWxtb3V0aCIsImVtYWlsIjoic3RldmVuLndpbG1vdXRoQGluaXN0LmZyIiwiaWF0IjoxNTY3MTY5MjU4fQ.5L1SLm8fCm1hGweyxL26ojN6nIG_F8s-DwTUMnLdOXU`,
+    },
   });
 
   server.route({
     path: '/api/ezmesure/reporting/list/{space*}',
     method: 'GET',
     handler: async (req) => {
-      server.log(['status', 'info', 'ezmesure:plugin'], 'Getting reporting list');
+      server.log(['status', 'info', 'ezmesure:plugin'], 'Getting dashboards/reporting list');
 
-      const kibanaUrl = 'http://localhost:5601';
-      const url = (req.params.space) ? `${kibanaUrl}/s/${req.params.space}/api/saved_objects/_find` : `${kibanaUrl}/api/saved_objects/_find`;
-      const { data } = await api.get(url, {
-        params: {
-          type: 'dashboard',
-          per_page: 10000,
-        },
-      });
+      try {
+        const resp = await callWithRequest(req, 'search', {
+          index: '.ezmesure-metrics'
+        }).then(res => console.log(res));
 
-      const savedObjects = data.saved_objects;
-      if (!savedObjects) {
-        server.log(['status', 'error', 'ezmesure:plugin'], 'Dashboards not founds');
-        return { error: 'dashboards_not_found' };
+
+        const { data } = await api.get(`/reporting/list/${req.params.space || ''}`);
+        return data;
+      } catch (error) {
+        server.log(['status', 'error', 'ezmesure:plugin'], error);
       }
-
-      const reportingList = [
-        {
-          id: '9d418e90-ba75-11e9-973d-e33aa776d300',
-          name: 'Dashboard : a',
-          time: 'Hebdomadaire',
-        },
-      ];
-
-      const dashboardsList = [];
-      savedObjects.forEach(savedObject => {
-        dashboardsList.push({
-          id: savedObject.id,
-          name: savedObject.attributes.title,
-        });
-      });
-      return { dashboardsList, reportingList };
+      return null;
     },
   });
 
   server.route({
     path: '/api/ezmesure/reporting',
     method: 'PUT',
-    handler: (req) => {
+    handler: async req => {
       server.log(['status', 'info', 'ezmesure:plugin'], 'Updating reporting');
       // req.payload, req.auth
       // /^req.payload.space:dashboard:([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})$/i
 
       return req.payload;
+    },
+  });
+
+  server.route({
+    path: '/api/ezmesure/reporting/delete/{id}',
+    method: 'DELETE',
+    handler: async req => {
+      server.log(['status', 'info', 'ezmesure:plugin'], 'Delete reporting');
+      if (req.params && !req.params.id) {
+        return 'error_no_id';
+      }
+
+      try {
+        const { data } = await api.delete(`/reporting/delete/${req.params.id}`);
+        console.log(data)
+        return data;
+      } catch (error) {
+        server.log(['status', 'error', 'ezmesure:plugin'], error);
+      }
+      return null;
     },
   });
 };
