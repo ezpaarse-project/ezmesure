@@ -1,7 +1,7 @@
-<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
-    xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+<SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
+    xmlns:conf="urn:mace:shibboleth:3.0:native:sp:config"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"    
+    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
     logger="syslog.logger" clockSkew="180">
 
@@ -36,11 +36,11 @@
             -->
         </ISAPI>
     </InProcess>
-    
+
     <!-- Only one listener can be defined, to connect in-process modules to shibd. -->
     <UnixListener address="shibd.sock"/>
     <!-- <TCPListener address="127.0.0.1" port="1600" acl="127.0.0.1"/> -->
-    
+
     <!-- This set of components stores sessions and other persistent data in daemon memory. -->
     <StorageService type="Memory" id="mem" cleanupInterval="900"/>
     <SessionCache type="StorageService" StorageService="mem" cacheAssertions="false"
@@ -65,7 +65,7 @@
     To customize behavior for specific resources on Apache, and to link vhosts or
     resources to ApplicationOverride settings below, use web server options/commands.
     See https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfigurationElements for help.
-    
+
     For examples with the RequestMap XML syntax instead, see the example-shibboleth2.xml
     file, and the https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPRequestMapHowTo topic.
     -->
@@ -116,7 +116,7 @@
             This uses the old "every handler specified directly" syntax. You can replace
             or supplement the new syntax following these examples.
             -->
-          
+
             <!--
             SessionInitiators handle session requests and relay them to a Discovery page,
             or to an IdP if possible. Automatic session setup will use the default or first
@@ -126,18 +126,18 @@
             <!-- Default directs to a specific IdP (favoring SAML 2 over Shib 1). -->
             <SessionInitiator type="Chaining" Location="/Login" isDefault="true" id="Login"
                               entityID="https://idp.example.org/idp/shibboleth">
-              
+
                 <SessionInitiator type="SAML2" template="bindingTemplate.html"/>
                 <SessionInitiator type="Shib1"/>
                 <!--
                 To allow for >1 IdP, remove entityID property from Chaining element and add
                 *either* of the SAMLDS or WAYF handlers below:
-                
+
                 <SessionInitiator type="SAMLDS" URL="https://ds.example.org/DS/WAYF"/>
                 <SessionInitiator type="WAYF" URL="https://wayf.example.org/WAYF"/>
                 -->
             </SessionInitiator>
-            
+
             <!--
             md:AssertionConsumerService locations handle specific SSO protocol bindings,
             such as SAML 2.0 POST or SAML 1.1 Artifact. The isDefault and index attributes
@@ -214,7 +214,7 @@
         <Errors supportContact="root@localhost"
             helpLocation="/about.html"
             styleSheet="/shibboleth-sp/main.css"/>
-        
+
         <!--
         Uncomment and modify to tweak settings for specific IdPs or groups. Settings here
         generally match those allowed by the <ApplicationDefaults> element.
@@ -261,7 +261,7 @@
         the https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplicationOverride topic).
         Resource requests are mapped by web server commands, or the RequestMapper, to an
         applicationId setting.
-        
+
         Example of a second application (for a second vhost) that has a different entityID.
         Resources on the vhost would map to an applicationId of "admin":
         -->
@@ -269,7 +269,7 @@
         <ApplicationOverride id="admin" entityID="https://admin.example.org/shibboleth"/>
         -->
     </ApplicationDefaults>
-    
+
     <!-- Policies that determine how to process and authenticate runtime messages. -->
     <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
 
