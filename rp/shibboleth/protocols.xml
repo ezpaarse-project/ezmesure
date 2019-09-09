@@ -1,5 +1,5 @@
 <Protocols xmlns="urn:mace:shibboleth:2.0:native:sp:protocols">
-  
+
   <!-- SAML 2.0 -->
   <Protocol id="SAML2">
     <Service id="SSO">
@@ -53,5 +53,5 @@
       <Initiator id="Local" />
     </Service>
   </Protocol>
-  
+
 </Protocols>

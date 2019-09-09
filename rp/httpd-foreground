@@ -14,6 +14,8 @@ if [[ ! -v APPLI_APACHE_LOGLEVEL ]]; then
   exit 1
 fi
 
+# Allow shibboleth to write in a mounted volume
+chown -R _shibd:_shibd /var/cache/shibboleth
 /etc/init.d/shibd start
 
 # Apache gets grumpy about pre-existing PID files
