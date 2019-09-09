@@ -113,7 +113,7 @@
     <Attribute name="urn:mace:cru.fr:attribute-def:supannEntiteAffectation" id="supannEntiteAffectation"/>
 
     <!-- affectation principale de la personne -->
-    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" id="supannEntiteAffectationPrincipale"/>
+    <Attribute name="urn:oid:1.3.6.1.4.1.7135.1.2.1.13" id="supannEntiteAffectationPrincipale"/>
     <Attribute name="urn:mace:cru.fr:attribute-def:supannEntiteAffectationPrincipale" id="supannEntiteAffectationPrincipale"/>
 
     <!-- etablissement (ou unite) de rattachement administratif de la personne -->
