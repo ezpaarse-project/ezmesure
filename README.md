@@ -41,8 +41,7 @@ https://ezmesure.couperin.org
 ```
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
-6) Adjust memory for elastic search
-To avoid out of memory exception problems, you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
+6) Adjust memory for elastic search. To avoid out of memory exception problems, you may have to adjust mmaps count (https://www.elastic.co/guide/en/elasticsearch/reference/2.1/setup-configuration.html)
 
 ```
 sudo vi /etc/sysctl.conf
@@ -77,9 +76,11 @@ You should be greeted with something like:
 
 ## Usage
 
-### Get and use your token
+### Get your authentication token
 
-You will need a token in order to use the API and Kibana. Start by browsing the profile page at https://localhost/front/#/profile and log in with your identity provider. Once logged, your token will appear and a cookie will be stored so that you can browse kibana right away.
+An authentication token is required in order to use the API. Navigate to https://localhost/myspace and log in with your identity provider. Once logged, grab your token in the authentication tab.
+
+**NB**: in order for the Shibboleth authentication to work, the hostname **MUST** match the one that have been declared for the service provider. You'll need to change your DNS settings for local testing.
 
 To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
 
