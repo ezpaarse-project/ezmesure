@@ -1,11 +1,10 @@
-# ezmesure
+# ezMESURE
 
-Platform aggregating suscribed electronic ressources usage statistics of the French reasearcher organizations.
+Platform aggregating electronic ressources usage statistics for the French reasearcher organizations.
 https://ezmesure.couperin.org
 
-## Prerequisite
-A recent version of NodeJS and npm should be installed.
-See the [official documentation](https://nodejs.org/en/download/package-manager/).
+## Prerequisites
+[Docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/)
 
 ## Installation
 
@@ -100,97 +99,6 @@ You can then issue a GET request on the /api/logs route to list your index(es)
 
 Now you can access the Kibana instance on https://localhost and start building dashboards (soon to be documented).
 
-## API routes
+## API
 
-### Authentication
-<table>
-<thead>
-  <tr>
-    <th>URL</th>
-    <th>Action</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>GET /login</td>
-    <td>login over shibboleth</td>
-  </tr>
-  <tr>
-    <td>GET /api/profile</td>
-    <td>get the profile associated with a token</td>
-  </tr>
-  <tr>
-    <td>GET /api/profile/token</td>
-    <td>get a token</td>
-  </tr>
-</tbody>
-</table>
-
-### Logs
-<table>
-<thead>
-  <tr>
-    <th>URL</th>
-    <th>Action</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>GET /api/logs</td>
-    <td>list current indixes</td>
-  </tr>
-  <tr>
-    <td>POST /api/logs/:index</td>
-    <td>insert a CSV file into an index</td>
-  </tr>
-  <tr>
-    <td>DELETE /api/logs/:index</td>
-    <td>delete an index</td>
-  </tr>
-</tbody>
-</table>
-
-### Data providers
-<table>
-<thead>
-  <tr>
-    <th>URL</th>
-    <th>Action</th>
-    <th>Request body</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>GET /api/providers</td>
-    <td>List providers</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>GET /api/providers/check</td>
-    <td>Apply providers</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>DELETE /api/providers/:providerName</td>
-    <td>Delete a provider</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>PUT /api/providers/:providerName</td>
-    <td>Create a data provider</td>
-    <td> JSON
-      <ul>
-      <li><strong>target</strong>: the index that should be enriched</li>
-        <li><strong>field</strong>: the field of the index used for matching</li>
-        <li><strong>key</strong>: the field of the enrichment data used for matching</li>
-        <li><strong>condition</strong>: the field of the index that will be used to consider each line enriched</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td>POST /api/providers/:providerName</td>
-    <td>Load data into a data provider</td>
-    <td>JSON array of objects</td>
-  </tr>
-</tbody>
-</table>
+https://ezmesure.couperin.org/api
