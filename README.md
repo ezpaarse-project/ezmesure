@@ -76,11 +76,13 @@ You should be greeted with something like:
 
 ## Usage
 
+### Log in
+
+Navigate to https://localhost/myspace and log in with your identity provider. The first time you log into ezMESURE, you'll get a mail with your Kibana credentials.
+
 ### Get your authentication token
 
-An authentication token is required in order to use the API. Navigate to https://localhost/myspace and log in with your identity provider. Once logged, grab your token in the authentication tab.
-
-**NB**: in order for the Shibboleth authentication to work, the hostname **MUST** match the one that have been declared for the service provider. You'll need to change your DNS settings for local testing.
+An authentication token is required in order to use the API. Once logged, grab your token in the authentication tab.
 
 To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
 
@@ -91,14 +93,14 @@ To upload an EC result file in elastic-search, you need to POST it on the /api/l
   curl -v -X POST https://localhost/api/logs/test-index -F "files[]=@114ee1d0_2016-03-31_10h53.job-ecs.csv" -H "Authorization: Bearer <token>"
 ```
 
-You can then issue a GET request on the /api/logs route to list your index(es)
+You can then issue a GET request on the /api/logs route to list your indices
 ```bash
   curl -X GET https://localhost/api/logs -H "Authorization: Bearer <token>"
 ```
 
 ### Visualize your data
 
-Now you can access the Kibana instance on https://localhost and start building dashboards (soon to be documented).
+Now you can access the Kibana instance on https://localhost/kibana/ and start building dashboards.
 
 ## API
 
