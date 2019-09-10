@@ -17,7 +17,7 @@ https://ezmesure.couperin.org
 1) Put the certificate (``server.crt``) and private key (``server.key``) used to declare the Shibboleth service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
 **NB**: the private key is critical and should not be shared.
 
-2) Put the SSL certificate (``server.pem``) and private key (``server.key``) in ``rp/apache2/ssl``.  
+2) Put the SSL certificate (``server.pem``) and private key (``server.key``) in ``rp/apache2/ssl``. Optional if ezMESURE runs behind proxy which takes care of handling HTTPS.
 **NB**: you can use [mkcert](https://github.com/FiloSottile/mkcert) for local development
 
 3) Set the following environment variables :
