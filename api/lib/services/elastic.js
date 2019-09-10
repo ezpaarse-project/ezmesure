@@ -37,4 +37,20 @@ client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => {
   };
 });
 
+client.extend('dashboard.findAll', ({ makeRequest, ConfigurationError }) => {
+  return function (params, options) {
+    params = params || {};
+    options = options || {};
+
+    if (!options.ignore) {
+      options.ignore = [404];
+    }
+
+    return makeRequest({
+      method: 'GET',
+      path: '/.kibana/_search?q=type:dashboard'
+    }, options).then(({ body }) => body && body.hits);
+  }
+});
+
 module.exports = client;

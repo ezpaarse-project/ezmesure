@@ -1,63 +1,27 @@
 const timesSpan = [
-  { text: 'Hebdomadaire', value: '1w' },
-  // { text: 'Bihebdomadaire', value: '2w' },
-  { text: 'Mensuelle', value: '1m' },
-  // { text: 'Bimestrielle', value: '2m' },
-  { text: 'Trimestrielle', value: '3m' },
-  { text: 'Semestrielle', value: '6m' },
-  { text: 'Annuelle', value: '1y' },
+  { text: 'Weekly', value: '1w' },
+  // { text: 'Twice a week', value: '2w' },
+  { text: 'Monthly', value: '1m' },
+  // { text: 'Bimonthly', value: '2m' },
+  { text: 'Quarterly', value: '3m' },
+  { text: 'Semi-annual', value: '6m' },
+  { text: 'Annual', value: '1y' },
 ];
 
-export const timeSpanData = timesSpan;
+export const timesSpanData = timesSpan;
 
 export const convertTimeSpan = (timesSpanValue) => {
-  return timesSpan.find(timeSpan => timeSpan.value === timesSpanValue).text;
+  return timesSpan.find(({ value }) => value === timesSpanValue).text;
 };
 
 export const defaultDashboard = {
-  _id: null,
+  id: null,
   dashboard: {
-    id: null,
-    name: null,
+    value: null,
+    text: null,
   },
   reporting: {
     timeSpan: null,
-    reporting: null,
+    emails: null,
   },
 };
-
-export const dashboards = [
-  {
-    value: 'aaaaa',
-    text: 'Dashboard aa',
-  },
-  {
-    value: 'bbbbb',
-    text: 'Dashboard bb',
-  },
-];
-
-export const dataReporting = [
-  {
-    _id: 1,
-    dashboard: {
-      id: 'aaaaa',
-      name: 'Dashboard aa',
-    },
-    reporting: {
-      timeSpan: '1w',
-      emails: 'a@a.a,b@b.b',
-    },
-  },
-  {
-    _id: 2,
-    dashboard: {
-      id: 'bbbbb',
-      name: 'Dashboard bb',
-    },
-    reporting: {
-      timeSpan: '1m',
-      emails: 'a@a.a',
-    },
-  },
-];

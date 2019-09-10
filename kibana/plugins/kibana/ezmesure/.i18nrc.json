@@ -1,8 +1,0 @@
-{
-  "paths": {
-    "ezmesure": "./"
-  },
-  "translations": [
-    "translations/fr-FR.json"
-  ]
-}

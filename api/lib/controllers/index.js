@@ -13,6 +13,7 @@ const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
+const reporting = require('./reporting');
 
 const elastic = require('../services/elastic');
 const openapi = require('./openapi.json');
@@ -32,6 +33,7 @@ app.use(route.get('/openapi.json', async ctx => {
   ctx.body = openapi;
 }));
 
+app.use(mount('/reporting', reporting));
 app.use(mount('/partners', partners));
 app.use(mount('/metrics', metrics));
 

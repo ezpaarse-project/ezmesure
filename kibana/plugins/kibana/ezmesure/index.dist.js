@@ -1,6 +1,3 @@
-import { resolve } from 'path';
-import { existsSync } from 'fs';
-
 import api from './server/routes';
 
 export default function (kibana) {
@@ -35,8 +32,6 @@ export default function (kibana) {
       hacks: [
         'plugins/ezmesure/hack',
       ],
-
-      styleSheetPaths: [resolve(__dirname, 'public/app.scss'), resolve(__dirname, 'public/app.css')].find(p => existsSync(p)),
     },
 
     config(Joi) {

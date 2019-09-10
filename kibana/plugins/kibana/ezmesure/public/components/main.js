@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import { FormattedMessage } from '@kbn/i18n/react';
+import React, { Fragment } from 'react';
 import {
   EuiPage,
   EuiPageBody,
@@ -10,21 +9,22 @@ import {
   EuiTitle,
   EuiButton,
 } from '@elastic/eui';
-import Toast from '../toast';
-import Table from '../table';
-import Flyout, { openFlyOut } from '../flyout';
 
-export class Main extends Component {
-  <React.Fragment>
+import Table from './table';
+import Flyout, { openFlyOut } from './flyout';
+import Toast from './toast';
+
+export const Main = (props) => (
+  <Fragment>
     <Toast />
-    <Flyout />
+    <Flyout httpClient={props.httpClient} />
     <EuiPage>
       <EuiPageBody className="euiPageBody--restrictWidth-default">
         <EuiPageContent verticalPosition="top" horizontalPosition="center">
           <EuiPageContentHeader>
             <EuiPageContentHeaderSection>
               <EuiTitle>
-                <h2>{props.title}</h2>
+                <h2>Reporting</h2>
               </EuiTitle>
             </EuiPageContentHeaderSection>
             <EuiPageContentHeaderSection>
@@ -32,16 +32,16 @@ export class Main extends Component {
                 fill
                 iconType="plusInCircle"
                 onClick={() => openFlyOut(null, false)}>
-                <FormattedMessage id="reporting.createTask" defaultMessage="Créer une nouvelle tâche de reporting"></FormattedMessage>
+                Create new reporting task
               </EuiButton>
             </EuiPageContentHeaderSection>
           </EuiPageContentHeader>
 
           <EuiPageContentBody>
-            <Table />
+            <Table httpClient={props.httpClient}/>
           </EuiPageContentBody>
         </EuiPageContent>
       </EuiPageBody>
     </EuiPage>
-  </React.Fragment>
+  </Fragment>
 );

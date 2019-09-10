@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
 } from '@elastic/eui';
-import { defaultDashboard } from '../../lib/reporting'
-import Form from '../form';
+import { defaultDashboard } from '../lib/reporting';
+import Form from './form';
 
 let openFlyOutHandler;
 
@@ -19,6 +19,7 @@ export default class Flyout extends Component {
     super(props);
 
     this.state = {
+      httpClient: props.httpClient,
       isFlyoutVisible: false,
       edit: false,
       currentDashboard: null,
@@ -38,7 +39,7 @@ export default class Flyout extends Component {
   }
 
   render() {
-    const { isFlyoutVisible, currentDashboard, edit } = this.state;
+    const { httpClient, isFlyoutVisible, currentDashboard, edit } = this.state;
     let flyOutRender;
 
     if (isFlyoutVisible) {
@@ -49,20 +50,20 @@ export default class Flyout extends Component {
           aria-labelledby="flyoutSmallTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
-              <h2>Création d'une tâche reporting</h2>
+              <h2>Creating a reporting task</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <Form currentDashboard={currentDashboard} edit={edit} />
+            <Form httpClient={httpClient} currentDashboard={currentDashboard} edit={edit} />
           </EuiFlyoutBody>
         </EuiFlyout>
       );
     }
 
     return (
-      <React.Fragment>
+      <Fragment>
         {flyOutRender}
-      </React.Fragment>
+      </Fragment>
     );
   }
 }
