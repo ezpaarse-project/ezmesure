@@ -1,37 +1,58 @@
-const elasticsearch = require('../../services/elastic');
+const elastic = require('../../services/elastic');
 
 exports.list = async function (ctx) {
   ctx.action = 'indices/list';
   ctx.type   = 'json';
-  ctx.body   = await elasticsearch.indices.stats({
-    metric: 'docs',
+
+  const { body } = await elastic.indices.stats({
+    metric: 'docs'
+  },{
     headers: { 'es-security-runas-user': ctx.state.user.username }
   });
+
+  ctx.body = body;
 };
 
 exports.deleteIndice = async function (ctx, index) {
   ctx.action = 'indices/delete';
-  ctx.index  = index;
-  const username  = ctx.state.user.username;
-  const perm      = await elasticsearch.hasPrivileges(username, [index], ['delete_index']);
+  ctx.index = index;
+  const username = ctx.state.user.username;
+  const { body: perm } = await elastic.security.hasPrivileges({
+    username,
+    body: {
+      index: [{ names: [index], privileges: ['delete_index'] }]
+    }
+  },{
+    headers: { 'es-security-runas-user': username }
+  });
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
 
   if (!canDelete) {
     return ctx.throw(403, `you don't have permission to delete ${index}`);
   }
 
-  ctx.type = 'json';
-  ctx.body = await elasticsearch.indices.delete({
-    index,
+  const { body } = await elastic.indices.delete({
+    index
+  }, {
     headers: { 'es-security-runas-user': username }
   });
+
+  ctx.type = 'json';
+  ctx.body = body;
 };
 
 exports.deleteEvents = async function (ctx, index) {
   ctx.action = 'events/delete';
-  ctx.index  = index;
-  const username  = ctx.state.user.username;
-  const perm      = await elasticsearch.hasPrivileges(username, [index], ['delete_index']);
+  ctx.index = index;
+  const username = ctx.state.user.username;
+  const { body: perm } = await elastic.security.hasPrivileges({
+    username,
+    body: {
+      index: [{ names: [index], privileges: ['delete_index'] }]
+    }
+  }, {
+    headers: { 'es-security-runas-user': username }
+  });
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
 
   if (!canDelete) {
@@ -52,13 +73,15 @@ exports.deleteEvents = async function (ctx, index) {
     query['match_all'] = {};
   }
 
-  ctx.type = 'json';
-  ctx.body = await elasticsearch.deleteByQuery({
+  const { body } = await elastic.deleteByQuery({
     index,
-    type: 'event',
-    headers: { 'es-security-runas-user': username },
     body: { query }
+  }, {
+    headers: { 'es-security-runas-user': username }
   });
+
+  ctx.type = 'json';
+  ctx.body = body;
 };
 
 /**
@@ -124,10 +147,8 @@ exports.tops = async function (ctx, index) {
       break;
   }
 
-  const result = await elasticsearch.search({
+  const { body: result } = await elastic.search({
     index,
-    type: "event",
-    headers: { 'es-security-runas-user': username },
     body: {
       size: 0,
       query: {
@@ -151,6 +172,8 @@ exports.tops = async function (ctx, index) {
         minDate   : { min : { field: "datetime" } }
       }
     }
+  }, {
+    headers: { 'es-security-runas-user': username }
   });
 
   const {

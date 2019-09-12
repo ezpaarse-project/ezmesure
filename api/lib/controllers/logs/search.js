@@ -1,5 +1,5 @@
 
-const elasticsearch = require('../../services/elastic');
+const elastic = require('../../services/elastic');
 
 module.exports = async function (ctx, index) {
   ctx.action = 'indices/search';
@@ -7,11 +7,13 @@ module.exports = async function (ctx, index) {
 
   const { body } = ctx.request;
 
-  ctx.body = await elasticsearch.search({
+  const { body: result } = await elastic.search({
     index,
-    type: 'event',
     body,
-    timeout: '30s',
+    timeout: '30s'
+  }, {
     headers: { 'es-security-runas-user': ctx.state.user.username }
   });
+
+  ctx.body = result;
 };

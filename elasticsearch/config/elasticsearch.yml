@@ -1,14 +1,12 @@
 cluster.name: ${CLUSTER_NAME}
 network.host: 0.0.0.0
 xpack.monitoring.enabled: true
-#xpack.security.enabled: false
+xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
 xpack.security.transport.ssl.verification_mode: certificate
-xpack.ssl.certificate_authorities: /usr/share/elasticsearch/config/x-pack/certificates/ca/ca.crt
-xpack.ssl.certificate: /usr/share/elasticsearch/config/x-pack/certificates/${EZMESURE_ES_NODE_NAME}/${EZMESURE_ES_NODE_NAME}.crt
-xpack.ssl.key: /usr/share/elasticsearch/config/x-pack/certificates/${EZMESURE_ES_NODE_NAME}/${EZMESURE_ES_NODE_NAME}.key
-xpack.ssl.verification_mode: "none"
-
+xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/x-pack/certificates/ca/ca.crt
+xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/x-pack/certificates/${EZMESURE_ES_NODE_NAME}/${EZMESURE_ES_NODE_NAME}.crt
+xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/x-pack/certificates/${EZMESURE_ES_NODE_NAME}/${EZMESURE_ES_NODE_NAME}.key
 
 xpack.notification.email.account:
   local_account:
@@ -20,17 +18,16 @@ xpack.notification.email.account:
       port: 25
 
 
-# minimum_master_nodes need to be explicitly set when bound on a public IP
-# set to 1 to allow single node clusters
-# Details: https://github.com/elastic/elasticsearch/pull/17288
 network.publish_host: ${EZMESURE_ES_PUBLISH}
 node.name: ${EZMESURE_ES_NODE_NAME}
-discovery.zen.ping.unicast.hosts: ${EZMESURE_ES_DISCOVERY}
-discovery.zen.minimum_master_nodes: ${EZMESURE_ES_MINMASTER}
+discovery.type: ${EZMESURE_ES_DISCOVERY_TYPE}
+discovery.seed_hosts: ${EZMESURE_ES_DISCOVERY}
+# initial_master_nodes must be set the very first time the cluster is started
+cluster.initial_master_nodes: ${EZMESURE_ES_INITIAL_MASTER_NODES}
 node.master: ${EZMESURE_ES_NODE_MASTER}
 node.data: ${EZMESURE_ES_NODE_DATA}
 node.ingest: ${EZMESURE_ES_NODE_INGEST}
-search.remote.connect: ${EZMESURE_ES_NODE_SEARCH_REMOTE}
+cluster.remote.connect: ${EZMESURE_ES_NODE_SEARCH_REMOTE}
 #bootstrap.memory_lock: true
 path.logs: /usr/share/elasticsearch/logs
 

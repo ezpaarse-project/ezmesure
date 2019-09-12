@@ -12,8 +12,7 @@ module.exports = {
     "port": 9200,
     "host": "localhost",
     "user": "elastic",
-    "password": "changeme",
-    "apiVersion": "6.0"
+    "password": "changeme"
   },
   "smtp": {
     "host": "localhost",

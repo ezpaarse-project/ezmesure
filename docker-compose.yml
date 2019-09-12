@@ -1,7 +1,7 @@
 version: '2'
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     ports:
       - 9200:9200
       - 9300:9300
@@ -12,11 +12,12 @@ services:
       - EZMESURE_ES_PUBLISH
       - EZMESURE_ES_NODE_NAME
       - EZMESURE_ES_DISCOVERY
+      - EZMESURE_ES_DISCOVERY_TYPE
       - EZMESURE_ES_NODE_MASTER
       - EZMESURE_ES_NODE_DATA
       - EZMESURE_ES_NODE_INGEST
       - EZMESURE_ES_NODE_SEARCH_REMOTE
-      - EZMESURE_ES_MINMASTER
+      - EZMESURE_ES_INITIAL_MASTER_NODES
       - EZMESURE_SMTP_HOST
       - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - bootstrap.memory_lock=true
@@ -49,7 +50,7 @@ services:
       - SERVER_HOST
       - SERVER_PORT
       - THIS_HOST
-      - ELASTICSEARCH_URL
+      - ELASTICSEARCH_HOSTS
       - XPACK_MONITORING_ENABLED
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME

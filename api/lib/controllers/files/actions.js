@@ -18,11 +18,16 @@ exports.upload = async function (ctx, fileName) {
 
   fileName = fileName.replace(/\s/g, '_');
 
-  const user   = ctx.state.user;
-  const domain = user.email.split('@')[1];
+  const { username, email } = ctx.state.user;
 
-  const relativePath = path.join(domain, user.username, fileName);
-  const userDir      = path.resolve(storagePath, domain, user.username);
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const domain = email.split('@')[1];
+
+  const relativePath = path.join(domain, username, fileName);
+  const userDir      = path.resolve(storagePath, domain, username);
   const filePath     = path.resolve(userDir, fileName);
 
   ctx.metadata = { path: relativePath };
@@ -49,8 +54,13 @@ exports.upload = async function (ctx, fileName) {
 
 exports.list = async function (ctx) {
   ctx.action = 'file/list';
-  const user    = ctx.state.user;
-  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const userDir = path.resolve(storagePath, email.split('@')[1], username);
 
   let fileList;
   try {
@@ -74,8 +84,13 @@ exports.list = async function (ctx) {
 
 exports.deleteOne = async function (ctx, fileName) {
   ctx.action = 'file/delete';
-  const user     = ctx.state.user;
-  const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const userDir  = path.resolve(storagePath, email.split('@')[1], username);
   const filePath = path.resolve(userDir, fileName);
 
   await fse.remove(filePath);
@@ -85,8 +100,13 @@ exports.deleteOne = async function (ctx, fileName) {
 
 exports.deleteMany = async function (ctx) {
   ctx.action = 'file/delete-many';
-  const user      = ctx.state.user;
-  const userDir   = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const userDir   = path.resolve(storagePath, email.split('@')[1], username);
   const body      = ctx.request.body;
   const fileNames = body && body.entries
 

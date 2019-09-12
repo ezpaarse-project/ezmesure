@@ -21,36 +21,35 @@ const job = new CronJob(cron, () => {
       });
     }
   }).catch(err => {
-    appLogger.error(`Failed to update depositors : ${err.message}`);
+    appLogger.error(`Failed to update depositors : ${err.statusCode} | ${err.message}`);
   });
 });
 
 job.start();
 
 elastic.indices.exists({ index })
-  .then(exist => {
-    if (!exist) { job.fireOnTick(); }
+  .then(({ body: exists }) => {
+    if (!exists) { job.fireOnTick(); }
   })
   .catch(err => {
-    appLogger.error(`Failed to check depositors index existence : ${err.message}`);
+    appLogger.error(`Failed to check depositors index existence : ${err.statusCode} | ${err.message}`);
   });
 
 /**
  * Get depositors from the index
  */
 async function getFromIndex() {
-  const response = await elastic.search({
+  const { body } = await elastic.search({
     index,
-    type: 'depositor',
     size: 1000,
     ignoreUnavailable: true
   });
 
-  if (!response || !response.hits || !response.hits.hits) {
+  if (!body || !body.hits || !body.hits.hits) {
     throw new Error('invalid elastic response');
   }
 
-  const depositors = response.hits.hits.map(hit => {
+  const depositors = body.hits.hits.map(hit => {
     const depositor = hit._source;
 
     if (!depositor) {
@@ -97,23 +96,20 @@ async function updateDepositors() {
     result.items.push(item);
 
     if (prefix) {
-      const { count } = await elastic.count({
-        index: `${prefix}*`,
-        type: 'event'
+      const { body } = await elastic.count({
+        index: `${prefix}*`
       });
 
-      item.count = dep.index.count = count;
+      item.count = dep.index.count = body.count;
     }
 
-    let response;
     try {
-      response = await elastic.index({
+      const { body } = await elastic.index({
         index,
-        type: 'depositor',
         body: dep
       });
 
-      item.result = response.result;
+      item.result = body.result;
 
     } catch (e) {
       result.errors = true;
