@@ -1,4 +1,4 @@
-const timesSpan = [
+const frequencies = [
   { text: 'Weekly', value: '1w' },
   // { text: 'Twice a week', value: '2w' },
   { text: 'Monthly', value: '1m' },
@@ -8,20 +8,21 @@ const timesSpan = [
   { text: 'Annual', value: '1y' },
 ];
 
-export const timesSpanData = timesSpan;
+export const frequenciesData = frequencies;
 
-export const convertTimeSpan = (timesSpanValue) => {
-  return timesSpan.find(({ value }) => value === timesSpanValue).text;
+export const convertFrequency = frequency => {
+  const freq = frequencies.find(({ value }) => value === frequency);
+  return freq ? freq.text : 'Error';
 };
 
 export const defaultDashboard = {
-  id: null,
+  _id: null,
   dashboard: {
     value: null,
     text: null,
   },
   reporting: {
-    timeSpan: null,
+    frequency: '1w',
     emails: null,
   },
 };

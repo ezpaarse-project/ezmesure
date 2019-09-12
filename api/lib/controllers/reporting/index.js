@@ -6,11 +6,11 @@ const { list, store, update, del } = require('./reporting');
 
 const app = new Koa();
 
-app.use(route.get('/list/:space?', list));
-app.use(route.delete('/delete/:index', del));
+app.use(route.get('/tasks/:space?', list));
+app.use(route.delete('/tasks/:id', del));
 
 app.use(bodyParser());
-app.use(route.post('/store', store));
-app.use(route.put('/update/:index', update));
+app.use(route.post('/tasks', store));
+app.use(route.patch('/tasks/:id', update));
 
 module.exports = app;

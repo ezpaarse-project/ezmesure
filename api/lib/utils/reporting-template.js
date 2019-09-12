@@ -23,22 +23,17 @@ module.exports = {
       "emails": {
         "type": "text"
       },
-      "timeSpan": {
+      "frequency": {
         "type": "text"
       },
       "dashboardId": {
         "type": "text"
       },
-      "user": {
-        "type": "text"
-      },
       "createdAt": {
-        "type": "date",
-        "format": "epoch_millis"
+        "type": "date"
       },
       "updatedAt": {
-        "type": "date",
-        "format": "epoch_millis"
+        "type": "date"
       }
     }
   }

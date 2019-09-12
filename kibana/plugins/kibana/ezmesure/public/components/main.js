@@ -17,7 +17,7 @@ import Toast from './toast';
 export const Main = (props) => (
   <Fragment>
     <Toast />
-    <Flyout httpClient={props.httpClient} />
+    <Flyout httpClient={props.httpClient} space={props.space} />
     <EuiPage>
       <EuiPageBody className="euiPageBody--restrictWidth-default">
         <EuiPageContent verticalPosition="top" horizontalPosition="center">
@@ -38,7 +38,7 @@ export const Main = (props) => (
           </EuiPageContentHeader>
 
           <EuiPageContentBody>
-            <Table httpClient={props.httpClient}/>
+            <Table httpClient={props.httpClient} space={props.space} />
           </EuiPageContentBody>
         </EuiPageContent>
       </EuiPageBody>

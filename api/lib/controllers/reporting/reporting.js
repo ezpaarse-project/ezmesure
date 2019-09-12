@@ -3,6 +3,53 @@ const indexTemplate = require('../../utils/reporting-template');
 
 const index = '.ezmesure-reporting';
 
+async function getDashboards (namespace) {
+  const bool = {
+    must: [{
+      match: {
+        type: 'dashboard',
+      },
+    }],
+  };
+
+  if (namespace) {
+    bool.must.push({
+      match: {
+        namespace,
+      },
+    });
+  }
+  
+  if (!namespace) {
+    bool['must_not'] = {
+      exists: {
+        field: 'namespace',
+      },
+    };
+  }
+
+  try {
+    const { body: data } = await elastic.search({
+      index: '.kibana',
+      timeout: '30s',
+      body: {
+        query: {
+          bool,
+        },
+      },
+    });
+  
+    if (data && data.hits && data.hits.hits) {
+      return data.hits.hits
+    }
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+
+  return [];
+}
+
 exports.list = async (ctx, space) => {
   ctx.action = 'reporting/list';
   ctx.type = 'json';
@@ -11,62 +58,80 @@ exports.list = async (ctx, space) => {
   const dashboards = [];
   const reporting = [];
 
-  let dashboardsData = await elastic.dashboard.findAll();
-  dashboardsData.hits.forEach(element => {
-    if (element._source.namespace === space) {
-      dashboards.push({
-        value: element._id.split(':')[1],
-        text: element._source.dashboard.title,
-      });
-    }
-  });
+  let dashboardsData;
 
   try {
-    for (let i = 0; i < dashboards.length; i += 1) {
-      const { body: result } = await elastic.search({
-        index,
-        timeout: '30s',
-        body: {
-          query: {
-            bool: {
-              must: [
-                {
-                  match: {
-                    space: space || 'NULL',
-                  },
-                },
-                {
-                  match: {
-                    dashboardId: dashboards[i].value,
-                  },
-                },
-              ],
-            },
-          },
-        },
-      });
+    dashboardsData = await getDashboards(space);
+  } catch (err) {
+    ctx.status = 500;
+    return ctx.body = { reporting, dashboards };
+  }
 
-      if (result) {
-        const { hits } = result.hits;
-        for (let i = 0; i < hits.length; i += 1) {
-          const dashboard = dashboards.find(({ value }) => value === hits[i]._source.dashboardId);
-          if (dashboard) {
-            reporting.push({
-              id: hits[i]._id,
-              dashboard,
-              reporting: {
-                timeSpan: hits[i]._source.timeSpan,
-                emails: hits[i]._source.emails,
-              }
-            })
+  for (let i = 0; i < dashboardsData.length; i += 1) {
+    const element = dashboardsData[i];
+    const dashboardId = element._id.split(':');
+
+    dashboards.push({
+      value: dashboardId[dashboardId.length - 1],
+      text: element._source.dashboard.title,
+    });
+  }
+
+  const bool = {
+    must: [],
+  };
+
+  if (space) {
+    bool.must.push({
+      match: {
+        space,
+      },
+    });
+  }
+  
+  if (!space) {
+    bool['must_not'] = {
+      exists: {
+        field: 'space',
+      },
+    };
+  }
+
+  let tasks;
+  try {
+    tasks = await elastic.search({
+      index,
+      timeout: '30s',
+      body: {
+        query: {
+          bool,
+        },
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    ctx.status = 500;
+  }
+
+  if (tasks) {
+    const { hits } = tasks.body.hits;
+
+    for (let i = 0; i < hits.length; i += 1) {
+      const dashboard = dashboards.find(({ value }) => value === hits[i]._source.dashboardId);
+      if (dashboard) {
+        reporting.push({
+          _id: hits[i]._id,
+          dashboard,
+          reporting: {
+            frequency: hits[i]._source.frequency,
+            emails: hits[i]._source.emails,
+            createdAt: hits[i]._source.createdAt,
           }
-        }
+        });
       }
     }
-  } catch (err) {
-    console.log(err)
   }
-console.log(reporting)
+
   ctx.body = { reporting, dashboards };
 };
 
@@ -76,26 +141,26 @@ exports.store = async ctx => {
 
   const { body: exists } = await elastic.indices.exists({ index });
   if (!exists) {
-    await elastic.indices.create({
-      index,
-      body: indexTemplate
-    });
+    try {
+      await elastic.indices.create({
+        index,
+        body: indexTemplate
+      });
+    } catch (err) {
+      console.log(err);
+      return ctx.status = 500;
+    }
   }
 
   const validator = {
-    user: {
-      required: true,
-      nullable: false,
-    },
     dashboardId: {
       required: true,
       nullable: false,
     },
     space: {
-      required: true,
-      nullable: true,
+      required: false,
     },
-    timeSpan: {
+    frequency: {
       required: true,
       nullable: false,
     },
@@ -109,36 +174,77 @@ exports.store = async ctx => {
   const body = ctx.request.body;
   const errors = [];
 
-  Object.keys(body).forEach(data => {
-    if (!validator[data].required) errors.push(`${data} is required`);
-    if (!validator[data].nullable) {
-      if (body[data].length <= 0 || body[data === null]) errors.push(`${data} cannot be null`);
-    }
+  // Object.keys(body).forEach(data => {
+  //   if (!validator[data].required) errors.push(`${data} is required`);
+  //   if (!validator[data].nullable) {
+  //     if (body[data].length <= 0 || body[data === null]) errors.push(`${data} cannot be null`);
+  //   }
 
-    if (validator[data].regex) {
-      if (!validator[data].regex.test(body[data])) errors.push(`Enter a valid email list`);
-    }
-  });
+  //   if (validator[data].regex) {
+  //     if (!validator[data].regex.test(body[data])) errors.push(`Enter a valid email list`);
+  //   }
+  // });
 
   if (errors.length > 0) {
     ctx.status = 400;
-    return ctx.body = errors;
+    ctx.body = errors;
+    return ctx;
   }
 
-  return elastic.index({
-    index,
-    body,
-  }).then(res => res.body);
+  body.createdAt = new Date();
+  body.updatedAt = new Date();
+
+  try {
+    const { body: data } = await elastic.index({
+      index,
+      body,
+    });
+
+    ctx.body = {
+      _id: data._id,
+      createdAt: body.createdAt,
+    };
+  } catch (err) {
+    console.log(err);
+    ctx.status = 500;
+  }
 };
 
-exports.update = (ctx, id) => {
+exports.update = async (ctx, id) => {
   ctx.action = 'reporting/update';
-  ctx.status = 200;
+  ctx.status = 204;
+
+  const body = ctx.request.body;
+
+  try {
+    await elastic.update({
+      index,
+      id,
+      body: {
+        doc: {
+          ...body,
+          updatedAt: new Date(),
+        },
+      },
+    }).then(res => res.body);
+  } catch (err) {
+    console.log(err);
+    ctx.status = 500;
+  }
 };
 
-exports.del = (ctx, id) => {
+exports.del = async (ctx, id) => {
   ctx.action = 'reporting/delete';
-  // ctx.status = 200;
-  // DELETE data in index by id
+  ctx.status = 204;
+  
+  try {
+    await elastic.delete({
+      id,
+      index,
+    }).then(res => res.body);
+  } catch (err) {
+    console.log(err);
+    ctx.status = 500;
+  }
 };
 

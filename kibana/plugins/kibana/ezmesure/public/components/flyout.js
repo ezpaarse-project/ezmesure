@@ -9,9 +9,13 @@ import { defaultDashboard } from '../lib/reporting';
 import Form from './form';
 
 let openFlyOutHandler;
-
 export function openFlyOut(dashboard, edit) {
   openFlyOutHandler(dashboard, edit);
+}
+
+let updateEdit;
+export function updateEditData(edit) {
+  updateEdit(edit);
 }
 
 export default class Flyout extends Component {
@@ -20,15 +24,17 @@ export default class Flyout extends Component {
 
     this.state = {
       httpClient: props.httpClient,
+      space: props.space,
       isFlyoutVisible: false,
       edit: false,
       currentDashboard: null,
     };
 
     openFlyOutHandler = this.open;
+    updateEdit = this.updateEdit;
   }
 
-  open = (dashboard, edit) => {
+  open = (dashboard, edit, callback) => {
     this.setState({ isFlyoutVisible: true });
     this.setState({ edit });
     this.setState({ currentDashboard: JSON.parse(JSON.stringify(dashboard || defaultDashboard)) });
@@ -38,11 +44,17 @@ export default class Flyout extends Component {
     this.setState({ isFlyoutVisible: false });
   }
 
+  updateEdit = edit => {
+    this.setState({ edit });
+    this.forceUpdate();
+  }
+
   render() {
-    const { httpClient, isFlyoutVisible, currentDashboard, edit } = this.state;
+    const { httpClient, isFlyoutVisible, currentDashboard, edit, space } = this.state;
     let flyOutRender;
 
     if (isFlyoutVisible) {
+      const title = edit ? 'Editing' : 'Creating'
       flyOutRender = (
         <EuiFlyout
           onClose={this.close}
@@ -50,11 +62,11 @@ export default class Flyout extends Component {
           aria-labelledby="flyoutSmallTitle">
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
-              <h2>Creating a reporting task</h2>
+              <h2>{ title } a reporting task</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <Form httpClient={httpClient} currentDashboard={currentDashboard} edit={edit} />
+            <Form httpClient={httpClient} currentDashboard={currentDashboard} edit={edit} space={space} />
           </EuiFlyoutBody>
         </EuiFlyout>
       );

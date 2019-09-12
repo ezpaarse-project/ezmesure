@@ -6,8 +6,9 @@ import {
   EuiForm,
   EuiButton,
 } from '@elastic/eui';
-import { timesSpanData } from '../lib/reporting';
-import $jQ from 'jquery';
+import { addToast } from './toast';
+import { editReportingTask, saveReportingTask } from './table';
+import { frequenciesData } from '../lib/reporting';
 
 export default class Form extends Component {
   constructor(props) {
@@ -16,35 +17,107 @@ export default class Form extends Component {
     this.state = {
       dashboards: [],
       currentDashboard: props.currentDashboard,
+      space: props.space,
+      httpClient: props.httpClient,
       edit: props.edit,
       errors: {
         show: false,
-        messages: [
-          // 'You must select a dashboard',
-          // 'You must select a time span',
-          // 'You must at least enter an email address',
-          // 'The email address format does not match',
-        ],
+        messages: [],
       },
+      editReporting: props.editReporting,
     };
   }
 
   componentDidMount() {
-    const { httpClient } = this.props;
+    const { httpClient, space } = this.props;
 
-    const currentUrl = $jQ(location).attr('pathname');
-    let space = '';
-    if (/^\/kibana\/s\/([a-z0-9\-]+)/i.test(currentUrl)) {
-      space = currentUrl.split('/')[3];
-    }
-
-    httpClient.get(`../api/ezmesure/reporting/list/${space}`).then(res => {
+    httpClient.get(`../api/ezmesure/reporting/tasks/${space}`).then(res => {
       this.setState({ dashboards: res.data.dashboards });
     }).catch(err => console.log(err));
   }
 
-  onChange = (el) => {
-    console.log(el);
+  onChangeDashboard = (event) => {
+    const currentDashboard = {...this.state.currentDashboard};
+    currentDashboard.dashboard.value = event.target.value
+    this.setState({ currentDashboard });
+  }
+
+  onChangeFrequency = (event) => {
+    const currentDashboard = {...this.state.currentDashboard};
+    currentDashboard.reporting.frequency = event.target.value
+    this.setState({ currentDashboard });
+  }
+
+  onChangeEmails = (event) => {
+    const currentDashboard = {...this.state.currentDashboard};
+    currentDashboard.reporting.emails = event.target.value
+    this.setState({ currentDashboard });
+  }
+
+  saveOrUpdate = () => {
+    const { httpClient, currentDashboard, edit, space, dashboards } = this.state;
+
+    const reportingData = {
+      dashboardId: currentDashboard.dashboard.value || dashboards[0].value,
+      emails: currentDashboard.reporting.emails,
+      frequency: currentDashboard.reporting.frequency,
+    };
+
+    if (edit) {
+      httpClient.patch(`../api/ezmesure/reporting/tasks/${currentDashboard._id}`, reportingData).then(res => {
+        addToast(
+          'Success',
+          'Task updated successfully.',
+          'success',
+        );
+
+        editReportingTask(currentDashboard);
+
+        this.forceUpdate();
+      }).catch(err => {
+        return addToast(
+          'Error',
+          'An error occurred when updating the task.',
+          'error',
+        );
+      });
+    }
+
+    if (!edit) {
+      if (space) {
+        reportingData = { ...reportingData, space };
+      }
+      httpClient.post('../api/ezmesure/reporting/tasks', reportingData).then(res => {
+        console.log(res)
+        addToast(
+          'Success',
+          'Task addedd successfully.',
+          'success',
+        );
+        
+        this.setState({ edit: true });
+
+        currentDashboard._id = res.data._id;
+        currentDashboard.reporting.createdAt = res.data.createdAt;
+
+        const dashboard = this.state.dashboards.find(({ value }) => value === currentDashboard.dashboard.value);
+        
+        if (dashboard) {
+          currentDashboard.dashboard.text = dashboard.text;  
+
+          saveReportingTask(currentDashboard);
+
+          this.forceUpdate();
+        }
+      }).catch(err => {
+        console.log(err)
+        return addToast(
+          'Error',
+          'An error occurred when adding the task.',
+          'error',
+        );
+      });
+    }
   }
 
   render() {
@@ -56,9 +129,9 @@ export default class Form extends Component {
           <EuiFormRow label="Dashboard" fullWidth isInvalid={edit ? false : errors.show}>
             <EuiSelect
               options={dashboards}
-              value={currentDashboard.dashboard.text}
+              value={currentDashboard.dashboard.value}
               aria-label="Dashboard"
-              onChange={this.onChange}
+              onChange={this.onChangeDashboard}
               fullWidth="true"
               disabled={edit}
               isInvalid={edit ? false : errors.show}
@@ -66,15 +139,15 @@ export default class Form extends Component {
             ></EuiSelect>
           </EuiFormRow>
 
-          <EuiFormRow label="Time span" fullWidth isInvalid={errors.show}>
+          <EuiFormRow label="Frequency" fullWidth isInvalid={errors.show}>
             <EuiSelect
-              options={timesSpanData}
-              value={currentDashboard.reporting.timeSpan}
-              aria-label="Time span"
-              onChange={this.onChange}
+              options={frequenciesData}
+              value={currentDashboard.reporting.frequency}
+              aria-label="Frequency"
+              onChange={this.onChangeFrequency}
               fullWidth
               isInvalid={errors.show}
-              name="selectedTimeSpan"
+              name="selectedFrequency"
             ></EuiSelect>
           </EuiFormRow>
 
@@ -82,7 +155,7 @@ export default class Form extends Component {
             <EuiTextArea
               placeholder="E-mail addresses for recipients (ex: john@doe.com,jane@doe.com)"
               value={currentDashboard.reporting.emails}
-              onChange={this.onChange}
+              onChange={this.onChangeEmails}
               fullWidth
               isInvalid={errors.show}
               name="selectedEmails"
@@ -93,7 +166,9 @@ export default class Form extends Component {
             <EuiButton
               fill
               iconType="save"
-              onClick={() => alert('Saved')}>
+              type="submit"
+              onClick={() => this.saveOrUpdate()}
+            >
               Save
             </EuiButton>
           </EuiFormRow>
