@@ -1,9 +1,0 @@
-{
-  "name": "ezmesure",
-  "version": "1.0.0",
-  "description": "ezMESURE plugin for Kibana",
-  "main": "index.js",
-  "kibana": {
-    "version": "7.2.0"
-  }
-}

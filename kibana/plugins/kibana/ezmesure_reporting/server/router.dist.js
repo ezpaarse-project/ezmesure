@@ -1,5 +1,6 @@
+/* eslint-disable @kbn/eslint/require-license-header */
 export default function (server) {
-  const apiUrl = 'http://api:3000';
+  const apiUrl = '{{EZMESURE_API_URL}}';
 
   server.route({
     path: '/api/ezmesure/{path*}',
@@ -12,4 +13,4 @@ export default function (server) {
       }
     }
   });
-};
+}

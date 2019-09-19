@@ -1,0 +1,10 @@
+{
+  "paths": {
+    "ezmesureReporting": "./"
+  },
+  "exclude": [
+  ],
+  "translations": [
+    "translations/fr-FR.json"
+  ]
+}

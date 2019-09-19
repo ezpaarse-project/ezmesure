@@ -1,13 +1,15 @@
-import api from './server/routes';
+/* eslint-disable @kbn/eslint/require-license-header */
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 
 export default function (kibana) {
 
   const ezmesureLink = '{{EZMESURE_URL}}';
 
   return new kibana.Plugin({
-    name: 'ezmesure',
+    require: ['elasticsearch'],
 
-    require: ['kibana', 'elasticsearch'],
+    name: 'ezmesure_home',
 
     uiExports: {
       links: [
@@ -21,17 +23,11 @@ export default function (kibana) {
         },
       ],
 
-      app: {
-        title: 'Reporting',
-        description: 'Reporting',
-        main: 'plugins/ezmesure/app',
-        euiIconType: 'reportingApp',
-        order: -1004,
-      },
-
       hacks: [
-        'plugins/ezmesure/hack',
+        'plugins/ezmesure_home/hack',
       ],
+
+      styleSheetPaths: [resolve(__dirname, 'public/app.scss'), resolve(__dirname, 'public/app.css')].find(p => existsSync(p)),
     },
 
     config(Joi) {
@@ -40,10 +36,5 @@ export default function (kibana) {
       }).default();
     },
 
-    init(server, options) {
-      server.log(['status', 'info', 'ezmesure:plugin'], 'ezmesure Initializing...');
-      api(server);
-    },
-
   });
-};
+}

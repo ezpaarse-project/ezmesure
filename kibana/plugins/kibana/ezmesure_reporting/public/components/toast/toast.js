@@ -1,3 +1,4 @@
+/* eslint-disable @kbn/eslint/require-license-header */
 import React, { Component } from 'react';
 import { EuiGlobalToastList, EuiPortal } from '@elastic/eui';
 
@@ -13,7 +14,7 @@ export function removeAllToasts() {
   removeAllToastsHandler();
 }
 
-export default class Toast extends Component {
+export class Toast extends Component {
   constructor(props) {
     super(props);
 

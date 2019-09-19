@@ -1,3 +1,4 @@
+/* eslint-disable @kbn/eslint/require-license-header */
 const frequencies = [
   { text: 'Weekly', value: '1w' },
   // { text: 'Twice a week', value: '2w' },
@@ -16,13 +17,14 @@ export const convertFrequency = frequency => {
 };
 
 export const defaultDashboard = {
-  _id: null,
+  _id: '',
   dashboard: {
-    value: null,
-    text: null,
+    value: '',
+    text: '',
   },
   reporting: {
     frequency: '1w',
-    emails: null,
+    emails: '',
+    createdAt: '',
   },
 };

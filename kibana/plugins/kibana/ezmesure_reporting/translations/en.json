@@ -1,0 +1,100 @@
+{
+  "formats": {
+    "number": {
+      "currency": {
+        "style": "currency"
+      },
+      "percent": {
+        "style": "percent"
+      }
+    },
+    "date": {
+      "short": {
+        "month": "numeric",
+        "day": "numeric",
+        "year": "2-digit"
+      },
+      "medium": {
+        "month": "short",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "long": {
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "full": {
+        "weekday": "long",
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      }
+    },
+    "time": {
+      "short": {
+        "hour": "numeric",
+        "minute": "numeric"
+      },
+      "medium": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric"
+      },
+      "long": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      },
+      "full": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      }
+    },
+    "relative": {
+      "years": {
+        "units": "year"
+      },
+      "months": {
+        "units": "month"
+      },
+      "days": {
+        "units": "day"
+      },
+      "hours": {
+        "units": "hour"
+      },
+      "minutes": {
+        "units": "minute"
+      },
+      "seconds": {
+        "units": "second"
+      }
+    }
+  },
+  "messages": {
+    "ezmesureReporting.title": "Reporting ezMESURE",
+    "ezmesureReporting.createNewTask": "Create new reporting task",
+    "ezmesureReporting.save": "Save",
+    "ezmesureReporting.dashboard": "Dashboard",
+    "ezmesureReporting.dashboardName": "Dashboard name",
+    "ezmesureReporting.frequency": "Frequency",
+    "ezmesureReporting.edit": "Edit",
+    "ezmesureReporting.editing": "Editing",
+    "ezmesureReporting.creating": "Creating",
+    "ezmesureReporting.remove": "Delete",
+    "ezmesureReporting.createdAt": "Creation date",
+    "ezmesureReporting.receiversEmails": "Receivers' email addresses",
+    "ezmesureReporting.reportingTask": "a reporting task",
+    "ezmesureReporting.editingSuccess": "Task editing successfully.",
+    "ezmesureReporting.editingError": "An error occurred when editing the task.",
+    "ezmesureReporting.creationSuccess": "Task created successfully.",
+    "ezmesureReporting.creationError": "An error occurred when creating the task.",
+    "ezmesureReporting.removalSuccess": "Task removed successfully.",
+    "ezmesureReporting.removalError": "An error occurred during the removal of the task."
+  }
+}
+  
