@@ -1,0 +1,58 @@
+<mjml>
+  <mj-head>
+    {% block title %}{% endblock %}
+    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:400,500"></mj-font>
+    <mj-attributes>
+      <mj-all font-family="Roboto, Helvetica, sans-serif"></mj-all>
+      <mj-text font-weight="400" font-size="14px" color="#616161" line-height="24px"></mj-text>
+      <mj-section padding="0px" />
+      <mj-class name="headline" font-weight="500" font-size="20px" />
+      <mj-class name="subheading" font-weight="500" font-size="16px" />
+      <mj-divider border-width="1px" border-color="#E0E0E0" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body width="700px">
+    <mj-spacer height="30px" />
+    <mj-section background-color="#9c27b0" border-radius="5px 5px 0px 0px">
+      <mj-column>
+        <mj-image
+          height="35px"
+          width="150px"
+          href="https://ezmesure.couperin.org"
+          src="cid:ezmesure_logo_white.png"
+        />
+      </mj-column>
+    </mj-section>
+
+    <mj-wrapper background-color="#f7f7f7" border-radius="0px 0px 5px 5px">
+      {% block content %}{% endblock %}
+
+      <mj-section>
+        <mj-column>
+          <mj-divider />
+        </mj-column>
+      </mj-section>
+
+      <mj-section>
+        <mj-column>
+          <mj-image
+            align="left"
+            height="35px"
+            width="150px"
+            href="https://ezmesure.couperin.org"
+            src="cid:ezmesure_logo.png"
+          />
+        </mj-column>
+
+        <mj-column>
+          <mj-social align="right" padding-bottom="0px">
+            <mj-social-element name="youtube" src="cid:ezmesure_youtube.png" href="https://www.youtube.com/channel/UCcR-0UE9WjYiwS4fMG2T4tQ" />
+            <mj-social-element name="twitter-noshare" src="cid:ezmesure_twitter.png" href="https://twitter.com/ezpaarse" />
+            <mj-social-element name="github-noshare" src="cid:ezmesure_github.png" href="https://github.com/ezpaarse-project/" />
+            <mj-social-element background-color="#8536ad" src="cid:ezmesure_email.png" href="mailto:ezpaarse@couperin.org" />
+          </mj-social>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

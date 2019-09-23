@@ -1,13 +1,23 @@
+Activité récente
+================
+
 {% if users.length %}
-Nouveaux utilisateurs enregistrés :
-  {% for user in users %}
-  {{ user.full_name }} ({{ user.email }})
+Enregistrements ({{ users.length }})
+  {% for action in users %}
+  [{{ action.datetime }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }}) [{{ action.datetime }}]
   {% endfor %}
 {% endif %}
 
 {% if files.length %}
-Nouveaux fichiers déposés :
-  {% for file in files %}
-  {{ path }}
+Dépôts de fichiers ({{ files.length }})
+  {% for action in files %}
+  [{{ action.datetime }}][{{ action.response.status }}] {{ action.metadata.path }}
+  {% endfor %}
+{% endif %}
+
+{% if insertions.length %}
+Chargements ({{ insertions.length }})
+  {% for action in insertions | sort %}
+  [{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.index }} (i:{{ action.response.body.inserted }}|u:{{ action.response.body.updated }}|e:{{ action.response.body.failed }})
   {% endfor %}
 {% endif %}

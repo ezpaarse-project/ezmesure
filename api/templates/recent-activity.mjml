@@ -1,0 +1,109 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Activité récente</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Activité récente</mj-text>
+  </mj-column>
+</mj-section>
+
+{% if users.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Enregistrements ({{ users.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>Nom</th>
+          <th>Email</th>
+          <th style="width: 140px">Date</th>
+          <th style="width: 50px">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in users %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ action.elasticUser.full_name }}</td>
+          <td>{{ action.elasticUser.email }}</td>
+          <td>{{ action.datetime }}</td>
+          <td>{{ action.response.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
+{% if files.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Dépôts de fichiers ({{ files.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>Fichier</th>
+          <th style="width: 130px">Date</th>
+          <th style="width: 50px">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in files | sort %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ action.metadata.path }}</td>
+          <td>{{ action.datetime }}</td>
+          <td>{{ action.response.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
+{% if insertions.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Chargements ({{ insertions.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>Utilisateur</th>
+          <th>Index</th>
+          <th>Insérés</th>
+          <th>Mis à jour</th>
+          <th>Échecs</th>
+          <th style="width: 130px">Date</th>
+          <th style="width: 50px">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in insertions | sort %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ action.user.name }}</td>
+          <td>{{ action.index }}</td>
+          <td>{{ action.response.body.inserted }}</td>
+          <td>{{ action.response.body.updated }}</td>
+          <td>{{ action.response.body.failed }}</td>
+          <td>{{ action.datetime }}</td>
+          <td>{{ action.response.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
+{% endblock %}
