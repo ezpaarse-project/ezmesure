@@ -57,7 +57,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for action in files | sort %}
+        {% for action in files %}
         <tr style="border-bottom: 1px solid #d0d0d0">
           <td>{{ action.metadata.path }}</td>
           <td>{{ action.datetime }}</td>
@@ -89,7 +89,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for action in insertions | sort %}
+        {% for action in insertions %}
         <tr style="border-bottom: 1px solid #d0d0d0">
           <td>{{ action.user.name }}</td>
           <td>{{ action.index }}</td>

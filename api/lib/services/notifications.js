@@ -31,6 +31,7 @@ async function sendNotifications () {
   const { body: result } = await elastic.search({
     index: '.ezmesure-metrics',
     size: 10000,
+    sort: 'datetime:desc',
     body: {
       'query': {
         'bool': {
@@ -108,7 +109,7 @@ function setBroadcasted (actions) {
 /**
  * Change a timestamp into a locale date
  */
-function toLocaleDate(timestamp) {
+function toLocaleDate (timestamp) {
   const date = new Date(timestamp);
   return isValid(date) ? format(date, 'Pp', { locale: fr }) : 'Invalid date';
 }
