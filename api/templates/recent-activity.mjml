@@ -51,6 +51,7 @@
     <mj-table cellpadding="5px">
       <thead>
         <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th></th>
           <th>Fichier</th>
           <th style="width: 130px">Date</th>
           <th style="width: 50px">Statut</th>
@@ -58,11 +59,14 @@
       </thead>
       <tbody>
         {% for action in files %}
-        <tr style="border-bottom: 1px solid #d0d0d0">
-          <td>{{ action.metadata.path }}</td>
-          <td>{{ action.datetime }}</td>
-          <td>{{ action.response.status }}</td>
-        </tr>
+          {% for path in action.path %}
+          <tr style="border-bottom: 1px solid #d0d0d0">
+            <td>{{ "+" if action.action == 'file/upload' else "-" }}</td>
+            <td>{{ path }}</td>
+            <td>{{ action.datetime }}</td>
+            <td>{{ action.response.status }}</td>
+          </tr>
+          {% endfor %}
         {% endfor %}
       </tbody>
     </mj-table>

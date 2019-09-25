@@ -39,7 +39,17 @@ async function sendNotifications () {
             { 'exists': { 'field': 'metadata.broadcasted' } }
           ],
           'filter': [
-            { 'terms': { 'action': ['file/upload', 'user/register', 'indices/insert'] } }
+            {
+              'terms': {
+                'action': [
+                  'file/upload',
+                  'file/delete',
+                  'file/delete-many',
+                  'user/register',
+                  'indices/insert'
+                ]
+              }
+            }
           ]
         }
       }
@@ -53,31 +63,35 @@ async function sendNotifications () {
   }
 
   const files = actions
-    .filter(a => a._source.action === 'file/upload')
-    .map(a => ({
-      ...a._source,
-      datetime: toLocaleDate(a._source.datetime)
-    }));
+    .filter(a => a._source.action.startsWith('file/'))
+    .map(({ _source }) => {
+      const metadata = _source.metadata || {};
+      const paths = metadata.path || [];
+      return {
+        ..._source,
+        path: Array.isArray(paths) ? paths : [paths],
+        datetime: toLocaleDate(_source.datetime)
+      };
+    });
 
   const users = await Promise.all(actions
     .filter(a => a._source.action === 'user/register')
-    .map(a => a._source)
-    .map(async a => {
-      const username = a.metadata && a.metadata.username;
+    .map(async ({ _source }) => {
+      const { username } = _source.metadata || {};
       const elasticUser = username && await elastic.security.findUser({ username });
       return {
-        ...a,
+        ..._source,
         elasticUser,
-        datetime: toLocaleDate(a.datetime)
+        datetime: toLocaleDate(_source.datetime)
       };
     })
   );
 
   const insertions = actions
     .filter(a => a._source.action === 'indices/insert')
-    .map(a => ({
-      ...a._source,
-      datetime: toLocaleDate(a._source.datetime)
+    .map(({ _source }) => ({
+      ..._source,
+      datetime: toLocaleDate(_source.datetime)
     }));
 
   await sendMail({
