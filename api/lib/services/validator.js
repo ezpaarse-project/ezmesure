@@ -4,10 +4,10 @@ const mandatoryFields = new Set([
   'rtype',
   'mime',
   'title_id',
-  'doi'
+  'doi',
 ]);
 
-function validationError (message) {
+function validationError(message) {
   const err = new Error(message);
   err.type = 'validation';
   return err;
@@ -23,7 +23,7 @@ exports.validateColumns = function (columns) {
       throw validationError(`Le champ "${field}" est manquant`);
     }
   }
-}
+};
 
 /**
  * Validate an EC
@@ -42,4 +42,4 @@ exports.validateEvent = function (ec, lineNumber) {
   if (ec.date && !/^\d{4}-\d{2}-\d{2}$/.test(ec.date)) {
     throw validationError(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`);
   }
-}
+};

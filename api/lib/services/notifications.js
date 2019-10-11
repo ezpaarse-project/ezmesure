@@ -1,15 +1,16 @@
 const config = require('config');
-const CronJob = require('cron').CronJob;
+const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
+
 const { sender, recipients, cron } = config.get('notifications');
 
 module.exports = {
-  start (appLogger) {
+  start(appLogger) {
     const job = new CronJob(cron, () => {
       sendNotifications().then(() => {
         appLogger.info('Recent activity successfully broadcasted');
-      }).catch(err => {
+      }).catch((err) => {
         appLogger.error(`Failed to broadcast recent activity : ${err}`);
       });
     });
@@ -19,30 +20,30 @@ module.exports = {
     } else {
       appLogger.warn('No recipient configured, notifications will be disabled');
     }
-  }
-}
+  },
+};
 
 /**
  * Send a mail containing new files and users
  */
-async function sendNotifications () {
+async function sendNotifications() {
   const { body: result } = await elastic.search({
     index: '.ezmesure-metrics',
     size: 1000,
     body: {
-      'query': {
-        'bool': {
-          'must_not': [
-            { 'exists': { 'field': 'metadata.broadcasted' } }
+      query: {
+        bool: {
+          must_not: [
+            { exists: { field: 'metadata.broadcasted' } },
           ],
-          'filter': [
-            { 'exists': { 'field': 'metadata' } },
-            { 'terms': { 'action': ['file/upload', 'user/register'] } },
-            { 'range': { 'response.status': { 'gte': 200, 'lt': 400 } } }
-          ]
-        }
-      }
-    }
+          filter: [
+            { exists: { field: 'metadata' } },
+            { terms: { action: ['file/upload', 'user/register'] } },
+            { range: { 'response.status': { gte: 200, lt: 400 } } },
+          ],
+        },
+      },
+    },
   });
 
   const actions = result && result.hits && result.hits.hits;
@@ -52,22 +53,20 @@ async function sendNotifications () {
   }
 
   const files = uniq(actions
-    .filter(a => a._source.action === 'file/upload')
-    .map(a => a._source.metadata.path)
-  );
+    .filter((a) => a._source.action === 'file/upload')
+    .map((a) => a._source.metadata.path));
 
   const users = await Promise.all(
     uniq(actions
-      .filter(a => a._source.action === 'user/register')
-      .map(a => a._source.metadata.username)
-    ).map(username => elastic.security.findUser({ username }))
+      .filter((a) => a._source.action === 'user/register')
+      .map((a) => a._source.metadata.username)).map((username) => elastic.security.findUser({ username })),
   );
 
   await sendMail({
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { files, users })
+    ...generateMail('recent-activity', { files, users }),
   });
 
   return setBroadcasted(actions);
@@ -77,7 +76,7 @@ async function sendNotifications () {
  * Helper function that removes duplicates from an array
  * @param {Array} array an array of arbitrary things
  */
-function uniq (array) {
+function uniq(array) {
   return Array.from(new Set(array));
 }
 
@@ -85,11 +84,11 @@ function uniq (array) {
  * Set metadata.broacasted to the current date for a list of action documents
  * @param {Array<Object>} actions a set of action documents from the metrics index
  */
-function setBroadcasted (actions) {
+function setBroadcasted(actions) {
   const bulk = [];
   const now = new Date();
 
-  actions.forEach(action => {
+  actions.forEach((action) => {
     bulk.push({ update: { _id: action._id, _type: action._type, _index: action._index } });
     bulk.push({ doc: { metadata: { broadcasted: now } } });
   });

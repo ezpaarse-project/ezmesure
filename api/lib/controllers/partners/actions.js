@@ -13,4 +13,3 @@ exports.refresh = async function (ctx) {
   ctx.status = result.errors ? 500 : 200;
   ctx.body = result;
 };
-

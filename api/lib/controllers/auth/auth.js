@@ -9,22 +9,22 @@ const secret = config.get('auth.secret');
 const sender = config.get('notifications.sender');
 
 exports.renaterLogin = async function (ctx) {
-  const query   = ctx.request.query;
+  const { query } = ctx.request;
   const headers = ctx.request.header;
-  const props   = {
+  const props = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
-    email:     decode(headers.mail),
+    email: decode(headers.mail),
     roles: ['kibana_dashboard_only_user'],
     metadata: {
-      idp:          headers['shib-identity-provider'],
-      uid:          headers.uid,
-      org:          decode(headers.o),
-      unit:         decode(headers.ou),
-      eppn:         headers.eppn,
-      remoteUser:   headers.remote_user,
+      idp: headers['shib-identity-provider'],
+      uid: headers.uid,
+      org: decode(headers.o),
+      unit: decode(headers.ou),
+      eppn: headers.eppn,
+      remoteUser: headers.remote_user,
       persistentId: headers['persistent-id'] || headers['targeted-id'],
-      affiliation:  headers.affiliation
-    }
+      affiliation: headers.affiliation,
+    },
   };
 
   if (!props.metadata.idp) {
@@ -40,14 +40,14 @@ exports.renaterLogin = async function (ctx) {
   let user = await elastic.security.findUser({ username });
 
   if (!user) {
-    ctx.action   = 'user/register';
+    ctx.action = 'user/register';
     ctx.metadata = { username };
 
     props.metadata.createdAt = props.metadata.updatedAt = new Date();
     props.metadata.acceptedTerms = false;
     props.password = await randomString();
 
-    await elastic.security.putUser({ username: username, body: props });
+    await elastic.security.putUser({ username, body: props });
     user = await elastic.security.findUser({ username });
 
     if (!user) {
@@ -60,7 +60,7 @@ exports.renaterLogin = async function (ctx) {
       appLogger.error('Failed to send mail', err);
     }
   } else if (query.refresh) {
-    ctx.action   = 'user/refresh';
+    ctx.action = 'user/refresh';
     ctx.metadata = { username };
 
     props.metadata.updatedAt = new Date();
@@ -70,13 +70,13 @@ exports.renaterLogin = async function (ctx) {
     props.username = username;
 
     try {
-      await elastic.security.putUser({ username: username, body: props });
+      await elastic.security.putUser({ username, body: props });
       user = props;
     } catch (e) {
       return ctx.throw(500, 'Failed to update user data');
     }
   } else {
-    ctx.action   = 'user/connection';
+    ctx.action = 'user/connection';
     ctx.metadata = { username };
   }
 
@@ -85,7 +85,7 @@ exports.renaterLogin = async function (ctx) {
 };
 
 exports.acceptTerms = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
@@ -95,10 +95,10 @@ exports.acceptTerms = async function (ctx) {
   await elastic.security.putUser({ username: user.username, body: user });
 
   ctx.status = 204;
-}
+};
 
 exports.resetPassword = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
@@ -109,27 +109,27 @@ exports.resetPassword = async function (ctx) {
   await elastic.security.changePassword({
     username: ctx.state.user.username,
     body: {
-      password: newPassword
-    }
+      password: newPassword,
+    },
   });
   await sendNewPassword(user, newPassword);
   ctx.status = 204;
-}
+};
 
 exports.getUser = async function (ctx) {
-  let user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
   ctx.status = 200;
-  ctx.body   = user;
+  ctx.body = user;
 };
 
 exports.getToken = async function (ctx) {
   ctx.status = 200;
-  ctx.body   = generateToken(ctx.state.user);
+  ctx.body = generateToken(ctx.state.user);
 };
 
 function generateToken(user) {
@@ -145,7 +145,7 @@ function decode(value) {
   return Buffer.from(value, 'binary').toString('utf8');
 }
 
-function randomString () {
+function randomString() {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(5, (err, buffer) => {
       if (err) { return reject(err); }
@@ -159,7 +159,7 @@ function sendWelcomeMail(user, password) {
     from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user, password })
+    ...generateMail('welcome', { user, password }),
   });
 }
 
@@ -168,6 +168,6 @@ function sendNewPassword(user, password) {
     from: sender,
     to: user.email,
     subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, password })
+    ...generateMail('new-password', { user, password }),
   });
 }

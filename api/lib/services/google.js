@@ -6,12 +6,12 @@ const auth = new google.auth.JWT(
   null,
   googleAPI.privateKey,
   ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-  null
+  null,
 );
 
 module.exports = {
   sheets: google.sheets({
     version: 'v4',
-    auth
-  })
+    auth,
+  }),
 };

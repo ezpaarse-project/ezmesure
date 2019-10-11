@@ -26,18 +26,18 @@ exports.register = async function (ctx, providerName) {
 
   ctx.type = 'json';
 
-  if (mandatory.some(p => !options[p])) {
+  if (mandatory.some((p) => !options[p])) {
     ctx.status = 400;
     return ctx.body = {
-      error: `mandatory field missing, you must specify: ${mandatory.join(', ')}`
+      error: `mandatory field missing, you must specify: ${mandatory.join(', ')}`,
     };
   }
 
   options.name = providerName;
   ctx.body = await providers.register(providerName, options);
-}
+};
 
 exports.load = async function (ctx, providerName) {
   ctx.type = 'json';
   ctx.body = await providers.load(providerName, ctx.request.body);
-}
+};

@@ -1,8 +1,10 @@
-const elastic = require('./elastic.js');
 const config = require('config');
 const co = require('co');
+const elastic = require('./elastic.js');
 
-module.exports = { check, register, load, list, remove };
+module.exports = {
+  check, register, load, list, remove,
+};
 
 /**
  * Find all providers and apply them
@@ -12,10 +14,10 @@ module.exports = { check, register, load, list, remove };
  */
 function check() {
   return co(function* () {
-    const res        = yield list();
-    const providers  = res && res.hits && res.hits.hits;
+    const res = yield list();
+    const providers = res && res.hits && res.hits.hits;
 
-    let response = { updated: {} };
+    const response = { updated: {} };
 
     if (!providers || providers.length === 0) {
       response.message = 'no meta provider';
@@ -23,13 +25,13 @@ function check() {
     }
 
     for (const i in providers) {
-      const index  = providers[i]._index;
+      const index = providers[i]._index;
       const config = providers[i]._source;
 
       const { buckets } = yield aggregate(
         config.target.index,
         config.target.field,
-        config.condition
+        config.condition,
       );
 
       response.updated[config.target.index] = 0;
@@ -37,7 +39,7 @@ function check() {
       if (!buckets) { continue; }
 
       for (const j in buckets) {
-        const bucket   = buckets[j];
+        const bucket = buckets[j];
         const metadata = yield search(index, config.key, bucket.key);
 
         if (!metadata || !metadata._source) { continue; }
@@ -45,7 +47,7 @@ function check() {
         const updateResponse = yield update(
           config.target.index,
           { key: config.target.field, value: bucket.key },
-          metadata._source
+          metadata._source,
         );
 
         response.updated[config.target.index] += updateResponse.updated;
@@ -71,19 +73,19 @@ function update(index, search, doc) {
   }
 
   return elastic.updateByQuery({
-    "index": index,
-    "type": "event",
-    "body": {
-      "conflicts": "proceed",
-      "query": {
-        "term": { [search.key]: search.value }
+    index,
+    type: 'event',
+    body: {
+      conflicts: 'proceed',
+      query: {
+        term: { [search.key]: search.value },
       },
-      "script" : {
-        "lang": "painless",
-        "inline": script,
-        "params": doc
-      }
-    }
+      script: {
+        lang: 'painless',
+        inline: script,
+        params: doc,
+      },
+    },
   });
 }
 
@@ -96,15 +98,15 @@ function update(index, search, doc) {
  */
 function search(index, key, value) {
   return elastic.search({
-    "index": index,
-    "type": "meta",
-    "body": {
-      "size": 1,
-      "query": {
-        "term": { [key]: value }
-      }
-    }
-  }).then(response => response.hits.hits[0]);
+    index,
+    type: 'meta',
+    body: {
+      size: 1,
+      query: {
+        term: { [key]: value },
+      },
+    },
+  }).then((response) => response.hits.hits[0]);
 }
 
 /**
@@ -117,27 +119,27 @@ function search(index, key, value) {
  */
 function aggregate(index, aggField, condition) {
   return elastic.search({
-    "index": index,
-    "type": "event",
-    "body": {
-      "size": 0,
-      "query": {
-        "bool": {
-          "must_not": {
-            "exists": { "field": condition }
-          }
-        }
+    index,
+    type: 'event',
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          must_not: {
+            exists: { field: condition },
+          },
+        },
       },
-      "aggregations": {
-        "agg": {
-          "terms": {
-            "field": aggField,
-            "size": 100
-          }
-        }
-      }
-    }
-  }).then(response => response.aggregations.agg);
+      aggregations: {
+        agg: {
+          terms: {
+            field: aggField,
+            size: 100,
+          },
+        },
+      },
+    },
+  }).then((response) => response.aggregations.agg);
 }
 
 /**
@@ -154,20 +156,20 @@ function register(providerName, options) {
   if (indexName.includes('*')) { throw new Error('* not allowed in name'); }
 
   return elastic.update({
-    "index": indexName,
-    "type": "config",
-    "id": 1,
-    "body": {
-      "doc_as_upsert": true,
-      "doc": {
-        "key": options.key,
-        "condition": options.condition,
-        "target": {
-          "index": options.target,
-          "field": options.field
-        }
-      }
-    }
+    index: indexName,
+    type: 'config',
+    id: 1,
+    body: {
+      doc_as_upsert: true,
+      doc: {
+        key: options.key,
+        condition: options.condition,
+        target: {
+          index: options.target,
+          field: options.field,
+        },
+      },
+    },
   });
 }
 
@@ -183,8 +185,8 @@ function load(providerName, data) {
   if (indexName.includes('*')) { throw new Error('* not allowed in name'); }
 
   const body = [];
-  data.forEach(m => {
-    body.push({ index:  { _index: indexName } });
+  data.forEach((m) => {
+    body.push({ index: { _index: indexName } });
     body.push(m);
   });
 
@@ -198,8 +200,8 @@ function load(providerName, data) {
  */
 function list(providerName) {
   return elastic.search({
-    "index": `.meta-${providerName || '*'}`,
-    "type": "config"
+    index: `.meta-${providerName || '*'}`,
+    type: 'config',
   });
 }
 
@@ -214,6 +216,6 @@ function remove(providerName) {
   if (indexName.includes('*')) { throw new Error('* not allowed in name'); }
 
   return elastic.indices.delete({
-    "index": indexName
+    index: indexName,
   });
 }

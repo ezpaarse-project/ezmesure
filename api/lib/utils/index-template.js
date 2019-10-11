@@ -1,116 +1,116 @@
 module.exports = {
-  "settings" : {
-    "number_of_shards" : 1
+  settings: {
+    number_of_shards: 1,
   },
-  "mappings": {
-    "dynamic_templates": [
+  mappings: {
+    dynamic_templates: [
       {
-        "strings_as_keywords": {
-          "match_mapping_type": "string",
-          "mapping": {
-            "type": "keyword"
-          }
-        }
-      }
+        strings_as_keywords: {
+          match_mapping_type: 'string',
+          mapping: {
+            type: 'keyword',
+          },
+        },
+      },
     ],
-    "properties": {
-      "date": {
-        "type": "date",
-        "format": "dd/MM/YYYY||YYYY-MM-dd"
+    properties: {
+      date: {
+        type: 'date',
+        format: 'dd/MM/YYYY||YYYY-MM-dd',
       },
-      "datetime": {
-        "type": "date"
+      datetime: {
+        type: 'date',
       },
-      "timestamp": {
-        "type": "date",
-        "format": "epoch_millis"
+      timestamp: {
+        type: 'date',
+        format: 'epoch_millis',
       },
-      "els-publication-date": {
-        "type": "date"
+      'els-publication-date': {
+        type: 'date',
       },
-      "els-publication-date-year": {
-        "type": "date",
-        "format": "year"
+      'els-publication-date-year': {
+        type: 'date',
+        format: 'year',
       },
-      "doi-publication-date": {
-        "type": "date"
+      'doi-publication-date': {
+        type: 'date',
       },
-      "doi-publication-date-year": {
-        "type": "date",
-        "format": "year"
+      'doi-publication-date-year': {
+        type: 'date',
+        format: 'year',
       },
-      "size": {
-        "type": "integer"
+      size: {
+        type: 'integer',
       },
-      "status": {
-        "type": "integer"
+      status: {
+        type: 'integer',
       },
-      "geoip-latitude": {
-        "type": "float"
+      'geoip-latitude': {
+        type: 'float',
       },
-      "geoip-longitude": {
-        "type": "float"
+      'geoip-longitude': {
+        type: 'float',
       },
-      "location": {
-        "type": "geo_point"
+      location: {
+        type: 'geo_point',
       },
-      "index_name": {
-        "type": "keyword"
+      index_name: {
+        type: 'keyword',
       },
-      "log_id": {
-        "type": "keyword"
+      log_id: {
+        type: 'keyword',
       },
-      "domain": {
-        "type": "keyword"
+      domain: {
+        type: 'keyword',
       },
-      "subject": {
-        "type": "keyword"
+      subject: {
+        type: 'keyword',
       },
-      "print_identifier": {
-        "type": "keyword"
+      print_identifier: {
+        type: 'keyword',
       },
-      "online_identifier": {
-        "type": "keyword"
+      online_identifier: {
+        type: 'keyword',
       },
-      "doi": {
-        "type": "keyword"
+      doi: {
+        type: 'keyword',
       },
-      "publication_title": {
-        "type": "keyword"
+      publication_title: {
+        type: 'keyword',
       },
-      "publication_date": {
-        "type": "keyword"
+      publication_date: {
+        type: 'keyword',
       },
-      "login": {
-        "type": "keyword"
+      login: {
+        type: 'keyword',
       },
-      "rtype": {
-        "type": "keyword"
+      rtype: {
+        type: 'keyword',
       },
-      "mime": {
-        "type": "keyword"
+      mime: {
+        type: 'keyword',
       },
-      "on_campus": {
-        "type": "keyword"
+      on_campus: {
+        type: 'keyword',
       },
-      "platform": {
-        "type": "keyword"
+      platform: {
+        type: 'keyword',
       },
-      "platform_name": {
-        "type": "keyword"
+      platform_name: {
+        type: 'keyword',
       },
-      "publisher_name": {
-        "type": "keyword"
+      publisher_name: {
+        type: 'keyword',
       },
-      "title_id": {
-        "type": "keyword"
+      title_id: {
+        type: 'keyword',
       },
-      "unitid": {
-        "type": "keyword"
+      unitid: {
+        type: 'keyword',
       },
-      "url": {
-        "type": "keyword"
-      }
-    }
-  }
-}
+      url: {
+        type: 'keyword',
+      },
+    },
+  },
+};

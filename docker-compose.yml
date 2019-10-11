@@ -1,7 +1,7 @@
 version: '2'
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
     ports:
       - 9200:9200
       - 9300:9300
@@ -41,6 +41,7 @@ services:
     links:
       - elastic
       - api
+      - reporting
     environment:
       - http_proxy
       - https_proxy
@@ -55,6 +56,8 @@ services:
       - XPACK_MONITORING_ENABLED
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
+      - APPLI_APACHE_SERVERNAME
+      - REPORTING_URL=http://reporting:4000
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -80,6 +83,9 @@ services:
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
+      - SERVER_HOST
+      - SERVER_PORT
+      - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
     links:
@@ -123,4 +129,33 @@ services:
       - ./rp/apache2/sites-available:/etc/apache2/sites-available
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth
+    restart: unless-stopped
+
+  reporting:
+    build:
+      context: ./reporting
+      args:
+        - http_proxy
+        - https_proxy
+    ports:
+      - 4000:3000
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=localhost,rp
+      - REPORTING_PORT=3000
+      - REPORTING_ELASTIC_HOST=elastic
+      - REPORTING_ELASTIC_PORT=9200
+      - REPORTING_ELASTIC_PASSWORD
+      - REPORTING_SMTP_HOST
+      - REPORTING_SMTP_PORT
+      - REPORTING_SENDER
+      - REPORTING_CRON
+      - REPORTING_INDEX=.ezmesure-reporting
+      - REPORTING_FREQUENCIES
+      - KIBANA_INTERNAL_URL=https://rp/kibana
+      - KIBANA_EXTERNAL_URL
+      - NODE_CONFIG
+    links:
+      - elastic
     restart: unless-stopped

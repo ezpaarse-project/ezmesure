@@ -18,12 +18,12 @@ exports.upload = async function (ctx, fileName) {
 
   fileName = fileName.replace(/\s/g, '_');
 
-  const user   = ctx.state.user;
+  const { user } = ctx.state;
   const domain = user.email.split('@')[1];
 
   const relativePath = path.join(domain, user.username, fileName);
-  const userDir      = path.resolve(storagePath, domain, user.username);
-  const filePath     = path.resolve(userDir, fileName);
+  const userDir = path.resolve(storagePath, domain, user.username);
+  const filePath = path.resolve(userDir, fileName);
 
   ctx.metadata = { path: relativePath };
 
@@ -49,7 +49,7 @@ exports.upload = async function (ctx, fileName) {
 
 exports.list = async function (ctx) {
   ctx.action = 'file/list';
-  const user    = ctx.state.user;
+  const { user } = ctx.state;
   const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
 
   let fileList;
@@ -60,7 +60,7 @@ exports.list = async function (ctx) {
     fileList = [];
   }
 
-  fileList = fileList.map(name => { return { name }; })
+  fileList = fileList.map((name) => ({ name }));
 
   for (const file of fileList) {
     const stat = await fse.stat(path.resolve(userDir, file.name));
@@ -74,8 +74,8 @@ exports.list = async function (ctx) {
 
 exports.deleteOne = async function (ctx, fileName) {
   ctx.action = 'file/delete';
-  const user     = ctx.state.user;
-  const userDir  = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { user } = ctx.state;
+  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
   const filePath = path.resolve(userDir, fileName);
 
   await fse.remove(filePath);
@@ -85,10 +85,10 @@ exports.deleteOne = async function (ctx, fileName) {
 
 exports.deleteMany = async function (ctx) {
   ctx.action = 'file/delete-many';
-  const user      = ctx.state.user;
-  const userDir   = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const body      = ctx.request.body;
-  const fileNames = body && body.entries
+  const { user } = ctx.state;
+  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { body } = ctx.request;
+  const fileNames = body && body.entries;
 
   if (!fileNames) {
     return ctx.throw(400, 'missing required field: entries');
@@ -110,10 +110,10 @@ exports.deleteMany = async function (ctx) {
  * Validate a file, assuming it's a CSV file
  * @param {String} filePath
  */
-function validateFile (filePath) {
+function validateFile(filePath) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
-    let readLimit = 50;
+    const readLimit = 50;
     let columns;
     let err;
 
@@ -126,21 +126,21 @@ function validateFile (filePath) {
     Papa.parse(stream, {
       delimiter: ';',
       complete: () => resolve(err),
-      error: error => reject(error),
+      error: (error) => reject(error),
       step: ({ data, errors }, parser) => {
         if (++lineNumber > readLimit) {
           return parser.abort();
         }
-        const row = data[0]
+        const row = data[0];
 
         if (errors.length > 0) {
-          err = errors[0]
+          err = errors[0];
 
           if (err.type === 'Quotes') {
-            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`
+            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
           }
 
-          return parser.abort()
+          return parser.abort();
         }
 
         if (typeof columns === 'undefined') {
@@ -149,16 +149,16 @@ function validateFile (filePath) {
           try {
             return validator.validateColumns(columns);
           } catch (e) {
-            err = e
+            err = e;
             return parser.abort();
           }
         }
 
-        const ec = {}
+        const ec = {};
 
         columns.forEach((colName, index) => {
           ec[colName] = row[index];
-        })
+        });
 
         try {
           validator.validateEvent(ec, lineNumber);
@@ -166,7 +166,7 @@ function validateFile (filePath) {
           err = e;
           parser.abort();
         }
-      }
-    })
-  })
+      },
+    });
+  });
 }

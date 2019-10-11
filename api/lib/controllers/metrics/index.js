@@ -1,4 +1,4 @@
-const Koa   = require('koa');
+const Koa = require('koa');
 const route = require('koa-route');
 
 const { overall } = require('./metrics');

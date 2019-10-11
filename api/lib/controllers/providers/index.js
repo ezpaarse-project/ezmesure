@@ -2,7 +2,9 @@ const Koa = require('koa');
 const route = require('koa-route');
 const bodyParser = require('koa-bodyparser');
 
-const { list, find, register, load, del, check } = require('./actions');
+const {
+  list, find, register, load, del, check,
+} = require('./actions');
 
 const app = new Koa();
 

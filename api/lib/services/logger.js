@@ -9,4 +9,4 @@ module.exports = function logger(loggersConfig) {
   }
 
   return winston.createLogger({ transports });
-}
+};

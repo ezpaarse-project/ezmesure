@@ -1,0 +1,24 @@
+{
+  "port": "REPORTING_PORT",
+  "kibana": {
+    "internal": "KIBANA_INTERNAL_URL",
+    "external": "KIBANA_EXTERNAL_URL"
+  },
+  "elasticsearch": {
+    "port": "REPORTING_ELASTIC_PORT",
+    "host": "REPORTING_ELASTIC_HOST",
+    "username": "REPORTING_ELASTIC_USER",
+    "password": "REPORTING_ELASTIC_PASSWORD"
+  },
+  "smtp": {
+    "host": "REPORTING_SMTP_HOST",
+    "port": "REPORTING_SMTP_PORT",
+    "sender": "REPORTING_SENDER"
+  },
+  "cron": "REPORTING_CRON",
+  "index": "REPORTING_INDEX",
+  "frequencies": {
+    "__name": "REPORTING_FREQUENCIES",
+    "__format": "json"
+  }
+}

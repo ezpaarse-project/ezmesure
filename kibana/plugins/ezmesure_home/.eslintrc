@@ -1,0 +1,10 @@
+---
+extends: "@elastic/kibana"
+
+settings:
+  import/resolver:
+    '@elastic/eslint-import-resolver-kibana':
+      rootPackageName: 'ezmesure_home'
+
+rules:
+  @kbn/eslint/require-license-header: 'off'

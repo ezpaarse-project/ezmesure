@@ -1,0 +1,9 @@
+dashboard-app .react-grid-item {
+  left: 0 !important;
+  background-color: inherit !important;
+  z-index: 1 !important;
+  width: 1096px !important;
+  height: 598px !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
