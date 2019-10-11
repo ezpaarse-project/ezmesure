@@ -40,6 +40,11 @@ async function sendNotifications () {
           ],
           'filter': [
             {
+              "range": {
+                "datetime": { "gte": "now-1w" }
+              }
+            },
+            {
               'terms': {
                 'action': [
                   'file/upload',
