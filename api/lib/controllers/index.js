@@ -39,7 +39,13 @@ const authMiddleware = async (ctx, next) => {
   if (!ctx.state.user || !ctx.state.user.username) {
     return ctx.throw(401, 'no username in the token');
   }
+  await next();
+};
 
+/**
+ * Any route below requires an authenticated user
+ */
+app.use(async (ctx, next) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
@@ -47,7 +53,7 @@ const authMiddleware = async (ctx, next) => {
   }
 
   await next();
-};
+});
 
 const termsOfUseMiddleware = async (ctx, next) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });

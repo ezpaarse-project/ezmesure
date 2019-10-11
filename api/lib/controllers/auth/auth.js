@@ -13,8 +13,13 @@ exports.renaterLogin = async function (ctx) {
   const headers = ctx.request.header;
   const props = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
+<<<<<<< HEAD
     email: decode(headers.mail),
     roles: ['kibana_dashboard_only_user'],
+=======
+    email:     decode(headers.mail),
+    roles: [],
+>>>>>>> master
     metadata: {
       idp: headers['shib-identity-provider'],
       uid: headers.uid,
@@ -85,11 +90,15 @@ exports.renaterLogin = async function (ctx) {
 };
 
 exports.acceptTerms = async function (ctx) {
+<<<<<<< HEAD
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
+=======
+  const user = ctx.state.user;
+>>>>>>> master
 
   user.metadata.acceptedTerms = true;
   await elastic.security.putUser({ username: user.username, body: user });
@@ -112,7 +121,7 @@ exports.resetPassword = async function (ctx) {
       password: newPassword,
     },
   });
-  await sendNewPassword(user, newPassword);
+  await sendNewPassword(ctx.state.user, newPassword);
   ctx.status = 204;
 };
 

@@ -4,6 +4,8 @@ const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 
 const { sender, recipients, cron } = config.get('notifications');
+const { fr } = require('date-fns/locale');
+const { format, isValid } = require('date-fns');
 
 module.exports = {
   start(appLogger) {
@@ -29,21 +31,30 @@ module.exports = {
 async function sendNotifications() {
   const { body: result } = await elastic.search({
     index: '.ezmesure-metrics',
-    size: 1000,
+    size: 10000,
+    sort: 'datetime:desc',
     body: {
       query: {
         bool: {
           must_not: [
             { exists: { field: 'metadata.broadcasted' } },
           ],
-          filter: [
-            { exists: { field: 'metadata' } },
-            { terms: { action: ['file/upload', 'user/register'] } },
-            { range: { 'response.status': { gte: 200, lt: 400 } } },
-          ],
-        },
-      },
-    },
+          'filter': [
+            {
+              'terms': {
+                'action': [
+                  'file/upload',
+                  'file/delete',
+                  'file/delete-many',
+                  'user/register',
+                  'indices/insert'
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
   });
 
   const actions = result && result.hits && result.hits.hits;
@@ -52,32 +63,46 @@ async function sendNotifications() {
     return;
   }
 
-  const files = uniq(actions
-    .filter((a) => a._source.action === 'file/upload')
-    .map((a) => a._source.metadata.path));
+  const files = actions
+    .filter(a => a._source.action.startsWith('file/'))
+    .map(({ _source }) => {
+      const metadata = _source.metadata || {};
+      const paths = metadata.path || [];
+      return {
+        ..._source,
+        path: Array.isArray(paths) ? paths : [paths],
+        datetime: toLocaleDate(_source.datetime)
+      };
+    });
 
-  const users = await Promise.all(
-    uniq(actions
-      .filter((a) => a._source.action === 'user/register')
-      .map((a) => a._source.metadata.username)).map((username) => elastic.security.findUser({ username })),
+  const users = await Promise.all(actions
+    .filter(a => a._source.action === 'user/register')
+    .map(async ({ _source }) => {
+      const { username } = _source.metadata || {};
+      const elasticUser = username && await elastic.security.findUser({ username });
+      return {
+        ..._source,
+        elasticUser,
+        datetime: toLocaleDate(_source.datetime)
+      };
+    })
   );
+
+  const insertions = actions
+    .filter(a => a._source.action === 'indices/insert')
+    .map(({ _source }) => ({
+      ..._source,
+      datetime: toLocaleDate(_source.datetime)
+    }));
 
   await sendMail({
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { files, users }),
+    ...generateMail('recent-activity', { files, users, insertions })
   });
 
   return setBroadcasted(actions);
-}
-
-/**
- * Helper function that removes duplicates from an array
- * @param {Array} array an array of arbitrary things
- */
-function uniq(array) {
-  return Array.from(new Set(array));
 }
 
 /**
@@ -94,4 +119,12 @@ function setBroadcasted(actions) {
   });
 
   return elastic.bulk({ body: bulk });
+}
+
+/**
+ * Change a timestamp into a locale date
+ */
+function toLocaleDate (timestamp) {
+  const date = new Date(timestamp);
+  return isValid(date) ? format(date, 'Pp', { locale: fr }) : 'Invalid date';
 }

@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const nunjucks = require('nunjucks');
+const mjml2html = require('mjml');
 const nodemailer = require('nodemailer');
 const { smtp } = require('config');
 
@@ -41,9 +42,10 @@ module.exports = {
   generateMail(templateName, locals = {}) {
     if (!templateName) { throw new Error('No template name provided'); }
 
-    return {
-      html: nunjucks.render(`${templateName}.html`, locals),
-      text: nunjucks.render(`${templateName}.txt`, locals),
-    };
-  },
+    const text = nunjucks.render(`${templateName}.txt`, locals);
+    const mjmlTemplate = nunjucks.render(`${templateName}.mjml`, locals);
+    const { html, errors } = mjml2html(mjmlTemplate);
+
+    return { html, text, errors };
+  }
 };

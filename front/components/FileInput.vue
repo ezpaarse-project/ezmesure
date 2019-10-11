@@ -1,10 +1,10 @@
 <template>
   <v-card :raised="drag" class="dropzone">
-    <v-card-text class="text-xs-center grey--text">
+    <v-card-text class="text-center grey--text">
       <v-layout column>
         <v-flex>
           <v-icon medium class="grey--text">
-            file_upload
+            mdi-cloud-upload
           </v-icon>
         </v-flex>
         <v-flex>Cliquez ou glissez-déposez vos fichiers ici</v-flex>

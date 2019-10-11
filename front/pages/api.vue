@@ -23,7 +23,8 @@ export default {
     background-color: transparent !important;
     border-color: transparent !important;
   }
-  #swagger .btn.execute {
-    background-color: #4990e2;
+  #swagger .col {
+    width: auto;
+    max-width: 20%;
   }
 </style>

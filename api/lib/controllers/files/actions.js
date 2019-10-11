@@ -18,12 +18,26 @@ exports.upload = async function (ctx, fileName) {
 
   fileName = fileName.replace(/\s/g, '_');
 
+<<<<<<< HEAD
   const { user } = ctx.state;
   const domain = user.email.split('@')[1];
 
   const relativePath = path.join(domain, user.username, fileName);
   const userDir = path.resolve(storagePath, domain, user.username);
   const filePath = path.resolve(userDir, fileName);
+=======
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const domain = email.split('@')[1];
+
+  const relativePath = path.join(domain, username, fileName);
+  const userDir      = path.resolve(storagePath, domain, username);
+  const filePath     = path.resolve(userDir, fileName);
+>>>>>>> master
 
   ctx.metadata = { path: relativePath };
 
@@ -49,8 +63,13 @@ exports.upload = async function (ctx, fileName) {
 
 exports.list = async function (ctx) {
   ctx.action = 'file/list';
-  const { user } = ctx.state;
-  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const userDir = path.resolve(storagePath, email.split('@')[1], username);
 
   let fileList;
   try {
@@ -74,9 +93,18 @@ exports.list = async function (ctx) {
 
 exports.deleteOne = async function (ctx, fileName) {
   ctx.action = 'file/delete';
-  const { user } = ctx.state;
-  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const filePath = path.resolve(userDir, fileName);
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const domain = email.split('@')[1];
+
+  const relativePath = path.join(domain, username, fileName);
+  const filePath     = path.resolve(storagePath, relativePath);
+
+  ctx.metadata = { path: relativePath };
 
   await fse.remove(filePath);
 
@@ -85,9 +113,14 @@ exports.deleteOne = async function (ctx, fileName) {
 
 exports.deleteMany = async function (ctx) {
   ctx.action = 'file/delete-many';
-  const { user } = ctx.state;
-  const userDir = path.resolve(storagePath, user.email.split('@')[1], user.username);
-  const { body } = ctx.request;
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
+  const domain = email.split('@')[1];
+  const body = ctx.request.body;
   const fileNames = body && body.entries;
 
   if (!fileNames) {
@@ -98,9 +131,12 @@ exports.deleteMany = async function (ctx) {
     return ctx.throw(400, 'entries should be an array of file names');
   }
 
-  for (name of fileNames) {
-    const filePath = path.resolve(userDir, name);
-    await fse.remove(filePath);
+  const relativePaths = fileNames.map(fileName => path.join(domain, username, fileName));
+
+  ctx.metadata = { path: relativePaths };
+
+  for (filePath of relativePaths) {
+    await fse.remove(path.resolve(storagePath, filePath));
   }
 
   ctx.status = 204;

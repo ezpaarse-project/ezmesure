@@ -1,13 +1,25 @@
-{% if users.length %}
-Nouveaux utilisateurs enregistrés :
-  {% for user in users %}
-  {{ user.full_name }} ({{ user.email }})
-  {% endfor %}
-{% endif %}
+Activité récente
+================
 
-{% if files.length %}
-Nouveaux fichiers déposés :
-  {% for file in files %}
-  {{ path }}
+{% if users.length -%}
+Enregistrements ({{ users.length }})
+  {% for action in users -%}
+    [{{ action.datetime }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }}) [{{ action.datetime }}]
   {% endfor %}
-{% endif %}
+{% endif -%}
+
+{% if files.length -%}
+Dépôts de fichiers ({{ files.length }})
+  {% for action in files -%}
+    {% for path in action.path -%}
+      [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
+    {% endfor %}
+  {%- endfor %}
+{% endif -%}
+
+{% if insertions.length -%}
+Chargements ({{ insertions.length }})
+  {% for action in insertions -%}
+    [{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.index }} (i:{{ action.response.body.inserted }}|u:{{ action.response.body.updated }}|e:{{ action.response.body.failed }})
+  {% endfor %}
+{% endif -%}
