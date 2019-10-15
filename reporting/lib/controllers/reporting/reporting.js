@@ -1,7 +1,6 @@
 const { index, frequencies } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
-const puppeteer = require('../../services/puppeteer');
 const indexTemplate = require('../../utils/reporting-template');
 
 async function getDashboards(namespace) {
@@ -170,6 +169,7 @@ exports.store = async (ctx) => {
 
   body.createdAt = new Date();
   body.updatedAt = new Date();
+  body.sentAt = '1970-01-01T12:00:00.000Z';
 
   try {
     const { body: data } = await elastic.index({

@@ -42,6 +42,7 @@ services:
     volumes:
       - "./api:/usr/src/app"
       - "./data/api/storage:/usr/src/app/storage"
+      - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
     environment:
       - http_proxy
@@ -91,6 +92,7 @@ services:
       - 4000:3000
     volumes:
       - "./reporting:/usr/src/app"
+      - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=development
@@ -114,10 +116,7 @@ services:
       - maildev
       - rp
     restart: "no"
-    entrypoint:
-      - npm
-      - run
-      - dev
+    entrypoint: npm run dev
 
   maildev:
     image: djfarrelly/maildev

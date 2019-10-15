@@ -1,4 +1,4 @@
-FROM node:10.16.3-slim
+FROM node:10.15.3
 
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
@@ -16,4 +16,4 @@ COPY package.json /usr/src/app/
 RUN npm install && npm cache clean --force
 COPY . /usr/src/app
 
-ENTRYPOINT [ "node", "./server.js" ]
+ENTRYPOINT [ "npm", "start" ]

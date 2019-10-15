@@ -41,7 +41,7 @@ module.exports = {
       updatedAt: {
         type: 'date',
       },
-      sendAt: {
+      sentAt: {
         type: 'date',
       },
     },

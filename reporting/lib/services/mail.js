@@ -1,31 +1,46 @@
+const path = require('path');
+const fs = require('fs');
+const nunjucks = require('nunjucks');
+const mjml2html = require('mjml');
 const nodemailer = require('nodemailer');
-const logger = require('../logger');
 const { smtp } = require('config');
 
+const templatesDir = path.resolve(__dirname, '..', '..', 'templates');
+const imagesDir = path.resolve(templatesDir, 'images');
 const transporter = nodemailer.createTransport(smtp);
 
+nunjucks.configure(templatesDir);
+
+const images = fs.readdirSync(imagesDir);
+
 module.exports = {
-  sendMail: async (mailOptions) => {
+  async sendMail(mailOptions, options) {
     mailOptions = mailOptions || {};
     mailOptions.attachments = mailOptions.attachments || [];
-    mailOptions.from = smtp.sender;
+
+    images.forEach((image) => {
+      mailOptions.attachments.push({
+        filename: image,
+        path: path.resolve(imagesDir, image),
+        cid: image,
+      });
+    });
 
     return new Promise((resolve, reject) => {
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) { return reject(err); }
-        return resolve(info);
+        resolve(info);
       });
     });
   },
 
-  templates: (templateName, params = {}) => {
-    if (!templateName) {
-      return logger.error('No template name defined');
-    }
+  generateMail(templateName, locals = {}) {
+    if (!templateName) { throw new Error('No template name provided'); }
 
-    return {
-      html: 'aa',
-      text: 'aa',
-    };
-  },
+    const text = nunjucks.render(`${templateName}.txt`, locals);
+    const mjmlTemplate = nunjucks.render(`${templateName}.mjml`, locals);
+    const { html, errors } = mjml2html(mjmlTemplate);
+
+    return { html, text, errors };
+  }
 };

@@ -92,6 +92,7 @@ services:
       - elastic
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
+      - "./templates:/usr/src/app/templates"
     restart: unless-stopped
 
   front:
@@ -158,4 +159,6 @@ services:
       - NODE_CONFIG
     links:
       - elastic
+    volumes:
+      - "./templates:/usr/src/app/templates"
     restart: unless-stopped

@@ -1,5 +1,9 @@
 {
   "port": 3000,
+  "kibana": {
+    "internal": "http://localhost:5601",
+    "external": "http://localhost:5601"
+  },
   "elasticsearch": {
     "port": 9200,
     "host": "localhost",
@@ -8,14 +12,16 @@
   },
   "smtp": {
     "host": "localhost",
-    "port": "25"
+    "port": "25",
+    "sender": "ezREPORTING"
   },
-  "cron": "0 0 0 * * 0",
+  "cron": "0 0 0 * * 1",
+  "index": ".ezreporting",
   "frequencies": [
-    { "text": "Weekly", "value": "1w" },
-    { "text": "Monthly", "value": "1m" },
-    { "text": "Quarterly", "value": "3m" },
-    { "text": "Semi-annual", "value": "6m" },
-    { "text": "Annual", "value": "1y" }
+    { "fr": "Hébdomadaire", "text": "Weekly", "value": "1w" },
+    { "fr": "Mensuel", "text": "Monthly", "value": "1M" },
+    { "fr": "Trimestriel", "text": "Quarterly", "value": "3M" },
+    { "fr": "Semestriel", "text": "Semi-annual", "value": "6M" },
+    { "fr": "Annuel", "text": "Annual", "value": "1y" }
   ]
 }

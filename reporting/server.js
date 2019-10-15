@@ -3,6 +3,7 @@ const mount = require('koa-mount');
 const cors = require('@koa/cors');
 const { port, cron } = require('config');
 const { CronJob } = require('cron');
+const moment = require('moment');
 
 const logger = require('./lib/logger');
 const controller = require('./lib/controllers');
@@ -10,10 +11,12 @@ const reporting = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
 
-reporting();
-const job = new CronJob('* * * * * *', () => {
-  
+moment().locale('en');
+
+const job = new CronJob(cron, () => {
+  reporting();
 });
+job.start();
 
 const app = new Koa();
 
@@ -57,8 +60,6 @@ app.on('error', (err, ctx = {}) => {
 app.use(mount('/', controller));
 
 const server = app.listen(port || 3000);
-
-job.start();
 
 logger.info(`API server listening on port ${port || 3000}`);
 logger.info('Press CTRL+C to stop server');
