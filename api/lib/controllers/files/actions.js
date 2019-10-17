@@ -18,26 +18,12 @@ exports.upload = async function (ctx, fileName) {
 
   fileName = fileName.replace(/\s/g, '_');
 
-<<<<<<< HEAD
   const { user } = ctx.state;
   const domain = user.email.split('@')[1];
 
   const relativePath = path.join(domain, user.username, fileName);
   const userDir = path.resolve(storagePath, domain, user.username);
   const filePath = path.resolve(userDir, fileName);
-=======
-  const { username, email } = ctx.state.user;
-
-  if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
-  }
-
-  const domain = email.split('@')[1];
-
-  const relativePath = path.join(domain, username, fileName);
-  const userDir      = path.resolve(storagePath, domain, username);
-  const filePath     = path.resolve(userDir, fileName);
->>>>>>> master
 
   ctx.metadata = { path: relativePath };
 
