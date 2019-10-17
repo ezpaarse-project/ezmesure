@@ -111,6 +111,8 @@ services:
       - KIBANA_INTERNAL_URL=https://rp/kibana
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
+      - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
+      - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
     links:
       - elastic
       - maildev
