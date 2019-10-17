@@ -57,7 +57,7 @@ services:
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
-      - REPORTING_URL=http://reporting:4000
+      - REPORTING_URL=http://reporting:3000
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
