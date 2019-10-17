@@ -4,7 +4,7 @@
   "description": "A Kibana plugin to return on ezMESURE",
   "main": "index.js",
   "license": "ISC",
-  "author": "Steven WILMOUTH <wilmouth.steven@gmail.com>",
+  "author": "ezTEAM",
   "repository": {
     "type": "git",
     "url": "https://github.com/ezpaarse-project/ezmesure.git"

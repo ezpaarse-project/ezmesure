@@ -46,11 +46,6 @@ export class Table extends Component {
   onTableChange = ({ page = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
 
-console.log({
-  pageIndex,
-  pageSize,
-});
-
     this.setState({
       pageIndex,
       pageSize,
@@ -132,8 +127,6 @@ console.log({
       pageSizeOptions: [10, 20, 30],
       hidePerPageOptions: false,
     };
-
-    console.log(tasks.length);
 
     const startIndex = (pageIndex * pageSize);
     const endIndex = Math.min(startIndex + pageSize, tasks.length);
