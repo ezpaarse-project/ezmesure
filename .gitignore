@@ -6,4 +6,3 @@ storage
 ezmesure.local.env.sh
 certificates/
 certs/instances.yml
-kibana/plugins/kibana/*.zip
