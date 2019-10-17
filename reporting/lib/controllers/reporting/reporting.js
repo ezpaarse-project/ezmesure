@@ -31,6 +31,7 @@ async function getDashboards(namespace) {
       index: '.kibana',
       timeout: '30s',
       body: {
+        size: 10000,
         query: {
           bool,
         },
@@ -120,6 +121,7 @@ exports.list = async (ctx) => {
       index,
       timeout: '30s',
       body: {
+        size: 10000,
         query: {
           bool,
         },
@@ -144,6 +146,7 @@ exports.list = async (ctx) => {
             emails: hits[i]._source.emails,
             print: hits[i]._source.print,
             createdAt: hits[i]._source.createdAt,
+            sentAt: hits[i]._source.sentAt,
           },
         });
       }

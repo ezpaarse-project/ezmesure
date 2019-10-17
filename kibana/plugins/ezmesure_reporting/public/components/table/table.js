@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EuiInMemoryTable, EuiDescriptionList, EuiButtonIcon, EuiLink } from '@elastic/eui';
+import { EuiBasicTable, EuiDescriptionList, EuiButtonIcon, EuiLink } from '@elastic/eui';
 import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT, CENTER_ALIGNMENT } from '@elastic/eui/lib/services';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
@@ -11,6 +11,8 @@ export class Table extends Component {
     super(props);
 
     this.state = {
+      pageIndex: 0,
+      pageSize: 10,
       itemIdToExpandedRowMap: {},
     };
   }
@@ -41,8 +43,22 @@ export class Table extends Component {
     return this.setState({ itemIdToExpandedRowMap });
   };
 
+  onTableChange = ({ page = {} }) => {
+    const { index: pageIndex, size: pageSize } = page;
+
+console.log({
+  pageIndex,
+  pageSize,
+});
+
+    this.setState({
+      pageIndex,
+      pageSize,
+    });
+  };
+
   render() {
-    const { itemIdToExpandedRowMap } = this.state;
+    const { pageIndex, pageSize, itemIdToExpandedRowMap } = this.state;
     const { tasks, dashboards, frequencies } = this.props;
 
     const columns = [
@@ -109,15 +125,29 @@ export class Table extends Component {
       });
     }
 
+    const pagination = {
+      pageIndex,
+      pageSize,
+      totalItemCount: tasks.length,
+      pageSizeOptions: [10, 20, 30],
+      hidePerPageOptions: false,
+    };
+
+    console.log(tasks.length);
+
+    const startIndex = (pageIndex * pageSize);
+    const endIndex = Math.min(startIndex + pageSize, tasks.length);
+
     return (
-      <EuiInMemoryTable
-        items={tasks}
+      <EuiBasicTable
+        items={tasks.slice(startIndex, endIndex)}
         itemId="_id"
         itemIdToExpandedRowMap={itemIdToExpandedRowMap}
         isExpandable={true}
         hasActions={true}
         columns={columns}
-        pagination={false}
+        pagination={pagination}
+        onChange={this.onTableChange}
       />
     );
   }
