@@ -17,8 +17,8 @@ module.exports = async () => {
           query: {
             bool: {
               filter: [
-                { 
-                  term: { 
+                {
+                  term: {
                     frequency: frequencies[i].value,
                   },
                 },
@@ -47,7 +47,7 @@ module.exports = async () => {
 
         try {
           const pdf = await puppeteer(source.dashboardId, source.space || null, source.frequency, source.print);
-  
+
           if (pdf) {
             let currentDate = new Date();
 
@@ -89,7 +89,6 @@ module.exports = async () => {
             });
           }
         } catch (e) {
-          reportsFailed.push(task._id);
           logger.error(`Error on task : ${task._id}`);
           logger.error(e);
         }
