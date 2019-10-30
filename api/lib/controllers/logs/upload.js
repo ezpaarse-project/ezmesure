@@ -180,7 +180,7 @@ function readStream(stream, index, username, splittedFields) {
 
     parser.on('readable', read);
     parser.on('error', err => { reject(err); });
-    parser.on('finish', () => {
+    parser.on('end', () => {
       doneReading = true;
       if (busy) { return; }
 
