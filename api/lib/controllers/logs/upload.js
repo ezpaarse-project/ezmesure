@@ -174,6 +174,7 @@ function readStream(stream, index, username, splittedFields) {
         }
         return columns;
       },
+      'skip_empty_lines: true': true,
       'relax_column_count': true
     });
 

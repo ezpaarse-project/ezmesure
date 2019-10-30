@@ -152,6 +152,7 @@ function validateFile (filePath) {
 
     Papa.parse(stream, {
       delimiter: ';',
+      skipEmptyLines: true,
       complete: () => resolve(err),
       error: error => reject(error),
       step: ({ data, errors }, parser) => {
