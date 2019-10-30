@@ -43,7 +43,7 @@
     "mongodb": "^3.1.9",
     "nodemailer": "^4.6.8",
     "nunjucks": "^3.2.0",
-    "papaparse": "^4.6.1",
+    "papaparse": "^5.1.0",
     "winston": "^3.1.0"
   },
   "devDependencies": {

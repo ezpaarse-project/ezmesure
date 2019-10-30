@@ -222,6 +222,7 @@ export default {
 
         const readLimit = 50;
         let lineNumber = 0;
+        let emptyLines = 0;
         let columns;
         let err;
 
@@ -230,7 +231,13 @@ export default {
           error: e => reject(e),
           step: ({ data: row, errors }, parser) => {
             lineNumber += 1;
-            if (lineNumber > readLimit) {
+
+            if (row.filter(f => f.trim()).length === 0) {
+              emptyLines += 1;
+              return;
+            }
+
+            if ((lineNumber - emptyLines) > readLimit) {
               parser.abort();
               return;
             }
