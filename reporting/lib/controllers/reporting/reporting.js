@@ -55,7 +55,7 @@ exports.list = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const { space } = ctx;
+  const { space } = ctx.request.params;
 
   const dashboards = [];
   const tasks = [];
@@ -137,19 +137,18 @@ exports.list = async (ctx) => {
 
     for (let i = 0; i < hits.length; i += 1) {
       const dashboard = dashboards.find(({ id }) => id === hits[i]._source.dashboardId);
-      if (dashboard) {
-        tasks.push({
-          _id: hits[i]._id,
-          dashboardId: hits[i]._source.dashboardId,
-          reporting: {
-            frequency: hits[i]._source.frequency,
-            emails: hits[i]._source.emails,
-            print: hits[i]._source.print,
-            createdAt: hits[i]._source.createdAt,
-            sentAt: hits[i]._source.sentAt,
-          },
-        });
-      }
+      tasks.push({
+        _id: hits[i]._id,
+        dashboardId: hits[i]._source.dashboardId,
+        exists: dashboard ? true : false,
+        reporting: {
+          frequency: hits[i]._source.frequency,
+          emails: hits[i]._source.emails,
+          print: hits[i]._source.print,
+          createdAt: hits[i]._source.createdAt,
+          sentAt: hits[i]._source.sentAt,
+        },
+      });
     }
   }
 
@@ -160,6 +159,12 @@ exports.store = async (ctx) => {
   logger.info('reporting/store');
   ctx.action = 'reporting/store';
   ctx.status = 200;
+
+  if (ctx.invalid) {
+    ctx.status = 400;
+    ctx.body = { errors: ctx.invalid.body };
+    return ctx;
+  }
 
   if (ctx.invalid) {
     const invalidBody = ctx.invalid.body;
@@ -183,6 +188,7 @@ exports.store = async (ctx) => {
     ctx.body = {
       _id: data._id,
       createdAt: body.createdAt,
+      sentAt: body.sentAt,
     };
   } catch (err) {
     logger.error(err);

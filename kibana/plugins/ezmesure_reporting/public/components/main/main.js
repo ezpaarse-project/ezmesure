@@ -13,7 +13,7 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 
 import { Table } from '../table';
-import { Flyout, openFlyOut } from '../flyout';
+import { Flyout, openFlyOut, closeFlyOut } from '../flyout';
 import { Toast, addToast } from '../toast';
 
 export class Main extends React.Component {
@@ -36,7 +36,11 @@ export class Main extends React.Component {
       this.setState({ dashboards: res.data.dashboards });
 
       this.setState({ frequencies: res.data.frequencies });
-    }).catch(err => console.log(err));
+    }).catch(() => addToast(
+      'Error',
+      <FormattedMessage id="ezmesureReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
+      'danger'
+    ));
   }
 
   editTaskHandler = task => {
@@ -51,7 +55,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      this.props.httpClient.patch(`../api/ezmesure/reporting/tasks/${task._id}`, reqData).then(() => {
+      return this.props.httpClient.patch(`../api/ezmesure/reporting/tasks/${task._id}`, reqData).then(() => {
         const index = this.state.tasks.findIndex(({ _id }) => _id === task._id);
 
         const tasks = this.state.tasks;
@@ -64,14 +68,9 @@ export class Main extends React.Component {
           'success',
         );
 
+        this.closeFlyOut();
         this.forceUpdate();
-      }).catch(() => {
-        addToast(
-          'Error',
-          <FormattedMessage id="ezmesureReporting.editingError" defaultMessage="An error occurred when editing the task." />,
-          'danger'
-        );
-      });
+      })
     }
   }
 
@@ -89,7 +88,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      this.props.httpClient.post('../api/ezmesure/reporting/tasks', reqData).then(res => {
+      return this.props.httpClient.post('../api/ezmesure/reporting/tasks', reqData).then(res => {
         task._id = res.data._id;
         task.reporting.createdAt = res.data.createdAt;
 
@@ -102,13 +101,8 @@ export class Main extends React.Component {
           'success',
         );
 
+        this.closeFlyOut();
         this.forceUpdate();
-      }).catch(() => {
-        addToast(
-          'Error',
-          <FormattedMessage id="ezmesureReporting.creationError" defaultMessage="An error occurred when creating the task." />,
-          'danger'
-        );
       });
     }
   }
@@ -127,7 +121,7 @@ export class Main extends React.Component {
           );
 
           this.forceUpdate();
-        }).catch(() => {
+        }).catch((err) => {
           addToast(
             'Error',
             <FormattedMessage id="ezmesureReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
@@ -155,7 +149,8 @@ export class Main extends React.Component {
         <EuiButton
           fill
           iconType="plusInCircle"
-          onClick={() => openFlyOut(null, false)}
+          isDisabled={frequencies.length > 0 ? false : true}
+          onClick={() => frequencies.length > 0 ? openFlyOut(null, false) : null}
         >
           <FormattedMessage id="ezmesureReporting.createNewTask" defaultMessage="Create new reporting task" />
         </EuiButton>

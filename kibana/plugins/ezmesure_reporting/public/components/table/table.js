@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiDescriptionList, EuiButtonIcon, EuiLink } from '@elastic/eui';
+import { 
+  EuiBasicTable,
+  EuiDescriptionList,
+  EuiButtonIcon,
+  EuiLink,
+  EuiTextColor,
+  EuiIcon,
+} from '@elastic/eui';
 import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT, CENTER_ALIGNMENT } from '@elastic/eui/lib/services';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
-import { convertFrequency } from '../../lib/reporting';
+import { convertFrequency, convertDate } from '../../lib/reporting';
 import { openFlyOut } from '../flyout';
+import { addToast } from '../toast';
 
 export class Table extends Component {
   constructor(props) {
@@ -33,7 +41,7 @@ export class Table extends Component {
       },
       {
         title: <FormattedMessage id="ezmesureReporting.createdAt" defaultMessage="Creation date" />,
-        description: reporting.createdAt,
+        description: convertDate(reporting.createdAt),
       },
     ];
     itemIdToExpandedRowMap[item._id] = (
@@ -61,10 +69,16 @@ export class Table extends Component {
         name: <FormattedMessage id="ezmesureReporting.dashboard" defaultMessage="Dashboard" />,
         description: <FormattedMessage id="ezmesureReporting.dashboardName" defaultMessage="Dashboard name" />,
         render: ({ dashboardId }) => {
-          const dashboard = dashboards.find(({ id }) => id === dashboardId);
-          if (dashboard) {
-            return (<EuiLink href={`kibana#/dashboard/${dashboard.id}`}>{dashboard.name}</EuiLink>)
+          if (dashboardId) {
+            const dashboard = dashboards.find(({ id }) => id === dashboardId);
+            if (dashboard) {
+              return (<EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>);
+            }
+
+            return (<EuiTextColor color="warning"><EuiIcon type="alert" /> Dashboard not found or removed (id: {dashboardId})</EuiTextColor>);
           }
+
+          return (<EuiTextColor color="warning"><EuiIcon type="alert" /> Dashboard not found or removed (id: {dashboardId})</EuiTextColor>);
         },
         sortable: false,
         align: LEFT_ALIGNMENT,
@@ -73,6 +87,19 @@ export class Table extends Component {
         name: <FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />,
         description: <FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />,
         render: ({ reporting }) => convertFrequency(frequencies, reporting.frequency),
+        sortable: true,
+        align: CENTER_ALIGNMENT,
+      },
+      {
+        name: <FormattedMessage id="ezmesureReporting.sentAt" defaultMessage="Sending date" />,
+        description: <FormattedMessage id="ezmesureReporting.sentAt" defaultMessage="Sending date" />,
+        render: ({ reporting }) => {
+          if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
+            return convertDate(reporting.sentAt);
+          }
+
+          return '-';
+        },
         sortable: true,
         align: CENTER_ALIGNMENT,
       },
@@ -95,20 +122,28 @@ export class Table extends Component {
     ];
 
     if (capabilities.get().ezmesure_reporting.edit) {
-      columns[2].actions.push({
+      columns[3].actions.push({
         name: <FormattedMessage id="ezmesureReporting.edit" defaultMessage="Edit" />,
         description: <FormattedMessage id="ezmesureReporting.edit" defaultMessage="Edit" />,
         icon: 'pencil',
         type: 'icon',
         color: 'primary',
         onClick: el => {
-          openFlyOut(el, true);
+          if (el.exists) {
+            return openFlyOut(el, true);
+          }
+
+          return addToast(
+            'Error',
+            <FormattedMessage id="ezmesureReporting.dashboardNotFound" values={{ dashboardId: <b>el.dashboardId</b> }} defaultMessage="Dashboard nof found or remove (id: {dashboardId})" />,
+            'danger'
+          );
         },
       });
     }
 
     if (capabilities.get().ezmesure_reporting.delete) {
-      columns[2].actions.push({
+      columns[3].actions.push({
         name: <FormattedMessage id="ezmesureReporting.delete" defaultMessage="Delete" />,
         description: <FormattedMessage id="ezmesureReporting.delete" defaultMessage="Delete" />,
         icon: 'trash',

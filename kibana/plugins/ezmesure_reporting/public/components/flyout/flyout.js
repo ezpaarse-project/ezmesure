@@ -14,10 +14,16 @@ import {
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { defaultTask } from '../../lib/reporting';
+import { Toast, addToast } from '../toast';
 
 let openFlyOutHandler;
 export function openFlyOut(dashboard, edit) {
   openFlyOutHandler(dashboard, edit);
+}
+
+let closeFlyOutHandler;
+export function closeFlyOut() {
+  closeFlyOutHandler();
 }
 
 let updateEdit;
@@ -40,13 +46,14 @@ export class Flyout extends Component {
     };
 
     openFlyOutHandler = this.open;
+    closeFlyOutHandler = this.close;
     updateEdit = this.updateEdit;
   }
 
   open = (dashboard, edit) => {
     this.setState({ isFlyoutVisible: true });
     this.setState({ edit });
-    if (dashboard) {
+    if (!dashboard) {
       defaultTask.dashboardId = this.props.dashboards[0].id;
     }
     this.setState({ currentTask: JSON.parse(JSON.stringify(dashboard || defaultTask)) });
@@ -57,7 +64,6 @@ export class Flyout extends Component {
   }
 
   onChangeDashboard = event => {
-    console.log(event.target.value)
     const currentTask = { ...this.state.currentTask };
     currentTask.dashboardId = event.target.value;
     this.setState({ currentTask });
@@ -85,13 +91,19 @@ export class Flyout extends Component {
     if (capabilities.get().ezmesure_reporting.save) {
       const { edit, currentTask } = this.state;
 
-      this.close();
-
       if (edit) {
-        return this.props.editTaskHandler(currentTask);
+        this.props.editTaskHandler(currentTask).catch((err) => addToast(
+          'Error',
+          err.data.errors.details[0].message,
+          'danger'
+        ));
       }
 
-      return this.props.saveTaskHandler(currentTask);
+      this.props.saveTaskHandler(currentTask).catch((err) => addToast(
+        'Error',
+        err.data.errors.details[0].message,
+        'danger'
+      ));
     }
   }
 

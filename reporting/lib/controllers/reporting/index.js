@@ -31,7 +31,7 @@ const validate = {
     dashboardId: Joi.string().guid().required(),
     space: Joi.string(),
     frequency: Joi.string().required(),
-    emails: Joi.string().required(),
+    emails: Joi.string().email({ multiple: true }).required(),
     print: Joi.boolean().required(),
   },
 };

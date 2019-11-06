@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { index, kibana } = require('config');
+const { index, kibana, smtp } = require('config');
 const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
@@ -46,50 +46,60 @@ module.exports = async () => {
         const source = task._source;
 
         try {
-          const pdf = await puppeteer(source.dashboardId, source.space || null, source.frequency, source.print);
+          logger.info(`Starting reporting task : #${task._id}`);
 
-          if (pdf) {
-            let currentDate = new Date();
+          const dashboard = await getDashboard(source.dashboardId, source.space);
 
-            const dashboard = await getDashboard(source.dashboardId, source.space);
+          if (!dashboard) {
+            logger.warn(`Dashboard not found or removed (id: ${source.dashboardId}) : #${task._id}`);
+          }
 
-            const shortenUrl = `${kibana.external}/${source.space ? `s/${source.space}`: ''}app/kibana#/dashboard/${source.dashboardId}`;
+          if (dashboard) {
+            const pdf = await puppeteer(source.dashboardId, source.space || null, source.frequency, source.print);
 
-            await sendMail({
-              to: source.emails,
-              subject: 'Reporting ezMESURE',
-              attachments: [
-                {
-                  contentType: 'application/pdf',
-                  filename: `reporting_ezMESURE_${source.dashboardId}_${currentDate.toISOString()}.pdf`,
-                  content: pdf,
-                  cid: task.dashboardId,
+            if (pdf) {
+              let currentDate = new Date();
+
+              const shortenUrl = `${kibana.external}/${source.space ? `s/${source.space}/`: ''}app/kibana#/dashboard/${source.dashboardId}`;
+
+              logger.info(`Sending mail : #${task._id}`);
+              await sendMail({
+                from: smtp.sender,
+                to: source.emails,
+                subject: 'Reporting ezMESURE',
+                attachments: [
+                  {
+                    contentType: 'application/pdf',
+                    filename: `reporting_ezMESURE_${source.dashboardId}_${currentDate.toISOString()}.pdf`,
+                    content: pdf,
+                    cid: task.dashboardId,
+                  },
+                ],
+                ...generateMail('reporting', {
+                  reportingDate: moment().locale('fr').format('dddd Do MMMM YYYY'),
+                  title: dashboard._source.dashboard.title || '',
+                  frequency: frequencies[i].fr.toLowerCase(),
+                  shortenUrl,
+                }),
+              });
+
+              currentDate.setHours(12, 0, 0, 0);
+
+              source.sentAt = currentDate;
+
+              await elastic.update({
+                index,
+                id: task._id,
+                body: {
+                  doc: {
+                    ...source,
+                  },
                 },
-              ],
-              ...generateMail('reporting', {
-                reportingDate: moment().locale('fr').format('dddd Do MMMM YYYY'),
-                title: dashboard._source.dashboard.title || '',
-                frequency: frequencies[i].fr.toLowerCase(),
-                shortenUrl,
-              }),
-            });
-
-            currentDate.setHours(12, 0, 0, 0);
-
-            source.sentAt = currentDate;
-
-            await elastic.update({
-              index,
-              id: task._id,
-              body: {
-                doc: {
-                  ...source,
-                },
-              },
-            });
+              });
+            }
           }
         } catch (e) {
-          logger.error(`Error on task : ${task._id}`);
+          logger.error(`Error on task : #${task._id}`);
           logger.error(e);
         }
       }
