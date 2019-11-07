@@ -162,4 +162,5 @@ services:
       - elastic
     volumes:
       - "./templates:/usr/src/app/templates"
+      - "./reporting/logs:/usr/src/app/logs"
     restart: unless-stopped

@@ -91,6 +91,7 @@ services:
     ports:
       - 4000:3000
     volumes:
+      - "./reporting/logs:/usr/src/app/logs"
       - "./reporting:/usr/src/app"
       - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app

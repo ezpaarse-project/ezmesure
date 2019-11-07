@@ -11,7 +11,7 @@ const reporting = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
 
-moment().locale('en');
+moment().locale('fr');
 
 const job = new CronJob(cron, () => {
   reporting();
