@@ -12,9 +12,9 @@
   },
   "smtp": {
     "host": "REPORTING_SMTP_HOST",
-    "port": "REPORTING_SMTP_PORT",
-    "sender": "REPORTING_SENDER"
+    "port": "REPORTING_SMTP_PORT"
   },
+  "sender": "REPORTING_SENDER",
   "cron": "REPORTING_CRON",
   "index": "REPORTING_INDEX",
   "frequencies": {

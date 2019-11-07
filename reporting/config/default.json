@@ -12,9 +12,9 @@
   },
   "smtp": {
     "host": "localhost",
-    "port": "25",
-    "sender": "ezREPORTING"
+    "port": 25
   },
+  "sender": "ezmesure-reporting@couperin.org",
   "cron": "0 0 0 * * 1",
   "index": ".ezreporting",
   "frequencies": [

@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { index, kibana, smtp } = require('config');
+const { index, kibana, sender } = require('config');
 const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
@@ -64,7 +64,7 @@ module.exports = async () => {
 
               logger.info(`Sending mail : #${task._id}`);
               await sendMail({
-                from: smtp.sender,
+                from: sender,
                 to: source.emails,
                 subject: 'Reporting ezMESURE',
                 attachments: [
