@@ -24,10 +24,7 @@ module.exports = {
         type: 'text',
       },
       frequency: {
-        type: 'text',
-      },
-      dashboardId: {
-        type: 'text',
+        type: 'keyword',
       },
       print: {
         type: 'boolean',
