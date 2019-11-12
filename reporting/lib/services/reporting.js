@@ -66,7 +66,7 @@ module.exports = async () => {
               await sendMail({
                 from: sender,
                 to: source.emails,
-                subject: 'Reporting ezMESURE',
+                subject: `Reporting ezMESURE - ${dashboard._source.dashboard.title}`,
                 attachments: [
                   {
                     contentType: 'application/pdf',
