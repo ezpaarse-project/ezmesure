@@ -8,6 +8,7 @@ import {
   EuiPageContentHeaderSection,
   EuiTitle,
   EuiButton,
+  EuiEmptyPrompt,
 } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
@@ -24,6 +25,7 @@ export class Main extends React.Component {
       tasks: [],
       dashboards: [],
       frequencies: [],
+      errors: false,
     };
   }
 
@@ -36,11 +38,21 @@ export class Main extends React.Component {
       this.setState({ dashboards: res.data.dashboards });
 
       this.setState({ frequencies: res.data.frequencies });
-    }).catch(() => addToast(
-      'Error',
-      <FormattedMessage id="ezmesureReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
-      'danger'
-    ));
+    }).catch((err) => {
+      this.setState({ errors: true });
+      if (err.data.error) {
+        return addToast(
+          'Error',
+          <FormattedMessage id="ezmesureReporting.noRights" defaultMessage="You have no rights to access this page." />,
+          'danger'
+        )
+      }
+      return addToast(
+        'Error',
+        <FormattedMessage id="ezmesureReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
+        'danger'
+      )
+    });
   }
 
   editTaskHandler = task => {
@@ -68,7 +80,7 @@ export class Main extends React.Component {
           'success',
         );
 
-        this.closeFlyOut();
+        closeFlyOut();
         this.forceUpdate();
       })
     }
@@ -101,7 +113,7 @@ export class Main extends React.Component {
           'success',
         );
 
-        this.closeFlyOut();
+        closeFlyOut();
         this.forceUpdate();
       });
     }
@@ -141,7 +153,24 @@ export class Main extends React.Component {
   }
 
   render() {
-    const { tasks, dashboards, frequencies } = this.state;  
+    const { tasks, dashboards, frequencies, errors } = this.state;  
+
+    if (errors) {
+      return (
+        <EuiEmptyPrompt
+          iconType="reportingApp"
+          title={<h2><FormattedMessage id="ezmesureReporting.accessDeniedTitle" defaultMessage="Access denied" /></h2>}
+          body={
+            <Fragment>
+              <p>
+                <FormattedMessage id="ezmesureReporting.accessDenied" defaultMessage="You are not authorized to access Reporting. To use Reporting management, you need the privileges granted by the `reporting` role." />,
+              </p>
+              <p></p>
+            </Fragment>
+          }
+        />
+      );
+    }
 
     let createBtn;
     if (capabilities.get().ezmesure_reporting.create) {

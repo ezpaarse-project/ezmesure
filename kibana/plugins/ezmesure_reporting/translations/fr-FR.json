@@ -87,6 +87,7 @@
     "ezmesureReporting.creating": "Créer",
     "ezmesureReporting.remove": "Supprimer",
     "ezmesureReporting.createdAt": "Date de création",
+    "ezmesureReporting.sentAt": "Date d'envoi",
     "ezmesureReporting.receiversEmails": "Adresses électroniques des destinataires",
     "ezmesureReporting.reportingTask": "une tâche de reporting",
     "ezmesureReporting.editingSuccess": "Tâche éditée avec siccès",
@@ -96,6 +97,11 @@
     "ezmesureReporting.removalSuccess": "Tâche supprimée avec succès.",
     "ezmesureReporting.removalError": "Une erreur s'est produite lors de la suppression de la tâche.",
     "ezmesureReporting.optimizedForPrinting": "Optimisé pour l'impression",
-    "ezmesureReporting.privilegesTooltip": "The user should have the rights to perform actions."
+    "ezmesureReporting.privilegesTooltip": "L'utilisateur doit avoir le droit d'effectuer des actions.",
+    "ezmesureReporting.dashboardNotFound": "Le tableau de bord n'a pas été trouvé ou supprimé (id : {dashboardId}).",
+    "ezmesureReporting.errorOccured": "Une erreur s'est produite pendant le chargement des données.",
+    "ezmesureReporting.noRights": "Vous n'avez aucun droit d'accès à cette page.",
+    "ezmesureReporting.accessDeniedTitle": "Accès refusé",
+    "ezmesureReporting.accessDenied": "Vous n'êtes pas autorisé à accéder au Reporting. Pour utiliser le Reporting, vous avez besoin des privilèges accordés par le rôle `reporting`."
   }
 }

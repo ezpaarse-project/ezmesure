@@ -92,14 +92,14 @@ export class Flyout extends Component {
       const { edit, currentTask } = this.state;
 
       if (edit) {
-        this.props.editTaskHandler(currentTask).catch((err) => addToast(
+        return this.props.editTaskHandler(currentTask).catch((err) => addToast(
           'Error',
           err.data.errors.details[0].message,
           'danger'
         ));
       }
 
-      this.props.saveTaskHandler(currentTask).catch((err) => addToast(
+      return this.props.saveTaskHandler(currentTask).catch((err) => addToast(
         'Error',
         err.data.errors.details[0].message,
         'danger'

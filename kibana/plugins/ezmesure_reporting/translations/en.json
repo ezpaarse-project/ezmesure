@@ -87,6 +87,7 @@
     "ezmesureReporting.creating": "Creating",
     "ezmesureReporting.remove": "Delete",
     "ezmesureReporting.createdAt": "Creation date",
+    "ezmesureReporting.sentAt": "Sending date",
     "ezmesureReporting.receiversEmails": "Receivers' email addresses",
     "ezmesureReporting.reportingTask": "a reporting task",
     "ezmesureReporting.editingSuccess": "Task editing successfully.",
@@ -96,7 +97,12 @@
     "ezmesureReporting.removalSuccess": "Task removed successfully.",
     "ezmesureReporting.removalError": "An error occurred during the removal of the task.",
     "ezmesureReporting.optimizedForPrinting": "Optimized for printing",
-    "ezmesureReporting.privilegesTooltip": "User should also be granted the appropriate Elasticsearch cluster and index privileges"
+    "ezmesureReporting.privilegesTooltip": "User should also be granted the appropriate Elasticsearch cluster and index privileges",
+    "ezmesureReporting.dashboardNotFound": "Dashboard not found or removed (id: {dashboardId}).",
+    "ezmesureReporting.errorOccured": "An error occurred while loading the data.",
+    "ezmesureReporting.noRights": "You have no rights to access this page.",
+    "ezmesureReporting.accessDeniedTitle": "Acess denied",
+    "ezmesureReporting.accessDenied": "You are not authorized to access Reporting. To use Reporting, you need the privileges granted by the `reporting` role."
   }
 }
   

@@ -5,11 +5,41 @@ const route = router();
 const { Joi } = router;
 const bodyParser = require('koa-bodyparser');
 
-const { list, store, update, del, report } = require('./reporting');
+const { list, store, update, del } = require('./reporting');
+const { index } = require('config');
+const elastic = require('../../services/elastic');
 
 const app = new Koa();
 
-route.get('/tasks/:space?', list);
+const hasPrivileges = (privileges) => {
+  return async (ctx, next) => {
+    const { user } = ctx.query;
+
+    const { body: perm } = await elastic.security.hasPrivileges({
+      user,
+      body: {
+        index: [{ names: [index], privileges: privileges }],
+      },
+    }, {
+      headers: { 'es-security-runas-user': user },
+    });
+    
+    let canMakeAction = false;
+    for (let privilege of privileges) {
+      canMakeAction = perm.index[index][privilege];
+    }
+
+    if (canMakeAction) {
+      await next();
+    }
+  
+    if (!canMakeAction) {
+      return ctx.throw(403, `You have no rights to access this page.`);
+    }
+  }
+};
+
+route.get('/tasks/:space?', hasPrivileges(['read']), list);
 
 route.delete('/tasks/:taskId?', {
   validate: {
@@ -19,7 +49,7 @@ route.delete('/tasks/:taskId?', {
       taskId: Joi.string().required(),
     },
   },
-}, del);
+}, hasPrivileges(['write', 'read']), del);
 
 app.use(bodyParser());
 
@@ -36,7 +66,7 @@ const validate = {
   },
 };
 
-route.post('/tasks', { validate }, store);
+route.post('/tasks', { validate }, hasPrivileges(['write', 'read']), store);
 
 route.patch('/tasks/:taskId?', {
   validate: {
@@ -45,7 +75,7 @@ route.patch('/tasks/:taskId?', {
       taskId: Joi.string().required(),
     },
   },
-}, update);
+}, hasPrivileges(['write', 'read']), update);
 
 app.use(route.middleware());
 

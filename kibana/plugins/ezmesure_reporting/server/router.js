@@ -7,7 +7,11 @@ export default function (server, apiUrl) {
       handler: {
         proxy: {
           mapUri: request => {
-            return { uri: `${apiUrl}/${request.params.path || ''}` };
+            if (!request) return;
+            if (!request.auth) return;
+            if (!request.auth.credentials) return;
+
+            return { uri: `${apiUrl}/${request.params.path || ''}?user=${request.auth.credentials.username}` };
           },
         },
       },
