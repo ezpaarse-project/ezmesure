@@ -176,12 +176,13 @@ function readStream(stream, index, username, splittedFields) {
         }
         return columns;
       },
-      relax_column_count: true,
+      'skip_empty_lines: true': true,
+      'relax_column_count': true
     });
 
     parser.on('readable', read);
-    parser.on('error', (err) => { reject(err); });
-    parser.on('finish', () => {
+    parser.on('error', err => { reject(err); });
+    parser.on('end', () => {
       doneReading = true;
       if (busy) { return; }
 

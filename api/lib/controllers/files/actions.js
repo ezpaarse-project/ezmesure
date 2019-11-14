@@ -135,7 +135,8 @@ exports.deleteMany = async function (ctx) {
 function validateFile(filePath) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
-    const readLimit = 50;
+    let emptyLines = 0;
+    let readLimit = 50;
     let columns;
     let err;
 
@@ -148,12 +149,18 @@ function validateFile(filePath) {
     Papa.parse(stream, {
       delimiter: ';',
       complete: () => resolve(err),
-      error: (error) => reject(error),
-      step: ({ data, errors }, parser) => {
-        if (++lineNumber > readLimit) {
+      error: error => reject(error),
+      step: ({ data: row, errors }, parser) => {
+        lineNumber += 1;
+
+        if (row.filter(f => f.trim()).length === 0) {
+          emptyLines += 1;
+          return;
+        }
+
+        if ((lineNumber - emptyLines) > readLimit) {
           return parser.abort();
         }
-        const row = data[0];
 
         if (errors.length > 0) {
           err = errors[0];
