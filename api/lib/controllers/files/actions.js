@@ -9,7 +9,9 @@ const validator = require('../../services/validator');
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
 
-exports.upload = async function (ctx, fileName) {
+exports.upload = async function (ctx) {
+  let { fileName } = ctx.request.params;
+
   ctx.action = 'file/upload';
 
   if (!/\.(csv|gz)$/i.test(fileName)) {
@@ -77,7 +79,8 @@ exports.list = async function (ctx) {
   ctx.body = fileList;
 };
 
-exports.deleteOne = async function (ctx, fileName) {
+exports.deleteOne = async function (ctx) {
+  const { fileName } = ctx.request.params;
   ctx.action = 'file/delete';
   const { username, email } = ctx.state.user;
 
@@ -106,7 +109,8 @@ exports.deleteMany = async function (ctx) {
   }
 
   const domain = email.split('@')[1];
-  const body = ctx.request.body;
+  const { body } = ctx.request;
+  console.log(body);
   const fileNames = body && body.entries;
 
   if (!fileNames) {

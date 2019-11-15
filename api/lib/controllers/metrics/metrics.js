@@ -3,7 +3,7 @@ const elastic = require('../../services/elastic');
 /**
  * Return global aggregated metrics
  */
-exports.overall = async function (ctx, index) {
+exports.overall = async function (ctx) {
   ctx.type = 'json';
 
   const { body: result } = await elastic.search({

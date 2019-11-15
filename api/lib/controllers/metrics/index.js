@@ -1,10 +1,7 @@
-const Koa = require('koa');
-const route = require('koa-route');
+const router = require('koa-joi-router')();
 
 const { overall } = require('./metrics');
 
-const app = new Koa();
+router.get('/', overall);
 
-app.use(route.get('/', overall));
-
-module.exports = app;
+module.exports = router;

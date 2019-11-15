@@ -1,18 +1,19 @@
-const Koa = require('koa');
-const route = require('koa-route');
+const router = require('koa-joi-router')();
 const bodyParser = require('koa-bodyparser');
+
+const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
 
 const {
   list, deleteOne, deleteMany, upload,
 } = require('./actions');
 
-const app = new Koa();
+router.use(requireJwt, requireUser, requireTermsOfUse);
 
-app.use(route.get('/', list));
-app.use(route.put('/:fileName', upload));
-app.use(route.delete('/:fileName', deleteOne));
+router.get('/', list);
+router.put('/:fileName', upload);
+router.delete('/:fileName', deleteOne);
 
-app.use(bodyParser());
-app.use(route.post('/delete_batch', deleteMany));
+router.use(bodyParser());
+router.post('/delete_batch', deleteMany);
 
-module.exports = app;
+module.exports = router;

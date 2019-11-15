@@ -14,11 +14,15 @@ const { appLogger } = require('../../../server');
 const storagePath = config.get('storage.path');
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
 
-module.exports = async function upload(ctx, index) {
+module.exports = async function upload(ctx) {
+  const { index } = ctx.request.params;
+
   ctx.action = 'indices/insert';
-  ctx.index = index;
+  ctx.index = ctx.request.params.index;
+
   const { username, email } = ctx.state.user;
   const { query } = ctx.request;
+
   const { body: perm } = await elastic.security.hasPrivileges({
     username,
     body: {

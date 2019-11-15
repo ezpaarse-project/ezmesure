@@ -13,7 +13,8 @@ exports.list = async function (ctx) {
   ctx.body = body;
 };
 
-exports.deleteIndice = async function (ctx, index) {
+exports.deleteIndice = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'indices/delete';
   ctx.index = index;
   const { username } = ctx.state.user;
@@ -41,7 +42,8 @@ exports.deleteIndice = async function (ctx, index) {
   ctx.body = body;
 };
 
-exports.deleteEvents = async function (ctx, index) {
+exports.deleteEvents = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'events/delete';
   ctx.index = index;
   const { username } = ctx.state.user;
@@ -87,7 +89,8 @@ exports.deleteEvents = async function (ctx, index) {
 /**
  * Return aggregated metrics for a given index pattern
  */
-exports.tops = async function (ctx, index) {
+exports.tops = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'indices/tops';
   ctx.type = 'json';
   ctx.index = index;
@@ -98,9 +101,9 @@ exports.tops = async function (ctx, index) {
   const currentMonth = now.getMonth();
   const currentDate = now.getDate();
 
-  let size = parseInt(ctx.query.size);
+  let size = Number.parseInt(ctx.query.size, 10);
 
-  if (isNaN(size)) {
+  if (Number.isNaN(size)) {
     size = 10;
   } else {
     size = Math.min(Math.abs(size), 50);
