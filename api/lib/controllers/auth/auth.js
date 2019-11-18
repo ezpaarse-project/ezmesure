@@ -14,7 +14,7 @@ exports.renaterLogin = async function (ctx) {
   const props   = {
     full_name: decode(headers.displayname || headers.cn || headers.givenname),
     email:     decode(headers.mail),
-    roles: [],
+    roles: ['new_user'],
     metadata: {
       idp:          headers['shib-identity-provider'],
       uid:          headers.uid,
