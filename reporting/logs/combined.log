@@ -626,3 +626,54 @@
 2019-11-19T09:03:40.407Z [32minfo[39m: reporting/list
 2019-11-19T09:03:48.126Z [32minfo[39m: reporting/store
 2019-11-19T09:03:53.648Z [32minfo[39m: reporting/delete
+2019-11-19T09:05:05.555Z [32minfo[39m: reporting/store
+2019-11-19T09:05:10.965Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:05:29.862Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:06:15.087Z [32minfo[39m: API server listening on port 3000
+2019-11-19T09:06:15.089Z [32minfo[39m: Press CTRL+C to stop server
+2019-11-19T09:07:10.050Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:07:26.506Z [31merror[39m: Error on task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:07:26.506Z [31merror[39m: Cannot create property 'Symbol(level)' on string 'Saving pdf file : tmp/_fzogm4BCaWuWmaHgHAU_auto_1574154446505.pdf'
+2019-11-19T09:08:10.031Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:08:26.400Z [31merror[39m: Error on task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:08:26.400Z [31merror[39m: Cannot create property 'Symbol(level)' on string 'Saving pdf file : tmp/_fzogm4BCaWuWmaHgHAU_auto_1574154506400.pdf'
+2019-11-19T09:09:10.033Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:09:15.973Z [32minfo[39m: API server listening on port 3000
+2019-11-19T09:09:15.975Z [32minfo[39m: Press CTRL+C to stop server
+2019-11-19T09:10:10.039Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:10:26.559Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:11:10.026Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:11:26.268Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:12:10.029Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:12:26.332Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:13:10.110Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:13:26.586Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:13:40.443Z [32minfo[39m: API server listening on port 3000
+2019-11-19T09:13:40.445Z [32minfo[39m: Press CTRL+C to stop server
+2019-11-19T09:14:10.028Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:14:26.290Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:15:03.520Z [32minfo[39m: API server listening on port 3000
+2019-11-19T09:15:03.522Z [32minfo[39m: Press CTRL+C to stop server
+2019-11-19T09:15:10.025Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:15:26.712Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:15:32.627Z [32minfo[39m: API server listening on port 3000
+2019-11-19T09:15:32.629Z [32minfo[39m: Press CTRL+C to stop server
+2019-11-19T09:16:10.036Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:16:26.638Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:17:10.039Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:17:26.568Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:18:10.035Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:18:26.175Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:19:10.023Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:19:26.549Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:20:10.035Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:20:26.456Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:21:10.035Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:21:26.172Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:22:10.034Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:22:26.512Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:23:10.033Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:23:26.130Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:24:10.037Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:24:26.525Z [32minfo[39m: Sending mail : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:25:10.024Z [32minfo[39m: Starting reporting task : #_fzogm4BCaWuWmaHgHAU

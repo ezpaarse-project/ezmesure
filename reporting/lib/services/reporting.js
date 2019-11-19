@@ -61,8 +61,8 @@ module.exports = async () => {
 
             if (pdf) {
               let currentDate = new Date();
-
-              // const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
+console.log(pdf)
+              const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
               // logger.log(`Saving pdf file : tmp/${pdfName}`);
               // fs.createWriteStream(path.resolve('tmp', pdfName));
 

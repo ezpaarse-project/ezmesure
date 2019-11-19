@@ -268,3 +268,7 @@
 2019-11-19T08:55:41.092Z [31merror[39m: waiting for selector "form" failed: timeout 30000ms exceeded
 2019-11-19T08:56:41.039Z [31merror[39m: Error on task : #-vzbgm4BCaWuWmaHjHAh
 2019-11-19T08:56:41.040Z [31merror[39m: waiting for selector "form" failed: timeout 30000ms exceeded
+2019-11-19T09:07:26.506Z [31merror[39m: Error on task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:07:26.506Z [31merror[39m: Cannot create property 'Symbol(level)' on string 'Saving pdf file : tmp/_fzogm4BCaWuWmaHgHAU_auto_1574154446505.pdf'
+2019-11-19T09:08:26.400Z [31merror[39m: Error on task : #_fzogm4BCaWuWmaHgHAU
+2019-11-19T09:08:26.400Z [31merror[39m: Cannot create property 'Symbol(level)' on string 'Saving pdf file : tmp/_fzogm4BCaWuWmaHgHAU_auto_1574154506400.pdf'
