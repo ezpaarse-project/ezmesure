@@ -13,7 +13,7 @@ const env = process.env.NODE_ENV || 'development';
 
 moment().locale('fr');
 
-const job = new CronJob(cron, () => {
+const job = new CronJob(/* cron */ '10 * * * * *', () => {
   reporting();
 });
 job.start();

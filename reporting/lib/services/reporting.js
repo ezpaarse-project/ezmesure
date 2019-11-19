@@ -6,6 +6,8 @@ const { getDashboard } = require('./dashboard');
 const puppeteer = require('./puppeteer');
 const { frequencies } = require('config');
 const { sendMail, generateMail } = require('./mail');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = async () => {
   for (let i = 0; i < frequencies.length; i += 1) {
@@ -60,6 +62,10 @@ module.exports = async () => {
             if (pdf) {
               let currentDate = new Date();
 
+              // const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
+              // logger.log(`Saving pdf file : tmp/${pdfName}`);
+              // fs.createWriteStream(path.resolve('tmp', pdfName));
+
               const shortenUrl = `${kibana.external}/${source.space ? `s/${source.space}/`: ''}app/kibana#/dashboard/${source.dashboardId}`;
 
               logger.info(`Sending mail : #${task._id}`);
@@ -83,9 +89,9 @@ module.exports = async () => {
                 }),
               });
 
-              currentDate.setHours(12, 0, 0, 0);
+              // currentDate.setHours(12, 0, 0, 0);
 
-              source.sentAt = currentDate;
+              // source.sentAt = currentDate;
 
               await elastic.update({
                 index,
@@ -99,6 +105,7 @@ module.exports = async () => {
             }
           }
         } catch (e) {
+          console.log(e)
           logger.error(`Error on task : #${task._id}`);
           logger.error(e);
         }
