@@ -61,7 +61,7 @@ module.exports = async () => {
 
             if (pdf) {
               let currentDate = new Date();
-console.log(pdf)
+
               const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
               // logger.log(`Saving pdf file : tmp/${pdfName}`);
               // fs.createWriteStream(path.resolve('tmp', pdfName));
@@ -89,9 +89,9 @@ console.log(pdf)
                 }),
               });
 
-              // currentDate.setHours(12, 0, 0, 0);
+              currentDate.setHours(12, 0, 0, 0);
 
-              // source.sentAt = currentDate;
+              source.sentAt = currentDate;
 
               await elastic.update({
                 index,
