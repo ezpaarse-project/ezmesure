@@ -6,6 +6,8 @@ import {
   EuiLink,
   EuiTextColor,
   EuiIcon,
+  EuiText,
+  EuiToolTip,
 } from '@elastic/eui';
 import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT, CENTER_ALIGNMENT } from '@elastic/eui/lib/services';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -68,11 +70,26 @@ export class Table extends Component {
       {
         name: <FormattedMessage id="ezmesureReporting.dashboard" defaultMessage="Dashboard" />,
         description: <FormattedMessage id="ezmesureReporting.dashboardName" defaultMessage="Dashboard name" />,
-        render: ({ dashboardId }) => {
+        render: ({ dashboardId, reporting }) => {
           if (dashboardId) {
             const dashboard = dashboards.find(({ id }) => id === dashboardId);
             if (dashboard) {
-              return (<EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>);
+              let printer = '';
+              if (reporting.print) {
+                printer = (
+                  <EuiText>
+                    {''}
+                    <EuiToolTip position="right" content="Optimized for printing">&#128438;</EuiToolTip>
+                  </EuiText>
+                );
+                console.log(printer)
+              }
+              return (
+                <EuiText>
+                  <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>
+                  {printer}
+                </EuiText>
+              );
             }
 
             return (<EuiTextColor color="warning"><EuiIcon type="alert" /> Dashboard not found or removed (id: {dashboardId})</EuiTextColor>);
@@ -135,7 +152,7 @@ export class Table extends Component {
 
           return addToast(
             'Error',
-            <FormattedMessage id="ezmesureReporting.dashboardNotFound" values={{ dashboardId: <b>el.dashboardId</b> }} defaultMessage="Dashboard nof found or remove (id: {dashboardId})" />,
+            <FormattedMessage id="ezmesureReporting.dashboardNotFound" values={{ dashboardId: el.dashboardId }} defaultMessage="Dashboard nof found or remove (id: {dashboardId})" />,
             'danger'
           );
         },

@@ -14,6 +14,7 @@ export const convertDate = (date) => {
 export const defaultTask = {
   _id: '',
   dashboardId: null,
+  exists: true,
   reporting: {
     frequency: '1w',
     emails: '',

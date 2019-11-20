@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('@koa/cors');
-const { port, cron } = require('config');
+const { port, frequencies } = require('config');
 const { CronJob } = require('cron');
 const moment = require('moment');
 
@@ -13,10 +13,12 @@ const env = process.env.NODE_ENV || 'development';
 
 moment().locale('fr');
 
-const job = new CronJob(cron, () => {
-  reporting();
+frequencies.forEach(frequency => {
+  const job = new CronJob(frequency.cron, () => {
+    reporting(frequency);
+  });
+  job.start();
 });
-job.start();
 
 const app = new Koa();
 

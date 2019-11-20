@@ -15,7 +15,6 @@
     "port": "REPORTING_SMTP_PORT"
   },
   "sender": "REPORTING_SENDER",
-  "cron": "REPORTING_CRON",
   "index": "REPORTING_INDEX",
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",

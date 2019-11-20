@@ -106,7 +106,6 @@ services:
       - REPORTING_SMTP_HOST=maildev
       - REPORTING_SMTP_PORT=25
       - REPORTING_SENDER
-      - REPORTING_CRON
       - REPORTING_INDEX=.ezmesure-reporting
       - REPORTING_FREQUENCIES
       - KIBANA_INTERNAL_URL=https://rp/kibana

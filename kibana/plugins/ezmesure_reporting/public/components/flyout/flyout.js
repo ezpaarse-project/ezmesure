@@ -14,7 +14,7 @@ import {
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { defaultTask } from '../../lib/reporting';
-import { Toast, addToast } from '../toast';
+import { addToast } from '../toast';
 
 let openFlyOutHandler;
 export function openFlyOut(dashboard, edit) {

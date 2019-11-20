@@ -25,7 +25,7 @@ export class Main extends React.Component {
       tasks: [],
       dashboards: [],
       frequencies: [],
-      errors: false,
+      accessDenied: false,
     };
   }
 
@@ -39,13 +39,8 @@ export class Main extends React.Component {
 
       this.setState({ frequencies: res.data.frequencies });
     }).catch((err) => {
-      this.setState({ errors: true });
-      if (err.data.error) {
-        return addToast(
-          'Error',
-          <FormattedMessage id="ezmesureReporting.noRights" defaultMessage="You have no rights to access this page." />,
-          'danger'
-        )
+      if (err.data.code === 403) {
+        this.setState({ accessDenied: true });
       }
       return addToast(
         'Error',
@@ -153,9 +148,9 @@ export class Main extends React.Component {
   }
 
   render() {
-    const { tasks, dashboards, frequencies, errors } = this.state;  
+    const { tasks, dashboards, frequencies, accessDenied } = this.state;  
 
-    if (errors) {
+    if (accessDenied) {
       return (
         <EuiEmptyPrompt
           iconType="reportingApp"
@@ -178,8 +173,8 @@ export class Main extends React.Component {
         <EuiButton
           fill
           iconType="plusInCircle"
-          isDisabled={frequencies.length > 0 ? false : true}
-          onClick={() => frequencies.length > 0 ? openFlyOut(null, false) : null}
+          isDisabled={dashboards.length > 0 ? false : true}
+          onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
         >
           <FormattedMessage id="ezmesureReporting.createNewTask" defaultMessage="Create new reporting task" />
         </EuiButton>

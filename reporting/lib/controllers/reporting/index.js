@@ -34,7 +34,12 @@ const hasPrivileges = (privileges) => {
     }
   
     if (!canMakeAction) {
-      return ctx.throw(403, `You have no rights to access this page.`);
+      ctx.status = 403;
+      ctx.type = 'json';
+      return ctx.body = {
+        error: 'You have no rights to access this page.',
+        code: 403,
+      }
     }
   }
 };

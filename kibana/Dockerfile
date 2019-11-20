@@ -1,4 +1,4 @@
-FROM docker.elastic.co/kibana/kibana:7.4.0
+FROM docker.elastic.co/kibana/kibana:7.4.2
 
 COPY ./plugins /tmp/plugins
 
