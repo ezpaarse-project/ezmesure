@@ -26,7 +26,7 @@ module.exports = async (frequency) => {
               {
                 range: {
                   sentAt: {
-                    lte: `now-${frequency.value}`,
+                    lte: `now-${frequency.value}/${(frequency.value.substr(frequency.value.length - 1))}`,
                   },
                 },
               },
