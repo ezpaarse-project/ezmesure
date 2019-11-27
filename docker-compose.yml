@@ -162,4 +162,5 @@ services:
     volumes:
       - "./templates:/usr/src/app/templates"
       - "./reporting/logs:/usr/src/app/logs"
+      - "./reporting/tmp:/usr/src/app/tmp"
     restart: unless-stopped

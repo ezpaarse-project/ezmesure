@@ -92,6 +92,7 @@ services:
       - 4000:3000
     volumes:
       - "./reporting/logs:/usr/src/app/logs"
+      - "./reporting/tmp:/usr/src/app/tmp"
       - "./reporting:/usr/src/app"
       - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
