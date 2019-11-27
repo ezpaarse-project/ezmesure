@@ -1,4 +1,4 @@
-const { index, frequencies } = require('config');
+const { index, frequencies, reportingName } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/reporting-template');
@@ -152,7 +152,7 @@ exports.list = async (ctx) => {
     }
   }
 
-  ctx.body = { tasks, dashboards, frequencies };
+  ctx.body = { tasks, dashboards, frequencies, reportingName };
 };
 
 exports.store = async (ctx) => {

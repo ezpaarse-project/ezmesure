@@ -23,7 +23,7 @@ const hasPrivileges = (privileges) => {
     }, {
       headers: { 'es-security-runas-user': user },
     });
-    
+
     let canMakeAction = false;
     for (let privilege of privileges) {
       canMakeAction = perm.index[index][privilege];
@@ -32,14 +32,14 @@ const hasPrivileges = (privileges) => {
     if (canMakeAction) {
       await next();
     }
-  
+
     if (!canMakeAction) {
       ctx.status = 403;
       ctx.type = 'json';
-      return ctx.body = {
+      ctx.body = {
         error: 'You have no rights to access this page.',
         code: 403,
-      }
+      };
     }
   }
 };
@@ -54,7 +54,7 @@ route.delete('/tasks/:taskId?', {
       taskId: Joi.string().required(),
     },
   },
-}, hasPrivileges(['write', 'read']), del);
+}, hasPrivileges(['write', 'read', 'delete']), del);
 
 app.use(bodyParser());
 

@@ -1,4 +1,5 @@
 {
+  "reportingName": "REPORTING_NAME",
   "port": "REPORTING_PORT",
   "kibana": {
     "internal": "KIBANA_INTERNAL_URL",
