@@ -1,6 +1,6 @@
 # ezMESURE
 
-Platform aggregating electronic ressources usage statistics for the French reasearcher organizations.
+Platform aggregating electronic ressources usage statistics for the French researcher organizations.
 https://ezmesure.couperin.org
 
 ## Prerequisites
@@ -82,7 +82,7 @@ Navigate to https://localhost/myspace and log in with your identity provider. Th
 
 ### Get your authentication token
 
-An authentication token is required in order to use the API. Once logged, grab your token in the authentication tab.
+An authentication token is required in order to use the API. Once logged, grab your token from the authentication tab.
 
 To use your token, add the following header to your requests: `Authorization: Bearer <token>` (replace `<token>` with your actual token)
 
