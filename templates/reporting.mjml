@@ -10,7 +10,7 @@
   <mj-column>
     <mj-text>
       <p>Bonjour,</p>
-      <p>Vous trouverez ci-joint le rapport {{ frequency }} du tableau de bord <strong>{{ title }}</strong> du <strong>{{ reportingDate }}</strong>.</p>
+      <p>Vous trouverez ci-joint le rapport <strong>{{ frequency }}</strong>{{ optimizedForPrinting }} du tableau de bord <strong>{{ title }}</strong> du <strong>{{ reportingDate }}</strong>.</p>
       <p>Ceci est un email envoyé automatiquement par l'application ezMESURE.</p>
       <p>Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.</p>
     </mj-text>

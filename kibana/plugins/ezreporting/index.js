@@ -6,17 +6,17 @@ export default function (kibana) {
   return new kibana.Plugin({
     require: ['kibana', 'elasticsearch', 'xpack_main'],
 
-    id: 'ezmesure_reporting',
+    id: 'ezreporting',
 
-    configPrefix: 'ezmesure.reporting',
+    configPrefix: 'ezreporting.app',
 
-    name: 'ezmesure_reporting',
+    name: 'ezreporting',
 
     uiExports: {
       app: {
-        title: 'Reporting ezMESURE',
-        description: 'Reporting ezMESURE',
-        main: 'plugins/ezmesure_reporting/app',
+        title: process.env.REPORTING_NAME || 'Reporting',
+        description: process.env.REPORTING_NAME || 'Reporting',
+        main: 'plugins/ezreporting/app',
         euiIconType: 'reportingApp',
       },
     },
@@ -28,18 +28,18 @@ export default function (kibana) {
     },
 
     init(server) {
-      server.log(['status', 'info', 'ezmesure_reporting:plugin'], 'ezmesure_reporting Initializing...');
+      server.log(['status', 'info', 'ezreporting:plugin'], 'ezreporting Initializing...');
 
       server.plugins.xpack_main.registerFeature({
-        id: 'ezmesure_reporting',
-        name: 'Reporting ezMESURE',
+        id: 'ezreporting',
+        name: process.env.REPORTING_NAME || 'Reporting',
         icon: 'reportingApp',
-        app: ['ezmesure_reporting', 'kibana'],
-        catalogue: ['ezmesure_reporting'],
-        navLinkId: 'ezmesure_reporting',
+        app: ['ezreporting', 'kibana'],
+        catalogue: ['ezreporting'],
+        navLinkId: 'ezreporting',
         privileges: {
           all: {
-            api: ['ezmesure_reporting'],
+            api: ['ezreporting'],
             savedObject: {
               all: [],
               read: [],
@@ -47,7 +47,7 @@ export default function (kibana) {
             ui: ['create', 'edit', 'save', 'delete', 'show'],
           },
           read: {
-            api: ['ezmesure_reporting'],
+            api: ['ezreporting'],
             savedObject: {
               all: [],
               read: [],
@@ -55,9 +55,6 @@ export default function (kibana) {
             ui: ['show'],
           },
         },
-        privilegesTooltip: i18n.translate('ezmesureReporting.privilegesTooltip', {
-          defaultMessage: 'The user should have the rights to perform actions.',
-        }),
       });
 
       router(server, process.env.REPORTING_URL || 'http://localhost:3000');

@@ -88,7 +88,7 @@ export class Flyout extends Component {
   }
 
   saveOrUpdate = () => {
-    if (capabilities.get().ezmesure_reporting.save) {
+    if (capabilities.get().ezreporting.save) {
       const { edit, currentTask } = this.state;
 
       if (edit) {
@@ -116,7 +116,7 @@ export class Flyout extends Component {
     let options = dashboards.map(dashboard => ({ value: dashboard.id, text: dashboard.name }));
 
     let saveBtn;
-    if (capabilities.get().ezmesure_reporting.save) {
+    if (capabilities.get().ezreporting.save) {
       saveBtn = (<EuiFormRow fullWidth={true}>
         <EuiButton
           fill
@@ -124,15 +124,15 @@ export class Flyout extends Component {
           type="submit"
           onClick={() => this.saveOrUpdate()}
         >
-          <FormattedMessage id="ezmesureReporting.save" defaultMessage="Save" />
+          <FormattedMessage id="ezReporting.save" defaultMessage="Save" />
         </EuiButton>
       </EuiFormRow>);
     }
 
     if (isFlyoutVisible) {
-      let title = <FormattedMessage id="ezmesureReporting.creating" defaultMessage="Creating" />;
+      let title = <FormattedMessage id="ezReporting.creating" defaultMessage="Creating" />;
       if (edit) {
-        title = <FormattedMessage id="ezmesureReporting.editing" defaultMessage="Editing" />;
+        title = <FormattedMessage id="ezReporting.editing" defaultMessage="Editing" />;
       }
       flyOutRender = (
         <EuiFlyout
@@ -142,7 +142,7 @@ export class Flyout extends Component {
         >
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size="m">
-              <h2>{ title } <FormattedMessage id="ezmesureReporting.reportingTask" defaultMessage="a reporting task" /></h2>
+              <h2>{ title } <FormattedMessage id="ezReporting.reportingTask" defaultMessage="a reporting task" /></h2>
             </EuiTitle>
           </EuiFlyoutHeader>
 
@@ -150,14 +150,14 @@ export class Flyout extends Component {
             <EuiForm isInvalid={errors.show} error={errors.messages}>
               <EuiFormRow
                 fullWidth={true}
-                label={<FormattedMessage id="ezmesureReporting.dashboard" defaultMessage="Dashboard" />}
+                label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
                 isInvalid={edit ? false : errors.show}
               >
                 <EuiSelect
                   fullWidth={true}
                   options={options}
                   value={currentTask.dashboardId}
-                  aria-label={<FormattedMessage id="ezmesureReporting.dashboard" defaultMessage="Dashboard" />}
+                  aria-label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
                   onChange={this.onChangeDashboard}
                   disabled={edit}
                   isInvalid={edit ? false : errors.show}
@@ -166,14 +166,14 @@ export class Flyout extends Component {
 
               <EuiFormRow
                 fullWidth={true}
-                label={<FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />}
+                label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
                 isInvalid={errors.show}
               >
                 <EuiSelect
                   fullWidth={true}
                   options={frequencies}
                   value={currentTask.reporting.frequency}
-                  aria-label={<FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />}
+                  aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
                   onChange={this.onChangeFrequency}
                   isInvalid={errors.show}
                 />
@@ -181,7 +181,7 @@ export class Flyout extends Component {
 
               <EuiFormRow
                 fullWidth={true}
-                label={<FormattedMessage id="ezmesureReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
+                label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
                 isInvalid={errors.show}
               >
                 <EuiTextArea
@@ -196,7 +196,7 @@ export class Flyout extends Component {
               <EuiFormRow fullWidth={true} >
                 <EuiCheckbox
                   checked={currentTask.reporting.print}
-                  label={<FormattedMessage id="ezmesureReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
+                  label={<FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
                   onChange={this.onChangeLayout}
                 />
               </EuiFormRow>

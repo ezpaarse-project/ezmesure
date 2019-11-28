@@ -1,5 +1,5 @@
 Bonjour,
-Vous trouverez ci-joint le rapport {{ frequency }} du tableau de bord {{ title }} du {{ reportingDate }}.
+Vous trouverez ci-joint le rapport {{ frequency }}{{ optimizedForPrinting }} du tableau de bord {{ title }} du {{ reportingDate }}.
 Ceci est un email envoyé automatiquement par l'application ezMESURE.
 
 Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.

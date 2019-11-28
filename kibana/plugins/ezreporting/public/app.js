@@ -7,7 +7,7 @@ import $jQ from 'jquery';
 import 'ui/autoload/styles';
 import { Main } from './components/main';
 
-const app = uiModules.get('apps/ezmesure');
+const app = uiModules.get('apps/ezreporting');
 
 app.config($locationProvider => {
   $locationProvider.html5Mode({
@@ -33,7 +33,7 @@ function RootController($scope, $element, $http) {
   // render react to DOM
   render(
     <I18nProvider>
-      <Main title="ezmesureReporting" httpClient={$http} space={space} />
+      <Main title="ezReporting" httpClient={$http} space={space} />
     </I18nProvider>,
     domNode
   );
@@ -44,4 +44,4 @@ function RootController($scope, $element, $http) {
   });
 }
 
-chrome.setRootController('ezmesureReporting', RootController);
+chrome.setRootController('ezReporting', RootController);

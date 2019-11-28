@@ -70,10 +70,11 @@ module.exports = async (frequency) => {
             const shortenUrl = `${kibana.external}/${source.space ? `s/${source.space}/`: ''}app/kibana#/dashboard/${source.dashboardId}`;
 
             logger.info(`Sending mail : ${task._id}`);
+
             await sendMail({
               from: sender,
               to: source.emails,
-              subject: `Reporting ezMESURE - ${dashboard._source.dashboard.title}`,
+              subject: `Reporting ezMESURE [${source.print ? 'OI - ' : ''}${moment().format('DD/MM/YYYY')}] - ${dashboard._source.dashboard.title}`,
               attachments: [
                 {
                   contentType: 'application/pdf',
@@ -87,6 +88,7 @@ module.exports = async (frequency) => {
                 title: dashboard._source.dashboard.title || '',
                 frequency: frequency.fr.toLowerCase(),
                 shortenUrl,
+                optimizedForPrinting: source.print ? ' optimisé pour impression' : '',
               }),
             });
 

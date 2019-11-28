@@ -25,6 +25,7 @@ export class Main extends React.Component {
       tasks: [],
       dashboards: [],
       frequencies: [],
+      reportingName: 'Reporting',
       accessDenied: false,
     };
   }
@@ -32,26 +33,28 @@ export class Main extends React.Component {
   componentDidMount = () => {
     const { httpClient, space } = this.props;
 
-    httpClient.get(`../api/ezmesure/reporting/tasks/${space}`).then(res => {
+    httpClient.get(`../api/ezreporting/reporting/tasks/${space}`).then(res => {
       this.setState({ tasks: res.data.tasks });
 
       this.setState({ dashboards: res.data.dashboards });
 
       this.setState({ frequencies: res.data.frequencies });
+
+      this.setState({ reportingName: res.data.reportingName });
     }).catch((err) => {
       if (err.data.code === 403) {
         this.setState({ accessDenied: true });
       }
       return addToast(
         'Error',
-        <FormattedMessage id="ezmesureReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
+        <FormattedMessage id="ezReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
         'danger'
       )
     });
   }
 
   editTaskHandler = task => {
-    if (capabilities.get().ezmesure_reporting.edit) {
+    if (capabilities.get().ezreporting.edit) {
       let reqData = {
         dashboardId: task.dashboardId,
         frequency: task.reporting.frequency,
@@ -62,7 +65,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      return this.props.httpClient.patch(`../api/ezmesure/reporting/tasks/${task._id}`, reqData).then(() => {
+      return this.props.httpClient.patch(`../api/ezreporting/reporting/tasks/${task._id}`, reqData).then(() => {
         const index = this.state.tasks.findIndex(({ _id }) => _id === task._id);
 
         const tasks = this.state.tasks;
@@ -71,7 +74,7 @@ export class Main extends React.Component {
 
         addToast(
           'Success',
-          <FormattedMessage id="ezmesureReporting.editingSuccess" defaultMessage="Task editing successfully." />,
+          <FormattedMessage id="ezReporting.editingSuccess" defaultMessage="Task editing successfully." />,
           'success',
         );
 
@@ -82,7 +85,7 @@ export class Main extends React.Component {
   }
 
   saveTaskHandler = task => {
-    if (capabilities.get().ezmesure_reporting.save) {
+    if (capabilities.get().ezreporting.save) {
       const tasks = this.state.tasks;
 
       let reqData = {
@@ -95,7 +98,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      return this.props.httpClient.post('../api/ezmesure/reporting/tasks', reqData).then(res => {
+      return this.props.httpClient.post('../api/ezreporting/reporting/tasks', reqData).then(res => {
         task._id = res.data._id;
         task.reporting.createdAt = res.data.createdAt;
 
@@ -104,7 +107,7 @@ export class Main extends React.Component {
 
         addToast(
           'Success',
-          <FormattedMessage id="ezmesureReporting.creationSuccess" defaultMessage="Task created successfully." />,
+          <FormattedMessage id="ezReporting.creationSuccess" defaultMessage="Task created successfully." />,
           'success',
         );
 
@@ -115,15 +118,15 @@ export class Main extends React.Component {
   }
 
   removeTaskHandler = task => {
-    if (capabilities.get().ezmesure_reporting.delete) {
+    if (capabilities.get().ezreporting.delete) {
       if (task) {
-        this.props.httpClient.delete(`../api/ezmesure/reporting/tasks/${task._id}`).then(() => {
+        this.props.httpClient.delete(`../api/ezreporting/reporting/tasks/${task._id}`).then(() => {
           const tasks = this.state.tasks.filter(({ _id }) => _id !== task._id);
           this.setState({ tasks });
 
           addToast(
             'Success',
-            <FormattedMessage id="ezmesureReporting.removalSuccess" defaultMessage="Task removed successfully." />,
+            <FormattedMessage id="ezReporting.removalSuccess" defaultMessage="Task removed successfully." />,
             'success',
           );
 
@@ -131,7 +134,7 @@ export class Main extends React.Component {
         }).catch((err) => {
           addToast(
             'Error',
-            <FormattedMessage id="ezmesureReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
+            <FormattedMessage id="ezReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
             'danger'
           );
         });
@@ -140,7 +143,7 @@ export class Main extends React.Component {
       if (!task._id) {
         addToast(
           'Error',
-          <FormattedMessage id="ezmesureReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
+          <FormattedMessage id="ezReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
           'danger'
         );
       }
@@ -148,17 +151,17 @@ export class Main extends React.Component {
   }
 
   render() {
-    const { tasks, dashboards, frequencies, accessDenied } = this.state;  
+    const { tasks, dashboards, frequencies, reportingName, accessDenied } = this.state;  
 
     if (accessDenied) {
       return (
         <EuiEmptyPrompt
           iconType="reportingApp"
-          title={<h2><FormattedMessage id="ezmesureReporting.accessDeniedTitle" defaultMessage="Access denied" /></h2>}
+          title={<h2><FormattedMessage id="ezReporting.accessDeniedTitle" defaultMessage="Access denied" /></h2>}
           body={
             <Fragment>
               <p>
-                <FormattedMessage id="ezmesureReporting.accessDenied" defaultMessage="You are not authorized to access Reporting. To use Reporting management, you need the privileges granted by the `reporting` role." />,
+                <FormattedMessage id="ezReporting.accessDenied" defaultMessage="You are not authorized to access Reporting. To use Reporting management, you need the privileges granted by the `reporting` role." />,
               </p>
               <p></p>
             </Fragment>
@@ -168,7 +171,7 @@ export class Main extends React.Component {
     }
 
     let createBtn;
-    if (capabilities.get().ezmesure_reporting.create) {
+    if (capabilities.get().ezreporting.create) {
       createBtn = (<EuiPageContentHeaderSection>
         <EuiButton
           fill
@@ -176,11 +179,11 @@ export class Main extends React.Component {
           isDisabled={dashboards.length > 0 ? false : true}
           onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
         >
-          <FormattedMessage id="ezmesureReporting.createNewTask" defaultMessage="Create new reporting task" />
+          <FormattedMessage id="ezReporting.createNewTask" defaultMessage="Create new reporting task" />
         </EuiButton>
       </EuiPageContentHeaderSection>);
     }
-    
+
     return (
       <Fragment>
         <Toast />
@@ -192,7 +195,7 @@ export class Main extends React.Component {
                 <EuiPageContentHeaderSection>
                   <EuiTitle>
                     <h2>
-                      <FormattedMessage id="ezmesureReporting.title" defaultMessage="Reporting ezMESURE" />
+                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage="Reporting" />
                     </h2>
                   </EuiTitle>
                 </EuiPageContentHeaderSection>

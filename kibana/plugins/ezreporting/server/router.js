@@ -1,9 +1,9 @@
 export default function (server, apiUrl) {
   server.route({
-    path: '/api/ezmesure/{path*}',
+    path: '/api/ezreporting/{path*}',
     method: ['GET', 'POST', 'PATCH', 'DELETE'],
     config: {
-      tags: ['access:ezmesure_reporting'],
+      tags: ['access:ezreporting'],
       handler: {
         proxy: {
           mapUri: request => {

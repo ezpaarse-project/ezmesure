@@ -38,11 +38,11 @@ export class Table extends Component {
     const { reporting } = item;
     const listItems = [
       {
-        title: <FormattedMessage id="ezmesureReporting.receiversEmails" defaultMessage="Receivers' email addresses" />,
+        title: <FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />,
         description: reporting.emails,
       },
       {
-        title: <FormattedMessage id="ezmesureReporting.createdAt" defaultMessage="Creation date" />,
+        title: <FormattedMessage id="ezReporting.createdAt" defaultMessage="Creation date" />,
         description: convertDate(reporting.createdAt),
       },
     ];
@@ -68,48 +68,52 @@ export class Table extends Component {
 
     const columns = [
       {
-        name: <FormattedMessage id="ezmesureReporting.dashboard" defaultMessage="Dashboard" />,
-        description: <FormattedMessage id="ezmesureReporting.dashboardName" defaultMessage="Dashboard name" />,
+        name: <FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />,
+        description: <FormattedMessage id="ezReporting.dashboardName" defaultMessage="Dashboard name" />,
         render: ({ dashboardId, reporting }) => {
           if (dashboardId) {
             const dashboard = dashboards.find(({ id }) => id === dashboardId);
             if (dashboard) {
-              let printer = '';
               if (reporting.print) {
-                printer = (
-                  <EuiText>
-                    {''}
-                    <EuiToolTip position="right" content="Optimized for printing">&#128438;</EuiToolTip>
-                  </EuiText>
+                const content = <FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />
+                return (
+                  <span>
+                    <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink> {' '}
+                    <EuiToolTip position="right" content={content}>
+                      <EuiText>&#128438;</EuiText>
+                    </EuiToolTip>
+                  </span>
                 );
-                console.log(printer)
               }
-              return (
-                <EuiText>
-                  <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>
-                  {printer}
-                </EuiText>
-              );
+              return (<EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>);
             }
 
-            return (<EuiTextColor color="warning"><EuiIcon type="alert" /> Dashboard not found or removed (id: {dashboardId})</EuiTextColor>);
+            return (
+              <EuiTextColor color="warning"><EuiIcon type="alert" />
+                <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />
+              </EuiTextColor>
+            );
           }
 
-          return (<EuiTextColor color="warning"><EuiIcon type="alert" /> Dashboard not found or removed (id: {dashboardId})</EuiTextColor>);
+          return (
+            <EuiTextColor color="warning"><EuiIcon type="alert" />
+              <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />
+            </EuiTextColor>
+          );
         },
         sortable: false,
         align: LEFT_ALIGNMENT,
       },
       {
-        name: <FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />,
-        description: <FormattedMessage id="ezmesureReporting.frequency" defaultMessage="Frequency" />,
+        name: <FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />,
+        description: <FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />,
         render: ({ reporting }) => convertFrequency(frequencies, reporting.frequency),
         sortable: true,
         align: CENTER_ALIGNMENT,
       },
       {
-        name: <FormattedMessage id="ezmesureReporting.sentAt" defaultMessage="Sending date" />,
-        description: <FormattedMessage id="ezmesureReporting.sentAt" defaultMessage="Sending date" />,
+        name: <FormattedMessage id="ezReporting.sentAt" defaultMessage="Sending date" />,
+        description: <FormattedMessage id="ezReporting.sentAt" defaultMessage="Sending date" />,
         render: ({ reporting }) => {
           if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
             return convertDate(reporting.sentAt);
@@ -138,10 +142,10 @@ export class Table extends Component {
       },
     ];
 
-    if (capabilities.get().ezmesure_reporting.edit) {
+    if (capabilities.get().ezreporting.edit) {
       columns[3].actions.push({
-        name: <FormattedMessage id="ezmesureReporting.edit" defaultMessage="Edit" />,
-        description: <FormattedMessage id="ezmesureReporting.edit" defaultMessage="Edit" />,
+        name: <FormattedMessage id="ezReporting.edit" defaultMessage="Edit" />,
+        description: <FormattedMessage id="ezReporting.edit" defaultMessage="Edit" />,
         icon: 'pencil',
         type: 'icon',
         color: 'primary',
@@ -152,17 +156,17 @@ export class Table extends Component {
 
           return addToast(
             'Error',
-            <FormattedMessage id="ezmesureReporting.dashboardNotFound" values={{ dashboardId: el.dashboardId }} defaultMessage="Dashboard nof found or remove (id: {dashboardId})" />,
+            <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: el.dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />,
             'danger'
           );
         },
       });
     }
 
-    if (capabilities.get().ezmesure_reporting.delete) {
+    if (capabilities.get().ezreporting.delete) {
       columns[3].actions.push({
-        name: <FormattedMessage id="ezmesureReporting.delete" defaultMessage="Delete" />,
-        description: <FormattedMessage id="ezmesureReporting.delete" defaultMessage="Delete" />,
+        name: <FormattedMessage id="ezReporting.delete" defaultMessage="Delete" />,
+        description: <FormattedMessage id="ezReporting.delete" defaultMessage="Delete" />,
         icon: 'trash',
         type: 'icon',
         color: 'danger',

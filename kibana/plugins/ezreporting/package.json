@@ -1,7 +1,7 @@
 {
-  "name": "ezmesure_reporting",
+  "name": "ezreporting",
   "version": "0.0.0",
-  "description": "ezMESURE plugin for Kibana",
+  "description": "ezreporting plugin for Kibana",
   "main": "index.js",
   "license": "ISC",
   "author": "ezTEAM",
@@ -13,7 +13,7 @@
     "url": "https://github.com/ezpaarse-project/ezmesure/issues"
   },
   "kibana": {
-    "version": "7.4.0",
+    "version": "7.4.2",
     "templateVersion": "1.0.0"
   },
   "scripts": {

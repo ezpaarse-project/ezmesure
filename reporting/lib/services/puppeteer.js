@@ -126,7 +126,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
     headerTemplate: `<div style="width: 1920px; color: black; text-align: center;">
       <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardData.dashboardUrl}">${dashboardData.dashboard.title}</a></h1>
       <p style="font-size: 12px;">${dashboardData.dashboard.description}</p>
-      <p style="font-size: 10px;">Rapport généré le ${moment().locale('fr').format('dddd Do MMMM YYYY')}</p></div>`,
+      <p style="font-size: 10px;">Rapport généré le ${moment().format('dddd Do MMMM YYYY')}</p></div>`,
     footerTemplate: `<div style="width: 1920px; color: black;">
       <div style="text-align: center;">
         <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
@@ -139,13 +139,14 @@ module.exports = async (dashboardId, space, frequency, print) => {
     pdfOptions.format = 'A4';
     pdfOptions.landscape = true;
   } else {
+    const height = (bouncingBox.height + viewport.heightPaddingTop);
     pdfOptions.width = viewport.width;
-    pdfOptions.height = (bouncingBox.height + viewport.heightPaddingTop);
+    pdfOptions.height = height < 600 ? 600 : height;
   }
 
   const pdf = await page.pdf(pdfOptions);
   
   await browser.close();
 
-  return pdf;
+  return pdf || null;
 };

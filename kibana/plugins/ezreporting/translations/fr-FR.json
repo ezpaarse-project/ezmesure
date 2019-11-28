@@ -1,0 +1,106 @@
+{
+  "formats": {
+    "number": {
+      "currency": {
+        "style": "currency"
+      },
+      "percent": {
+        "style": "percent"
+      }
+    },
+    "date": {
+      "short": {
+        "month": "numeric",
+        "day": "numeric",
+        "year": "2-digit"
+      },
+      "medium": {
+        "month": "short",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "long": {
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      },
+      "full": {
+        "weekday": "long",
+        "month": "long",
+        "day": "numeric",
+        "year": "numeric"
+      }
+    },
+    "time": {
+      "short": {
+        "hour": "numeric",
+        "minute": "numeric"
+      },
+      "medium": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric"
+      },
+      "long": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      },
+      "full": {
+        "hour": "numeric",
+        "minute": "numeric",
+        "second": "numeric",
+        "timeZoneName": "short"
+      }
+    },
+    "relative": {
+      "years": {
+        "units": "année"
+      },
+      "months": {
+        "units": "mois"
+      },
+      "days": {
+        "units": "jour"
+      },
+      "hours": {
+        "units": "heure"
+      },
+      "minutes": {
+        "units": "minute"
+      },
+      "seconds": {
+        "units": "seconde"
+      }
+    }
+  },
+  "messages": {
+    "ezReporting.title": "{REPORTING_NAME}",
+    "ezReporting.createNewTask": "Créer une nouvelle tâche de reporting",
+    "ezReporting.save": "Sauvegarder",
+    "ezReporting.dashboard": "Tableau de bord",
+    "ezReporting.dashboardName": "Tableau de bord",
+    "ezReporting.frequency": "Fréquence",
+    "ezReporting.edit": "Edition",
+    "ezReporting.editing": "Éditer",
+    "ezReporting.creating": "Créer",
+    "ezReporting.remove": "Supprimer",
+    "ezReporting.createdAt": "Date de création",
+    "ezReporting.sentAt": "Date d'envoi",
+    "ezReporting.receiversEmails": "Adresses électroniques des destinataires",
+    "ezReporting.reportingTask": "une tâche de reporting",
+    "ezReporting.editingSuccess": "Tâche éditée avec siccès",
+    "ezReporting.editingError": "Une erreur s'est produite lors de la modification de la tâche.",
+    "ezReporting.creationSuccess": "Tâche créée avec succès.",
+    "ezReporting.creationError": "Une erreur s'est produite lors de la création de la tâche.",
+    "ezReporting.removalSuccess": "Tâche supprimée avec succès.",
+    "ezReporting.removalError": "Une erreur s'est produite lors de la suppression de la tâche.",
+    "ezReporting.optimizedForPrinting": "Optimisé pour l'impression",
+    "ezReporting.dashboardNotFound": "Le tableau de bord n'a pas été trouvé ou supprimé (id : {DASHBOARD_ID}).",
+    "ezReporting.errorOccured": "Une erreur s'est produite pendant le chargement des données.",
+    "ezReporting.noRights": "Vous n'avez aucun droit d'accès à cette page.",
+    "ezReporting.accessDeniedTitle": "Accès refusé",
+    "ezReporting.accessDenied": "Vous n'êtes pas autorisé à accéder au Reporting. Pour utiliser le Reporting, vous avez besoin des privilèges accordés par le rôle `reporting`."
+  }
+}
