@@ -195,7 +195,7 @@ export class Main extends React.Component {
                 <EuiPageContentHeaderSection>
                   <EuiTitle>
                     <h2>
-                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage="Reporting" />
+                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage={reportingName} />
                     </h2>
                   </EuiTitle>
                 </EuiPageContentHeaderSection>

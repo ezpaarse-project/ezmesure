@@ -114,7 +114,7 @@ services:
       - NODE_CONFIG
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
       - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - REPORTING_NAME=Reporting ezMESURE
+      - REPORTING_NAME="Reporting ezMESURE"
     links:
       - elastic
       - maildev
