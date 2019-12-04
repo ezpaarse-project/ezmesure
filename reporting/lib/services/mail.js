@@ -14,7 +14,7 @@ nunjucks.configure(templatesDir);
 const images = fs.readdirSync(imagesDir);
 
 module.exports = {
-  async sendMail(mailOptions, options) {
+  sendMail: async (mailOptions, options) => {
     mailOptions = mailOptions || {};
     mailOptions.attachments = mailOptions.attachments || [];
 
@@ -34,7 +34,7 @@ module.exports = {
     });
   },
 
-  generateMail(templateName, locals = {}) {
+  generateMail: (templateName, locals = {}) => {
     if (!templateName) { throw new Error('No template name provided'); }
 
     const text = nunjucks.render(`${templateName}.txt`, locals);

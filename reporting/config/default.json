@@ -1,5 +1,6 @@
 {
   "reportingName": "Reporting",
+  "pluginName": "ezreporting",
   "port": 3000,
   "kibana": {
     "internal": "http://localhost:5601",
@@ -17,6 +18,7 @@
   },
   "sender": "ezmesure-reporting@couperin.org",
   "index": ".ezreporting",
+  "roleName": "ezreporting",
   "frequencies": [
     { "fr": "Hébdomadaire", "text": "Weekly", "value": "1w", "cron": "0 0 0 * * 1" },
     { "fr": "Mensuel", "text": "Monthly", "value": "1M", "cron": "0 0 0 1 * *" },

@@ -1,5 +1,6 @@
 {
   "reportingName": "REPORTING_NAME",
+  "pluginName": "REPORTING_PLUGIN_NAME",
   "port": "REPORTING_PORT",
   "kibana": {
     "internal": "KIBANA_INTERNAL_URL",
@@ -17,6 +18,7 @@
   },
   "sender": "REPORTING_SENDER",
   "index": "REPORTING_INDEX",
+  "roleName": "REPORTING_ROLE",
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",
     "__format": "json"

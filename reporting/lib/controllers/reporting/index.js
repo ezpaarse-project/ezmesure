@@ -54,7 +54,7 @@ route.delete('/tasks/:taskId?', {
       taskId: Joi.string().required(),
     },
   },
-}, hasPrivileges(['write', 'read', 'delete']), del);
+}, hasPrivileges(['delete']), del);
 
 app.use(bodyParser());
 
@@ -71,7 +71,7 @@ const validate = {
   },
 };
 
-route.post('/tasks', { validate }, hasPrivileges(['write', 'read']), store);
+route.post('/tasks', { validate }, hasPrivileges(['create']), store);
 
 route.patch('/tasks/:taskId?', {
   validate: {
@@ -80,7 +80,7 @@ route.patch('/tasks/:taskId?', {
       taskId: Joi.string().required(),
     },
   },
-}, hasPrivileges(['write', 'read']), update);
+}, hasPrivileges(['write']), update);
 
 app.use(route.middleware());
 

@@ -4,7 +4,6 @@ const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
 const puppeteer = require('./puppeteer');
-const { frequencies } = require('config');
 const { sendMail, generateMail } = require('./mail');
 const fs = require('fs');
 const path = require('path');

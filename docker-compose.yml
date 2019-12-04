@@ -152,12 +152,12 @@ services:
       - REPORTING_SMTP_HOST=${EZMESURE_SMTP_HOST}
       - REPORTING_SMTP_PORT
       - REPORTING_SENDER
-      - REPORTING_INDEX=.ezmesure-reporting
+      - REPORTING_INDEX=.ezreporting
       - REPORTING_FREQUENCIES
       - KIBANA_INTERNAL_URL=https://rp/kibana
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
-      - REPORTING_NAME="Reporting ezMESURE"
+      - REPORTING_NAME=Reporting ezMESURE
     links:
       - elastic
     volumes:

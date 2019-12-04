@@ -6,13 +6,19 @@ const { CronJob } = require('cron');
 const moment = require('moment');
 
 const logger = require('./lib/logger');
+const roles = require('./lib/services/roles');
 const controller = require('./lib/controllers');
 const reporting = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
 
+// Set locale date to FR 
 moment().locale('fr');
 
+// check if roles exists
+roles.findOrCreate();
+
+// CronTab for reporting job
 frequencies.forEach(frequency => {
   const job = new CronJob(frequency.cron, () => {
     reporting(frequency);

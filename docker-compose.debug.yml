@@ -107,14 +107,14 @@ services:
       - REPORTING_SMTP_HOST=maildev
       - REPORTING_SMTP_PORT=25
       - REPORTING_SENDER
-      - REPORTING_INDEX=.ezmesure-reporting
+      - REPORTING_INDEX=.ezreporting
       - REPORTING_FREQUENCIES
       - KIBANA_INTERNAL_URL=https://rp/kibana
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
       - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - REPORTING_NAME="Reporting ezMESURE"
+      - REPORTING_NAME=Reporting ezMESURE
     links:
       - elastic
       - maildev
