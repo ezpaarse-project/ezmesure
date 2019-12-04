@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app fixed dark :inverted-scroll="invertedScroll" color="primary">
+  <v-app-bar app fixed dark color="primary">
     <router-link
       to="/"
       aria-label="Page d'accueil ezMESURE"
@@ -71,12 +71,6 @@
 
 <script>
 export default {
-  props: {
-    invertedScroll: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data() {
     return {
       sheet: false,

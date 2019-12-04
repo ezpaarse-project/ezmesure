@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="pa-0">
-    <v-container fluid class="main-page">
+  <v-container fluid class="px-0 py-4 main-cover">
+    <v-container fluid>
       <v-layout
         fill-height
         align-center
@@ -52,7 +52,7 @@
       Ce service est soutenu par :
     </h3>
 
-    <v-container grid-list-lg class="my-4">
+    <v-container grid-list-lg class="mt-4">
       <v-layout justify-center wrap>
         <v-flex v-for="logo in logos" :key="logo.name" d-flex shrink>
           <v-card width="250px" class="pa-3">
@@ -130,10 +130,12 @@ export default {
 
 
 <style scoped>
-.main-page {
+.main-cover {
   background-image: url('/images/dashboard_r10_light.jpg');
-  background-size: cover;
-  height: 100vh;
+  background-size: initial;
+  background-position-x: center;
+  background-position-y: top;
+  background-repeat: repeat;
 }
 .logo {
   max-width: 100%
