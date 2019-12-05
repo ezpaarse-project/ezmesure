@@ -1,27 +1,8 @@
 <template>
   <v-container fluid class="px-0 py-4 main-cover">
     <v-container fluid>
-      <v-layout
-        fill-height
-        align-center
-        justify-center
-        column
-      >
+      <v-layout justify-center>
         <img class="logo" alt="ezMESURE" src="/images/logo-ezMESURE-slogan.png">
-
-        <v-layout
-          :justify-center="$vuetify.breakpoint.mdAndDown"
-          pa-4
-          wrap
-          shrink
-        >
-          <v-btn class="ma-2" outlined large color="primary" href="/kibana/">
-            Tableaux de bord
-          </v-btn>
-          <v-btn class="ma-2" outlined large color="primary" exact to="/myspace">
-            Mon compte
-          </v-btn>
-        </v-layout>
       </v-layout>
     </v-container>
 
