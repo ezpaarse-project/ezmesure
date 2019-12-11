@@ -1,0 +1,29 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Rapport ezMESURE du {{ reportingDate }}.</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      <p>Bonjour,</p>
+      <p>Vous trouverez ci-joint le rapport <strong>{{ frequency }}</strong>{{ optimizedForPrinting }} du tableau de bord <strong>{{ title }}</strong> du <strong>{{ reportingDate }}</strong>.</p>
+      <p>Ceci est un email envoyé automatiquement par l'application ezMESURE.</p>
+      <p>Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.</p>
+    </mj-text>
+
+    <mj-button background-color="#9c27b0" color="white" href="{{ dashboardUrl }}" target="_blank">
+      Pour accéder au tableau de bord, cliquez ici !
+    </mj-button>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

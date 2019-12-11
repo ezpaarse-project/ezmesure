@@ -9,7 +9,9 @@ const validator = require('../../services/validator');
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../../server');
 
-exports.upload = async function (ctx, fileName) {
+exports.upload = async function (ctx) {
+  let { fileName } = ctx.request.params;
+
   ctx.action = 'file/upload';
 
   if (!/\.(csv|gz)$/i.test(fileName)) {
@@ -18,17 +20,12 @@ exports.upload = async function (ctx, fileName) {
 
   fileName = fileName.replace(/\s/g, '_');
 
-  const { username, email } = ctx.state.user;
+  const { user } = ctx.state;
+  const domain = user.email.split('@')[1];
 
-  if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
-  }
-
-  const domain = email.split('@')[1];
-
-  const relativePath = path.join(domain, username, fileName);
-  const userDir      = path.resolve(storagePath, domain, username);
-  const filePath     = path.resolve(userDir, fileName);
+  const relativePath = path.join(domain, user.username, fileName);
+  const userDir = path.resolve(storagePath, domain, user.username);
+  const filePath = path.resolve(userDir, fileName);
 
   ctx.metadata = { path: relativePath };
 
@@ -70,7 +67,7 @@ exports.list = async function (ctx) {
     fileList = [];
   }
 
-  fileList = fileList.map(name => { return { name }; })
+  fileList = fileList.map((name) => ({ name }));
 
   for (const file of fileList) {
     const stat = await fse.stat(path.resolve(userDir, file.name));
@@ -82,7 +79,8 @@ exports.list = async function (ctx) {
   ctx.body = fileList;
 };
 
-exports.deleteOne = async function (ctx, fileName) {
+exports.deleteOne = async function (ctx) {
+  const { fileName } = ctx.request.params;
   ctx.action = 'file/delete';
   const { username, email } = ctx.state.user;
 
@@ -111,7 +109,8 @@ exports.deleteMany = async function (ctx) {
   }
 
   const domain = email.split('@')[1];
-  const body = ctx.request.body;
+  const { body } = ctx.request;
+  console.log(body);
   const fileNames = body && body.entries;
 
   if (!fileNames) {
@@ -137,7 +136,7 @@ exports.deleteMany = async function (ctx) {
  * Validate a file, assuming it's a CSV file
  * @param {String} filePath
  */
-function validateFile (filePath) {
+function validateFile(filePath) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
     let emptyLines = 0;
@@ -168,13 +167,13 @@ function validateFile (filePath) {
         }
 
         if (errors.length > 0) {
-          err = errors[0]
+          err = errors[0];
 
           if (err.type === 'Quotes') {
-            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`
+            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
           }
 
-          return parser.abort()
+          return parser.abort();
         }
 
         if (typeof columns === 'undefined') {
@@ -183,16 +182,16 @@ function validateFile (filePath) {
           try {
             return validator.validateColumns(columns);
           } catch (e) {
-            err = e
+            err = e;
             return parser.abort();
           }
         }
 
-        const ec = {}
+        const ec = {};
 
         columns.forEach((colName, index) => {
           ec[colName] = row[index];
-        })
+        });
 
         try {
           validator.validateEvent(ec, lineNumber);
@@ -200,7 +199,7 @@ function validateFile (filePath) {
           err = e;
           parser.abort();
         }
-      }
-    })
-  })
+      },
+    });
+  });
 }

@@ -1,5 +1,5 @@
-FROM docker.elastic.co/kibana/kibana:7.2.0
+FROM docker.elastic.co/kibana/kibana:7.4.2
 
-COPY ./plugins/kibana.zip /tmp/plugins/
+COPY ./plugins /tmp/plugins
 
-RUN bin/kibana-plugin install file:///tmp/plugins/kibana.zip
+RUN bash /tmp/plugins/install.sh

@@ -1,0 +1,28 @@
+{
+  "reportingName": "REPORTING_NAME",
+  "pluginName": "REPORTING_PLUGIN_NAME",
+  "port": "REPORTING_PORT",
+  "kibana": {
+    "internal": "KIBANA_INTERNAL_URL",
+    "external": "KIBANA_EXTERNAL_URL"
+  },
+  "elasticsearch": {
+    "port": "REPORTING_ELASTIC_PORT",
+    "host": "REPORTING_ELASTIC_HOST",
+    "username": "REPORTING_ELASTIC_USER",
+    "password": "REPORTING_ELASTIC_PASSWORD"
+  },
+  "smtp": {
+    "host": "REPORTING_SMTP_HOST",
+    "port": "REPORTING_SMTP_PORT"
+  },
+  "emailAttempts": "REPORTING_EMAIL_ATTEMPTS",
+  "sender": "REPORTING_SENDER",
+  "index": "REPORTING_INDEX",
+  "historyIndex": "REPORTING_HISTORY_INDEX",
+  "roleName": "REPORTING_ROLE",
+  "frequencies": {
+    "__name": "REPORTING_FREQUENCIES",
+    "__format": "json"
+  }
+}

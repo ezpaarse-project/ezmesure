@@ -17,7 +17,7 @@ mongo.connect = function (url, callback) {
 mongo.disconnect = function (callback) {
   if (!mongo.db) { return callback(null); }
 
-  mongo.db.close(err => {
+  mongo.db.close((err) => {
     mongo.db = null;
     callback(err);
   });

@@ -9,7 +9,7 @@ exports.save = async function (ctx) {
   if (!exists) {
     await elastic.indices.create({
       index,
-      body: indexTemplate
+      body: indexTemplate,
     });
   }
 
@@ -22,33 +22,33 @@ exports.save = async function (ctx) {
     request: ctx.httpLog,
     response: {
       status: ctx.status,
-      body: typeof ctx.body === 'object' ? ctx.body : null
-    }
+      body: typeof ctx.body === 'object' ? ctx.body : null,
+    },
   };
 
   switch (ctx.action) {
-  case 'indices/list':
-  case 'indices/search':
-  case 'file/list':
-    if (metric.response.body && !metric.response.body.error) {
-      metric.response.body = null;
-    }
+    case 'indices/list':
+    case 'indices/search':
+    case 'file/list':
+      if (metric.response.body && !metric.response.body.error) {
+        metric.response.body = null;
+      }
   }
 
   const username = ctx.state && ctx.state.user && ctx.state.user.username;
 
   if (username) {
-    let user = await elastic.security.findUser({ username });
+    const user = await elastic.security.findUser({ username });
 
     metric.user = !user ? null : {
       name: user.username,
       roles: user.roles,
-      idp: user.metadata && user.metadata.idp
+      idp: user.metadata && user.metadata.idp,
     };
   }
 
   return elastic.index({
     index,
-    body: metric
-  }).then(res => res.body);
+    body: metric,
+  }).then((res) => res.body);
 };

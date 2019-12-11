@@ -1,0 +1,46 @@
+{
+  "name": "reporting",
+  "version": "1.0.0",
+  "description": "Plugin to make kibana reporting",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon -w server.js -w config/ -w lib/ server.js",
+    "start": "node server.js",
+    "lint": "eslint --ext .js ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezpaarse-project/ezmesure.git"
+  },
+  "author": "ezTEAM <ezpaarse@couperin.org>",
+  "license": "CeCILL",
+  "bugs": {
+    "url": "https://github.com/ezpaarse-project/ezmesure/issues"
+  },
+  "homepage": "https://github.com/ezpaarse-project/ezmesure#readme",
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.4.0",
+    "@koa/cors": "^3.0.0",
+    "config": "^3.2.3",
+    "cron": "^1.7.2",
+    "fs-extra": "^8.1.0",
+    "koa": "^2.8.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-joi-router": "^6.0.0",
+    "koa-mount": "^4.0.0",
+    "koa-route": "^3.2.0",
+    "mjml": "^4.5.1",
+    "moment": "^2.24.0",
+    "nodemailer": "^6.3.0",
+    "nunjucks": "^3.2.0",
+    "puppeteer": "^1.20.0",
+    "rison-node": "^2.1.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "nodemon": "^1.19.3"
+  }
+}

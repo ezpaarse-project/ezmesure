@@ -1,19 +1,23 @@
-const Koa   = require('koa');
-const route = require('koa-route');
+const router = require('koa-joi-router')();
 const bodyParser = require('koa-bodyparser');
 
-const { list, deleteIndice, deleteEvents, tops } = require('./basics');
+const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
+
+const {
+  list, deleteIndice, deleteEvents, tops,
+} = require('./basics');
 const search = require('./search');
 const upload = require('./upload');
-const app = new Koa();
 
-app.use(route.get('/', list));
-app.use(route.get('/:index/tops', tops));
-app.use(route.delete('/:index', deleteIndice));
-app.use(route.delete('/:index/events', deleteEvents));
-app.use(route.post('/:index', upload));
+router.use(requireJwt, requireUser, requireTermsOfUse);
 
-app.use(bodyParser());
-app.use(route.post('/:index/search', search));
+router.get('/', list);
+router.get('/:index/tops', tops);
+router.delete('/:index', deleteIndice);
+router.delete('/:index/events', deleteEvents);
+router.post('/:index', upload);
 
-module.exports = app;
+router.use(bodyParser());
+router.post('/:index/search', search);
+
+module.exports = router;

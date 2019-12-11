@@ -3,27 +3,27 @@ const elastic = require('../../services/elastic');
 /**
  * Return global aggregated metrics
  */
-exports.overall = async function (ctx, index) {
+exports.overall = async function (ctx) {
   ctx.type = 'json';
 
   const { body: result } = await elastic.search({
     body: {
       size: 0,
       track_total_hits: true,
-      aggs : {
-        indices   : { cardinality: { field: '_index' } },
-        titles    : { cardinality: { field: 'publication_title' } },
-        platforms:  { cardinality: { field: 'platform' } },
-        maxDate   : { max : { field: 'datetime' } },
-        minDate   : { min : { field: 'datetime' } }
-      }
-    }
+      aggs: {
+        indices: { cardinality: { field: '_index' } },
+        titles: { cardinality: { field: 'publication_title' } },
+        platforms: { cardinality: { field: 'platform' } },
+        maxDate: { max: { field: 'datetime' } },
+        minDate: { min: { field: 'datetime' } },
+      },
+    },
   });
 
   const {
     took,
     hits = {},
-    aggregations = {}
+    aggregations = {},
   } = result;
 
   const {
@@ -31,7 +31,7 @@ exports.overall = async function (ctx, index) {
     platforms = {},
     indices = {},
     minDate = {},
-    maxDate = {}
+    maxDate = {},
   } = aggregations;
 
   let days = 0;
@@ -45,13 +45,13 @@ exports.overall = async function (ctx, index) {
     docs: hits.total && hits.total.value,
     dateCoverage: {
       min: minDate.value,
-      max: maxDate.value
+      max: maxDate.value,
     },
     metrics: {
       days,
       titles: titles.value,
       platforms: platforms.value,
-      indices: indices.value
-    }
+      indices: indices.value,
+    },
   };
 };

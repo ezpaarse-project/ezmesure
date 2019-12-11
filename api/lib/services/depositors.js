@@ -1,5 +1,5 @@
 const config = require('config');
-const CronJob = require('cron').CronJob;
+const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
 const indexTemplate = require('../utils/depositors-template');
@@ -10,17 +10,17 @@ const { index, cron, spreadsheetId } = config.get('depositors');
 const { spreadsheets } = sheets;
 
 const job = new CronJob(cron, () => {
-  updateDepositors().then(result => {
+  updateDepositors().then((result) => {
     appLogger.info('Depositors updated');
 
     if (result.errors) {
-      result.items.forEach(item => {
+      result.items.forEach((item) => {
         if (item.error) {
           appLogger.error(`Failed to update depositor ${item.name} : ${item.error}`);
         }
       });
     }
-  }).catch(err => {
+  }).catch((err) => {
     appLogger.error(`Failed to update depositors : ${err.statusCode} | ${err.message}`);
   });
 });
@@ -31,7 +31,7 @@ elastic.indices.exists({ index })
   .then(({ body: exists }) => {
     if (!exists) { job.fireOnTick(); }
   })
-  .catch(err => {
+  .catch((err) => {
     appLogger.error(`Failed to check depositors index existence : ${err.statusCode} | ${err.message}`);
   });
 
@@ -42,14 +42,14 @@ async function getFromIndex() {
   const { body } = await elastic.search({
     index,
     size: 1000,
-    ignoreUnavailable: true
+    ignoreUnavailable: true,
   });
 
   if (!body || !body.hits || !body.hits.hits) {
     throw new Error('invalid elastic response');
   }
 
-  const depositors = body.hits.hits.map(hit => {
+  const depositors = body.hits.hits.map((hit) => {
     const depositor = hit._source;
 
     if (!depositor) {
@@ -82,7 +82,7 @@ async function updateDepositors() {
 
   const result = {
     errors: false,
-    items: []
+    items: [],
   };
 
   for (const dep of depositors) {
@@ -90,14 +90,14 @@ async function updateDepositors() {
 
     const item = {
       name: dep.organisation && dep.organisation.name,
-      prefix
+      prefix,
     };
 
     result.items.push(item);
 
     if (prefix) {
       const { body } = await elastic.count({
-        index: `${prefix}*`
+        index: `${prefix}*`,
       });
 
       item.count = dep.index.count = body.count;
@@ -106,11 +106,10 @@ async function updateDepositors() {
     try {
       const { body } = await elastic.index({
         index,
-        body: dep
+        body: dep,
       });
 
       item.result = body.result;
-
     } catch (e) {
       result.errors = true;
       item.error = e.message;
@@ -128,7 +127,7 @@ function fetchDepositors() {
     spreadsheets.values.get({
       spreadsheetId,
       range: 'ezmesure-correspondants',
-    }, function (err, response) {
+    }, (err, response) => {
       if (err) { return reject(err); }
 
       if (!Array.isArray(response && response.values)) {
@@ -141,8 +140,8 @@ function fetchDepositors() {
 
       const columns = response.values.shift().map(camelize);
 
-      const rows = response.values.map(row => {
-        let org = {};
+      const rows = response.values.map((row) => {
+        const org = {};
 
         columns.forEach((column, i) => {
           if (row[i]) { org[column] = row[i]; }
@@ -150,7 +149,7 @@ function fetchDepositors() {
 
         const doc = {
           index: {
-            prefix: org.indexPrefix
+            prefix: org.indexPrefix,
           },
           organisation: {
             name: org.organisme,
@@ -158,32 +157,32 @@ function fetchDepositors() {
             uai: org.uaiIdentifiant,
             city: org.localisationVille,
             website: org.siteWeb,
-            logoUrl: org.logo
+            logoUrl: org.logo,
           },
           contact: {
             confirmed: !!(org.mailEnvoi && org.mailRetour),
             tech: {
               firstName: org.correspondantTechniquePrenom,
               lastName: org.correspondantTechniqueNom,
-              mail: org.correspondantTechniqueMail
+              mail: org.correspondantTechniqueMail,
             },
             doc: {
               firstName: org.correspondantDocumentairePrenom,
               lastName: org.correspondantDocumentaireNom,
-              mail: org.correspondantDocumentaireMail
+              mail: org.correspondantDocumentaireMail,
             },
           },
           auto: {
             ezmesure: !!org.automatisationEzpaarse,
             ezpaarse: !!org.automatisationEzmesure,
-            report: !!org.automatisationRapport
-          }
+            report: !!org.automatisationRapport,
+          },
         };
 
         if (org.longitude && org.latitude) {
           doc.location = {
             lon: parseFloat(org.longitude),
-            lat: parseFloat(org.latitude)
+            lat: parseFloat(org.latitude),
           };
         }
 
@@ -196,12 +195,10 @@ function fetchDepositors() {
 }
 
 function camelize(str) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
-    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
-  }).replace(/\W+/g, '');
-};
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => (index == 0 ? letter.toLowerCase() : letter.toUpperCase())).replace(/\W+/g, '');
+}
 
 module.exports = {
   update: updateDepositors,
-  getFromIndex
+  getFromIndex,
 };

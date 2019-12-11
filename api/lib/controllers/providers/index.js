@@ -1,17 +1,20 @@
-const Koa = require('koa');
-const route = require('koa-route');
+const router = require('koa-joi-router')();
 const bodyParser = require('koa-bodyparser');
 
-const { list, find, register, load, del, check } = require('./actions');
+const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
 
-const app = new Koa();
+const {
+  list, find, register, load, del, check,
+} = require('./actions');
 
-app.use(bodyParser());
-app.use(route.get('/check', check));
-app.use(route.get('/', list));
-app.use(route.get('/:providerName', find));
-app.use(route.delete('/:providerName', del));
-app.use(route.put('/:providerName', register));
-app.use(route.post('/:providerName', load));
+router.use(requireJwt, requireUser, requireTermsOfUse);
 
-module.exports = app;
+bodyParser();
+router.get('/check', check);
+router.get('/', list);
+router.get('/:providerName', find);
+router.delete('/:providerName', del);
+router.put('/:providerName', register);
+router.post('/:providerName', load);
+
+module.exports = router;

@@ -1,13 +1,16 @@
-const Koa = require('koa');
-const route = require('koa-route');
+const router = require('koa-joi-router')();
 
-const { resetPassword, getToken, getUser, acceptTerms } = require('./auth');
+const { requireJwt, requireUser } = require('../../services/auth');
 
-const app = new Koa();
+const {
+  resetPassword, getToken, getUser, acceptTerms,
+} = require('./auth');
 
-app.use(route.get('/', getUser));
-app.use(route.get('/token', getToken));
-app.use(route.post('/terms/accept', acceptTerms));
-app.use(route.put('/password/reset', resetPassword));
+router.use(requireJwt, requireUser);
 
-module.exports = app;
+router.get('/', getUser);
+router.get('/token', getToken);
+router.post('/terms/accept', acceptTerms);
+router.put('/password/reset', resetPassword);
+
+module.exports = router;

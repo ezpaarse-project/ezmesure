@@ -1,17 +1,17 @@
-'use strict';
 
 const env = process.env.NODE_ENV || 'development';
 
-const Koa    = require('koa');
-const mount  = require('koa-mount');
-const cors   = require('koa-cors');
+const Koa = require('koa');
+const mount = require('koa-mount');
+const cors = require('koa-cors');
 const config = require('config');
 
-const metrics       = require('./lib/services/metrics');
-const logger        = require('./lib/services/logger');
+const metrics = require('./lib/services/metrics');
+const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
-const appLogger     = logger(config.get('logs.app'));
-const httpLogger    = logger(config.get('logs.http'));
+
+const appLogger = logger(config.get('logs.app'));
+const httpLogger = logger(config.get('logs.http'));
 
 module.exports = { appLogger };
 
@@ -31,8 +31,8 @@ const app = new Koa();
 
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  headers: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  headers: ['Content-Type', 'Authorization'],
 }));
 
 // Server logs
@@ -41,7 +41,7 @@ app.use(async (ctx, next) => {
     method: ctx.request.method,
     url: ctx.request.url,
     remoteIP: ctx.request.ip,
-    userAgent: ctx.request.headers['user-agent']
+    userAgent: ctx.request.headers['user-agent'],
   };
 
   ctx.startTime = Date.now();
@@ -51,7 +51,7 @@ app.use(async (ctx, next) => {
   httpLogger.log('info', {
     ...ctx.httpLog,
     user: ctx.state && ctx.state.user && ctx.state.user.username,
-    status: ctx.status
+    status: ctx.status,
   });
 
   ctx.httpLog.query = ctx.request.query;
@@ -87,7 +87,7 @@ app.use(async (ctx, next) => {
     ctx.body = {
       error: error.message,
       stack: error.stack,
-      code: error.code
+      code: error.code,
     };
   }
 });
@@ -111,7 +111,7 @@ process.on('SIGINT', closeApp);
 process.on('SIGTERM', closeApp);
 
 function closeApp() {
-  appLogger.info(`Got Signal, closing the server`);
+  appLogger.info('Got Signal, closing the server');
   server.close(() => {
     process.exit(0);
   });

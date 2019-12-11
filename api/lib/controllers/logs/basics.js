@@ -2,58 +2,60 @@ const elastic = require('../../services/elastic');
 
 exports.list = async function (ctx) {
   ctx.action = 'indices/list';
-  ctx.type   = 'json';
+  ctx.type = 'json';
 
   const { body } = await elastic.indices.stats({
-    metric: 'docs'
-  },{
-    headers: { 'es-security-runas-user': ctx.state.user.username }
+    metric: 'docs',
+  }, {
+    headers: { 'es-security-runas-user': ctx.state.user.username },
   });
 
   ctx.body = body;
 };
 
-exports.deleteIndice = async function (ctx, index) {
+exports.deleteIndice = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'indices/delete';
   ctx.index = index;
-  const username = ctx.state.user.username;
+  const { username } = ctx.state.user;
   const { body: perm } = await elastic.security.hasPrivileges({
     username,
     body: {
-      index: [{ names: [index], privileges: ['delete_index'] }]
-    }
-  },{
-    headers: { 'es-security-runas-user': username }
+      index: [{ names: [index], privileges: ['delete_index'] }],
+    },
+  }, {
+    headers: { 'es-security-runas-user': username },
   });
-  const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
+  const canDelete = perm && perm.index && perm.index[index] && perm.index[index].delete_index;
 
   if (!canDelete) {
     return ctx.throw(403, `you don't have permission to delete ${index}`);
   }
 
   const { body } = await elastic.indices.delete({
-    index
+    index,
   }, {
-    headers: { 'es-security-runas-user': username }
+    headers: { 'es-security-runas-user': username },
   });
 
   ctx.type = 'json';
   ctx.body = body;
 };
 
-exports.deleteEvents = async function (ctx, index) {
+exports.deleteEvents = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'events/delete';
   ctx.index = index;
-  const username = ctx.state.user.username;
+  const { username } = ctx.state.user;
   const { body: perm } = await elastic.security.hasPrivileges({
     username,
     body: {
-      index: [{ names: [index], privileges: ['delete_index'] }]
-    }
+      index: [{ names: [index], privileges: ['delete_index'] }],
+    },
   }, {
-    headers: { 'es-security-runas-user': username }
+    headers: { 'es-security-runas-user': username },
   });
-  const canDelete = perm && perm.index && perm.index[index] && perm.index[index]['delete_index'];
+  const canDelete = perm && perm.index && perm.index[index] && perm.index[index].delete_index;
 
   if (!canDelete) {
     return ctx.throw(403, `you don't have permission to delete from ${index}`);
@@ -70,14 +72,14 @@ exports.deleteEvents = async function (ctx, index) {
   }
 
   if (Object.keys(query).length === 0) {
-    query['match_all'] = {};
+    query.match_all = {};
   }
 
   const { body } = await elastic.deleteByQuery({
     index,
-    body: { query }
+    body: { query },
   }, {
-    headers: { 'es-security-runas-user': username }
+    headers: { 'es-security-runas-user': username },
   });
 
   ctx.type = 'json';
@@ -87,20 +89,21 @@ exports.deleteEvents = async function (ctx, index) {
 /**
  * Return aggregated metrics for a given index pattern
  */
-exports.tops = async function (ctx, index) {
+exports.tops = async function (ctx) {
+  const { index } = ctx.request.params;
   ctx.action = 'indices/tops';
-  ctx.type   = 'json';
-  ctx.index  = index;
-  const username = ctx.state.user.username;
+  ctx.type = 'json';
+  ctx.index = index;
+  const { username } = ctx.state.user;
 
-  const now          = new Date();
-  const currentYear  = now.getFullYear();
+  const now = new Date();
+  const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  const currentDate  = now.getDate();
+  const currentDate = now.getDate();
 
-  let size = parseInt(ctx.query.size);
+  let size = Number.parseInt(ctx.query.size, 10);
 
-  if (isNaN(size)) {
+  if (Number.isNaN(size)) {
     size = 10;
   } else {
     size = Math.min(Math.abs(size), 50);
@@ -108,7 +111,7 @@ exports.tops = async function (ctx, index) {
 
   const dateRange = {
     min: new Date(0),
-    max: now
+    max: now,
   };
 
   switch (ctx.query.period || 'all') {
@@ -158,28 +161,28 @@ exports.tops = async function (ctx, index) {
               datetime: {
                 gte: dateRange.min.getTime(),
                 lte: dateRange.max.getTime(),
-                format: "epoch_millis"
-              }
-            }
-          }]
-        }
+                format: 'epoch_millis',
+              },
+            },
+          }],
+        },
       },
-      aggs : {
-        indices   : { terms: { field: "_index", size } },
-        titles    : { terms: { field: "publication_title", size } },
-        publishers: { terms: { field: "publisher_name", size } },
-        maxDate   : { max : { field: "datetime" } },
-        minDate   : { min : { field: "datetime" } }
-      }
-    }
+      aggs: {
+        indices: { terms: { field: '_index', size } },
+        titles: { terms: { field: 'publication_title', size } },
+        publishers: { terms: { field: 'publisher_name', size } },
+        maxDate: { max: { field: 'datetime' } },
+        minDate: { min: { field: 'datetime' } },
+      },
+    },
   }, {
-    headers: { 'es-security-runas-user': username }
+    headers: { 'es-security-runas-user': username },
   });
 
   const {
     took,
     hits = {},
-    aggregations = {}
+    aggregations = {},
   } = result;
 
   const {
@@ -187,7 +190,7 @@ exports.tops = async function (ctx, index) {
     publishers = {},
     indices = {},
     minDate = {},
-    maxDate = {}
+    maxDate = {},
   } = aggregations;
 
   ctx.body = {
@@ -195,12 +198,12 @@ exports.tops = async function (ctx, index) {
     docs: hits.total,
     dateCoverage: {
       min: minDate.value,
-      max: maxDate.value
+      max: maxDate.value,
     },
     tops: {
       titles: titles.buckets,
       publishers: publishers.buckets,
-      indices: indices.buckets
-    }
+      indices: indices.buckets,
+    },
   };
-}
+};

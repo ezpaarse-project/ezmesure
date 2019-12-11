@@ -1,10 +1,6 @@
-'use strict';
 
 const Koa = require('koa');
-const jwt = require('koa-jwt');
-const route = require('koa-route');
-const mount = require('koa-mount');
-const { auth } = require('config');
+const router = require('koa-joi-router');
 
 const { renaterLogin } = require('./auth/auth');
 const logs = require('./logs');
@@ -14,67 +10,31 @@ const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
 
-const elastic = require('../services/elastic');
 const openapi = require('./openapi.json');
 
 const app = new Koa();
 
-app.use(route.get('/login', renaterLogin));
+const publicRouter = router();
+publicRouter.get('/login', renaterLogin);
 
-app.use(route.get('/', async ctx => {
+publicRouter.get('/', async (ctx) => {
   ctx.status = 200;
-  ctx.body   = 'OK';
-}));
+  ctx.body = 'OK';
+});
 
-app.use(route.get('/openapi.json', async ctx => {
+publicRouter.get('/openapi.json', async (ctx) => {
   ctx.status = 200;
   ctx.type = 'json';
   ctx.body = openapi;
-}));
-
-app.use(mount('/partners', partners));
-app.use(mount('/metrics', metrics));
-
-app.use(jwt({ secret: auth.secret, cookie: auth.cookie }));
-app.use(async (ctx, next) => {
-  if (!ctx.state.user || !ctx.state.user.username) {
-    return ctx.throw(401, 'no username in the token');
-  }
-  await next();
 });
 
-/**
- * Any route below requires an authenticated user
- */
-app.use(async (ctx, next) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+app.use(publicRouter.middleware());
+app.use(partners.prefix('/partners').middleware());
+app.use(metrics.prefix('/metrics').middleware());
 
-  if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
-  }
-
-  ctx.state.user = user;
-
-  await next();
-});
-
-app.use(mount('/profile', authorize));
-
-/**
- * Any route below requires the user to accept the terms of use
- */
-app.use(async (ctx, next) => {
-  const { metadata = {} } = ctx.state.user;
-
-  if (!metadata.acceptedTerms) {
-    return ctx.throw(403, 'You must accept the terms of use before using this service');
-  }
-
-  await next();
-});
-
-app.use(mount('/logs', logs));
-app.use(mount('/files', files));
-app.use(mount('/providers', providers));
+app.use(authorize.prefix('/profile').middleware());
+app.use(logs.prefix('/logs').middleware());
+app.use(files.prefix('/files').middleware());
+app.use(providers.prefix('/providers').middleware());
 
 module.exports = app;

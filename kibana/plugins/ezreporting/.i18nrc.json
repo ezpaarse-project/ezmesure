@@ -1,0 +1,11 @@
+{
+  "prefix": "ezReporting",
+  "paths": {
+    "ezReporting": "./"
+  },
+  "exclude": [
+  ],
+  "translations": [
+    "translations/fr-FR.json"
+  ]
+}
