@@ -1,7 +1,6 @@
-const { index, frequencies, reportingName } = require('config');
+const { index, historyIndex, frequencies, reportingName } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
-const indexTemplate = require('../../utils/reporting-template');
 
 async function getDashboards(namespace) {
   const bool = {
@@ -61,21 +60,6 @@ exports.list = async (ctx) => {
   const tasks = [];
 
   let dashboardsData;
-
-  const { body: exists } = await elastic.indices.exists({ index });
-  if (!exists) {
-    try {
-      await elastic.indices.create({
-        index,
-        body: indexTemplate,
-      });
-    } catch (err) {
-      logger.error(err);
-      ctx.status = 500;
-      return ctx;
-    }
-  }
-
   try {
     dashboardsData = await getDashboards(space);
   } catch (err) {
@@ -264,6 +248,83 @@ exports.del = async (ctx) => {
       id,
       index,
     });
+  } catch (err) {
+    logger.error(err);
+    ctx.status = 500;
+  }
+
+  try {
+    await elastic.deleteByQuery({
+      index: historyIndex,
+      body: {
+        query: {
+          match: {
+            taskId: id,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    logger.error(err);
+    ctx.status = 500;
+  }
+};
+
+exports.history = async (ctx) => {
+  logger.info('reporting/history');
+  ctx.action = 'reporting/history';
+
+  const { taskId: id } = ctx.request.params;
+
+  if (!id) {
+    ctx.status = 404;
+  }
+
+  try {
+    const { body: data } = await elastic.search({
+      index: historyIndex,
+      timeout: '30s',
+      body: {
+        size: 10000,
+        query: {
+          bool: {
+            must: [
+              {
+                match: {
+                  taskId: id,
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+
+    if (data && data.hits && data.hits.hits) {
+      ctx.type = 'json';
+      ctx.status = 200;
+
+      const historiesData = [];
+      const histories = [];
+      data.hits.hits.forEach((history) => {
+        let match;
+
+        let date = history._source.createdAt;
+        if ((match = /^([0-9]{4}-[0-9]{2}-[0-9]{2})T([0-9]{2}:[0-9]{2}:[0-9]{2}).([0-9]{3})Z$/i.exec(history._source.createdAt)) !== null) {
+          date = `${match[1]}`;
+        }
+
+        histories.push({
+          value: history._id,
+          text: date,
+        });
+
+        history._source.id = history._id;
+        historiesData.push(history._source); 
+      });
+
+      ctx.body = { historiesData, histories };
+    }
   } catch (err) {
     logger.error(err);
     ctx.status = 500;

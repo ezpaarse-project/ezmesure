@@ -1,6 +1,7 @@
 {
+  "prefix": "ezReporting",
   "paths": {
-    "ezmesureReporting": "./"
+    "ezReporting": "./"
   },
   "exclude": [
   ],

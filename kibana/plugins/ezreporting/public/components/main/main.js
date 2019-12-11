@@ -53,7 +53,7 @@ export class Main extends React.Component {
     });
   }
 
-  editTaskHandler = task => {
+  editTaskHandler = (task) => {
     if (capabilities.get().ezreporting.edit) {
       let reqData = {
         dashboardId: task.dashboardId,
@@ -84,7 +84,7 @@ export class Main extends React.Component {
     }
   }
 
-  saveTaskHandler = task => {
+  saveTaskHandler = (task) => {
     if (capabilities.get().ezreporting.save) {
       const tasks = this.state.tasks;
 
@@ -117,7 +117,7 @@ export class Main extends React.Component {
     }
   }
 
-  removeTaskHandler = task => {
+  removeTaskHandler = (task) => {
     if (capabilities.get().ezreporting.delete) {
       if (task) {
         this.props.httpClient.delete(`../api/ezreporting/reporting/tasks/${task._id}`).then(() => {
@@ -146,6 +146,14 @@ export class Main extends React.Component {
           <FormattedMessage id="ezReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
           'danger'
         );
+      }
+    }
+  }
+
+  loadHistory = (taskId) => {
+    if (capabilities.get().ezreporting.show) {
+      if (taskId) {
+        return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/history`);
       }
     }
   }
@@ -195,7 +203,7 @@ export class Main extends React.Component {
                 <EuiPageContentHeaderSection>
                   <EuiTitle>
                     <h2>
-                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage={reportingName} />
+                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage="{REPORTING_NAME}" />
                     </h2>
                   </EuiTitle>
                 </EuiPageContentHeaderSection>
@@ -203,7 +211,7 @@ export class Main extends React.Component {
               </EuiPageContentHeader>
 
               <EuiPageContentBody>
-                <Table tasks={tasks} frequencies={frequencies} dashboards={dashboards} removeTaskHandler={this.removeTaskHandler} />
+                <Table tasks={tasks} frequencies={frequencies} dashboards={dashboards} removeTaskHandler={this.removeTaskHandler} loadHistory={this.loadHistory} />
               </EuiPageContentBody>
             </EuiPageContent>
           </EuiPageBody>

@@ -1,5 +1,5 @@
 const elastic = require('./elastic');
-const { roleName, index } = require('config');
+const { roleName, index, historyIndex } = require('config');
 const logger = require('../logger');
 
 const createRole = (name, privileges) => {
@@ -9,7 +9,7 @@ const createRole = (name, privileges) => {
       cluster: [],
       indices: [
         {
-          names: [index],
+          names: [index, historyIndex],
           privileges,
         },
       ],

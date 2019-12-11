@@ -5,7 +5,7 @@ const route = router();
 const { Joi } = router;
 const bodyParser = require('koa-bodyparser');
 
-const { list, store, update, del } = require('./reporting');
+const { list, store, update, del, history } = require('./reporting');
 const { index } = require('config');
 const elastic = require('../../services/elastic');
 
@@ -81,6 +81,8 @@ route.patch('/tasks/:taskId?', {
     },
   },
 }, hasPrivileges(['write']), update);
+
+route.get('/tasks/:taskId?/history', hasPrivileges(['read']), history);
 
 app.use(route.middleware());
 

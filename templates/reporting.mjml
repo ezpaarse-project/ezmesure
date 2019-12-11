@@ -15,7 +15,7 @@
       <p>Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.</p>
     </mj-text>
 
-    <mj-button background-color="#9c27b0" color="white" href="{{ shortenUrl }}" target="_blank">
+    <mj-button background-color="#9c27b0" color="white" href="{{ dashboardUrl }}" target="_blank">
       Pour accéder au tableau de bord, cliquez ici !
     </mj-button>
 

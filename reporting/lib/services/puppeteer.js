@@ -141,7 +141,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
   } else {
     const height = (bouncingBox.height + viewport.heightPaddingTop);
     pdfOptions.width = viewport.width;
-    pdfOptions.height = height < 600 ? 600 : height;
+    pdfOptions.height = Math.max(height, 600);
   }
 
   const pdf = await page.pdf(pdfOptions);

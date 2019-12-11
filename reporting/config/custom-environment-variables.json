@@ -16,8 +16,10 @@
     "host": "REPORTING_SMTP_HOST",
     "port": "REPORTING_SMTP_PORT"
   },
+  "emailAttempts": "REPORTING_EMAIL_ATTEMPTS",
   "sender": "REPORTING_SENDER",
   "index": "REPORTING_INDEX",
+  "historyIndex": "REPORTING_HISTORY_INDEX",
   "roleName": "REPORTING_ROLE",
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",

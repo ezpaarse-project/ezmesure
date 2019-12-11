@@ -4,7 +4,7 @@ Ceci est un email envoyé automatiquement par l'application ezMESURE.
 
 Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.
 
-Pour accéder au tableau de bord, suivez cette url : {{ shortenUrl }}
+Pour accéder au tableau de bord, suivez cette url : {{ dashboardUrl }}
 
 Cordialement,
 L'équipe ezMESURE.

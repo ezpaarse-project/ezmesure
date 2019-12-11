@@ -1,1 +1,1 @@
-export { Flyout, openFlyOut, closeFlyOut, updateEditData } from './flyout';
+export { Flyout, openFlyOut, openFlyOutHistory, closeFlyOut, updateEditData } from './flyout';

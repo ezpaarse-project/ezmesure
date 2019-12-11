@@ -23,6 +23,7 @@
     "@koa/cors": "^3.0.0",
     "config": "^3.2.3",
     "cron": "^1.7.2",
+    "fs-extra": "^8.1.0",
     "koa": "^2.8.2",
     "koa-bodyparser": "^4.2.1",
     "koa-joi-router": "^6.0.0",

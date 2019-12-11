@@ -16,11 +16,13 @@
     "host": "localhost",
     "port": 25
   },
+  "emailAttempts": 5,
   "sender": "ezmesure-reporting@couperin.org",
   "index": ".ezreporting",
+  "historyIndex": ".ezreporting-history",
   "roleName": "ezreporting",
   "frequencies": [
-    { "fr": "Hébdomadaire", "text": "Weekly", "value": "1w", "cron": "0 0 0 * * 1" },
+    { "fr": "Hebdomadaire", "text": "Weekly", "value": "1w", "cron": "0 0 0 * * 1" },
     { "fr": "Mensuel", "text": "Monthly", "value": "1M", "cron": "0 0 0 1 * *" },
     { "fr": "Trimestriel", "text": "Quarterly", "value": "3M", "cron": "0 0 0 1 */3 *" },
     { "fr": "Semestriel", "text": "Semi-annual", "value": "6M", "cron": "0 0 0 1 */6 " },

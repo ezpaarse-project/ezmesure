@@ -13,7 +13,7 @@ import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT, CENTER_ALIGNMENT } from '@elastic/eui/
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { convertFrequency, convertDate } from '../../lib/reporting';
-import { openFlyOut } from '../flyout';
+import { openFlyOut, openFlyOutHistory } from '../flyout';
 import { addToast } from '../toast';
 
 export class Table extends Component {
@@ -125,8 +125,9 @@ export class Table extends Component {
         align: CENTER_ALIGNMENT,
       },
       {
-        name: 'Actions',
         actions: [],
+        alignment: RIGHT_ALIGNMENT,
+        width: '32px',
       },
       {
         align: RIGHT_ALIGNMENT,
@@ -159,6 +160,39 @@ export class Table extends Component {
             <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: el.dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />,
             'danger'
           );
+        },
+      });
+    }
+
+    if (capabilities.get().ezreporting.show) {
+      columns[3].actions.push({
+        name: <FormattedMessage id="ezReporting.history" defaultMessage="History" />,
+        description: <FormattedMessage id="ezReporting.history" defaultMessage="History" />,
+        icon: 'clock',
+        type: 'icon',
+        color: 'primary',
+        onClick: el => {
+          if (el.exists) {
+            return this.props.loadHistory(el._id).then((res) => {
+              if (res && res.data) {
+                if (res.data.historiesData.length <= 0) {
+                  return addToast(
+                    'Information',
+                    <FormattedMessage id="ezReporting.noHistories" defaultMessage="This task has no history." />,
+                    'info'
+                  );
+                }
+
+                return openFlyOutHistory(res.data);
+              }
+            }).catch((err) => {
+              return addToast(
+                'Error',
+                <FormattedMessage id="ezReporting.historyError" defaultMessage="An error occurred while loading the history." />,
+                'danger'
+              );
+            });
+          }
         },
       });
     }

@@ -7,6 +7,7 @@ const moment = require('moment');
 
 const logger = require('./lib/logger');
 const roles = require('./lib/services/roles');
+const indexes = require('./lib/services/indexes');
 const controller = require('./lib/controllers');
 const reporting = require('./lib/services/reporting');
 
@@ -18,6 +19,9 @@ moment().locale('fr');
 // check if roles exists
 roles.findOrCreate();
 
+// check if indexes exists
+indexes.findOrCreate();
+
 // CronTab for reporting job
 frequencies.forEach(frequency => {
   const job = new CronJob(frequency.cron, () => {
@@ -25,6 +29,7 @@ frequencies.forEach(frequency => {
   });
   job.start();
 });
+
 
 const app = new Koa();
 
