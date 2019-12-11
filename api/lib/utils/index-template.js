@@ -16,7 +16,7 @@ module.exports = {
     properties: {
       date: {
         type: 'date',
-        format: 'dd/MM/YYYY||YYYY-MM-dd',
+        format: 'dd/MM/yyyy||yyyy-MM-dd',
       },
       datetime: {
         type: 'date',

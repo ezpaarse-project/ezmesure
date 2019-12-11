@@ -1,10 +1,12 @@
-const crypto = require('crypto');
-const fse = require('fs-extra');
-const path = require('path');
-const csv = require('csv');
-const parse = require('co-busboy');
-const zlib = require('zlib');
+const fse    = require('fs-extra');
+const path   = require('path');
+const csv    = require('csv');
+const parse  = require('co-busboy');
+const zlib   = require('zlib');
 const config = require('config');
+
+const dateIsValid = require('date-fns/isValid');
+const formatDate = require('date-fns/format');
 
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
@@ -234,6 +236,16 @@ function readStream(stream, index, username, splittedFields) {
           result.failed++;
           continue;
         }
+
+        const date = new Date(ec.datetime);
+
+        if (!dateIsValid(date)) {
+          addError({ reason: 'datetime is not valid' });
+          result.failed++;
+          continue;
+        }
+
+        ec.date = formatDate(date, 'yyyy-MM-dd');
 
         if (ec['geoip-longitude'] && ec['geoip-latitude']) {
           ec.location = {

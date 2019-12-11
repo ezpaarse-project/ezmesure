@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <AppBar :inverted-scroll="isHomepage" />
+    <AppBar />
 
     <v-content>
       <nuxt />
@@ -18,11 +18,6 @@ export default {
   components: {
     AppBar,
     Snackbar,
-  },
-  computed: {
-    isHomepage() {
-      return this.$route.name === 'index';
-    },
   },
 };
 </script>
