@@ -44,7 +44,7 @@ module.exports = async (frequency) => {
       const task = reportingTasks[j];
 
       logger.info(`Starting reporting task ${task._id}`);
-      const hrstart = process.hrtime();
+      const hrstart = process.hrtime.bigint();
 
       const source = task._source;
 
@@ -163,8 +163,8 @@ module.exports = async (frequency) => {
         logger.error(e);
       }
 
-      const hrend = process.hrtime(hrstart);
-      history.executionTime = hrend[1] / Math.pow(10, 6);
+      const hrend = process.hrtime.bigint();
+      history.executionTime = Math.floor(Number.parseInt(hrend - hrstart, 10) / 1e6);
 
       try {
         history.createdAt = new Date();

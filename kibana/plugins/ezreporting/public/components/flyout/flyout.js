@@ -17,7 +17,7 @@ import {
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
-import { defaultTask, convertDate } from '../../lib/reporting';
+import { defaultTask, convertDate, ms2Str } from '../../lib/reporting';
 import { addToast } from '../toast';
 
 let openFlyOutHandler;
@@ -228,7 +228,7 @@ export class Flyout extends Component {
             </EuiForm>
 
             <EuiHorizontalRule margin="m" />
-            <EuiText><strong><FormattedMessage id="ezReporting.executionTime" defaultMessage="Execution time" /></strong> : { currentHistory.executionTime } ms</EuiText>
+            <EuiText><strong><FormattedMessage id="ezReporting.executionTime" defaultMessage="Execution time" /></strong> : { ms2Str(currentHistory.executionTime) }</EuiText>
 
             <EuiHorizontalRule margin="m" />
             <EuiBasicTable
