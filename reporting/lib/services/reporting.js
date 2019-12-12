@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { index, historyIndex, kibana, sender, emailAttempts } = require('config');
+const { index, historyIndex, kibana, sender, email } = require('config');
 const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
@@ -82,25 +82,23 @@ module.exports = async (frequency) => {
         return logger.error(e);
       }
 
-      let currentDate = new Date();
-
-      const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
-      logger.info(`Saving pdf file : tmp/${source.space || 'default'}/${pdfName}`);
-      try {
-        await fs.ensureDir(path.resolve('tmp', source.space || 'default'));
-        logger.info(`Folder tmp/${source.space || 'default'} created`);
-      } catch (e) {
-        logger.error(e);
-      }
-      fs.writeFile(path.resolve('tmp', source.space || 'default', pdfName), pdf, err => {
-        if(err) logger.error('PDF saving failed !');
-      });
+      // const pdfName = `${task._id}_auto_${currentDate.getTime()}.pdf`;
+      // logger.info(`Saving pdf file : tmp/${source.space || 'default'}/${pdfName}`);
+      // try {
+      //   await fs.ensureDir(path.resolve('tmp', source.space || 'default'));
+      //   logger.info(`Folder tmp/${source.space || 'default'} created`);
+      // } catch (e) {
+      //   logger.error(e);
+      // }
+      // fs.writeFile(path.resolve('tmp', source.space || 'default', pdfName), pdf, err => {
+      //   if(err) logger.error('PDF saving failed !');
+      // });
 
       const dashboardUrl = `${kibana.external}/${source.space ? `s/${source.space}/`: ''}app/kibana#/dashboard/${source.dashboardId}`;
 
       let emailSent = false;
       logger.info('Sending mail');
-      for (let i = 0; i < emailAttempts; i += 1) {
+      for (let i = 0; i < email.attempts; i += 1) {
         try {
           await sendMail({
             from: sender,
@@ -109,7 +107,7 @@ module.exports = async (frequency) => {
             attachments: [
               {
                 contentType: 'application/pdf',
-                filename: `reporting_ezMESURE_${source.dashboardId}_${currentDate.toISOString()}.pdf`,
+                filename: `reporting_ezMESURE_${source.dashboardId}_${moment().format('DD-MM-YYYY')}.pdf`,
                 content: pdf,
                 cid: task.dashboardId,
               },
@@ -126,12 +124,14 @@ module.exports = async (frequency) => {
           logger.info('Email sent');
           break;
         } catch (e) {
-          logger.error(`Error when generating or sending emails (attempts: ${i}`);
+          logger.error(`Error when generating or sending emails (attempts: ${(i + 1)})`);
           logger.error(e);
+
+          await wait(email.interval * (i + 1));
         }
       }
 
-      if (emailSent) {
+      if (!emailSent) {
         history.data.push({
           status: 'error',
           message: 'Error when generating or sending emails',
@@ -139,6 +139,7 @@ module.exports = async (frequency) => {
         });
       }
 
+      let currentDate = new Date();
       currentDate.setHours(12, 0, 0, 0);
       source.sentAt = currentDate;
 
@@ -180,3 +181,5 @@ module.exports = async (frequency) => {
     }
   }
 };
+
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
