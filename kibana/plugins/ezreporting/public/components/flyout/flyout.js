@@ -12,6 +12,7 @@ import {
   EuiCheckbox,
   EuiText,
   EuiBasicTable,
+  EuiHorizontalRule,
 } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
@@ -226,6 +227,10 @@ export class Flyout extends Component {
               </EuiFormRow>
             </EuiForm>
 
+            <EuiHorizontalRule margin="m" />
+            <EuiText><strong><FormattedMessage id="ezReporting.executionTime" defaultMessage="Execution time" /></strong> : { currentHistory.executionTime } ms</EuiText>
+
+            <EuiHorizontalRule margin="m" />
             <EuiBasicTable
               items={currentHistory.data.slice(startIndex, endIndex)}
               columns={columns}

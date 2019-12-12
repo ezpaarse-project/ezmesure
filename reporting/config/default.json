@@ -16,7 +16,10 @@
     "host": "localhost",
     "port": 25
   },
-  "emailAttempts": 5,
+  "email": {
+    "attempts": 5,
+    "interval": 2000
+  },
   "sender": "ezmesure-reporting@couperin.org",
   "index": ".ezreporting",
   "historyIndex": ".ezreporting-history",
