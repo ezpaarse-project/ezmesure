@@ -24,7 +24,7 @@ indexes.findOrCreate();
 
 // CronTab for reporting job
 frequencies.forEach(frequency => {
-  const job = new CronJob(frequency.cron, () => {
+  const job = new CronJob('*/60 * * * * *', () => {
     reporting(frequency);
   });
   job.start();
