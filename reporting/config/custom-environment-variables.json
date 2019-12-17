@@ -27,5 +27,6 @@
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",
     "__format": "json"
-  }
+  },
+  "puppeteerTimeout": "REPORTING_PUPPETEER_TIMEOUT"
 }
