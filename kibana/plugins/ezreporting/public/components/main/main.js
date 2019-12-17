@@ -158,6 +158,14 @@ export class Main extends React.Component {
     }
   }
 
+  downloadReport = (taskId) => {
+    if (capabilities.get().ezreporting.save) {
+      if (taskId) {
+        return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/download`);
+      }
+    }
+  }
+
   render() {
     const { tasks, dashboards, frequencies, reportingName, accessDenied } = this.state;  
 
@@ -211,7 +219,7 @@ export class Main extends React.Component {
               </EuiPageContentHeader>
 
               <EuiPageContentBody>
-                <Table tasks={tasks} frequencies={frequencies} dashboards={dashboards} removeTaskHandler={this.removeTaskHandler} loadHistory={this.loadHistory} />
+                <Table tasks={tasks} frequencies={frequencies} dashboards={dashboards} removeTaskHandler={this.removeTaskHandler} loadHistory={this.loadHistory} downloadReport={downloadReport} />
               </EuiPageContentBody>
             </EuiPageContent>
           </EuiPageBody>

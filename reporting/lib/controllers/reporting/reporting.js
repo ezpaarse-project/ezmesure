@@ -1,6 +1,7 @@
 const { index, historyIndex, frequencies, reportingName } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
+const reporting = require('../../services/reporting');
 
 async function getDashboards(namespace) {
   const bool = {
@@ -286,6 +287,11 @@ exports.history = async (ctx) => {
       timeout: '30s',
       body: {
         size: 10000,
+        sort: {
+          createdAt: {
+            order: 'desc',
+          },
+        },
         query: {
           bool: {
             must: [
@@ -328,5 +334,51 @@ exports.history = async (ctx) => {
   } catch (err) {
     logger.error(err);
     ctx.status = 500;
+  }
+};
+
+exports.download = async (ctx) => {
+  ctx.status = 400;
+
+  const { taskId, frequency } = ctx.request.params;
+  
+  let task;
+  try {
+    const { body: data } = await elastic.search({
+      index: index,
+      timeout: '30s',
+      body: {
+        size: 10000,
+        query: {
+          bool: {
+            must: [
+              {
+                match: {
+                  _id: taskId,
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+
+    if (data && data.hits && data.hits.hits) {
+      task = data.hits.hits;
+    }
+  } catch (e) {
+    logger.error(`Cannot find task ${taskId}`);
+  }
+
+  const frequencyData = frequencies.find((freq) => freq.value === task[0]._source.frequency);
+
+  if (task.length > 0 && frequencyData) {
+    try {
+      reporting(frequencyData, task);
+      ctx.status = 200;
+    } catch (err) {
+      logger.err(err);
+      ctx.status(500);
+    }
   }
 };

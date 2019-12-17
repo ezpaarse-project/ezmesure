@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
-const { elasticsearch, kibana } = require('config');
+const { elasticsearch, kibana, puppeteerTimeout } = require('config');
 const logger = require('../logger');
 const dashboard = require('./dashboard');
 
@@ -63,8 +63,11 @@ module.exports = async (dashboardId, space, frequency, print) => {
       '--no-sandbox', '--disable-setuid-sandbox', // Absolute trust of the open content in chromium
     ],
   });
-
   const page = await browser.newPage();
+
+  page.setDefaultNavigationTimeout(puppeteerTimeout);
+  page.setDefaultTimeout(puppeteerTimeout);
+  
   await page.goto(`${kibana.internal || kibana.external}/${dashboardData.dashboardUrl}`, {
     waitUntil: 'load',
   });
@@ -145,8 +148,6 @@ module.exports = async (dashboardId, space, frequency, print) => {
   }
 
   const pdf = await page.pdf(pdfOptions);
-  
-  await browser.close();
 
   return pdf || null;
 };

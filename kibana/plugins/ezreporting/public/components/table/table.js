@@ -164,6 +164,33 @@ export class Table extends Component {
       });
     }
 
+    if (capabilities.get().ezreporting.save) {
+      columns[3].actions.push({
+        name: <FormattedMessage id="ezReporting.download" defaultMessage="Download" />,
+        description: <FormattedMessage id="ezReporting.download" defaultMessage="Download" />,
+        icon: 'importAction',
+        type: 'icon',
+        color: 'primary',
+        onClick: el => {
+          if (el.exists) {
+            return this.props.downloadReport(el).then((res) => {
+              return addToast(
+                'Information',
+                <FormattedMessage id="ezReporting.downloaded" defaultMessage="Your report will be sent to you by email" />,
+                'info'
+              );
+            }).catch((error) => {
+              return addToast(
+                'Error',
+                <FormattedMessage id="ezReporting.downloadError" defaultMessage="An error occurred while downloading report." />,
+                'danger'
+              );
+            });
+          }
+        },
+      });
+    }
+
     if (capabilities.get().ezreporting.show) {
       columns[3].actions.push({
         name: <FormattedMessage id="ezReporting.history" defaultMessage="History" />,

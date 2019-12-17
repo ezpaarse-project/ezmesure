@@ -30,7 +30,6 @@ frequencies.forEach(frequency => {
   job.start();
 });
 
-
 const app = new Koa();
 
 app.use(cors({
