@@ -91,7 +91,7 @@ module.exports = {
     });
 
     return {
-      dashboardUrl: `${space ? `s/${space}`: ''}app/kibana#/dashboard/${dashboardId}?_g=${encodeURIComponent(_gData)}&_a=${encodeURIComponent(_aData)}`,
+      dashboardUrl: `${space ? `s/${space}/` : ''}app/kibana#/dashboard/${dashboardId}?_g=${encodeURIComponent(gData)}&_a=${encodeURIComponent(aData)}`,
       dashboard: {
         title: source.dashboard.title,
         description: source.dashboard.description,
