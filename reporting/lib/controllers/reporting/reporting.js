@@ -338,47 +338,42 @@ exports.history = async (ctx) => {
 };
 
 exports.download = async (ctx) => {
-  ctx.status = 400;
+  const { taskId } = ctx.request.params;
 
-  const { taskId, frequency } = ctx.request.params;
-  
   let task;
   try {
-    const { body: data } = await elastic.search({
-      index: index,
-      timeout: '30s',
-      body: {
-        size: 10000,
-        query: {
-          bool: {
-            must: [
-              {
-                match: {
-                  _id: taskId,
-                },
-              },
-            ],
-          },
-        },
-      },
-    });
-
-    if (data && data.hits && data.hits.hits) {
-      task = data.hits.hits;
-    }
+    const { body } = await elastic.get({ id: taskId, index });
+    task = body;
   } catch (e) {
     logger.error(`Cannot find task ${taskId}`);
   }
 
-  const frequencyData = frequencies.find((freq) => freq.value === task[0]._source.frequency);
+  if (!task) {
+    ctx.status = 404;
+    ctx.body = {
+      statusCode: 404,
+      error: `Cannot find task ${taskId}`,
+    };
+    return;
+  }
 
-  if (task.length > 0 && frequencyData) {
+  const { _source: source } = task;
+  const frequencyData = frequencies.find((freq) => freq.value === source.frequency);
+
+  if (!frequencyData) {
+    ctx.status = 500;
+    ctx.body = {
+      statusCode: 500,
+      error: `no frequency data found for task ${taskId}`,
+    };
+    return;
+  }
+
     try {
-      reporting(frequencyData, task);
+    reporting(frequencyData, [task]);
       ctx.status = 200;
     } catch (err) {
       logger.err(err);
       ctx.status(500);
     }
-  }
 };
