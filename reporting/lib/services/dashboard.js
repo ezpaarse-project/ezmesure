@@ -38,8 +38,6 @@ module.exports = {
   data: async (dashboardId, space, frequency) => {
     const dashboard = await getDashboard(dashboardId, space);
 
-    dashboard = await getDashboard(dashboardId, space);
-
     if (!dashboard) {
       return null;
     }
