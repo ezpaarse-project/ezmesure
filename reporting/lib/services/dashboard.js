@@ -36,7 +36,7 @@ module.exports = {
   getDashboard,
 
   data: async (dashboardId, space, frequency) => {
-    let _gData, _aData, dashboard;
+    const dashboard = await getDashboard(dashboardId, space);
 
     dashboard = await getDashboard(dashboardId, space);
 
@@ -68,8 +68,10 @@ module.exports = {
       }
     });
 
+    let gData;
+
     if (source.dashboard.timeRestore) {
-      _gData = rison.encode({
+      gData = rison.encode({
         refreshInterval: source.dashboard.refreshInterval,
         time: {
           from: `now-${frequency}`,
@@ -78,7 +80,7 @@ module.exports = {
       });
     }
 
-    _aData = rison.encode({
+    const aData = rison.encode({
       description: source.dashboard.description,
       filters,
       fullScreenMode: false,
