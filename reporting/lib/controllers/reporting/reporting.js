@@ -1,4 +1,9 @@
-const { index, historyIndex, frequencies, reportingName } = require('config');
+const {
+  index,
+  historyIndex,
+  frequencies,
+  reportingName,
+} = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const reporting = require('../../services/reporting');
@@ -57,28 +62,25 @@ exports.list = async (ctx) => {
 
   const { space } = ctx.request.params;
 
-  const dashboards = [];
-  const tasks = [];
-
   let dashboardsData;
   try {
     dashboardsData = await getDashboards(space);
   } catch (err) {
-    ctx.body = { tasks, dashboards, frequencies };
+    ctx.body = { tasks: [], dashboards: [], frequencies };
     logger.error(err);
     ctx.status = 500;
-    return ctx;
+    return;
   }
 
-  for (let i = 0; i < dashboardsData.length; i += 1) {
-    const element = dashboardsData[i];
-    const dashboardId = element._id.split(':');
+  const dashboards = dashboardsData.map(({ _id: dashId, _source: dashSource }) => {
+    const dashboardId = dashId.split(':').pop();
+    const dashboardTitle = dashSource && dashSource.dashboard && dashSource.dashboard.title;
 
-    dashboards.push({
-      id: dashboardId[dashboardId.length - 1],
-      name: element._source.dashboard.title,
-    });
-  }
+    return {
+      id: dashboardId,
+      name: dashboardTitle,
+    };
+  });
 
   const bool = {
     must: [],
@@ -117,27 +119,33 @@ exports.list = async (ctx) => {
     ctx.status = 500;
   }
 
-  if (tasksData) {
-    const { hits } = tasksData.body.hits;
+  const body = tasksData && tasksData.body;
+  const hits = (body && body.hits && body.hits.hits) || [];
 
-    for (let i = 0; i < hits.length; i += 1) {
-      const dashboard = dashboards.find(({ id }) => id === hits[i]._source.dashboardId);
-      tasks.push({
-        _id: hits[i]._id,
-        dashboardId: hits[i]._source.dashboardId,
-        exists: dashboard ? true : false,
-        reporting: {
-          frequency: hits[i]._source.frequency,
-          emails: hits[i]._source.emails,
-          print: hits[i]._source.print,
-          createdAt: hits[i]._source.createdAt,
-          sentAt: hits[i]._source.sentAt,
-        },
-      });
-    }
-  }
+  const tasks = hits.map((hit) => {
+    const { _source: hitSource, _id: hitId } = hit;
+    const dashboard = dashboards.find(({ id }) => id === hitSource.dashboardId);
 
-  ctx.body = { tasks, dashboards, frequencies, reportingName };
+    return {
+      _id: hitId,
+      dashboardId: hitSource.dashboardId,
+      exists: !!dashboard,
+      reporting: {
+        frequency: hitSource.frequency,
+        emails: hitSource.emails,
+        print: hitSource.print,
+        createdAt: hitSource.createdAt,
+        sentAt: hitSource.sentAt,
+      },
+    };
+  });
+
+  ctx.body = {
+    tasks,
+    dashboards,
+    frequencies,
+    reportingName,
+  };
 };
 
 exports.store = async (ctx) => {
@@ -148,30 +156,28 @@ exports.store = async (ctx) => {
   if (ctx.invalid) {
     ctx.status = 400;
     ctx.body = { errors: ctx.invalid.body };
-    return ctx;
+    return;
   }
 
   if (ctx.invalid) {
     const invalidBody = ctx.invalid.body;
     const errors = invalidBody.details.map(({ message }) => message);
     ctx.body = errors;
-    return ctx;
+    return;
   }
 
   const { body } = ctx.request;
 
   body.createdAt = new Date();
   body.updatedAt = new Date();
-  body.sentAt = '1970-01-01T12:00:00.000Z';
+  body.sentAt = '1970-01-01T12:00:00.000Z'; // FIXME: use native Date
 
   try {
-    const { body: data } = await elastic.index({
-      index,
-      body,
-    });
+    const { body: data } = await elastic.index({ index, body });
+    const { _id: dataId } = data;
 
     ctx.body = {
-      _id: data._id,
+      _id: dataId,
       createdAt: body.createdAt,
       sentAt: body.sentAt,
     };
@@ -200,7 +206,7 @@ exports.update = async (ctx) => {
 
     ctx.status = 400;
     ctx.body = errors;
-    return ctx;
+    return;
   }
 
   const { taskId: id } = ctx.request.params;
@@ -239,7 +245,7 @@ exports.del = async (ctx) => {
 
     ctx.status = 400;
     ctx.body = errors;
-    return ctx;
+    return;
   }
 
   const { taskId: id } = ctx.request.params;
@@ -313,20 +319,21 @@ exports.history = async (ctx) => {
       const historiesData = [];
       const histories = [];
       data.hits.hits.forEach((history) => {
-        let match;
+        const { _source: historySource, _id: historyId } = history;
 
-        let date = history._source.createdAt;
-        if ((match = /^([0-9]{4}-[0-9]{2}-[0-9]{2})T([0-9]{2}:[0-9]{2}:[0-9]{2}).([0-9]{3})Z$/i.exec(history._source.createdAt)) !== null) {
-          date = `${match[1]}`;
-        }
+        // FIXME: should be done with either moment or date-fns
+        const match = /^([0-9]{4}-[0-9]{2}-[0-9]{2})T([0-9]{2}:[0-9]{2}:[0-9]{2}).([0-9]{3})Z$/i.exec(historySource.createdAt);
+        const date = match ? match[1] : historySource.createdAt;
 
         histories.push({
-          value: history._id,
+          value: historyId,
           text: date,
         });
 
-        history._source.id = history._id;
-        historiesData.push(history._source); 
+        historiesData.push({
+          id: historyId,
+          ...historySource,
+        });
       });
 
       ctx.body = { historiesData, histories };
@@ -369,11 +376,11 @@ exports.download = async (ctx) => {
     return;
   }
 
-    try {
+  try {
     reporting(frequencyData, [task]);
-      ctx.status = 200;
-    } catch (err) {
-      logger.err(err);
-      ctx.status(500);
-    }
+    ctx.status = 200;
+  } catch (err) {
+    logger.err(err);
+    ctx.status(500);
+  }
 };

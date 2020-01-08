@@ -14,8 +14,8 @@ nunjucks.configure(templatesDir);
 const images = fs.readdirSync(imagesDir);
 
 module.exports = {
-  sendMail: async (mailOptions, options) => {
-    mailOptions = mailOptions || {};
+  sendMail: async (options) => {
+    const mailOptions = options || {};
     mailOptions.attachments = mailOptions.attachments || [];
 
     images.forEach((image) => {
@@ -28,8 +28,11 @@ module.exports = {
 
     return new Promise((resolve, reject) => {
       transporter.sendMail(mailOptions, (err, info) => {
-        if (err) { return reject(err); }
-        resolve(info);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(info);
+        }
       });
     });
   },
@@ -42,5 +45,5 @@ module.exports = {
     const { html, errors } = mjml2html(mjmlTemplate);
 
     return { html, text, errors };
-  }
+  },
 };

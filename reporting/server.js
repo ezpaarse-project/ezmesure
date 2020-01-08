@@ -13,7 +13,7 @@ const reporting = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
 
-// Set locale date to FR 
+// Set locale date to FR
 moment().locale('fr');
 
 // check if roles exists
@@ -23,7 +23,7 @@ roles.findOrCreate();
 indexes.findOrCreate();
 
 // CronTab for reporting job
-frequencies.forEach(frequency => {
+frequencies.forEach((frequency) => {
   const job = new CronJob(frequency.cron, () => {
     reporting(frequency);
   });
@@ -51,7 +51,8 @@ app.use(async (ctx, next) => {
     if (ctx.headerSent || !ctx.writable) { return; }
 
     if (env !== 'development') {
-      return ctx.body = { error: error.message };
+      ctx.body = { error: error.message };
+      return;
     }
 
     ctx.type = 'json';
@@ -81,7 +82,7 @@ const closeApp = () => {
   server.close(() => {
     process.exit(0);
   });
-}
+};
 
 process.on('SIGINT', closeApp);
 process.on('SIGTERM', closeApp);

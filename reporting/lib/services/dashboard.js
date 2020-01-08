@@ -1,5 +1,5 @@
 const rison = require('rison-node');
-const elastic = require('./elastic')
+const elastic = require('./elastic');
 
 const getDashboard = async (dashboardId, namespace) => {
   const { body: data } = await elastic.search({
@@ -42,28 +42,30 @@ module.exports = {
       return null;
     }
 
-    const source = dashboard._source;
+    const { _source: source } = dashboard;
 
     const sourceJSON = JSON.parse(source.dashboard.kibanaSavedObjectMeta.searchSourceJSON);
     const panelsJSON = JSON.parse(source.dashboard.panelsJSON);
     const referencesData = source.references;
 
     const filters = sourceJSON.filter;
+    const index = referencesData.find((ref) => ref.name === filters[0].meta.indexRefName);
 
-    const index = referencesData.find(ref => ref.name === filters[0].meta.indexRefName);
     if (index) {
+      // FIXME: filters can be empty
       filters[0].meta.index = index.id;
       delete filters[0].meta.indexRefName;
     }
 
-    panelsJSON.forEach((panel) => {
-      const reference = referencesData.find(ref => ref.name === panel.panelRefName);
-      if (reference) {
-        panel.type = reference.type;
-        panel.id = reference.id;
+    const panels = panelsJSON.map((panel) => {
+      const reference = referencesData.find((ref) => ref.name === panel.panelRefName);
 
-        delete panel.panelRefName;
-      }
+      return {
+        ...panel,
+        type: reference ? reference.type : panel.type,
+        id: reference ? reference.id : panel.id,
+        panelRefName: reference ? undefined : panel.panelRefName,
+      };
     });
 
     let gData;
@@ -83,7 +85,7 @@ module.exports = {
       filters,
       fullScreenMode: false,
       options: JSON.parse(source.dashboard.optionsJSON),
-      panels: panelsJSON,
+      panels,
       query: sourceJSON.query,
       timeRestore: source.dashboard.timeRestore,
       title: source.dashboard.title,
@@ -98,4 +100,4 @@ module.exports = {
       },
     };
   },
-}
+};

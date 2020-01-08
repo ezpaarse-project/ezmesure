@@ -2,20 +2,17 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
+const moment = require('moment');
 const { elasticsearch, kibana, puppeteerTimeout } = require('config');
-const logger = require('../logger');
 const dashboard = require('./dashboard');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
-const moment = require('moment');
 
 const getAssets = async () => {
-  let logo, preserveLayoutCSS, printCSS;
-
-  logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
-  preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
-  printCSS = await fsp.readFile(path.resolve('assets', 'css', 'print.css'), 'utf8');
+  const logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
+  const preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
+  const printCSS = await fsp.readFile(path.resolve('assets', 'css', 'print.css'), 'utf8');
 
   if (logo && preserveLayoutCSS && printCSS) {
     return {
@@ -26,18 +23,18 @@ const getAssets = async () => {
   }
 
   return null;
-}
+};
 
 module.exports = async (dashboardId, space, frequency, print) => {
   const dashboardData = await dashboard.data(dashboardId, space, frequency);
 
   const css = await getAssets();
-  
+
   const fields = {
     username: 'input[name=username]',
     password: 'input[name=password]',
   };
-  
+
   const viewport = {
     width: 1920,
     a4: {
@@ -50,7 +47,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
       right: 75,
       top: 120,
       bottom: 75,
-    }
+    },
   };
 
   const browser = await puppeteer.launch({
@@ -67,7 +64,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
 
   page.setDefaultNavigationTimeout(puppeteerTimeout);
   page.setDefaultTimeout(puppeteerTimeout);
-  
+
   await page.goto(`${kibana.internal || kibana.external}/${dashboardData.dashboardUrl}`, {
     waitUntil: 'load',
   });
@@ -85,7 +82,6 @@ module.exports = async (dashboardId, space, frequency, print) => {
   await page.waitFor('.dshLayout--viewing');
 
   const dashboardViewport = await page.$('.dshLayout--viewing');
-
   const bouncingBox = await dashboardViewport.boundingBox();
   const visualizations = await page.$$('.dshLayout--viewing .react-grid-item');
 
@@ -95,29 +91,31 @@ module.exports = async (dashboardId, space, frequency, print) => {
     deviceScaleFactor: 1,
   });
 
-  await page.evaluate(({ print, css, viewport }) => {
-    let cssLayout = css.preserveLayoutCSS;
+  await page.evaluate((params, ...allVisualizations) => {
+    let cssLayout = params.css.preserveLayoutCSS;
 
-    if (print) {
-      cssLayout += css.printCSS;
+    if (params.print) {
+      cssLayout += params.css.printCSS;
     }
 
-    const node = document.createElement('style');
-    node.type = 'text/css';
-    node.innerHTML = cssLayout;
-    document.getElementsByTagName('head')[0].appendChild(node);
+    const styleNode = document.createElement('style'); // eslint-disable-line no-undef
+    styleNode.type = 'text/css';
+    styleNode.innerHTML = cssLayout;
+    document.head.appendChild(styleNode); // eslint-disable-line no-undef
 
-    if (print) {
-      const visualizations = $('.dshLayout--viewing .react-grid-item').toArray();
-      for (i = 0; i < visualizations.length; i += 1) {
-        visualizations[i].style.top = `${(viewport.a4.height - viewport.margin.top) * i}px`;
-      }
+    if (params.print) {
+      allVisualizations.forEach((visualization, index) => {
+        visualization.style.setProperty('top', `${(params.viewport.a4.height - params.viewport.margin.top) * index}px`);
+      });
     }
-  }, { print, css, viewport });
+  }, { print, css, viewport }, ...visualizations);
+
+  dashboardViewport.dispose();
+  visualizations.forEach((v) => v.dispose());
 
   await page.waitFor(5000);
 
-  let pdfOptions = {
+  const pdfOptions = {
     margin: {
       left: `${viewport.margin.left}px`,
       right: `${viewport.margin.right}px`,

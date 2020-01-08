@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const route = require('koa-route');
 const mount = require('koa-mount');
-const { name, version } = require('../../package.json')
+const { name, version } = require('../../package.json');
 
 const reporting = require('./reporting');
 
