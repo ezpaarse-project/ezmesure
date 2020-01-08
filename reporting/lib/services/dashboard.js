@@ -68,17 +68,12 @@ module.exports = {
       };
     });
 
-    let gData;
-
-    if (source.dashboard.timeRestore) {
-      gData = rison.encode({
-        refreshInterval: source.dashboard.refreshInterval,
-        time: {
-          from: `now-${frequency}`,
-          to: 'now',
-        },
-      });
-    }
+    const gData = rison.encode({
+      time: {
+        from: `now-${frequency}`,
+        to: 'now',
+      },
+    });
 
     const aData = rison.encode({
       description: source.dashboard.description,
@@ -87,7 +82,7 @@ module.exports = {
       options: JSON.parse(source.dashboard.optionsJSON),
       panels,
       query: sourceJSON.query,
-      timeRestore: source.dashboard.timeRestore,
+      timeRestore: true,
       title: source.dashboard.title,
       viewMode: 'view',
     });
