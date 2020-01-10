@@ -72,7 +72,7 @@ module.exports = async function generateReports(frequency, tasks) {
 
   for (let j = 0; j < reportingTasks.length; j += 1) {
     const task = reportingTasks[j];
-    const { _id: taskId, _source: source } = task;
+    const { _id: taskId, _source: taskSource } = task;
 
     logger.info(`Starting reporting task ${taskId}`);
     const hrstart = process.hrtime.bigint();
@@ -84,17 +84,17 @@ module.exports = async function generateReports(frequency, tasks) {
     };
 
     let dashboard;
-    logger.info(`${taskId} : getting dashboard (id: ${source.space || 'default'}:${source.dashboardId})`);
+    logger.info(`${taskId} : getting dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
     try {
       // eslint-disable-next-line no-await-in-loop
-      dashboard = await getDashboard(source.dashboardId, source.space);
+      dashboard = await getDashboard(taskSource.dashboardId, taskSource.space);
     } catch (e) {
       history.data.push({
         status: 'error',
-        message: `${taskId} : dashboard (id: ${source.space || 'default'}:${source.dashboardId}) not found or removed`,
+        message: `${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`,
         date: new Date(),
       });
-      logger.error(`${taskId} : dashboard (id: ${source.space || 'default'}:${source.dashboardId}) not found or removed`);
+      logger.error(`${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`);
       logger.error(e);
 
       try {
@@ -108,16 +108,16 @@ module.exports = async function generateReports(frequency, tasks) {
       }
     }
 
-    logger.info(`${taskId} : generating pdf (id: ${source.space || 'default'}:${source.dashboardId})`);
+    logger.info(`${taskId} : generating pdf (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
 
     let pdf;
     try {
       // eslint-disable-next-line no-await-in-loop
       pdf = await puppeteer(
-        source.dashboardId,
-        source.space || null,
-        source.frequency,
-        source.print,
+        taskSource.dashboardId,
+        taskSource.space || null,
+        taskSource.frequency,
+        taskSource.print,
       );
     } catch (e) {
       history.data.push({
@@ -125,7 +125,7 @@ module.exports = async function generateReports(frequency, tasks) {
         message: 'Error during PDF report generation',
         date: new Date(),
       });
-      logger.error(`${taskId} : error during PDF report generation (id: ${source.space || 'default'}:${source.dashboardId})`);
+      logger.error(`${taskId} : error during PDF report generation (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
       logger.error(e);
 
       try {
@@ -139,7 +139,7 @@ module.exports = async function generateReports(frequency, tasks) {
       }
     }
 
-    const dashboardUrl = `${kibana.external}/${source.space ? `s/${source.space}/` : ''}app/kibana#/dashboard/${source.dashboardId}`;
+    const dashboardUrl = `${kibana.external}/${taskSource.space ? `s/${taskSource.space}/` : ''}app/kibana#/dashboard/${taskSource.dashboardId}`;
 
     let emailSent = false;
     logger.info(`${taskId} : sending mail`);
@@ -152,12 +152,12 @@ module.exports = async function generateReports(frequency, tasks) {
         // eslint-disable-next-line no-await-in-loop
         await sendMail({
           from: sender,
-          to: source.emails,
-          subject: `Reporting ezMESURE [${source.print ? 'OI - ' : ''}${moment().format('DD/MM/YYYY')}] - ${dashboardTitle}`,
+          to: taskSource.emails,
+          subject: `Reporting ezMESURE [${taskSource.print ? 'OI - ' : ''}${moment().format('DD/MM/YYYY')}] - ${dashboardTitle}`,
           attachments: [
             {
               contentType: 'application/pdf',
-              filename: `reporting_ezMESURE_${source.dashboardId}_${moment().format('DD-MM-YYYY')}.pdf`,
+              filename: `reporting_ezMESURE_${taskSource.dashboardId}_${moment().format('DD-MM-YYYY')}.pdf`,
               content: pdf,
               cid: task.dashboardId,
             },
@@ -167,7 +167,7 @@ module.exports = async function generateReports(frequency, tasks) {
             title: dashboardTitle,
             frequency: frequency.fr.toLowerCase(),
             dashboardUrl,
-            optimizedForPrinting: source.print ? ' optimisé pour impression' : '',
+            optimizedForPrinting: taskSource.print ? ' optimisé pour impression' : '',
           }),
         });
         emailSent = true;
@@ -192,7 +192,7 @@ module.exports = async function generateReports(frequency, tasks) {
 
     const currentDate = new Date();
     currentDate.setHours(12, 0, 0, 0);
-    source.sentAt = currentDate;
+    taskSource.sentAt = currentDate;
 
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -201,7 +201,7 @@ module.exports = async function generateReports(frequency, tasks) {
         id: taskId,
         body: {
           doc: {
-            ...source,
+            ...taskSource,
           },
         },
       });
