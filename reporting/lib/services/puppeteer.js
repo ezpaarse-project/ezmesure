@@ -4,7 +4,7 @@ const fs = require('fs');
 const { promisify } = require('util');
 const moment = require('moment');
 const { elasticsearch, kibana, puppeteerTimeout } = require('config');
-const dashboard = require('./dashboard');
+const { getDashboard, buildDashboardUrl } = require('./dashboard');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
@@ -26,7 +26,10 @@ const getAssets = async () => {
 };
 
 module.exports = async (dashboardId, space, frequency, print) => {
-  const dashboardData = await dashboard.data(dashboardId, space, frequency);
+  const { dashboard } = (await getDashboard(dashboardId, space)) || {};
+  const dashboardUrl = buildDashboardUrl(dashboardId, space, frequency);
+  const dashboardTitle = dashboard && dashboard.title;
+  const dashboardDesc = dashboard && dashboard.description;
 
   const css = await getAssets();
 
@@ -65,7 +68,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
   page.setDefaultNavigationTimeout(puppeteerTimeout);
   page.setDefaultTimeout(puppeteerTimeout);
 
-  await page.goto(`${kibana.internal || kibana.external}/${dashboardData.dashboardUrl}`, {
+  await page.goto(`${kibana.internal || kibana.external}/${dashboardUrl}`, {
     waitUntil: 'load',
   });
 
@@ -125,8 +128,8 @@ module.exports = async (dashboardId, space, frequency, print) => {
     printBackground: false,
     displayHeaderFooter: true,
     headerTemplate: `<div style="width: 1920px; color: black; text-align: center;">
-      <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardData.dashboardUrl}">${dashboardData.dashboard.title}</a></h1>
-      <p style="font-size: 12px;">${dashboardData.dashboard.description}</p>
+      <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
+      <p style="font-size: 12px;">${dashboardDesc}</p>
       <p style="font-size: 10px;">Rapport généré le ${moment().locale('fr').format('dddd Do MMMM YYYY')}</p></div>`,
     footerTemplate: `<div style="width: 1920px; color: black;">
       <div style="text-align: center;">

@@ -144,8 +144,7 @@ module.exports = async function generateReports(frequency, tasks) {
     let emailSent = false;
     logger.info(`${taskId} : sending mail`);
 
-    const { _source: dashboardSource } = dashboard;
-    const dashboardTitle = (dashboardSource && dashboardSource.dashboard && dashboardSource.dashboard.title) || '';
+    const dashboardTitle = (dashboard && dashboard.dashboard && dashboard.dashboard.title) || '';
 
     for (let i = 0; i < email.attempts; i += 1) {
       try {
