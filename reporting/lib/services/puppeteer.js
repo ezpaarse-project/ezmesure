@@ -85,12 +85,12 @@ module.exports = async (dashboardId, space, frequency, print) => {
   await page.waitFor('.dshLayout--viewing');
 
   const dashboardViewport = await page.$('.dshLayout--viewing');
-  const bouncingBox = await dashboardViewport.boundingBox();
+  const boundingBox = await dashboardViewport.boundingBox();
   const visualizations = await page.$$('.dshLayout--viewing .react-grid-item');
 
   await page.setViewport({
     width: print ? viewport.a4.width : viewport.width,
-    height: print ? (viewport.a4.height * visualizations.length) : bouncingBox.height,
+    height: print ? (viewport.a4.height * visualizations.length) : boundingBox.height,
     deviceScaleFactor: 1,
   });
 
@@ -143,7 +143,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
     pdfOptions.format = 'A4';
     pdfOptions.landscape = true;
   } else {
-    const height = (bouncingBox.height + viewport.heightPaddingTop);
+    const height = (boundingBox.height + viewport.heightPaddingTop);
     pdfOptions.width = viewport.width;
     pdfOptions.height = Math.max(height, 600);
   }
