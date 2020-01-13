@@ -4,7 +4,7 @@ const router = require('koa-joi-router');
 const route = router();
 const { Joi } = router;
 const bodyParser = require('koa-bodyparser');
-const { index } = require('config');
+const { index, frequencies } = require('config');
 
 const {
   list,
@@ -68,7 +68,7 @@ const validate = {
   body: {
     dashboardId: Joi.string().guid().required(),
     space: Joi.string(),
-    frequency: Joi.string().required(),
+    frequency: Joi.string().required().valid(frequencies.map((f) => f.value)),
     emails: Joi.string().required(),
     print: Joi.boolean().required(),
   },
