@@ -6,7 +6,8 @@ const {
 } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
-const reporting = require('../../services/reporting');
+const { generateReport } = require('../../services/reporting');
+const Frequency = require('../../services/frequency');
 
 async function getDashboards(namespace) {
   const bool = {
@@ -151,26 +152,20 @@ exports.list = async (ctx) => {
 exports.store = async (ctx) => {
   logger.info('reporting/store');
   ctx.action = 'reporting/store';
-  ctx.status = 200;
-
-  if (ctx.invalid) {
-    ctx.status = 400;
-    ctx.body = { errors: ctx.invalid.body };
-    return;
-  }
-
-  if (ctx.invalid) {
-    const invalidBody = ctx.invalid.body;
-    const errors = invalidBody.details.map(({ message }) => message);
-    ctx.body = errors;
-    return;
-  }
 
   const { body } = ctx.request;
+  const frequency = new Frequency(body.frequency);
 
-  body.createdAt = new Date();
-  body.updatedAt = new Date();
-  body.sentAt = '1970-01-01T12:00:00.000Z'; // FIXME: use native Date
+  if (!frequency.isValid()) {
+    ctx.throw(400, 'invalid frequency');
+    return;
+  }
+
+  const now = new Date();
+  body.createdAt = now;
+  body.updatedAt = now;
+  body.sentAt = null;
+  body.runAt = frequency.nextDateFrom(now);
 
   try {
     const { body: data } = await elastic.index({ index, body });
@@ -185,33 +180,24 @@ exports.store = async (ctx) => {
     logger.error(err);
     ctx.status = 500;
   }
+
+  ctx.status = 200;
 };
 
 exports.update = async (ctx) => {
   logger.info('reporting/update');
   ctx.action = 'reporting/update';
-  ctx.status = 204;
 
-  if (ctx.invalid) {
-    const errors = [];
 
-    const { params, body } = ctx.invalid;
-    if (params) {
-      params.details.forEach(({ message }) => errors.push(message));
-    }
+  const now = new Date();
+  const { body } = ctx.request;
+  const { taskId: id } = ctx.request.params;
+  const frequency = new Frequency(body.frequency);
 
-    if (body) {
-      body.details.forEach(({ message }) => errors.push(message));
-    }
-
-    ctx.status = 400;
-    ctx.body = errors;
+  if (!frequency.isValid()) {
+    ctx.throw(400, 'invalid frequency');
     return;
   }
-
-  const { taskId: id } = ctx.request.params;
-
-  const { body } = ctx.request;
 
   try {
     await elastic.update({
@@ -220,7 +206,8 @@ exports.update = async (ctx) => {
       body: {
         doc: {
           ...body,
-          updatedAt: new Date(),
+          runAt: frequency.nextDateFrom(now),
+          updatedAt: now,
         },
       },
     });
@@ -228,6 +215,8 @@ exports.update = async (ctx) => {
     logger.error(err);
     ctx.status = 500;
   }
+
+  ctx.status = 204;
 };
 
 exports.del = async (ctx) => {
@@ -377,7 +366,7 @@ exports.download = async (ctx) => {
   }
 
   try {
-    reporting(frequencyData, [task]);
+    generateReport(task);
     ctx.status = 200;
   } catch (err) {
     logger.err(err);

@@ -2,7 +2,8 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
-const moment = require('moment');
+const formatDate = require('date-fns/format');
+const { fr } = require('date-fns/locale');
 const { elasticsearch, kibana, puppeteerTimeout } = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
 
@@ -130,7 +131,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
     headerTemplate: `<div style="width: 1920px; color: black; text-align: center;">
       <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
       <p style="font-size: 12px;">${dashboardDesc}</p>
-      <p style="font-size: 10px;">Rapport généré le ${moment().locale('fr').format('dddd Do MMMM YYYY')}</p></div>`,
+      <p style="font-size: 10px;">Rapport généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p></div>`,
     footerTemplate: `<div style="width: 1920px; color: black;">
       <div style="text-align: center;">
         <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>

@@ -1,20 +1,16 @@
 const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('@koa/cors');
-const { port, frequencies } = require('config');
+const { port, cron } = require('config');
 const { CronJob } = require('cron');
-const moment = require('moment');
 
 const logger = require('./lib/logger');
 const roles = require('./lib/services/roles');
 const indexes = require('./lib/services/indexes');
 const controller = require('./lib/controllers');
-const reporting = require('./lib/services/reporting');
+const { generatePendingReports } = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
-
-// Set locale date to FR
-moment().locale('fr');
 
 // check if roles exists
 roles.findOrCreate();
@@ -23,12 +19,10 @@ roles.findOrCreate();
 indexes.findOrCreate();
 
 // CronTab for reporting job
-frequencies.forEach((frequency) => {
-  const job = new CronJob(frequency.cron, () => {
-    reporting(frequency);
-  });
-  job.start();
+const job = new CronJob(cron, () => {
+  generatePendingReports();
 });
+job.start();
 
 const app = new Koa();
 
