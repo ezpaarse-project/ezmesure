@@ -167,7 +167,7 @@ export class Main extends React.Component {
   }
 
   render() {
-    const { tasks, dashboards, frequencies, reportingName, accessDenied } = this.state;  
+    const { tasks, dashboards, frequencies, reportingName, accessDenied } = this.state;
 
     if (accessDenied) {
       return (
