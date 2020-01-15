@@ -64,7 +64,6 @@ app.use(bodyParser());
 const validate = {
   type: 'json',
   failure: 400,
-  continueOnError: true,
   body: {
     dashboardId: Joi.string().guid().required(),
     space: Joi.string(),
