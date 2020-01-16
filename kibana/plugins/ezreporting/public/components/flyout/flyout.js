@@ -297,6 +297,7 @@ export class Flyout extends Component {
 
             <EuiFormRow fullWidth={true} >
               <EuiCheckbox
+                id="optimize-checkbox"
                 checked={currentTask.reporting.print}
                 label={<FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
                 onChange={this.onChangeLayout}
