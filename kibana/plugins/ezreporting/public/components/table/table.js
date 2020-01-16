@@ -9,7 +9,7 @@ import {
   EuiText,
   EuiToolTip,
 } from '@elastic/eui';
-import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT, CENTER_ALIGNMENT } from '@elastic/eui/lib/services';
+import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { convertFrequency, convertDate } from '../../lib/reporting';
@@ -66,95 +66,12 @@ export class Table extends Component {
     const { pageIndex, pageSize, itemIdToExpandedRowMap } = this.state;
     const { tasks, dashboards, frequencies } = this.props;
 
-    const columns = [
-      {
-        name: <FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />,
-        description: <FormattedMessage id="ezReporting.dashboardName" defaultMessage="Dashboard name" />,
-        render: ({ dashboardId, reporting }) => {
-          if (dashboardId) {
-            const dashboard = dashboards.find(({ id }) => id === dashboardId);
-            if (dashboard) {
-              if (reporting.print) {
-                const content = <FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />;
-                return (
-                  <span>
-                    <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink> {' '}
-                    <EuiToolTip position="right" content={content}>
-                      <EuiText>&#128438;</EuiText>
-                    </EuiToolTip>
-                  </span>
-                );
-              }
-              return (<EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>);
-            }
-
-            return (
-              <EuiTextColor color="warning"><EuiIcon type="alert" />
-                <FormattedMessage
-                  id="ezReporting.dashboardNotFound"
-                  values={{ DASHBOARD_ID: dashboardId }}
-                  defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
-                />
-              </EuiTextColor>
-            );
-          }
-
-          return (
-            <EuiTextColor color="warning"><EuiIcon type="alert" />
-              <FormattedMessage
-                id="ezReporting.dashboardNotFound"
-                values={{ DASHBOARD_ID: dashboardId }}
-                defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
-              />
-            </EuiTextColor>
-          );
-        },
-        sortable: false,
-        align: LEFT_ALIGNMENT,
-      },
-      {
-        name: <FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />,
-        description: <FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />,
-        render: ({ reporting }) => convertFrequency(frequencies, reporting.frequency),
-        sortable: true,
-        align: CENTER_ALIGNMENT,
-      },
-      {
-        name: <FormattedMessage id="ezReporting.sentAt" defaultMessage="Sending date" />,
-        description: <FormattedMessage id="ezReporting.sentAt" defaultMessage="Sending date" />,
-        render: ({ reporting }) => {
-          if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
-            return convertDate(reporting.sentAt);
-          }
-
-          return '-';
-        },
-        sortable: true,
-        align: CENTER_ALIGNMENT,
-      },
-      {
-        actions: [],
-        alignment: RIGHT_ALIGNMENT,
-        width: '32px',
-      },
-      {
-        align: RIGHT_ALIGNMENT,
-        width: '40px',
-        isExpander: true,
-        render: item => (
-          <EuiButtonIcon
-            onClick={() => this.toggleDetails(item)}
-            aria-label={itemIdToExpandedRowMap[item._id] ? 'Collapse' : 'Expand'}
-            iconType={itemIdToExpandedRowMap[item._id] ? 'arrowUp' : 'arrowDown'}
-          />
-        ),
-      },
-    ];
+    const actions = [];
 
     if (capabilities.get().ezreporting.edit) {
-      columns[3].actions.push({
-        name: <FormattedMessage id="ezReporting.edit" defaultMessage="Edit" />,
-        description: <FormattedMessage id="ezReporting.edit" defaultMessage="Edit" />,
+      actions.push({
+        name: i18n.translate('ezReporting.edit', { defaultMessage: 'Edit' }),
+        description: i18n.translate('ezReporting.edit', { defaultMessage: 'Edit' }),
         icon: 'pencil',
         type: 'icon',
         color: 'primary',
@@ -177,9 +94,9 @@ export class Table extends Component {
     }
 
     if (capabilities.get().ezreporting.save) {
-      columns[3].actions.push({
-        name: <FormattedMessage id="ezReporting.download" defaultMessage="Download" />,
-        description: <FormattedMessage id="ezReporting.download" defaultMessage="Download" />,
+      actions.push({
+        name: i18n.translate('ezReporting.download', { defaultMessage: 'Download' }),
+        description: i18n.translate('ezReporting.download', { defaultMessage: 'Download' }),
         icon: 'importAction',
         type: 'icon',
         color: 'primary',
@@ -204,9 +121,9 @@ export class Table extends Component {
     }
 
     if (capabilities.get().ezreporting.show) {
-      columns[3].actions.push({
-        name: <FormattedMessage id="ezReporting.history" defaultMessage="History" />,
-        description: <FormattedMessage id="ezReporting.history" defaultMessage="History" />,
+      actions.push({
+        name: i18n.translate('ezReporting.history', { defaultMessage: 'History' }),
+        description: i18n.translate('ezReporting.history', { defaultMessage: 'History' }),
         icon: 'clock',
         type: 'icon',
         color: 'primary',
@@ -237,9 +154,9 @@ export class Table extends Component {
     }
 
     if (capabilities.get().ezreporting.delete) {
-      columns[3].actions.push({
-        name: <FormattedMessage id="ezReporting.delete" defaultMessage="Delete" />,
-        description: <FormattedMessage id="ezReporting.delete" defaultMessage="Delete" />,
+      actions.push({
+        name: i18n.translate('ezReporting.delete', { defaultMessage: 'Delete' }),
+        description: i18n.translate('ezReporting.delete', { defaultMessage: 'Delete' }),
         icon: 'trash',
         type: 'icon',
         color: 'danger',
@@ -248,6 +165,78 @@ export class Table extends Component {
         },
       });
     }
+
+    const columns = [
+      {
+        name: i18n.translate('ezReporting.dashboard', { defaultMessage: 'Dashboard' }),
+        description: i18n.translate('ezReporting.dashboardName', { defaultMessage: 'Dashboard name' }),
+        align: 'left',
+        render: ({ dashboardId, reporting }) => {
+          if (dashboardId) {
+            const dashboard = dashboards.find(({ id }) => id === dashboardId);
+            if (dashboard) {
+              if (reporting.print) {
+                const content = <FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />;
+                return (
+                  <span>
+                    <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink> {' '}
+                    <EuiToolTip position="right" content={content}>
+                      <EuiText>&#128438;</EuiText>
+                    </EuiToolTip>
+                  </span>
+                );
+              }
+              return (<EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>);
+            }
+          }
+
+          return (
+            <EuiTextColor color="warning"><EuiIcon type="alert" />
+              <FormattedMessage
+                id="ezReporting.dashboardNotFound"
+                values={{ DASHBOARD_ID: dashboardId }}
+                defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
+              />
+            </EuiTextColor>
+          );
+        },
+      },
+      {
+        name: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
+        description: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
+        render: ({ reporting }) => convertFrequency(frequencies, reporting.frequency),
+        align: 'center',
+      },
+      {
+        name: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
+        description: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
+        align: 'center',
+        render: ({ reporting }) => {
+          if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
+            return convertDate(reporting.sentAt);
+          }
+
+          return '-';
+        },
+      },
+      {
+        actions,
+        align: 'right',
+        width: '32px',
+      },
+      {
+        align: 'right',
+        width: '40px',
+        isExpander: true,
+        render: item => (
+          <EuiButtonIcon
+            onClick={() => this.toggleDetails(item)}
+            aria-label={itemIdToExpandedRowMap[item._id] ? 'Collapse' : 'Expand'}
+            iconType={itemIdToExpandedRowMap[item._id] ? 'arrowUp' : 'arrowDown'}
+          />
+        ),
+      },
+    ];
 
     const pagination = {
       pageIndex,
