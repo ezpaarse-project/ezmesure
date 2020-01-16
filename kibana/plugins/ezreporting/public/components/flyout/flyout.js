@@ -16,7 +16,6 @@ import {
 } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
-import { LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { defaultTask, convertDate, ms2Str } from '../../lib/reporting';
 import { addToast } from '../toast';
 
@@ -165,180 +164,178 @@ export class Flyout extends Component {
       );
     }
 
-    let flyOutRender;
     let flyOutContent;
-    if (isFlyoutVisible) {
-      let title;
 
-      if (currentHistory) {
-        title = <FormattedMessage id="ezReporting.history" defaultMessage="History" />;
+    if (!isFlyoutVisible) {
+      return <Fragment />;
+    }
 
-        const columns = [
-          {
-            field: 'date',
-            name: 'Date',
-            sortable: true,
-            align: LEFT_ALIGNMENT,
-            width: '200px',
-            render: (date) => {
-              return convertDate(date, true);
-            },
+    let title;
+
+    if (currentHistory) {
+      title = <FormattedMessage id="ezReporting.history" defaultMessage="History" />;
+
+      const columns = [
+        {
+          field: 'date',
+          name: 'Date',
+          sortable: true,
+          align: 'left',
+          width: '200px',
+          render: (date) => {
+            return convertDate(date, true);
           },
-          {
-            field: 'status',
-            name: 'Status',
-            sortable: true,
-            align: LEFT_ALIGNMENT,
-            width: '100px',
-          },
-          {
-            field: 'message',
-            name: 'Message',
-            sortable: false,
-            align: LEFT_ALIGNMENT,
-          }
-        ];
-
-        const pagination = {
-          pageIndex,
-          pageSize,
-          totalItemCount: currentHistory.data.length,
-          pageSizeOptions: [10, 20, 30],
-          hidePerPageOptions: false,
-        };
-
-        const startIndex = (pageIndex * pageSize);
-        const endIndex = Math.min(startIndex + pageSize, currentHistory.data.length);
-
-        flyOutContent = (
-          <Fragment>
-            <EuiForm>
-              <EuiFormRow
-                fullWidth={true}
-                label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
-              >
-                <EuiSelect
-                  fullWidth={true}
-                  options={histories}
-                  value={currentHistory.id}
-                  onChange={this.onChangeHistory}
-                  aria-label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
-                />
-              </EuiFormRow>
-            </EuiForm>
-
-            <EuiHorizontalRule margin="m" />
-            <EuiText>
-              <strong>
-                <FormattedMessage
-                  id="ezReporting.executionTime"
-                  defaultMessage="Execution time"
-                />
-              </strong> : { ms2Str(currentHistory.executionTime) }
-            </EuiText>
-
-            <EuiHorizontalRule margin="m" />
-            <EuiBasicTable
-              items={currentHistory.data.slice(startIndex, endIndex)}
-              columns={columns}
-              onChange={this.onTableChange}
-              pagination={pagination}
-            />
-          </Fragment>
-        );
-      }
-
-      if (!currentHistory) {
-        title = <FormattedMessage id="ezReporting.creating" defaultMessage="Creating" />;
-        if (edit) {
-          title = <FormattedMessage id="ezReporting.editing" defaultMessage="Editing" />;
+        },
+        {
+          field: 'status',
+          name: 'Status',
+          sortable: true,
+          align: 'left',
+          width: '100px',
+        },
+        {
+          field: 'message',
+          name: 'Message',
+          sortable: false,
+          align: 'left',
         }
-        title = (<Fragment>{ title }  <FormattedMessage id="ezReporting.reportingTask" defaultMessage="a reporting task" /></Fragment>);
+      ];
 
-        flyOutContent = (
-          <EuiForm isInvalid={errors.show} error={errors.messages}>
+      const pagination = {
+        pageIndex,
+        pageSize,
+        totalItemCount: currentHistory.data.length,
+        pageSizeOptions: [10, 20, 30],
+        hidePerPageOptions: false,
+      };
+
+      const startIndex = (pageIndex * pageSize);
+      const endIndex = Math.min(startIndex + pageSize, currentHistory.data.length);
+
+      flyOutContent = (
+        <Fragment>
+          <EuiForm>
             <EuiFormRow
               fullWidth={true}
-              label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
-              isInvalid={edit ? false : errors.show}
+              label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
             >
               <EuiSelect
                 fullWidth={true}
-                options={options}
-                value={currentTask.dashboardId}
-                aria-label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
-                onChange={this.onChangeDashboard}
-                disabled={edit}
-                isInvalid={edit ? false : errors.show}
+                options={histories}
+                value={currentHistory.id}
+                onChange={this.onChangeHistory}
+                aria-label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
               />
             </EuiFormRow>
-
-            <EuiFormRow
-              fullWidth={true}
-              label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
-              isInvalid={errors.show}
-            >
-              <EuiSelect
-                fullWidth={true}
-                options={frequencies}
-                value={currentTask.reporting.frequency}
-                aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
-                onChange={this.onChangeFrequency}
-                isInvalid={errors.show}
-              />
-            </EuiFormRow>
-
-            <EuiFormRow
-              fullWidth={true}
-              label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
-              isInvalid={errors.show}
-            >
-              <EuiTextArea
-                fullWidth={true}
-                placeholder="(ex: john@doe.com,jane@doe.com)"
-                value={currentTask.reporting.emails}
-                onChange={this.onChangeEmails}
-                isInvalid={errors.show}
-              />
-            </EuiFormRow>
-
-            <EuiFormRow fullWidth={true} >
-              <EuiCheckbox
-                id="optimize-checkbox"
-                checked={currentTask.reporting.print}
-                label={<FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
-                onChange={this.onChangeLayout}
-              />
-            </EuiFormRow>
-
-            {saveBtn}
           </EuiForm>
-        );
+
+          <EuiHorizontalRule margin="m" />
+          <EuiText>
+            <strong>
+              <FormattedMessage
+                id="ezReporting.executionTime"
+                defaultMessage="Execution time"
+              />
+            </strong> : { ms2Str(currentHistory.executionTime) }
+          </EuiText>
+
+          <EuiHorizontalRule margin="m" />
+          <EuiBasicTable
+            items={currentHistory.data.slice(startIndex, endIndex)}
+            columns={columns}
+            onChange={this.onTableChange}
+            pagination={pagination}
+          />
+        </Fragment>
+      );
+    }
+
+    if (!currentHistory) {
+      if (edit) {
+        title = <FormattedMessage id="ezReporting.editing" defaultMessage="Editing" />;
+      } else {
+        title = <FormattedMessage id="ezReporting.creating" defaultMessage="Creating" />;
       }
 
-      flyOutRender = (
-        <EuiFlyout
-          onClose={this.close}
-          size="m"
-          aria-labelledby="flyoutSmallTitle"
-        >
-          <EuiFlyoutHeader hasBorder>
-            <EuiTitle size="m">
-              <h2>{ title }</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
+      title = (<Fragment>{ title }  <FormattedMessage id="ezReporting.reportingTask" defaultMessage="a reporting task" /></Fragment>);
 
-          <EuiFlyoutBody>
-            { flyOutContent }
-          </EuiFlyoutBody>
-        </EuiFlyout>
+      flyOutContent = (
+        <EuiForm isInvalid={errors.show} error={errors.messages}>
+          <EuiFormRow
+            fullWidth={true}
+            label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
+            isInvalid={edit ? false : errors.show}
+          >
+            <EuiSelect
+              fullWidth={true}
+              options={options}
+              value={currentTask.dashboardId}
+              aria-label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
+              onChange={this.onChangeDashboard}
+              disabled={edit}
+              isInvalid={edit ? false : errors.show}
+            />
+          </EuiFormRow>
+
+          <EuiFormRow
+            fullWidth={true}
+            label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
+            isInvalid={errors.show}
+          >
+            <EuiSelect
+              fullWidth={true}
+              options={frequencies}
+              value={currentTask.reporting.frequency}
+              aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
+              onChange={this.onChangeFrequency}
+              isInvalid={errors.show}
+            />
+          </EuiFormRow>
+
+          <EuiFormRow
+            fullWidth={true}
+            label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
+            isInvalid={errors.show}
+          >
+            <EuiTextArea
+              fullWidth={true}
+              placeholder="(ex: john@doe.com,jane@doe.com)"
+              value={currentTask.reporting.emails}
+              onChange={this.onChangeEmails}
+              isInvalid={errors.show}
+            />
+          </EuiFormRow>
+
+          <EuiFormRow fullWidth={true} >
+            <EuiCheckbox
+              id="optimize-checkbox"
+              checked={currentTask.reporting.print}
+              label={<FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
+              onChange={this.onChangeLayout}
+            />
+          </EuiFormRow>
+
+          {saveBtn}
+        </EuiForm>
       );
     }
 
     return (
-      <Fragment>
-        {flyOutRender}
-      </Fragment>
+      <EuiFlyout
+        onClose={this.close}
+        size="m"
+        aria-labelledby="flyoutSmallTitle"
+      >
+        <EuiFlyoutHeader hasBorder>
+          <EuiTitle size="m">
+            <h2>{ title }</h2>
+          </EuiTitle>
+        </EuiFlyoutHeader>
+
+        <EuiFlyoutBody>
+          { flyOutContent }
+        </EuiFlyoutBody>
+      </EuiFlyout>
     );
   }
 }
