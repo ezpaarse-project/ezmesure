@@ -130,14 +130,14 @@ export class Flyout extends Component {
       if (edit) {
         return this.props.editTaskHandler(currentTask).catch((err) => addToast(
           'Error',
-          err.data.errors.details[0].message,
+          err && err.data && err.data.error || 'Error',
           'danger'
         ));
       }
 
       return this.props.saveTaskHandler(currentTask).catch((err) => addToast(
         'Error',
-        err.data.errors.details[0].message,
+        err && err.data && err.data.error || 'Error',
         'danger'
       ));
     }
