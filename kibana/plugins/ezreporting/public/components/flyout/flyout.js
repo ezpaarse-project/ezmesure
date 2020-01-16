@@ -63,7 +63,7 @@ export class Flyout extends Component {
     openFlyOutHistoryHandler = this.openHistory;
     closeFlyOutHandler = this.close;
     updateEdit = this.updateEdit;
-  };
+  }
 
   open = (dashboard, edit) => {
     this.setState({ currentHistory: null });
@@ -147,20 +147,22 @@ export class Flyout extends Component {
     const { isFlyoutVisible, currentTask, edit, errors, histories, currentHistory, pageIndex, pageSize } = this.state;
     const { dashboards, frequencies } = this.props;
 
-    let options = dashboards.map(dashboard => ({ value: dashboard.id, text: dashboard.name }));
+    const options = dashboards.map(dashboard => ({ value: dashboard.id, text: dashboard.name }));
 
     let saveBtn;
     if (capabilities.get().ezreporting.save) {
-      saveBtn = (<EuiFormRow fullWidth={true}>
-        <EuiButton
-          fill
-          iconType="save"
-          type="submit"
-          onClick={() => this.saveOrUpdate()}
-        >
-          <FormattedMessage id="ezReporting.save" defaultMessage="Save" />
-        </EuiButton>
-      </EuiFormRow>);
+      saveBtn = (
+        <EuiFormRow fullWidth={true}>
+          <EuiButton
+            fill
+            iconType="save"
+            type="submit"
+            onClick={() => this.saveOrUpdate()}
+          >
+            <FormattedMessage id="ezReporting.save" defaultMessage="Save" />
+          </EuiButton>
+        </EuiFormRow>
+      );
     }
 
     let flyOutRender;
@@ -204,7 +206,7 @@ export class Flyout extends Component {
           pageSizeOptions: [10, 20, 30],
           hidePerPageOptions: false,
         };
-    
+
         const startIndex = (pageIndex * pageSize);
         const endIndex = Math.min(startIndex + pageSize, currentHistory.data.length);
 
@@ -226,7 +228,14 @@ export class Flyout extends Component {
             </EuiForm>
 
             <EuiHorizontalRule margin="m" />
-            <EuiText><strong><FormattedMessage id="ezReporting.executionTime" defaultMessage="Execution time" /></strong> : { ms2Str(currentHistory.executionTime) }</EuiText>
+            <EuiText>
+              <strong>
+                <FormattedMessage
+                  id="ezReporting.executionTime"
+                  defaultMessage="Execution time"
+                />
+              </strong> : { ms2Str(currentHistory.executionTime) }
+            </EuiText>
 
             <EuiHorizontalRule margin="m" />
             <EuiBasicTable

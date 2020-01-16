@@ -49,7 +49,7 @@ export class Main extends React.Component {
         'Error',
         <FormattedMessage id="ezReporting.errorOccured" defaultMessage="An error occurred while loading the data." />,
         'danger'
-      )
+      );
     });
   }
 
@@ -80,7 +80,7 @@ export class Main extends React.Component {
 
         closeFlyOut();
         this.forceUpdate();
-      })
+      });
     }
   }
 
@@ -131,7 +131,7 @@ export class Main extends React.Component {
           );
 
           this.forceUpdate();
-        }).catch((err) => {
+        }).catch(() => {
           addToast(
             'Error',
             <FormattedMessage id="ezReporting.removalError" defaultMessage="An error occurred during the removal of the task." />,
@@ -170,6 +170,10 @@ export class Main extends React.Component {
     const { tasks, dashboards, frequencies, reportingName, accessDenied } = this.state;
 
     if (accessDenied) {
+      const defaultMsg = `
+        You are not authorized to access Reporting.
+        To use Reporting management, you need the privileges granted by the \`reporting\` role.
+      `;
       return (
         <EuiEmptyPrompt
           iconType="reportingApp"
@@ -177,9 +181,11 @@ export class Main extends React.Component {
           body={
             <Fragment>
               <p>
-                <FormattedMessage id="ezReporting.accessDenied" defaultMessage="You are not authorized to access Reporting. To use Reporting management, you need the privileges granted by the `reporting` role." />,
+                <FormattedMessage
+                  id="ezReporting.accessDenied"
+                  defaultMessage={defaultMsg}
+                />,
               </p>
-              <p></p>
             </Fragment>
           }
         />
@@ -188,22 +194,29 @@ export class Main extends React.Component {
 
     let createBtn;
     if (capabilities.get().ezreporting.create) {
-      createBtn = (<EuiPageContentHeaderSection>
-        <EuiButton
-          fill
-          iconType="plusInCircle"
-          isDisabled={dashboards.length > 0 ? false : true}
-          onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
-        >
-          <FormattedMessage id="ezReporting.createNewTask" defaultMessage="Create new reporting task" />
-        </EuiButton>
-      </EuiPageContentHeaderSection>);
+      createBtn = (
+        <EuiPageContentHeaderSection>
+          <EuiButton
+            fill
+            iconType="plusInCircle"
+            isDisabled={dashboards.length > 0 ? false : true}
+            onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
+          >
+            <FormattedMessage id="ezReporting.createNewTask" defaultMessage="Create new reporting task" />
+          </EuiButton>
+        </EuiPageContentHeaderSection>
+      );
     }
 
     return (
       <Fragment>
         <Toast />
-        <Flyout dashboards={dashboards} frequencies={frequencies} editTaskHandler={this.editTaskHandler} saveTaskHandler={this.saveTaskHandler} />
+        <Flyout
+          dashboards={dashboards}
+          frequencies={frequencies}
+          editTaskHandler={this.editTaskHandler}
+          saveTaskHandler={this.saveTaskHandler}
+        />
         <EuiPage>
           <EuiPageBody className="euiPageBody--restrictWidth-default">
             <EuiPageContent horizontalPosition="center">
@@ -211,7 +224,11 @@ export class Main extends React.Component {
                 <EuiPageContentHeaderSection>
                   <EuiTitle>
                     <h2>
-                      <FormattedMessage id="ezReporting.title" values={{ REPORTING_NAME: reportingName }} defaultMessage="{REPORTING_NAME}" />
+                      <FormattedMessage
+                        id="ezReporting.title"
+                        values={{ REPORTING_NAME: reportingName }}
+                        defaultMessage="{REPORTING_NAME}"
+                      />
                     </h2>
                   </EuiTitle>
                 </EuiPageContentHeaderSection>

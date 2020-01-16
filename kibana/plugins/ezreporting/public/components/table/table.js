@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { 
+import {
   EuiBasicTable,
   EuiDescriptionList,
   EuiButtonIcon,
@@ -75,7 +75,7 @@ export class Table extends Component {
             const dashboard = dashboards.find(({ id }) => id === dashboardId);
             if (dashboard) {
               if (reporting.print) {
-                const content = <FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />
+                const content = <FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />;
                 return (
                   <span>
                     <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink> {' '}
@@ -90,14 +90,22 @@ export class Table extends Component {
 
             return (
               <EuiTextColor color="warning"><EuiIcon type="alert" />
-                <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />
+                <FormattedMessage
+                  id="ezReporting.dashboardNotFound"
+                  values={{ DASHBOARD_ID: dashboardId }}
+                  defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
+                />
               </EuiTextColor>
             );
           }
 
           return (
             <EuiTextColor color="warning"><EuiIcon type="alert" />
-              <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />
+              <FormattedMessage
+                id="ezReporting.dashboardNotFound"
+                values={{ DASHBOARD_ID: dashboardId }}
+                defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
+              />
             </EuiTextColor>
           );
         },
@@ -157,7 +165,11 @@ export class Table extends Component {
 
           return addToast(
             'Error',
-            <FormattedMessage id="ezReporting.dashboardNotFound" values={{ DASHBOARD_ID: el.dashboardId }} defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})" />,
+            <FormattedMessage
+              id="ezReporting.dashboardNotFound"
+              values={{ DASHBOARD_ID: el.dashboardId }}
+              defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
+            />,
             'danger'
           );
         },
@@ -173,13 +185,13 @@ export class Table extends Component {
         color: 'primary',
         onClick: el => {
           if (el.exists) {
-            return this.props.downloadReport(el).then((res) => {
+            return this.props.downloadReport(el).then(() => {
               return addToast(
                 'Information',
                 <FormattedMessage id="ezReporting.downloaded" defaultMessage="Your report will be sent to you by email" />,
                 'info'
               );
-            }).catch((error) => {
+            }).catch(() => {
               return addToast(
                 'Error',
                 <FormattedMessage id="ezReporting.downloadError" defaultMessage="An error occurred while downloading report." />,
@@ -212,7 +224,7 @@ export class Table extends Component {
 
                 return openFlyOutHistory(res.data);
               }
-            }).catch((err) => {
+            }).catch(() => {
               return addToast(
                 'Error',
                 <FormattedMessage id="ezReporting.historyError" defaultMessage="An error occurred while loading the history." />,
