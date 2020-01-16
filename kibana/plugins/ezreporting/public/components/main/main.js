@@ -219,7 +219,14 @@ export class Main extends React.Component {
               </EuiPageContentHeader>
 
               <EuiPageContentBody>
-                <Table tasks={tasks} frequencies={frequencies} dashboards={dashboards} removeTaskHandler={this.removeTaskHandler} loadHistory={this.loadHistory} downloadReport={downloadReport} />
+                <Table
+                  tasks={tasks}
+                  frequencies={frequencies}
+                  dashboards={dashboards}
+                  removeTaskHandler={this.removeTaskHandler}
+                  loadHistory={this.loadHistory}
+                  downloadReport={this.downloadReport}
+                />
               </EuiPageContentBody>
             </EuiPageContent>
           </EuiPageBody>
