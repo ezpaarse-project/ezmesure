@@ -7,6 +7,6 @@ settings:
       rootPackageName: 'ezreporting'
 
 rules:
-  @kbn/eslint/require-license-header: 'off'
+  '@kbn/eslint/require-license-header': 'off'
   import/no-unresolved: 'off'
   no-restricted-globals: 'off'
