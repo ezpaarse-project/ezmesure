@@ -12,9 +12,9 @@ export const convertDate = (date, hours) => {
   return date;
 };
 
-export const defaultTask = {
+export const defaultTask = (dashboardId) => ({
   _id: '',
-  dashboardId: null,
+  dashboardId: dashboardId || null,
   exists: true,
   reporting: {
     frequency: '1w',
@@ -22,7 +22,7 @@ export const defaultTask = {
     createdAt: '',
     print: false,
   },
-};
+});
 
 export const ms2Str = (time) => {
   if (time < 1000) {

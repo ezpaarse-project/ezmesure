@@ -69,10 +69,8 @@ export class Flyout extends Component {
     this.setState({ currentHistory: null });
     this.setState({ isFlyoutVisible: true });
     this.setState({ edit });
-    if (!dashboard) {
-      defaultTask.dashboardId = this.props.dashboards[0].id;
-    }
-    this.setState({ currentTask: JSON.parse(JSON.stringify(dashboard || defaultTask)) });
+    const task = dashboard || defaultTask(this.props.dashboards[0].id);
+    this.setState({ currentTask: JSON.parse(JSON.stringify(task)) });
   };
 
   openHistory = (history) => {
