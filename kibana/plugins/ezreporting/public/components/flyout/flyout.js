@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { get, set } from 'lodash';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
@@ -68,8 +69,17 @@ export class Flyout extends Component {
     this.setState({ currentHistory: null });
     this.setState({ isFlyoutVisible: true });
     this.setState({ edit });
-    const task = dashboard || defaultTask(this.props.dashboards[0].id);
-    this.setState({ currentTask: JSON.parse(JSON.stringify(task)) });
+
+    const currentTask = JSON.parse(JSON.stringify(dashboard || defaultTask(this.props.dashboards[0].id)));
+    const currentFrequency = get(currentTask, 'reporting.frequency.value');
+    const frequency = this.props.frequencies.find((f) => f.value === currentFrequency);
+
+    if (!frequency && this.props.frequencies.length > 0) {
+      // If the task frequency doesn't exist anymore, auto-select first frequency
+      set(currentTask, 'reporting.frequency', this.props.frequencies[0].value);
+    }
+
+    this.setState({ currentTask });
   };
 
   openHistory = (history) => {
