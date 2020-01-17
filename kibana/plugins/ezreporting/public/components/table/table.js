@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import {
   EuiBasicTable,
   EuiDescriptionList,
@@ -12,7 +13,7 @@ import {
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
-import { convertFrequency, convertDate } from '../../lib/reporting';
+import { convertFrequency } from '../../lib/reporting';
 import { openFlyOut, openFlyOutHistory } from '../flyout';
 import { addToast } from '../toast';
 
@@ -43,7 +44,7 @@ export class Table extends Component {
       },
       {
         title: <FormattedMessage id="ezReporting.createdAt" defaultMessage="Creation date" />,
-        description: convertDate(reporting.createdAt),
+        description: moment(reporting.createdAt).format('YYYY-MM-DD'),
       },
     ];
     itemIdToExpandedRowMap[item._id] = (
@@ -213,7 +214,7 @@ export class Table extends Component {
         align: 'center',
         render: ({ reporting }) => {
           if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
-            return convertDate(reporting.sentAt);
+            return moment(reporting.sentAt).format('YYYY-MM-DD');
           }
 
           return '-';

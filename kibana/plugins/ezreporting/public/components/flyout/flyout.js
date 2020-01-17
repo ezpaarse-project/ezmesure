@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { get, set } from 'lodash';
+import moment from 'moment';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
@@ -17,7 +18,7 @@ import {
 } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
-import { defaultTask, convertDate, ms2Str } from '../../lib/reporting';
+import { defaultTask, ms2Str } from '../../lib/reporting';
 import { addToast } from '../toast';
 
 let openFlyOutHandler;
@@ -193,7 +194,7 @@ export class Flyout extends Component {
           align: 'left',
           width: '200px',
           render: (date) => {
-            return convertDate(date, true);
+            return moment(date).format('YYYY-MM-DD HH:mm:ss');
           },
         },
         {
