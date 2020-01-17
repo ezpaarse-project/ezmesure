@@ -165,7 +165,7 @@ exports.store = async (ctx) => {
   body.createdAt = now;
   body.updatedAt = now;
   body.sentAt = null;
-  body.runAt = frequency.nextDateFrom(now);
+  body.runAt = frequency.startOfnextPeriod(now);
 
   try {
     const { body: data } = await elastic.index({ index, body });
@@ -206,7 +206,7 @@ exports.update = async (ctx) => {
       body: {
         doc: {
           ...body,
-          runAt: frequency.nextDateFrom(now),
+          runAt: frequency.startOfnextPeriod(now),
           updatedAt: now,
         },
       },

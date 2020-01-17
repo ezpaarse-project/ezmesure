@@ -56,8 +56,16 @@ class Frequency {
     return this.valid;
   }
 
-  nextDateFrom(date) {
+  startOfnextPeriod(date) {
     return startFunctions.get(this.unit)(addFunctions.get(this.unit)(date, this.count));
+  }
+
+  startOfCurrentPeriod(date) {
+    return startFunctions.get(this.unit)(date);
+  }
+
+  startOfPreviousPeriod(date) {
+    return startFunctions.get(this.unit)(addFunctions.get(this.unit)(date, this.count * -1));
   }
 }
 

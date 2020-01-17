@@ -199,7 +199,7 @@ async function generateReport(task) {
         doc: {
           ...taskSource,
           sentAt,
-          runAt: freq.isValid() ? freq.nextDateFrom(sentAt) : null,
+          runAt: freq.isValid() ? freq.startOfnextPeriod(sentAt) : null,
         },
       },
     });

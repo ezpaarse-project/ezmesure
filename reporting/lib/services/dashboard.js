@@ -1,5 +1,6 @@
 const rison = require('rison-node');
 const elastic = require('./elastic');
+const Frequency = require('./frequency');
 
 const getDashboard = async (dashboardId, namespace) => {
   const { body: data } = await elastic.getSource({
@@ -17,15 +18,22 @@ const getDashboard = async (dashboardId, namespace) => {
 module.exports = {
   getDashboard,
 
-  buildDashboardUrl(dashboardId, space, frequency) {
-    if (!dashboardId || !frequency) {
+  buildDashboardUrl(dashboardId, space, frequencyString) {
+    if (!dashboardId || !frequencyString) {
       return null;
     }
 
+    const frequency = new Frequency(frequencyString);
+
+    if (!frequency.isValid()) {
+      throw new Error('invalid frequency');
+    }
+
+    const now = new Date();
     const gData = rison.encode({
       time: {
-        from: `now-${frequency}`,
-        to: 'now',
+        from: frequency.startOfPreviousPeriod(now),
+        to: frequency.startOfCurrentPeriod(now),
       },
     });
 
