@@ -103,7 +103,7 @@ export class Table extends Component {
         color: 'primary',
         onClick: el => {
           if (el.exists) {
-            return this.props.downloadReport(el).then(() => {
+            return this.props.downloadReport(el._id).then(() => {
               return addToast(
                 'Information',
                 <FormattedMessage id="ezReporting.downloaded" defaultMessage="Your report will be sent to you by email" />,
