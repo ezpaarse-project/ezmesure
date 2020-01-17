@@ -24,11 +24,9 @@ function RootController($scope, $element, $http) {
   const domNode = $element[0];
 
   // get space name
-  const currentUrl = $jQ(location).attr('pathname');
-  let space = '';
-  if (/^\/kibana\/s\/([a-z0-9\-]+)/i.test(currentUrl)) {
-    space = currentUrl.split('/')[3];
-  }
+  const currentUrl = $jQ(window.location).attr('pathname');
+  const match = /^\/kibana\/s\/([a-z0-9\-]+)/i.exec(currentUrl);
+  const space = match ? match[1] : '';
 
   // render react to DOM
   render(
