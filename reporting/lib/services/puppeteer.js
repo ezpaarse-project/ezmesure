@@ -6,6 +6,7 @@ const formatDate = require('date-fns/format');
 const { fr } = require('date-fns/locale');
 const { elasticsearch, kibana, puppeteerTimeout } = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
+const Frequency = require('./frequency');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
@@ -26,9 +27,21 @@ const getAssets = async () => {
   return null;
 };
 
-module.exports = async (dashboardId, space, frequency, print) => {
+module.exports = async (dashboardId, space, frequencyString, print) => {
+  const frequency = new Frequency(frequencyString);
+
+  if (!frequency.isValid()) {
+    throw new Error('invalid task frequency');
+  }
+
+  const now = new Date();
+  const period = {
+    from: frequency.startOfPreviousPeriod(now),
+    to: frequency.startOfCurrentPeriod(now),
+  };
+
   const { dashboard } = (await getDashboard(dashboardId, space)) || {};
-  const dashboardUrl = buildDashboardUrl(dashboardId, space, frequency);
+  const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
   const dashboardTitle = dashboard && dashboard.title;
   const dashboardDesc = dashboard && dashboard.description;
 
@@ -128,16 +141,26 @@ module.exports = async (dashboardId, space, frequency, print) => {
     },
     printBackground: false,
     displayHeaderFooter: true,
-    headerTemplate: `<div style="width: 1920px; color: black; text-align: center;">
-      <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
-      <p style="font-size: 12px;">${dashboardDesc}</p>
-      <p style="font-size: 10px;">Rapport généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p></div>`,
-    footerTemplate: `<div style="width: 1920px; color: black;">
-      <div style="text-align: center;">
-        <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
+    headerTemplate: `
+      <div style="width: 1920px; color: black; text-align: center;">
+        <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
+        <p style="font-size: 12px;">${dashboardDesc}</p>
+        <p style="font-size: 10px;">
+          Rapport couvrant la période
+          du ${formatDate(period.from, 'Pp', { locale: fr })}
+          au ${formatDate(period.to, 'Pp', { locale: fr })}
+        </p>
+        <p style="font-size: 10px;">Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p>
       </div>
-      <div style="text-align: right; margin-right: 60px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>
-    </div>`,
+    `,
+    footerTemplate: `
+      <div style="width: 1920px; color: black;">
+        <div style="text-align: center;">
+          <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
+        </div>
+        <div style="text-align: right; margin-right: 60px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+      </div>
+    `,
   };
 
   if (print) {
