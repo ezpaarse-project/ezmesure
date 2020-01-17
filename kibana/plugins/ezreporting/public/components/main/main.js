@@ -159,10 +159,8 @@ export class Main extends React.Component {
   }
 
   downloadReport = (taskId) => {
-    if (capabilities.get().ezreporting.save) {
-      if (taskId) {
-        return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/download`);
-      }
+    if (capabilities.get().ezreporting.save && taskId) {
+      return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/download`);
     }
   }
 
