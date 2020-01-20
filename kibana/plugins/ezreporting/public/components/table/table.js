@@ -43,6 +43,10 @@ export class Table extends Component {
         description: reporting.emails,
       },
       {
+        title: <FormattedMessage id="ezReporting.nextReport" defaultMessage="Next report" />,
+        description: moment(reporting.runAt).format('YYYY-MM-DD hh:mm'),
+      },
+      {
         title: <FormattedMessage id="ezReporting.createdAt" defaultMessage="Creation date" />,
         description: moment(reporting.createdAt).format('YYYY-MM-DD'),
       },

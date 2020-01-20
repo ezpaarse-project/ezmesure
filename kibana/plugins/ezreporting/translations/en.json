@@ -86,6 +86,7 @@
     "ezReporting.editing": "Editing",
     "ezReporting.creating": "Creating",
     "ezReporting.remove": "Delete",
+    "ezReporting.nextReport": "Next report",
     "ezReporting.createdAt": "Creation date",
     "ezReporting.sentAt": "Sending date",
     "ezReporting.receiversEmails": "Receivers' email addresses",
