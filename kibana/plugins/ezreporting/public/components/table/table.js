@@ -37,6 +37,7 @@ export class Table extends Component {
     }
 
     const { reporting } = item;
+
     const listItems = [
       {
         title: <FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />,
@@ -44,11 +45,11 @@ export class Table extends Component {
       },
       {
         title: <FormattedMessage id="ezReporting.nextReport" defaultMessage="Next report" />,
-        description: moment(reporting.runAt).format('YYYY-MM-DD hh:mm'),
+        description: reporting.runAt ? moment(reporting.runAt).format('YYYY-MM-DD hh:mm') : 'N/A',
       },
       {
         title: <FormattedMessage id="ezReporting.createdAt" defaultMessage="Creation date" />,
-        description: moment(reporting.createdAt).format('YYYY-MM-DD'),
+        description: reporting.createdAt ? moment(reporting.createdAt).format('YYYY-MM-DD') : 'N/A',
       },
     ];
     itemIdToExpandedRowMap[item._id] = (
