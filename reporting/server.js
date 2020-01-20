@@ -44,13 +44,18 @@ app.use(async (ctx, next) => {
 
     if (ctx.headerSent || !ctx.writable) { return; }
 
+    ctx.type = 'json';
+
     if (env !== 'development') {
-      ctx.body = { error: error.message };
+      ctx.body = {
+        statusCode: ctx.status,
+        error: error.message,
+      };
       return;
     }
 
-    ctx.type = 'json';
     ctx.body = {
+      statusCode: ctx.status,
       error: error.message,
       stack: error.stack,
       code: error.code,
