@@ -137,6 +137,7 @@ exports.list = async (ctx) => {
         print: hitSource.print,
         createdAt: hitSource.createdAt,
         sentAt: hitSource.sentAt,
+        runAt: hitSource.runAt,
       },
     };
   });
