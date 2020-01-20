@@ -176,6 +176,7 @@ exports.store = async (ctx) => {
       _id: dataId,
       createdAt: body.createdAt,
       sentAt: body.sentAt,
+      runAt: body.runAt,
     };
   } catch (err) {
     logger.error(err);
