@@ -1,15 +1,15 @@
-const elastic = require('./elastic');
 const { index, historyIndex } = require('config');
+const elastic = require('./elastic');
 const indexTemplate = require('../utils/reporting-template');
 const historyTemplate = require('../utils/history-template');
 const logger = require('../logger');
 
-const createIndex = (indexName, template) => {
+function createIndex(indexName, template) {
   return elastic.indices.create({
     index: indexName,
     body: template,
   });
-};
+}
 
 module.exports = {
   findOrCreate: async () => {

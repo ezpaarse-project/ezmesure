@@ -1,8 +1,8 @@
-const elastic = require('./elastic');
 const { roleName, index, historyIndex } = require('config');
+const elastic = require('./elastic');
 const logger = require('../logger');
 
-const createRole = (name, privileges) => {
+function createRole(name, privileges) {
   return elastic.security.putRole({
     name,
     body: {
@@ -15,7 +15,7 @@ const createRole = (name, privileges) => {
       ],
     },
   });
-};
+}
 
 module.exports = {
   findOrCreate: async () => {

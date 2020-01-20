@@ -1,20 +1,16 @@
 const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('@koa/cors');
-const { port, frequencies } = require('config');
+const { port, cron } = require('config');
 const { CronJob } = require('cron');
-const moment = require('moment');
 
 const logger = require('./lib/logger');
 const roles = require('./lib/services/roles');
 const indexes = require('./lib/services/indexes');
 const controller = require('./lib/controllers');
-const reporting = require('./lib/services/reporting');
+const { generatePendingReports } = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
-
-// Set locale date to FR 
-moment().locale('fr');
 
 // check if roles exists
 roles.findOrCreate();
@@ -23,12 +19,10 @@ roles.findOrCreate();
 indexes.findOrCreate();
 
 // CronTab for reporting job
-frequencies.forEach(frequency => {
-  const job = new CronJob(frequency.cron, () => {
-    reporting(frequency);
-  });
-  job.start();
+const job = new CronJob(cron, () => {
+  generatePendingReports();
 });
+job.start();
 
 const app = new Koa();
 
@@ -50,12 +44,18 @@ app.use(async (ctx, next) => {
 
     if (ctx.headerSent || !ctx.writable) { return; }
 
+    ctx.type = 'json';
+
     if (env !== 'development') {
-      return ctx.body = { error: error.message };
+      ctx.body = {
+        statusCode: ctx.status,
+        error: error.message,
+      };
+      return;
     }
 
-    ctx.type = 'json';
     ctx.body = {
+      statusCode: ctx.status,
       error: error.message,
       stack: error.stack,
       code: error.code,
@@ -81,7 +81,7 @@ const closeApp = () => {
   server.close(() => {
     process.exit(0);
   });
-}
+};
 
 process.on('SIGINT', closeApp);
 process.on('SIGTERM', closeApp);

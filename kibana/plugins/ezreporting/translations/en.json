@@ -86,11 +86,12 @@
     "ezReporting.editing": "Editing",
     "ezReporting.creating": "Creating",
     "ezReporting.remove": "Delete",
+    "ezReporting.nextReport": "Next report",
     "ezReporting.createdAt": "Creation date",
     "ezReporting.sentAt": "Sending date",
     "ezReporting.receiversEmails": "Receivers' email addresses",
     "ezReporting.reportingTask": "a reporting task",
-    "ezReporting.editingSuccess": "Task editing successfully.",
+    "ezReporting.editingSuccess": "Task edited successfully.",
     "ezReporting.editingError": "An error occurred when editing the task.",
     "ezReporting.creationSuccess": "Task created successfully.",
     "ezReporting.creationError": "An error occurred when creating the task.",
@@ -104,4 +105,3 @@
     "ezReporting.accessDenied": "You are not authorized to access Reporting. To use Reporting, you need the privileges granted by the `reporting` role."
   }
 }
-  

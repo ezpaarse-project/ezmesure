@@ -2,20 +2,19 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
+const formatDate = require('date-fns/format');
+const { fr } = require('date-fns/locale');
 const { elasticsearch, kibana, puppeteerTimeout } = require('config');
-const logger = require('../logger');
-const dashboard = require('./dashboard');
+const { getDashboard, buildDashboardUrl } = require('./dashboard');
+const Frequency = require('./frequency');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
-const moment = require('moment');
 
 const getAssets = async () => {
-  let logo, preserveLayoutCSS, printCSS;
-
-  logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
-  preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
-  printCSS = await fsp.readFile(path.resolve('assets', 'css', 'print.css'), 'utf8');
+  const logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
+  const preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
+  const printCSS = await fsp.readFile(path.resolve('assets', 'css', 'print.css'), 'utf8');
 
   if (logo && preserveLayoutCSS && printCSS) {
     return {
@@ -26,18 +25,33 @@ const getAssets = async () => {
   }
 
   return null;
-}
+};
 
-module.exports = async (dashboardId, space, frequency, print) => {
-  const dashboardData = await dashboard.data(dashboardId, space, frequency);
+module.exports = async (dashboardId, space, frequencyString, print) => {
+  const frequency = new Frequency(frequencyString);
+
+  if (!frequency.isValid()) {
+    throw new Error('invalid task frequency');
+  }
+
+  const now = new Date();
+  const period = {
+    from: frequency.startOfPreviousPeriod(now),
+    to: frequency.startOfCurrentPeriod(now),
+  };
+
+  const { dashboard } = (await getDashboard(dashboardId, space)) || {};
+  const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
+  const dashboardTitle = dashboard && dashboard.title;
+  const dashboardDesc = dashboard && dashboard.description;
 
   const css = await getAssets();
-  
+
   const fields = {
     username: 'input[name=username]',
     password: 'input[name=password]',
   };
-  
+
   const viewport = {
     width: 1920,
     a4: {
@@ -50,7 +64,7 @@ module.exports = async (dashboardId, space, frequency, print) => {
       right: 75,
       top: 120,
       bottom: 75,
-    }
+    },
   };
 
   const browser = await puppeteer.launch({
@@ -67,8 +81,8 @@ module.exports = async (dashboardId, space, frequency, print) => {
 
   page.setDefaultNavigationTimeout(puppeteerTimeout);
   page.setDefaultTimeout(puppeteerTimeout);
-  
-  await page.goto(`${kibana.internal || kibana.external}/${dashboardData.dashboardUrl}`, {
+
+  await page.goto(`${kibana.internal || kibana.external}/${dashboardUrl}`, {
     waitUntil: 'load',
   });
 
@@ -85,39 +99,40 @@ module.exports = async (dashboardId, space, frequency, print) => {
   await page.waitFor('.dshLayout--viewing');
 
   const dashboardViewport = await page.$('.dshLayout--viewing');
-
-  const bouncingBox = await dashboardViewport.boundingBox();
+  const boundingBox = await dashboardViewport.boundingBox();
   const visualizations = await page.$$('.dshLayout--viewing .react-grid-item');
 
   await page.setViewport({
     width: print ? viewport.a4.width : viewport.width,
-    height: print ? (viewport.a4.height * visualizations.length) : bouncingBox.height,
+    height: print ? (viewport.a4.height * visualizations.length) : boundingBox.height,
     deviceScaleFactor: 1,
   });
 
-  await page.evaluate(({ print, css, viewport }) => {
-    let cssLayout = css.preserveLayoutCSS;
+  await page.evaluate((params, ...allVisualizations) => {
+    let cssLayout = params.css.preserveLayoutCSS;
 
-    if (print) {
-      cssLayout += css.printCSS;
+    if (params.print) {
+      cssLayout += params.css.printCSS;
     }
 
-    const node = document.createElement('style');
-    node.type = 'text/css';
-    node.innerHTML = cssLayout;
-    document.getElementsByTagName('head')[0].appendChild(node);
+    const styleNode = document.createElement('style'); // eslint-disable-line no-undef
+    styleNode.type = 'text/css';
+    styleNode.innerHTML = cssLayout;
+    document.head.appendChild(styleNode); // eslint-disable-line no-undef
 
-    if (print) {
-      const visualizations = $('.dshLayout--viewing .react-grid-item').toArray();
-      for (i = 0; i < visualizations.length; i += 1) {
-        visualizations[i].style.top = `${(viewport.a4.height - viewport.margin.top) * i}px`;
-      }
+    if (params.print) {
+      allVisualizations.forEach((visualization, index) => {
+        visualization.style.setProperty('top', `${(params.viewport.a4.height - params.viewport.margin.top) * index}px`);
+      });
     }
-  }, { print, css, viewport });
+  }, { print, css, viewport }, ...visualizations);
+
+  dashboardViewport.dispose();
+  visualizations.forEach((v) => v.dispose());
 
   await page.waitFor(5000);
 
-  let pdfOptions = {
+  const pdfOptions = {
     margin: {
       left: `${viewport.margin.left}px`,
       right: `${viewport.margin.right}px`,
@@ -126,23 +141,33 @@ module.exports = async (dashboardId, space, frequency, print) => {
     },
     printBackground: false,
     displayHeaderFooter: true,
-    headerTemplate: `<div style="width: 1920px; color: black; text-align: center;">
-      <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardData.dashboardUrl}">${dashboardData.dashboard.title}</a></h1>
-      <p style="font-size: 12px;">${dashboardData.dashboard.description}</p>
-      <p style="font-size: 10px;">Rapport généré le ${moment().locale('fr').format('dddd Do MMMM YYYY')}</p></div>`,
-    footerTemplate: `<div style="width: 1920px; color: black;">
-      <div style="text-align: center;">
-        <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
+    headerTemplate: `
+      <div style="width: 1920px; color: black; text-align: center;">
+        <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
+        <p style="font-size: 12px;">${dashboardDesc}</p>
+        <p style="font-size: 10px;">
+          Rapport couvrant la période
+          du ${formatDate(period.from, 'Pp', { locale: fr })}
+          au ${formatDate(period.to, 'Pp', { locale: fr })}
+        </p>
+        <p style="font-size: 10px;">Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p>
       </div>
-      <div style="text-align: right; margin-right: 60px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>
-    </div>`,
+    `,
+    footerTemplate: `
+      <div style="width: 1920px; color: black;">
+        <div style="text-align: center;">
+          <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
+        </div>
+        <div style="text-align: right; margin-right: 60px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+      </div>
+    `,
   };
 
   if (print) {
     pdfOptions.format = 'A4';
     pdfOptions.landscape = true;
   } else {
-    const height = (bouncingBox.height + viewport.heightPaddingTop);
+    const height = (boundingBox.height + viewport.heightPaddingTop);
     pdfOptions.width = viewport.width;
     pdfOptions.height = Math.max(height, 600);
   }

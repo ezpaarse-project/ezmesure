@@ -4,9 +4,9 @@ extends: "@elastic/kibana"
 settings:
   import/resolver:
     '@elastic/eslint-import-resolver-kibana':
-      rootPackageName: 'ezreporting'
+      rootPackageName: 'kibana'
 
 rules:
-  @kbn/eslint/require-license-header: 'off'
+  '@kbn/eslint/require-license-header': 'off'
   import/no-unresolved: 'off'
   no-restricted-globals: 'off'

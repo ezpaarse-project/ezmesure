@@ -1,4 +1,3 @@
-import { i18n } from '@kbn/i18n';
 import router from './server/router';
 
 export default function (kibana) {

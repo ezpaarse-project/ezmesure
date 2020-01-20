@@ -1,203 +1,247 @@
-const moment = require('moment');
-const { index, historyIndex, kibana, sender, email } = require('config');
+const formatDate = require('date-fns/format');
+const { fr } = require('date-fns/locale');
+
+const {
+  index,
+  historyIndex,
+  kibana,
+  sender,
+  email,
+  frequencies,
+} = require('config');
 const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
+const Frequency = require('./frequency');
 const puppeteer = require('./puppeteer');
 const { sendMail, generateMail } = require('./mail');
-const fs = require('fs-extra');
-const path = require('path');
 
-const getTasks = async (frequency) => {
-  try {
-    let tasks = await elastic.search({
-      index,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              {
-                term: {
-                  frequency: frequency.value,
-                },
-              },
-              {
-                range: {
-                  sentAt: {
-                    lte: `now-${frequency.value}/${(frequency.value.substr(frequency.value.length - 1))}`,
-                  },
-                },
-              },
-            ],
+async function getTasks() {
+  const res = await elastic.search({
+    index,
+    body: {
+      query: {
+        range: {
+          runAt: {
+            lte: new Date(),
           },
         },
       },
-    });
+    },
+  });
 
-    if (tasks && tasks.body && tasks.body.hits && tasks.body.hits.hits) {
-      return tasks.body.hits.hits;
-    }
-  } catch (e) {
-    return logger.error(`${frequency.text} : cannot fetch tasks`);
-  }
-};
+  return (res && res.body && res.body.hits && res.body.hits.hits) || [];
+}
 
-module.exports = async (frequency, tasks) => {
-  let reportingTasks = tasks;
-  if (!tasks) {
-    try {
-      reportingTasks = await getTasks(frequency);
-    } catch (e) {
-      return logger.error(`${frequency.text} : cannot fetch tasks`);
-    }
-  }
-
-  for (let j = 0; j < reportingTasks.length; j += 1) {
-    const task = reportingTasks[j];
-
-    logger.info(`Starting reporting task ${task._id}`);
-    const hrstart = process.hrtime.bigint();
-
-    const source = task._source;
-
-    const history = {
-      taskId: task._id,
-      executionTime: 0,
-      data: [],
-    };
-
-    let dashboard;
-    logger.info(`${task._id} : getting dashboard (id: ${source.space || 'default'}:${source.dashboardId})`);
-    try {
-      dashboard = await getDashboard(source.dashboardId, source.space);
-    } catch (e) {
-      history.data.push({
-        status: 'error',
-        message: `${task._id} : dashboard (id: ${source.space || 'default'}:${source.dashboardId}) not found or removed`,
-        date: new Date(),
-      });
-      logger.error(`${task._id} : dashboard (id: ${source.space || 'default'}:${source.dashboardId}) not found or removed`);
-      logger.error(e);
-
-      try {
-        return storeHistory(history, task._id, hrstart);
-      } catch (e) {
-        logger.error(`${task._id} : error during data insertion in index (${historyIndex})`);
-        return logger.error(e);
-      }
-    }
-
-    let pdf;
-    logger.info(`${task._id} : generating pdf (id: ${source.space || 'default'}:${source.dashboardId})`);
-    try {
-      pdf = await puppeteer(source.dashboardId, source.space || null, source.frequency, source.print);
-    } catch (e) {
-      history.data.push({
-        status: 'error',
-        message: 'Error during PDF report generation',
-        date: new Date(),
-      });
-      logger.error(`${task._id} : error during PDF report generation (id: ${source.space || 'default'}:${source.dashboardId})`);
-      logger.error(e);
-
-      try {
-        return storeHistory(history, task._id, hrstart);
-      } catch (e) {
-        logger.error(`${task._id} : error during data insertion in index (${historyIndex})`);
-        return logger.error(e);
-      }
-    }
-
-    const dashboardUrl = `${kibana.external}/${source.space ? `s/${source.space}/`: ''}app/kibana#/dashboard/${source.dashboardId}`;
-
-    let emailSent = false;
-    logger.info(`${task._id} : sending mail`);
-    for (let i = 0; i < email.attempts; i += 1) {
-      try {
-        await sendMail({
-          from: sender,
-          to: source.emails,
-          subject: `Reporting ezMESURE [${source.print ? 'OI - ' : ''}${moment().format('DD/MM/YYYY')}] - ${dashboard._source.dashboard.title}`,
-          attachments: [
-            {
-              contentType: 'application/pdf',
-              filename: `reporting_ezMESURE_${source.dashboardId}_${moment().format('DD-MM-YYYY')}.pdf`,
-              content: pdf,
-              cid: task.dashboardId,
-            },
-          ],
-          ...generateMail('reporting', {
-            reportingDate: moment().locale('fr').format('dddd Do MMMM YYYY'),
-            title: dashboard._source.dashboard.title || '',
-            frequency: frequency.fr.toLowerCase(),
-            dashboardUrl,
-            optimizedForPrinting: source.print ? ' optimisé pour impression' : '',
-          }),
-        });
-        emailSent = true;
-        logger.info(`${task._id} : email sent`);
-        break;
-      } catch (e) {
-        logger.error(`${task._id} : error when generating or sending emails (attempts: ${(i + 1)})`);
-        logger.error(e);
-
-        await wait(email.interval * (i + 1));
-      }
-    }
-
-    if (!emailSent) {
-      history.data.push({
-        status: 'error',
-        message: 'Error when generating or sending emails',
-        date: new Date(),
-      });
-    }
-
-    let currentDate = new Date();
-    currentDate.setHours(12, 0, 0, 0);
-    source.sentAt = currentDate;
-
-    try {
-      await elastic.update({
-        index,
-        id: task._id,
-        body: {
-          doc: {
-            ...source,
-          },
-        },
-      });
-    } catch (e) {
-      history.data.push({
-        status: 'error',
-        message: 'Error during data insertion in index',
-        date: new Date(),
-      });
-      logger.error(`${task._id} : error during data insertion in index (${index})`);
-      logger.error(e);
-    }
-
-    try {
-      await storeHistory(history, task._id, hrstart);
-    } catch (e) {
-      logger.error(`Error during data insertion in index ${historyIndex} (taskId: ${task._id})`);
-      return logger.error(e);
-    }
-  }
-};
-
-const storeHistory = async (history, taskId, hrstart) => {
-  history.createdAt = new Date();
-
+async function storeHistory(history, taskId, hrstart) {
   const hrend = process.hrtime.bigint();
-  history.executionTime = Math.floor(Number.parseInt(hrend - hrstart, 10) / 1e6);
 
   logger.info(`Ending reporting task ${taskId} in ${history.executionTime}ms`);
 
   return elastic.index({
     index: historyIndex,
-    body: history,
+    body: {
+      ...history,
+      createdAt: new Date(),
+      executionTime: Math.floor(Number.parseInt(hrend - hrstart, 10) / 1e6),
+    },
   });
-};
+}
 
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Run a task : generate a PDF and send it by mail
+ * @param {Object} task the task to run
+ */
+async function generateReport(task) {
+  const { _id: taskId, _source: taskSource } = task;
+
+  logger.info(`Starting reporting task ${taskId}`);
+  const hrstart = process.hrtime.bigint();
+
+  const history = {
+    taskId,
+    executionTime: 0,
+    data: [],
+  };
+
+  let dashboard;
+  logger.info(`${taskId} : getting dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+  try {
+    // eslint-disable-next-line no-await-in-loop
+    dashboard = await getDashboard(taskSource.dashboardId, taskSource.space);
+  } catch (e) {
+    history.data.push({
+      status: 'error',
+      message: `${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`,
+      date: new Date(),
+    });
+    logger.error(`${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`);
+    logger.error(e);
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await storeHistory(history, taskId, hrstart);
+      return;
+    } catch (err) {
+      logger.error(`${taskId} : error during data insertion in index (${historyIndex})`);
+      logger.error(err);
+      return;
+    }
+  }
+
+  logger.info(`${taskId} : generating pdf (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+
+  let pdf;
+  try {
+    // eslint-disable-next-line no-await-in-loop
+    pdf = await puppeteer(
+      taskSource.dashboardId,
+      taskSource.space || null,
+      taskSource.frequency,
+      taskSource.print,
+    );
+  } catch (e) {
+    history.data.push({
+      status: 'error',
+      message: 'Error during PDF report generation',
+      date: new Date(),
+    });
+    logger.error(`${taskId} : error during PDF report generation (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+    logger.error(e);
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await storeHistory(history, taskId, hrstart);
+      return;
+    } catch (err) {
+      logger.error(`${taskId} : error during data insertion in index (${historyIndex})`);
+      logger.error(err);
+      return;
+    }
+  }
+
+  logger.info(`${taskId} : sending mail`);
+
+  const dashboardUrl = `${kibana.external}/${taskSource.space ? `s/${taskSource.space}/` : ''}app/kibana#/dashboard/${taskSource.dashboardId}`;
+  const dashboardTitle = (dashboard && dashboard.dashboard && dashboard.dashboard.title) || '';
+
+  const frequency = frequencies.find((f) => f.value === taskSource.frequency);
+  const frequencyText = (frequency && frequency.fr && frequency.fr.toLowerCase()) || 'N/A';
+
+  const now = new Date();
+  let emailSent = false;
+
+  for (let i = 0; i < email.attempts; i += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await sendMail({
+        from: sender,
+        to: taskSource.emails,
+        subject: `Reporting ezMESURE [${taskSource.print ? 'OI - ' : ''}${formatDate(now, 'dd/MM/yyyy')}] - ${dashboardTitle}`,
+        attachments: [
+          {
+            contentType: 'application/pdf',
+            filename: `reporting_ezMESURE_${taskSource.dashboardId}_${formatDate(now, 'dd-MM-yyyy')}.pdf`,
+            content: pdf,
+            cid: task.dashboardId,
+          },
+        ],
+        ...generateMail('reporting', {
+          reportingDate: formatDate(now, 'PPPP', { locale: fr }),
+          title: dashboardTitle,
+          frequency: frequencyText,
+          dashboardUrl,
+          optimizedForPrinting: taskSource.print ? ' optimisé pour impression' : '',
+        }),
+      });
+      emailSent = true;
+      logger.info(`${taskId} : email sent`);
+      break;
+    } catch (e) {
+      logger.error(`${taskId} : error when generating or sending emails (attempts: ${(i + 1)})`);
+      logger.error(e);
+
+      // eslint-disable-next-line no-await-in-loop
+      await wait(email.interval * (i + 1));
+    }
+  }
+
+  if (!emailSent) {
+    history.data.push({
+      status: 'error',
+      message: 'Error when generating or sending emails',
+      date: new Date(),
+    });
+  }
+
+  const sentAt = new Date();
+  const freq = new Frequency(taskSource.frequency);
+
+  if (!freq.isValid()) {
+    history.data.push({
+      status: 'error',
+      message: 'Task frequency is invalid, cannot schedule next run',
+      date: new Date(),
+    });
+    logger.error(`${taskId} : task frequency is invalid, cannot schedule next run`);
+  }
+
+  try {
+    // eslint-disable-next-line no-await-in-loop
+    await elastic.update({
+      index,
+      id: taskId,
+      body: {
+        doc: {
+          ...taskSource,
+          sentAt,
+          runAt: freq.isValid() ? freq.startOfnextPeriod(sentAt) : null,
+        },
+      },
+    });
+  } catch (e) {
+    history.data.push({
+      status: 'error',
+      message: 'Error during data insertion in index',
+      date: new Date(),
+    });
+    logger.error(`${taskId} : error during data insertion in index (${index})`);
+    logger.error(e);
+  }
+
+  try {
+    // eslint-disable-next-line no-await-in-loop
+    await storeHistory(history, taskId, hrstart);
+  } catch (e) {
+    logger.error(`Error during data insertion in index ${historyIndex} (taskId: ${taskId})`);
+    logger.error(e);
+  }
+}
+
+async function generatePendingReports() {
+  logger.info('Looking for pending tasks');
+  let tasks;
+
+  try {
+    tasks = await getTasks();
+  } catch (e) {
+    logger.error('Cannot fetch tasks');
+    return;
+  }
+
+  logger.info(`${tasks.length} pending tasks found`);
+
+  for (let i = 0; i < tasks.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await generateReport(tasks[i]);
+  }
+}
+
+module.exports = {
+  generateReport,
+  generatePendingReports,
+};
