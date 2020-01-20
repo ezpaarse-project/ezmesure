@@ -27,6 +27,10 @@ module.exports = {
       time: { from, to },
     });
 
-    return `${space ? `s/${space}/` : ''}app/kibana#/dashboard/${dashboardId}?_g=${encodeURIComponent(gData)}`;
+    const aData = rison.encode({
+      timeRestore: true,
+    });
+
+    return `${space ? `s/${space}/` : ''}app/kibana#/dashboard/${dashboardId}?_g=${encodeURIComponent(gData)}&_a=${encodeURIComponent(aData)}`;
   },
 };
