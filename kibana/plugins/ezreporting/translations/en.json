@@ -77,7 +77,7 @@
   },
   "messages": {
     "ezReporting.title": "{REPORTING_NAME}",
-    "ezReporting.createNewTask": "Create new reporting task",
+    "ezReporting.createNewTask": "New reporting task",
     "ezReporting.save": "Save",
     "ezReporting.dashboard": "Dashboard",
     "ezReporting.dashboardName": "Dashboard name",
@@ -102,6 +102,9 @@
     "ezReporting.errorOccured": "An error occurred while loading the data.",
     "ezReporting.noRights": "You have no rights to access this page.",
     "ezReporting.accessDeniedTitle": "Acess denied",
-    "ezReporting.accessDenied": "You are not authorized to access Reporting. To use Reporting, you need the privileges granted by the `reporting` role."
+    "ezReporting.accessDenied": "You are not authorized to access Reporting. To use Reporting, you need the privileges granted by the `reporting` role.",
+    "ezReporting.generate": "Generate",
+    "ezReporting.generationError": "An error occurred while generating the report.",
+    "ezReporting.generated": "Your report will be sent to you by email."
   }
 }

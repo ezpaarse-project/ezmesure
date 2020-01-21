@@ -101,8 +101,8 @@ export class Table extends Component {
 
     if (capabilities.get().ezreporting.save) {
       actions.push({
-        name: i18n.translate('ezReporting.download', { defaultMessage: 'Download' }),
-        description: i18n.translate('ezReporting.download', { defaultMessage: 'Download' }),
+        name: i18n.translate('ezReporting.generate', { defaultMessage: 'Generate' }),
+        description: i18n.translate('ezReporting.generate', { defaultMessage: 'Generate' }),
         icon: 'importAction',
         type: 'icon',
         color: 'primary',
@@ -111,13 +111,13 @@ export class Table extends Component {
             return this.props.downloadReport(el._id).then(() => {
               return addToast(
                 'Information',
-                <FormattedMessage id="ezReporting.downloaded" defaultMessage="Your report will be sent to you by email" />,
+                <FormattedMessage id="ezReporting.generated" defaultMessage="Your report will be sent to you by email" />,
                 'info'
               );
             }).catch(() => {
               return addToast(
                 'Error',
-                <FormattedMessage id="ezReporting.downloadError" defaultMessage="An error occurred while downloading report." />,
+                <FormattedMessage id="ezReporting.generationError" defaultMessage="An error occurred while downloading report." />,
                 'danger'
               );
             });

@@ -200,7 +200,7 @@ export class Main extends React.Component {
             isDisabled={dashboards.length > 0 ? false : true}
             onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
           >
-            <FormattedMessage id="ezReporting.createNewTask" defaultMessage="Create new reporting task" />
+            <FormattedMessage id="ezReporting.createNewTask" defaultMessage="New reporting task" />
           </EuiButton>
         </EuiPageContentHeaderSection>
       );
