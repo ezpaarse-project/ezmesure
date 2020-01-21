@@ -72,7 +72,7 @@ export class Flyout extends Component {
     this.setState({ edit });
 
     const currentTask = JSON.parse(JSON.stringify(dashboard || defaultTask(this.props.dashboards[0].id)));
-    const currentFrequency = get(currentTask, 'reporting.frequency.value');
+    const currentFrequency = get(currentTask, 'reporting.frequency');
     const frequency = this.props.frequencies.find((f) => f.value === currentFrequency);
 
     if (!frequency && this.props.frequencies.length > 0) {
