@@ -30,7 +30,7 @@ export class Toast extends Component {
       title: title,
       text: content,
       color: type,
-      id: toastId++
+      id: Number.toString(toastId++)
     };
 
     this.setState({
