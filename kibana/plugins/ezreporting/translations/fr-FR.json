@@ -107,6 +107,8 @@
     "ezReporting.generate": "Générer",
     "ezReporting.generationError": "Une erreur s'est produite lors du téléchargement du rapport.",
     "ezReporting.generated": "Votre rapport vous sera envoyé par email",
-    "ezreporting.pleaseEnterValidEmail": "Veuillez entrer une adresse email valide"
+    "ezreporting.pleaseEnterValidEmail": "Veuillez entrer une adresse email valide",
+    "ezreporting.pleaseSelectDashboard": "Veuillez sélectionner un tableau de bord",
+    "ezreporting.selectDashboard": "Sélectionnez un tableau de bord"
   }
 }

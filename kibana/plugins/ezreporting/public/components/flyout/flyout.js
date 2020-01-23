@@ -12,6 +12,7 @@ import {
   EuiListGroupItem,
   EuiFieldText,
   EuiButton,
+  EuiComboBox,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
@@ -60,6 +61,7 @@ export class Flyout extends Component {
       currentHistory: null,
       pageIndex: 0,
       pageSize: 10,
+      dashboardErrorMessages: [],
       mailErrorMessages: [],
       receivers: [],
       email: '',
@@ -94,6 +96,7 @@ export class Flyout extends Component {
       receivers,
       email: '',
       mailErrorMessages: [],
+      dashboardErrorMessages: [],
     });
   };
 
@@ -109,10 +112,24 @@ export class Flyout extends Component {
     this.setState({ currentHistory: null });
   };
 
-  onChangeDashboard = (event) => {
+  onChangeDashboard = (selectedDashboards) => {
+    const dashboard = selectedDashboards[0];
     const currentTask = { ...this.state.currentTask };
-    currentTask.dashboardId = event.target.value;
-    this.setState({ currentTask });
+    currentTask.dashboardId = dashboard && dashboard.value;
+    const dashboardErrorMessages = [];
+
+    if (!currentTask.dashboardId) {
+      dashboardErrorMessages.push(
+        i18n.translate('ezreporting.pleaseSelectDashboard', {
+          defaultMessage: 'Please select a dashboard'
+        })
+      );
+    }
+
+    this.setState({
+      currentTask,
+      dashboardErrorMessages,
+    });
   };
 
   onChangeFrequency = (event) => {
@@ -202,6 +219,7 @@ export class Flyout extends Component {
       currentTask,
       edit,
       mailErrorMessages,
+      dashboardErrorMessages,
       histories,
       currentHistory,
       pageIndex,
@@ -209,9 +227,10 @@ export class Flyout extends Component {
     } = this.state;
     const { dashboards, frequencies } = this.props;
 
-    const options = dashboards.map(dashboard => ({ value: dashboard.id, text: dashboard.name }));
+    const dashboardList = dashboards.map(dashboard => ({ value: dashboard.id, label: dashboard.name }));
 
-    const invalidForm = mailErrorMessages.length > 0;
+    const invalidMail = mailErrorMessages.length > 0;
+    const invalidDashboard = dashboardErrorMessages.length > 0;
 
     let saveBtn;
     if (capabilities.get().ezreporting.save) {
@@ -348,28 +367,31 @@ export class Flyout extends Component {
         );
       }
 
+      const selectedDashboards = dashboardList.filter(d => d.value === currentTask.dashboardId);
+
       flyOutContent = (
         <EuiForm>
           <EuiFormRow
             fullWidth={true}
             label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
-            isInvalid={invalidForm}
+            isInvalid={invalidDashboard}
+            error={dashboardErrorMessages}
           >
-            <EuiSelect
+            <EuiComboBox
               fullWidth={true}
-              options={options}
-              value={currentTask.dashboardId}
-              aria-label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
+              placeholder={i18n.translate('ezReporting.selectDashboard', { defaultMessage: 'Select a dashboard' })}
+              singleSelection={{ asPlainText: true }}
+              options={dashboardList}
+              selectedOptions={selectedDashboards}
               onChange={this.onChangeDashboard}
-              disabled={edit}
-              isInvalid={invalidForm}
+              isClearable={true}
+              isInvalid={invalidDashboard}
             />
           </EuiFormRow>
 
           <EuiFormRow
             fullWidth={true}
             label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
-            isInvalid={invalidForm}
           >
             <EuiSelect
               fullWidth={true}
@@ -377,7 +399,6 @@ export class Flyout extends Component {
               value={currentTask.reporting.frequency}
               aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
               onChange={this.onChangeFrequency}
-              isInvalid={invalidForm}
             />
           </EuiFormRow>
 
@@ -388,7 +409,7 @@ export class Flyout extends Component {
                 <EuiFormRow
                   label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
                   fullWidth={true}
-                  isInvalid={invalidForm}
+                  isInvalid={invalidMail}
                   error={mailErrorMessages}
                 >
                   <EuiFieldText
