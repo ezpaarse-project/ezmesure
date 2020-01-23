@@ -41,7 +41,7 @@ const addFunctions = new Map([
 
 class Frequency {
   constructor(str) {
-    const match = /^([0-9]+)?([mhdwMy])$/.exec(str);
+    const match = /^([0-9]+)?([mhdwMy]|quarterly|semiannual)$/.exec(str);
 
     if (match) {
       this.valid = true;

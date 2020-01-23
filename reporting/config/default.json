@@ -28,7 +28,7 @@
   "frequencies": [
     { "fr": "Hebdomadaire", "text": "Weekly", "value": "1w" },
     { "fr": "Mensuel", "text": "Monthly", "value": "1M" },
-    { "fr": "Trimestriel", "text": "Quarterly", "value": "quaterly" },
+    { "fr": "Trimestriel", "text": "Quarterly", "value": "quarterly" },
     { "fr": "Semestriel", "text": "Semi-annual", "value": "semiannual" },
     { "fr": "Annuel", "text": "Annual", "value": "1y" }
   ],
