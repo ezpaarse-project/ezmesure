@@ -9,7 +9,7 @@ export const defaultTask = (dashboardId) => ({
   exists: true,
   reporting: {
     frequency: '1w',
-    emails: '',
+    emails: [],
     createdAt: '',
     print: false,
   },

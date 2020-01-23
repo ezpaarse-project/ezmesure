@@ -76,6 +76,7 @@
     }
   },
   "messages": {
+    "ezReporting.add": "Add",
     "ezReporting.title": "{REPORTING_NAME}",
     "ezReporting.createNewTask": "New reporting task",
     "ezReporting.save": "Save",
@@ -105,6 +106,7 @@
     "ezReporting.accessDenied": "You are not authorized to access Reporting. To use Reporting, you need the privileges granted by the `reporting` role.",
     "ezReporting.generate": "Generate",
     "ezReporting.generationError": "An error occurred while generating the report.",
-    "ezReporting.generated": "Your report will be sent to you by email."
+    "ezReporting.generated": "Your report will be sent to you by email.",
+    "ezreporting.pleaseEnterValidEmail": "Please enter a valid email address"
   }
 }

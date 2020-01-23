@@ -27,10 +27,11 @@
     "build": "plugin-helpers build"
   },
   "devDependencies": {
-    "@kbn/i18n": "link:../../packages/kbn-i18n",
     "@elastic/eslint-config-kibana": "link:../../packages/eslint-config-kibana",
     "@elastic/eslint-import-resolver-kibana": "link:../../packages/kbn-eslint-import-resolver-kibana",
+    "@hapi/address": "4.0.0",
     "@kbn/expect": "link:../../packages/kbn-expect",
+    "@kbn/i18n": "link:../../packages/kbn-i18n",
     "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",

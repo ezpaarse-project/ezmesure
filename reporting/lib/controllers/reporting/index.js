@@ -68,7 +68,7 @@ const validate = {
     dashboardId: Joi.string().guid().required(),
     space: Joi.string(),
     frequency: Joi.string().required().valid(frequencies.map((f) => f.value)),
-    emails: Joi.string().required(),
+    emails: Joi.array().items(Joi.string().email()).min(1),
     print: Joi.boolean().required(),
   },
 };

@@ -134,13 +134,18 @@ async function generateReport(task) {
 
   const now = new Date();
   let emailSent = false;
+  let receivers = taskSource.emails;
+
+  if (!Array.isArray(taskSource.emails)) {
+    receivers = [receivers];
+  }
 
   for (let i = 0; i < email.attempts; i += 1) {
     try {
       // eslint-disable-next-line no-await-in-loop
       await sendMail({
         from: sender,
-        to: taskSource.emails,
+        to: receivers.join(','),
         subject: `Reporting ezMESURE [${taskSource.print ? 'OI - ' : ''}${formatDate(now, 'dd/MM/yyyy')}] - ${dashboardTitle}`,
         attachments: [
           {

@@ -37,11 +37,12 @@ export class Table extends Component {
     }
 
     const { reporting } = item;
+    const receivers = Array.isArray(reporting.emails) ? reporting.emails.join(', ') : reporting.emails;
 
     const listItems = [
       {
         title: <FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />,
-        description: reporting.emails,
+        description: receivers,
       },
       {
         title: <FormattedMessage id="ezReporting.nextReport" defaultMessage="Next report" />,

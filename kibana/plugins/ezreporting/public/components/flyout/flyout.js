@@ -1,16 +1,21 @@
 import React, { Component, Fragment } from 'react';
 import { get, set } from 'lodash';
 import moment from 'moment';
+import Address from '@hapi/address';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
   EuiSelect,
-  EuiTextArea,
+  EuiListGroup,
+  EuiListGroupItem,
+  EuiFieldText,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiFormRow,
   EuiForm,
-  EuiButton,
   EuiCheckbox,
   EuiText,
   EuiBasicTable,
@@ -20,6 +25,7 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { defaultTask, ms2Str } from '../../lib/reporting';
 import { addToast } from '../toast';
+import { i18n } from '@kbn/i18n';
 
 let openFlyOutHandler;
 export function openFlyOut(dashboard, edit) {
@@ -49,15 +55,14 @@ export class Flyout extends Component {
       isFlyoutVisible: false,
       edit: false,
       currentTask: null,
-      errors: {
-        show: false,
-        messages: [],
-      },
       historiesData: [],
       histories: [],
       currentHistory: null,
       pageIndex: 0,
       pageSize: 10,
+      mailErrorMessages: [],
+      receivers: [],
+      email: '',
     };
 
     openFlyOutHandler = this.open;
@@ -67,20 +72,29 @@ export class Flyout extends Component {
   }
 
   open = (dashboard, edit) => {
-    this.setState({ currentHistory: null });
-    this.setState({ isFlyoutVisible: true });
-    this.setState({ edit });
-
     const currentTask = JSON.parse(JSON.stringify(dashboard || defaultTask(this.props.dashboards[0].id)));
     const currentFrequency = get(currentTask, 'reporting.frequency');
     const frequency = this.props.frequencies.find((f) => f.value === currentFrequency);
+    let receivers = get(currentTask, 'reporting.emails', []);
+
+    if (typeof receivers === 'string') {
+      receivers = receivers.split(',').map(e => e.trim());
+    }
 
     if (!frequency && this.props.frequencies.length > 0) {
       // If the task frequency doesn't exist anymore, auto-select first frequency
       set(currentTask, 'reporting.frequency', this.props.frequencies[0].value);
     }
 
-    this.setState({ currentTask });
+    this.setState({
+      currentHistory: null,
+      isFlyoutVisible: true,
+      currentTask,
+      edit,
+      receivers,
+      email: '',
+      mailErrorMessages: [],
+    });
   };
 
   openHistory = (history) => {
@@ -107,10 +121,8 @@ export class Flyout extends Component {
     this.setState({ currentTask });
   };
 
-  onChangeEmails = (event) => {
-    const currentTask = { ...this.state.currentTask };
-    currentTask.reporting.emails = event.target.value;
-    this.setState({ currentTask });
+  onChangeEmail = (event) => {
+    this.setState({ email: event.target.value });
   };
 
   onChangeLayout = (event) => {
@@ -133,31 +145,73 @@ export class Flyout extends Component {
     });
   };
 
+  addReceiver = (event) => {
+    event.preventDefault();
+    const { email, receivers } = this.state;
+
+    if (!Address.email.isValid(email)) {
+      this.setState({
+        mailErrorMessages: [
+          i18n.translate('ezreporting.pleaseEnterValidEmail', {
+            defaultMessage: 'Please enter a valid email address'
+          })
+        ],
+      });
+    } else {
+      const exists = receivers.includes(email);
+
+      this.setState({
+        email: '',
+        mailErrorMessages: [],
+        receivers: exists ? receivers : receivers.concat([email]),
+      });
+    }
+  }
+
+  removeReceiver = (email) => {
+    this.setState({
+      receivers: this.state.receivers.filter(r => r !== email)
+    });
+  }
+
   saveOrUpdate = () => {
     if (capabilities.get().ezreporting.save) {
-      const { edit, currentTask } = this.state;
+      const { edit, currentTask, receivers } = this.state;
+
+      set(currentTask, 'reporting.emails', receivers);
 
       if (edit) {
         return this.props.editTaskHandler(currentTask).catch((err) => addToast(
           'Error',
-          err && err.data && err.data.error || 'Error',
+          get(err, 'data.error', 'Error'),
           'danger'
         ));
       }
 
       return this.props.saveTaskHandler(currentTask).catch((err) => addToast(
         'Error',
-        err && err.data && err.data.error || 'Error',
+        get(err, 'data.error', 'Error'),
         'danger'
       ));
     }
   };
 
   render() {
-    const { isFlyoutVisible, currentTask, edit, errors, histories, currentHistory, pageIndex, pageSize } = this.state;
+    const {
+      isFlyoutVisible,
+      currentTask,
+      edit,
+      mailErrorMessages,
+      histories,
+      currentHistory,
+      pageIndex,
+      pageSize
+    } = this.state;
     const { dashboards, frequencies } = this.props;
 
     const options = dashboards.map(dashboard => ({ value: dashboard.id, text: dashboard.name }));
+
+    const invalidForm = mailErrorMessages.length > 0;
 
     let saveBtn;
     if (capabilities.get().ezreporting.save) {
@@ -270,12 +324,36 @@ export class Flyout extends Component {
 
       title = (<Fragment>{ title }  <FormattedMessage id="ezReporting.reportingTask" defaultMessage="a reporting task" /></Fragment>);
 
+      const receiverItems = this.state.receivers.map((email = '', index) => (
+        <EuiListGroupItem
+          key={index}
+          label={email}
+          extraAction={{
+            iconType: 'trash',
+            iconSize: 's',
+            'aria-label': `remove receiver ${email}`,
+            onClick: () => { this.removeReceiver(email); },
+          }}
+        />)
+      );
+
+      let receivers;
+      if (receiverItems.length > 0) {
+        receivers = (
+          <EuiFormRow fullWidth={true}>
+            <EuiListGroup maxWidth={false} bordered={true}>
+              {receiverItems}
+            </EuiListGroup>
+          </EuiFormRow>
+        );
+      }
+
       flyOutContent = (
-        <EuiForm isInvalid={errors.show} error={errors.messages}>
+        <EuiForm>
           <EuiFormRow
             fullWidth={true}
             label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
-            isInvalid={edit ? false : errors.show}
+            isInvalid={invalidForm}
           >
             <EuiSelect
               fullWidth={true}
@@ -284,14 +362,14 @@ export class Flyout extends Component {
               aria-label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
               onChange={this.onChangeDashboard}
               disabled={edit}
-              isInvalid={edit ? false : errors.show}
+              isInvalid={invalidForm}
             />
           </EuiFormRow>
 
           <EuiFormRow
             fullWidth={true}
             label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
-            isInvalid={errors.show}
+            isInvalid={invalidForm}
           >
             <EuiSelect
               fullWidth={true}
@@ -299,23 +377,39 @@ export class Flyout extends Component {
               value={currentTask.reporting.frequency}
               aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
               onChange={this.onChangeFrequency}
-              isInvalid={errors.show}
+              isInvalid={invalidForm}
             />
           </EuiFormRow>
 
-          <EuiFormRow
-            fullWidth={true}
-            label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
-            isInvalid={errors.show}
-          >
-            <EuiTextArea
-              fullWidth={true}
-              placeholder="(ex: john@doe.com,jane@doe.com)"
-              value={currentTask.reporting.emails}
-              onChange={this.onChangeEmails}
-              isInvalid={errors.show}
-            />
-          </EuiFormRow>
+
+          <form onSubmit={this.addReceiver}>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFormRow
+                  label={<FormattedMessage id="ezReporting.receiversEmails" defaultMessage="Receivers' email addresses" />}
+                  fullWidth={true}
+                  isInvalid={invalidForm}
+                  error={mailErrorMessages}
+                >
+                  <EuiFieldText
+                    fullWidth={true}
+                    placeholder="Email"
+                    value={this.state.email}
+                    onChange={this.onChangeEmail}
+                  />
+                </EuiFormRow>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiFormRow hasEmptyLabelSpace>
+                  <EuiButton iconType="plusInCircle" type="submit">
+                    <FormattedMessage id="ezReporting.add" defaultMessage="Add" />
+                  </EuiButton>
+                </EuiFormRow>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </form>
+
+          {receivers}
 
           <EuiFormRow fullWidth={true} >
             <EuiCheckbox
