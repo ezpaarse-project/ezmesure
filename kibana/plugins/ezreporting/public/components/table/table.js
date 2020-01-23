@@ -14,7 +14,8 @@ import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 import { convertFrequency } from '../../lib/reporting';
-import { openFlyOut, openFlyOutHistory } from '../flyout';
+import { openFlyOut as openEditFlyOut } from '../flyout/edit';
+import { openFlyOut as openHistoryFlyOut } from '../flyout/history';
 import { addToast } from '../toast';
 
 export class Table extends Component {
@@ -84,7 +85,7 @@ export class Table extends Component {
         color: 'primary',
         onClick: el => {
           if (el.exists) {
-            return openFlyOut(el, true);
+            return openEditFlyOut(el, true);
           }
 
           return addToast(
@@ -146,7 +147,7 @@ export class Table extends Component {
                   );
                 }
 
-                return openFlyOutHistory(res.data);
+                return openHistoryFlyOut(res.data);
               }
             }).catch(() => {
               return addToast(

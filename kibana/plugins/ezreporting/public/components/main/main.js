@@ -14,7 +14,13 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { capabilities } from 'ui/capabilities';
 
 import { Table } from '../table';
-import { Flyout, openFlyOut, closeFlyOut } from '../flyout';
+import {
+  TaskEditFlyout,
+  openFlyOut as openEditFlyOut,
+  closeFlyOut as closeEditFlyOut
+} from '../flyout/edit';
+import { HistoryFlyout } from '../flyout/history';
+
 import { Toast, addToast } from '../toast';
 
 export class Main extends React.Component {
@@ -74,11 +80,11 @@ export class Main extends React.Component {
 
         addToast(
           'Success',
-          <FormattedMessage id="ezReporting.editingSuccess" defaultMessage="Task editing successfully." />,
+          <FormattedMessage id="ezReporting.editingSuccess" defaultMessage="Task edited successfully." />,
           'success',
         );
 
-        closeFlyOut();
+        closeEditFlyOut();
         this.forceUpdate();
       });
     }
@@ -111,7 +117,7 @@ export class Main extends React.Component {
           'success',
         );
 
-        closeFlyOut();
+        closeEditFlyOut();
         this.forceUpdate();
       });
     }
@@ -198,7 +204,7 @@ export class Main extends React.Component {
             fill
             iconType="plusInCircle"
             isDisabled={dashboards.length > 0 ? false : true}
-            onClick={() => dashboards.length > 0 ? openFlyOut(null, false) : null}
+            onClick={() => dashboards.length > 0 ? openEditFlyOut(null, false) : null}
           >
             <FormattedMessage id="ezReporting.createNewTask" defaultMessage="New reporting task" />
           </EuiButton>
@@ -209,12 +215,13 @@ export class Main extends React.Component {
     return (
       <Fragment>
         <Toast />
-        <Flyout
+        <TaskEditFlyout
           dashboards={dashboards}
           frequencies={frequencies}
           editTaskHandler={this.editTaskHandler}
           saveTaskHandler={this.saveTaskHandler}
         />
+        <HistoryFlyout />
         <EuiPage>
           <EuiPageBody className="euiPageBody--restrictWidth-default">
             <EuiPageContent horizontalPosition="center">
