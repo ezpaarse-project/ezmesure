@@ -43,7 +43,6 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
   const { dashboard } = (await getDashboard(dashboardId, space)) || {};
   const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
   const dashboardTitle = dashboard && dashboard.title;
-  const dashboardDesc = dashboard && dashboard.description;
 
   const css = await getAssets();
 
@@ -59,10 +58,10 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
       height: 793, // 21cm
     },
     margin: {
-      left: 75,
-      right: 75,
-      top: 120,
-      bottom: 75,
+      left: 50,
+      right: 50,
+      top: 100,
+      bottom: 60,
     },
   };
 
@@ -141,9 +140,8 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
     printBackground: false,
     displayHeaderFooter: true,
     headerTemplate: `
-      <div style="width: 1920px; color: black; text-align: center;">
+      <div style="width: 1920px; color: black; text-align: center; line-height: 5px">
         <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
-        <p style="font-size: 12px;">${dashboardDesc}</p>
         <p style="font-size: 10px;">
           Rapport couvrant la période
           du ${formatDate(period.from, 'Pp', { locale: fr })}
@@ -157,7 +155,9 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
         <div style="text-align: center;">
           <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
         </div>
-        <div style="text-align: right; margin-right: 60px;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+        <div style="text-align: right; margin-right: 60px;">
+          <span class="pageNumber"></span> / <span class="totalPages"></span>
+        </div>
       </div>
     `,
   };
