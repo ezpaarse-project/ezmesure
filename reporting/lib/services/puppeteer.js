@@ -58,7 +58,6 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
       width: 1096, // 29cm
       height: 793, // 21cm
     },
-    heightPaddingTop: 100,
     margin: {
       left: 75,
       right: 75,
@@ -167,7 +166,7 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
     pdfOptions.format = 'A4';
     pdfOptions.landscape = true;
   } else {
-    const height = (boundingBox.height + viewport.heightPaddingTop);
+    const height = (boundingBox.height + viewport.margin.top + viewport.margin.bottom);
     pdfOptions.width = viewport.width;
     pdfOptions.height = Math.max(height, 600);
   }
