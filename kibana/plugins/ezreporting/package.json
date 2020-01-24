@@ -26,10 +26,12 @@
     "test:browser": "plugin-helpers test:browser",
     "build": "plugin-helpers build"
   },
+  "dependencies": {
+    "@hapi/address": "4.0.0"
+  },
   "devDependencies": {
     "@elastic/eslint-config-kibana": "link:../../packages/eslint-config-kibana",
     "@elastic/eslint-import-resolver-kibana": "link:../../packages/kbn-eslint-import-resolver-kibana",
-    "@hapi/address": "4.0.0",
     "@kbn/expect": "link:../../packages/kbn-expect",
     "@kbn/i18n": "link:../../packages/kbn-i18n",
     "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
