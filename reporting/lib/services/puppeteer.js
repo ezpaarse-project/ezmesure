@@ -10,22 +10,70 @@ const Frequency = require('./frequency');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
-
-const getAssets = async () => {
+async function getAssets() {
   const logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
   const preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
-  const printCSS = await fsp.readFile(path.resolve('assets', 'css', 'print.css'), 'utf8');
 
-  if (logo && preserveLayoutCSS && printCSS) {
+  if (logo && preserveLayoutCSS) {
     return {
       logo,
       preserveLayoutCSS,
-      printCSS,
     };
   }
 
   return null;
-};
+}
+
+function insertStyles(page, css) {
+  return page.evaluate((styles) => {
+    const styleNode = document.createElement('style'); // eslint-disable-line no-undef
+    styleNode.type = 'text/css';
+    styleNode.innerHTML = styles;
+    document.head.appendChild(styleNode); // eslint-disable-line no-undef
+  }, css);
+}
+
+function positionElements(page, viewport) {
+  return page.evaluate((vp) => {
+    // eslint-disable-next-line no-undef
+    const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
+    const pageHeight = vp.height - vp.margin.top - vp.margin.bottom;
+
+    visualizations.forEach((visualization, index) => {
+      visualization.style.setProperty('top', `${(pageHeight) * index}px`, 'important');
+    });
+  }, viewport);
+}
+
+function waitForCompleteRender(page) {
+  page.evaluate(() => {
+    const allVis = document.querySelectorAll('[data-shared-item]'); // eslint-disable-line no-undef
+    const renderedTasks = [];
+
+    function waitForRender(visualization) {
+      return new Promise((resolve) => {
+        visualization.addEventListener('renderComplete', () => { resolve(); });
+      });
+    }
+
+    function waitForRenderDelay() {
+      // Time to wait for visualizations that are not evented (official ones are all evented)
+      return new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+
+    allVis.forEach((visualization) => {
+      const isRendered = visualization.getAttribute('data-render-complete');
+
+      if (isRendered === 'disabled') {
+        renderedTasks.push(waitForRenderDelay());
+      } else if (isRendered === 'false') {
+        renderedTasks.push(waitForRender(visualization));
+      }
+    });
+
+    return Promise.all(renderedTasks);
+  });
+}
 
 module.exports = async (dashboardId, space, frequencyString, print) => {
   const frequency = new Frequency(frequencyString);
@@ -49,20 +97,6 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
   const fields = {
     username: 'input[name=username]',
     password: 'input[name=password]',
-  };
-
-  const viewport = {
-    width: 1920,
-    a4: {
-      width: 1096, // 29cm
-      height: 793, // 21cm
-    },
-    margin: {
-      left: 50,
-      right: 50,
-      top: 100,
-      bottom: 60,
-    },
   };
 
   const browser = await puppeteer.launch({
@@ -98,35 +132,49 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
 
   const dashboardViewport = await page.$('.dshLayout--viewing');
   const boundingBox = await dashboardViewport.boundingBox();
-  const visualizations = await page.$$('.dshLayout--viewing .react-grid-item');
+
+  // 792x1122 = A4 at 96PPI
+  const viewport = {
+    width: 1122,
+    height: print ? 792 : boundingBox.height,
+    margin: {
+      left: 50,
+      right: 50,
+      top: 100,
+      bottom: 60,
+    },
+  };
 
   await page.setViewport({
-    width: print ? viewport.a4.width : viewport.width,
-    height: print ? (viewport.a4.height * visualizations.length) : boundingBox.height,
+    width: viewport.width,
+    height: viewport.height,
     deviceScaleFactor: 1,
   });
 
-  await page.evaluate((params, ...allVisualizations) => {
-    let cssLayout = params.css.preserveLayoutCSS;
+  let styles = css.preserveLayoutCSS;
 
-    if (params.print) {
-      cssLayout += params.css.printCSS;
-    }
+  if (print) {
+    styles += `
+      dashboard-app .react-grid-item {
+        position: fixed;
+        left: 0 !important;
+        background-color: inherit !important;
+        z-index: 1 !important;
+        width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
+        height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
+        transform: none !important;
+        -webkit-transform: none !important;
+      }
+    `;
+  }
 
-    const styleNode = document.createElement('style'); // eslint-disable-line no-undef
-    styleNode.type = 'text/css';
-    styleNode.innerHTML = cssLayout;
-    document.head.appendChild(styleNode); // eslint-disable-line no-undef
-
-    if (params.print) {
-      allVisualizations.forEach((visualization, index) => {
-        visualization.style.setProperty('top', `${(params.viewport.a4.height - params.viewport.margin.top) * index}px`);
-      });
-    }
-  }, { print, css, viewport }, ...visualizations);
+  await insertStyles(page, styles);
+  if (print) {
+    await positionElements(page, viewport);
+  }
+  await waitForCompleteRender(page);
 
   dashboardViewport.dispose();
-  visualizations.forEach((v) => v.dispose());
 
   await page.waitFor(5000);
 
@@ -140,7 +188,8 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
     printBackground: false,
     displayHeaderFooter: true,
     headerTemplate: `
-      <div style="width: 1920px; color: black; text-align: center; line-height: 5px">
+      <style>#header, #footer { padding: 10px !important; }</style>
+      <div style="width: ${viewport.width}px; color: black; text-align: center; line-height: 5px">
         <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
         <p style="font-size: 10px;">
           Rapport couvrant la période
@@ -151,11 +200,11 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
       </div>
     `,
     footerTemplate: `
-      <div style="width: 1920px; color: black;">
-        <div style="text-align: center;">
-          <a href="${kibana.external}"><img src="data:image/png;base64,${css.logo}" width="128px" /></a>
-        </div>
-        <div style="text-align: right; margin-right: 60px;">
+      <div style="width: ${viewport.width}px; color: black; position: relative;">
+        <a href="${kibana.external}">
+          <img src="data:image/png;base64,${css.logo}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
+        </a>
+        <div style="position: absolute; right: 0; bottom: 0; font-size: 8px;">
           <span class="pageNumber"></span> / <span class="totalPages"></span>
         </div>
       </div>
@@ -163,8 +212,8 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
   };
 
   if (print) {
-    pdfOptions.format = 'A4';
-    pdfOptions.landscape = true;
+    pdfOptions.width = viewport.width;
+    pdfOptions.height = viewport.height;
   } else {
     const height = (boundingBox.height + viewport.margin.top + viewport.margin.bottom);
     pdfOptions.width = viewport.width;

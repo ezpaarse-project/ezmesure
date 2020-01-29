@@ -17,7 +17,7 @@ filter-bar,
 discover-app .dscTimechart,
 discover-app .sidebar-container,
 discover-app .kbnCollapsibleSidebar__collapseButton,
-discover-app navbar[name=discover-search],
+discover-app navbar[name="discover-search"],
 discover-app .discover-table-footer {
   display: none;
 }
@@ -26,7 +26,7 @@ discover-app .discover-table-footer {
   display: none;
 }
 
-visualization-editor .visEditor--default> :not(.visEditor__canvas) {
+visualization-editor .visEditor--default > :not(.visEditor__canvas) {
   display: none;
 }
 
@@ -61,4 +61,8 @@ visualize-app .visEditor__canvas {
 
 .vis-editor visualization {
   min-height: 0 !important;
+}
+
+.dshPanel__header {
+  display: none !important;
 }
