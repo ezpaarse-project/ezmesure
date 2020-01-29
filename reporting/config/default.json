@@ -32,5 +32,8 @@
     { "fr": "Semestriel", "text": "Semi-annual", "value": "semiannual" },
     { "fr": "Annuel", "text": "Annual", "value": "1y" }
   ],
+  "logos": [
+    { "file": "images/logo.png", "link": "kibana" }
+  ],
   "puppeteerTimeout": 60000
 }

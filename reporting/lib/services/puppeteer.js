@@ -4,24 +4,38 @@ const fs = require('fs');
 const { promisify } = require('util');
 const formatDate = require('date-fns/format');
 const { fr } = require('date-fns/locale');
-const { elasticsearch, kibana, puppeteerTimeout } = require('config');
+const {
+  elasticsearch,
+  kibana,
+  puppeteerTimeout,
+  logos,
+} = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
 const Frequency = require('./frequency');
 
 const fsp = { readFile: promisify(fs.readFile) };
 
-async function getAssets() {
-  const logo = await fsp.readFile(path.resolve('assets', 'logo.png'), 'base64');
-  const preserveLayoutCSS = await fsp.readFile(path.resolve('assets', 'css', 'preserve_layout.css'), 'utf8');
+const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
 
-  if (logo && preserveLayoutCSS) {
-    return {
-      logo,
-      preserveLayoutCSS,
-    };
-  }
+function loadStyles() {
+  return fsp.readFile(path.resolve(assetsDir, 'css', 'preserve_layout.css'), 'utf8');
+}
 
-  return null;
+function loadLogos() {
+  return Promise.all(
+    logos.map(async (l) => {
+      const logo = { ...l };
+
+      if (logo.link === 'kibana') {
+        logo.link = `${kibana.external}/`;
+      }
+      if (logo.file) {
+        logo.base64 = await fsp.readFile(path.resolve(assetsDir, logo.file), 'base64');
+      }
+
+      return logo;
+    }),
+  );
 }
 
 function insertStyles(page, css) {
@@ -92,8 +106,6 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
   const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
   const dashboardTitle = dashboard && dashboard.title;
 
-  const css = await getAssets();
-
   const fields = {
     username: 'input[name=username]',
     password: 'input[name=password]',
@@ -151,7 +163,7 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
     deviceScaleFactor: 1,
   });
 
-  let styles = css.preserveLayoutCSS;
+  let styles = await loadStyles();
 
   if (print) {
     styles += `
@@ -178,6 +190,12 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
 
   await page.waitFor(5000);
 
+  const logoHtml = (await loadLogos()).map((logo) => `
+    <a href="${logo.link}">
+      <img src="data:image/png;base64,${logo.base64}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
+    </a>
+  `);
+
   const pdfOptions = {
     margin: {
       left: `${viewport.margin.left}px`,
@@ -201,9 +219,7 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
     `,
     footerTemplate: `
       <div style="width: ${viewport.width}px; color: black; position: relative;">
-        <a href="${kibana.external}">
-          <img src="data:image/png;base64,${css.logo}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
-        </a>
+        ${logoHtml}
         <div style="position: absolute; right: 0; bottom: 0; font-size: 8px;">
           <span class="pageNumber"></span> / <span class="totalPages"></span>
         </div>
