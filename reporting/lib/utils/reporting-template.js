@@ -15,13 +15,13 @@ module.exports = {
     ],
     properties: {
       dashboardId: {
-        type: 'text',
+        type: 'keyword',
       },
       space: {
-        type: 'text',
+        type: 'keyword',
       },
       emails: {
-        type: 'text',
+        type: 'keyword',
       },
       frequency: {
         type: 'keyword',
