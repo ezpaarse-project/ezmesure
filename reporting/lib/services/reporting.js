@@ -19,6 +19,7 @@ const { sendMail, generateMail } = require('./mail');
 async function getTasks() {
   const res = await elastic.search({
     index,
+    size: 10000,
     body: {
       query: {
         range: {
