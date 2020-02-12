@@ -40,6 +40,10 @@ module.exports = async function upload(ctx) {
     return ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
+  if (!email) {
+    return ctx.throw(400, 'mandatory email is missing from user profile');
+  }
+
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
