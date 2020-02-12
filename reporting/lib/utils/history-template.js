@@ -15,7 +15,7 @@ module.exports = {
     ],
     properties: {
       taskId: {
-        type: 'text',
+        type: 'keyword',
       },
       executionTime: {
         type: 'integer',
