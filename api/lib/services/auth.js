@@ -18,6 +18,8 @@ const requireUser = async (ctx, next) => {
     return ctx.throw(401, 'Unable to fetch user data, please log in again');
   }
 
+  ctx.state.user = user;
+
   await next();
 };
 
