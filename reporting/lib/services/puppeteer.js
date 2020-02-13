@@ -238,5 +238,7 @@ module.exports = async (dashboardId, space, frequencyString, print) => {
 
   const pdf = await page.pdf(pdfOptions);
 
+  await browser.close();
+
   return pdf || null;
 };
