@@ -22,6 +22,7 @@ import {
 import { HistoryFlyout } from '../flyout/history';
 
 import { Toast, addToast } from '../toast';
+import { httpClient } from '../../lib/reporting';
 
 export class Main extends React.Component {
   constructor(props) {
@@ -37,16 +38,15 @@ export class Main extends React.Component {
   }
 
   componentDidMount = () => {
-    const { httpClient, space } = this.props;
+    const { space } = this.props;
 
     httpClient.get(`../api/ezreporting/reporting/tasks/${space}`).then(res => {
-      this.setState({ tasks: res.data.tasks });
-
-      this.setState({ dashboards: res.data.dashboards });
-
-      this.setState({ frequencies: res.data.frequencies });
-
-      this.setState({ reportingName: res.data.reportingName });
+      this.setState({
+        tasks: res.data.tasks,
+        dashboards: res.data.dashboards,
+        frequencies: res.data.frequencies,
+        reportingName: res.data.reportingName,
+      });
     }).catch((err) => {
       if (err.data.code === 403) {
         this.setState({ accessDenied: true });
@@ -71,7 +71,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      return this.props.httpClient.patch(`../api/ezreporting/reporting/tasks/${task._id}`, reqData).then(() => {
+      return httpClient.patch(`../api/ezreporting/reporting/tasks/${task._id}`, reqData).then(() => {
         const index = this.state.tasks.findIndex(({ _id }) => _id === task._id);
 
         const tasks = this.state.tasks;
@@ -104,7 +104,7 @@ export class Main extends React.Component {
         reqData = { ...reqData, space: this.props.space };
       }
 
-      return this.props.httpClient.post('../api/ezreporting/reporting/tasks', reqData).then(res => {
+      return httpClient.post('../api/ezreporting/reporting/tasks', reqData).then(res => {
         task._id = res.data._id;
         task.reporting.createdAt = res.data.createdAt;
 
@@ -126,7 +126,7 @@ export class Main extends React.Component {
   removeTaskHandler = (task) => {
     if (capabilities.get().ezreporting.delete) {
       if (task) {
-        this.props.httpClient.delete(`../api/ezreporting/reporting/tasks/${task._id}`).then(() => {
+        httpClient.delete(`../api/ezreporting/reporting/tasks/${task._id}`).then(() => {
           const tasks = this.state.tasks.filter(({ _id }) => _id !== task._id);
           this.setState({ tasks });
 
@@ -156,17 +156,9 @@ export class Main extends React.Component {
     }
   }
 
-  loadHistory = (taskId) => {
-    if (capabilities.get().ezreporting.show) {
-      if (taskId) {
-        return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/history`);
-      }
-    }
-  }
-
   downloadReport = (taskId) => {
     if (capabilities.get().ezreporting.save && taskId) {
-      return this.props.httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/download`);
+      return httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/download`);
     }
   }
 
@@ -246,7 +238,6 @@ export class Main extends React.Component {
                   frequencies={frequencies}
                   dashboards={dashboards}
                   removeTaskHandler={this.removeTaskHandler}
-                  loadHistory={this.loadHistory}
                   downloadReport={this.downloadReport}
                 />
               </EuiPageContentBody>

@@ -90,7 +90,7 @@ export class TaskEditFlyout extends Component {
 
     if (!currentTask.dashboardId) {
       dashboardErrorMessages.push(
-        i18n.translate('ezreporting.pleaseSelectDashboard', {
+        i18n.translate('ezReporting.pleaseSelectDashboard', {
           defaultMessage: 'Please select a dashboard'
         })
       );
@@ -125,7 +125,7 @@ export class TaskEditFlyout extends Component {
     if (!Address.email.isValid(email)) {
       this.setState({
         mailErrorMessages: [
-          i18n.translate('ezreporting.pleaseEnterValidEmail', {
+          i18n.translate('ezReporting.pleaseEnterValidEmail', {
             defaultMessage: 'Please enter a valid email address'
           })
         ],

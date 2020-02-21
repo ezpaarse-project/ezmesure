@@ -16,24 +16,23 @@ export const defaultTask = (dashboardId) => ({
 });
 
 export const ms2Str = (time) => {
-  if (time < 1000) {
-    return `${time}ms`;
-  }
+  let ms = time;
+  let s = Math.floor(ms / 1000);
+  ms %= 1000;
+  let m = Math.floor(s / 60);
+  s %= 60;
+  const h = Math.floor(m / 60);
+  m %= 60;
 
-  if (time > 1000) {
-    const executionTime = [];
+  if (h) { return `${h}h ${m}m`; }
+  if (m) { return `${m}m ${s}s`; }
+  if (s) { return `${s}s`; }
 
-    const s = Number.parseInt(time / 1000, 10);
-    const sec = Number.parseInt(s % 60, 10);
-    executionTime.push(`${sec}s`);
-
-    executionTime.push(`${time % 1000}ms`);
-
-    if (s > 60) {
-      const min = Number.parseInt((time / (60 * 1000)), 10);
-      executionTime.unshift(`${min}m`);
-    }
-
-    return executionTime.join(' ');
-  }
+  return `${ms}ms`;
 };
+
+export let httpClient;
+
+export function setHttpClient(client) {
+  httpClient = client;
+}

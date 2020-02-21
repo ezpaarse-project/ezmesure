@@ -137,25 +137,7 @@ export class Table extends Component {
         color: 'primary',
         onClick: el => {
           if (el.exists) {
-            return this.props.loadHistory(el._id).then((res) => {
-              if (res && res.data) {
-                if (res.data.historiesData.length <= 0) {
-                  return addToast(
-                    'Information',
-                    <FormattedMessage id="ezReporting.noHistories" defaultMessage="This task has no history." />,
-                    'info'
-                  );
-                }
-
-                return openHistoryFlyOut(res.data);
-              }
-            }).catch(() => {
-              return addToast(
-                'Error',
-                <FormattedMessage id="ezReporting.historyError" defaultMessage="An error occurred while loading the history." />,
-                'danger'
-              );
-            });
+            openHistoryFlyOut(el._id);
           }
         },
       });

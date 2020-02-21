@@ -1,19 +1,23 @@
 import React, { Component, Fragment } from 'react';
-import moment from 'moment';
 import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiTitle,
-  EuiSelect,
-  EuiFormRow,
-  EuiForm,
-  EuiText,
+  EuiBadge,
   EuiBasicTable,
-  EuiHorizontalRule,
+  EuiButtonIcon,
+  EuiHealth,
+  EuiFlyoutFooter,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
+import { capabilities } from 'ui/capabilities';
 import { FormattedMessage } from '@kbn/i18n/react';
-import { ms2Str } from '../../lib/reporting';
+import { addToast } from '../toast';
+import { ms2Str, httpClient } from '../../lib/reporting';
+import { i18n } from '@kbn/i18n';
 
 let openFlyOutHandler;
 export function openFlyOut(dashboard, edit) {
@@ -30,33 +34,107 @@ export class HistoryFlyout extends Component {
     super(props);
 
     this.state = {
+      taskId: null,
+      refreshing: false,
       isFlyoutVisible: false,
-      historiesData: [],
-      histories: [],
-      currentHistory: null,
+      historyItems: [],
       pageIndex: 0,
       pageSize: 10,
+      expandedRows: {},
     };
 
     openFlyOutHandler = this.open;
     closeFlyOutHandler = this.close;
   }
 
-  open = (history) => {
-    this.setState({ historiesData: history.historiesData });
-    this.setState({ histories: history.histories });
-    this.setState({ currentHistory: JSON.parse(JSON.stringify(history.historiesData[0])) });
-    this.setState({ isFlyoutVisible: true });
+  toggleDetails = (historyItem) => {
+    const expandedRows = { ...this.state.expandedRows };
+
+    if (expandedRows[historyItem.id]) {
+      delete expandedRows[historyItem.id];
+      this.setState({ expandedRows });
+      return;
+    }
+
+    const { logs = [] } = historyItem;
+
+    const columns = [
+      {
+        field: 'date',
+        name: i18n.translate('ezReporting.date', { defaultMessage: 'Date' }),
+        align: 'left',
+        dataType: 'date',
+        width: '180px',
+      },
+      {
+        field: 'type',
+        name: i18n.translate('ezReporting.type', { defaultMessage: 'Type' }),
+        width: '80px',
+        render: (type) => {
+          const colors = {
+            'error': 'danger',
+            'info': 'primary',
+            'warn': 'warning'
+          };
+          return <EuiBadge color={colors[type] || 'hollow'}>{type}</EuiBadge>;
+        },
+      },
+      {
+        field: 'message',
+        name: i18n.translate('ezReporting.message', { defaultMessage: 'Message' }),
+        align: 'left',
+      },
+    ];
+    expandedRows[historyItem.id] = (
+      <Fragment>
+        <EuiBasicTable
+          items={logs}
+          columns={columns}
+        />
+
+      </Fragment>
+    );
+
+    this.setState({ expandedRows });
+  }
+
+  refresh = async () => {
+    const { taskId } = this.state;
+
+    this.setState({ refreshing: true });
+
+    let historyItems;
+    try {
+      const resp = await httpClient.get(`../api/ezreporting/reporting/tasks/${taskId}/history`);
+      historyItems = resp && resp.data;
+    } catch (e) {
+      addToast(
+        'Error',
+        <FormattedMessage id="ezReporting.historyError" defaultMessage="An error occurred while loading the history." />,
+        'danger'
+      );
+    }
+
+    this.setState({
+      refreshing: false,
+      historyItems: historyItems || this.props.historyItems || [],
+    });
+  }
+
+  open = async (taskId) => {
+    if (!taskId || !capabilities.get().ezreporting.show) {
+      return;
+    }
+
+    this.setState({
+      taskId,
+      historyItems: [],
+      isFlyoutVisible: true
+    }, this.refresh);
   };
 
   close = () => {
     this.setState({ isFlyoutVisible: false });
-    this.setState({ currentHistory: null });
-  };
-
-  onChangeHistory = (event) => {
-    const tmp = this.state.historiesData.find(({ id }) => id === event.target.value);
-    this.setState({ currentHistory: tmp });
   };
 
   onTableChange = ({ page = {} }) => {
@@ -70,95 +148,79 @@ export class HistoryFlyout extends Component {
 
   render() {
     const {
+      refreshing,
       isFlyoutVisible,
-      histories,
-      currentHistory,
+      historyItems,
+      expandedRows,
       pageIndex,
-      pageSize
+      pageSize,
     } = this.state;
-
-    let flyOutContent;
 
     if (!isFlyoutVisible) {
       return <Fragment />;
     }
 
-    if (currentHistory) {
-
-      const columns = [
-        {
-          field: 'date',
-          name: 'Date',
-          sortable: true,
-          align: 'left',
-          width: '200px',
-          render: (date) => {
-            return moment(date).format('YYYY-MM-DD HH:mm:ss');
-          },
+    const columns = [
+      {
+        field: 'startTime',
+        name: i18n.translate('ezReporting.date', { defaultMessage: 'Date' }),
+        sortable: true,
+        dataType: 'date',
+        align: 'left',
+      },
+      {
+        field: 'status',
+        name: i18n.translate('ezReporting.status', { defaultMessage: 'Status' }),
+        sortable: true,
+        align: 'left',
+        width: '140px',
+        render: (status) => {
+          switch (status) {
+            case 'error':
+              return <EuiHealth color="danger">{ i18n.translate('ezReporting.error', { defaultMessage: 'Error' })}</EuiHealth>;
+            case 'completed':
+              return <EuiHealth color="success">{ i18n.translate('ezReporting.completed', { defaultMessage: 'Completed' })}</EuiHealth>;
+            case 'ongoing':
+              return <EuiHealth color="primary">{ i18n.translate('ezReporting.ongoing', { defaultMessage: 'Ongoing' })}</EuiHealth>;
+            default:
+              return <EuiHealth color="subdued">{ i18n.translate('ezReporting.unknown', { defaultMessage: 'Unknown' })}</EuiHealth>;
+          }
         },
-        {
-          field: 'status',
-          name: 'Status',
-          sortable: true,
-          align: 'left',
-          width: '100px',
+      },
+      {
+        field: 'executionTime',
+        name: i18n.translate('ezReporting.executionTime', { defaultMessage: 'Execution time' }),
+        sortable: true,
+        align: 'right',
+        width: '140px',
+        render: (executionTime) => {
+          return ms2Str(executionTime);
         },
-        {
-          field: 'message',
-          name: 'Message',
-          sortable: false,
-          align: 'left',
-        }
-      ];
-
-      const pagination = {
-        pageIndex,
-        pageSize,
-        totalItemCount: currentHistory.data.length,
-        pageSizeOptions: [10, 20, 30],
-        hidePerPageOptions: false,
-      };
-
-      const startIndex = (pageIndex * pageSize);
-      const endIndex = Math.min(startIndex + pageSize, currentHistory.data.length);
-
-      flyOutContent = (
-        <Fragment>
-          <EuiForm>
-            <EuiFormRow
-              fullWidth={true}
-              label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
-            >
-              <EuiSelect
-                fullWidth={true}
-                options={histories}
-                value={currentHistory.id}
-                onChange={this.onChangeHistory}
-                aria-label={<FormattedMessage id="ezReporting.reportingDate" defaultMessage="Reporting date" />}
-              />
-            </EuiFormRow>
-          </EuiForm>
-
-          <EuiHorizontalRule margin="m" />
-          <EuiText>
-            <strong>
-              <FormattedMessage
-                id="ezReporting.executionTime"
-                defaultMessage="Execution time"
-              />
-            </strong> : { ms2Str(currentHistory.executionTime) }
-          </EuiText>
-
-          <EuiHorizontalRule margin="m" />
-          <EuiBasicTable
-            items={currentHistory.data.slice(startIndex, endIndex)}
-            columns={columns}
-            onChange={this.onTableChange}
-            pagination={pagination}
+      },
+      {
+        align: 'right',
+        width: '40px',
+        isExpander: true,
+        render: item => (
+          <EuiButtonIcon
+            onClick={() => this.toggleDetails(item)}
+            aria-label={expandedRows[item.id] ? 'Collapse' : 'Expand'}
+            iconType={expandedRows[item.id] ? 'arrowUp' : 'arrowDown'}
           />
-        </Fragment>
-      );
-    }
+        ),
+      }
+    ];
+
+    const pagination = {
+      pageIndex,
+      pageSize,
+      totalItemCount: historyItems.length,
+      pageSizeOptions: [10, 20, 30],
+      hidePerPageOptions: false,
+    };
+
+    const startIndex = (pageIndex * pageSize);
+    const endIndex = Math.min(startIndex + pageSize, historyItems.length);
 
     return (
       <EuiFlyout
@@ -173,8 +235,31 @@ export class HistoryFlyout extends Component {
         </EuiFlyoutHeader>
 
         <EuiFlyoutBody>
-          { flyOutContent }
+          <EuiBasicTable
+            items={historyItems.slice(startIndex, endIndex)}
+            itemId="id"
+            itemIdToExpandedRowMap={this.state.expandedRows}
+            isExpandable={true}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+          />
         </EuiFlyoutBody>
+
+        <EuiFlyoutFooter>
+          <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                iconType="refresh"
+                onClick={this.refresh}
+                isLoading={refreshing}
+                fill
+              >
+                <FormattedMessage id="ezReporting.refresh" defaultMessage="Refresh" />
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutFooter>
       </EuiFlyout>
     );
   }

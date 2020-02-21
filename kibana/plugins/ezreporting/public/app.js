@@ -6,6 +6,7 @@ import { I18nProvider } from '@kbn/i18n/react';
 import $jQ from 'jquery';
 import 'ui/autoload/styles';
 import { Main } from './components/main';
+import { setHttpClient } from './lib/reporting';
 
 const app = uiModules.get('apps/ezreporting');
 
@@ -22,6 +23,7 @@ app.config(stateManagementConfigProvider =>
 
 function RootController($scope, $element, $http) {
   const domNode = $element[0];
+  setHttpClient($http);
 
   // get space name
   const currentUrl = $jQ(window.location).attr('pathname');
@@ -31,7 +33,7 @@ function RootController($scope, $element, $http) {
   // render react to DOM
   render(
     <I18nProvider>
-      <Main title="ezReporting" httpClient={$http} space={space} />
+      <Main title="ezReporting" space={space} />
     </I18nProvider>,
     domNode
   );
