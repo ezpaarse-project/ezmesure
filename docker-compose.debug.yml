@@ -121,7 +121,7 @@ services:
       - maildev
       - rp
     restart: "no"
-    entrypoint: npm run dev
+    command: npm run dev
 
   maildev:
     image: djfarrelly/maildev
