@@ -13,7 +13,7 @@ const logger = require('../logger');
 const elastic = require('./elastic');
 const { getDashboard } = require('./dashboard');
 const Frequency = require('./frequency');
-const puppeteer = require('./puppeteer');
+const reporter = require('./puppeteer');
 const { sendMail, generateMail } = require('./mail');
 
 async function getTasks() {
@@ -34,23 +34,75 @@ async function getTasks() {
   return (res && res.body && res.body.hits && res.body.hits.hits) || [];
 }
 
-async function storeHistory(history, taskId, hrstart) {
-  const hrend = process.hrtime.bigint();
-
-  logger.info(`Ending reporting task ${taskId} in ${history.executionTime}ms`);
-
-  return elastic.index({
-    index: historyIndex,
-    body: {
-      ...history,
-      createdAt: new Date(),
-      executionTime: Math.floor(Number.parseInt(hrend - hrstart, 10) / 1e6),
-    },
-  });
-}
-
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+class HistoryEntry {
+  constructor(taskId) {
+    this.id = null;
+    this.startTime = null;
+    this.endTime = null;
+
+    this.history = {
+      taskId,
+      executionTime: 0,
+      status: 'ongoing',
+      logs: [],
+      startTime: new Date(),
+      endTime: null,
+    };
+  }
+
+  setStatus(str) {
+    this.history.status = str;
+    return this;
+  }
+
+  log(type, message) {
+    this.history.logs.push({ date: new Date(), type, message });
+
+    if (typeof logger[type] === 'function') {
+      logger[type](`${this.history.taskId}: ${message}`);
+    }
+    return this;
+  }
+
+  startTimer() {
+    this.startTime = process.hrtime.bigint();
+  }
+
+  end() {
+    const endTime = process.hrtime.bigint();
+    this.history.endTime = new Date();
+    this.history.executionTime = Math.floor(Number.parseInt(endTime - this.startTime, 10) / 1e6);
+
+    if (this.history.status === 'ongoing') {
+      this.history.status = 'completed';
+    }
+
+    this.log('info', `task terminated in ${this.history.executionTime}ms`);
+    return this;
+  }
+
+  async save() {
+    try {
+      const result = await elastic.index({
+        id: this.id,
+        index: historyIndex,
+        body: this.history,
+      });
+
+      if (!this.id) {
+        const { body = {} } = result || {};
+        const { _id: newID } = body;
+        this.id = newID;
+      }
+    } catch (e) {
+      this.log('error', `failed to create or update history entry in index (${historyIndex})`);
+      logger.error(e);
+    }
+  }
 }
 
 /**
@@ -60,69 +112,52 @@ function wait(ms) {
 async function generateReport(task) {
   const { _id: taskId, _source: taskSource } = task;
 
-  logger.info(`Starting reporting task ${taskId}`);
-  const hrstart = process.hrtime.bigint();
-
-  const history = {
-    taskId,
-    executionTime: 0,
-    data: [],
-  };
-
+  const history = new HistoryEntry(taskId);
+  const fullDashboardId = `${taskSource.space || 'default'}:${taskSource.dashboardId}`;
   let dashboard;
-  logger.info(`${taskId} : getting dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+
+  history.log('info', `fetching dashboard data (id: ${fullDashboardId})`);
+
+  // eslint-disable-next-line no-await-in-loop
+  await history.save();
+
   try {
     // eslint-disable-next-line no-await-in-loop
     dashboard = await getDashboard(taskSource.dashboardId, taskSource.space);
   } catch (e) {
-    history.data.push({
-      status: 'error',
-      message: `${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`,
-      date: new Date(),
-    });
-    logger.error(`${taskId} : dashboard (id: ${taskSource.space || 'default'}:${taskSource.dashboardId}) not found or removed`);
+    history.setStatus('error');
+    history.log('error', `dashboard (id: ${fullDashboardId}) not found or removed`);
     logger.error(e);
 
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await storeHistory(history, taskId, hrstart);
-      return;
-    } catch (err) {
-      logger.error(`${taskId} : error during data insertion in index (${historyIndex})`);
-      logger.error(err);
-      return;
-    }
+    // eslint-disable-next-line no-await-in-loop
+    await history.end().save();
+    return;
   }
 
-  logger.info(`${taskId} : generating pdf (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+  history.log('info', 'adding task to queue');
+  await history.save();
 
   let pdf;
   try {
     // eslint-disable-next-line no-await-in-loop
-    pdf = await puppeteer(
-      taskSource.dashboardId,
-      taskSource.space || null,
-      taskSource.frequency,
-      taskSource.print,
-    );
-  } catch (e) {
-    history.data.push({
-      status: 'error',
-      message: 'Error during PDF report generation',
-      date: new Date(),
+    pdf = await new Promise((resolve, reject) => {
+      reporter.addTask(taskSource)
+        .on('start', () => {
+          history.startTimer();
+          history.log('info', 'task has been started');
+          history.save();
+        })
+        .on('complete', resolve)
+        .on('error', reject);
     });
-    logger.error(`${taskId} : error during PDF report generation (id: ${taskSource.space || 'default'}:${taskSource.dashboardId})`);
+  } catch (e) {
+    history.setStatus('error');
+    history.log('error', 'failed to generate PDF');
     logger.error(e);
 
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await storeHistory(history, taskId, hrstart);
-      return;
-    } catch (err) {
-      logger.error(`${taskId} : error during data insertion in index (${historyIndex})`);
-      logger.error(err);
-      return;
-    }
+    // eslint-disable-next-line no-await-in-loop
+    await history.end().save();
+    return;
   }
 
   logger.info(`${taskId} : sending mail`);
@@ -165,10 +200,10 @@ async function generateReport(task) {
         }),
       });
       emailSent = true;
-      logger.info(`${taskId} : email sent`);
+      history.log('info', 'the email was sent');
       break;
     } catch (e) {
-      logger.error(`${taskId} : error when generating or sending emails (attempts: ${(i + 1)})`);
+      history.log('warn', `failed to send email (attempts: ${(i + 1)})`);
       logger.error(e);
 
       // eslint-disable-next-line no-await-in-loop
@@ -177,23 +212,16 @@ async function generateReport(task) {
   }
 
   if (!emailSent) {
-    history.data.push({
-      status: 'error',
-      message: 'Error when generating or sending emails',
-      date: new Date(),
-    });
+    history.setStatus('error');
+    history.log('error', 'error when generating or sending emails');
   }
 
   const sentAt = new Date();
   const freq = new Frequency(taskSource.frequency);
 
   if (!freq.isValid()) {
-    history.data.push({
-      status: 'error',
-      message: 'Task frequency is invalid, cannot schedule next run',
-      date: new Date(),
-    });
-    logger.error(`${taskId} : task frequency is invalid, cannot schedule next run`);
+    history.setStatus('error');
+    history.log('error', 'task frequency is invalid, cannot schedule next run');
   }
 
   try {
@@ -210,22 +238,13 @@ async function generateReport(task) {
       },
     });
   } catch (e) {
-    history.data.push({
-      status: 'error',
-      message: 'Error during data insertion in index',
-      date: new Date(),
-    });
-    logger.error(`${taskId} : error during data insertion in index (${index})`);
+    history.setStatus('error');
+    history.log('error', `Failed to update task data in index (${index})`);
     logger.error(e);
   }
 
-  try {
-    // eslint-disable-next-line no-await-in-loop
-    await storeHistory(history, taskId, hrstart);
-  } catch (e) {
-    logger.error(`Error during data insertion in index ${historyIndex} (taskId: ${taskId})`);
-    logger.error(e);
-  }
+  // eslint-disable-next-line no-await-in-loop
+  await history.end().save();
 }
 
 async function generatePendingReports() {
@@ -241,10 +260,13 @@ async function generatePendingReports() {
 
   logger.info(`${tasks.length} pending tasks found`);
 
-  for (let i = 0; i < tasks.length; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
-    await generateReport(tasks[i]);
-  }
+  tasks.forEach((task) => {
+    generateReport(task)
+      .catch((e) => {
+        logger.error(`${task.id}: failed to generate report`);
+        logger.error(e);
+      });
+  });
 }
 
 module.exports = {

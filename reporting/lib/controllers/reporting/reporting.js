@@ -276,6 +276,7 @@ exports.history = async (ctx) => {
 
   if (!id) {
     ctx.status = 404;
+    return;
   }
 
   try {
@@ -285,7 +286,7 @@ exports.history = async (ctx) => {
       body: {
         size: 10000,
         sort: {
-          createdAt: {
+          startTime: {
             order: 'desc',
           },
         },
@@ -303,31 +304,20 @@ exports.history = async (ctx) => {
       },
     });
 
-    if (data && data.hits && data.hits.hits) {
+    const hits = data && data.hits && data.hits.hits;
+
+    if (hits) {
       ctx.type = 'json';
       ctx.status = 200;
 
-      const historiesData = [];
-      const histories = [];
-      data.hits.hits.forEach((history) => {
-        const { _source: historySource, _id: historyId } = history;
+      ctx.body = hits.map((historyItem) => {
+        const { _source: historySource, _id: historyId } = historyItem;
 
-        // FIXME: should be done with either moment or date-fns
-        const match = /^([0-9]{4}-[0-9]{2}-[0-9]{2})T([0-9]{2}:[0-9]{2}:[0-9]{2}).([0-9]{3})Z$/i.exec(historySource.createdAt);
-        const date = match ? match[1] : historySource.createdAt;
-
-        histories.push({
-          value: historyId,
-          text: date,
-        });
-
-        historiesData.push({
+        return {
           id: historyId,
           ...historySource,
-        });
+        };
       });
-
-      ctx.body = { historiesData, histories };
     }
   } catch (err) {
     logger.error(err);

@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
-const fs = require('fs');
-const { promisify } = require('util');
+const fs = require('fs-extra');
+const { EventEmitter } = require('events');
 const formatDate = require('date-fns/format');
 const { fr } = require('date-fns/locale');
 const {
@@ -12,13 +12,12 @@ const {
 } = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
 const Frequency = require('./frequency');
-
-const fsp = { readFile: promisify(fs.readFile) };
+const logger = require('../logger');
 
 const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
 
 function loadStyles() {
-  return fsp.readFile(path.resolve(assetsDir, 'css', 'preserve_layout.css'), 'utf8');
+  return fs.readFile(path.resolve(assetsDir, 'css', 'preserve_layout.css'), 'utf8');
 }
 
 function loadLogos() {
@@ -30,7 +29,7 @@ function loadLogos() {
         logo.link = `${kibana.external}/`;
       }
       if (logo.file) {
-        logo.base64 = await fsp.readFile(path.resolve(assetsDir, logo.file), 'base64');
+        logo.base64 = await fs.readFile(path.resolve(assetsDir, logo.file), 'base64');
       }
 
       return logo;
@@ -89,156 +88,253 @@ function waitForCompleteRender(page) {
   });
 }
 
-module.exports = async (dashboardId, space, frequencyString, print) => {
-  const frequency = new Frequency(frequencyString);
-
-  if (!frequency.isValid()) {
-    throw new Error('invalid task frequency');
+class Reporter {
+  constructor() {
+    this.browser = null;
+    this.busy = false;
+    this.tasks = [];
   }
 
-  const now = new Date();
-  const period = {
-    from: frequency.startOfPreviousPeriod(now),
-    to: frequency.startOfCurrentPeriod(now),
-  };
+  /**
+   * Launch a browser if there's no instance yet
+   */
+  async launchBrowser() {
+    if (this.browser) { return; }
 
-  const { dashboard } = (await getDashboard(dashboardId, space)) || {};
-  const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
-  const dashboardTitle = dashboard && dashboard.title;
+    this.browser = await puppeteer.launch({
+      ignoreHTTPSErrors: true,
+      headless: true,
+      slowMo: 10,
+      ignoreDefaultArgs: ['--enable-automation'],
+      defaultViewport: null,
+      args: [
+        '--no-sandbox',
+        '--no-zygote',
+        '--disable-setuid-sandbox', // Absolute trust of the open content in chromium
+        '--disable-dev-shm-usage',
+      ],
+    });
+  }
 
-  const fields = {
-    username: 'input[name=username]',
-    password: 'input[name=password]',
-  };
+  /**
+   * Close the current browser
+   */
+  async closeBrowser() {
+    if (this.browser) {
+      // const pages = await this.browser.pages();
+      // await Promise.all(pages.map((page) => page.close()));
+      await this.browser.close();
+      this.browser = null;
+    }
+  }
 
-  const browser = await puppeteer.launch({
-    ignoreHTTPSErrors: true,
-    headless: true,
-    slowMo: 10,
-    ignoreDefaultArgs: ['--enable-automation'],
-    defaultViewport: null,
-    args: [
-      '--no-sandbox', '--disable-setuid-sandbox', // Absolute trust of the open content in chromium
-    ],
-  });
-  const page = await browser.newPage();
+  /**
+   * Create a new page, launch browser if needed
+   */
+  async newPage() {
+    const page = await this.browser.newPage();
+    page.setDefaultNavigationTimeout(puppeteerTimeout);
+    page.setDefaultTimeout(puppeteerTimeout);
 
-  page.setDefaultNavigationTimeout(puppeteerTimeout);
-  page.setDefaultTimeout(puppeteerTimeout);
+    return page;
+  }
 
-  await page.goto(`${kibana.internal || kibana.external}/${dashboardUrl}`, {
-    waitUntil: 'load',
-  });
+  addTask(task = {}) {
+    const frequency = new Frequency(task.frequency);
 
-  await page.waitFor('form');
+    if (!frequency.isValid()) {
+      throw new Error('invalid task frequency');
+    }
 
-  await page.waitFor(fields.username);
-  await page.type(fields.username, elasticsearch.username);
+    const emitter = new EventEmitter();
+    this.tasks.push([task, emitter]);
+    this.performTasks();
 
-  await page.waitFor(fields.password);
-  await page.type(fields.password, elasticsearch.password);
+    return emitter;
+  }
 
-  await page.keyboard.press('Enter');
+  async performTasks() {
+    if (this.busy) { return; }
+    this.busy = true;
 
-  await page.waitFor('.dshLayout--viewing');
+    try {
+      await this.launchBrowser();
+    } catch (e) {
+      logger.error('Failed to launch browser');
+      logger.error(e);
+      this.busy = false;
+      return;
+    }
 
-  const dashboardViewport = await page.$('.dshLayout--viewing');
-  const boundingBox = await dashboardViewport.boundingBox();
+    while (this.tasks.length > 0) {
+      const [task, emitter] = this.tasks.shift();
+      let page;
 
-  // 792x1122 = A4 at 96PPI
-  const viewport = {
-    width: 1122,
-    height: print ? 792 : boundingBox.height,
-    margin: {
-      left: 50,
-      right: 50,
-      top: 100,
-      bottom: 60,
-    },
-  };
+      emitter.emit('start');
 
-  await page.setViewport({
-    width: viewport.width,
-    height: viewport.height,
-    deviceScaleFactor: 1,
-  });
-
-  let styles = await loadStyles();
-
-  if (print) {
-    styles += `
-      dashboard-app .react-grid-item {
-        position: fixed;
-        left: 0 !important;
-        background-color: inherit !important;
-        z-index: 1 !important;
-        width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
-        height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
-        transform: none !important;
-        -webkit-transform: none !important;
+      try {
+        page = await this.newPage(); // eslint-disable-line no-await-in-loop
+        const pdf = await Reporter.generatePDF(page, task); // eslint-disable-line no-await-in-loop
+        emitter.emit('complete', pdf);
+      } catch (e) {
+        emitter.emit('error', e);
       }
-    `;
+
+      try {
+        if (page) {
+          await page.close(); // eslint-disable-line no-await-in-loop
+        }
+      } catch (e) {
+        logger.error('Failed to close page');
+        logger.error(e);
+      }
+    }
+
+    try {
+      await this.closeBrowser();
+    } catch (e) {
+      logger.error('Failed to close browser');
+      logger.error(e);
+    }
+
+    this.busy = false;
   }
 
-  await insertStyles(page, styles);
-  if (print) {
-    await positionElements(page, viewport);
-  }
-  await waitForCompleteRender(page);
+  static async generatePDF(page, task) {
+    const {
+      dashboardId,
+      space,
+      frequency: frequencyString,
+      print,
+    } = task;
 
-  dashboardViewport.dispose();
+    const frequency = new Frequency(frequencyString);
 
-  await page.waitFor(5000);
+    if (!frequency.isValid()) {
+      throw new Error('invalid task frequency');
+    }
 
-  const logoHtml = (await loadLogos()).map((logo) => `
-    <a href="${logo.link}">
-      <img src="data:image/png;base64,${logo.base64}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
-    </a>
-  `);
+    const now = new Date();
+    const period = {
+      from: frequency.startOfPreviousPeriod(now),
+      to: frequency.startOfCurrentPeriod(now),
+    };
 
-  const pdfOptions = {
-    margin: {
-      left: `${viewport.margin.left}px`,
-      right: `${viewport.margin.right}px`,
-      top: `${viewport.margin.top}px`,
-      bottom: `${viewport.margin.bottom}px`,
-    },
-    printBackground: false,
-    displayHeaderFooter: true,
-    headerTemplate: `
-      <style>#header, #footer { padding: 10px !important; }</style>
-      <div style="width: ${viewport.width}px; color: black; text-align: center; line-height: 5px">
-        <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
-        <p style="font-size: 10px;">
-          Rapport couvrant la période
-          du ${formatDate(period.from, 'Pp', { locale: fr })}
-          au ${formatDate(period.to, 'Pp', { locale: fr })}
-        </p>
-        <p style="font-size: 10px;">Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p>
-      </div>
-    `,
-    footerTemplate: `
-      <div style="width: ${viewport.width}px; color: black; position: relative;">
-        ${logoHtml}
-        <div style="position: absolute; right: 0; bottom: 0; font-size: 8px;">
-          <span class="pageNumber"></span> / <span class="totalPages"></span>
+    const { dashboard } = (await getDashboard(dashboardId, space)) || {};
+    const dashboardUrl = buildDashboardUrl(dashboardId, space, period);
+    const dashboardTitle = dashboard && dashboard.title;
+
+    await page.goto(`${kibana.internal || kibana.external}/${dashboardUrl}`, {
+      waitUntil: 'load',
+    });
+
+    // Wait for either login form or dashboard wrapper
+    await page.waitFor('.login-form, .dshLayout--viewing');
+
+    const loginForm = await page.$('.login-form');
+    if (loginForm) {
+      await page.type('input[name=username]', elasticsearch.username);
+      await page.type('input[name=password]', elasticsearch.password);
+      await page.keyboard.press('Enter');
+      await page.waitFor('.dshLayout--viewing');
+    }
+
+    const dashboardViewport = await page.$('.dshLayout--viewing');
+    const boundingBox = await dashboardViewport.boundingBox();
+
+    // 792x1122 = A4 at 96PPI
+    const viewport = {
+      width: 1122,
+      height: print ? 792 : boundingBox.height,
+      margin: {
+        left: 50,
+        right: 50,
+        top: 100,
+        bottom: 60,
+      },
+    };
+
+    await page.setViewport({
+      width: viewport.width,
+      height: viewport.height,
+      deviceScaleFactor: 1,
+    });
+
+    let styles = await loadStyles();
+
+    if (print) {
+      styles += `
+        dashboard-app .react-grid-item {
+          position: fixed;
+          left: 0 !important;
+          background-color: inherit !important;
+          z-index: 1 !important;
+          width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
+          height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
+          transform: none !important;
+          -webkit-transform: none !important;
+        }
+      `;
+    }
+
+    await insertStyles(page, styles);
+    if (print) {
+      await positionElements(page, viewport);
+    }
+    await waitForCompleteRender(page);
+
+    dashboardViewport.dispose();
+
+    await page.waitFor(5000);
+
+    const logoHtml = (await loadLogos()).map((logo) => `
+      <a href="${logo.link}">
+        <img src="data:image/png;base64,${logo.base64}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
+      </a>
+    `);
+
+    const pdfOptions = {
+      margin: {
+        left: `${viewport.margin.left}px`,
+        right: `${viewport.margin.right}px`,
+        top: `${viewport.margin.top}px`,
+        bottom: `${viewport.margin.bottom}px`,
+      },
+      printBackground: false,
+      displayHeaderFooter: true,
+      headerTemplate: `
+        <style>#header, #footer { padding: 10px !important; }</style>
+        <div style="width: ${viewport.width}px; color: black; text-align: center; line-height: 5px">
+          <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
+          <p style="font-size: 10px;">
+            Rapport couvrant la période
+            du ${formatDate(period.from, 'Pp', { locale: fr })}
+            au ${formatDate(period.to, 'Pp', { locale: fr })}
+          </p>
+          <p style="font-size: 10px;">Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p>
         </div>
-      </div>
-    `,
-  };
+      `,
+      footerTemplate: `
+        <div style="width: ${viewport.width}px; color: black; position: relative;">
+          ${logoHtml}
+          <div style="position: absolute; right: 0; bottom: 0; font-size: 8px;">
+            <span class="pageNumber"></span> / <span class="totalPages"></span>
+          </div>
+        </div>
+      `,
+    };
 
-  if (print) {
-    pdfOptions.width = viewport.width;
-    pdfOptions.height = viewport.height;
-  } else {
-    const height = (boundingBox.height + viewport.margin.top + viewport.margin.bottom);
-    pdfOptions.width = viewport.width;
-    pdfOptions.height = Math.max(height, 600);
+    if (print) {
+      pdfOptions.width = viewport.width;
+      pdfOptions.height = viewport.height;
+    } else {
+      const height = (boundingBox.height + viewport.margin.top + viewport.margin.bottom);
+      pdfOptions.width = viewport.width;
+      pdfOptions.height = Math.max(height, 600);
+    }
+
+    return page.pdf(pdfOptions);
   }
+}
 
-  const pdf = await page.pdf(pdfOptions);
-
-  await browser.close();
-
-  return pdf || null;
-};
+module.exports = new Reporter();

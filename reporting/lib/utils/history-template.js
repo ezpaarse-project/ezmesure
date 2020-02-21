@@ -20,10 +20,16 @@ module.exports = {
       executionTime: {
         type: 'integer',
       },
-      data: {
+      status: {
+        type: 'string',
+      },
+      logs: {
         type: 'nested',
       },
-      createdAt: {
+      startTime: {
+        type: 'date',
+      },
+      endTime: {
         type: 'date',
       },
     },
