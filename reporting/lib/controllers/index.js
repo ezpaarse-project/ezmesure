@@ -8,6 +8,7 @@ const reporting = require('./reporting');
 const app = new Koa();
 
 app.use(route.get('/', async (ctx) => {
+  ctx.action = 'reporting/index';
   ctx.status = 200;
   ctx.body = { name, version };
 }));

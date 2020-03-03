@@ -23,6 +23,7 @@
   "sender": "ezmesure-reporting@couperin.org",
   "index": ".ezreporting",
   "historyIndex": ".ezreporting-history",
+  "activityIndex": ".ezreporting-activity",
   "roleName": "ezreporting",
   "cron": "0 0 1 * * *",
   "frequencies": [
