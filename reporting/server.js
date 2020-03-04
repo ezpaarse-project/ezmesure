@@ -56,6 +56,7 @@ app.use(async (ctx, next) => {
     try {
       await activity.save(ctx);
     } catch (e) {
+      console.log(e)
       ctx.app.emit('error', e, ctx);
     }
   }

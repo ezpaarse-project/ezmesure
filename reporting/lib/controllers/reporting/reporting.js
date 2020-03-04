@@ -63,6 +63,8 @@ exports.list = async (ctx) => {
 
   const { space } = ctx.request.params;
 
+  ctx.space = space;
+
   let dashboardsData;
   try {
     dashboardsData = await getDashboards(space);
@@ -172,6 +174,8 @@ exports.store = async (ctx) => {
     const { body: data } = await elastic.index({ index, body });
     const { _id: dataId } = data;
 
+    ctx.taskId = dataId;
+
     ctx.body = {
       _id: dataId,
       createdAt: body.createdAt,
@@ -190,10 +194,10 @@ exports.update = async (ctx) => {
   logger.info('reporting/update');
   ctx.action = 'reporting/update';
 
-
   const now = new Date();
   const { body } = ctx.request;
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
   const frequency = new Frequency(body.frequency);
 
   if (!frequency.isValid()) {
@@ -240,6 +244,7 @@ exports.del = async (ctx) => {
   }
 
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
 
   try {
     await elastic.delete({
@@ -273,6 +278,7 @@ exports.history = async (ctx) => {
   ctx.action = 'reporting/history';
 
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
 
   if (!id) {
     ctx.status = 404;
@@ -327,6 +333,7 @@ exports.history = async (ctx) => {
 
 exports.download = async (ctx) => {
   const { taskId } = ctx.request.params;
+  ctx.taskId = taskId;
 
   let task;
   try {

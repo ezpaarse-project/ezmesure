@@ -9,6 +9,7 @@ const { format, isValid } = require('date-fns');
 
 module.exports = {
   start(appLogger) {
+    sendNotifications()
     const job = new CronJob(cron, () => {
       sendNotifications().then(() => {
         appLogger.info('Recent activity successfully broadcasted');
@@ -25,10 +26,7 @@ module.exports = {
   },
 };
 
-/**
- * Send a mail containing new files and users
- */
-async function sendNotifications() {
+async function getEzMesureMetrics() {
   const { body: result } = await elastic.search({
     index: '.ezmesure-metrics',
     size: 10000,
@@ -39,15 +37,15 @@ async function sendNotifications() {
           must_not: [
             { exists: { field: 'metadata.broadcasted' } },
           ],
-          'filter': [
+          filter: [
             {
-              "range": {
-                "datetime": { "gte": "now-1w" }
+              range: {
+                datetime: { gte: 'now-1w' }
               }
             },
             {
-              'terms': {
-                'action': [
+              terms: {
+                action: [
                   'file/upload',
                   'file/delete',
                   'file/delete-many',
@@ -65,7 +63,7 @@ async function sendNotifications() {
   const actions = result && result.hits && result.hits.hits;
 
   if (actions.length === 0) {
-    return;
+    return {};
   }
 
   const files = actions
@@ -100,14 +98,91 @@ async function sendNotifications() {
       datetime: toLocaleDate(_source.datetime)
     }));
 
+  return { actions, files, users, insertions };
+}
+
+async function getReportingActivity() {
+  const { body: result } = await elastic.search({
+    index: config.reportingActivityIndex || '.ezreporting-activity',
+    size: 10000,
+    sort: 'datetime:desc',
+    body: {
+      query: {
+        bool: {
+          must_not: [
+            { exists: { field: 'metadata.broadcasted' } },
+          ],
+          filter: [
+            {
+              range: {
+                datetime: { gte: 'now-1w' }
+              }
+            },
+            {
+              terms: {
+                action: [
+                  'reporting/store',
+                  'reporting/update',
+                  'reporting/delete'
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const actions = result && result.hits && result.hits.hits;
+
+  if (actions.length === 0) {
+    return {};
+  }
+
+  const reportings = await Promise.all(actions
+    .map(async ({ _source }) => {
+      const { taskId } = _source || {};
+      const task = await elastic.search({
+        index: config.reportingIndex || '.ezreporting',
+        timeout: '30s',
+        body: {
+          size: 10000,
+          query: {
+            bool: {
+              must: [ { match: { _id: taskId } } ]
+            },
+          },
+        },
+      });
+
+      const { _source: taskData } = task && task.body && task.body.hits && task.body.hits.hits && task.body.hits.hits[0];
+
+      return {
+        ..._source,
+        taskData,
+      };
+    })
+  );
+
+  return { actions, reportings };
+}
+
+/**
+ * Send a mail containing new files and users
+ */
+async function sendNotifications() {
+  const { actions: ezMesureActions, files, users, insertions } = await getEzMesureMetrics();
+  const { actions: reportingActions, reportings } = await getReportingActivity();
+
   await sendMail({
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { files, users, insertions })
+    ...generateMail('recent-activity', { reportings })
   });
 
-  return setBroadcasted(actions);
+  await setBroadcasted(reportingActions);
+  return setBroadcasted(ezMesureActions);
 }
 
 /**

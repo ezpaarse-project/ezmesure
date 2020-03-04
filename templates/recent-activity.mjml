@@ -110,4 +110,44 @@
 </mj-section>
 {% endif %}
 
+{% if reportings.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Rapports ({{ reportings.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th></th>
+          <th>Utilisateur</th>
+          <th>Espace</th>
+          <th>DashboardId</th>
+          <th style="width: 130px">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in reportings %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          {% if action.action == 'reporting/store' %}
+            <td>+</td>
+          {% endif %}
+          {% if action.action == 'reporting/delete' %}
+            <td>-</td>
+          {% endif %}
+          {% if action.action == 'reporting/update' %}
+            <td>*</td>
+          {% endif %}
+          <td>{{ action.user.name }}</td>
+          <td>{{ action.taskData.space }}</td>
+          <td>{{ action.taskData.dashboardId }}</td>
+          <td>{{ action.taskData.sentAt }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
 {% endblock %}

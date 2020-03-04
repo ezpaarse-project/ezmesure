@@ -19,12 +19,12 @@ exports.save = async function (ctx) {
     action: ctx.action,
     index: ctx.index,
     responseTime: ctx.responseTime,
-    metadata: ctx.metadata,
     request: ctx.httpLog,
     response: {
       status: ctx.status,
-      body: typeof ctx.body === 'object' ? ctx.body : null,
+      body: typeof ctx.body === 'object' ? JSON.stringify(ctx.body) : null,
     },
+    taskId: ctx.taskId || null
   };
 
   switch (ctx.action) {

@@ -44,20 +44,10 @@ module.exports = {
       response: {
         properties: {
           status: { type: 'integer' },
-          body: {
-            properties: {
-              space: { type: 'keyword' },
-              dashboard: { type: 'keyword' },
-            },
-          },
+          body: { type: 'keyword' },
         },
       },
-      metadata: {
-        properties: {
-          username: { type: 'keyword' },
-          path: { type: 'keyword' },
-        },
-      },
+      taskId: { type: 'keyword' },
     },
   },
 };
