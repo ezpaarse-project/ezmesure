@@ -114,7 +114,7 @@ export class Table extends Component {
               return addToast(
                 'Information',
                 <FormattedMessage id="ezReporting.generated" defaultMessage="Your report will be sent to you by email" />,
-                'info'
+                'primary'
               );
             }).catch(() => {
               return addToast(
