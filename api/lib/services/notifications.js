@@ -198,7 +198,7 @@ async function sendNotifications() {
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { files, users, insertion, reportings })
+    ...generateMail('recent-activity', { files, users, insertions, reportings })
   });
 
   await setBroadcasted(reportingActions);
