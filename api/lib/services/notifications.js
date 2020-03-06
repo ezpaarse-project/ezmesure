@@ -50,7 +50,7 @@ async function getEzMesureMetrics() {
                   'file/delete',
                   'file/delete-many',
                   'user/register',
-                  'indices/insert'
+                  'indices/insert',
                 ]
               }
             }
@@ -100,6 +100,19 @@ async function getEzMesureMetrics() {
 
   return { actions, files, users, insertions };
 }
+
+async function getDashboardName(dashboardId, namespace) {
+  const { body: data } = await elastic.getSource({
+    index: '.kibana',
+    id: `${namespace ? `${namespace}:` : ''}dashboard:${dashboardId}`,
+  });
+
+  if (data && data.type === 'dashboard') {
+    return data.dashboard.title;
+  }
+
+  return null;
+};
 
 async function getReportingActivity() {
   const { body: result } = await elastic.search({
@@ -155,7 +168,14 @@ async function getReportingActivity() {
         },
       });
 
-      const { _source: taskData } = task && task.body && task.body.hits && task.body.hits.hits && task.body.hits.hits[0];
+      const { body } = task || {};
+      const { hits } = body || {};
+      const { hits: hitsArray } = hits || {};
+      const { _source: taskData } = hitsArray[0] || [];
+
+      if (taskData) {
+        taskData.dashboardName = await getDashboardName(taskData.dashboardId, taskData.space);
+      }
 
       return {
         ..._source,
@@ -178,7 +198,7 @@ async function sendNotifications() {
     from: sender,
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { reportings })
+    ...generateMail('recent-activity', { files, users, insertion, reportings })
   });
 
   await setBroadcasted(reportingActions);

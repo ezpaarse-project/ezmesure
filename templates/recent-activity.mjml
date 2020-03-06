@@ -142,7 +142,7 @@
           {% endif %}
           <td>{{ action.user.name }}</td>
           <td>{{ action.taskData.space }}</td>
-          <td>{{ action.taskData.dashboardId }}</td>
+          <td>{{ action.taskData.dashboardName }}</td>
           <td width="70px">{{ action.taskData.createdAt }}</td>
           <td width="70px">{{ action.taskData.updatedAt }}</td>
           <td width="70px">{{ action.taskData.sentAt }}</td>
