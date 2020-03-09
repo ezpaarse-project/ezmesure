@@ -6,6 +6,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../../server');
 
 const secret = config.get('auth.secret');
+const cookie = config.get('auth.cookie');
 const sender = config.get('notifications.sender');
 
 exports.renaterLogin = async function (ctx) {
@@ -80,7 +81,7 @@ exports.renaterLogin = async function (ctx) {
     ctx.metadata = { username };
   }
 
-  ctx.cookies.set('eztoken', generateToken(user), { httpOnly: true });
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
