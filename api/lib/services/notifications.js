@@ -9,7 +9,6 @@ const { format, isValid } = require('date-fns');
 
 module.exports = {
   start(appLogger) {
-    sendNotifications()
     const job = new CronJob(cron, () => {
       sendNotifications().then(() => {
         appLogger.info('Recent activity successfully broadcasted');

@@ -10,9 +10,6 @@ services:
       context: ./kibana
     ports:
       - 5601:5601
-    links:
-      - elastic
-      - reporting
     environment:
       - ELASTICSEARCH_PASSWORD
       - ELASTICSEARCH_USERNAME
@@ -63,9 +60,6 @@ services:
       - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
-    links:
-      - elastic
-      - maildev
     restart: "no"
     command: npm run dev
 
@@ -116,10 +110,6 @@ services:
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
       - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - REPORTING_NAME=Reporting ezMESURE
-    links:
-      - elastic
-      - maildev
-      - rp
     restart: "no"
     command: npm run dev
 
