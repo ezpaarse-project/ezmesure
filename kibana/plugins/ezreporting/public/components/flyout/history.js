@@ -202,6 +202,8 @@ export class HistoryFlyout extends Component {
               return <EuiHealth color="danger">{ i18n.translate('ezReporting.error', { defaultMessage: 'Error' })}</EuiHealth>;
             case 'completed':
               return <EuiHealth color="success">{ i18n.translate('ezReporting.completed', { defaultMessage: 'Completed' })}</EuiHealth>;
+            case 'pending':
+              return <EuiHealth color="primary">{ i18n.translate('ezReporting.pending', { defaultMessage: 'Pending' })}</EuiHealth>;
             case 'ongoing':
               return <EuiHealth color="primary">{ i18n.translate('ezReporting.ongoing', { defaultMessage: 'Ongoing' })}</EuiHealth>;
             default:

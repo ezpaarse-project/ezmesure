@@ -121,6 +121,7 @@
     "ezreporting.selectDashboard": "Sélectionnez un tableau de bord",
     "ezreporting.error": "Erreur",
     "ezreporting.completed": "Terminé",
+    "ezReporting.pending": "En attente",
     "ezreporting.ongoing": "En cours",
     "ezreporting.unknown": "Inconnu",
     "ezReporting.refresh": "Actualiser"
