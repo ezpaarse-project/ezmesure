@@ -114,8 +114,15 @@ async function getDashboardName(dashboardId, namespace) {
 };
 
 async function getReportingActivity() {
+  const index = config.reportingActivityIndex || '.ezreporting-activity';
+  const { body: exists } = await elastic.indices.exists({ index });
+
+  if (!exists) {
+    return {};
+  }
+
   const { body: result } = await elastic.search({
-    index: config.reportingActivityIndex || '.ezreporting-activity',
+    index,
     size: 10000,
     sort: 'datetime:desc',
     body: {
