@@ -197,8 +197,14 @@ async function getReportingActivity() {
  * Send a mail containing new files and users
  */
 async function sendNotifications() {
-  const { actions: ezMesureActions, files, users, insertions } = await getEzMesureMetrics();
-  const { actions: reportingActions, reportings } = await getReportingActivity();
+  const { actions: ezMesureActions = [], files, users, insertions } = await getEzMesureMetrics();
+  const { actions: reportingActions = [], reportings } = await getReportingActivity();
+
+  const actions = [...ezMesureActions, ...reportingActions];
+
+  if (actions.length === 0) {
+    return;
+  }
 
   await sendMail({
     from: sender,
@@ -207,8 +213,7 @@ async function sendNotifications() {
     ...generateMail('recent-activity', { files, users, insertions, reportings })
   });
 
-  await setBroadcasted(reportingActions);
-  return setBroadcasted(ezMesureActions);
+  return setBroadcasted(actions);
 }
 
 /**
