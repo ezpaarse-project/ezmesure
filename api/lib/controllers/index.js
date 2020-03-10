@@ -2,7 +2,7 @@
 const Koa = require('koa');
 const router = require('koa-joi-router');
 
-const { renaterLogin } = require('./auth/auth');
+const { renaterLogin, logout } = require('./auth/auth');
 const logs = require('./logs');
 const files = require('./files');
 const authorize = require('./auth');
@@ -16,6 +16,7 @@ const app = new Koa();
 
 const publicRouter = router();
 publicRouter.get('/login', renaterLogin);
+publicRouter.get('/logout', logout);
 
 publicRouter.get('/', async (ctx) => {
   ctx.status = 200;

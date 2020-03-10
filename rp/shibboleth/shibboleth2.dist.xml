@@ -68,6 +68,8 @@
 
             <!-- LogoutInitiators enable SP-initiated local or global/single logout of sessions. -->
             <LogoutInitiator type="Chaining" Location="/Logout" relayState="cookie">
+                <LogoutInitiator type="Global" />
+                <LogoutInitiator type="SAML2" template="bindingTemplate.html"/>
                 <LogoutInitiator type="Local" />
             </LogoutInitiator>
 
@@ -92,7 +94,7 @@
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"/>
 
             <!-- SAML and local-only logout. -->
-<!--             <Logout>SAML2 Local</Logout> -->
+            <!-- <Logout>SAML2 Local</Logout> -->
 
             <!-- Extension service that generates "approximate" metadata based on SP configuration. -->
             <Handler type="MetadataGenerator" Location="/Metadata" signing="false"/>
