@@ -122,10 +122,8 @@
           <th></th>
           <th>Utilisateur</th>
           <th>Espace</th>
-          <th>DashboardId</th>
-          <th>Création</th>
-          <th>MàJ</th>
-          <th>Envoi</th>
+          <th>Tableau de bord</th>
+          <th style="width: 130px">Date</th>
         </tr>
       </thead>
       <tbody>
@@ -141,11 +139,9 @@
             <td>*</td>
           {% endif %}
           <td>{{ action.user.name }}</td>
-          <td>{{ action.taskData.space }}</td>
-          <td>{{ action.taskData.dashboardName }}</td>
-          <td width="70px">{{ action.taskData.createdAt }}</td>
-          <td width="70px">{{ action.taskData.updatedAt }}</td>
-          <td width="70px">{{ action.taskData.sentAt }}</td>
+          <td>{{ action.metadata.space }}</td>
+          <td>{{ action.metadata.dashboardName }}</td>
+          <td>{{ action.datetime }}</td>
         </tr>
         {% endfor %}
       </tbody>

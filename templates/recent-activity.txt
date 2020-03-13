@@ -28,6 +28,6 @@ Chargements ({{ insertions.length }})
 {% if reportings.length -%}
 Rapports ({{ reportings.length }})
   {% for action in reportings -%}
-    [{{ "+" if action.action == 'reporting/store' }}{{ "*" if action.action == 'reporting/update' }}{{ "-" if action.action == 'reporting/delete' }}] {{ action.user.name }} {{ action.taskData.space }} {{ action.taskData.dashboardName }} (Création {{ action.taskData.createdAt }}) (MàJ {{ action.taskData.updatedAt }}) (Envoi {{ action.taskData.sentAt if action.taskData.sentAt else "-" }}) 
+    [{{ "+" if action.action == 'reporting/store' }}{{ "*" if action.action == 'reporting/update' }}{{ "-" if action.action == 'reporting/delete' }}] {{ action.user.name }} {{ action.metadata.space }} {{ action.metadata.dashboardName }} {{ action.datetime }}
   {% endfor %}
 {% endif -%}

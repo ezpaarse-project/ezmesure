@@ -1,29 +1,20 @@
+/* eslint-disable no-underscore-dangle */
 const config = require('config');
+const { fr } = require('date-fns/locale');
+const { format, isValid } = require('date-fns');
 const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 
 const { sender, recipients, cron } = config.get('notifications');
-const { fr } = require('date-fns/locale');
-const { format, isValid } = require('date-fns');
 
-module.exports = {
-  start(appLogger) {
-    const job = new CronJob(cron, () => {
-      sendNotifications().then(() => {
-        appLogger.info('Recent activity successfully broadcasted');
-      }).catch((err) => {
-        appLogger.error(`Failed to broadcast recent activity : ${err}`);
-      });
-    });
-
-    if (recipients) {
-      job.start();
-    } else {
-      appLogger.warn('No recipient configured, notifications will be disabled');
-    }
-  },
-};
+/**
+ * Change a timestamp into a locale date
+ */
+function toLocaleDate(timestamp) {
+  const date = new Date(timestamp);
+  return isValid(date) ? format(date, 'Pp', { locale: fr }) : 'Invalid date';
+}
 
 async function getEzMesureMetrics() {
   const { body: result } = await elastic.search({
@@ -39,8 +30,8 @@ async function getEzMesureMetrics() {
           filter: [
             {
               range: {
-                datetime: { gte: 'now-1w' }
-              }
+                datetime: { gte: 'now-1w' },
+              },
             },
             {
               terms: {
@@ -50,13 +41,13 @@ async function getEzMesureMetrics() {
                   'file/delete-many',
                   'user/register',
                   'indices/insert',
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }
+                ],
+              },
+            },
+          ],
+        },
+      },
+    },
   });
 
   const actions = result && result.hits && result.hits.hits;
@@ -66,52 +57,43 @@ async function getEzMesureMetrics() {
   }
 
   const files = actions
-    .filter(a => a._source.action.startsWith('file/'))
+    .filter((a) => a._source.action.startsWith('file/'))
     .map(({ _source }) => {
       const metadata = _source.metadata || {};
       const paths = metadata.path || [];
       return {
         ..._source,
         path: Array.isArray(paths) ? paths : [paths],
-        datetime: toLocaleDate(_source.datetime)
+        datetime: toLocaleDate(_source.datetime),
       };
     });
 
   const users = await Promise.all(actions
-    .filter(a => a._source.action === 'user/register')
+    .filter((a) => a._source.action === 'user/register')
     .map(async ({ _source }) => {
       const { username } = _source.metadata || {};
       const elasticUser = username && await elastic.security.findUser({ username });
       return {
         ..._source,
         elasticUser,
-        datetime: toLocaleDate(_source.datetime)
+        datetime: toLocaleDate(_source.datetime),
       };
-    })
-  );
-
-  const insertions = actions
-    .filter(a => a._source.action === 'indices/insert')
-    .map(({ _source }) => ({
-      ..._source,
-      datetime: toLocaleDate(_source.datetime)
     }));
 
-  return { actions, files, users, insertions };
+  const insertions = actions
+    .filter((a) => a._source.action === 'indices/insert')
+    .map(({ _source }) => ({
+      ..._source,
+      datetime: toLocaleDate(_source.datetime),
+    }));
+
+  return {
+    actions,
+    files,
+    users,
+    insertions,
+  };
 }
-
-async function getDashboardName(dashboardId, namespace) {
-  const { body: data } = await elastic.getSource({
-    index: '.kibana',
-    id: `${namespace ? `${namespace}:` : ''}dashboard:${dashboardId}`,
-  });
-
-  if (data && data.type === 'dashboard') {
-    return data.dashboard.title;
-  }
-
-  return null;
-};
 
 async function getReportingActivity() {
   const index = config.reportingActivityIndex || '.ezreporting-activity';
@@ -134,22 +116,22 @@ async function getReportingActivity() {
           filter: [
             {
               range: {
-                datetime: { gte: 'now-1w' }
-              }
+                datetime: { gte: 'now-1w' },
+              },
             },
             {
               terms: {
                 action: [
                   'reporting/store',
                   'reporting/update',
-                  'reporting/delete'
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }
+                  'reporting/delete',
+                ],
+              },
+            },
+          ],
+        },
+      },
+    },
   });
 
   const actions = result && result.hits && result.hits.hits;
@@ -158,62 +140,12 @@ async function getReportingActivity() {
     return {};
   }
 
-  const reportings = await Promise.all(actions
-    .map(async ({ _source }) => {
-      const { taskId } = _source || {};
-      const task = await elastic.search({
-        index: config.reportingIndex || '.ezreporting',
-        timeout: '30s',
-        body: {
-          size: 10000,
-          query: {
-            bool: {
-              must: [ { match: { _id: taskId } } ]
-            },
-          },
-        },
-      });
-
-      const { body } = task || {};
-      const { hits } = body || {};
-      const { hits: hitsArray } = hits || {};
-      const { _source: taskData } = hitsArray[0] || [];
-
-      if (taskData) {
-        taskData.dashboardName = await getDashboardName(taskData.dashboardId, taskData.space);
-      }
-
-      return {
-        ..._source,
-        taskData,
-      };
-    })
-  );
+  const reportings = actions.map(({ _source }) => ({
+    ..._source,
+    datetime: toLocaleDate(_source.datetime),
+  }));
 
   return { actions, reportings };
-}
-
-/**
- * Send a mail containing new files and users
- */
-async function sendNotifications() {
-  const { actions: ezMesureActions = [], files, users, insertions } = await getEzMesureMetrics();
-  const { actions: reportingActions = [], reportings } = await getReportingActivity();
-
-  const actions = [...ezMesureActions, ...reportingActions];
-
-  if (actions.length === 0) {
-    return;
-  }
-
-  await sendMail({
-    from: sender,
-    to: recipients,
-    subject: '[Admin] Activité ezMESURE',
-    ...generateMail('recent-activity', { files, users, insertions, reportings })
-  });
-
-  return setBroadcasted(actions);
 }
 
 /**
@@ -233,9 +165,53 @@ function setBroadcasted(actions) {
 }
 
 /**
- * Change a timestamp into a locale date
+ * Send a mail containing new files and users
  */
-function toLocaleDate (timestamp) {
-  const date = new Date(timestamp);
-  return isValid(date) ? format(date, 'Pp', { locale: fr }) : 'Invalid date';
+async function sendNotifications() {
+  const {
+    actions: ezMesureActions = [],
+    files,
+    users,
+    insertions,
+  } = await getEzMesureMetrics();
+  const { actions: reportingActions = [], reportings } = await getReportingActivity();
+
+  const actions = [...ezMesureActions, ...reportingActions];
+
+  if (actions.length === 0) {
+    return;
+  }
+
+  await sendMail({
+    from: sender,
+    to: recipients,
+    subject: '[Admin] Activité ezMESURE',
+    ...generateMail('recent-activity', {
+      files,
+      users,
+      insertions,
+      reportings,
+    }),
+  });
+
+  // eslint-disable-next-line consistent-return
+  return setBroadcasted(actions);
 }
+
+module.exports = {
+  start(appLogger) {
+    const job = new CronJob(cron, () => {
+      sendNotifications().then(() => {
+        appLogger.info('Recent activity successfully broadcasted');
+      }).catch((err) => {
+        appLogger.error(`Failed to broadcast recent activity : ${err}`);
+      });
+    });
+
+    if (recipients) {
+      job.start();
+    } else {
+      appLogger.warn('No recipient configured, notifications will be disabled');
+    }
+  },
+};

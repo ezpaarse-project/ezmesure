@@ -13,10 +13,10 @@ const { generatePendingReports } = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
 
-// // check if roles exists
+// check if roles exists
 roles.findOrCreate();
 
-// // check if indexes exists
+// check if indexes exists
 indexes.findOrCreate();
 
 // CronTab for reporting job
@@ -56,7 +56,6 @@ app.use(async (ctx, next) => {
     try {
       await activity.save(ctx);
     } catch (e) {
-      console.log(e)
       ctx.app.emit('error', e, ctx);
     }
   }

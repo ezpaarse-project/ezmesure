@@ -48,6 +48,12 @@ module.exports = {
         },
       },
       taskId: { type: 'keyword' },
+      metadata: {
+        properties: {
+          dashboardName: { type: 'keyword' },
+          space: { type: 'keyword' },
+        },
+      },
     },
   },
 };

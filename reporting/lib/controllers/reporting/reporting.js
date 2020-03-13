@@ -9,6 +9,31 @@ const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
 
+async function getMetadata(taskId) {
+  const { body: data } = await elastic.getSource({
+    index,
+    id: taskId,
+  });
+
+  if (data) {
+    const { body: dashboard } = await elastic.getSource({
+      index: '.kibana',
+      // eslint-disable-next-line no-underscore-dangle
+      id: `${data.space ? `${data.space}:` : ''}dashboard:${data.dashboardId}`,
+    });
+
+    if (dashboard && dashboard.type === 'dashboard') {
+      return {
+        dashboardName: dashboard.dashboard.title,
+        space: data.space || null,
+      };
+    }
+
+    return null;
+  }
+  return null;
+}
+
 async function getDashboards(namespace) {
   const bool = {
     must: [{
@@ -176,6 +201,8 @@ exports.store = async (ctx) => {
 
     ctx.taskId = dataId;
 
+    ctx.metadata = await getMetadata(dataId);
+
     ctx.body = {
       _id: dataId,
       createdAt: body.createdAt,
@@ -222,6 +249,12 @@ exports.update = async (ctx) => {
     ctx.status = 500;
   }
 
+  try {
+    ctx.metadata = await getMetadata(id);
+  } catch (e) {
+    logger.error(e);
+  }
+
   ctx.status = 204;
 };
 
@@ -245,6 +278,12 @@ exports.del = async (ctx) => {
 
   const { taskId: id } = ctx.request.params;
   ctx.taskId = id;
+
+  try {
+    ctx.metadata = await getMetadata(id);
+  } catch (e) {
+    logger.error(e);
+  }
 
   try {
     await elastic.delete({

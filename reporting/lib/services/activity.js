@@ -1,10 +1,10 @@
+const config = require('config');
 const elastic = require('./elastic');
 const indexTemplate = require('../utils/activity-template');
-const config = require('config');
 
 const index = config.activityIndex || '.ezreporting-activity';
 
-exports.save = async function (ctx) {
+exports.save = async function save(ctx) {
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
@@ -24,9 +24,11 @@ exports.save = async function (ctx) {
       status: ctx.status,
       body: typeof ctx.body === 'object' ? JSON.stringify(ctx.body) : null,
     },
-    taskId: ctx.taskId || null
+    taskId: ctx.taskId || null,
+    metadata: ctx.metadata || null,
   };
 
+  // eslint-disable-next-line default-case
   switch (ctx.action) {
     case 'reporting/list':
     case 'reporting/history':
