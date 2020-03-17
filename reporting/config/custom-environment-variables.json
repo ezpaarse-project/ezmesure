@@ -23,6 +23,7 @@
   "sender": "REPORTING_SENDER",
   "index": "REPORTING_INDEX",
   "historyIndex": "REPORTING_HISTORY_INDEX",
+  "activityIndex": "REPORTING_ACTIVITY_INDEX",
   "roleName": "REPORTING_ROLE",
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",

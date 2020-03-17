@@ -9,6 +9,31 @@ const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
 
+async function getMetadata(taskId) {
+  const { body: data } = await elastic.getSource({
+    index,
+    id: taskId,
+  });
+
+  if (data) {
+    const { body: dashboard } = await elastic.getSource({
+      index: '.kibana',
+      // eslint-disable-next-line no-underscore-dangle
+      id: `${data.space ? `${data.space}:` : ''}dashboard:${data.dashboardId}`,
+    });
+
+    if (dashboard && dashboard.type === 'dashboard') {
+      return {
+        dashboardName: dashboard.dashboard.title,
+        space: data.space || null,
+      };
+    }
+
+    return null;
+  }
+  return null;
+}
+
 async function getDashboards(namespace) {
   const bool = {
     must: [{
@@ -62,6 +87,8 @@ exports.list = async (ctx) => {
   ctx.status = 200;
 
   const { space } = ctx.request.params;
+
+  ctx.space = space;
 
   let dashboardsData;
   try {
@@ -172,6 +199,10 @@ exports.store = async (ctx) => {
     const { body: data } = await elastic.index({ index, body });
     const { _id: dataId } = data;
 
+    ctx.taskId = dataId;
+
+    ctx.metadata = await getMetadata(dataId);
+
     ctx.body = {
       _id: dataId,
       createdAt: body.createdAt,
@@ -190,10 +221,10 @@ exports.update = async (ctx) => {
   logger.info('reporting/update');
   ctx.action = 'reporting/update';
 
-
   const now = new Date();
   const { body } = ctx.request;
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
   const frequency = new Frequency(body.frequency);
 
   if (!frequency.isValid()) {
@@ -218,6 +249,12 @@ exports.update = async (ctx) => {
     ctx.status = 500;
   }
 
+  try {
+    ctx.metadata = await getMetadata(id);
+  } catch (e) {
+    logger.error(e);
+  }
+
   ctx.status = 204;
 };
 
@@ -240,6 +277,13 @@ exports.del = async (ctx) => {
   }
 
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
+
+  try {
+    ctx.metadata = await getMetadata(id);
+  } catch (e) {
+    logger.error(e);
+  }
 
   try {
     await elastic.delete({
@@ -273,6 +317,7 @@ exports.history = async (ctx) => {
   ctx.action = 'reporting/history';
 
   const { taskId: id } = ctx.request.params;
+  ctx.taskId = id;
 
   if (!id) {
     ctx.status = 404;
@@ -327,6 +372,7 @@ exports.history = async (ctx) => {
 
 exports.download = async (ctx) => {
   const { taskId } = ctx.request.params;
+  ctx.taskId = taskId;
 
   let task;
   try {

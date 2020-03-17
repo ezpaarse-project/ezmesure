@@ -21,7 +21,7 @@ module.exports = {
         type: 'integer',
       },
       status: {
-        type: 'string',
+        type: 'keyword',
       },
       logs: {
         type: 'nested',

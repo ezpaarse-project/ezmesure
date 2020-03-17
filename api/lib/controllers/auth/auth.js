@@ -140,6 +140,11 @@ function generateToken(user) {
   return jwt.sign({ username, email }, secret);
 }
 
+exports.logout = async function (ctx) {
+  ctx.cookies.set('eztoken', null, { httpOnly: true });
+  ctx.redirect(decodeURIComponent('/myspace'));
+};
+
 function decode(value) {
   if (typeof value !== 'string') { return value; }
 

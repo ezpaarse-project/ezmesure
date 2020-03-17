@@ -38,10 +38,6 @@ services:
       context: ./kibana
     ports:
       - 5601:5601
-    links:
-      - elastic
-      - api
-      - reporting
     environment:
       - http_proxy
       - https_proxy
@@ -89,8 +85,6 @@ services:
       - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
-    links:
-      - elastic
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
       - "./templates:/usr/src/app/templates"

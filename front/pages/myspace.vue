@@ -21,6 +21,13 @@
           Token d'authentification
         </v-tab>
 
+        <v-spacer />
+        <v-divider />
+
+        <v-tab class="red--text" href="/Shibboleth.sso/Logout?return=/logout">
+          Déconnexion
+        </v-tab>
+
         <v-tabs-items v-model="activeTab">
           <v-tab-item id="tab-profile">
             <v-toolbar dense flat>

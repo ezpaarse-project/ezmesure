@@ -23,3 +23,11 @@ Chargements ({{ insertions.length }})
     [{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.index }} (i:{{ action.response.body.inserted }}|u:{{ action.response.body.updated }}|e:{{ action.response.body.failed }})
   {% endfor %}
 {% endif -%}
+
+
+{% if reportings.length -%}
+Rapports ({{ reportings.length }})
+  {% for action in reportings -%}
+    [{{ "+" if action.action == 'reporting/store' }}{{ "*" if action.action == 'reporting/update' }}{{ "-" if action.action == 'reporting/delete' }}] {{ action.user.name }} {{ action.metadata.space }} {{ action.metadata.dashboardName }} {{ action.datetime }}
+  {% endfor %}
+{% endif -%}

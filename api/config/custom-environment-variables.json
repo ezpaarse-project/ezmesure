@@ -36,5 +36,7 @@
     "index": "EZMESURE_DEPOSITORS_INDEX",
     "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",
     "cron": "EZMESURE_DEPOSITORS_CRON"
-  }
+  },
+  "reportingActivityIndex": "REPORTING_ACTIVITY_INDEX",
+  "reportingIndex": "REPORTING_INDEX"
 }
