@@ -54,7 +54,7 @@ services:
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
       - REPORTING_URL=http://reporting:3000
-      - REPORTING_NAME=Reporting ezMESURE
+      - REPORTING_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -152,7 +152,9 @@ services:
       - KIBANA_INTERNAL_URL=https://rp/kibana
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
-      - REPORTING_NAME=Reporting ezMESURE
+      - REPORTING_NAME
+    links:
+      - elastic
     volumes:
       - "./templates:/usr/src/app/templates"
       - "./reporting/logs:/usr/src/app/logs"

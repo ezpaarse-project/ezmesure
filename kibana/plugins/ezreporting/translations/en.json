@@ -121,6 +121,7 @@
     "ezReporting.selectDashboard": "Select a dashboard",
     "ezReporting.error": "Error",
     "ezReporting.completed": "Completed",
+    "ezReporting.pending": "Pending",
     "ezReporting.ongoing": "Ongoing",
     "ezReporting.unknown": "Unknown",
     "ezReporting.refresh": "Refresh"

@@ -47,15 +47,8 @@ export class HistoryFlyout extends Component {
     closeFlyOutHandler = this.close;
   }
 
-  toggleDetails = (historyItem) => {
+  showDetails = (historyItem) => {
     const expandedRows = { ...this.state.expandedRows };
-
-    if (expandedRows[historyItem.id]) {
-      delete expandedRows[historyItem.id];
-      this.setState({ expandedRows });
-      return;
-    }
-
     const { logs = [] } = historyItem;
 
     const columns = [
@@ -98,8 +91,24 @@ export class HistoryFlyout extends Component {
     this.setState({ expandedRows });
   }
 
+  hideDetails = (historyId) => {
+    const expandedRows = { ...this.state.expandedRows };
+    delete expandedRows[historyId];
+    this.setState({ expandedRows });
+  }
+
+  toggleDetails = (historyItem) => {
+    const expandedRows = { ...this.state.expandedRows };
+
+    if (expandedRows[historyItem.id]) {
+      this.hideDetails(historyItem.id);
+    } else {
+      this.showDetails(historyItem);
+    }
+  }
+
   refresh = async () => {
-    const { taskId } = this.state;
+    const { taskId, expandedRows } = this.state;
 
     this.setState({ refreshing: true });
 
@@ -115,9 +124,22 @@ export class HistoryFlyout extends Component {
       );
     }
 
+    historyItems = historyItems || [];
+
+    // Refresh history logs
+    Object.keys(expandedRows).forEach((historyId) => {
+      const historyItem = historyItems.find(item => item.id === historyId);
+
+      if (historyItem) {
+        this.showDetails(historyItem);
+      } else {
+        this.hideDetails(historyId);
+      }
+    });
+
     this.setState({
       refreshing: false,
-      historyItems: historyItems || this.props.historyItems || [],
+      historyItems,
     });
   }
 
@@ -180,6 +202,8 @@ export class HistoryFlyout extends Component {
               return <EuiHealth color="danger">{ i18n.translate('ezReporting.error', { defaultMessage: 'Error' })}</EuiHealth>;
             case 'completed':
               return <EuiHealth color="success">{ i18n.translate('ezReporting.completed', { defaultMessage: 'Completed' })}</EuiHealth>;
+            case 'pending':
+              return <EuiHealth color="primary">{ i18n.translate('ezReporting.pending', { defaultMessage: 'Pending' })}</EuiHealth>;
             case 'ongoing':
               return <EuiHealth color="primary">{ i18n.translate('ezReporting.ongoing', { defaultMessage: 'Ongoing' })}</EuiHealth>;
             default:

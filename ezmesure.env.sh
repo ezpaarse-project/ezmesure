@@ -3,7 +3,7 @@
 EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
-export EZMESURE_DOMAIN="ezmesure-preprod"
+export EZMESURE_DOMAIN="ezmesure-preprod.couperin.org"
 
 export APPLI_APACHE_SERVERADMIN="ezpaarse@couperin.org"
 export APPLI_APACHE_LOGLEVEL="info ssl:warn"
@@ -44,8 +44,8 @@ if [[ -f ezmesure.local.env.sh ]] ; then
 fi
 
 # set ezmesure Domain
-export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}.couperin.org"
-export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}.couperin.org/sp"
+export APPLI_APACHE_SERVERNAME="https://${EZMESURE_DOMAIN}"
+export SHIBBOLETH_SP_URL="https://${EZMESURE_DOMAIN}/sp"
 
 # set local EZMESURE_ES_DISCOVERY variable
 # should contain all ES cluster IP host except local IP address
