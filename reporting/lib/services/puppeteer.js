@@ -46,16 +46,15 @@ function insertStyles(page, css) {
   }, css);
 }
 
-function positionElements(page, viewport) {
-  return page.evaluate((vp) => {
+function positionElements(page) {
+  return page.evaluate(() => {
     // eslint-disable-next-line no-undef
     const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
-    const pageHeight = vp.height - vp.margin.top - vp.margin.bottom;
 
     visualizations.forEach((visualization, index) => {
-      visualization.style.setProperty('top', `${(pageHeight) * index}px`, 'important');
+      visualization.style.setProperty('top', `calc(100vh * ${index})`, 'important');
     });
-  }, viewport);
+  });
 }
 
 function waitForCompleteRender(page) {
@@ -242,10 +241,10 @@ class Reporter {
     const dashboardViewport = await page.$('.dshLayout--viewing');
     const boundingBox = await dashboardViewport.boundingBox();
 
-    // 792x1122 = A4 at 96PPI
+    // 1358x1920 = A4 at 107PPI
     const viewport = {
-      width: 1122,
-      height: print ? 792 : boundingBox.height,
+      width: 1920,
+      height: print ? 1358 : boundingBox.height,
       margin: {
         left: 50,
         right: 50,
@@ -269,8 +268,8 @@ class Reporter {
           left: 0 !important;
           background-color: inherit !important;
           z-index: 1 !important;
-          width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
-          height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
+          width: 100vw !important;
+          height: 100vh !important;
           transform: none !important;
           -webkit-transform: none !important;
         }
