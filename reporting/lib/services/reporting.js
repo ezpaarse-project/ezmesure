@@ -74,6 +74,7 @@ class HistoryEntry {
 
   end() {
     const endTime = process.hrtime.bigint();
+    this.startTime = this.startTime || endTime;
     this.history.endTime = new Date();
     this.history.executionTime = Math.floor(Number.parseInt(endTime - this.startTime, 10) / 1e6);
 
