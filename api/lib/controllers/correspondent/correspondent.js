@@ -6,7 +6,6 @@ const { depositors } = require('config');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const { appLogger } = require('../../../server');
-const { appLogger } = require('../../../server');
 
 const instance = axios.create({
   baseURL: 'https://api.opendata.onisep.fr/downloads/57da952417293/57da952417293.json',
