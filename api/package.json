@@ -36,6 +36,7 @@
     "googleapis": "^22.2.0",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.6.1",
+    "koa-body": "^4.1.1",
     "koa-bodyparser": "^4.2.1",
     "koa-cors": "0.0.16",
     "koa-joi-router": "^6.0.0",

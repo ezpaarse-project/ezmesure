@@ -9,7 +9,7 @@
       />
 
       <div class="title">
-        {{ organisation.label || organisation.name }}
+        {{ organisation.name }}
       </div>
       <div class="body-2">
         {{ indexCount }} <abbr title="Événements de consultation">ECs</abbr> chargés
@@ -50,7 +50,7 @@ export default {
     contact() { return this.partner.contact || {}; },
     organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
-    logoUrl() { return this.organisation.logoUrl; },
+    logoUrl() { return `/api/partners/pictures/${this.organisation.logoUrl}`; },
     docName() {
       if (!this.contact.confirmed) { return null; }
       if (!this.contact.doc) { return null; }

@@ -7,7 +7,7 @@ module.exports = {
       organisation: {
         properties: {
           name: { type: 'keyword' },
-          label: { type: 'keyword' },
+          nomCourt: { type: 'keyword' },
           uai: { type: 'keyword' },
           city: { type: 'keyword' },
           website: { type: 'keyword' },
@@ -24,20 +24,7 @@ module.exports = {
       contact: {
         properties: {
           confirmed: { type: 'boolean' },
-          doc: {
-            properties: {
-              firstName: { type: 'keyword' },
-              lastName: { type: 'keyword' },
-              mail: { type: 'keyword' },
-            },
-          },
-          tech: {
-            properties: {
-              firstName: { type: 'keyword' },
-              lastName: { type: 'keyword' },
-              mail: { type: 'keyword' },
-            },
-          },
+          users: { type: 'nested' },
         },
       },
       index: {

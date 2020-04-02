@@ -56,5 +56,5 @@ module.exports = {
     cron: '0 0 0 * * *',
   },
   reportingActivityIndex: '.ezreporting-activity',
-  reportingIndex: '.ezreporting'
+  reportingIndex: '.ezreporting',
 };
