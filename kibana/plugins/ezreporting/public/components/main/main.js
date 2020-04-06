@@ -66,7 +66,10 @@ export class Main extends React.Component {
         frequency: task.reporting.frequency,
         emails: task.reporting.emails,
         print: task.reporting.print,
+        landscape: task.reporting.landscape,
+        format: task.reporting.format,
       };
+
       if (this.props.space) {
         reqData = { ...reqData, space: this.props.space };
       }
@@ -99,7 +102,10 @@ export class Main extends React.Component {
         frequency: task.reporting.frequency,
         emails: task.reporting.emails,
         print: task.reporting.print,
+        landscape: task.reporting.landscape,
+        format: task.reporting.format,
       };
+
       if (this.props.space) {
         reqData = { ...reqData, space: this.props.space };
       }

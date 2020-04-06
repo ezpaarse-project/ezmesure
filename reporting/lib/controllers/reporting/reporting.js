@@ -162,6 +162,8 @@ exports.list = async (ctx) => {
         frequency: hitSource.frequency,
         emails: hitSource.emails,
         print: hitSource.print,
+        landscape: hitSource.landscape,
+        format: hitSource.format,
         createdAt: hitSource.createdAt,
         sentAt: hitSource.sentAt,
         runAt: hitSource.runAt,

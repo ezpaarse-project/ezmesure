@@ -108,13 +108,25 @@ export class TaskEditFlyout extends Component {
     this.setState({ currentTask });
   };
 
+  onChangeFormat = (event) => {
+    const currentTask = { ...this.state.currentTask };
+    currentTask.reporting.format = event.target.value;
+    this.setState({ currentTask });
+  };
+
   onChangeEmail = (event) => {
     this.setState({ email: event.target.value });
   };
 
-  onChangeLayout = (event) => {
+  onChangeOptimized = (event) => {
     const currentTask = { ...this.state.currentTask };
     currentTask.reporting.print = event.target.checked;
+    this.setState({ currentTask });
+  };
+
+  onChangeLayout = (event) => {
+    const currentTask = { ...this.state.currentTask };
+    currentTask.reporting.landscape = event.target.value === 'landscape';
     this.setState({ currentTask });
   };
 
@@ -203,9 +215,23 @@ export class TaskEditFlyout extends Component {
       );
     }
 
-    if (!isFlyoutVisible) {
+    if (!isFlyoutVisible || !currentTask) {
       return <Fragment />;
     }
+
+    const formats = [
+      { value: 'A5', text: 'A5' },
+      { value: 'A4', text: 'A4' },
+      { value: 'A3', text: 'A3' },
+      { value: 'A2', text: 'A2' },
+    ];
+    const selectedFormat = currentTask.reporting.format || 'A4';
+    const { landscape = true } = currentTask.reporting;
+
+    const printLayouts = [
+      { value: 'landscape', text: i18n.translate('ezReporting.landscape', { defaultMessage: 'Landscape' }) },
+      { value: 'portrait', text: i18n.translate('ezReporting.portrait', { defaultMessage: 'Portrait' }) },
+    ];
 
     let title;
 
@@ -304,12 +330,41 @@ export class TaskEditFlyout extends Component {
 
         {receiversList}
 
+        <EuiFlexGroup style={{ maxWidth: 400 }}>
+          <EuiFlexItem>
+            <EuiFormRow
+              fullWidth={true}
+              label={<FormattedMessage id="ezReporting.layout" defaultMessage="Layout" />}
+            >
+              <EuiSelect
+                options={printLayouts}
+                value={landscape ? 'landscape' : 'portrait'}
+                onChange={this.onChangeLayout}
+                aria-label={<FormattedMessage id="ezReporting.layout" defaultMessage="Layout" />}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiFormRow
+              fullWidth={true}
+              label={<FormattedMessage id="ezReporting.format" defaultMessage="Format" />}
+            >
+              <EuiSelect
+                options={formats}
+                value={selectedFormat}
+                aria-label={<FormattedMessage id="ezReporting.format" defaultMessage="Format" />}
+                onChange={this.onChangeFormat}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+
         <EuiFormRow fullWidth={true} >
           <EuiCheckbox
             id="optimize-checkbox"
             checked={currentTask.reporting.print}
             label={<FormattedMessage id="ezReporting.optimizedForPrinting" defaultMessage="Optimized for printing" />}
-            onChange={this.onChangeLayout}
+            onChange={this.onChangeOptimized}
           />
         </EuiFormRow>
 

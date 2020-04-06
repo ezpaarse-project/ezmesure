@@ -1,0 +1,72 @@
+#dashboardViewport {
+  position: relative;
+  width: var(--page-width);
+  padding: 0 10mm;
+}
+
+.reporting-footer,
+.reporting-header
+{
+  position: relative;
+  width: 100%;
+  color: black;
+}
+
+.reporting-header {
+  display: block;
+  height: var(--header-height, 25mm);
+  padding: 5mm 0;
+  page-break-before: always;
+  page-break-inside: avoid;
+  text-align: center;
+  line-height: 6mm;
+}
+
+.reporting-header-title {
+  font-size: 6mm;
+}
+.reporting-header-subtitle {
+  font-size: 4mm;
+}
+.reporting-header-caption {
+  font-size: 4mm;
+}
+
+.reporting-footer {
+  height: var(--footer-height, 10mm);
+  page-break-before: avoid;
+  page-break-after: always;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.reporting-footer .footer-logos {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.reporting-footer .footer-logo {
+  max-height: calc(var(--footer-height, 10mm) - 2mm);
+  margin-right: 3mm;
+}
+.reporting-footer .footer-page {
+  display: flex;
+  align-items: center;
+  font-size: 3mm;
+}
+
+.react-grid-item.reporting-optimized {
+  display: block !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  background-color: inherit !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  height: calc(var(--page-height) - var(--header-height) - var(--footer-height) - 1mm) !important;
+  padding: 0;
+  transform: none !important;
+  -webkit-transform: none !important;
+  page-break-inside: avoid !important;
+}

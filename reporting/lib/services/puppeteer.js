@@ -37,26 +37,6 @@ function loadLogos() {
   );
 }
 
-function insertStyles(page, css) {
-  return page.evaluate((styles) => {
-    const styleNode = document.createElement('style'); // eslint-disable-line no-undef
-    styleNode.type = 'text/css';
-    styleNode.innerHTML = styles;
-    document.head.appendChild(styleNode); // eslint-disable-line no-undef
-  }, css);
-}
-
-function positionElements(page) {
-  return page.evaluate(() => {
-    // eslint-disable-next-line no-undef
-    const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
-
-    visualizations.forEach((visualization, index) => {
-      visualization.style.setProperty('top', `calc(100vh * ${index})`, 'important');
-    });
-  });
-}
-
 function waitForCompleteRender(page) {
   page.evaluate(() => {
     const allVis = document.querySelectorAll('[data-shared-item]'); // eslint-disable-line no-undef
@@ -120,8 +100,6 @@ class Reporter {
    */
   async closeBrowser() {
     if (this.browser) {
-      // const pages = await this.browser.pages();
-      // await Promise.all(pages.map((page) => page.close()));
       await this.browser.close();
       this.browser = null;
     }
@@ -206,9 +184,24 @@ class Reporter {
       space,
       frequency: frequencyString,
       print,
+      landscape = true,
+      format = 'A4',
     } = task;
 
+    // Dimensions in mm
+    const formats = {
+      'A5': { width: 148, height: 210 },
+      'A4': { width: 210, height: 297 },
+      'A3': { width: 297, height: 420 },
+      'A2': { width: 420, height: 594 },
+    }
+
+    const reportSize = formats[format];
     const frequency = new Frequency(frequencyString);
+
+    if (!reportSize) {
+      throw new Error(`invalid report size, should be one of : ${Object.keys(formats).join(', ')}`);
+    }
 
     if (!frequency.isValid()) {
       throw new Error('invalid task frequency');
@@ -239,98 +232,121 @@ class Reporter {
       await page.waitFor('.dshLayout--viewing');
     }
 
-    const dashboardViewport = await page.$('.dshLayout--viewing');
-    const boundingBox = await dashboardViewport.boundingBox();
-
-    // 1358x1920 = A4 at 107PPI
-    const viewport = {
-      width: 1920,
-      height: print ? 1358 : boundingBox.height,
-      margin: {
-        left: 50,
-        right: 50,
-        top: 100,
-        bottom: 60,
-      },
-    };
-
     await page.setViewport({
-      width: viewport.width,
-      height: viewport.height,
+      width: 1920,
+      height: 1080,
       deviceScaleFactor: 1,
     });
 
-    let styles = await loadStyles();
+    const pageWidth = landscape ? reportSize.height : reportSize.width;
+    const pageHeight = landscape ? reportSize.width : reportSize.height;
+    const headerHeight = 25;
+    const footerHeight = 10;
 
-    if (print) {
-      styles += `
-        dashboard-app .react-grid-item {
-          position: fixed;
-          left: 0 !important;
-          background-color: inherit !important;
-          z-index: 1 !important;
-          width: 100vw !important;
-          height: 100vh !important;
-          transform: none !important;
-          -webkit-transform: none !important;
+    await page.addStyleTag({
+      content: `
+        :root {
+          --page-width: ${pageWidth}mm;
+          --page-height: ${pageHeight}mm;
+          --header-height: ${headerHeight}mm;
+          --footer-height: ${footerHeight}mm;
         }
-      `;
-    }
+      `
+    });
+    await page.addStyleTag({
+      path: path.resolve(assetsDir, 'css', 'preserve_layout.css')
+    });
+    await page.addStyleTag({
+      path: path.resolve(assetsDir, 'css', 'reporting.css')
+    });
 
-    await insertStyles(page, styles);
-    if (print) {
-      await positionElements(page, viewport);
-    }
-    await waitForCompleteRender(page);
-
-    dashboardViewport.dispose();
-
-    await page.waitFor(5000);
+    const headerTemplate = `
+      <h1 class="reporting-header-title">
+        <a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a>
+      </h1>
+      <p class="reporting-header-subtitle">
+        Rapport couvrant la période
+        du ${formatDate(period.from, 'Pp', { locale: fr })}
+        au ${formatDate(period.to, 'Pp', { locale: fr })}
+      </p>
+      <p class="reporting-header-caption">
+        Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}
+      </p>
+    `;
 
     const logoHtml = (await loadLogos()).map((logo) => `
       <a href="${logo.link}">
-        <img src="data:image/png;base64,${logo.base64}" style="max-height: 20px; margin-right: 5px; vertical-align: middle;" />
+        <img class="footer-logo" src="data:image/png;base64,${logo.base64}" />
       </a>
     `);
 
+    const footerTemplate = `
+      <div class="footer-logos">
+        ${logoHtml.join('\n')}
+      </div>
+      <div class="footer-page"></div>
+    `;
+
+    await page.evaluate((hTemplate, fTemplate, optimized) => {
+      if (optimized) {
+        const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
+
+        visualizations.forEach((visualization, index) => {
+          visualization.classList.add('reporting-optimized');
+
+          const header = document.createElement('div');
+          header.className = 'reporting-header';
+          header.innerHTML = hTemplate;
+
+          const footer = document.createElement('div');
+          footer.className = 'reporting-footer';
+          footer.innerHTML = fTemplate;
+
+          footer.querySelector('.footer-page').textContent = `${index + 1} / ${visualizations.length}`;
+
+          visualization.parentNode.insertBefore(header, visualization);
+          visualization.parentNode.insertBefore(footer, visualization.nextSibling);
+        });
+      } else {
+        const wrapper = document.getElementById('dashboardViewport');
+
+        const header = document.createElement('div');
+        header.className = 'reporting-header';
+        header.innerHTML = hTemplate;
+
+        const footer = document.createElement('div');
+        footer.className = 'reporting-footer';
+        footer.innerHTML = fTemplate;
+
+        wrapper.prepend(header);
+        wrapper.append(footer);
+      }
+    }, headerTemplate, footerTemplate, print);
+
+    await waitForCompleteRender(page);
+    await page.waitFor(2000);
+
     const pdfOptions = {
       margin: {
-        left: `${viewport.margin.left}px`,
-        right: `${viewport.margin.right}px`,
-        top: `${viewport.margin.top}px`,
-        bottom: `${viewport.margin.bottom}px`,
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        // left: `${viewport.margin.left}mm`,
+        // right: `${viewport.margin.right}mm`,
+        // top: `${viewport.margin.top}mm`,
+        // bottom: `${viewport.margin.bottom}mm`,
       },
       printBackground: false,
-      displayHeaderFooter: true,
-      headerTemplate: `
-        <style>#header, #footer { padding: 10px !important; }</style>
-        <div style="width: ${viewport.width}px; color: black; text-align: center; line-height: 5px">
-          <h1 style="font-size: 14px;"><a href="${kibana.external}/${dashboardUrl}">${dashboardTitle}</a></h1>
-          <p style="font-size: 10px;">
-            Rapport couvrant la période
-            du ${formatDate(period.from, 'Pp', { locale: fr })}
-            au ${formatDate(period.to, 'Pp', { locale: fr })}
-          </p>
-          <p style="font-size: 10px;">Généré le ${formatDate(new Date(), 'PPPP', { locale: fr })}</p>
-        </div>
-      `,
-      footerTemplate: `
-        <div style="width: ${viewport.width}px; color: black; position: relative;">
-          ${logoHtml}
-          <div style="position: absolute; right: 0; bottom: 0; font-size: 8px;">
-            <span class="pageNumber"></span> / <span class="totalPages"></span>
-          </div>
-        </div>
-      `,
+      displayHeaderFooter: false
     };
 
     if (print) {
-      pdfOptions.width = viewport.width;
-      pdfOptions.height = viewport.height;
+      pdfOptions.width = `${pageWidth}mm`;
+      pdfOptions.height = `${pageHeight}mm`;
     } else {
-      const height = (boundingBox.height + viewport.margin.top + viewport.margin.bottom);
-      pdfOptions.width = viewport.width;
-      pdfOptions.height = Math.max(height, 600);
+      pdfOptions.width = `${pageWidth}mm`;
+      pdfOptions.height = await page.evaluate(() => document.documentElement.scrollHeight);
     }
 
     return page.pdf(pdfOptions);
