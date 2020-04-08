@@ -1,0 +1,111 @@
+<template>
+  <section>
+    <v-toolbar dense flat>
+      <v-toolbar-title>
+        Profil
+      </v-toolbar-title>
+
+      <v-spacer />
+
+      <v-btn text :href="refreshUrl">
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        Actualiser
+      </v-btn>
+    </v-toolbar>
+
+    <v-card flat class="mx-auto" max-width="800px">
+      <v-card-text>
+        <v-alert
+          type="info"
+          prominent
+          :value="!hasRoles"
+        >
+          <div class="headline">
+            Aucun rôle n'est encore associé à votre compte.
+          </div>
+          <div>
+            Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe
+            ou le correspondant ezMESURE de votre établissement.
+          </div>
+        </v-alert>
+        <v-text-field
+          :value="user.full_name"
+          label="Nom"
+          readonly
+          outlined
+        />
+
+        <v-text-field
+          :value="user.email"
+          label="Mail"
+          readonly
+          outlined
+        />
+
+        <v-text-field
+          :value="metadata.idp"
+          label="IDP"
+          readonly
+          outlined
+        />
+
+        <v-text-field
+          :value="metadata.org"
+          label="Organisation"
+          readonly
+          outlined
+        />
+
+        <v-text-field
+          :value="metadata.unit"
+          label="Unité"
+          readonly
+          outlined
+        />
+
+        <v-card v-if="hasRoles" outlined>
+          <v-card-text>
+            <div class="title">
+              Vos rôles
+            </div>
+            <div class="mb-2">
+              Ces rôles définissent vos droits d'accès aux données
+              et aux tableaux de bord hébergés sur ezMESURE.
+            </div>
+            <div>
+              <v-chip
+                v-for="role in user.roles"
+                :key="role"
+                class="mr-2"
+                label
+                outlined
+                color="accent"
+              >
+                {{ role }}
+              </v-chip>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-card-text>
+    </v-card>
+  </section>
+</template>
+
+<script>
+export default {
+  data() {
+    const currentLocation = encodeURIComponent(window.location.href);
+
+    return {
+      refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
+    };
+  },
+  computed: {
+    user() { return this.$store.state.auth.user; },
+    metadata() { return (this.user && this.user.metadata) || {}; },
+    hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
+  },
+};
+</script>

@@ -7,11 +7,16 @@ module.exports = {
       organisation: {
         properties: {
           name: { type: 'keyword' },
-          nomCourt: { type: 'keyword' },
+          shortName: { type: 'keyword' },
           uai: { type: 'keyword' },
           city: { type: 'keyword' },
           website: { type: 'keyword' },
           logoUrl: { type: 'keyword' },
+          establismentType: { type: 'keyword' },
+          location: {
+            type: 'geo_point',
+          },
+          domains: { type: 'nested' },
         },
       },
       auto: {
@@ -33,9 +38,8 @@ module.exports = {
           prefix: { type: 'keyword' },
         },
       },
-      location: {
-        type: 'geo_point',
-      },
+      createdAt: { type: 'date' },
+      updatedAt: { type: 'date' },
     },
   },
 };

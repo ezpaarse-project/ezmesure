@@ -61,14 +61,22 @@ exports.storeData = async function (ctx) {
     }
   }
 
+  const currentDate = new Date();
+
   const indexData = {
     organisation: {
       name: body.name,
-      nomCourt: '',
+      shortName: '',
       uai: body.uai,
       city: '',
       website: body.url || '',
       logoUrl: base64Logo || '',
+      typeEtablissement: '',
+      location: {
+        lon: 0,
+        lat: 0,
+      },
+      domains: [],
     },
     auto: {
       ezmesure: false,
@@ -89,10 +97,8 @@ exports.storeData = async function (ctx) {
       prefix: body.indexAffected,
       count: 0,
     },
-    location: {
-      lon: 0,
-      lat: 0,
-    },
+    createdAt: currentDate,
+    updatedAt: currentDate,
   };
 
   if (body.uai) {
@@ -100,10 +106,11 @@ exports.storeData = async function (ctx) {
       const establisment = await getEtablishmentData(body.uai);
 
       if (establisment) {
-        indexData.sigle.nomCourt = establisment.sigle;
+        indexData.sigle.shortName = establisment.sigle;
         indexData.organisation.city = establisment.commune;
-        indexData.location.lon = establisment.longitude_x;
-        indexData.location.lat = establisment.latitude_y;
+        indexData.organisation.establismentType = establisment.type_detablissement;
+        indexData.organisation.location.lon = establisment.longitude_x;
+        indexData.organisation.location.lat = establisment.latitude_y;
       }
     } catch (err) {
       appLogger.error('Failed to get establishment data', err);
