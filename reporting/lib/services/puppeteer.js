@@ -1,3 +1,5 @@
+
+/* global document */
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs-extra');
@@ -15,10 +17,6 @@ const Frequency = require('./frequency');
 const logger = require('../logger');
 
 const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
-
-function loadStyles() {
-  return fs.readFile(path.resolve(assetsDir, 'css', 'preserve_layout.css'), 'utf8');
-}
 
 function loadLogos() {
   return Promise.all(
@@ -190,11 +188,11 @@ class Reporter {
 
     // Dimensions in mm
     const formats = {
-      'A5': { width: 148, height: 210 },
-      'A4': { width: 210, height: 297 },
-      'A3': { width: 297, height: 420 },
-      'A2': { width: 420, height: 594 },
-    }
+      A5: { width: 148, height: 210 },
+      A4: { width: 210, height: 297 },
+      A3: { width: 297, height: 420 },
+      A2: { width: 420, height: 594 },
+    };
 
     const reportSize = formats[format];
     const frequency = new Frequency(frequencyString);
@@ -251,13 +249,13 @@ class Reporter {
           --header-height: ${headerHeight}mm;
           --footer-height: ${footerHeight}mm;
         }
-      `
+      `,
     });
     await page.addStyleTag({
-      path: path.resolve(assetsDir, 'css', 'preserve_layout.css')
+      path: path.resolve(assetsDir, 'css', 'preserve_layout.css'),
     });
     await page.addStyleTag({
-      path: path.resolve(assetsDir, 'css', 'reporting.css')
+      path: path.resolve(assetsDir, 'css', 'reporting.css'),
     });
 
     const headerTemplate = `
@@ -332,13 +330,9 @@ class Reporter {
         right: 0,
         top: 0,
         bottom: 0,
-        // left: `${viewport.margin.left}mm`,
-        // right: `${viewport.margin.right}mm`,
-        // top: `${viewport.margin.top}mm`,
-        // bottom: `${viewport.margin.bottom}mm`,
       },
       printBackground: false,
-      displayHeaderFooter: false
+      displayHeaderFooter: false,
     };
 
     if (print) {
