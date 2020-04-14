@@ -238,16 +238,12 @@ class Reporter {
 
     const pageWidth = landscape ? reportSize.height : reportSize.width;
     const pageHeight = landscape ? reportSize.width : reportSize.height;
-    const headerHeight = 25;
-    const footerHeight = 10;
 
     await page.addStyleTag({
       content: `
         :root {
           --page-width: ${pageWidth}mm;
           --page-height: ${pageHeight}mm;
-          --header-height: ${headerHeight}mm;
-          --footer-height: ${footerHeight}mm;
         }
       `,
     });

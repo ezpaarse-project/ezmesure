@@ -1,3 +1,8 @@
+:root {
+  --header-height: 22mm;
+  --footer-height: 12mm;
+}
+
 #dashboardViewport {
   position: relative;
   width: var(--page-width);
@@ -14,12 +19,14 @@
 
 .reporting-header {
   display: block;
-  height: var(--header-height, 25mm);
+  height: var(--header-height);
+  margin: 0;
   padding: 5mm 0;
   page-break-before: always;
   page-break-inside: avoid;
   text-align: center;
   line-height: 6mm;
+  overflow: visible;
 }
 
 .reporting-header-title {
@@ -33,12 +40,14 @@
 }
 
 .reporting-footer {
-  height: var(--footer-height, 10mm);
+  height: var(--footer-height);
   page-break-before: avoid;
   page-break-after: always;
+  margin: 0;
   padding: 0;
   display: flex;
   justify-content: space-between;
+  overflow: visible;
 }
 
 .reporting-footer .footer-logos {
@@ -47,7 +56,7 @@
   align-items: center;
 }
 .reporting-footer .footer-logo {
-  max-height: calc(var(--footer-height, 10mm) - 2mm);
+  max-height: calc(var(--footer-height) - 4mm);
   margin-right: 3mm;
 }
 .reporting-footer .footer-page {
@@ -64,7 +73,8 @@
   background-color: inherit !important;
   z-index: 1 !important;
   width: 100% !important;
-  padding: 0 !important;
+  height: calc(var(--page-height) - var(--header-height) - var(--footer-height)) !important;
+  padding: 3mm 0 !important;
   margin: 0 !important;
   transform: none !important;
   -webkit-transform: none !important;
