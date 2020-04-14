@@ -64,8 +64,8 @@
   background-color: inherit !important;
   z-index: 1 !important;
   width: 100% !important;
-  height: calc(var(--page-height) - var(--header-height) - var(--footer-height) - 1mm) !important;
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
   transform: none !important;
   -webkit-transform: none !important;
   page-break-inside: avoid !important;
