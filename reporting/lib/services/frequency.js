@@ -25,7 +25,7 @@ const startFunctions = new Map([
   ['M', startOfMonth],
   ['y', startOfYear],
   ['quarterly', startOfQuarter],
-  ['semiannual', (date) => (getMonth(date) < 5 ? startOfYear(date) : startOfMonth(setMonth(date, 5)))],
+  ['semiannual', (date) => (getMonth(date) < 6 ? startOfYear(date) : startOfMonth(setMonth(date, 6)))],
 ]);
 
 const addFunctions = new Map([
