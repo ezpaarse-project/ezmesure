@@ -198,7 +198,7 @@ async function generateReport(task) {
           title: dashboardTitle,
           frequency: frequencyText,
           dashboardUrl,
-          optimizedForPrinting: taskSource.print ? ' optimisé pour impression' : '',
+          optimizedForPrinting: taskSource.print,
         }),
       });
       emailSent = true;
