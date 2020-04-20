@@ -4,7 +4,6 @@ const { list, refresh, pictures } = require('./actions');
 
 
 router.get('/', list);
-router.get('/pictures/:id', pictures);
 router.use(requireJwt);
 router.post('/refresh', refresh);
 

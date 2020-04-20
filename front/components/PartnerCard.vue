@@ -2,7 +2,15 @@
   <v-card width="350" height="100%" class="flexCard">
     <v-card-text class="text-center grow">
       <v-img
-        :src="logoUrl"
+        v-if="logoUrl"
+        :src="`/api/correspondents/pictures/${logoUrl}`"
+        contain
+        height="100"
+        class="mb-3"
+      />
+
+      <v-img
+        v-else
         contain
         height="100"
         class="mb-3"
@@ -23,16 +31,18 @@
         Correspondants
       </div>
 
-      <div>
-        Documentaire :
-        <span v-if="docName" class="text--primary">{{ docName }}</span>
-        <span v-else>non confirmé</span>
-      </div>
-
-      <div>
-        Technique :
-        <span v-if="techName" class="text--primary">{{ techName }}</span>
-        <span v-else>non confirmé</span>
+      <div v-for="(contact, key) in contacts.users" :ref="key" :key="key">
+        <v-tooltip v-if="contact.confirmed" right>
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ contact.fullName }}</span>
+          </template>
+          <span>
+            <span v-for="(type, k) in contact.type" :ref="k" :key="k">
+              {{ contactType[type].value }}
+              <v-spacer />
+            </span>
+          </span>
+        </v-tooltip>
       </div>
     </v-card-text>
   </v-card>
@@ -47,26 +57,20 @@ export default {
     },
   },
   computed: {
-    contact() { return this.partner.contact || {}; },
+    contacts() { return this.partner.contacts || {}; },
     organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
-    logoUrl() { return `/api/partners/pictures/${this.organisation.logoUrl}`; },
-    docName() {
-      if (!this.contact.confirmed) { return null; }
-      if (!this.contact.doc) { return null; }
-      const { firstName = '', lastName = '' } = this.contact.doc;
-      return `${lastName} ${firstName}`;
-    },
-    techName() {
-      if (!this.contact.confirmed) { return null; }
-      if (!this.contact.tech) { return null; }
-      const { firstName = '', lastName = '' } = this.contact.tech;
-      return `${lastName} ${firstName}`;
-    },
+    logoUrl() { return this.organisation.logoUrl || null; },
     indexCount() {
       const n = parseInt(this.index.count, 10);
       if (Number.isNaN(n)) { return '0'; }
       return n.toLocaleString();
+    },
+    contactType() {
+      return {
+        tech: { value: 'Technique' },
+        doc: { value: 'Documentaire' },
+      };
     },
   },
 };

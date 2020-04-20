@@ -15,18 +15,3 @@ exports.refresh = async function (ctx) {
   ctx.status = result.errors ? 500 : 200;
   ctx.body = result;
 };
-
-exports.pictures = async function (ctx) {
-  ctx.type = 'image/png';
-  ctx.status = 200;
-
-  const { id } = ctx.params;
-  if (id) {
-    const logo = fs.createReadStream(path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`));
-    ctx.body = logo;
-    return ctx;
-  }
-
-  ctx.status = 400;
-  return ctx;
-};
