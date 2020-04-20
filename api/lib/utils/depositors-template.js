@@ -16,7 +16,7 @@ module.exports = {
           location: {
             type: 'geo_point',
           },
-          domains: { type: 'nested' },
+          domains: { type: 'keyword' },
         },
       },
       auto: {
@@ -28,7 +28,6 @@ module.exports = {
       },
       contact: {
         properties: {
-          confirmed: { type: 'boolean' },
           users: { type: 'nested' },
         },
       },
@@ -36,6 +35,7 @@ module.exports = {
         properties: {
           count: { type: 'long' },
           prefix: { type: 'keyword' },
+          suggested: { type: 'keyword' },
         },
       },
       createdAt: { type: 'date' },

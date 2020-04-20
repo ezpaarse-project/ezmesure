@@ -74,7 +74,7 @@ import Profile from '~/components/space/Profile';
 import Files from '~/components/space/Files';
 import Kibana from '~/components/space/Kibana';
 import Token from '~/components/space/Token';
-import Admin from '~/components/space/Admin';
+import Admin from '~/components/space/Admin/Index';
 import Correspondent from '~/components/space/Correspondent';
 
 export default {
@@ -94,6 +94,14 @@ export default {
       redirect('/authenticate', { origin: route.fullPath });
     } else if (!user.metadata.acceptedTerms) {
       redirect('/terms');
+    }
+
+    if (user.roles) {
+      const isAdmin = user.roles.find(role => role === 'admin');
+
+      if (isAdmin) {
+        await store.dispatch('getEstablishments');
+      }
     }
   },
   data() {

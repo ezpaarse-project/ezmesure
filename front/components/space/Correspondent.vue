@@ -277,7 +277,7 @@ export default {
         this.formData.append('indexSuggested', this.form.indexSuggested);
         this.formData.append('correspondent', this.form.correspondent);
 
-        this.$axios.post('/correspondent/', this.formData, {
+        this.$axios.post('/correspondents/store', this.formData, {
           headers: {
             // eslint-disable-next-line no-underscore-dangle
             'Content-Type': `multipart/form-data; boundary=${this.formData._boundary}`,

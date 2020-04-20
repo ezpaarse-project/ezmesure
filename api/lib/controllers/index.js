@@ -9,7 +9,7 @@ const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
-const correspondent = require('./correspondent');
+const correspondents = require('./correspondents');
 
 const openapi = require('./openapi.json');
 
@@ -38,6 +38,6 @@ app.use(authorize.prefix('/profile').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
 app.use(providers.prefix('/providers').middleware());
-app.use(correspondent.prefix('/correspondent').middleware());
+app.use(correspondents.prefix('/correspondents').middleware());
 
 module.exports = app;

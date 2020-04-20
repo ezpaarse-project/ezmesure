@@ -10,19 +10,19 @@ const { index, cron, spreadsheetId } = config.get('depositors');
 const { spreadsheets } = sheets;
 
 const job = new CronJob(cron, () => {
-  updateDepositors().then((result) => {
-    appLogger.info('Depositors updated');
+  // updateDepositors().then((result) => {
+  //   appLogger.info('Depositors updated');
 
-    if (result.errors) {
-      result.items.forEach((item) => {
-        if (item.error) {
-          appLogger.error(`Failed to update depositor ${item.name} : ${item.error}`);
-        }
-      });
-    }
-  }).catch((err) => {
-    appLogger.error(`Failed to update depositors : ${err.statusCode} | ${err.message}`);
-  });
+  //   if (result.errors) {
+  //     result.items.forEach((item) => {
+  //       if (item.error) {
+  //         appLogger.error(`Failed to update depositor ${item.name} : ${item.error}`);
+  //       }
+  //     });
+  //   }
+  // }).catch((err) => {
+  //   appLogger.error(`Failed to update depositors : ${err.statusCode} | ${err.message}`);
+  // });
 });
 
 job.start();
@@ -56,8 +56,10 @@ async function getFromIndex() {
       return {};
     }
 
-    if (!depositor.contact || !depositor.contact.confirmed) {
-      depositor.contact = {};
+    depositor.id = hit._id;
+
+    if (!depositor.contacts || !depositor.contacts.users) {
+      depositor.contacts = {};
     }
 
     return depositor;
