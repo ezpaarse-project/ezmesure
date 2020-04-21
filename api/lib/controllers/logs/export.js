@@ -21,7 +21,7 @@ exports.counter5 = async function counter5(ctx) {
 
   const responseBody = {
     total: 0,
-    created: 0,
+    inserted: 0,
     updated: 0,
     failed: 0,
     errors: [],
