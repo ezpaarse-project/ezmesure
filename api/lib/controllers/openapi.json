@@ -860,6 +860,74 @@
         }
       }
     },
+    "/logs/{index}/counterize": {
+      "post": {
+        "tags": [
+          "Indices"
+        ],
+        "summary": "Export aggregated COUNTER metrics into another index",
+        "description": "Export aggregated COUNTER metrics into another index",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar"
+            },
+            "description": "the index that contains the consultations to be aggregated",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "destination"
+                ],
+                "properties": {
+                  "destination": {
+                    "type": "string",
+                    "example": "univ-foobar-counter5"
+                  },
+                  "from": {
+                    "type": "string",
+                    "example": "2020-01"
+                  },
+                  "to": {
+                    "type": "string",
+                    "example": "2020-04"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "example": "wiley"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexInsert"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/files": {
       "get": {
         "tags": [

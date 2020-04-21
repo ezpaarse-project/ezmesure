@@ -29,6 +29,7 @@ exports.save = async function (ctx) {
   switch (ctx.action) {
     case 'indices/list':
     case 'indices/search':
+    case 'export/counter5':
     case 'file/list':
       if (metric.response.body && !metric.response.body.error) {
         metric.response.body = null;
