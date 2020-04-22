@@ -58,7 +58,7 @@ async function getFromIndex() {
 
     depositor.id = hit._id;
 
-    if (!depositor.contacts || !depositor.contacts.users) {
+    if (!depositor.contacts.length) {
       depositor.contacts = {};
     }
 

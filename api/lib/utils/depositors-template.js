@@ -26,11 +26,7 @@ module.exports = {
           report: { type: 'boolean' },
         },
       },
-      contact: {
-        properties: {
-          users: { type: 'nested' },
-        },
-      },
+      contacts: { type: 'nested' },
       index: {
         properties: {
           count: { type: 'long' },

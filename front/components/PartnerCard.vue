@@ -31,7 +31,7 @@
         Correspondants
       </div>
 
-      <div v-for="(contact, key) in contacts.users" :ref="key" :key="key">
+      <div v-for="(contact, key) in contacts" :ref="key" :key="key">
         <v-tooltip v-if="contact.confirmed" right>
           <template v-slot:activator="{ on }">
             <span v-on="on">{{ contact.fullName }}</span>
@@ -57,7 +57,7 @@ export default {
     },
   },
   computed: {
-    contacts() { return this.partner.contacts || {}; },
+    contacts() { console.log(this.partner); return this.partner.contacts || {}; },
     organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
     logoUrl() { return this.organisation.logoUrl || null; },
