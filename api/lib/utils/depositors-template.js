@@ -26,7 +26,15 @@ module.exports = {
           report: { type: 'boolean' },
         },
       },
-      contacts: { type: 'nested' },
+      contacts: {
+        type: 'nested',
+        properties: {
+          fullName: { type: 'keyword' },
+          email: { type: 'keyword' },
+          type: { type: 'keyword' },
+          confirmed: { type: 'boolean' },
+        },
+      },
       index: {
         properties: {
           count: { type: 'long' },

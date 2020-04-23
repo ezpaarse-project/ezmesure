@@ -8,13 +8,14 @@
 
     <v-card flat class="mx-auto mb-5" max-width="800px">
       <v-card-text>
+        {{ establishment }}
         <v-form>
           <v-container>
             <v-row>
               <v-col cols="12" sm="6">
                 <v-text-field
                   ref="name"
-                  v-model="form.name"
+                  v-model="establishment.organisation.name"
                   label="Nom établissement *"
                   placeholder="ex: Université de Blancherive"
                   :rules="[v => !!v || '']"
@@ -29,7 +30,7 @@
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="form.uai"
+                  v-model="establishment.organisation.uai"
                   label="UAI"
                   placeholder="ex: 1234567A"
                   outlined
@@ -40,7 +41,7 @@
 
               <v-col cols="12">
                 <v-text-field
-                  v-model="form.url"
+                  v-model="establishment.organisation.website"
                   label="Page d'accueil établissement"
                   placeholder="ex: https://cnrs.fr/"
                   outlined
@@ -51,7 +52,7 @@
               <v-col cols="12">
                 <v-text-field
                   ref="email"
-                  v-model="form.email"
+                  v-model="establishment.contacts[0].email"
                   label="Adresse email *"
                   type="email"
                   :rules="[
@@ -70,7 +71,7 @@
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="form.indexAffected"
+                  v-model="establishment.index.prefix"
                   label="Index affecté"
                   placeholder="ex: univ-blancherive"
                   outlined
@@ -80,7 +81,7 @@
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="form.indexSuggested"
+                  v-model="establishment.index.suggested"
                   label="Index suggéré"
                   placeholder="ex: univ-blancherive"
                   outlined
@@ -94,13 +95,13 @@
               <v-col cols="12">
                 <p>Je souhaite être désigné(e) correspondant :</p>
                 <v-checkbox
-                  v-model="form.correspondent"
+                  v-model="establishment.contacts[0].type"
                   label="Technique"
                   hide-details
                   value="tech"
                 />
                 <v-checkbox
-                  v-model="form.correspondent"
+                  v-model="establishment.contacts[0].type"
                   label="Documentaire"
                   hide-details
                   value="doc"
@@ -169,16 +170,7 @@
 export default {
   data() {
     return {
-      form: {
-        logo: null,
-        name: null,
-        uai: null,
-        url: null,
-        email: null,
-        indexAffected: null,
-        indexSuggested: null,
-        correspondent: [],
-      },
+      logo: null,
       formData: new FormData(),
       errors: {
         name: null,
@@ -204,24 +196,23 @@ export default {
   },
   computed: {
     user() { return this.$store.state.auth.user; },
-  },
-  mounted() {
-    this.form.email = this.user.email;
-    this.indexSuggested();
-  },
-  methods: {
-    indexSuggested() {
+    establishment() {
+      const establishment = JSON.parse(JSON.stringify(this.$store.state.establishment));
+
+      establishment.contacts[0].fullName = this.user.full_name;
+      establishment.contacts[0].email = this.user.email;
       const index = this.user.email.match(/@(\w+)/i);
       if (index) {
         // eslint-disable-next-line prefer-destructuring
-        this.form.indexSuggested = index[1];
+        establishment.index.suggested = index[1];
         // eslint-disable-next-line prefer-destructuring
-        this.form.indexAffected = index[1];
-        return;
+        establishment.index.prefix = index[1];
       }
-      this.form.indexSuggested = '';
-      this.form.indexAffected = '';
+
+      return establishment;
     },
+  },
+  methods: {
     dragAndDrop(event) {
       if (this.$refs && this.$refs.dropZone) {
         if (event && event === 'over') {
@@ -234,19 +225,19 @@ export default {
     },
     upload() {
       if (!this.$refs.logo.files) {
-        this.form.logo = null;
+        this.logo = null;
         this.logoPreview = null;
         return;
       }
       const logo = this.$refs.logo.files[0];
       this.logoPreview = URL.createObjectURL(logo);
 
-      this.form.logo = logo;
+      this.establishment.logo = logo;
     },
     removeLogo() {
       this.$refs.logo.files.value = '';
       this.logoPreview = null;
-      this.form.logo = null;
+      this.logo = null;
     },
     valideName() {
       if (!this.$refs.name.validate()) {
@@ -261,21 +252,14 @@ export default {
       } else {
         this.errors.email = '';
       }
-      this.indexSuggested();
     },
     send() {
       this.valideName();
       this.valideMail();
 
       if (!this.errors.name && !this.errors.email) {
-        this.formData.append('logo', this.form.logo);
-        this.formData.append('name', this.form.name);
-        this.formData.append('uai', this.form.uai);
-        this.formData.append('url', this.form.url);
-        this.formData.append('email', this.form.email);
-        this.formData.append('indexAffected', this.form.indexAffected);
-        this.formData.append('indexSuggested', this.form.indexSuggested);
-        this.formData.append('correspondent', this.form.correspondent);
+        this.formData.append('logo', this.logo);
+        this.formData.append('form', JSON.stringify(this.establishment));
 
         this.$axios.post('/correspondents/store', this.formData, {
           headers: {
@@ -287,23 +271,13 @@ export default {
             if (res.status === 200 && res.data === 'OK') {
               this.$store.dispatch('snacks/success', 'Informations transmises');
 
-              this.form = {
-                logo: null,
-                name: null,
-                uai: null,
-                url: null,
-                email: this.user.email,
-                indexAffected: null,
-                indexSuggested: null,
-                correspondent: [],
-              };
+              this.logo = null;
               this.formData = new FormData();
               this.errors = {
                 name: null,
                 email: null,
               };
               this.logoPreview = null;
-              this.indexSuggested();
               this.$refs.name.resetValidation();
               this.$refs.email.resetValidation();
             }

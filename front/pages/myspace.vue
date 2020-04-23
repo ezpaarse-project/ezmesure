@@ -96,6 +96,8 @@ export default {
       redirect('/terms');
     }
 
+    await store.dispatch('getEstablishment');
+
     if (user.roles) {
       const isAdmin = user.roles.find(role => role === 'admin');
 

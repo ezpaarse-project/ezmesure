@@ -50,6 +50,64 @@ exports.list = async function (ctx) {
   ctx.body = await depositors.getFromIndex();
 };
 
+exports.getOne = async function (ctx) {
+  indiciesExists();
+
+  ctx.type = 'json';
+
+  const { body } = await elastic.search({
+    index: config.depositors.index,
+    size: 1,
+    ignoreUnavailable: true,
+    body: {
+      query: {
+        bool: {
+          must: [
+            {
+              nested: {
+                path: 'contacts',
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          'contacts.mail': ctx.state.user.email,
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  if (!body || !body.hits || !body.hits.hits) {
+    throw new Error('invalid elastic response');
+  }
+
+  const establishment = body.hits.hits.map((hit) => {
+    const depositor = hit._source;
+
+    if (!depositor) {
+      return {};
+    }
+
+    depositor.id = hit._id;
+
+    if (!depositor.contacts.length) {
+      depositor.contacts = {};
+    }
+
+    return depositor;
+  });
+
+  ctx.body = establishment;
+};
+
 exports.updateData = async function (ctx) {
   indiciesExists();
 
@@ -152,7 +210,7 @@ exports.storeData = async function (ctx) {
     contacts: [
       {
         fullName: ctx.state.user.full_name,
-        mail: ctx.state.user.email,
+        email: ctx.state.user.email,
         type: body.correspondent ? body.correspondent.split(',') : ['default'],
         confirmed: false,
       },

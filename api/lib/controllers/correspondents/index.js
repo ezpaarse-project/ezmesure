@@ -9,6 +9,7 @@ const {
   updateData,
   deleteData,
   pictures,
+  getOne,
 } = require('./actions');
 
 router.get('/pictures/:id', pictures);
@@ -16,6 +17,7 @@ router.get('/pictures/:id', pictures);
 router.use(requireJwt, requireUser);
 
 router.get('/list', list);
+router.get('/myestablishment', getOne);
 router.post('/delete', koaBody(), deleteData);
 router.put('/update', koaBody(), updateData);
 router.post('/store', koaBody({
