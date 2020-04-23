@@ -10,14 +10,26 @@
   <mj-column>
     <mj-text>
       <p>Bonjour,</p>
-      <p>Vous trouverez ci-joint le rapport <strong>{{ frequency }}</strong>{{ optimizedForPrinting }} du tableau de bord <strong>{{ title }}</strong> du <strong>{{ reportingDate }}</strong>.</p>
-      <p>Ceci est un email envoyé automatiquement par l'application ezMESURE.</p>
-      <p>Vous recevez ce message parce que vous faites partie d'une liste de diffusion de rapports ezMESURE.</p>
+      <p>
+        Vous trouverez dans ce mail le rapport <strong>{{ frequency }}</strong> {{ "optimisé pour impression" if optimizedForPrinting }}
+        du tableau de bord <strong>{{ title }}</strong>, généré le <strong>{{ reportingDate }}</strong>.
+      </p>
+      <p>
+        Ce message est envoyé automatiquement par l'application ezMESURE,
+        vous le recevez parce que vous faites partie d'une liste de diffusion de rapports.
+      </p>
     </mj-text>
 
-    <mj-button background-color="#9c27b0" color="white" href="{{ dashboardUrl }}" target="_blank">
-      Pour accéder au tableau de bord, cliquez ici !
-    </mj-button>
+    <mj-text align="center" color="#55575d" font-size="24px" line-height="22px" padding="10px 25px">
+      <p>- Trouvez votre rapport en pièce jointe -</p>
+    </mj-text>
+
+    <mj-text>
+      <p>
+        Ce tableau de bord peut être visualisé en ligne à <a href="{{ dashboardUrl }}" target="_blank">cette adresse</a>,
+        sous réserve de droits d'accès suffisants. En cas de doute, veuillez contacter le correspondant ezMESURE de votre établissement.
+      </p>
+    </mj-text>
 
     <mj-text>
       <p>Cordialement,</p>

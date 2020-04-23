@@ -163,6 +163,7 @@ class Reporter {
       logger.error('Failed to launch browser');
       logger.error(e);
       this.busy = false;
+      this.tasks.forEach(([, emitter]) => emitter.emit('error', e));
       return;
     }
 

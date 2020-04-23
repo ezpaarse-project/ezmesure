@@ -47,7 +47,7 @@ class HistoryEntry {
     this.history = {
       taskId,
       executionTime: 0,
-      status: 'ongoing',
+      status: 'pending',
       logs: [],
       startTime: new Date(),
       endTime: null,
@@ -74,10 +74,11 @@ class HistoryEntry {
 
   end() {
     const endTime = process.hrtime.bigint();
+    this.startTime = this.startTime || endTime;
     this.history.endTime = new Date();
     this.history.executionTime = Math.floor(Number.parseInt(endTime - this.startTime, 10) / 1e6);
 
-    if (this.history.status === 'ongoing') {
+    if (this.history.status !== 'error') {
       this.history.status = 'completed';
     }
 
@@ -144,6 +145,7 @@ async function generateReport(task) {
       reporter.addTask(taskSource)
         .on('start', () => {
           history.startTimer();
+          history.setStatus('ongoing');
           history.log('info', 'task has been started');
           history.save();
         })
@@ -196,7 +198,7 @@ async function generateReport(task) {
           title: dashboardTitle,
           frequency: frequencyText,
           dashboardUrl,
-          optimizedForPrinting: taskSource.print ? ' optimisé pour impression' : '',
+          optimizedForPrinting: taskSource.print,
         }),
       });
       emailSent = true;
