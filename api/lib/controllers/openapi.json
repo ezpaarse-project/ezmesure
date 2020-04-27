@@ -370,6 +370,7 @@
       "IndexInsert": {
         "type": "object",
         "properties": {
+          "took": { "type": "integer" },
           "total": { "type": "integer" },
           "inserted": { "type": "integer" },
           "updated": { "type": "integer" },

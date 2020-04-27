@@ -19,6 +19,7 @@ exports.counter5 = async function counter5(ctx) {
   const requestRtypes = new Set(['ARTICLE', 'BOOK', 'BOOK_SECTION']);
   const investigationRtypes = new Set(['PREVIEW', 'ABS', 'REF', 'OPENURL', 'LINK']);
 
+  const startTime = process.hrtime.bigint();
   const responseBody = {
     total: 0,
     inserted: 0,
@@ -197,6 +198,9 @@ exports.counter5 = async function counter5(ctx) {
       });
     }
   } while (nextKey);
+
+  const endTime = process.hrtime.bigint();
+  responseBody.took = Math.ceil(Number((endTime - startTime) / 1000000n));
 
   ctx.status = 200;
   ctx.body = responseBody;
