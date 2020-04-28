@@ -9,7 +9,7 @@ const {
 } = require('./basics');
 const search = require('./search');
 const upload = require('./upload');
-const { counter5 } = require('./export');
+const { aggregate, counter5 } = require('./export');
 
 router.use(requireJwt, requireUser, requireTermsOfUse);
 
@@ -19,7 +19,24 @@ router.delete('/:index', deleteIndice);
 router.delete('/:index/events', deleteEvents);
 router.post('/:index', upload);
 
-
+router.route({
+  method: 'GET',
+  path: '/:index/aggregation.:extension',
+  handler: aggregate,
+  validate: {
+    params: {
+      index: Joi.string().trim().min(1),
+      extension: Joi.string().valid(['csv', 'ndjson']),
+    },
+    query: {
+      fields: Joi.string().required().trim().min(1),
+      platform: Joi.string().trim(),
+      delimiter: Joi.string().trim(),
+      from: Joi.string(),
+      to: Joi.string(),
+    },
+  },
+});
 router.route({
   method: 'POST',
   path: '/:index/counterize',

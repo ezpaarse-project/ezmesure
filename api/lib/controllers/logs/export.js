@@ -1,6 +1,111 @@
 
+const { PassThrough } = require('stream');
 const crypto = require('crypto');
+const Papa = require('papaparse');
 const elastic = require('../../services/elastic');
+
+exports.aggregate = async function aggregate(ctx) {
+  const { index, extension } = ctx.request.params;
+  const {
+    fields: rawFields = '',
+    from,
+    to,
+    platform,
+    delimiter = ';',
+  } = ctx.request.query;
+  ctx.action = 'export/aggregate';
+
+  ctx.type = extension === 'csv' ? 'text/csv' : 'application/x-ndjson';
+  ctx.attachment(`aggregation.${extension}`);
+
+  const aggregatedFields = rawFields.split(',').map((f) => f.trim()).filter((f) => f);
+  const csvColumns = ['doc_count', ...aggregatedFields];
+
+  if (aggregatedFields.length === 0) {
+    ctx.throw(400, 'missing mandatory "fields" param');
+    return;
+  }
+
+  const filter = [];
+
+  if (platform) {
+    filter.push({ term: { platform } });
+  }
+
+  if (from || to) {
+    filter.push({
+      range: {
+        datetime: {
+          gte: from,
+          lte: to,
+        },
+      },
+    });
+  }
+
+  ctx.body = new PassThrough();
+
+  if (extension === 'csv') {
+    ctx.body.write(Papa.unparse([csvColumns], {
+      delimiter: delimiter === 'tab' ? '\t' : delimiter,
+      newline: '\n',
+    }));
+    ctx.body.write('\n');
+  }
+
+  async function nextPage(nextKey) {
+    const { body: result } = await elastic.search({
+      index,
+      body: {
+        size: 0,
+        query: filter.length > 0 ? { bool: { filter } } : undefined,
+        aggs: {
+          main: {
+            composite: {
+              size: 1000,
+              sources: aggregatedFields.map((field) => ({ [field]: { terms: { field } } })),
+              after: nextKey,
+            },
+          },
+        },
+      },
+      timeout: '30s',
+    }, {
+      headers: { 'es-security-runas-user': ctx.state.user.username },
+    });
+
+    const aggregations = result && result.aggregations && result.aggregations;
+    const buckets = aggregations && aggregations.main && aggregations.main.buckets;
+    const afterKey = aggregations && aggregations.main && aggregations.main.after_key;
+
+    if (extension === 'csv') {
+      const docs = buckets.map((b) => ({ ...b.key, doc_count: b.doc_count }));
+      ctx.body.write(Papa.unparse(docs, {
+        delimiter: delimiter === 'tab' ? '\t' : delimiter,
+        newline: '\n',
+        header: false,
+        columns: csvColumns,
+      }));
+    } else {
+      ctx.body.write(buckets.map((bucket) => JSON.stringify(bucket)).join('\n'));
+    }
+    const isWritable = ctx.body.write('\n');
+
+    if (!isWritable) {
+      await new Promise((resolve) => ctx.body.once('drain', resolve));
+    }
+
+    if (afterKey) {
+      await nextPage(afterKey);
+    }
+  }
+
+  nextPage().catch((e) => {
+    ctx.body.destroy(e);
+  }).then(() => {
+    ctx.body.end();
+  });
+};
 
 exports.counter5 = async function counter5(ctx) {
   ctx.action = 'export/counter5';
