@@ -51,6 +51,7 @@ router.route({
       platform: Joi.string().trim(),
       from: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       to: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      sessionField: Joi.string().min(1),
     },
   },
 });

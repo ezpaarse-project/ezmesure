@@ -1001,6 +1001,7 @@
                 "properties": {
                   "destination": {
                     "type": "string",
+                    "description": "The index where aggregations should be stored",
                     "example": "univ-foobar-counter5"
                   },
                   "from": {
@@ -1013,7 +1014,13 @@
                   },
                   "platform": {
                     "type": "string",
+                    "description": "filter aggregations for a specific platform",
                     "example": "wiley"
+                  },
+                  "sessionField": {
+                    "type": "string",
+                    "description": "The field that holds the session ID, for unique request/investigation counting",
+                    "example": "ezproxy-session"
                   }
                 }
               }

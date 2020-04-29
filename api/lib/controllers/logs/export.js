@@ -118,6 +118,7 @@ exports.counter5 = async function counter5(ctx) {
     to,
     platform,
     destination: destIndex,
+    sessionField = 'session',
   } = ctx.request.body;
 
   let nextKey;
@@ -242,8 +243,46 @@ exports.counter5 = async function counter5(ctx) {
               ],
             },
             aggregations: {
+              uniqueItems: {
+                cardinality: {
+                  precision_threshold: 3000,
+                  script: {
+                    lang: 'painless',
+                    source: `
+                      if (doc.containsKey(params.sessionField) && doc.containsKey('unitid')) {
+                        return doc[params.sessionField].value + '_' + doc['unitid'].value;
+                      } else {
+                        return null;
+                      }
+                    `,
+                    params: {
+                      sessionField,
+                    },
+                  },
+                },
+              },
               requests: {
                 filter: { terms: { rtype: [...requestRtypes] } },
+                aggregations: {
+                  uniqueItems: {
+                    cardinality: {
+                      precision_threshold: 3000,
+                      script: {
+                        lang: 'painless',
+                        source: `
+                          if (doc.containsKey(params.sessionField) && doc.containsKey('unitid')) {
+                            return doc[params.sessionField].value + '_' + doc['unitid'].value;
+                          } else {
+                            return null;
+                          }
+                        `,
+                        params: {
+                          sessionField,
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -272,10 +311,15 @@ exports.counter5 = async function counter5(ctx) {
           _id: crypto.createHash('sha1').update(id).digest('hex'),
         },
       });
+
+      const { uniqueItems = {}, requests = {} } = bucket;
+
       acc.push({
         ...bucket.key,
         totalItemInvestigations: bucket.doc_count,
-        totalItemRequests: bucket.requests.doc_count,
+        totalItemRequests: requests.doc_count,
+        uniqueItemInvestigations: uniqueItems.value,
+        uniqueItemRequests: requests.uniqueItems && requests.uniqueItems.value,
       });
       return acc;
     }, []);
