@@ -6,7 +6,7 @@ export default {
         name: '',
         uai: '',
         website: '',
-        logo: '',
+        logoUrl: '',
       },
       contacts: [
         {
@@ -42,8 +42,13 @@ export default {
       return this.$axios.$post('/correspondents/delete', ids);
     },
     // eslint-disable-next-line no-unused-vars
-    updateEstablishment({ commit }, establishment) {
-      return this.$axios.$put('/correspondents/update', establishment);
+    storeOrUpdateEstablishment({ commit }, establishment) {
+      return this.$axios.$post('/correspondents/', establishment, {
+        headers: {
+          // eslint-disable-next-line no-underscore-dangle
+          'Content-Type': `multipart/form-data; boundary=${establishment._boundary}`,
+        },
+      });
     },
   },
   mutations: {

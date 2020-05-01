@@ -8,7 +8,6 @@
 
     <v-card flat class="mx-auto mb-5" max-width="800px">
       <v-card-text>
-        {{ establishment }}
         <v-form>
           <v-container>
             <v-row>
@@ -167,16 +166,19 @@
 </template>
 
 <script>
+/* eslint-disable vue/no-side-effects-in-computed-properties */
+
 export default {
   data() {
     return {
-      logo: null,
       formData: new FormData(),
+      logo: null,
+      logoPreview: null,
       errors: {
         name: null,
         email: null,
       },
-      logoPreview: null,
+      establishmentData: null,
     };
   },
   async fetch({ store, redirect, route }) {
@@ -197,19 +199,23 @@ export default {
   computed: {
     user() { return this.$store.state.auth.user; },
     establishment() {
-      const establishment = JSON.parse(JSON.stringify(this.$store.state.establishment));
+      this.establishmentData = JSON.parse(JSON.stringify(this.$store.state.establishment));
 
-      establishment.contacts[0].fullName = this.user.full_name;
-      establishment.contacts[0].email = this.user.email;
+      this.establishmentData.contacts[0].fullName = this.user.full_name;
+      this.establishmentData.contacts[0].email = this.user.email;
       const index = this.user.email.match(/@(\w+)/i);
-      if (index) {
+      if (index && !this.establishmentData.index.prefix) {
         // eslint-disable-next-line prefer-destructuring
-        establishment.index.suggested = index[1];
+        this.establishmentData.index.suggested = index[1];
         // eslint-disable-next-line prefer-destructuring
-        establishment.index.prefix = index[1];
+        this.establishmentData.index.prefix = index[1];
       }
 
-      return establishment;
+      if (this.establishmentData.organisation.logoUrl.length) {
+        this.logoPreview = `/api/correspondents/pictures/${this.establishmentData.organisation.logoUrl}`;
+      }
+
+      return this.establishmentData;
     },
   },
   methods: {
@@ -229,10 +235,9 @@ export default {
         this.logoPreview = null;
         return;
       }
-      const logo = this.$refs.logo.files[0];
-      this.logoPreview = URL.createObjectURL(logo);
-
-      this.establishment.logo = logo;
+      // eslint-disable-next-line prefer-destructuring
+      this.logo = this.$refs.logo.files[0];
+      this.logoPreview = URL.createObjectURL(this.logo);
     },
     removeLogo() {
       this.$refs.logo.files.value = '';
@@ -259,28 +264,22 @@ export default {
 
       if (!this.errors.name && !this.errors.email) {
         this.formData.append('logo', this.logo);
-        this.formData.append('form', JSON.stringify(this.establishment));
+        this.formData.append('form', JSON.stringify(this.establishmentData));
 
-        this.$axios.post('/correspondents/store', this.formData, {
-          headers: {
-            // eslint-disable-next-line no-underscore-dangle
-            'Content-Type': `multipart/form-data; boundary=${this.formData._boundary}`,
-          },
-        })
-          .then((res) => {
-            if (res.status === 200 && res.data === 'OK') {
-              this.$store.dispatch('snacks/success', 'Informations transmises');
+        this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+          .then(async () => {
+            this.$store.dispatch('snacks/success', 'Informations transmises');
 
-              this.logo = null;
-              this.formData = new FormData();
-              this.errors = {
-                name: null,
-                email: null,
-              };
-              this.logoPreview = null;
-              this.$refs.name.resetValidation();
-              this.$refs.email.resetValidation();
-            }
+            this.formData = new FormData();
+            this.errors = {
+              name: null,
+              email: null,
+            };
+            this.$refs.name.resetValidation();
+            this.$refs.email.resetValidation();
+
+            await this.$store.dispatch('getEstablishment');
+            this.establishmentData = this.establishment;
           })
           .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
 

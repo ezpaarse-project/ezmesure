@@ -104,6 +104,47 @@
               hide-details
             />
           </v-col>
+
+          <v-col cols="12" class="text-center">
+            <center>
+              <section
+                ref="dropzone"
+                cols="12"
+                class="text-center dropZone"
+                :style="{
+                  'background-color': item.logoPreview ? 'transparent' : '#ccc',
+                  'background-image': `url(
+                  ${item.logoPreview ? item.logoPreview : require('@/static/images/logo-etab.png')}
+                  )`
+                }"
+                @dragover="dragAndDrop('over')"
+                @dragleave="dragAndDrop('leave')"
+              >
+                <v-tooltip v-if="item.logoPreview" right>
+                  <template v-slot:activator="{ on }" class="removeLogoTooltip">
+                    <v-btn
+                      icon
+                      small
+                      color="error"
+                      class="removeLogo"
+                      v-on="on"
+                      @click="removeLogo(item.id)"
+                    >
+                      <v-icon>mdi-close-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Supprimer logo</span>
+                </v-tooltip>
+                <input
+                  ref="logo"
+                  type="file"
+                  accept="image/*"
+                  @change="upload(item.id)"
+                >
+              </section>
+              <span class="caption">320x100</span>
+            </center>
+          </v-col>
         </v-row>
 
         <v-divider />
@@ -187,7 +228,7 @@
             <span class="subtitle-1">Contacts :</span>
           </v-col>
         </v-row>
-        <v-row v-for="(contact, key) in item.contacts.users" :ref="key" :key="key">
+        <v-row v-for="(contact, key) in item.contacts" :ref="key" :key="key">
           <v-col cols="5">
             <v-text-field
               v-model="contact.fullName"
@@ -207,6 +248,9 @@
           <v-col cols="2">
             <v-checkbox v-model="contact.confirmed" label="Contact confirmé" />
           </v-col>
+        </v-row>
+
+        <v-row>
           <v-col cols="12">
             <v-btn
               block
@@ -247,6 +291,8 @@ export default {
         { text: 'Automatisations', value: 'automatisations' },
         { text: '', value: 'data-table-expand' },
       ],
+      logo: null,
+      logoPreview: null,
     };
   },
   computed: {
@@ -263,6 +309,11 @@ export default {
               });
             }
           }
+          establishment.logo = null;
+          establishment.logoPreview = null;
+          if (establishment.organisation.logoUrl.length) {
+            establishment.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
+          }
         });
       }
       return establishments;
@@ -272,6 +323,34 @@ export default {
     },
   },
   methods: {
+    dragAndDrop(event) {
+      if (this.$refs && this.$refs.dropZone) {
+        if (event && event === 'over') {
+          this.$refs.dropZone.classList.add('overlay');
+        }
+        if (event && event === 'leave') {
+          this.$refs.dropZone.classList.remove('overlay');
+        }
+      }
+    },
+    upload(itemId) {
+      const establishment = this.establishments.find(etab => etab.id === itemId);
+      if (establishment) {
+        if (!this.$refs.logo.files) {
+          establishment.logo = null;
+          establishment.logoPreview = null;
+          return;
+        }
+        // eslint-disable-next-line prefer-destructuring
+        establishment.logo = this.$refs.logo.files[0];
+        establishment.logoPreview = URL.createObjectURL(establishment.logo);
+      }
+    },
+    removeLogo() {
+      this.$refs.logo.files.value = '';
+      this.logoPreview = null;
+      this.logo = null;
+    },
     deleteData() {
       if (this.selected.length) {
         const ids = this.selected.map(select => select.id);
@@ -285,10 +364,49 @@ export default {
       }
     },
     updateEstablishment(establishment) {
-      this.$store.dispatch('updateEstablishment', { establishment }).then(() => {
+      const formData = new FormData();
+
+      formData.append('logo', establishment.logo);
+
+      delete establishment.logo;
+      delete establishment.logoPreview;
+
+      formData.append('form', JSON.stringify(establishment));
+
+      this.$store.dispatch('storeOrUpdateEstablishment', formData).then(async () => {
         this.$store.dispatch('snacks/success', 'Établissement mis à jour');
+        await this.$store.dispatch('getEstablishments');
       }).catch(() => this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement'));
     },
   },
 };
 </script>
+
+<style scoped>
+.dropZone {
+  cursor: pointer;
+  width: 320px;
+  height: 100px;
+  background-size: 320px 100px;
+  border: 1px solid #ccc;
+}
+.dropZone input[type='file'] {
+  cursor: pointer;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.overlay {
+  background-color: rgba(62, 62, 62, 0.3);
+  border-color: #787878;
+}
+.removeLogo {
+  float: right;
+  display: none;
+}
+.dropZone:hover > .removeLogo {
+  display: inline;
+}
+</style>

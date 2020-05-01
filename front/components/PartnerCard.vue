@@ -57,7 +57,7 @@ export default {
     },
   },
   computed: {
-    contacts() { console.log(this.partner); return this.partner.contacts || {}; },
+    contacts() { return this.partner.contacts || {}; },
     organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
     logoUrl() { return this.organisation.logoUrl || null; },

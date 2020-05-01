@@ -5,8 +5,7 @@ const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
   list,
-  storeData,
-  updateData,
+  storeOrUpdate,
   deleteData,
   pictures,
   getOne,
@@ -19,10 +18,9 @@ router.use(requireJwt, requireUser);
 router.get('/list', list);
 router.get('/myestablishment', getOne);
 router.post('/delete', koaBody(), deleteData);
-router.put('/update', koaBody(), updateData);
-router.post('/store', koaBody({
+router.post('/', koaBody({
   multipart: true,
   uploadDir: './uploads/',
-}), storeData);
+}), storeOrUpdate);
 
 module.exports = router;

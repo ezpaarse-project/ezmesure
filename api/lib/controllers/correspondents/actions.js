@@ -71,7 +71,7 @@ exports.getOne = async function (ctx) {
                     must: [
                       {
                         term: {
-                          'contacts.mail': ctx.state.user.email,
+                          'contacts.email': ctx.state.user.email,
                         },
                       },
                     ],
@@ -108,35 +108,6 @@ exports.getOne = async function (ctx) {
   ctx.body = establishment;
 };
 
-exports.updateData = async function (ctx) {
-  indiciesExists();
-
-  const { body } = ctx.request;
-
-  if (!body || !body.establisment) {
-    ctx.status = 400;
-    ctx.body = {
-      status: 400,
-      error: 'No data send',
-    };
-  }
-
-  const docId = body.establishment.id;
-  delete body.establishment.id;
-
-  body.establishment.updatedAt = new Date();
-
-  ctx.status = 204;
-
-  return elastic.update({
-    id: docId,
-    index: config.depositors.index,
-    body: {
-      doc: body.establishment,
-    },
-  });
-};
-
 exports.deleteData = async function (ctx) {
   indiciesExists();
 
@@ -161,8 +132,10 @@ exports.deleteData = async function (ctx) {
   }
 };
 
-exports.storeData = async function (ctx) {
+exports.storeOrUpdate = async function (ctx) {
   indiciesExists();
+
+  ctx.status = 200;
 
   const { body } = ctx.request;
   const { logo } = ctx.request.files;
@@ -185,67 +158,69 @@ exports.storeData = async function (ctx) {
     }
   }
 
-  const currentDate = new Date();
+  const { form } = body;
+  if (body && form) {
+    const formData = JSON.parse(form);
 
-  const indexData = {
-    organisation: {
-      name: body.name,
-      shortName: '',
-      uai: body.uai || '',
-      city: '',
-      website: body.url || '',
-      logoUrl: logoId || '',
-      establismentType: '',
-      location: {
-        lon: 0,
-        lat: 0,
-      },
-      domains: [],
-    },
-    auto: {
+    const currentDate = new Date();
+
+    if (formData.organisation.uai) {
+      try {
+        const establisment = await getEtablishmentData(formData.organisation.uai);
+
+        if (establisment) {
+          formData.organisation.shortName = establisment.sigle;
+          formData.organisation.city = establisment.commune;
+          formData.organisation.establismentType = establisment.type_detablissement;
+          formData.organisation.location.lon = establisment.longitude_x;
+          formData.organisation.location.lat = establisment.latitude_y;
+        }
+      } catch (err) {
+        appLogger.error('Failed to get establishment data', err);
+      }
+    }
+
+    formData.organisation.logoUrl = logoId || '';
+    formData.updatedAt = currentDate;
+
+    if (formData.id) {
+      const docId = formData.id;
+      delete formData.id;
+
+      return elastic.update({
+        id: docId,
+        index: config.depositors.index,
+        body: {
+          doc: formData,
+        },
+      }).then((res) => res.body).catch((err) => {
+        ctx.status = 500;
+        appLogger.error('Failed to update data in index', err);
+      });
+    }
+    
+    formData.organisation.establismentType = '';
+    formData.organisation.city = '';
+    formData.organisation.location = {
+      lon: 0,
+      lat: 0,
+    };
+    formData.organisation.domains = [];
+    formData.auto = {
       ezmesure: false,
       ezpaarse: false,
       report: false,
-    },
-    contacts: [
-      {
-        fullName: ctx.state.user.full_name,
-        email: ctx.state.user.email,
-        type: body.correspondent ? body.correspondent.split(',') : ['default'],
-        confirmed: false,
-      },
-    ],
-    index: {
-      count: 0,
-      prefix: body.indexAffected,
-      suggested: body.indexSuggested,
-    },
-    createdAt: currentDate,
-    updatedAt: currentDate,
-  };
+    };
+    formData.createdAt = currentDate;
 
-  if (body.uai) {
-    try {
-      const establisment = await getEtablishmentData(body.uai);
-
-      if (establisment) {
-        indexData.organisation.shortName = establisment.sigle;
-        indexData.organisation.city = establisment.commune;
-        indexData.organisation.establismentType = establisment.type_detablissement;
-        indexData.organisation.location.lon = establisment.longitude_x;
-        indexData.organisation.location.lat = establisment.latitude_y;
-      }
-    } catch (err) {
-      appLogger.error('Failed to get establishment data', err);
-    }
+    return elastic.index({
+      index: config.depositors.index,
+      body: formData,
+    }).then((res) => res.body).catch((err) => {
+      ctx.status = 500;
+      appLogger.error('Failed to store data in index', err);
+    });
   }
-
-  ctx.status = 200;
-
-  return elastic.index({
-    index: config.depositors.index,
-    body: indexData,
-  }).then((res) => res.body).catch((err) => appLogger.error('Failed to store data in index', err));
 };
 
 exports.pictures = async function (ctx) {
