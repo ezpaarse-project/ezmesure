@@ -9,7 +9,7 @@
         background-color="grey lighten-3"
       >
         <v-tab to="#tab-profile" router>
-          Profil {{ isAdmin }}
+          Profil
         </v-tab>
         <v-tab to="#tab-files" router>
           Mes dépôts
