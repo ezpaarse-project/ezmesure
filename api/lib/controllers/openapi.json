@@ -901,6 +901,16 @@
           },
           {
             "in": "query",
+            "name": "missing",
+            "description": "Include combinations with missing values",
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "allowEmptyValue": false
+            }
+          },
+          {
+            "in": "query",
             "name": "from",
             "schema": {
               "type": "string",

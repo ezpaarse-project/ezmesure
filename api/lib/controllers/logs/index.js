@@ -34,6 +34,7 @@ router.route({
       delimiter: Joi.string().trim(),
       from: Joi.string(),
       to: Joi.string(),
+      missing: Joi.boolean(),
     },
   },
 });

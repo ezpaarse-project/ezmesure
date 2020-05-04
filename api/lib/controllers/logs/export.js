@@ -12,6 +12,7 @@ exports.aggregate = async function aggregate(ctx) {
     to,
     platform,
     delimiter = ';',
+    missing = true,
   } = ctx.request.query;
   ctx.action = 'export/aggregate';
 
@@ -63,7 +64,9 @@ exports.aggregate = async function aggregate(ctx) {
           main: {
             composite: {
               size: 1000,
-              sources: aggregatedFields.map((field) => ({ [field]: { terms: { field } } })),
+              sources: aggregatedFields.map((field) => ({
+                [field]: { terms: { field, missing_bucket: missing } },
+              })),
               after: nextKey,
             },
           },
