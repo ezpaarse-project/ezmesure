@@ -1,32 +1,22 @@
-export default {
-  state: () => ({
+/* eslint-disable import/no-extraneous-dependencies */
+import Vue from 'vue';
+import Vuex from 'vuex';
+import auth from './auth';
+import snacks from './snacks';
+
+const store = () => new Vuex.Store({
+  modules: {
+    auth,
+    snacks,
+  },
+  state: {
     establishments: [],
-    establishment: {
-      organisation: {
-        name: '',
-        uai: '',
-        website: '',
-        logoUrl: '',
-      },
-      contacts: [
-        {
-          fullName: '',
-          email: '',
-          type: [],
-          confirmed: false,
-        },
-      ],
-      index: {
-        count: 0,
-        prefix: '',
-        suggested: '',
-      },
-    },
-  }),
+    establishment: null,
+  },
   actions: {
-    async getEstablishment({ commit, state }) {
+    async getEstablishment({ commit }) {
       return this.$axios.$get('/correspondents/myestablishment')
-        .then(establishment => commit('setEstablishment', establishment.length ? establishment[0] : state.establishment))
+        .then(establishment => commit('setEstablishment', establishment))
         .catch(() => {});
     },
     setEstablishment({ commit }, establishment) {
@@ -53,10 +43,12 @@ export default {
   },
   mutations: {
     setEstablishments(state, establishments) {
-      state.establishments = establishments;
+      Vue.set(state, 'establishments', establishments);
     },
     setEstablishment(state, establishment) {
-      state.establishment = establishment;
+      Vue.set(state, 'establishment', establishment);
     },
   },
-};
+});
+
+export default store;

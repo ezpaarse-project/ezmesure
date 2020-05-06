@@ -1,0 +1,21 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+  {% if updated == true %}
+    <mj-title>Mise à jour de données établissement</mj-title>
+  {% else %}
+    <mj-title>Création de données établissement</mj-title>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      L'utilisateur <strong>{{ user }}</strong> vient de {% if updated == true %}mettre à jour{% else %}créer{% endif %} les données de l'établissement : <strong>{{ establishment }}</strong>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

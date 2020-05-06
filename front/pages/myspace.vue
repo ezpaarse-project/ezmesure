@@ -99,7 +99,7 @@ export default {
     await store.dispatch('getEstablishment');
 
     if (user.roles) {
-      const isAdmin = user.roles.find(role => role === 'admin');
+      const isAdmin = user.roles.find(role => (role === 'admin' || role === 'superuser'));
 
       if (isAdmin) {
         await store.dispatch('getEstablishments');

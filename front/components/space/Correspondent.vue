@@ -11,6 +11,7 @@
         <v-form>
           <v-container>
             <v-row>
+              {{ establishment }}
               <v-col cols="12" sm="6">
                 <v-text-field
                   ref="name"
@@ -178,7 +179,6 @@ export default {
         name: null,
         email: null,
       },
-      establishmentData: null,
     };
   },
   async fetch({ store, redirect, route }) {
@@ -198,24 +198,11 @@ export default {
   },
   computed: {
     user() { return this.$store.state.auth.user; },
-    establishment() {
-      this.establishmentData = JSON.parse(JSON.stringify(this.$store.state.establishment));
-
-      this.establishmentData.contacts[0].fullName = this.user.full_name;
-      this.establishmentData.contacts[0].email = this.user.email;
-      const index = this.user.email.match(/@(\w+)/i);
-      if (index && !this.establishmentData.index.prefix) {
-        // eslint-disable-next-line prefer-destructuring
-        this.establishmentData.index.suggested = index[1];
-        // eslint-disable-next-line prefer-destructuring
-        this.establishmentData.index.prefix = index[1];
-      }
-
-      if (this.establishmentData.organisation.logoUrl.length) {
-        this.logoPreview = `/api/correspondents/pictures/${this.establishmentData.organisation.logoUrl}`;
-      }
-
-      return this.establishmentData;
+    establishment: {
+      get() {
+        return this.$store.state.establishment;
+      },
+      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
     },
   },
   methods: {
@@ -264,10 +251,11 @@ export default {
 
       if (!this.errors.name && !this.errors.email) {
         this.formData.append('logo', this.logo);
-        this.formData.append('form', JSON.stringify(this.establishmentData));
+        this.formData.append('form', JSON.stringify(this.establishment));
 
         this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
-          .then(async () => {
+          .then((data) => {
+            console.log(data);
             this.$store.dispatch('snacks/success', 'Informations transmises');
 
             this.formData = new FormData();
@@ -277,9 +265,6 @@ export default {
             };
             this.$refs.name.resetValidation();
             this.$refs.email.resetValidation();
-
-            await this.$store.dispatch('getEstablishment');
-            this.establishmentData = this.establishment;
           })
           .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
 

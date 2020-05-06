@@ -91,21 +91,60 @@ exports.getOne = async function (ctx) {
     throw new Error('invalid elastic response');
   }
 
-  const establishment = body.hits.hits.map((hit) => {
-    const depositor = hit._source;
+  let establishment;
 
-    if (!depositor) {
-      return {};
+  if (!body.hits.hits.length) {
+    establishment = {
+      organisation: {
+        name: '',
+        uai: '',
+        website: '',
+        logoUrl: '',
+      },
+      contacts: [
+        {
+          fullName: ctx.state.user.full_name,
+          email: ctx.state.user.email,
+          type: [],
+          confirmed: false,
+        },
+      ],
+      index: {
+        count: 0,
+        prefix: '',
+        suggested: '',
+      }
+    };
+
+    const index = ctx.state.user.email.match(/@(\w+)/i);
+    if (index && !establishment.index.prefix) {
+      establishment.index.suggested = index[1];
+      establishment.index.prefix = index[1];
+    }
+  }
+
+  if (body.hits.hits.length) {
+    establishment = body.hits.hits[0]._source;
+
+    establishment.id = body.hits.hits[0]._id;
+
+    if (!establishment.contacts.length) {
+      establishment.contacts = {};
     }
 
-    depositor.id = hit._id;
+    establishment.contacts[0].fullName = ctx.state.user.full_name;
+    establishment.contacts[0].email = ctx.state.user.email;
 
-    if (!depositor.contacts.length) {
-      depositor.contacts = {};
+    const index = ctx.state.user.email.match(/@(\w+)/i);
+    if (index && !establishment.index.prefix) {
+      establishment.index.suggested = index[1];
+      establishment.index.prefix = index[1];
     }
 
-    return depositor;
-  });
+    if (establishment.organisation.logoUrl.length) {
+      this.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
+    }
+  }
 
   ctx.body = establishment;
 };
@@ -163,6 +202,7 @@ exports.storeOrUpdate = async function (ctx) {
   const { form } = body;
   if (body && form) {
     const formData = JSON.parse(form);
+    ctx.body = formData;
 
     const currentDate = new Date();
 
@@ -189,27 +229,31 @@ exports.storeOrUpdate = async function (ctx) {
       const docId = formData.id;
       delete formData.id;
 
-      return elastic.update({
+      await elastic.update({
         id: docId,
         index: config.depositors.index,
         body: {
           doc: formData,
         },
       })
-      .then(async (res) => {
+      .then(async () => {
         await sendMail({
           from: sender,
           to: recipients,
-          subject: 'Mise à jour formulaire établissement',
-          ...generateMail('establishment', { }),
+          subject: 'Mise à jour de données établissement',
+          ...generateMail('establishment', {
+            updated: true,
+            user: ctx.state.user.full_name,
+            establishment: formData.organisation.name,
+          }),
         });
-
-        return res.body
       })
       .catch((err) => {
         ctx.status = 500;
         appLogger.error('Failed to update data in index', err);
       });
+
+      return ctx;
     }
     
     formData.organisation.establismentType = '';
@@ -226,24 +270,28 @@ exports.storeOrUpdate = async function (ctx) {
     };
     formData.createdAt = currentDate;
 
-    return elastic.index({
+    await elastic.index({
       index: config.depositors.index,
       body: formData,
     })
-    .then(async (res) => {
+    .then(async () => {
       await sendMail({
         from: sender,
         to: recipients,
         subject: 'Création de données établissement',
-        ...generateMail('establishment', { }),
+        ...generateMail('establishment', {
+          updated: false,
+          user: ctx.state.user.full_name,
+          establishment: formData.organisation.name,
+        }),
       });
-
-      return res.body
     })
     .catch((err) => {
       ctx.status = 500;
       appLogger.error('Failed to store data in index', err);
     });
+
+    return ctx;
   }
 };
 
