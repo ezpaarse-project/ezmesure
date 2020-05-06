@@ -57,4 +57,7 @@ module.exports = {
   },
   reportingActivityIndex: '.ezreporting-activity',
   reportingIndex: '.ezreporting',
+  cypher: {
+    secret: 'some-secret',
+  },
 };

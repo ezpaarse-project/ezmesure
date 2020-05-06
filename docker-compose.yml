@@ -85,6 +85,7 @@ services:
       - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
+      - EZMESURE_ENCRYPTION_SECRET
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
       - "./templates:/usr/src/app/templates"

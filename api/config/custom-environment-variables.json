@@ -38,5 +38,8 @@
     "cron": "EZMESURE_DEPOSITORS_CRON"
   },
   "reportingActivityIndex": "REPORTING_ACTIVITY_INDEX",
-  "reportingIndex": "REPORTING_INDEX"
+  "reportingIndex": "REPORTING_INDEX",
+  "cypher": {
+    "secret": "EZMESURE_ENCRYPTION_SECRET"
+  }
 }
