@@ -7,6 +7,8 @@ const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
 const { appLogger } = require('../../../server');
+const { sendMail, generateMail } = require('../../services/mail');
+const { sender, recipients } = config.get('notifications');
 
 const instance = axios.create({
   baseURL: 'https://api.opendata.onisep.fr/downloads/57da952417293/57da952417293.json',
@@ -193,7 +195,18 @@ exports.storeOrUpdate = async function (ctx) {
         body: {
           doc: formData,
         },
-      }).then((res) => res.body).catch((err) => {
+      })
+      .then(async (res) => {
+        await sendMail({
+          from: sender,
+          to: recipients,
+          subject: 'Mise à jour formulaire établissement',
+          ...generateMail('establishment', { }),
+        });
+
+        return res.body
+      })
+      .catch((err) => {
         ctx.status = 500;
         appLogger.error('Failed to update data in index', err);
       });
@@ -216,7 +229,18 @@ exports.storeOrUpdate = async function (ctx) {
     return elastic.index({
       index: config.depositors.index,
       body: formData,
-    }).then((res) => res.body).catch((err) => {
+    })
+    .then(async (res) => {
+      await sendMail({
+        from: sender,
+        to: recipients,
+        subject: 'Création de données établissement',
+        ...generateMail('establishment', { }),
+      });
+
+      return res.body
+    })
+    .catch((err) => {
       ctx.status = 500;
       appLogger.error('Failed to store data in index', err);
     });
