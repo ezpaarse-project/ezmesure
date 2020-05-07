@@ -8,7 +8,11 @@
 
     <v-card flat class="mx-auto mb-5" max-width="800px">
       <v-card-text>
-        <v-form>
+        <v-form
+          ref="form"
+          v-model="valid"
+          :lazy-validation="lazy"
+        >
           <v-container>
             <v-row>
               <v-col cols="12" sm="6">
@@ -17,12 +21,9 @@
                   v-model="establishment.organisation.name"
                   label="Nom établissement *"
                   placeholder="ex: Université de Blancherive"
-                  :rules="[v => !!v || '']"
+                  :rules="[v => !!v || 'Veuillez saisir un nom d\'établissement.']"
                   outlined
                   required
-                  hide-details
-                  @change="valideName"
-                  @blur="valideName"
                 />
                 <span v-if="errors.name" class="red--text" v-text="errors.name" />
               </v-col>
@@ -44,27 +45,27 @@
                   label="Page d'accueil établissement"
                   placeholder="ex: https://cnrs.fr/"
                   outlined
-                  hide-details
                 />
               </v-col>
 
               <v-col cols="12">
-                <v-text-field
-                  ref="email"
-                  v-model="establishment.contacts[0].email"
-                  label="Adresse email *"
-                  type="email"
-                  :rules="[
-                    v => !!v || '',
-                    v => /.+@.+\..+/.test(v) || '',
-                  ]"
-                  placeholder="ex: john@doe.fr"
-                  outlined
-                  required
-                  hide-details
-                  @change="valideMail"
-                  @blur="valideMail"
-                />
+                <span v-for="(contact, key) in establishment.contacts" :key="key">
+                  <v-text-field
+                    v-if="contact.email === user.email"
+                    ref="email"
+                    v-model="establishment.contacts[key].email"
+                    label="Adresse email *"
+                    type="email"
+                    :rules="[
+                      v => !!v || '',
+                      v => /.+@.+\..+/.test(v) || 'Veuillez saisir un email valide.',
+                    ]"
+                    placeholder="ex: john@doe.fr"
+                    outlined
+                    required
+                    :disabled="establishment.contacts[key].email.length > 0"
+                  />
+                </span>
                 <span v-if="errors.email" class="red--text" v-text="errors.email" />
               </v-col>
 
@@ -93,18 +94,22 @@
 
               <v-col cols="12">
                 <p>Je souhaite être désigné(e) correspondant :</p>
-                <v-checkbox
-                  v-model="establishment.contacts[0].type"
-                  label="Technique"
-                  hide-details
-                  value="tech"
-                />
-                <v-checkbox
-                  v-model="establishment.contacts[0].type"
-                  label="Documentaire"
-                  hide-details
-                  value="doc"
-                />
+                <span v-for="(contact, key) in establishment.contacts" :key="key">
+                  <v-checkbox
+                    v-if="contact.email === user.email"
+                    v-model="establishment.contacts[key].type"
+                    label="Technique"
+                    hide-details
+                    value="tech"
+                  />
+                  <v-checkbox
+                    v-if="contact.email === user.email"
+                    v-model="establishment.contacts[key].type"
+                    label="Documentaire"
+                    hide-details
+                    value="doc"
+                  />
+                </span>
               </v-col>
 
               <v-col cols="12" class="text-center">
@@ -156,6 +161,7 @@
         <v-spacer />
         <v-btn
           color="primary"
+          :disabled="!valid"
           @click="send"
         >
           Valider
@@ -178,6 +184,8 @@ export default {
         name: null,
         email: null,
       },
+      valid: true,
+      lazy: false,
     };
   },
   async fetch({ store, redirect, route }) {
@@ -231,31 +239,15 @@ export default {
       this.logoPreview = null;
       this.logo = null;
     },
-    valideName() {
-      if (!this.$refs.name.validate()) {
-        this.errors.name = 'Veuillez saisir un nom d\'établissement.';
-      } else {
-        this.errors.name = '';
-      }
-    },
-    valideMail() {
-      if (!this.$refs.email.validate()) {
-        this.errors.email = 'Veuillez saisir un email valide.';
-      } else {
-        this.errors.email = '';
-      }
-    },
     send() {
-      this.valideName();
-      this.valideMail();
+      this.$refs.form.validate();
 
       if (!this.errors.name && !this.errors.email) {
         this.formData.append('logo', this.logo);
         this.formData.append('form', JSON.stringify(this.establishment));
 
         this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
-          .then((data) => {
-            console.log(data);
+          .then(() => {
             this.$store.dispatch('snacks/success', 'Informations transmises');
 
             this.formData = new FormData();
