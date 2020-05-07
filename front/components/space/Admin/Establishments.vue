@@ -373,9 +373,9 @@ export default {
 
       formData.append('form', JSON.stringify(establishment));
 
-      this.$store.dispatch('storeOrUpdateEstablishment', formData).then(async () => {
+      this.$store.dispatch('storeOrUpdateEstablishment', formData).then((establishmentData) => {
+        establishment = establishmentData;
         this.$store.dispatch('snacks/success', 'Établissement mis à jour');
-        await this.$store.dispatch('getEstablishments');
       }).catch(() => this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement'));
     },
   },
