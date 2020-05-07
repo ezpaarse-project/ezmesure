@@ -20,7 +20,7 @@
         <v-tab to="#tab-token" router>
           Token d'authentification
         </v-tab>
-        <v-tab v-if="isTester || isAdmin" to="#tab-correspondent" router>
+        <v-tab v-if="betaTester || isAdmin" to="#tab-establishment" router>
           Informations établissement
         </v-tab>
         <v-tab v-if="isAdmin" to="#tab-admin" router>
@@ -56,8 +56,8 @@
             <Token />
           </v-tab-item>
 
-          <v-tab-item v-if="isTester || isAdmin" id="tab-correspondent">
-            <Correspondent v-if="isTester || isAdmin" />
+          <v-tab-item v-if="betaTester || isAdmin" id="tab-establishment">
+            <Establishment v-if="betaTester || isAdmin" />
           </v-tab-item>
 
           <v-tab-item v-if="isAdmin" id="tab-admin">
@@ -75,7 +75,7 @@ import Files from '~/components/space/Files';
 import Kibana from '~/components/space/Kibana';
 import Token from '~/components/space/Token';
 import Admin from '~/components/space/Admin/Index';
-import Correspondent from '~/components/space/Correspondent';
+import Establishment from '~/components/space/Establishment';
 
 export default {
   components: {
@@ -84,7 +84,7 @@ export default {
     Kibana,
     Token,
     Admin,
-    Correspondent,
+    Establishment,
   },
   async fetch({ store, redirect, route }) {
     await store.dispatch('auth/checkAuth');
@@ -121,7 +121,7 @@ export default {
       }
       return null;
     },
-    isTester() {
+    betaTester() {
       if (this.hasRoles) {
         return this.user.roles.find(role => role === 'tester');
       }

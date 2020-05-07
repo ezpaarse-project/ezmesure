@@ -142,7 +142,7 @@ exports.getOne = async function (ctx) {
     }
 
     if (establishment.organisation.logoUrl.length) {
-      this.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
+      establishment.organisation.logoUrl = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
     }
   }
 
