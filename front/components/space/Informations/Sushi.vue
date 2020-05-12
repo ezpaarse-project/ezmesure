@@ -27,13 +27,6 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-row>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="platform.customerId"
-                    label="CustomerId *"
-                    outlined
-                    required
-                  />
                 </v-col>
                 <v-col cols="4">
                   <v-text-field
