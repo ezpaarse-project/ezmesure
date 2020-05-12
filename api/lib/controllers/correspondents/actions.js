@@ -64,25 +64,19 @@ exports.getOne = async function (ctx) {
     ignoreUnavailable: true,
     body: {
       query: {
-        bool: {
-          must: [
-            {
-              nested: {
-                path: 'contacts',
-                query: {
-                  bool: {
-                    must: [
-                      {
-                        term: {
-                          'contacts.email': ctx.state.user.email,
-                        },
-                      },
-                    ],
+        nested: {
+          path: 'contacts',
+          query: {
+            bool: {
+              must: [
+                {
+                  match: {
+                    'contacts.email': ctx.state.user.email,
                   },
                 },
-              },
+              ],
             },
-          ],
+          },
         },
       },
     },
@@ -114,7 +108,7 @@ exports.getOne = async function (ctx) {
         count: 0,
         prefix: '',
         suggested: '',
-      }
+      },
     };
 
     const index = ctx.state.user.email.match(/@(\w+)/i);
