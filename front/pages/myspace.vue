@@ -91,9 +91,10 @@ export default {
     const { user } = store.state.auth;
 
     if (!user) {
-      redirect('/authenticate', { origin: route.fullPath });
-    } else if (!user.metadata.acceptedTerms) {
-      redirect('/terms');
+      return redirect('/authenticate', { origin: route.fullPath });
+    }
+    if (!user.metadata.acceptedTerms) {
+      return redirect('/terms');
     }
 
     await store.dispatch('getEstablishment');
@@ -105,6 +106,7 @@ export default {
         await store.dispatch('getEstablishments');
       }
     }
+    return true;
   },
   data() {
     return {
