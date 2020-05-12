@@ -68,8 +68,7 @@ export default {
   methods: {
     async refreshAdminData() {
       if (this.isAdmin) {
-        this.$store.dispatch('getEstablishments');
-        console.log(this.establishments);
+        await this.$store.dispatch('getEstablishments');
       }
     },
   },

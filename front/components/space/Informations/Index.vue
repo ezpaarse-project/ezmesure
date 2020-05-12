@@ -5,7 +5,7 @@
         Établissement
       </v-tab>
       <v-tab to="#tab-correspondant" router>
-        Correspondent
+        Correspondant
       </v-tab>
       <v-tab to="#tab-sushi" router>
         Sushi

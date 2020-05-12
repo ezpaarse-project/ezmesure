@@ -30,15 +30,22 @@
                 <v-col cols="4">
                   <v-text-field
                     v-model="platform.requestorId"
-                    label="RequestorId *"
+                    label="Requestor Id *"
                     outlined
                     required
                   />
                 </v-col>
                 <v-col cols="4">
                   <v-text-field
-                    v-model="platform.consortialId"
-                    label="ConsortialId"
+                    v-model="platform.customerId"
+                    label="Customer Id *"
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="platform.apiKey"
+                    label="Clé API"
                     outlined
                   />
                 </v-col>
@@ -187,9 +194,9 @@ export default {
       this.$emit('save');
     },
     addPlatform() {
-      this.platformSelected.consortialId = '';
       this.platformSelected.requestorId = '';
       this.platformSelected.customerId = '';
+      this.platformSelected.apiKey = '';
 
       this.platformsAdded.push(this.platformSelected);
     },
