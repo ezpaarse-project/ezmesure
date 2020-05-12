@@ -26,6 +26,7 @@ module.exports = {
           report: { type: 'boolean' },
         },
       },
+      sushi: { type: 'nested' },
       contacts: {
         type: 'nested',
         properties: {
