@@ -81,7 +81,9 @@ export default {
     user() { return this.$store.state.auth.user; },
     establishment: {
       get() {
-        this.logoPreview = this.$store.state.establishment.organisation.logoUrl;
+        if (this.$store.state.establishment) {
+          this.logoPreview = this.$store.state.establishment.organisation.logoUrl;
+        }
         return this.$store.state.establishment;
       },
       set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
