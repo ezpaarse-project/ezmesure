@@ -106,7 +106,6 @@ export default {
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
           this.formData = new FormData();
-          this.$refs.form.resetValidation();
         })
         .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
     },
