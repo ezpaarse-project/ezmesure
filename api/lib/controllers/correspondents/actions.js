@@ -8,6 +8,7 @@ const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
 const { appLogger } = require('../../../server');
 const { sendMail, generateMail } = require('../../services/mail');
+
 const { sender, recipients } = config.get('notifications');
 
 const instance = axios.create({
