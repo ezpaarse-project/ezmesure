@@ -32,10 +32,7 @@
       </v-tab-item>
 
       <v-tab-item id="tab-sushi">
-        <Sushi
-          :establishment="establishment"
-          @save="save"
-        />
+        <Sushi @save="save" />
       </v-tab-item>
     </v-tabs-items>
   </section>

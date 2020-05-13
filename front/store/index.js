@@ -22,9 +22,11 @@ const store = () => new Vuex.Store({
     setEstablishment({ commit }, establishment) {
       commit('setEstablishment', establishment);
     },
-    async getEstablishments({ commit }) {
+    getEstablishments({ commit }) {
       return this.$axios.$get('/correspondents/list')
-        .then(establishments => commit('setEstablishments', establishments))
+        .then((establishments) => {
+          commit('setEstablishments', establishments);
+        })
         .catch(() => commit('setEstablishments', []));
     },
     // eslint-disable-next-line no-unused-vars
@@ -39,6 +41,9 @@ const store = () => new Vuex.Store({
           'Content-Type': `multipart/form-data; boundary=${establishment._boundary}`,
         },
       });
+    },
+    SET_ESTABLISHMENT({ commit }, value) {
+      commit('setEstablishments', value);
     },
   },
   mutations: {

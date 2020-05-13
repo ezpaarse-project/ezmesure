@@ -1,11 +1,11 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const config = require('config');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
+const crypto = require('../../services/crypto');
 const { appLogger } = require('../../../server');
 const { sendMail, generateMail } = require('../../services/mail');
 
@@ -104,6 +104,7 @@ exports.getOne = async function (ctx) {
           confirmed: false,
         },
       ],
+      sushi: [],
       index: {
         count: 0,
         prefix: '',
@@ -113,8 +114,9 @@ exports.getOne = async function (ctx) {
 
     const index = ctx.state.user.email.match(/@(\w+)/i);
     if (index && !establishment.index.prefix) {
-      establishment.index.suggested = index[1];
-      establishment.index.prefix = index[1];
+      const [, indexPrefix] = index;
+      establishment.index.suggested = indexPrefix;
+      establishment.index.prefix = indexPrefix;
     }
   }
 
@@ -132,12 +134,20 @@ exports.getOne = async function (ctx) {
 
     const index = ctx.state.user.email.match(/@(\w+)/i);
     if (index && !establishment.index.prefix) {
-      establishment.index.suggested = index[1];
-      establishment.index.prefix = index[1];
+      const [, indexPrefix] = index;
+      establishment.index.suggested = indexPrefix;
+      establishment.index.prefix = indexPrefix;
     }
 
     if (establishment.organisation.logoUrl.length) {
       establishment.organisation.logoUrl = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
+    }
+
+    if (establishment.sushi.length) {
+      for (let i = 0; i < establishment.sushi.length; i += 1) {
+        establishment.sushi[i].customerId = crypto.decrypt(establishment.sushi[i].customerId);
+        establishment.sushi[i].requestorId = crypto.decrypt(establishment.sushi[i].requestorId);
+      }
     }
   }
 
@@ -150,7 +160,7 @@ exports.deleteData = async function (ctx) {
   ctx.status = 204;
 
   const { body } = ctx.request;
-  
+
   if (body.ids && body.ids.length) {
     try {
       for (let i = 0; i < body.ids.length; i += 1) {
@@ -201,6 +211,13 @@ exports.storeOrUpdate = async function (ctx) {
 
     const currentDate = new Date();
 
+    if (formData.sushi.length) {
+      for (let i = 0; i < formData.sushi.length; i += 1) {
+        formData.sushi[i].customerId = crypto.encrypt(formData.sushi[i].customerId);
+        formData.sushi[i].requestorId = crypto.encrypt(formData.sushi[i].requestorId);
+      }
+    }
+
     if (formData.organisation.uai) {
       try {
         const establisment = await getEtablishmentData(formData.organisation.uai);
@@ -250,7 +267,7 @@ exports.storeOrUpdate = async function (ctx) {
 
       return ctx;
     }
-    
+
     formData.organisation.establismentType = '';
     formData.organisation.city = '';
     formData.organisation.location = {

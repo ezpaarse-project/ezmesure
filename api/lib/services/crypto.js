@@ -5,12 +5,11 @@ const privateKey = cypher.secret; // 32 caractères obligatoire
 const ivLength = 16; // 16 pour de l'AES
 
 function encrypt(text) {
-console.log(privateKey);
   const iv = crypto.randomBytes(ivLength);
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(privateKey), iv);
   const encrypted = cipher.update(text);
 
-  return iv.toString('hex') + ':' + Buffer.concat([encrypted, cipher.final()]).toString('hex');
+  return `${iv.toString('hex')}:${Buffer.concat([encrypted, cipher.final()]).toString('hex')}`;
 }
 
 function decrypt(text) {

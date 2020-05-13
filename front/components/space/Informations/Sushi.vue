@@ -2,203 +2,353 @@
   <v-card flat>
     <v-card-text>
       <v-row>
-        <v-col cols="12">
-          <v-combobox
-            v-model="platformSelected"
-            :items="platforms"
-            label="Plateformes"
-            item-text="name"
-            outlined
-            @change="addPlatform()"
-          />
-        </v-col>
+        <v-spacer />
+        <v-btn color="primary" class="mr-4" @click.stop="dialog = true">
+          Ajouter une plateforme
+        </v-btn>
+        <v-dialog v-model="dialog" max-width="600">
+          <v-card>
+            <v-card-title class="headline mb-5">
+              Ajouter une plateforme
+            </v-card-title>
 
-        <v-expansion-panels accordion>
-          <v-expansion-panel
-            v-for="(platform, key) in platformsAdded"
-            :ref="key"
-            :key="key"
-          >
-            <v-expansion-panel-header>
-              {{ platform.name }}
-              <template v-slot:actions>
-                <v-icon>mdi-menu-down</v-icon>
-              </template>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-row>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="platform.requestorId"
-                    label="Requestor Id *"
-                    outlined
-                    required
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="platform.customerId"
-                    label="Customer Id *"
-                    outlined
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="platform.apiKey"
-                    label="Clé API"
-                    outlined
-                  />
-                </v-col>
-              </v-row>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+            <v-card-text>
+              <v-form
+                ref="form"
+                v-model="valid"
+                :lazy-validation="lazy"
+              >
+                <v-container>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-combobox
+                        v-model="platformSelected"
+                        :items="platforms"
+                        label="Plateformes"
+                        item-text="vendor"
+                        outlined
+                      />
+                    </v-col>
+
+                    <v-col cols="12">
+                      <v-text-field
+                        v-if="platformSelected"
+                        v-model="platformSelected.vendor"
+                        label="Libellé *"
+                        :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                        outlined
+                        required
+                      />
+                    </v-col>
+
+                    <v-col cols="6">
+                      <v-text-field
+                        v-if="platformSelected"
+                        v-model="platformSelected.requestorId"
+                        label="Requestor Id *"
+                        :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                        outlined
+                        required
+                      />
+                    </v-col>
+
+                    <v-col cols="6">
+                      <v-text-field
+                        v-if="platformSelected"
+                        v-model="platformSelected.customerId"
+                        label="Customer Id *"
+                        :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                        outlined
+                      />
+                    </v-col>
+
+                    <v-col cols="12">
+                      <v-text-field
+                        v-if="platformSelected"
+                        v-model="platformSelected.apiKey"
+                        label="Clé API"
+                        outlined
+                      />
+                    </v-col>
+
+                    <v-col cols="12">
+                      <v-textarea
+                        v-if="platformSelected"
+                        v-model="platformSelected.comment"
+                        label="Commentaire"
+                        outlined
+                      />
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+
+            <v-card-actions>
+              <span class="caption">* champs obligatoires</span>
+
+              <v-spacer />
+
+              <v-btn text @click="dialog = false">
+                Fermer
+              </v-btn>
+
+              <v-btn
+                color="primary"
+                :disabled="!valid || !platformSelected"
+                @click="save"
+              >
+                Ajouter
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-row>
-    </v-card-text>
-    <v-card-actions>
-      <span class="caption">* champs obligatoires</span>
-      <v-spacer />
-      <v-btn
-        color="primary"
-        :disabled="!platformsAdded.length"
-        @click="save"
+
+      <v-data-table
+        v-model="selected"
+        :headers="headers"
+        :items="establishment.sushi"
+        :expanded.sync="expanded"
+        show-select
+        show-expand
+        item-key="id"
       >
-        Sauvegarder
-      </v-btn>
-    </v-card-actions>
+        <template v-slot:item.name="{ item }">
+          {{ item.vendor }}
+        </template>
+
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="px-5 py-5">
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="item.vendor"
+                  label="Libellé *"
+                  :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                  outlined
+                  required
+                />
+              </v-col>
+
+              <v-col cols="6">
+                <v-text-field
+                  v-model="item.requestorId"
+                  label="Requestor Id *"
+                  :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                  outlined
+                  required
+                />
+              </v-col>
+
+              <v-col cols="6">
+                <v-text-field
+                  v-model="item.customerId"
+                  label="Customer Id *"
+                  :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                  outlined
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-text-field
+                  v-model="item.apiKey"
+                  label="Clé API"
+                  outlined
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-textarea
+                  v-model="item.comment"
+                  label="Commentaire"
+                  outlined
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-btn
+                  block
+                  color="primary"
+                  @click="save()"
+                >
+                  Mettre à jour
+                </v-btn>
+              </v-col>
+            </v-row>
+          </td>
+        </template>
+
+        <template v-slot:footer>
+          <span v-if="selected.length">
+            <v-btn small color="error" class="ma-2" @click="deleteData">
+              <v-icon left>mdi-delete</v-icon>
+              Supprimer ({{ selected.length }})
+            </v-btn>
+          </span>
+        </template>
+      </v-data-table>
+    </v-card-text>
   </v-card>
 </template>
 
 <script>
+import { v4 as uuidv4 } from 'uuid';
+
 export default {
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['establishment'],
   data() {
     return {
+      selected: [],
+      expanded: [],
+      headers: [
+        { text: 'Libellé', value: 'name' },
+        { text: '', value: 'data-table-expand' },
+      ],
+      dialog: null,
+      valid: true,
+      lazy: false,
       platformSelected: null,
-      platformsAdded: [],
       platforms: [
-        { url: 'https://www.projectcounter.org/counter-user/acs-publicatio/', name: 'ACS Publications' },
-        { url: 'https://www.projectcounter.org/counter-user/adam-matthew-d/', name: 'Adam Matthew Digital' },
-        { url: 'https://www.projectcounter.org/counter-user/american-mathe/', name: 'American Mathematical Society' },
-        { url: 'https://www.projectcounter.org/counter-user/remco-de-boer/', name: 'Atlantis Press' },
-        { url: 'https://www.projectcounter.org/counter-user/atypon/', name: 'Atypon Systems' },
-        { url: 'https://www.projectcounter.org/counter-user/begell-house-p/', name: 'Begell House Publishing' },
-        { url: 'https://www.projectcounter.org/counter-user/bentham-science/', name: 'Bentham Science' },
-        { url: 'https://www.projectcounter.org/counter-user/tao-mantaras/', name: 'BibliU' },
-        { url: 'https://www.projectcounter.org/counter-user/bloomsbury-publishing-plc/', name: 'Bloomsbury Publishing Plc' },
-        { url: 'https://www.projectcounter.org/counter-user/stuart-kacy/', name: 'Cabell\'s International' },
-        { url: 'https://www.projectcounter.org/counter-user/cairn/', name: 'Cairn' },
-        { url: 'https://www.projectcounter.org/counter-user/cambridge-univ/', name: 'Cambridge University Press' },
-        { url: 'https://www.projectcounter.org/counter-user/thomson-reuter/', name: 'Clarivate Analytics' },
-        { url: 'https://www.projectcounter.org/counter-user/credo-referenc/', name: 'Credo Reference' },
-        { url: 'https://www.projectcounter.org/counter-user/ebook-central/', name: 'Ebook Central (Proquest)' },
-        { url: 'https://www.projectcounter.org/counter-user/ebsco/', name: 'EBSCO Information Services' },
-        { url: 'https://www.projectcounter.org/counter-user/elsevier-scien/', name: 'Elsevier ScienceDirect' },
-        { url: 'https://www.projectcounter.org/counter-user/elsevier-scopu/', name: 'Elsevier SCOPUS' },
-        { url: 'https://www.projectcounter.org/counter-user/engineering-vi/', name: 'Engineering Village' },
-        { url: 'https://www.projectcounter.org/counter-user/faculty-of-100/', name: 'Faculty of 1000' },
-        { url: 'https://www.projectcounter.org/counter-user/gale-cengage/', name: 'Gale Cengage' },
-        { url: 'https://www.projectcounter.org/counter-user/igi-global/', name: 'IGI Global' },
-        { url: 'https://www.projectcounter.org/counter-user/informit/', name: 'Informit' },
-        { url: 'https://www.projectcounter.org/counter-user/publishing-tec/', name: 'Ingenta' },
-        { url: 'https://www.projectcounter.org/counter-user/international/', name: 'International Association for Energy Economics' },
-        { url: 'https://www.projectcounter.org/counter-user/john-hopkins-u/', name: 'John Hopkins University/Project MUSE' },
-        { url: 'https://www.projectcounter.org/counter-user/jstage-japan-s/', name: 'JSTAGE Japan Science &amp; Technology Agency' },
-        { url: 'https://www.projectcounter.org/counter-user/jstor/', name: 'JSTOR' },
-        { url: 'https://www.projectcounter.org/counter-user/scott-gibberns/', name: 'Kortext Limited' },
-        { url: 'https://www.projectcounter.org/counter-user/liblynx-connect/', name: 'LibLynx' },
-        { url: 'https://www.projectcounter.org/counter-user/mps-technologi/', name: 'MPS Technologies' },
-        { url: 'https://www.projectcounter.org/counter-user/newsbank-inc/', name: 'NewsBank Inc' },
-        { url: 'https://www.projectcounter.org/counter-user/ovid-technolog/', name: 'Ovid Technologies' },
-        { url: 'https://www.projectcounter.org/counter-user/proquest-ebook/', name: 'ProQuest' },
-        { url: 'https://www.projectcounter.org/counter-user/karger/', name: 'S. Karger AG' },
-        { url: 'https://www.projectcounter.org/counter-user/global-village/', name: 'SAGE Publications – SecureCenter (previously GVPi)' },
-        { url: 'https://www.projectcounter.org/counter-user/scholarly-iq/', name: 'Scholarly iQ' },
-        { url: 'https://www.projectcounter.org/counter-user/safari-books-online-pubfactory-platform/', name: 'Sheridan PubFactory' },
-        { url: 'https://www.projectcounter.org/counter-user/silverchair-in/', name: 'Silverchair Information Systems' },
-        { url: 'https://www.projectcounter.org/counter-user/nature-publish/', name: 'Springer Nature' },
-        { url: 'https://www.projectcounter.org/counter-user/karen-coles/', name: 'VitalSource Limited' },
-        { url: 'https://www.projectcounter.org/counter-user/wolters-kluwer/', name: 'Wolters Kluwer Espana (LamyLine)' },
-        { url: 'https://www.projectcounter.org/counter-user/acm/', name: 'ACM' },
-        { url: 'https://www.projectcounter.org/counter-user/aip-publishing-american-institute-of-physics/', name: 'AIP Publishing American Institute of Physics' },
-        { url: 'https://www.projectcounter.org/counter-user/apa-psycnet/', name: 'APA PsycNET' },
-        { url: 'https://www.projectcounter.org/counter-user/astm-international/', name: 'ASTM International' },
-        { url: 'https://www.projectcounter.org/counter-user/alexander-street-press/', name: 'Alexander Street Press' },
-        { url: 'https://www.projectcounter.org/counter-user/american-association-of-neurological-surgeons/', name: 'American Association of Neurological Surgeons' },
-        { url: 'https://www.projectcounter.org/counter-user/american-assoc/', name: 'American Associaton for the Advancement of Science AAAS' },
-        { url: 'https://www.projectcounter.org/counter-user/american-physi/', name: 'American Physical Society (APS)' },
-        { url: 'https://www.projectcounter.org/counter-user/american-psych/', name: 'American Psychological Association' },
-        { url: 'https://www.projectcounter.org/counter-user/american-society-for-tropical-medicine-and-hygiene/', name: 'American Society for Tropical Medicine and Hygiene' },
-        { url: 'https://www.projectcounter.org/counter-user/american-socie2/', name: 'American Society of Agronomy (ASA)' },
-        { url: 'https://www.projectcounter.org/counter-user/american-society-of-microbiology/', name: 'American Society of Microbiology' },
-        { url: 'https://www.projectcounter.org/counter-user/annual-reviews/', name: 'Annual Reviews' },
-        { url: 'https://www.projectcounter.org/counter-user/association-fo/', name: 'Association for Computing Machinery [ACM]' },
-        { url: 'https://www.projectcounter.org/counter-user/bmj-publishing/', name: 'BMJ Publishing Group' },
-        { url: 'https://www.projectcounter.org/counter-user/bsava/', name: 'BSAVA (British Small Animal Veterinary Association) Library Ingenta Connect' },
-        { url: 'https://www.projectcounter.org/counter-user/bioone/', name: 'BioOne' },
-        { url: 'https://www.projectcounter.org/counter-user/brill/', name: 'Brill Books and Journals Online' },
-        { url: 'https://www.projectcounter.org/counter-user/bob-gibson/', name: 'Canadian Electronic Library/deslibris' },
-        { url: 'https://www.projectcounter.org/counter-user/commonwealth-s/', name: 'Commonwealth Scientific and Industrial Research Organisation (CSIRO)' },
-        { url: 'https://www.projectcounter.org/counter-user/computing-revi/', name: 'Computing Reviews' },
-        { url: 'https://www.projectcounter.org/counter-user/dram/', name: 'DRAM (dramonline.org)' },
-        { url: 'https://www.projectcounter.org/counter-user/dawson-books-limited/', name: 'Dawsonera' },
-        { url: 'https://www.projectcounter.org/counter-user/de-gruyter-onl/', name: 'De Gruyter Online' },
-        { url: 'https://www.projectcounter.org/counter-user/dare-dictionary/', name: 'Dictionary of American Regional English' },
-        { url: 'https://www.projectcounter.org/counter-user/ebsco-ebooks-e/', name: 'EBSCOhost (eBooks and databases)' },
-        { url: 'https://www.projectcounter.org/counter-user/edp-sciences/', name: 'EDP Sciences' },
-        { url: 'https://www.projectcounter.org/counter-user/eage/', name: 'Eage European Association of Geoscientists and Engineers (EAGE)' },
-        { url: 'https://www.projectcounter.org/counter-user/edward-elgar-p/', name: 'Edward Elgar Publishing' },
-        { url: 'https://www.projectcounter.org/counter-user/emerald-group/', name: 'Emerald Group Publishing' },
-        { url: 'https://www.projectcounter.org/counter-user/harvard-university-press/', name: 'Harvard University Press' },
-        { url: 'https://www.projectcounter.org/counter-user/human-kinetics/', name: 'Human Kinetics' },
-        { url: 'https://www.projectcounter.org/counter-user/ieee-computer/', name: 'IEEE Computer Society' },
-        { url: 'https://www.projectcounter.org/counter-user/ieee-inc-insti/', name: 'IEEE Inc [Institute of Electrical and Electronics Engineers]' },
-        { url: 'https://www.projectcounter.org/counter-user/iet/', name: 'IET Digital Library' },
-        { url: 'https://www.projectcounter.org/counter-user/iop-publishing/', name: 'IOP Publishing' },
-        { url: 'https://www.projectcounter.org/counter-user/indian-journal/', name: 'Indian Journals.com [Divan Enterprises] New Delhi' },
-        { url: 'https://www.projectcounter.org/counter-user/infobase/', name: 'Infobase' },
-        { url: 'https://www.projectcounter.org/counter-user/irish-newspape/', name: 'Irish Newspaper Archives (INA)' },
-        { url: 'https://www.projectcounter.org/counter-user/john-benjamins/', name: 'John Benjamins e-Platform' },
-        { url: 'https://www.projectcounter.org/counter-user/journal-of-neurosurgery/', name: 'Journal of Neurosurgery' },
-        { url: 'https://www.projectcounter.org/counter-user/loeb-classics/', name: 'LOEB Classics' },
-        { url: 'https://www.projectcounter.org/counter-user/mit/', name: 'MIT Press' },
-        { url: 'https://www.projectcounter.org/counter-user/mms/', name: 'Massachusetts Medical Society' },
-        { url: 'https://www.projectcounter.org/counter-user/tasha-mellinsc/', name: 'Microbiology Society' },
-        { url: 'https://www.projectcounter.org/counter-user/new-england-jo/', name: 'New England Journal of Medicine' },
-        { url: 'https://www.projectcounter.org/counter-user/np/', name: 'Numerique Premium' },
-        { url: 'https://www.projectcounter.org/counter-user/oecd/', name: 'OECD' },
-        { url: 'https://www.projectcounter.org/counter-user/optical-societ/', name: 'Optical Society of America (OSA)' },
-        { url: 'https://www.projectcounter.org/counter-user/oxford-univers/', name: 'Oxford University Press' },
-        { url: 'https://www.projectcounter.org/counter-user/philosophy-documentation-center/', name: 'Philosophy Documentation Center' },
-        { url: 'https://www.projectcounter.org/counter-user/physicians-postgraduate-press/', name: 'Physicians Postgraduate Press' },
-        { url: 'https://www.projectcounter.org/counter-user/pieronline/', name: 'PierOnline' },
-        { url: 'https://www.projectcounter.org/counter-user/portland-press/', name: 'Portland Press' },
-        { url: 'https://www.projectcounter.org/counter-user/proquest-llc/', name: 'ProQuest' },
-        { url: 'https://www.projectcounter.org/counter-user/rockefeller-un/', name: 'Rockefeller University Press' },
-        { url: 'https://www.projectcounter.org/counter-user/rsc/', name: 'Royal Society of Chemistry' },
-        { url: 'https://www.projectcounter.org/counter-user/sage-publicati/', name: 'SAGE Publications – Journals' },
-        { url: 'https://www.projectcounter.org/counter-user/society-of-photographic-instrumentation-engineers/', name: 'SPIE (Society of Photo-Optical Instrumentation Engineers)' },
-        { url: 'https://www.projectcounter.org/counter-user/sabinet/', name: 'Sabinet' },
-        { url: 'https://www.projectcounter.org/counter-user/taylor-francis/', name: 'Taylor &amp; Francis Online' },
-        { url: 'https://www.projectcounter.org/counter-user/thieme-ebooks/', name: 'Thieme Medical Publishers' },
-        { url: 'https://www.projectcounter.org/counter-user/university-of2/', name: 'University of Chicago Press' },
-        { url: 'https://www.projectcounter.org/counter-user/john-wiley-son/', name: 'Wiley' },
-        { url: 'https://www.projectcounter.org/counter-user/accessible-arc/', name: 'Wolters Kluwer Espana (LamyLine)' },
-        { url: 'https://www.projectcounter.org/counter-user/world-scientific-publishing/', name: 'World Scientific Publishing' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/acs-publicatio/', vendor: 'ACS Publications' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/adam-matthew-d/', vendor: 'Adam Matthew Digital' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-mathe/', vendor: 'American Mathematical Society' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/remco-de-boer/', vendor: 'Atlantis Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/atypon/', vendor: 'Atypon Systems' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/begell-house-p/', vendor: 'Begell House Publishing' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bentham-science/', vendor: 'Bentham Science' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/tao-mantaras/', vendor: 'BibliU' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bloomsbury-publishing-plc/', vendor: 'Bloomsbury Publishing Plc' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/stuart-kacy/', vendor: 'Cabell\'s International' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/cairn/', vendor: 'Cairn' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/cambridge-univ/', vendor: 'Cambridge University Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/thomson-reuter/', vendor: 'Clarivate Analytics' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/credo-referenc/', vendor: 'Credo Reference' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ebook-central/', vendor: 'Ebook Central (Proquest)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ebsco/', vendor: 'EBSCO Information Services' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/elsevier-scien/', vendor: 'Elsevier ScienceDirect' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/elsevier-scopu/', vendor: 'Elsevier SCOPUS' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/engineering-vi/', vendor: 'Engineering Village' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/faculty-of-100/', vendor: 'Faculty of 1000' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/gale-cengage/', vendor: 'Gale Cengage' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/igi-global/', vendor: 'IGI Global' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/informit/', vendor: 'Informit' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/publishing-tec/', vendor: 'Ingenta' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/international/', vendor: 'International Association for Energy Economics' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/john-hopkins-u/', vendor: 'John Hopkins University/Project MUSE' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/jstage-japan-s/', vendor: 'JSTAGE Japan Science &amp; Technology Agency' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/jstor/', vendor: 'JSTOR' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/scott-gibberns/', vendor: 'Kortext Limited' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/liblynx-connect/', vendor: 'LibLynx' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/mps-technologi/', vendor: 'MPS Technologies' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/newsbank-inc/', vendor: 'NewsBank Inc' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ovid-technolog/', vendor: 'Ovid Technologies' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/proquest-ebook/', vendor: 'ProQuest' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/karger/', vendor: 'S. Karger AG' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/global-village/', vendor: 'SAGE Publications – SecureCenter (previously GVPi)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/scholarly-iq/', vendor: 'Scholarly iQ' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/safari-books-online-pubfactory-platform/', vendor: 'Sheridan PubFactory' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/silverchair-in/', vendor: 'Silverchair Information Systems' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/nature-publish/', vendor: 'Springer Nature' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/karen-coles/', vendor: 'VitalSource Limited' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/wolters-kluwer/', vendor: 'Wolters Kluwer Espana (LamyLine)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/acm/', vendor: 'ACM' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/aip-publishing-american-institute-of-physics/', vendor: 'AIP Publishing American Institute of Physics' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/apa-psycnet/', vendor: 'APA PsycNET' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/astm-international/', vendor: 'ASTM International' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/alexander-street-press/', vendor: 'Alexander Street Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-association-of-neurological-surgeons/', vendor: 'American Association of Neurological Surgeons' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-assoc/', vendor: 'American Associaton for the Advancement of Science AAAS' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-physi/', vendor: 'American Physical Society (APS)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-psych/', vendor: 'American Psychological Association' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-society-for-tropical-medicine-and-hygiene/', vendor: 'American Society for Tropical Medicine and Hygiene' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-socie2/', vendor: 'American Society of Agronomy (ASA)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/american-society-of-microbiology/', vendor: 'American Society of Microbiology' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/annual-reviews/', vendor: 'Annual Reviews' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/association-fo/', vendor: 'Association for Computing Machinery [ACM]' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bmj-publishing/', vendor: 'BMJ Publishing Group' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bsava/', vendor: 'BSAVA (British Small Animal Veterinary Association) Library Ingenta Connect' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bioone/', vendor: 'BioOne' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/brill/', vendor: 'Brill Books and Journals Online' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/bob-gibson/', vendor: 'Canadian Electronic Library/deslibris' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/commonwealth-s/', vendor: 'Commonwealth Scientific and Industrial Research Organisation (CSIRO)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/computing-revi/', vendor: 'Computing Reviews' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/dram/', vendor: 'DRAM (dramonline.org)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/dawson-books-limited/', vendor: 'Dawsonera' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/de-gruyter-onl/', vendor: 'De Gruyter Online' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/dare-dictionary/', vendor: 'Dictionary of American Regional English' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ebsco-ebooks-e/', vendor: 'EBSCOhost (eBooks and databases)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/edp-sciences/', vendor: 'EDP Sciences' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/eage/', vendor: 'Eage European Association of Geoscientists and Engineers (EAGE)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/edward-elgar-p/', vendor: 'Edward Elgar Publishing' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/emerald-group/', vendor: 'Emerald Group Publishing' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/harvard-university-press/', vendor: 'Harvard University Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/human-kinetics/', vendor: 'Human Kinetics' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ieee-computer/', vendor: 'IEEE Computer Society' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/ieee-inc-insti/', vendor: 'IEEE Inc [Institute of Electrical and Electronics Engineers]' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/iet/', vendor: 'IET Digital Library' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/iop-publishing/', vendor: 'IOP Publishing' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/indian-journal/', vendor: 'Indian Journals.com [Divan Enterprises] New Delhi' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/infobase/', vendor: 'Infobase' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/irish-newspape/', vendor: 'Irish Newspaper Archives (INA)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/john-benjamins/', vendor: 'John Benjamins e-Platform' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/journal-of-neurosurgery/', vendor: 'Journal of Neurosurgery' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/loeb-classics/', vendor: 'LOEB Classics' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/mit/', vendor: 'MIT Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/mms/', vendor: 'Massachusetts Medical Society' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/tasha-mellinsc/', vendor: 'Microbiology Society' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/new-england-jo/', vendor: 'New England Journal of Medicine' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/np/', vendor: 'Numerique Premium' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/oecd/', vendor: 'OECD' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/optical-societ/', vendor: 'Optical Society of America (OSA)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/oxford-univers/', vendor: 'Oxford University Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/philosophy-documentation-center/', vendor: 'Philosophy Documentation Center' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/physicians-postgraduate-press/', vendor: 'Physicians Postgraduate Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/pieronline/', vendor: 'PierOnline' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/portland-press/', vendor: 'Portland Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/proquest-llc/', vendor: 'ProQuest' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/rockefeller-un/', vendor: 'Rockefeller University Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/rsc/', vendor: 'Royal Society of Chemistry' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/sage-publicati/', vendor: 'SAGE Publications – Journals' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/society-of-photographic-instrumentation-engineers/', vendor: 'SPIE (Society of Photo-Optical Instrumentation Engineers)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/sabinet/', vendor: 'Sabinet' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/taylor-francis/', vendor: 'Taylor &amp; Francis Online' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/thieme-ebooks/', vendor: 'Thieme Medical Publishers' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/university-of2/', vendor: 'University of Chicago Press' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/john-wiley-son/', vendor: 'Wiley' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/accessible-arc/', vendor: 'Wolters Kluwer Espana (LamyLine)' },
+        { sushiUrl: 'https://www.projectcounter.org/counter-user/world-scientific-publishing/', vendor: 'World Scientific Publishing' },
       ],
     };
   },
+  computed: {
+    establishment: {
+      get() {
+        return this.$store.state.establishment;
+      },
+      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+    },
+  },
   methods: {
     save() {
+      if (this.platformSelected) {
+        this.platformSelected.id = uuidv4();
+        this.establishment.sushi.push(this.platformSelected);
+        this.platformSelected = null;
+        this.dialog = false;
+      }
       this.$emit('save');
     },
-    addPlatform() {
-      this.platformSelected.requestorId = '';
-      this.platformSelected.customerId = '';
-      this.platformSelected.apiKey = '';
+    deleteData() {
+      this.establishment.sushi = this.establishment.sushi.filter(({ id }) => {
+        const sushiData = this.selected.find(data => data.id === id);
+        if (sushiData) {
+          return false;
+        }
 
-      this.platformsAdded.push(this.platformSelected);
+        return true;
+      });
+      this.$emit('save');
+      this.selected = [];
     },
   },
 };

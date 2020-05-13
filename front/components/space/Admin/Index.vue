@@ -28,7 +28,7 @@
       <v-tab-item id="tab-admin-establishment">
         <v-card flat>
           <v-card-text>
-            <Establishments @refreshAdminData="refreshAdminData" />
+            <Establishments />
           </v-card-text>
         </v-card>
       </v-tab-item>
@@ -66,9 +66,9 @@ export default {
     },
   },
   methods: {
-    async refreshAdminData() {
+    refreshAdminData() {
       if (this.isAdmin) {
-        await this.$store.dispatch('getEstablishments');
+        this.$store.dispatch('getEstablishments');
       }
     },
   },

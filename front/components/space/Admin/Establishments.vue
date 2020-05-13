@@ -296,27 +296,30 @@ export default {
     };
   },
   computed: {
-    establishments() {
-      const establishments = JSON.parse(JSON.stringify(this.$store.state.establishments));
-      if (establishments.length) {
-        establishments.forEach((establishment) => {
-          if (establishment.contacts) {
-            if (establishment.contacts.users && establishment.contacts.length) {
-              establishment.contacts.users.forEach((user) => {
-                if (user.type.length) {
-                  user.type = user.type.split(',');
-                }
-              });
+    establishments: {
+      get() {
+        const establishments = JSON.parse(JSON.stringify(this.$store.state.establishments));
+        if (establishments.length) {
+          establishments.forEach((establishment) => {
+            if (establishment.contacts) {
+              if (establishment.contacts.users && establishment.contacts.length) {
+                establishment.contacts.users.forEach((user) => {
+                  if (user.type.length) {
+                    user.type = user.type.split(',');
+                  }
+                });
+              }
             }
-          }
-          establishment.logo = null;
-          establishment.logoPreview = null;
-          if (establishment.organisation.logoUrl.length) {
-            establishment.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
-          }
-        });
-      }
-      return establishments;
+            establishment.logo = null;
+            establishment.logoPreview = null;
+            if (establishment.organisation.logoUrl.length) {
+              establishment.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
+            }
+          });
+        }
+        return establishments;
+      },
+      set(newVal) { this.$store.dispatch('SET_ESTABLISHMENT', newVal); },
     },
     types() {
       return ['tech', 'doc'];
@@ -357,8 +360,15 @@ export default {
         this.$store.dispatch('deleteEstablishments', { ids }).then((res) => {
           if (res === 'OK') {
             this.$store.dispatch('snacks/success', `${this.selected.length} élement(s) supprimé(s)`);
+            this.establishments = this.establishments.filter(({ id }) => {
+              const sushiData = this.selected.find(data => data.id === id);
+              if (sushiData) {
+                return false;
+              }
+
+              return true;
+            });
             this.selected = [];
-            this.$emit('refreshAdminData');
           }
         }).catch(() => this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`));
       }
