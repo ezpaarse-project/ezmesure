@@ -80,12 +80,12 @@ services:
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
+      - EZMESURE_ENCRYPTION_SECRET
+      - EZMESURE_KIBANA_TIMEOUT
       - SERVER_HOST
       - SERVER_PORT
-      - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
-      - EZMESURE_ENCRYPTION_SECRET
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
       - "./templates:/usr/src/app/templates"
