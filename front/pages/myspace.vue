@@ -1,152 +1,119 @@
 <template>
-  <v-container class="mt-5">
-    <v-card class="mx-auto" max-width="1400">
-      <v-tabs
-        v-model="activeTab"
-        show-arrows
-        :vertical="$vuetify.breakpoint.mdAndUp"
-        color="primary"
-        background-color="grey lighten-3"
-      >
-        <v-tab to="#tab-profile" router>
-          Profil
-        </v-tab>
-        <v-tab to="#tab-files" router>
-          Mes dépôts
-        </v-tab>
-        <v-tab to="#tab-kibana" router>
-          Identifiants Kibana
-        </v-tab>
-        <v-tab to="#tab-token" router>
-          Token d'authentification
-        </v-tab>
-        <v-tab v-if="betaTester || isAdmin" to="#tab-informations" router>
-          Informations établissement
-        </v-tab>
-        <v-tab v-if="isAdmin" to="#tab-admin" router>
-          Administration
-        </v-tab>
-
+  <section>
+    <ToolBar title="Profil">
+      <slot>
         <v-spacer />
-        <v-divider />
 
-        <v-tab class="red--text" href="/Shibboleth.sso/Logout?return=/logout">
-          Déconnexion
-        </v-tab>
+        <v-btn text :href="refreshUrl">
+          <v-icon left>
+            mdi-refresh
+          </v-icon>
+          Actualiser
+        </v-btn>
+      </slot>
+    </ToolBar>
 
-        <v-tabs-items v-model="activeTab" class="h640">
-          <v-tab-item id="tab-profile">
-            <Profile />
-          </v-tab-item>
+    <v-card-text>
+      <v-alert
+        type="info"
+        prominent
+        :value="!hasRoles"
+      >
+        <div class="headline">
+          Aucun rôle n'est encore associé à votre compte.
+        </div>
+        <div>
+          Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe
+          ou le correspondant ezMESURE de votre établissement.
+        </div>
+      </v-alert>
+      <v-text-field
+        :value="user.full_name"
+        label="Nom"
+        readonly
+        outlined
+      />
 
-          <v-tab-item id="tab-files">
-            <Files
-              :nb-selected-files="nbSelectedFiles"
-              @refreshFileList="refreshFileList"
-              @deleteSelectedFiles="deleteSelectedFiles"
-              @deselectFiles="deselectFiles"
-            />
-          </v-tab-item>
+      <v-text-field
+        :value="user.email"
+        label="Mail"
+        readonly
+        outlined
+      />
 
-          <v-tab-item id="tab-kibana">
-            <Kibana :nb-selected-files="nbSelectedFiles" />
-          </v-tab-item>
+      <v-text-field
+        :value="metadata.idp"
+        label="IDP"
+        readonly
+        outlined
+      />
 
-          <v-tab-item id="tab-token">
-            <Token />
-          </v-tab-item>
+      <v-text-field
+        :value="metadata.org"
+        label="Organisation"
+        readonly
+        outlined
+      />
 
-          <v-tab-item v-if="betaTester || isAdmin" id="tab-informations">
-            <Informations v-if="betaTester || isAdmin" />
-          </v-tab-item>
+      <v-text-field
+        :value="metadata.unit"
+        label="Unité"
+        readonly
+        outlined
+      />
 
-          <v-tab-item v-if="isAdmin" id="tab-admin">
-            <Admin v-if="isAdmin" />
-          </v-tab-item>
-        </v-tabs-items>
-      </v-tabs>
-    </v-card>
-  </v-container>
+      <v-card v-if="hasRoles" outlined>
+        <v-card-text>
+          <div class="title">
+            Vos rôles
+          </div>
+          <div class="mb-2">
+            Ces rôles définissent vos droits d'accès aux données
+            et aux tableaux de bord hébergés sur ezMESURE.
+          </div>
+          <div>
+            <v-chip
+              v-for="role in user.roles"
+              :key="role"
+              class="mr-2"
+              label
+              outlined
+              color="accent"
+            >
+              {{ role }}
+            </v-chip>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-card-text>
+  </section>
 </template>
 
+
 <script>
-import Profile from '~/components/space/Profile';
-import Files from '~/components/space/Files';
-import Kibana from '~/components/space/Kibana';
-import Token from '~/components/space/Token';
-import Admin from '~/components/space/Admin/Index';
-import Informations from '~/components/space/Informations/Index';
+import ToolBar from '~/components/space/ToolBar';
 
 export default {
+  layout: 'space',
+  middleware: 'isLoggin',
   components: {
-    Profile,
-    Files,
-    Kibana,
-    Token,
-    Admin,
-    Informations,
-  },
-  async fetch({ store, redirect, route }) {
-    await store.dispatch('auth/checkAuth');
-    const { user } = store.state.auth;
-
-    if (!user) {
-      return redirect('/authenticate', { origin: route.fullPath });
-    }
-    if (!user.metadata.acceptedTerms) {
-      return redirect('/terms');
-    }
-
-    await store.dispatch('getEstablishment');
-
-    if (user.roles) {
-      const isAdmin = user.roles.find(role => (role === 'admin' || role === 'superuser'));
-
-      if (isAdmin) {
-        await store.dispatch('getEstablishments');
-      }
-    }
-    return true;
+    ToolBar,
   },
   data() {
+    const currentLocation = encodeURIComponent(window.location.href);
+
     return {
-      activeTab: 'tab-profile',
-      selectedFiles: [],
+      refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
     };
   },
   computed: {
+    drawer: {
+      get() { return this.$store.state.drawer; },
+      set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },
+    },
     user() { return this.$store.state.auth.user; },
+    metadata() { return (this.user && this.user.metadata) || {}; },
     hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
-    isAdmin() {
-      if (this.hasRoles) {
-        return this.user.roles.find(role => role === 'admin');
-      }
-      return null;
-    },
-    betaTester() {
-      if (this.hasRoles) {
-        return this.user.roles.find(role => role === 'tester');
-      }
-      return null;
-    },
-    nbSelectedFiles() { return this.selectedFiles.length; },
-  },
-  methods: {
-    refreshFileList() {
-      this.$refs.filelist.refreshFiles();
-    },
-
-    deleteSelectedFiles() {
-      this.$refs.filelist.deleteSelected();
-    },
-
-    deselectFiles() {
-      this.$refs.filelist.deselectAll();
-    },
   },
 };
 </script>
-
-<style scoped>
-.h640 { min-height: 640px; }
-</style>

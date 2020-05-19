@@ -1,5 +1,6 @@
 <template>
-  <v-card flat>
+  <section>
+    <ToolBar title="Informations: Correspondant" />
     <v-card-text>
       <v-form
         ref="form"
@@ -61,25 +62,47 @@
         Sauvegarder
       </v-btn>
     </v-card-actions>
-  </v-card>
+  </section>
 </template>
 
 <script>
+import ToolBar from '~/components/space/ToolBar';
+
 export default {
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['establishment'],
+  layout: 'space',
+  middleware: ['isLoggin'],
+  components: {
+    ToolBar,
+  },
   data() {
     return {
       valid: true,
       lazy: false,
+      formData: new FormData(),
     };
+  },
+  async fetch({ store }) {
+    await store.dispatch('getEstablishment');
   },
   computed: {
     user() { return this.$store.state.auth.user; },
+    establishment: {
+      get() { return this.$store.state.establishment; },
+      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+    },
   },
   methods: {
     save() {
-      this.$emit('save');
+      this.$refs.form.validate();
+
+      this.formData.append('form', JSON.stringify(this.establishment));
+
+      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+        .then(() => {
+          this.$store.dispatch('snacks/success', 'Informations transmises');
+          this.formData = new FormData();
+        })
+        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
     },
   },
 };

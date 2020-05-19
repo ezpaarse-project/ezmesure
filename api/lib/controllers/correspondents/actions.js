@@ -247,22 +247,20 @@ exports.storeOrUpdate = async function (ctx) {
         body: {
           doc: formData,
         },
-      })
-      .then(async () => {
-        await sendMail({
-          from: sender,
-          to: recipients,
-          subject: 'Mise à jour de données établissement',
-          ...generateMail('establishment', {
-            updated: true,
-            user: ctx.state.user.full_name,
-            establishment: formData.organisation.name,
-          }),
-        });
-      })
-      .catch((err) => {
+      }).catch((err) => {
         ctx.status = 500;
         appLogger.error('Failed to update data in index', err);
+      });
+
+      await sendMail({
+        from: sender,
+        to: recipients,
+        subject: 'Mise à jour de données établissement',
+        ...generateMail('establishment', {
+          updated: true,
+          user: ctx.state.user.full_name,
+          establishment: formData.organisation.name,
+        }),
       });
 
       return ctx;
@@ -285,22 +283,20 @@ exports.storeOrUpdate = async function (ctx) {
     await elastic.index({
       index: config.depositors.index,
       body: formData,
-    })
-    .then(async () => {
-      await sendMail({
-        from: sender,
-        to: recipients,
-        subject: 'Création de données établissement',
-        ...generateMail('establishment', {
-          updated: false,
-          user: ctx.state.user.full_name,
-          establishment: formData.organisation.name,
-        }),
-      });
-    })
-    .catch((err) => {
+    }).catch((err) => {
       ctx.status = 500;
       appLogger.error('Failed to store data in index', err);
+    });
+
+    await sendMail({
+      from: sender,
+      to: recipients,
+      subject: 'Création de données établissement',
+      ...generateMail('establishment', {
+        updated: false,
+        user: ctx.state.user.full_name,
+        establishment: formData.organisation.name,
+      }),
     });
 
     return ctx;

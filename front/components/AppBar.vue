@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app fixed dark color="primary">
+  <v-app-bar app clipped-left dark color="primary">
     <router-link
       to="/"
       aria-label="Page d'accueil ezMESURE"

@@ -16,7 +16,9 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
   },
-  plugins: [],
+  plugins: [
+    { src: '~/plugins/user.js', ssr: false },
+  ],
   css: [
     'swagger-ui/dist/swagger-ui.css',
   ],
@@ -77,5 +79,8 @@ module.exports = {
         });
       }
     },
+  },
+  env: {
+    key: process.env.EZMESURE_ENCRYPTION_SECRET,
   },
 };

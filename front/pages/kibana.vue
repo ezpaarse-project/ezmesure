@@ -1,38 +1,33 @@
 <template>
   <section>
-    <v-toolbar v-if="nbSelectedFiles === 0" dense flat>
-      <v-toolbar-title>
-        Identifiants Kibana
-      </v-toolbar-title>
+    <ToolBar title="Identifiants kibana">
+      <slot>
+        <v-spacer />
 
-      <v-spacer />
+        <v-btn text @click="showPasswordReset = true">
+          <v-icon left>
+            mdi-lock-question
+          </v-icon>
+          Mot de passe oublié
+        </v-btn>
+      </slot>
+    </ToolBar>
+    <v-card-text>
+      <p>
+        Ce nom d'utilisateur vous permet de vous connecter à l'interface
+        Kibana afin d'accéder à vos tableaux de bord.
+        Pour changer votre mot de passe,
+        accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.
+      </p>
 
-      <v-btn text @click="showPasswordReset = true">
-        <v-icon left>
-          mdi-lock-question
-        </v-icon>
-        Mot de passe oublié
-      </v-btn>
-    </v-toolbar>
-
-    <v-card flat class="mx-auto" max-width="800px">
-      <v-card-text>
-        <p>
-          Ce nom d'utilisateur vous permet de vous connecter à l'interface
-          Kibana afin d'accéder à vos tableaux de bord.
-          Pour changer votre mot de passe,
-          accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.
-        </p>
-
-        <v-text-field
-          :value="user.username"
-          append-icon="mdi-account"
-          label="Nom d'utilisateur"
-          readonly
-          outlined
-        />
-      </v-card-text>
-    </v-card>
+      <v-text-field
+        :value="user.username"
+        append-icon="mdi-account"
+        label="Nom d'utilisateur"
+        readonly
+        outlined
+      />
+    </v-card-text>
 
     <v-dialog v-model="showPasswordReset" width="500">
       <v-card>
@@ -93,9 +88,14 @@
 </template>
 
 <script>
+import ToolBar from '~/components/space/ToolBar';
+
 export default {
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['nbSelectedFiles'],
+  layout: 'space',
+  middleware: 'isLoggin',
+  components: {
+    ToolBar,
+  },
   data() {
     return {
       showPasswordReset: false,
@@ -103,10 +103,12 @@ export default {
       resetSuccess: false,
       resetError: null,
       resetErrorText: '',
+      selectedFiles: [],
     };
   },
   computed: {
     user() { return this.$store.state.auth.user; },
+    nbSelectedFiles() { return this.selectedFiles.length; },
   },
   methods: {
     async resetPassword() {

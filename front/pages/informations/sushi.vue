@@ -1,201 +1,213 @@
 <template>
-  <v-card flat>
-    <v-card-text>
-      <v-row>
+  <section>
+    <ToolBar title="Informations: Sushi">
+      <slot>
         <v-spacer />
         <v-btn color="primary" class="mr-4" @click.stop="dialog = true">
           Ajouter une plateforme
         </v-btn>
-        <v-dialog v-model="dialog" max-width="600">
-          <v-card>
-            <v-card-title class="headline mb-5">
-              Ajouter une plateforme
-            </v-card-title>
+      </slot>
+    </ToolBar>
 
-            <v-card-text>
-              <v-form
-                ref="form"
-                v-model="valid"
-                :lazy-validation="lazy"
-              >
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-combobox
-                        v-model="platformSelected"
-                        :items="platforms"
-                        label="Plateformes"
-                        item-text="vendor"
-                        outlined
-                      />
-                    </v-col>
+    <v-dialog v-model="dialog" max-width="600">
+      <v-card>
+        <v-card-title class="headline mb-5">
+          Ajouter une plateforme
+        </v-card-title>
 
-                    <v-col cols="12">
-                      <v-text-field
-                        v-if="platformSelected"
-                        v-model="platformSelected.vendor"
-                        label="Libellé *"
-                        :rules="[v => !!v || 'Veuillez saisir un libellé.']"
-                        outlined
-                        required
-                      />
-                    </v-col>
+        <v-card-text>
+          <v-form
+            ref="form"
+            v-model="valid"
+            :lazy-validation="lazy"
+          >
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-combobox
+                    v-model="platformSelected"
+                    :items="platforms"
+                    label="Plateformes"
+                    item-text="vendor"
+                    outlined
+                    @change="selectPlatform()"
+                  />
+                </v-col>
 
-                    <v-col cols="6">
-                      <v-text-field
-                        v-if="platformSelected"
-                        v-model="platformSelected.requestorId"
-                        label="Requestor Id *"
-                        :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
-                        outlined
-                        required
-                      />
-                    </v-col>
+                <v-col v-if="platformSelected" cols="12">
+                  <v-text-field
+                    v-model="platformSelected.vendor"
+                    label="Libellé *"
+                    :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                    outlined
+                    required
+                  />
+                </v-col>
 
-                    <v-col cols="6">
-                      <v-text-field
-                        v-if="platformSelected"
-                        v-model="platformSelected.customerId"
-                        label="Customer Id *"
-                        :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
-                        outlined
-                      />
-                    </v-col>
+                <v-col v-if="platformSelected && !platformSelected.sushiUrl" cols="12">
+                  <v-text-field
+                    v-model="platformSelected.sushiUrl"
+                    label="URL Sushi *"
+                    :rules="[v => !!v || 'Veuillez saisir une url.']"
+                    outlined
+                    required
+                  />
+                </v-col>
 
-                    <v-col cols="12">
-                      <v-text-field
-                        v-if="platformSelected"
-                        v-model="platformSelected.apiKey"
-                        label="Clé API"
-                        outlined
-                      />
-                    </v-col>
+                <v-col v-if="platformSelected" cols="6">
+                  <v-text-field
+                    v-model="platformSelected.requestorId"
+                    label="Requestor Id *"
+                    :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                    outlined
+                    required
+                  />
+                </v-col>
 
-                    <v-col cols="12">
-                      <v-textarea
-                        v-if="platformSelected"
-                        v-model="platformSelected.comment"
-                        label="Commentaire"
-                        outlined
-                      />
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-form>
-            </v-card-text>
+                <v-col v-if="platformSelected" cols="6">
+                  <v-text-field
+                    v-model="platformSelected.customerId"
+                    label="Customer Id *"
+                    :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                    outlined
+                  />
+                </v-col>
 
-            <v-card-actions>
-              <span class="caption">* champs obligatoires</span>
+                <v-col v-if="platformSelected" cols="12">
+                  <v-text-field
+                    v-model="platformSelected.apiKey"
+                    label="Clé API"
+                    outlined
+                  />
+                </v-col>
 
-              <v-spacer />
+                <v-col v-if="platformSelected" cols="12">
+                  <v-textarea
+                    v-model="platformSelected.comment"
+                    label="Commentaire"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </v-card-text>
 
-              <v-btn text @click="dialog = false">
-                Fermer
-              </v-btn>
+        <v-card-actions>
+          <span class="caption">* champs obligatoires</span>
 
+          <v-spacer />
+
+          <v-btn text @click="dialog = false">
+            Fermer
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            :disabled="!valid || !platformSelected"
+            @click="saveData"
+          >
+            Ajouter
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-data-table
+      v-model="selected"
+      :headers="headers"
+      :items="establishment.sushi"
+      :expanded.sync="expanded"
+      show-select
+      show-expand
+      item-key="id"
+    >
+      <template v-slot:item.name="{ item }">
+        {{ item.vendor }}
+      </template>
+
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" class="px-5 py-5">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="item.vendor"
+                label="Libellé *"
+                :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                outlined
+                required
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="item.requestorId"
+                label="Requestor Id *"
+                :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                outlined
+                required
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="item.customerId"
+                label="Customer Id *"
+                :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                outlined
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-model="item.apiKey"
+                label="Clé API"
+                outlined
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-textarea
+                v-model="item.comment"
+                label="Commentaire"
+                outlined
+              />
+            </v-col>
+
+            <v-col cols="12">
               <v-btn
+                block
                 color="primary"
-                :disabled="!valid || !platformSelected"
-                @click="save"
+                @click="save()"
               >
-                Ajouter
+                Mettre à jour
               </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-row>
+            </v-col>
+          </v-row>
+        </td>
+      </template>
 
-      <v-data-table
-        v-model="selected"
-        :headers="headers"
-        :items="establishment.sushi"
-        :expanded.sync="expanded"
-        show-select
-        show-expand
-        item-key="id"
-      >
-        <template v-slot:item.name="{ item }">
-          {{ item.vendor }}
-        </template>
-
-        <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length" class="px-5 py-5">
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="item.vendor"
-                  label="Libellé *"
-                  :rules="[v => !!v || 'Veuillez saisir un libellé.']"
-                  outlined
-                  required
-                />
-              </v-col>
-
-              <v-col cols="6">
-                <v-text-field
-                  v-model="item.requestorId"
-                  label="Requestor Id *"
-                  :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
-                  outlined
-                  required
-                />
-              </v-col>
-
-              <v-col cols="6">
-                <v-text-field
-                  v-model="item.customerId"
-                  label="Customer Id *"
-                  :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
-                  outlined
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-text-field
-                  v-model="item.apiKey"
-                  label="Clé API"
-                  outlined
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-textarea
-                  v-model="item.comment"
-                  label="Commentaire"
-                  outlined
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-btn
-                  block
-                  color="primary"
-                  @click="save()"
-                >
-                  Mettre à jour
-                </v-btn>
-              </v-col>
-            </v-row>
-          </td>
-        </template>
-
-        <template v-slot:footer>
-          <span v-if="selected.length">
-            <v-btn small color="error" class="ma-2" @click="deleteData">
-              <v-icon left>mdi-delete</v-icon>
-              Supprimer ({{ selected.length }})
-            </v-btn>
-          </span>
-        </template>
-      </v-data-table>
-    </v-card-text>
-  </v-card>
+      <template v-slot:footer>
+        <span v-if="selected.length">
+          <v-btn small color="error" class="ma-2" @click="deleteData">
+            <v-icon left>mdi-delete</v-icon>
+            Supprimer ({{ selected.length }})
+          </v-btn>
+        </span>
+      </template>
+    </v-data-table>
+  </section>
 </template>
 
 <script>
 import { v4 as uuidv4 } from 'uuid';
+import ToolBar from '~/components/space/ToolBar';
 
 export default {
+  layout: 'space',
+  middleware: ['isLoggin'],
+  components: {
+    ToolBar,
+  },
   data() {
     return {
       selected: [],
@@ -204,9 +216,10 @@ export default {
         { text: 'Libellé', value: 'name' },
         { text: '', value: 'data-table-expand' },
       ],
-      dialog: null,
+      dialog: false,
       valid: true,
       lazy: false,
+      formData: new FormData(),
       platformSelected: null,
       platforms: [
         { sushiUrl: 'https://www.projectcounter.org/counter-user/acs-publicatio/', vendor: 'ACS Publications' },
@@ -320,6 +333,9 @@ export default {
       ],
     };
   },
+  async fetch({ store }) {
+    await store.dispatch('getEstablishment');
+  },
   computed: {
     establishment: {
       get() {
@@ -328,15 +344,45 @@ export default {
       set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
     },
   },
+  watch: {
+    dialog(val) {
+      if (!val) this.platformSelected = null;
+    },
+  },
   methods: {
+    selectPlatform() {
+      if (typeof this.platformSelected !== 'object') {
+        const exists = this.platforms.find(({ vendor }) => vendor === this.platformSelected);
+        if (!exists) {
+          this.platformSelected = {
+            vendor: this.platformSelected,
+            sushiUrl: null,
+            requestorId: null,
+            customerId: null,
+            apiKey: null,
+            comment: null,
+          };
+        }
+      }
+    },
     save() {
+      this.formData.append('form', JSON.stringify(this.establishment));
+
+      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+        .then(() => {
+          this.$store.dispatch('snacks/success', 'Informations transmises');
+          this.formData = new FormData();
+        })
+        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
+    },
+    saveData() {
       if (this.platformSelected) {
         this.platformSelected.id = uuidv4();
         this.establishment.sushi.push(this.platformSelected);
         this.platformSelected = null;
         this.dialog = false;
       }
-      this.$emit('save');
+      this.save();
     },
     deleteData() {
       this.establishment.sushi = this.establishment.sushi.filter(({ id }) => {
@@ -347,7 +393,7 @@ export default {
 
         return true;
       });
-      this.$emit('save');
+      this.save();
       this.selected = [];
     },
   },

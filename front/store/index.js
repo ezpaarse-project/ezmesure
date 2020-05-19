@@ -12,6 +12,7 @@ const store = () => new Vuex.Store({
   state: {
     establishments: [],
     establishment: null,
+    drawer: true,
   },
   actions: {
     async getEstablishment({ commit }) {
@@ -45,6 +46,9 @@ const store = () => new Vuex.Store({
     SET_ESTABLISHMENT({ commit }, value) {
       commit('setEstablishments', value);
     },
+    SET_DRAWER({ commit }, drawer) {
+      commit('setDrawer', drawer);
+    },
   },
   mutations: {
     setEstablishments(state, establishments) {
@@ -52,6 +56,9 @@ const store = () => new Vuex.Store({
     },
     setEstablishment(state, establishment) {
       Vue.set(state, 'establishment', establishment);
+    },
+    setDrawer(state, drawer) {
+      Vue.set(state, 'drawer', drawer);
     },
   },
 });

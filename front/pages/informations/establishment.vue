@@ -1,5 +1,6 @@
 <template>
-  <v-card flat>
+  <section>
+    <ToolBar title="Informations: Établissement" />
     <v-card-text>
       <v-form
         ref="form"
@@ -118,18 +119,42 @@
         Sauvegarder
       </v-btn>
     </v-card-actions>
-  </v-card>
+  </section>
 </template>
 
 <script>
+import ToolBar from '~/components/space/ToolBar';
+
 export default {
-  // eslint-disable-next-line vue/require-prop-types
-  props: ['establishment', 'logo', 'logoPreview'],
+  layout: 'space',
+  middleware: ['isLoggin'],
+  components: {
+    ToolBar,
+  },
   data() {
     return {
       valid: true,
       lazy: false,
+      logo: null,
+      logoPreview: null,
+      formData: new FormData(),
     };
+  },
+  async fetch({ store }) {
+    await store.dispatch('getEstablishment');
+  },
+  computed: {
+    user() { return this.$store.state.auth.user; },
+    establishment: {
+      get() {
+        if (this.$store.state.establishment) {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+          this.logoPreview = this.$store.state.establishment.organisation.logoUrl;
+        }
+        return this.$store.state.establishment;
+      },
+      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+    },
   },
   methods: {
     dragAndDrop(event) {
@@ -144,20 +169,34 @@ export default {
     },
     upload() {
       if (!this.$refs.logo.files) {
-        return this.$emit('removeLogo');
+        this.logoPreview = null;
+        this.logo = null;
+        return true;
       }
 
       const logo = this.$refs.logo.files[0];
       const logoPreview = URL.createObjectURL(logo);
-      return this.$emit('upload', logo, logoPreview);
+
+      this.logo = logo;
+      this.logoPreview = logoPreview;
+      return true;
     },
     removeLogo() {
-      this.$emit('removeLogo');
+      this.logoPreview = null;
+      this.logo = null;
     },
     save() {
       this.$refs.form.validate();
 
-      this.$emit('save');
+      this.formData.append('logo', this.logo);
+      this.formData.append('form', JSON.stringify(this.establishment));
+
+      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+        .then(() => {
+          this.$store.dispatch('snacks/success', 'Informations transmises');
+          this.formData = new FormData();
+        })
+        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
     },
   },
 };

@@ -103,6 +103,7 @@ services:
       - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
       - PORT=8080
       - HOST=0.0.0.0
+      - EZMESURE_ENCRYPTION_SECRET
     restart: unless-stopped
 
   rp:
