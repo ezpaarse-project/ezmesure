@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Profil">
+    <ToolBar title="Mon Profil">
       <slot>
         <v-spacer />
 
