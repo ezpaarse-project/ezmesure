@@ -22,6 +22,7 @@ module.exports = async function upload(ctx) {
   ctx.action = 'indices/insert';
   ctx.index = ctx.request.params.index;
 
+  const startTime = process.hrtime.bigint();
   const { username, email } = ctx.state.user;
   const { query } = ctx.request;
 
@@ -89,6 +90,8 @@ module.exports = async function upload(ctx) {
 
     try {
       ctx.body = await readStream(stream, index, username, splittedFields);
+      const endTime = process.hrtime.bigint();
+      ctx.body.took = Math.ceil(Number((endTime - startTime) / 1000000n));
     } catch (e) {
       try {
         await fse.remove(filePath);
@@ -150,9 +153,17 @@ module.exports = async function upload(ctx) {
     }
   }
 
+
+  const endTime = process.hrtime.bigint();
+
   ctx.type = 'json';
   ctx.body = {
-    total, inserted, updated, failed, errors,
+    took: Math.ceil(Number((endTime - startTime) / 1000000n)),
+    total,
+    inserted,
+    updated,
+    failed,
+    errors,
   };
   return appLogger.info(`Insert into [${index}]`, ctx.body);
 };
