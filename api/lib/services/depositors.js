@@ -5,7 +5,7 @@ const { appLogger } = require('../../server');
 
 const { index } = config.get('depositors');
 
-const crypto = require('../services/crypto');
+const encrypter = require('../services/encrypter');
 
 elastic.indices.exists({ index })
   .then(({ body: exists }) => {
@@ -44,8 +44,8 @@ async function getFromIndex() {
 
     if (depositor.sushi.length) {
       for (let i = 0; i < depositor.sushi.length; i += 1) {
-        depositor.sushi[i].customerId = crypto.decrypt(depositor.sushi[i].customerId);
-        depositor.sushi[i].requestorId = crypto.decrypt(depositor.sushi[i].requestorId);
+        depositor.sushi[i].customerId = encrypter.decrypt(depositor.sushi[i].customerId);
+        depositor.sushi[i].requestorId = encrypter.decrypt(depositor.sushi[i].requestorId);
       }
     }
 

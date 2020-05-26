@@ -2,10 +2,11 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const config = require('config');
+const { randomBytes } = require('crypto');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
-const crypto = require('../../services/crypto');
+const encrypter = require('../../services/encrypter');
 const { appLogger } = require('../../../server');
 const { sendMail, generateMail } = require('../../services/mail');
 
@@ -145,8 +146,8 @@ exports.getOne = async function (ctx) {
 
     if (establishment.sushi.length) {
       for (let i = 0; i < establishment.sushi.length; i += 1) {
-        establishment.sushi[i].customerId = crypto.decrypt(establishment.sushi[i].customerId);
-        establishment.sushi[i].requestorId = crypto.decrypt(establishment.sushi[i].requestorId);
+        establishment.sushi[i].customerId = encrypter.decrypt(establishment.sushi[i].customerId);
+        establishment.sushi[i].requestorId = encrypter.decrypt(establishment.sushi[i].requestorId);
       }
     }
   }
@@ -191,7 +192,7 @@ exports.storeOrUpdate = async function (ctx) {
     try {
       const dest = path.resolve(__dirname, '..', '..', '..', 'uploads');
 
-      logoId = crypto.randomBytes(16).toString('hex');
+      logoId = randomBytes(16).toString('hex');
 
       if (!fs.existsSync(dest)) {
         fs.mkdirSync(dest);
@@ -213,8 +214,8 @@ exports.storeOrUpdate = async function (ctx) {
 
     if (formData.sushi.length) {
       for (let i = 0; i < formData.sushi.length; i += 1) {
-        formData.sushi[i].customerId = crypto.encrypt(formData.sushi[i].customerId);
-        formData.sushi[i].requestorId = crypto.encrypt(formData.sushi[i].requestorId);
+        formData.sushi[i].customerId = encrypter.encrypt(formData.sushi[i].customerId);
+        formData.sushi[i].requestorId = encrypter.encrypt(formData.sushi[i].requestorId);
       }
     }
 
