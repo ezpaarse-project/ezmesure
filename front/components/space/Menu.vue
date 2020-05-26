@@ -11,7 +11,6 @@
       <v-list-item
         v-for="link in links"
         :key="link.title"
-        dense
         router
         :to="{ path: link.href }"
       >
@@ -23,7 +22,6 @@
       </v-list-item>
 
       <v-list-group
-        dense
         :value="$nuxt.$route.name.indexOf(informations.title.toLowerCase()) !== -1"
       >
         <template v-slot:activator>
@@ -49,7 +47,6 @@
 
       <v-list-group
         v-if="administration.admin && isAdmin"
-        dense
         :value="$nuxt.$route.name.indexOf(administration.title.toLowerCase()) !== -1"
       >
         <template v-slot:activator>

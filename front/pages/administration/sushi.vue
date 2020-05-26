@@ -100,6 +100,10 @@
         </td>
       </template>
 
+      <template v-slot:item.count="{ item }">
+        {{ item.sushi.length || 0 }}
+      </template>
+
       <template v-slot:footer>
         <span v-if="selected.length">
           <v-btn small color="error" class="ma-2" @click="deleteData">
@@ -129,6 +133,7 @@ export default {
       expandedSushi: [],
       headers: [
         { text: 'Etablissement', value: 'organisation.name' },
+        { text: 'Identifiants', value: 'count' },
         { text: '', value: 'data-table-expand' },
       ],
       headersSushi: [
@@ -137,20 +142,23 @@ export default {
       ],
     };
   },
+  async fetch({ store }) {
+    await store.dispatch('informations/getEstablishments');
+  },
   computed: {
     establishments: {
       get() {
-        return this.$store.state.establishments.filter((establishment) => {
+        return this.$store.state.informations.establishments.filter((establishment) => {
           if (!establishment.sushi.length) return false;
           return true;
         });
       },
-      set(newVal) { this.$store.dispatch('SET_ESTABLISHMENT', newVal); },
+      set(newVal) { this.$store.dispatch('informations/setEstablishments', newVal); },
     },
   },
   methods: {
     refreshAdminData() {
-      this.$store.dispatch('getEstablishments');
+      this.$store.dispatch('informations/getEstablishments');
     },
   },
 };

@@ -4,8 +4,6 @@ const RESET_URL = '/profile/password/reset';
 const TERMS_URL = '/profile/terms/accept';
 
 export default {
-  namespaced: true,
-
   state: () => ({
     user: null,
     token: null,

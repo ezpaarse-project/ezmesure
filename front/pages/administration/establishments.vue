@@ -320,12 +320,13 @@ export default {
     };
   },
   async fetch({ store }) {
-    await store.dispatch('getEstablishments');
+    await store.dispatch('informations/getEstablishments');
   },
   computed: {
     establishments: {
       get() {
-        const establishments = JSON.parse(JSON.stringify(this.$store.state.establishments));
+        const establishmentData = JSON.stringify(this.$store.state.informations.establishments);
+        const establishments = JSON.parse(establishmentData);
         if (establishments.length) {
           establishments.forEach((establishment) => {
             if (establishment.contacts) {
@@ -346,7 +347,7 @@ export default {
         }
         return establishments;
       },
-      set(newVal) { this.$store.dispatch('SET_ESTABLISHMENT', newVal); },
+      set(newVal) { this.$store.dispatch('informations/setEstablishments', newVal); },
     },
     types() {
       return ['tech', 'doc'];
@@ -384,7 +385,7 @@ export default {
     deleteData() {
       if (this.selected.length) {
         const ids = this.selected.map(select => select.id);
-        this.$store.dispatch('deleteEstablishments', { ids }).then((res) => {
+        this.$store.dispatch('informations/deleteEstablishments', { ids }).then((res) => {
           if (res === 'OK') {
             this.$store.dispatch('snacks/success', `${this.selected.length} élement(s) supprimé(s)`);
             this.establishments = this.establishments.filter(({ id }) => {
@@ -410,7 +411,7 @@ export default {
 
       formData.append('form', JSON.stringify(establishment));
 
-      this.$store.dispatch('storeOrUpdateEstablishment', formData).then((establishmentData) => {
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', formData).then((establishmentData) => {
         establishment = establishmentData;
         this.$store.dispatch('snacks/success', 'Établissement mis à jour');
       }).catch(() => this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement'));

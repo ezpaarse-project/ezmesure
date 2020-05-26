@@ -113,7 +113,8 @@
       <v-spacer />
       <v-btn
         color="primary"
-        :disabled="!valid"
+        :disabled="!valid || loading"
+        :loading="loading"
         @click="save"
       >
         Sauvegarder
@@ -138,22 +139,23 @@ export default {
       logo: null,
       logoPreview: null,
       formData: new FormData(),
+      loading: false,
     };
   },
   async fetch({ store }) {
-    await store.dispatch('getEstablishment');
+    await store.dispatch('informations/getEstablishment');
   },
   computed: {
     user() { return this.$store.state.auth.user; },
     establishment: {
       get() {
-        if (this.$store.state.establishment) {
+        if (this.$store.state.informations.establishment) {
           // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.logoPreview = this.$store.state.establishment.organisation.logoUrl;
+          this.logoPreview = this.$store.state.informations.establishment.organisation.logoUrl;
         }
-        return this.$store.state.establishment;
+        return this.$store.state.informations.establishment;
       },
-      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+      set(newVal) { this.$store.dispatch('informations/setEstablishment', newVal); },
     },
   },
   methods: {
@@ -188,15 +190,21 @@ export default {
     save() {
       this.$refs.form.validate();
 
+      this.loading = true;
+
       this.formData.append('logo', this.logo);
       this.formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
           this.formData = new FormData();
+          this.loading = false;
         })
-        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
+        .catch(() => {
+          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
+          this.loading = false;
+        });
     },
   },
 };

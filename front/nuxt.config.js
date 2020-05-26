@@ -80,7 +80,4 @@ module.exports = {
       }
     },
   },
-  env: {
-    key: process.env.EZMESURE_ENCRYPTION_SECRET,
-  },
 };
