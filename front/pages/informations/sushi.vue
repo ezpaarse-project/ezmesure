@@ -153,25 +153,19 @@
             <v-col cols="6">
               <v-text-field
                 v-model="item.requestorId"
-                :type="showRequestorId[item._id] ? 'text' : 'password'"
-                :append-icon="showRequestorId[item._id] ? 'mdi-eye' : 'mdi-eye-off'"
                 label="Requestor Id *"
                 :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
                 outlined
                 required
-                @click:append="showRequestorId[item._id] = !showRequestorId[item._id]"
               />
             </v-col>
 
             <v-col cols="6">
               <v-text-field
                 v-model="item.customerId"
-                :type="showCustomerId[item._id] ? 'text' : 'password'"
-                :append-icon="showCustomerId[item._id] ? 'mdi-eye' : 'mdi-eye-off'"
                 label="Customer Id *"
                 :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
                 outlined
-                @click:append="showCustomerId[item._id] = !showCustomerId[item._id]"
               />
             </v-col>
 
@@ -180,9 +174,6 @@
                 v-model="item.apiKey"
                 label="Clé API"
                 outlined
-                :type="showApiKey[item._id]? 'text' : 'password'"
-                :append-icon="showApiKey[item._id] ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showApiKey[item._id] = !showApiKey[item._id]"
               />
             </v-col>
 
@@ -255,9 +246,6 @@ export default {
       formData: new FormData(),
       loading: false,
       platformSelected: null,
-      showRequestorId: [],
-      showCustomerId: [],
-      showApiKey: [],
       platforms: [
         { sushiUrl: 'https://www.projectcounter.org/counter-user/acs-publicatio/', vendor: 'ACS Publications' },
         { sushiUrl: 'https://www.projectcounter.org/counter-user/adam-matthew-d/', vendor: 'Adam Matthew Digital' },
