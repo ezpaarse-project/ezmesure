@@ -138,7 +138,6 @@ export default {
       lazy: false,
       logo: null,
       logoPreview: null,
-      formData: new FormData(),
       loading: false,
     };
   },
@@ -191,14 +190,14 @@ export default {
       this.$refs.form.validate();
 
       this.loading = true;
+      const formData = new FormData();
 
-      this.formData.append('logo', this.logo);
-      this.formData.append('form', JSON.stringify(this.establishment));
+      formData.append('logo', this.logo);
+      formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', formData)
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
-          this.formData = new FormData();
           this.loading = false;
         })
         .catch(() => {

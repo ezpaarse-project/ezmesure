@@ -243,7 +243,6 @@ export default {
       dialog: false,
       valid: true,
       lazy: false,
-      formData: new FormData(),
       loading: false,
       platformSelected: null,
       platforms: [
@@ -395,13 +394,13 @@ export default {
       this.$refs.form.validate();
 
       this.loading = true;
+      const formData = new FormData();
 
-      this.formData.append('form', JSON.stringify(this.establishment));
+      formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', formData)
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
-          this.formData = new FormData();
           this.loading = false;
         })
         .catch(() => {
