@@ -370,6 +370,7 @@
       "IndexInsert": {
         "type": "object",
         "properties": {
+          "took": { "type": "integer" },
           "total": { "type": "integer" },
           "inserted": { "type": "integer" },
           "updated": { "type": "integer" },
@@ -856,6 +857,202 @@
         "responses": {
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/logs/{index}/aggregation.{extension}": {
+      "get": {
+        "tags": [
+          "Indices"
+        ],
+        "summary": "Export all aggregated combinations of the given fields",
+        "description": "Export all aggregated combinations of the given fields",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar"
+            },
+            "description": "the index that contains the consultations to be aggregated",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "extension",
+            "schema": {
+              "type": "string",
+              "enum": ["csv", "ndjson"]
+            },
+            "description": "the export format",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "fields",
+            "description": "comma-separated list of fields that should be aggregated",
+            "schema": {
+              "type": "string",
+              "example": "rtype,mime"
+            }
+          },
+          {
+            "in": "query",
+            "name": "missing",
+            "description": "Include combinations with missing values",
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "allowEmptyValue": false
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "example": "2020-01-01"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "example": "2020-12-31"
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "description": "filter aggregations for a specific platform",
+            "schema": {
+              "type": "string",
+              "example": "wiley"
+            }
+          },
+          {
+            "in": "query",
+            "name": "delimiter",
+            "description": "Delimiter for the CSV output. Use 'tab' to get tab-seperated values.",
+            "schema": {
+              "type": "string",
+              "example": ","
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "doc_count": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": "{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"PDF\" }, \"doc_count\": 42 }\n{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"HTML\" }, \"doc_count\": 17 }"
+                }
+              },
+              "text/csv": {
+                "example": "doc_count;rtype;mime\n42;ARTICLE;PDF\n17;ARTICLE;HTML"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs/{index}/counterize": {
+      "post": {
+        "tags": [
+          "Indices"
+        ],
+        "summary": "Export aggregated COUNTER metrics into another index",
+        "description": "Export aggregated COUNTER metrics into another index",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar"
+            },
+            "description": "the index that contains the consultations to be aggregated",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "destination"
+                ],
+                "properties": {
+                  "destination": {
+                    "type": "string",
+                    "description": "The index where aggregations should be stored",
+                    "example": "univ-foobar-counter5"
+                  },
+                  "from": {
+                    "type": "string",
+                    "example": "2020-01"
+                  },
+                  "to": {
+                    "type": "string",
+                    "example": "2020-04"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "description": "filter aggregations for a specific platform",
+                    "example": "wiley"
+                  },
+                  "sessionField": {
+                    "type": "string",
+                    "description": "The field that holds the session ID, for unique request/investigation counting",
+                    "example": "ezproxy-session"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexInsert"
+                }
+              }
+            }
           }
         }
       }
