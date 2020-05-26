@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     refreshAdminData() {
-      this.$store.dispatch('getEstablishments');
+      this.$store.dispatch('informations/getEstablishments');
     },
   },
 };

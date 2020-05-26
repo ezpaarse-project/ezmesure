@@ -3,13 +3,22 @@
     <ToolBar title="Informations: Sushi">
       <slot>
         <v-spacer />
-        <v-btn color="primary" class="mr-4" @click.stop="dialog = true">
+        <v-btn
+          v-if="hasEstablishment"
+          color="primary"
+          class="mr-4"
+          @click.stop="dialog = true"
+        >
           Ajouter une plateforme
         </v-btn>
       </slot>
     </ToolBar>
 
-    <v-dialog v-model="dialog" max-width="600">
+    <v-dialog
+      v-if="hasEstablishment"
+      v-model="dialog"
+      max-width="600"
+    >
       <v-card>
         <v-card-title class="headline mb-5">
           Ajouter une plateforme
@@ -104,7 +113,8 @@
 
           <v-btn
             color="primary"
-            :disabled="!valid || !platformSelected"
+            :disabled="!valid || !platformSelected || loading"
+            :loading="loading"
             @click="saveData"
           >
             Ajouter
@@ -112,7 +122,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
     <v-data-table
+      v-if="hasEstablishment"
       v-model="selected"
       :headers="headers"
       :items="establishment.sushi"
@@ -195,6 +207,18 @@
         </span>
       </template>
     </v-data-table>
+
+    <v-card v-else tile flat color="transparent">
+      <v-card-text>
+        <div class="mb-2">
+          Vous n'êtes rattachés à aucun établissement,
+          où vous n'avez déclaré aucunes informations sur votre établissement.
+        </div>
+        <a :href="'/informations/establishment'">
+          Déclarer des informations d'établissement.
+        </a>
+      </v-card-text>
+    </v-card>
   </section>
 </template>
 
@@ -220,6 +244,7 @@ export default {
       valid: true,
       lazy: false,
       formData: new FormData(),
+      loading: false,
       platformSelected: null,
       platforms: [
         { sushiUrl: 'https://www.projectcounter.org/counter-user/acs-publicatio/', vendor: 'ACS Publications' },
@@ -334,14 +359,15 @@ export default {
     };
   },
   async fetch({ store }) {
-    await store.dispatch('getEstablishment');
+    await store.dispatch('informations/getEstablishment');
   },
   computed: {
     establishment: {
-      get() {
-        return this.$store.state.establishment;
-      },
-      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+      get() { return this.$store.state.informations.establishment || []; },
+      set(newVal) { this.$store.dispatch('informations/setEstablishment', newVal); },
+    },
+    hasEstablishment() {
+      return this.establishment.organisation.name.length;
     },
   },
   watch: {
@@ -366,14 +392,22 @@ export default {
       }
     },
     save() {
+      this.$refs.form.validate();
+
+      this.loading = true;
+
       this.formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
           this.formData = new FormData();
+          this.loading = false;
         })
-        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
+        .catch(() => {
+          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
+          this.loading = false;
+        });
     },
     saveData() {
       if (this.platformSelected) {

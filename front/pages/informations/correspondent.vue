@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar title="Informations: Correspondant" />
-    <v-card-text>
+    <v-card-text v-if="hasEstablishment">
       <v-form
         ref="form"
         v-model="valid"
@@ -52,16 +52,28 @@
         </v-container>
       </v-form>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions v-if="hasEstablishment">
       <span class="caption">* champs obligatoires</span>
       <v-spacer />
       <v-btn
         color="primary"
+        :disabled="loading"
+        :loading="loading"
         @click="save"
       >
         Sauvegarder
       </v-btn>
     </v-card-actions>
+
+    <v-card-text v-if="!hasEstablishment">
+      <div class="mb-2">
+        Vous n'êtes rattachés à aucun établissement,
+        où vous n'avez déclaré aucunes informations sur votre établissement.
+      </div>
+      <a :href="'/informations/establishment'">
+        Déclarer des informations d'établissement.
+      </a>
+    </v-card-text>
   </section>
 </template>
 
@@ -79,30 +91,40 @@ export default {
       valid: true,
       lazy: false,
       formData: new FormData(),
+      loading: false,
     };
   },
   async fetch({ store }) {
-    await store.dispatch('getEstablishment');
+    await store.dispatch('informations/getEstablishment');
   },
   computed: {
     user() { return this.$auth.user; },
     establishment: {
-      get() { return this.$store.state.establishment; },
-      set(newVal) { this.$store.dispatch('setEstablishment', newVal); },
+      get() { return this.$store.state.informations.establishment; },
+      set(newVal) { this.$store.dispatch('informations/setEstablishment', newVal); },
+    },
+    hasEstablishment() {
+      return this.establishment.organisation.name.length;
     },
   },
   methods: {
     save() {
       this.$refs.form.validate();
 
+      this.loading = true;
+
       this.formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('storeOrUpdateEstablishment', this.formData)
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
         .then(() => {
           this.$store.dispatch('snacks/success', 'Informations transmises');
           this.formData = new FormData();
+          this.loading = false;
         })
-        .catch(() => this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué'));
+        .catch(() => {
+          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
+          this.loading = false;
+        });
     },
   },
 };
