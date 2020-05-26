@@ -19,7 +19,7 @@ const instance = axios.create({
   },
 });
 
-const indiciesExists = async function () {
+const ensureIndex = async function () {
   const { body: exists } = await elastic.indices.exists({ index: config.depositors.index });
 
   if (!exists) {
@@ -46,7 +46,7 @@ const getEtablishmentData = async function (uai) {
 };
 
 exports.list = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.type = 'json';
 
@@ -54,7 +54,7 @@ exports.list = async function (ctx) {
 };
 
 exports.getOne = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.type = 'json';
 
@@ -155,7 +155,7 @@ exports.getOne = async function (ctx) {
 };
 
 exports.deleteData = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.status = 204;
 
@@ -179,7 +179,7 @@ exports.deleteData = async function (ctx) {
 };
 
 exports.storeOrUpdate = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.status = 200;
 
