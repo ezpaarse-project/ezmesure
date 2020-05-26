@@ -70,7 +70,7 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin'],
+  middleware: ['auth', 'terms'],
   components: {
     ToolBar,
   },
@@ -85,7 +85,7 @@ export default {
     await store.dispatch('getEstablishment');
   },
   computed: {
-    user() { return this.$store.state.auth.user; },
+    user() { return this.$auth.user; },
     establishment: {
       get() { return this.$store.state.establishment; },
       set(newVal) { this.$store.dispatch('setEstablishment', newVal); },

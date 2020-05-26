@@ -20,7 +20,7 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin', 'isAdmin'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
   },

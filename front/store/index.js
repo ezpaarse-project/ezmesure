@@ -1,12 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import auth from './auth';
 import snacks from './snacks';
 
 const store = () => new Vuex.Store({
   modules: {
-    auth,
     snacks,
   },
   state: {

@@ -1,15 +1,7 @@
-export default function ({ store, route, redirect }) {
-  const { user } = store.state.auth;
+export default function ({ $auth, redirect }) {
+  const roles = new Set(($auth.user && $auth.user.roles) || []);
 
-  if (!user) {
-    return redirect('/authenticate', { origin: route.fullPath });
-  }
-  if (user && !user.roles.length) {
-    return redirect('/myspace');
-  }
-
-  const isAdmin = user.roles.some(role => ['admin', 'superuser'].includes(role));
-  if (!isAdmin) {
+  if (!roles.has('admin') && !roles.has('superuser')) {
     return redirect('/myspace');
   }
   return true;

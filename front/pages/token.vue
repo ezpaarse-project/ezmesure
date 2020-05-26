@@ -15,7 +15,6 @@
               ref="token"
               label="Token"
               :value="token"
-              :rules="[() => ('The email and password you entered don\'t match')]"
               hide-details
               readonly
               outlined
@@ -44,20 +43,27 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: 'isLoggin',
+  middleware: ['auth', 'terms'],
   components: {
     ToolBar,
   },
   data() {
     return {
       showToken: false,
+      token: '',
     };
   },
   computed: {
-    token() { return this.$store.state.auth.token; },
     clipboardAvailable() {
       return navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
     },
+  },
+  async mounted() {
+    try {
+      this.token = await this.$axios.$get('/profile/token');
+    } catch (e) {
+      this.$store.dispatch('snacks/error', 'Impossible de récupérer le token d\'authentification');
+    }
   },
   methods: {
     async copyTokenToClipboard() {
