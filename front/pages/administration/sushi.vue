@@ -23,80 +23,16 @@
     >
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="px-5 py-5">
-          <v-row justify="center">
-            <v-expansion-panels accordion>
-              <v-expansion-panel
-                v-for="(sushi, i) in item.sushi"
-                :key="i"
-              >
-                <v-expansion-panel-header expand-icon="mdi-chevron-down">
-                  {{ sushi.vendor }}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-form ref="form">
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="sushi.vendor"
-                            label="Libellé *"
-                            :rules="[v => !!v || 'Veuillez saisir un libellé.']"
-                            outlined
-                            required
-                          />
-                        </v-col>
-
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="sushi.sushiUrl"
-                            label="URL Sushi *"
-                            :rules="[v => !!v || 'Veuillez saisir une url.']"
-                            outlined
-                            required
-                          />
-                        </v-col>
-
-                        <v-col cols="6">
-                          <v-text-field
-                            v-model="sushi.requestorId"
-                            label="Requestor Id *"
-                            :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
-                            outlined
-                            required
-                          />
-                        </v-col>
-
-                        <v-col cols="6">
-                          <v-text-field
-                            v-model="sushi.customerId"
-                            label="Customer Id *"
-                            :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
-                            outlined
-                          />
-                        </v-col>
-
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="sushi.apiKey"
-                            label="Clé API"
-                            outlined
-                          />
-                        </v-col>
-
-                        <v-col cols="12">
-                          <v-textarea
-                            v-model="sushi.comment"
-                            label="Commentaire"
-                            outlined
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-form>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-row>
+          <v-btn
+            v-for="(sushi, key) in item.sushi"
+            :key="key"
+            :ref="key"
+            color="grey lighten-1"
+            dark
+            class="ma-1"
+            @click.stop="edit(item, key)"
+            v-text="item.sushi[key].vendor"
+          />
         </td>
       </template>
 
@@ -113,6 +49,105 @@
         </span>
       </template>
     </v-data-table>
+
+    <v-dialog v-model="dialog" width="600">
+      <v-card>
+        <v-card-title class="headline" v-text="sushiData.vendor" />
+
+        <v-card-text>
+          <v-form
+            ref="form"
+            v-model="valid"
+            :lazy-validation="lazy"
+          >
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="sushiData.vendor"
+                    label="Libellé *"
+                    :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                    outlined
+                    required
+                  />
+                </v-col>
+
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="sushiData.sushiUrl"
+                    label="URL Sushi *"
+                    :rules="[v => !!v || 'Veuillez saisir une url.']"
+                    outlined
+                    required
+                  />
+                </v-col>
+
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="sushiData.requestorId"
+                    label="Requestor Id *"
+                    :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                    outlined
+                    required
+                  />
+                </v-col>
+
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="sushiData.customerId"
+                    label="Customer Id *"
+                    :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                    outlined
+                  />
+                </v-col>
+
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="sushiData.apiKey"
+                    label="Clé API"
+                    outlined
+                  />
+                </v-col>
+
+                <v-col cols="12">
+                  <v-textarea
+                    v-model="sushiData.comment"
+                    label="Commentaire"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn
+            color="red"
+            text
+            :loading="loading.delete"
+            @click.stop="deleteSushiData"
+          >
+            Supprimer
+          </v-btn>
+
+          <v-spacer />
+
+          <v-btn text @click="dialog = false">
+            Fermer
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            text
+            :loading="loading.update"
+            @click="update"
+          >
+            Mettre à jour
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </section>
 </template>
 
@@ -128,9 +163,17 @@ export default {
   data() {
     return {
       selected: [],
-      selectedSushi: [],
       expanded: [],
-      expandedSushi: [],
+      current: [],
+      sushiData: [],
+      valid: false,
+      lazy: false,
+      loading: {
+        delete: false,
+        update: false,
+      },
+      dialog: false,
+      formData: new FormData(),
       headers: [
         { text: 'Etablissement', value: 'organisation.name' },
         { text: 'Identifiants', value: 'count' },
@@ -148,8 +191,11 @@ export default {
   computed: {
     establishments: {
       get() {
-        return this.$store.state.informations.establishments.filter((establishment) => {
-          if (!establishment.sushi.length) return false;
+        const establishmentsData = JSON.stringify(this.$store.state.informations.establishments);
+        const establishments = JSON.parse(establishmentsData);
+
+        return establishments.filter((establishment) => {
+          if (establishment.sushi.length) return establishment;
           return true;
         });
       },
@@ -159,6 +205,41 @@ export default {
   methods: {
     refreshAdminData() {
       this.$store.dispatch('informations/getEstablishments');
+    },
+    edit(platform, key) {
+      this.dialog = true;
+      this.current = platform;
+      this.sushiData = platform.sushi[key];
+    },
+    deleteSushiData() {
+      this.loading.delete = true;
+      this.current.sushi = this.current.sushi.filter((credentials) => {
+        if (credentials.id === this.sushiData.id) return false;
+        return true;
+      });
+      this.save('delete');
+    },
+    update() {
+      this.loading.update = true;
+      this.save('update');
+    },
+    save(loading) {
+      this.loading[loading] = true;
+
+      this.formData.append('form', JSON.stringify(this.current));
+
+      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
+        .then(() => {
+          this.$store.dispatch('snacks/success', 'Informations transmises');
+          this.formData = new FormData();
+          this.loading[loading] = false;
+          this.dialog = false;
+        })
+        .catch(() => {
+          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
+          this.loading[loading] = false;
+          this.dialog = false;
+        });
     },
   },
 };
