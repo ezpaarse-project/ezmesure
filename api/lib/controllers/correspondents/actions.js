@@ -1,5 +1,5 @@
 const axios = require('axios');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const config = require('config');
 const { randomBytes } = require('crypto');
@@ -194,12 +194,8 @@ exports.storeOrUpdate = async function (ctx) {
 
       logoId = randomBytes(16).toString('hex');
 
-      if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest);
-      }
-
-      fs.createReadStream(path.resolve(logo.path))
-        .pipe(fs.createWriteStream(path.resolve(dest, `${logoId}.png`)));
+      await fs.ensureDir(dest);
+      await fs.move(path.resolve(logo.path), path.resolve(dest, `${logoId}.png`));
     } catch (err) {
       appLogger.error('Failed store logo', err);
     }
@@ -310,8 +306,8 @@ exports.pictures = async function (ctx) {
 
   const { id } = ctx.params;
   if (id) {
-    const logo = fs.createReadStream(path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`));
-    ctx.body = logo;
+    const logoPath = path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`);
+    ctx.body = fs.createReadStream(logoPath);
     return ctx;
   }
 
