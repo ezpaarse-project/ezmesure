@@ -1,19 +1,8 @@
 const config = require('config');
 
 const elastic = require('./elastic');
-const { appLogger } = require('../../server');
-
 const { index } = config.get('depositors');
-
 const encrypter = require('../services/encrypter');
-
-elastic.indices.exists({ index })
-  .then(({ body: exists }) => {
-    if (!exists) { job.fireOnTick(); }
-  })
-  .catch((err) => {
-    appLogger.error(`Failed to check depositors index existence : ${err.statusCode} | ${err.message}`);
-  });
 
 /**
  * Get depositors from the index
