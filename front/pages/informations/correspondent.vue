@@ -2,11 +2,7 @@
   <section>
     <ToolBar title="Informations: Correspondant" />
     <v-card-text v-if="hasEstablishment">
-      <v-form
-        ref="form"
-        v-model="valid"
-        :lazy-validation="lazy"
-      >
+      <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12">
@@ -65,7 +61,7 @@
       </v-btn>
     </v-card-actions>
 
-    <v-card-text v-if="!hasEstablishment">
+    <v-card-text v-else>
       <div class="mb-2">
         Vous n'êtes rattachés à aucun établissement,
         où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -95,7 +91,7 @@ export default {
     }
 
     return {
-      valid: true,
+      valid: false,
       lazy: false,
       loading: false,
       establishment,

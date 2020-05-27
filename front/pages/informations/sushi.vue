@@ -25,11 +25,7 @@
         </v-card-title>
 
         <v-card-text>
-          <v-form
-            ref="form"
-            v-model="valid"
-            :lazy-validation="lazy"
-          >
+          <v-form v-model="valid">
             <v-container>
               <v-row>
                 <v-col cols="12">
@@ -249,7 +245,7 @@ export default {
       ],
       establishment,
       dialog: false,
-      valid: true,
+      valid: false,
       lazy: false,
       loading: false,
       platformSelected: null,

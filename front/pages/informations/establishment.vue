@@ -2,11 +2,7 @@
   <section>
     <ToolBar title="Informations: Établissement" />
     <v-card-text>
-      <v-form
-        ref="form"
-        v-model="valid"
-        :lazy-validation="lazy"
-      >
+      <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12" sm="6">
@@ -141,7 +137,7 @@ export default {
     }
 
     return {
-      valid: true,
+      valid: false,
       lazy: false,
       logo: null,
       logoPreview: null,
