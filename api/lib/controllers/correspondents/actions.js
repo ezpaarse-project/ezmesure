@@ -158,24 +158,26 @@ exports.getOne = async function (ctx) {
 exports.deleteData = async function (ctx) {
   ensureIndex();
 
-  ctx.status = 204;
-
   const { body } = ctx.request;
 
-  if (body.ids && body.ids.length) {
-    try {
-      for (let i = 0; i < body.ids.length; i += 1) {
+  const response = [];
+
+  if (Array.isArray(body.ids) && body.ids.length > 0) {
+    for (let i = 0; i < body.ids.length; i += 1) {
+      try {
         await elastic.delete({
           id: body.ids[i],
           index: config.depositors.index,
         });
+        response.push({ id: body.ids[i], status: 'deleted' });
+      } catch (error) {
+        response.push({ id: body.ids[i], status: 'failed' });
+        appLogger.error('Failed to delete establishment', error);
       }
-    } catch (error) {
-      appLogger.error('Failed to delete establishment', error);
     }
 
     ctx.status = 200;
-    ctx.body = 'OK';
+    ctx.body = response;
   }
 };
 
