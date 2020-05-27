@@ -132,30 +132,22 @@ export default {
   components: {
     ToolBar,
   },
-  data() {
+  async asyncData({ $axios, store }) {
+    let establishment = null;
+    try {
+      establishment = await $axios.$get('/correspondents/myestablishment');
+    } catch (e) {
+      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+    }
+
     return {
       valid: true,
       lazy: false,
       logo: null,
       logoPreview: null,
       loading: false,
+      establishment,
     };
-  },
-  async fetch({ store }) {
-    await store.dispatch('informations/getEstablishment');
-  },
-  computed: {
-    user() { return this.$auth.user; },
-    establishment: {
-      get() {
-        if (this.$store.state.informations.establishment) {
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.logoPreview = this.$store.state.informations.establishment.organisation.logoUrl;
-        }
-        return this.$store.state.informations.establishment;
-      },
-      set(newVal) { this.$store.dispatch('informations/setEstablishment', newVal); },
-    },
   },
   methods: {
     dragAndDrop(event) {
@@ -186,24 +178,23 @@ export default {
       this.logoPreview = null;
       this.logo = null;
     },
-    save() {
-      this.$refs.form.validate();
-
+    async save() {
       this.loading = true;
       const formData = new FormData();
 
       formData.append('logo', this.logo);
       formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', formData)
-        .then(() => {
-          this.$store.dispatch('snacks/success', 'Informations transmises');
-          this.loading = false;
-        })
-        .catch(() => {
-          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
-          this.loading = false;
-        });
+      try {
+        await this.$axios.$post('/correspondents/', formData);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+        this.loading = false;
+        return;
+      }
+
+      this.$store.dispatch('snacks/success', 'Informations transmises');
+      this.loading = false;
     },
   },
 };

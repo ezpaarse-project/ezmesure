@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshAdminData">
+        <v-btn text @click="refreshEstablishments">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -131,6 +131,7 @@ export default {
       selectedSushi: [],
       expanded: [],
       expandedSushi: [],
+      establishments: [],
       headers: [
         { text: 'Etablissement', value: 'organisation.name' },
         { text: 'Identifiants', value: 'count' },
@@ -142,23 +143,24 @@ export default {
       ],
     };
   },
-  async fetch({ store }) {
-    await store.dispatch('informations/getEstablishments');
-  },
-  computed: {
-    establishments: {
-      get() {
-        return this.$store.state.informations.establishments.filter((establishment) => {
-          if (!establishment.sushi.length) return false;
-          return true;
-        });
-      },
-      set(newVal) { this.$store.dispatch('informations/setEstablishments', newVal); },
-    },
+  mounted() {
+    return this.refreshEstablishments();
   },
   methods: {
-    refreshAdminData() {
-      this.$store.dispatch('informations/getEstablishments');
+    async refreshEstablishments() {
+      let establishments;
+      try {
+        establishments = await this.$axios.$get('/correspondents/list');
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      }
+
+      if (!Array.isArray(establishments)) {
+        establishments = [];
+      }
+
+      const hasSushi = item => Array.isArray(item.sushi) && item.sushi.length > 0;
+      this.establishments = establishments.filter(hasSushi);
     },
   },
 };

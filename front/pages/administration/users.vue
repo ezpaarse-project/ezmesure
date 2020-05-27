@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshAdminData">
+        <v-btn text>
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -25,9 +25,6 @@ export default {
     ToolBar,
   },
   methods: {
-    refreshAdminData() {
-      this.$store.dispatch('informations/getEstablishments');
-    },
   },
 };
 </script>
