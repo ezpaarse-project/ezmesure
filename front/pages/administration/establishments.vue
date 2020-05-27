@@ -28,27 +28,39 @@
 
       <template v-slot:item.automatisations="{ item }">
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.ezpaarse ? 'green' : 'red'"
+          :outlined="!item.auto.ezpaarse"
+          :text-color="item.auto.ezpaarse ? 'white' : 'grey'"
+          :color="item.auto.ezpaarse ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.ezpaarse" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           ezPAARSE
         </v-chip>
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.ezmesure ? 'green' : 'red'"
+          :outlined="!item.auto.ezmesure"
+          :text-color="item.auto.ezmesure ? 'white' : 'grey'"
+          :color="item.auto.ezmesure ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.ezmesure" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           ezMESURE
         </v-chip>
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.report ? 'green' : 'red'"
+          :outlined="!item.auto.report"
+          :text-color="item.auto.report ? 'white' : 'grey'"
+          :color="item.auto.report ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.report" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           Reporting
         </v-chip>
       </template>
