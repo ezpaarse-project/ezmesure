@@ -66,14 +66,15 @@
                   ref="dropzone"
                   cols="12"
                   class="text-center dropZone"
+                  :class="{ overlay: hoverDropzone }"
                   :style="{
                     'background-color': logoPreview ? 'transparent' : '#ccc',
                     'background-image': `url(
                       ${logoPreview ? logoPreview : require('@/static/images/logo-etab.png')}
                     )`
                   }"
-                  @dragover="dragAndDrop('over')"
-                  @dragleave="dragAndDrop('leave')"
+                  @dragover="hoverDropzone = true"
+                  @dragleave="hoverDropzone = false"
                 >
                   <v-tooltip v-if="logoPreview" right>
                     <template v-slot:activator="{ on }" class="removeLogoTooltip">
@@ -142,20 +143,11 @@ export default {
       logo: null,
       logoPreview: null,
       loading: false,
+      hoverDropzone: false,
       establishment,
     };
   },
   methods: {
-    dragAndDrop(event) {
-      if (this.$refs && this.$refs.dropZone) {
-        if (event && event === 'over') {
-          this.$refs.dropZone.classList.add('overlay');
-        }
-        if (event && event === 'leave') {
-          this.$refs.dropZone.classList.remove('overlay');
-        }
-      }
-    },
     upload() {
       if (!this.$refs.logo.files) {
         this.logoPreview = null;
