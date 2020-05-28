@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshAdminData">
+        <v-btn text @click="refreshEstablishments">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -28,27 +28,39 @@
 
       <template v-slot:item.automatisations="{ item }">
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.ezpaarse ? 'green' : 'red'"
+          :outlined="!item.auto.ezpaarse"
+          :text-color="item.auto.ezpaarse ? 'white' : 'grey'"
+          :color="item.auto.ezpaarse ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.ezpaarse" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           ezPAARSE
         </v-chip>
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.ezmesure ? 'green' : 'red'"
+          :outlined="!item.auto.ezmesure"
+          :text-color="item.auto.ezmesure ? 'white' : 'grey'"
+          :color="item.auto.ezmesure ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.ezmesure" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           ezMESURE
         </v-chip>
         <v-chip
-          class="white--text ma-2"
           label
           small
-          :color="item.auto.report ? 'green' : 'red'"
+          :outlined="!item.auto.report"
+          :text-color="item.auto.report ? 'white' : 'grey'"
+          :color="item.auto.report ? 'green' : 'grey'"
         >
+          <v-avatar v-if="item.auto.report" left small>
+            <v-icon>mdi-check</v-icon>
+          </v-avatar>
           Reporting
         </v-chip>
       </template>
@@ -297,7 +309,7 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin', 'isAdmin'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
   },
@@ -315,45 +327,48 @@ export default {
         { text: 'Automatisations', value: 'automatisations' },
         { text: '', value: 'data-table-expand' },
       ],
+      types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
+      establishments: [],
     };
   },
-  async fetch({ store }) {
-    await store.dispatch('informations/getEstablishments');
-  },
-  computed: {
-    establishments: {
-      get() {
-        const establishmentData = JSON.stringify(this.$store.state.informations.establishments);
-        const establishments = JSON.parse(establishmentData);
-        if (establishments.length) {
-          establishments.forEach((establishment) => {
-            if (establishment.contacts) {
-              if (establishment.contacts.users && establishment.contacts.length) {
-                establishment.contacts.users.forEach((user) => {
-                  if (user.type.length) {
-                    user.type = user.type.split(',');
-                  }
-                });
-              }
-            }
-            establishment.logo = null;
-            establishment.logoPreview = null;
-            if (establishment.organisation.logoUrl.length) {
-              establishment.logoPreview = `/api/correspondents/pictures/${establishment.organisation.logoUrl}`;
-            }
-          });
-        }
-        return establishments;
-      },
-      set(newVal) { this.$store.dispatch('informations/setEstablishments', newVal); },
-    },
-    types() {
-      return ['tech', 'doc'];
-    },
+  mounted() {
+    return this.refreshEstablishments();
   },
   methods: {
+    async refreshEstablishments() {
+      let establishments;
+      try {
+        establishments = await this.$axios.$get('/correspondents/list');
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      }
+
+      if (!Array.isArray(establishments)) {
+        establishments = [];
+      }
+
+      establishments.forEach((establishment) => {
+        const users = establishment?.contacts?.users;
+        const logoUrl = establishment?.organisation?.logoUrl;
+
+        if (Array.isArray(users)) {
+          users.filter(u => u.type).forEach((user) => {
+            user.type = user.type.split(',');
+          });
+        }
+
+        establishment.logo = null;
+        establishment.logoPreview = null;
+
+        if (logoUrl) {
+          establishment.logoPreview = `/api/correspondents/pictures/${logoUrl}`;
+        }
+      });
+
+      this.establishments = establishments;
+    },
     dragAndDrop(event) {
       if (this.$refs && this.$refs.dropZone) {
         if (event && event === 'over') {
@@ -382,42 +397,59 @@ export default {
       this.logoPreview = null;
       this.logo = null;
     },
-    deleteData() {
-      if (this.selected.length) {
-        const ids = this.selected.map(select => select.id);
-        this.$store.dispatch('informations/deleteEstablishments', { ids }).then((res) => {
-          if (res === 'OK') {
-            this.$store.dispatch('snacks/success', `${this.selected.length} élement(s) supprimé(s)`);
-            this.establishments = this.establishments.filter(({ id }) => {
-              const sushiData = this.selected.find(data => data.id === id);
-              if (sushiData) {
-                return false;
-              }
+    async deleteData() {
+      if (this.selected.length === 0) {
+        return;
+      }
 
-              return true;
-            });
-            this.selected = [];
-          }
-        }).catch(() => this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`));
+      const ids = this.selected.map(select => select.id);
+      let response;
+
+      try {
+        response = await this.$axios.$post('/correspondents/delete', { ids });
+        if (!Array.isArray(response)) {
+          throw new Error('invalid response');
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`);
+        return;
+      }
+
+      const failed = response.filter(item => item?.status !== 'deleted');
+      const deleted = response.filter(item => item?.status === 'deleted');
+
+      failed.forEach(({ id }) => {
+        this.$store.dispatch('snacks/error', `Impossible de supprimer l'établissement ${id}`);
+      });
+
+
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', `${deleted.length} élement(s) supprimé(s)`);
+
+        const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
+        this.establishments = this.establishments.filter(removeDeleted);
+        this.selected = this.selected.filter(removeDeleted);
       }
     },
-    updateEstablishment(establishment) {
+    async updateEstablishment(establishment) {
       const formData = new FormData();
-
-      formData.append('logo', establishment.logo);
 
       delete establishment.logo;
       delete establishment.logoPreview;
 
+      formData.append('logo', establishment.logo);
       formData.append('form', JSON.stringify(establishment));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', formData).then((establishmentData) => {
-        establishment = establishmentData;
-        this.$store.dispatch('snacks/success', 'Établissement mis à jour');
-      }).catch(() => this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement'));
-    },
-    refreshAdminData() {
-      this.$store.dispatch('getEstablishments');
+      try {
+        await this.$axios.$post('/correspondents/', formData);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement');
+        this.loading = false;
+        return;
+      }
+
+      this.$store.dispatch('snacks/success', 'Établissement mis à jour');
+      this.loading = false;
     },
   },
 };

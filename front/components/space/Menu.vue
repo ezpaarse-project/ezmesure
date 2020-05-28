@@ -136,7 +136,7 @@ export default {
       get() { return this.$store.state.drawer; },
       set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },
     },
-    user() { return this.$store.state.auth.user; },
+    user() { return this.$auth.user; },
     hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
     isAdmin() {
       if (this.user && this.hasRoles) {

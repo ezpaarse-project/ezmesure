@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshAdminData">
+        <v-btn text>
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -20,14 +20,11 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin', 'isAdmin'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
   },
   methods: {
-    refreshAdminData() {
-      this.$store.dispatch('informations/getEstablishments');
-    },
   },
 };
 </script>

@@ -1,11 +1,12 @@
 const axios = require('axios');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const config = require('config');
+const { randomBytes } = require('crypto');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
-const crypto = require('../../services/crypto');
+const encrypter = require('../../services/encrypter');
 const { appLogger } = require('../../../server');
 const { sendMail, generateMail } = require('../../services/mail');
 
@@ -19,7 +20,7 @@ const instance = axios.create({
   },
 });
 
-const indiciesExists = async function () {
+const ensureIndex = async function () {
   const { body: exists } = await elastic.indices.exists({ index: config.depositors.index });
 
   if (!exists) {
@@ -46,7 +47,7 @@ const getEtablishmentData = async function (uai) {
 };
 
 exports.list = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.type = 'json';
 
@@ -54,7 +55,7 @@ exports.list = async function (ctx) {
 };
 
 exports.getOne = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.type = 'json';
 
@@ -145,8 +146,8 @@ exports.getOne = async function (ctx) {
 
     if (establishment.sushi.length) {
       for (let i = 0; i < establishment.sushi.length; i += 1) {
-        establishment.sushi[i].customerId = crypto.decrypt(establishment.sushi[i].customerId);
-        establishment.sushi[i].requestorId = crypto.decrypt(establishment.sushi[i].requestorId);
+        establishment.sushi[i].customerId = encrypter.decrypt(establishment.sushi[i].customerId);
+        establishment.sushi[i].requestorId = encrypter.decrypt(establishment.sushi[i].requestorId);
       }
     }
   }
@@ -155,31 +156,33 @@ exports.getOne = async function (ctx) {
 };
 
 exports.deleteData = async function (ctx) {
-  indiciesExists();
-
-  ctx.status = 204;
+  ensureIndex();
 
   const { body } = ctx.request;
 
-  if (body.ids && body.ids.length) {
-    try {
-      for (let i = 0; i < body.ids.length; i += 1) {
+  const response = [];
+
+  if (Array.isArray(body.ids) && body.ids.length > 0) {
+    for (let i = 0; i < body.ids.length; i += 1) {
+      try {
         await elastic.delete({
           id: body.ids[i],
           index: config.depositors.index,
         });
+        response.push({ id: body.ids[i], status: 'deleted' });
+      } catch (error) {
+        response.push({ id: body.ids[i], status: 'failed' });
+        appLogger.error('Failed to delete establishment', error);
       }
-    } catch (error) {
-      appLogger.error('Failed to delete establishment', error);
     }
 
     ctx.status = 200;
-    ctx.body = 'OK';
+    ctx.body = response;
   }
 };
 
 exports.storeOrUpdate = async function (ctx) {
-  indiciesExists();
+  ensureIndex();
 
   ctx.status = 200;
 
@@ -191,14 +194,10 @@ exports.storeOrUpdate = async function (ctx) {
     try {
       const dest = path.resolve(__dirname, '..', '..', '..', 'uploads');
 
-      logoId = crypto.randomBytes(16).toString('hex');
+      logoId = randomBytes(16).toString('hex');
 
-      if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest);
-      }
-
-      fs.createReadStream(path.resolve(logo.path))
-        .pipe(fs.createWriteStream(path.resolve(dest, `${logoId}.png`)));
+      await fs.ensureDir(dest);
+      await fs.move(path.resolve(logo.path), path.resolve(dest, `${logoId}.png`));
     } catch (err) {
       appLogger.error('Failed store logo', err);
     }
@@ -213,8 +212,8 @@ exports.storeOrUpdate = async function (ctx) {
 
     if (formData.sushi.length) {
       for (let i = 0; i < formData.sushi.length; i += 1) {
-        formData.sushi[i].customerId = crypto.encrypt(formData.sushi[i].customerId);
-        formData.sushi[i].requestorId = crypto.encrypt(formData.sushi[i].requestorId);
+        formData.sushi[i].customerId = encrypter.encrypt(formData.sushi[i].customerId);
+        formData.sushi[i].requestorId = encrypter.encrypt(formData.sushi[i].requestorId);
       }
     }
 
@@ -309,8 +308,8 @@ exports.pictures = async function (ctx) {
 
   const { id } = ctx.params;
   if (id) {
-    const logo = fs.createReadStream(path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`));
-    ctx.body = logo;
+    const logoPath = path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`);
+    ctx.body = fs.createReadStream(logoPath);
     return ctx;
   }
 

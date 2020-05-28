@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshAdminData">
+        <v-btn text @click="refreshEstablishments">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -156,7 +156,7 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin', 'isAdmin'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
   },
@@ -166,6 +166,7 @@ export default {
       expanded: [],
       current: [],
       sushiData: [],
+      establishments: [],
       valid: false,
       lazy: false,
       loading: {
@@ -173,7 +174,6 @@ export default {
         update: false,
       },
       dialog: false,
-      formData: new FormData(),
       headers: [
         { text: 'Etablissement', value: 'organisation.name' },
         { text: 'Identifiants', value: 'count' },
@@ -185,61 +185,62 @@ export default {
       ],
     };
   },
-  async fetch({ store }) {
-    await store.dispatch('informations/getEstablishments');
-  },
-  computed: {
-    establishments: {
-      get() {
-        const establishmentsData = JSON.stringify(this.$store.state.informations.establishments);
-        const establishments = JSON.parse(establishmentsData);
-
-        return establishments.filter((establishment) => {
-          if (establishment.sushi.length) return establishment;
-          return true;
-        });
-      },
-      set(newVal) { this.$store.dispatch('informations/setEstablishments', newVal); },
-    },
+  mounted() {
+    return this.refreshEstablishments();
   },
   methods: {
-    refreshAdminData() {
-      this.$store.dispatch('informations/getEstablishments');
+    async refreshEstablishments() {
+      let establishments;
+      try {
+        establishments = await this.$axios.$get('/correspondents/list');
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      }
+
+      if (!Array.isArray(establishments)) {
+        establishments = [];
+      }
+
+      const hasSushi = item => Array.isArray(item.sushi) && item.sushi.length > 0;
+      this.establishments = establishments.filter(hasSushi);
     },
     edit(platform, key) {
       this.dialog = true;
       this.current = platform;
       this.sushiData = platform.sushi[key];
     },
-    deleteSushiData() {
+    async deleteSushiData() {
       this.loading.delete = true;
-      this.current.sushi = this.current.sushi.filter((credentials) => {
-        if (credentials.id === this.sushiData.id) return false;
-        return true;
-      });
-      this.save('delete');
+      const removeCurrentSushiData = credentials => credentials.id !== this.sushiData.id;
+      this.current.sushi = this.current.sushi.filter(removeCurrentSushiData);
+      try {
+        await this.save('delete');
+      } finally {
+        this.loading.delete = false;
+      }
     },
     update() {
       this.loading.update = true;
       this.save('update');
     },
-    save(loading) {
+    async save(loading) {
       this.loading[loading] = true;
 
-      this.formData.append('form', JSON.stringify(this.current));
+      const formData = new FormData();
+      formData.append('form', JSON.stringify(this.current));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
-        .then(() => {
-          this.$store.dispatch('snacks/success', 'Informations transmises');
-          this.formData = new FormData();
-          this.loading[loading] = false;
-          this.dialog = false;
-        })
-        .catch(() => {
-          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
-          this.loading[loading] = false;
-          this.dialog = false;
-        });
+      try {
+        await this.$axios.$post('/correspondents/', formData);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+        this.loading[loading] = false;
+        this.dialog = false;
+        return;
+      }
+
+      this.$store.dispatch('snacks/success', 'Informations transmises');
+      this.loading[loading] = false;
+      this.dialog = false;
     },
   },
 };

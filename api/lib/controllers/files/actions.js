@@ -110,7 +110,6 @@ exports.deleteMany = async function (ctx) {
 
   const domain = email.split('@')[1];
   const { body } = ctx.request;
-  console.log(body);
   const fileNames = body && body.entries;
 
   if (!fileNames) {

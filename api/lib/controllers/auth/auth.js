@@ -85,6 +85,38 @@ exports.renaterLogin = async function (ctx) {
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
+exports.elasticLogin = async function (ctx) {
+  const { username, password } = ctx.request.body;
+  const basicString = Buffer.from(`${username}:${password}`).toString('base64');
+  let user;
+
+  try {
+    const response = await elastic.security.authenticate({}, {
+      headers: {
+        authorization: `Basic ${basicString}`,
+      },
+    });
+    user = response && response.body;
+  } catch (e) {
+    ctx.throw(e.statusCode || 500, e.message);
+    return;
+  }
+
+  if (!user) {
+    ctx.throw(401);
+    return;
+  }
+
+  if (user.metadata && user.metadata._reserved) {
+    ctx.throw(403, 'cannot login as reserved user');
+    return;
+  }
+
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  ctx.body = user;
+  ctx.status = 200;
+};
+
 exports.acceptTerms = async function (ctx) {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
@@ -141,7 +173,7 @@ function generateToken(user) {
 }
 
 exports.logout = async function (ctx) {
-  ctx.cookies.set('eztoken', null, { httpOnly: true });
+  ctx.cookies.set(cookie, null, { httpOnly: true });
   ctx.redirect(decodeURIComponent('/myspace'));
 };
 
