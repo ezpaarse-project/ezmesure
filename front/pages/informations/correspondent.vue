@@ -2,11 +2,7 @@
   <section>
     <ToolBar title="Informations: Correspondant" />
     <v-card-text v-if="hasEstablishment">
-      <v-form
-        ref="form"
-        v-model="valid"
-        :lazy-validation="lazy"
-      >
+      <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12">
@@ -65,7 +61,7 @@
       </v-btn>
     </v-card-actions>
 
-    <v-card-text v-if="!hasEstablishment">
+    <v-card-text v-else>
       <div class="mb-2">
         Vous n'êtes rattachés à aucun établissement,
         où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -82,49 +78,48 @@ import ToolBar from '~/components/space/ToolBar';
 
 export default {
   layout: 'space',
-  middleware: ['isLoggin'],
+  middleware: ['auth', 'terms'],
   components: {
     ToolBar,
   },
-  data() {
+  async asyncData({ $axios, store }) {
+    let establishment = null;
+    try {
+      establishment = await $axios.$get('/correspondents/myestablishment');
+    } catch (e) {
+      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+    }
+
     return {
-      valid: true,
+      valid: false,
       lazy: false,
-      formData: new FormData(),
       loading: false,
+      establishment,
     };
   },
-  async fetch({ store }) {
-    await store.dispatch('informations/getEstablishment');
-  },
   computed: {
-    user() { return this.$store.state.auth.user; },
-    establishment: {
-      get() { return this.$store.state.informations.establishment; },
-      set(newVal) { this.$store.dispatch('informations/setEstablishment', newVal); },
-    },
+    user() { return this.$auth.user; },
     hasEstablishment() {
-      return this.establishment.organisation.name.length;
+      return !!this.establishment?.organisation?.name;
     },
   },
   methods: {
-    save() {
-      this.$refs.form.validate();
-
+    async save() {
       this.loading = true;
+      const formData = new FormData();
 
-      this.formData.append('form', JSON.stringify(this.establishment));
+      formData.append('form', JSON.stringify(this.establishment));
 
-      this.$store.dispatch('informations/storeOrUpdateEstablishment', this.formData)
-        .then(() => {
-          this.$store.dispatch('snacks/success', 'Informations transmises');
-          this.formData = new FormData();
-          this.loading = false;
-        })
-        .catch(() => {
-          this.$store.dispatch('snacks/error', 'L\'envoi du forumlaire a échoué');
-          this.loading = false;
-        });
+      try {
+        await this.$axios.$post('/correspondents/', formData);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+        this.loading = false;
+        return;
+      }
+
+      this.$store.dispatch('snacks/success', 'Informations transmises');
+      this.loading = false;
     },
   },
 };

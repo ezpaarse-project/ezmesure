@@ -1,19 +1,8 @@
 const config = require('config');
 
 const elastic = require('./elastic');
-const { appLogger } = require('../../server');
-
 const { index } = config.get('depositors');
-
-const crypto = require('../services/crypto');
-
-elastic.indices.exists({ index })
-  .then(({ body: exists }) => {
-    if (!exists) { job.fireOnTick(); }
-  })
-  .catch((err) => {
-    appLogger.error(`Failed to check depositors index existence : ${err.statusCode} | ${err.message}`);
-  });
+const encrypter = require('../services/encrypter');
 
 /**
  * Get depositors from the index
@@ -44,8 +33,8 @@ async function getFromIndex() {
 
     if (depositor.sushi.length) {
       for (let i = 0; i < depositor.sushi.length; i += 1) {
-        depositor.sushi[i].customerId = crypto.decrypt(depositor.sushi[i].customerId);
-        depositor.sushi[i].requestorId = crypto.decrypt(depositor.sushi[i].requestorId);
+        depositor.sushi[i].customerId = encrypter.decrypt(depositor.sushi[i].customerId);
+        depositor.sushi[i].requestorId = encrypter.decrypt(depositor.sushi[i].requestorId);
       }
     }
 
