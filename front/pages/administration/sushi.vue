@@ -216,7 +216,7 @@ export default {
       try {
         await this.save('delete');
       } finally {
-        this.loading.delete = true;
+        this.loading.delete = false;
       }
     },
     update() {
