@@ -73,7 +73,7 @@
 
     <template v-slot:append>
       <div class="pa-2">
-        <v-btn block color="red lighten-2" dark>
+        <v-btn block color="red lighten-2" dark href="/Shibboleth.sso/Logout?return=/logout">
           Déconnexion
         </v-btn>
       </div>
