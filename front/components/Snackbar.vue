@@ -7,9 +7,12 @@
     :timeout="currentMessage.timeout"
   >
     {{ currentMessage.text }}
-    <v-btn dark text @click.native="visible = false">
-      Fermer
-    </v-btn>
+    <v-btn
+      dark
+      text
+      @click.native="visible = false"
+      v-text="$t('clsoe')"
+    />
   </v-snackbar>
 </template>
 

@@ -6,8 +6,8 @@
     :loading="loading"
     item-key="name"
     show-select
-    no-data-text="Aucun fichier"
-    no-results-text="Aucun fichier"
+    :no-data-text="$t('files.noFile')"
+    :no-results-text="$t('files.noFile')"
   >
     <template v-slot:item.lastModified="{ item }">
       {{ item.prettyLastModified }}
@@ -33,23 +33,6 @@ export default {
       hostedFiles: [],
       selected: [],
       loading: false,
-      headers: [
-        {
-          align: 'left',
-          text: 'Nom',
-          value: 'name',
-        }, {
-          align: 'left',
-          text: 'Modifié',
-          value: 'lastModified',
-          width: '220px',
-        }, {
-          align: 'left',
-          text: 'Taille',
-          value: 'size',
-          width: '120px',
-        },
-      ],
     };
   },
   computed: {
@@ -63,6 +46,25 @@ export default {
     },
     noFileSelected() {
       return this.selected.length === 0;
+    },
+    headers() {
+      return [
+        {
+          align: 'left',
+          text: this.$t('files.name'),
+          value: 'name',
+        }, {
+          align: 'left',
+          text: this.$t('files.modified'),
+          value: 'lastModified',
+          width: '220px',
+        }, {
+          align: 'left',
+          text: this.$t('files.size'),
+          value: 'size',
+          width: '120px',
+        },
+      ];
     },
   },
   watch: {
@@ -81,7 +83,7 @@ export default {
       try {
         this.hostedFiles = (await this.$axios.get('/files')).data;
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'La mise à jour de la liste a échoué');
+        this.$store.dispatch('snacks/error', this.$t('files.updatingFailed'));
       }
 
       this.loading = false;
@@ -96,7 +98,7 @@ export default {
       try {
         await this.$axios.post('/files/delete_batch', { entries });
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'La suppression des fichiers a échoué');
+        this.$store.dispatch('snacks/error', this.$t('files.deletingFailed'));
       }
 
       this.selected = [];

@@ -1,9 +1,9 @@
 <template>
   <v-app-bar app clipped-left dark color="primary">
     <router-link
-      to="/"
-      aria-label="Page d'accueil ezMESURE"
-      title="Page d'accueil ezMESURE"
+      :to="localePath('/')"
+      :aria-label="$t('menu.homepage')"
+      :title="$t('menu.homepage')"
     >
       <v-img
         alt="Logo ezMESURE"
@@ -22,21 +22,46 @@
     <v-spacer />
 
     <v-toolbar-items class="hidden-sm-and-down">
-      <v-btn text exact to="/">
-        Accueil
-      </v-btn>
-      <v-btn text href="/kibana/">
-        Tableaux de bord
-      </v-btn>
-      <v-btn text to="/myspace">
-        Mon compte
-      </v-btn>
-      <v-btn text exact to="/partners">
-        Nos partenaires
-      </v-btn>
-      <v-btn text exact to="/api">
-        API
-      </v-btn>
+      <v-btn text exact :to="localePath('/')" v-text="$t('menu.home')" />
+      <v-btn text href="/kibana/" v-text="$t('menu.dashboard')" />
+      <v-btn text :to="localePath('/myspace')" v-text="$t('menu.myspace')" />
+      <v-btn text exact :to="localePath('/partners')" v-text="$t('menu.partners')" />
+      <v-btn text exact :to="localePath('/api')" v-text="$t('menu.api')" />
+
+      <v-menu v-model="chooseLanguage" offset-y>
+        <template v-slot:activator="{ on }">
+          <v-btn
+            text
+            v-on="on"
+            @click.stop="chooseLanguage = !chooseLanguage"
+          >
+            <v-img
+              :src="require(`@/static/images/${$i18n.locale}.png`)"
+              width="16"
+              class="mr-2"
+            />
+            {{ currentLocal }}
+            <v-icon v-if="chooseLanguage">
+              mdi-chevron-up
+            </v-icon>
+            <v-icon v-else>
+              mdi-chevron-down
+            </v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="locale in $i18n.locales"
+            :key="locale.code"
+            router
+            :to="switchLocalePath(locale.code)"
+            ripple
+            @click.stop="chooseLanguage = !chooseLanguage"
+          >
+            <v-list-item-title v-text="locale.name" />
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-toolbar-items>
 
     <v-bottom-sheet v-model="sheet">
@@ -47,22 +72,22 @@
       </template>
 
       <v-list>
-        <v-subheader>Naviguer vers</v-subheader>
+        <v-subheader v-text="$t('toolbar.navigateTo')" />
 
-        <v-list-item exact to="/" @click="sheet = false">
-          <v-list-item-title>Accueil</v-list-item-title>
+        <v-list-item exact :to="localePath('/')" @click="sheet = false">
+          <v-list-item-title v-text="$t('menu.home')" />
         </v-list-item>
         <v-list-item href="/kibana/" @click="sheet = false">
-          <v-list-item-title>Tableaux de bord</v-list-item-title>
+          <v-list-item-title v-text="$t('menu.dashboard')" />
         </v-list-item>
-        <v-list-item exact to="/myspace" @click="sheet = false">
-          <v-list-item-title>Mon compte</v-list-item-title>
+        <v-list-item exact :to="localePath('/myspace')" @click="sheet = false">
+          <v-list-item-title v-text="$t('menu.myspace')" />
         </v-list-item>
-        <v-list-item exact to="/partners" @click="sheet = false">
-          <v-list-item-title>Nos partenaires</v-list-item-title>
+        <v-list-item exact :to="localePath('/partners')" @click="sheet = false">
+          <v-list-item-title v-text="$t('menu.partners')" />
         </v-list-item>
-        <v-list-item exact to="/api" @click="sheet = false">
-          <v-list-item-title>API</v-list-item-title>
+        <v-list-item exact :to="localePath('/api')" @click="sheet = false">
+          <v-list-item-title v-text="$t('menu.api')" />
         </v-list-item>
       </v-list>
     </v-bottom-sheet>
@@ -74,7 +99,13 @@ export default {
   data() {
     return {
       sheet: false,
+      chooseLanguage: false,
     };
+  },
+  computed: {
+    currentLocal() {
+      return this.$i18n.locales.find(locale => locale.code === this.$i18n.locale).name;
+    },
   },
 };
 </script>

@@ -20,16 +20,14 @@
         {{ organisation.name }}
       </div>
       <div class="body-2">
-        {{ indexCount }} <abbr title="Événements de consultation">ECs</abbr> chargés
+        {{ indexCount }} <abbr :title="$t('partners.ecs')">ECs</abbr> {{ $t('partners.ecsLoaded') }}
       </div>
     </v-card-text>
 
     <v-divider />
 
     <v-card-text class="text-center">
-      <div class="subtitle-1">
-        Correspondants
-      </div>
+      <div class="subtitle-1" v-text="$t('partners.correspondents')" />
 
       <div v-for="(contact, key) in contacts" :ref="key" :key="key">
         <v-tooltip v-if="contact.confirmed" right>
@@ -68,8 +66,8 @@ export default {
     },
     contactType() {
       return {
-        tech: { value: 'Technique' },
-        doc: { value: 'Documentaire' },
+        tech: { value: this.$t('partners.technical') },
+        doc: { value: this.$t('partners.documentary') },
       };
     },
   },

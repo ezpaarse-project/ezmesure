@@ -12,7 +12,7 @@
         v-for="link in links"
         :key="link.title"
         router
-        :to="{ path: link.href }"
+        :to="localePath({ path: link.href })"
       >
         <v-list-item-content>
           <v-list-item-title class="grey--text text--darken-3 uppercase">
@@ -35,7 +35,7 @@
           v-for="child in informations.children"
           :key="child.title"
           router
-          :to="{ path: `${informations.href}${child.href}` }"
+          :to="localePath({ path: `${informations.href}${child.href}` })"
           ripple
         >
           <v-list-item-title
@@ -60,7 +60,7 @@
           v-for="child in administration.children"
           :key="child.title"
           router
-          :to="{ path: `${administration.href}${child.href}` }"
+          :to="localePath({ path: `${administration.href}${child.href}` })"
           ripple
         >
           <v-list-item-title
@@ -73,9 +73,13 @@
 
     <template v-slot:append>
       <div class="pa-2">
-        <v-btn block color="red lighten-2" dark>
-          Déconnexion
-        </v-btn>
+        <v-btn
+          block
+          color="red lighten-2"
+          dark
+          href="/Shibboleth.sso/Logout?return=/logout"
+          v-text="$t('menu.logout')"
+        />
       </div>
     </template>
   </v-navigation-drawer>
@@ -86,52 +90,58 @@ export default {
   data() {
     return {
       item: 1,
-      links: [
-        { title: 'Profil', href: '/myspace' },
-        { title: 'Mes dépots', href: '/files' },
-        { title: 'Identifiants Kibana', href: '/kibana' },
-        { title: 'Token d\'authentification', href: '/token' },
-      ],
-      administration: {
-        title: 'Administration',
+    };
+  },
+  computed: {
+    links() {
+      return [
+        { title: this.$t('menu.profile'), href: '/myspace' },
+        { title: this.$t('menu.myDeposits'), href: '/files' },
+        { title: this.$t('menu.kibanIdentifiers'), href: '/kibana' },
+        { title: this.$t('menu.authentificationToken'), href: '/token' },
+      ];
+    },
+    administration() {
+      return {
+        title: this.$t('menu.administration'),
         href: '/administration',
         admin: true,
         children: [
           {
-            title: 'Établissements',
+            title: this.$t('menu.establishments'),
             href: '/establishments',
           },
           {
-            title: 'Sushi',
+            title: this.$t('menu.sushi'),
             href: '/sushi',
           },
           {
-            title: 'Utilisateurs',
+            title: this.$t('menu.users'),
             href: '/users',
           },
         ],
-      },
-      informations: {
-        title: 'Informations',
+      };
+    },
+    informations() {
+      return {
+        title: this.$t('menu.informations'),
         href: '/informations',
         children: [
           {
-            title: 'Établissement',
+            title: this.$t('menu.establishment'),
             href: '/establishment',
           },
           {
-            title: 'Correspondant',
+            title: this.$t('menu.correspondent'),
             href: '/correspondent',
           },
           {
-            title: 'Sushi',
+            title: this.$t('menu.sushi'),
             href: '/sushi',
           },
         ],
-      },
-    };
-  },
-  computed: {
+      };
+    },
     drawer: {
       get() { return this.$store.state.drawer; },
       set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },

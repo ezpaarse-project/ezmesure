@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Mon Profil">
+    <ToolBar :title="$t('myspace.title')">
       <slot>
         <v-spacer />
 
@@ -8,7 +8,7 @@
           <v-icon left>
             mdi-refresh
           </v-icon>
-          Actualiser
+          {{ $t('refresh') }}
         </v-btn>
       </slot>
     </ToolBar>
@@ -19,58 +19,48 @@
         prominent
         :value="!hasRoles"
       >
-        <div class="headline">
-          Aucun rôle n'est encore associé à votre compte.
-        </div>
-        <div>
-          Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe
-          ou le correspondant ezMESURE de votre établissement.
-        </div>
+        <div class="headline" v-text="$t('myspace.noRoles')" />
+        <div v-text="$t('myspace.determineAccesRight')" />
       </v-alert>
       <v-text-field
         :value="user.full_name"
-        label="Nom"
+        :label="$t('myspace.name')"
         readonly
         outlined
       />
 
       <v-text-field
         :value="user.email"
-        label="Mail"
+        :label="$t('myspace.mail')"
         readonly
         outlined
       />
 
       <v-text-field
         :value="metadata.idp"
-        label="IDP"
+        :label="$t('myspace.idp')"
         readonly
         outlined
       />
 
       <v-text-field
         :value="metadata.org"
-        label="Organisation"
+        :label="$t('myspace.organization')"
         readonly
         outlined
       />
 
       <v-text-field
         :value="metadata.unit"
-        label="Unité"
+        :label="$t('myspace.unit')"
         readonly
         outlined
       />
 
       <v-card v-if="hasRoles" outlined>
         <v-card-text>
-          <div class="title">
-            Vos rôles
-          </div>
-          <div class="mb-2">
-            Ces rôles définissent vos droits d'accès aux données
-            et aux tableaux de bord hébergés sur ezMESURE.
-          </div>
+          <div class="title" v-text="$t('myspace.yourRights')" />
+          <div class="mb-2" v-text="$t('myspace.whatDoesRoles')" />
           <div>
             <v-chip
               v-for="role in user.roles"

@@ -1,16 +1,7 @@
 <template>
   <v-container>
-    <p>
-      Déposez ici les fichiers d'événements de consultations
-      que vous souhaitez charger dans ezMESURE.
-      Veuillez noter que le chargement n'est <strong>pas</strong> immédiat,
-      et sera effectué par nos soins dès que possible.
-      Nous vous invitons à lire nos
-      <a href="http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/">règles de bonnes pratiques</a> afin de faciliter le processus,
-      et à vous rapprocher de l'équipe si vous souhaitez
-      en savoir plus sur l'automatisation des chargements.
-      Les données chargées ne sont pas accessibles aux autres déposants.
-    </p>
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <p v-html="$t('files.depositFiles')" />
 
     <FileInput @change="addFilesToUpload" />
 
@@ -22,7 +13,7 @@
               <v-icon left>
                 mdi-notification-clear-all
               </v-icon>
-              Supprimer terminés
+              {{ $t('files.deleteCompleted') }}
             </v-btn>
           </div>
         </v-flex>
@@ -63,12 +54,12 @@
 
                   <div class="grey--text">
                     <span v-if="upload.error" class="error--text">
-                      {{ upload.errorMessage || 'Erreur' }}
+                      {{ upload.errorMessage || $t('error') }}
                     </span>
-                    <span v-else-if="upload.done">Chargé</span>
-                    <span v-else-if="upload.progress">Chargement en cours</span>
-                    <span v-else-if="upload.validating">Validation du fichier...</span>
-                    <span v-else>En attente</span>
+                    <span v-else-if="upload.done" v-text="$t('files.uploaded')" />
+                    <span v-else-if="upload.progress" v-text="$t('files.loadingInProgress')" />
+                    <span v-else-if="upload.validating" v-text="$t('files.validatingFile')" />
+                    <span v-else v-text="$t('files.isWaiting')" />
                   </div>
                 </v-flex>
 
@@ -115,27 +106,29 @@ export default {
       uploading: false,
       hostedFiles: [],
       loading: false,
-      headers: [
-        {
-          align: 'left',
-          text: 'Nom',
-          value: 'name',
-          class: 'grow',
-        }, {
-          align: 'left',
-          text: 'Taille',
-          value: 'size',
-        }, {
-          align: 'left',
-          text: 'Modifié',
-          value: 'lastModified',
-        },
-      ],
     };
   },
   computed: {
     noUploads() {
       return this.uploads.length === 0;
+    },
+    headers() {
+      return [
+        {
+          align: 'left',
+          text: this.$t('files.name'),
+          value: 'name',
+          class: 'grow',
+        }, {
+          align: 'left',
+          text: this.$t('files.size'),
+          value: 'size',
+        }, {
+          align: 'left',
+          text: this.$t('files.modified'),
+          value: 'lastModified',
+        },
+      ];
     },
   },
   methods: {
@@ -193,7 +186,7 @@ export default {
         } catch (e) {
           const data = e.response && e.response.data;
           upload.error = e;
-          upload.errorMessage = isCancel(e) ? 'Annulé' : (data && data.error) || e.statusText;
+          upload.errorMessage = isCancel(e) ? this.$t('canceled') : (data && data.error) || e.statusText;
         }
       }
 
@@ -207,7 +200,7 @@ export default {
         if (/\.csv\.gz$/i.test(file.name)) { resolve(); return; }
 
         if (!/\.csv$/i.test(file.name)) {
-          reject(new Error('Le fichier n\'est pas un CSV'));
+          reject(new Error(this.$t('files.isNotCSV')));
           return;
         }
 
@@ -247,7 +240,7 @@ export default {
               err = errors[0];
 
               if (err.type === 'Quotes') {
-                err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
+                err.message = this.$t('files.markFieldIncorrectlyFormatted', { lineNumber });
               }
 
               parser.abort();
@@ -260,7 +253,7 @@ export default {
               const missingField = mandatoryFields.find(field => !columns.includes(field));
 
               if (missingField) {
-                err = new Error(`Le champ "${missingField}" est manquant`);
+                err = new Error(this.$t('files.missingField', { missingField }));
                 parser.abort();
               }
               return;
@@ -273,13 +266,13 @@ export default {
             });
 
             if (!obj.log_id) {
-              err = new Error(`Ligne #${lineNumber}: champ "log_id" vide`);
+              err = new Error(this.$t('files.fieldIsEmpty', { lineNumber, field: 'log_id' }));
             } else if (!obj.datetime) {
-              err = new Error(`Ligne #${lineNumber}: champ "datetime" vide`);
+              err = new Error(this.$t('files.fieldIsEmpty', { lineNumber, field: 'datetime' }));
             } else if (Number.isNaN(Date.parse(obj.datetime))) {
-              err = new Error(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`);
+              err = new Error(this.$t('files.invalidField', { lineNumber, field: 'datetime' }));
             } else if (obj.date && !/^\d{4}-\d{2}-\d{2}$/.test(obj.date)) {
-              err = new Error(`Ligne #${lineNumber}: champ "date" invalide, le fichier a-t-il été modifié ?`);
+              err = new Error(this.$t('files.fieldIsEmpty', { lineNumber, field: 'date' }));
             }
 
             if (err) {

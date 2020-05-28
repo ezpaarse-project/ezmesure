@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar v-if="nbSelectedFiles === 0" flat title="Mes dépots">
+    <ToolBar v-if="nbSelectedFiles === 0" flat :title="$t('files.title')">
       <slot>
         <v-spacer />
 
@@ -8,20 +8,20 @@
           <v-icon left>
             mdi-refresh
           </v-icon>
-          Actualiser
+          {{ $t('refresh') }}
         </v-btn>
       </slot>
     </ToolBar>
 
 
-    <ToolBar v-else title="Mes dépots">
+    <ToolBar v-else :title="$t('files.title')">
       <slot>
         <v-btn icon @click="deselectFiles">
           <v-icon>mdi-close</v-icon>
         </v-btn>
 
         <v-toolbar-title>
-          {{ nbSelectedFiles }} sélectionné(s)
+          {{ $t('files.count', { count: nbSelectedFiles }) }}
         </v-toolbar-title>
 
         <v-spacer />
@@ -30,18 +30,14 @@
           <v-icon left>
             mdi-delete
           </v-icon>
-          Supprimer
+          {{ $t('delete') }}
         </v-btn>
       </slot>
     </ToolBar>
 
     <v-tabs v-model="activeFilesTab" grow>
-      <v-tab href="#tab-files-list">
-        Liste
-      </v-tab>
-      <v-tab href="#tab-files-upload">
-        Déposer
-      </v-tab>
+      <v-tab href="#tab-files-list" v-text="$t('files.list')" />
+      <v-tab href="#tab-files-upload" v-text="$t('files.submit')" />
     </v-tabs>
 
     <v-tabs-items v-model="activeFilesTab">

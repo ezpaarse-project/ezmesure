@@ -34,13 +34,41 @@ module.exports = {
       credentials: true,
       proxy: true,
     }],
+    'nuxt-i18n',
   ],
+  i18n: {
+    baseUrl: process.env.APPLI_APACHE_SERVERNAME,
+    locales: [
+      {
+        name: 'Français',
+        code: 'fr',
+        iso: 'fr-FR',
+        file: 'fr.json',
+      },
+      {
+        name: 'English',
+        code: 'en',
+        iso: 'en-US',
+        file: 'en.json',
+      },
+    ],
+    defaultLocale: 'fr',
+    seo: true,
+    lazy: true,
+    langDir: 'locales/',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'ezmesure_i18n',
+      alwaysRedirect: true,
+      fallbackLocale: 'en',
+    },
+    vueI18n: {
+      fallbackLocale: 'fr',
+    },
+  },
   devModules: [
     ['@nuxtjs/vuetify', {
-      lang: {
-        locales: { fr },
-        current: 'fr',
-      },
       theme: {
         themes: {
           light: {

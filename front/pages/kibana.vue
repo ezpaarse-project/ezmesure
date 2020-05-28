@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Identifiants kibana">
+    <ToolBar :title="$t('kibana.title')">
       <slot>
         <v-spacer />
 
@@ -8,22 +8,18 @@
           <v-icon left>
             mdi-lock-question
           </v-icon>
-          Mot de passe oublié
+          {{ $t('kibana.passwordLost') }}
         </v-btn>
       </slot>
     </ToolBar>
     <v-card-text>
-      <p>
-        Ce nom d'utilisateur vous permet de vous connecter à l'interface
-        Kibana afin d'accéder à vos tableaux de bord.
-        Pour changer votre mot de passe,
-        accédez à votre <a href="/kibana/app/kibana#/account">compte Kibana</a>.
-      </p>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <p v-html="$t('kibana.whatDoesUsername')" />
 
       <v-text-field
         :value="user.username"
         append-icon="mdi-account"
-        label="Nom d'utilisateur"
+        :label="$t('kibana.username')"
         readonly
         outlined
       />
@@ -37,7 +33,7 @@
           flat
           dense
         >
-          <v-toolbar-title>Mot de passe oublié</v-toolbar-title>
+          <v-toolbar-title v-text="$t('kibana.passwordLost')" />
           <v-spacer />
           <v-icon>mdi-lock-question</v-icon>
         </v-toolbar>
@@ -58,29 +54,25 @@
             prominent
             dense
             type="success"
-          >
-            Un nouveau mot de passe vous a été envoyé par mail.
-          </v-alert>
+            v-text="$t('kibana.newPasswordSentByEmail')"
+          />
 
-          Vous ne vous souvenez plus de votre mot de passe ?
-          Cliquez sur <code>réinitialiser</code> pour en recevoir un nouveau par mail.
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <p v-html="$t('kibana.resetPassword')" />
         </v-card-text>
 
         <v-divider />
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="showPasswordReset = false">
-            Fermer
-          </v-btn>
+          <v-btn text @click="showPasswordReset = false" v-text="$t('close')" />
           <v-btn
             color="primary"
             text
             :loading="resettingPassword"
             @click="resetPassword"
-          >
-            Réinitialiser
-          </v-btn>
+            v-text="$t('reset')"
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -1,21 +1,18 @@
 <template>
   <section>
-    <ToolBar title="Token d'autentification" />
+    <ToolBar :title="$t('token.title')" />
     <v-card-text>
-      <p>
-        Ce token est nécessaire pour utiliser l'API d'ezMESURE.
-        Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP :
-        <code>Authorization: Bearer {insérez le token ici}</code>
-      </p>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <p v-html="$t('token.whatDoesToken')" />
 
       <v-container grid-list-md class="px-0">
         <v-layout row align-center>
           <v-flex grow>
             <v-text-field
               ref="token"
-              label="Token"
+              :label="$t('token.token')"
               :value="token"
-              :rules="[() => ('The email and password you entered don\'t match')]"
+              :rules="[() => ($t('token.rule'))]"
               hide-details
               readonly
               outlined
@@ -30,7 +27,7 @@
               <v-icon left>
                 mdi-clipboard-text
               </v-icon>
-              Copier
+              {{ $t('copy') }}
             </v-btn>
           </v-flex>
         </v-layout>

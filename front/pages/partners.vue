@@ -5,16 +5,17 @@
         mdi-charity
       </v-icon>
 
-      <h1 class="display-1 text-center mb-2">
-        Nos {{ partners.length }} partenaires
-      </h1>
+      <h1
+        class="display-1 text-center mb-2"
+        v-text="$t('partners.count', { count: partners.length })"
+      />
     </v-layout>
 
     <v-layout row justify-center align-center>
       <v-flex xs12 sm8 md6 lg4>
         <v-text-field
           v-model="search"
-          label="Recherche"
+          :label="$t('partners.search')"
           solo
           max-width="200"
           append-icon="mdi-magnify"

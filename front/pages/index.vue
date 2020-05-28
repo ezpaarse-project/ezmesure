@@ -7,9 +7,10 @@
     </v-container>
 
     <v-container grid-list-xl class="my-6">
-      <h3 class="display-1 grey--text text--darken-2 text-center my-3">
-        Qu'est-ce qu'ezMESURE ?
-      </h3>
+      <h3
+        class="display-1 grey--text text--darken-2 text-center my-3"
+        v-text="$t('home.whatDoesEzMESURE')"
+      />
 
       <v-layout justify-center wrap>
         <v-flex v-for="(feature, i) in features" :key="i" d-flex shrink>
@@ -29,9 +30,10 @@
       </v-layout>
     </v-container>
 
-    <h3 class="headline grey--text text--darken-2 text-center">
-      Ce service est soutenu par :
-    </h3>
+    <h3
+      class="headline grey--text text--darken-2 text-center"
+      v-text="$t('home.supportedBy')"
+    />
 
     <v-container grid-list-lg class="mt-4">
       <v-layout justify-center wrap>
@@ -51,9 +53,12 @@
         </v-flex>
 
         <v-flex xs12 class="text-center">
-          <v-btn to="/partners" large class="white primary--text">
-            Découvrez nos partenaires
-          </v-btn>
+          <v-btn
+            :to="localePath('/partners')"
+            large
+            class="white primary--text"
+            v-text="$t('home.discoverOurPartners')"
+          />
         </v-flex>
       </v-layout>
     </v-container>
@@ -65,23 +70,6 @@ export default {
   name: 'Home',
   data() {
     return {
-      features: [
-        {
-          src: '/images/pres_visualizations.svg',
-          title: 'Visualisations dynamiques en ligne',
-          text: 'Les tableaux de bord dynamiques propulsés par Kibana facilitent la fouille et l\'analyse des données d\'usage.',
-        },
-        {
-          src: '/images/pres_centralized.svg',
-          title: 'Dépôt centralisé',
-          text: 'ezMESURE est un entrepôt national centralisant les statistiques d\'usage de la documentation numérique des établissements de l\'enseignement supérieur et de la recherche (ESR).',
-        },
-        {
-          src: '/images/pres_ezpaarse.svg',
-          title: 'Données produites par ezPAARSE',
-          text: 'Les données sont produites par les différentes installations d\'ezPAARSE dans les établissements de l\'ESR avant d\'être agrégées dans ezMESURE.',
-        },
-      ],
       logos: [
         {
           name: 'CNRS',
@@ -105,6 +93,27 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    features() {
+      return [
+        {
+          src: '/images/pres_visualizations.svg',
+          title: this.$t('home.dynamicOnlineVisualizations'),
+          text: this.$t('home.dynamicOnlineVisualizationsText'),
+        },
+        {
+          src: '/images/pres_centralized.svg',
+          title: this.$t('home.centralizedRepository'),
+          text: this.$t('home.centralizedRepositoryText'),
+        },
+        {
+          src: '/images/pres_ezpaarse.svg',
+          title: this.$t('home.dataProducedByEzPAARSE'),
+          text: this.$t('home.dataProducedByEzPAARSEText'),
+        },
+      ];
+    },
   },
 };
 </script>
