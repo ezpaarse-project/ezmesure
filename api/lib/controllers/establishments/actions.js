@@ -372,13 +372,26 @@ exports.getSushiData = async function (ctx) {
     return;
   }
 
+  const sushi = establishment.sushi.map((sushi) => {
+    if (sushi.owner === email) {
+
+      if (sushi.requestorId) {
+        sushi.requestorId = encrypter.decrypt(sushi.requestorId);
+      }
+      if (sushi.customerId) {
+        sushi.customerId = encrypter.decrypt(sushi.customerId);
+      }
+      if (sushi.apiKey) {
+        sushi.apiKey = encrypter.decrypt(sushi.apiKey);
+      }
+
+      return sushi;
+    }
+  });
+
   ctx.body = {
     id: establishment.id,
-    sushi: establishment.sushi.filter((sushi) => {
-      if (sushi.owner !== email) { return false; }
-
-      return true;
-    }),
+    sushi,
   };
 };
 
@@ -390,6 +403,16 @@ exports.addSushi = async function (ctx) {
 
   body.id = uuidv4();
   body.owner = ctx.state.user.email;
+
+  if (body.requestorId) {
+    body.requestorId = encrypter.encrypt(body.requestorId);
+  }
+  if (body.customerId) {
+    body.customerId = encrypter.encrypt(body.customerId);
+  }
+  if (body.apiKey) {
+    body.apiKey = encrypter.encrypt(body.apiKey);
+  }
   
   await elastic.update({
     index: config.depositors.index,
@@ -413,7 +436,15 @@ exports.updateSushi = async function (ctx) {
 
   ctx.status = 200;
 
-  console.log(body);
+  if (body.requestorId) {
+    body.requestorId = encrypter.encrypt(body.requestorId);
+  }
+  if (body.customerId) {
+    body.customerId = encrypter.encrypt(body.customerId);
+  }
+  if (body.apiKey) {
+    body.apiKey = encrypter.encrypt(body.apiKey);
+  }
   
   await elastic.update({
     index: config.depositors.index,
