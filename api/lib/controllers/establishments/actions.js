@@ -224,6 +224,7 @@ exports.storeEstablishment = async function (ctx) {
 
   await elastic.index({
     index: config.depositors.index,
+    refresh: true,
     body: establishment,
   }).catch((err) => {
     ctx.status = 500;
@@ -274,6 +275,7 @@ exports.updateEstablishment = async function (ctx) {
   await elastic.update({
     index: config.depositors.index,
     id: docId,
+    refresh: true,
     body: {
       doc: establishment,
     },
@@ -295,6 +297,7 @@ exports.deleteEstablishments = async function (ctx) {
         await elastic.delete({
           id: body.ids[i],
           index: config.depositors.index,
+          refresh: true,
         });
         response.push({ id: body.ids[i], status: 'deleted' });
       } catch (error) {
@@ -340,6 +343,7 @@ exports.updateCorrespondent = async function (ctx) {
   await elastic.update({
     index: config.depositors.index,
     id: establishmentId,
+    refresh: true,
     body: {
       script: {
         source: 'def targets = ctx._source.contacts.findAll(contact -> contact.id == params.id);' +
@@ -417,6 +421,7 @@ exports.addSushi = async function (ctx) {
   await elastic.update({
     index: config.depositors.index,
     id: establishmentId,
+    refresh: true,
     body: {
       doc: {
         sushi: [
@@ -449,6 +454,7 @@ exports.updateSushi = async function (ctx) {
   await elastic.update({
     index: config.depositors.index,
     id: establishmentId,
+    refresh: true,
     body: {
       script: {
         source: 'def targets = ctx._source.sushi.findAll(sushi -> sushi.id == params.id);' +
@@ -481,6 +487,7 @@ exports.deleteSushiData = async function (ctx) {
     establisment = await elastic.getSource({
       index: config.depositors.index,
       id: establishmentId,
+      refresh: true,
     });
   } catch(err) {
     ctx.status = 500;
