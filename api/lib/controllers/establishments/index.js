@@ -1,5 +1,7 @@
 const router = require('koa-joi-router')();
+const { Joi } = require('koa-joi-router');
 const koaBody = require('koa-body');
+const bodyParser = require('koa-bodyparser');
 
 const { requireJwt, requireUser } = require('../../services/auth');
 
@@ -24,23 +26,171 @@ router.use(requireJwt, requireUser);
 
 router.get('/', getEtablishments);
 
-router.get('/:email', getEtablishment);
-router.post('/', koaBody({
+router.route({
+  method: 'GET',
+  path: '/pictures/:id',
+  handler: pictures,
+  validate: {
+    params: {
+      id: Joi.string().trim().min(16).max(16).required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:email',
+  handler: getEtablishment,
+  validate: {
+    params: {
+      email: Joi.string().trim().email().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/correspondents/:email',
+  handler: getCorrespondents,
+  validate: {
+    params: {
+      email: Joi.string().trim().email().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/sushi/:email',
+  handler: getSushiData,
+  validate: {
+    params: {
+      email: Joi.string().trim().email().required(),
+    },
+  },
+});
+
+router.use(bodyParser());
+
+router.route({
+  method: 'POST',
+  path: '/:establishmentId/sushi',
+  handler: addSushi,
+  validate: {
+    type: 'json',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+    body: {
+      vendor: Joi.string().trim().required(),
+      package: Joi.string().trim().required(),
+      sushiUrl: Joi.string().trim().required(),
+      owner: Joi.string().trim(),
+      requestorId: Joi.string().trim(),
+      customerId: Joi.string().trim(),
+      apiKey: Joi.string().trim(),
+      comment: Joi.string().trim(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:establishmentId/delete',
+  handler: deleteEstablishments,
+  validate: {
+    type: 'json',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+    body: {
+      ids: Joi.array().items(Joi.string().trim().guid({ version: [ 'uuidv4' ] })),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:establishmentId/sushi/delete',
+  handler: deleteSushiData,
+  validate: {
+    type: 'json',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+    body: {
+      ids: Joi.array().items(Joi.string().trim().guid({ version: [ 'uuidv4' ] })),
+    },
+  },
+});
+
+router.route({
+  method: 'PATCH',
+  path: '/:establishmentId/correspondent/:email',
+  handler: updateCorrespondent,
+  validate: {
+    type: 'json',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+      email: Joi.string().trim().email().required(),
+    },
+    body: {
+      id: Joi.string().trim().guid({ version: [ 'uuidv4' ] }).required(),
+      type: Joi.array().items(Joi.string().trim().required()).required(),
+      email: Joi.string().trim().required(),
+      confirmed: Joi.boolean().required(),
+      fullName: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'PATCH',
+  path: '/:establishmentId/sushi',
+  handler: updateSushi,
+  validate: {
+    type: 'json',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+    body: {
+      id: Joi.string().trim().guid({ version: [ 'uuidv4' ] }).required(),
+      vendor: Joi.string().trim().required(),
+      package: Joi.string().trim().required(),
+      sushiUrl: Joi.string().trim().required(),
+      owner: Joi.string().trim().required(),
+      requestorId: Joi.string().trim(),
+      customerId: Joi.string().trim(),
+      apiKey: Joi.string().trim(),
+      comment: Joi.string().trim(),
+    },
+  },
+});
+
+router.use(koaBody({
   multipart: true,
   uploadDir: './uploads/',
-}), storeEstablishment);
-router.patch('/:establishmentId', koaBody({
-  multipart: true,
-  uploadDir: './uploads/',
-}), updateEstablishment);
-router.post('/:establishmentId/delete', koaBody(), deleteEstablishments);
+}));
 
-router.get('/correspondents/:email', getCorrespondents);
-router.patch('/:establishmentId/correspondent/:email', koaBody(), updateCorrespondent);
+router.route({
+  method: 'POST',
+  path: '/',
+  handler: storeEstablishment,
+  validate: {
+    type: 'multipart',
+  },
+});
 
-router.get('/sushi/:email', koaBody(), getSushiData);
-router.post('/:establishmentId/sushi', koaBody(), addSushi);
-router.patch('/:establishmentId/sushi', koaBody(), updateSushi);
-router.post('/:establishmentId/sushi/delete', koaBody(), deleteSushiData);
+router.route({
+  method: 'PATCH',
+  path: '/:establishmentId',
+  handler: updateEstablishment,
+  validate: {
+    type: 'multipart',
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+  },
+});
 
 module.exports = router;

@@ -245,15 +245,13 @@ exports.updateEstablishment = async function (ctx) {
     return ctx;
   }
 
+  const establishment = JSON.parse(form);
+
   let logoId;
   if (logo) {
     logoId = await addLogo(logo);
+    establishment.organisation.logoId = logoId || '';
   }
-
-  const establishment = JSON.parse(form);
-
-  const docId = establishment.id;
-  delete establishment.id;
 
   if (establishment.organisation.uai) {
     try {
@@ -274,7 +272,7 @@ exports.updateEstablishment = async function (ctx) {
 
   await elastic.update({
     index: config.depositors.index,
-    id: docId,
+    id: establishmentId,
     refresh: true,
     body: {
       doc: establishment,
