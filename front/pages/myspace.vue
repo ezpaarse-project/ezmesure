@@ -13,7 +13,7 @@
       </slot>
     </ToolBar>
 
-    <v-card-text>
+    <v-card-text class="w-800 mx-auto">
       <v-alert
         type="info"
         prominent

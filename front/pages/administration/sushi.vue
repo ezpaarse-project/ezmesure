@@ -27,7 +27,7 @@
             v-for="(sushi, key) in item.sushi"
             :key="key"
             :ref="key"
-            color="grey lighten-1"
+            color="primary"
             dark
             class="ma-1"
             @click.stop="edit(item, key)"

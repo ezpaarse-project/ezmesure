@@ -11,7 +11,7 @@ module.exports = {
           uai: { type: 'keyword' },
           city: { type: 'keyword' },
           website: { type: 'keyword' },
-          logoUrl: { type: 'keyword' },
+          logoId: { type: 'keyword' },
           establismentType: { type: 'keyword' },
           location: {
             type: 'geo_point',

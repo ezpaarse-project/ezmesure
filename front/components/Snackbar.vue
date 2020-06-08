@@ -11,7 +11,7 @@
       dark
       text
       @click.native="visible = false"
-      v-text="$t('clsoe')"
+      v-text="$t('close')"
     />
   </v-snackbar>
 </template>

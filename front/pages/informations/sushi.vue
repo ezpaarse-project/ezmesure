@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Informations: Sushi">
+    <ToolBar title="Mes identifiants Sushi">
       <slot>
         <v-spacer />
         <v-btn
@@ -44,6 +44,17 @@
                     v-model="platformSelected.vendor"
                     label="Libellé *"
                     :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                    outlined
+                    required
+                    disabled
+                  />
+                </v-col>
+
+                <v-col v-if="platformSelected" cols="12">
+                  <v-text-field
+                    v-model="platformSelected.package"
+                    label="Package *"
+                    :rules="[v => !!v || 'Veuillez saisir un package.']"
                     outlined
                     required
                   />
@@ -111,7 +122,7 @@
             color="primary"
             :disabled="!valid || !platformSelected || loading"
             :loading="loading"
-            @click="saveData"
+            @click="save()"
           >
             Ajouter
           </v-btn>
@@ -123,7 +134,7 @@
       v-if="hasEstablishment"
       v-model="selected"
       :headers="headers"
-      :items="establishment.sushi"
+      :items="sushi"
       :expanded.sync="expanded"
       show-select
       show-expand
@@ -141,6 +152,17 @@
                 v-model="item.vendor"
                 label="Libellé *"
                 :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                outlined
+                required
+                disabled
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-model="item.package"
+                label="Package *"
+                :rules="[v => !!v || 'Veuillez saisir un package.']"
                 outlined
                 required
               />
@@ -185,7 +207,7 @@
               <v-btn
                 block
                 color="primary"
-                @click="save()"
+                @click="save(item)"
               >
                 Mettre à jour
               </v-btn>
@@ -219,7 +241,6 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid';
 import ToolBar from '~/components/space/ToolBar';
 
 export default {
@@ -228,12 +249,17 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store }) {
+  async asyncData({ $axios, store, $auth }) {
     let establishment = null;
+    let sushi = [];
     try {
-      establishment = await $axios.$get('/correspondents/myestablishment');
+      establishment = await $axios.$get(`/establishments/sushi/${$auth.state.user.email}`);
     } catch (e) {
-      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      store.dispatch('snacks/error', 'Impossible de récupérer les informations sushi');
+    }
+    if (establishment) {
+      // eslint-disable-next-line prefer-destructuring
+      sushi = establishment.sushi;
     }
 
     return {
@@ -244,6 +270,7 @@ export default {
         { text: '', value: 'data-table-expand' },
       ],
       establishment,
+      sushi,
       dialog: false,
       valid: false,
       lazy: false,
@@ -363,7 +390,7 @@ export default {
   },
   computed: {
     hasEstablishment() {
-      return !!this.establishment?.organisation?.name;
+      return !!this.establishment?.id;
     },
   },
   watch: {
@@ -378,6 +405,7 @@ export default {
         if (!exists) {
           this.platformSelected = {
             vendor: this.platformSelected,
+            package: null,
             sushiUrl: null,
             requestorId: null,
             customerId: null,
@@ -387,43 +415,72 @@ export default {
         }
       }
     },
-    async save() {
+    async save(item) {
       this.loading = true;
-      const formData = new FormData();
-
-      formData.append('form', JSON.stringify(this.establishment));
 
       try {
-        await this.$axios.$post('/correspondents/', formData);
+        if (item) {
+          await this.$axios.$patch(`/establishments/${this.establishment.id}/sushi`, JSON.parse(JSON.stringify(item)));
+        }
+
+        if (!item) {
+          await this.$axios.$post(`/establishments/${this.establishment.id}/sushi`, this.platformSelected);
+          this.sushi.push(this.platformSelected);
+          this.platformSelected = null;
+          this.dialog = false;
+        }
       } catch (e) {
         this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
         this.loading = false;
         return;
       }
 
+      try {
+        this.establishment = await this.$axios.$get(`/establishments/sushi/${this.$auth.state.user.email}`);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations sushi');
+      }
+      if (this.establishment) {
+        // eslint-disable-next-line prefer-destructuring
+        this.sushi = this.establishment.sushi;
+      }
+
       this.$store.dispatch('snacks/success', 'Informations transmises');
       this.loading = false;
     },
-    saveData() {
-      if (this.platformSelected) {
-        this.platformSelected.id = uuidv4();
-        this.establishment.sushi.push(this.platformSelected);
-        this.platformSelected = null;
-        this.dialog = false;
+    async deleteData() {
+      if (this.selected.length === 0) {
+        return;
       }
-      this.save();
-    },
-    deleteData() {
-      this.establishment.sushi = this.establishment.sushi.filter(({ id }) => {
-        const sushiData = this.selected.find(data => data.id === id);
-        if (sushiData) {
-          return false;
-        }
 
-        return true;
+      const ids = this.selected.map(select => select.id);
+      let response;
+
+      try {
+        response = await this.$axios.$post(`/establishments/${this.establishment.id}/sushi/delete`, { ids });
+        if (!Array.isArray(response)) {
+          throw new Error('invalid response');
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`);
+        return;
+      }
+
+      const failed = response.filter(item => item?.status !== 'deleted');
+      const deleted = response.filter(item => item?.status === 'deleted');
+
+      failed.forEach(({ id }) => {
+        this.$store.dispatch('snacks/error', `Impossible de supprimer l'élment ${id}`);
       });
-      this.save();
-      this.selected = [];
+
+
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', `${deleted.length} élement(s) supprimé(s)`);
+
+        const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
+        this.sushi = this.sushi.filter(removeDeleted);
+        this.selected = this.selected.filter(removeDeleted);
+      }
     },
   },
 };

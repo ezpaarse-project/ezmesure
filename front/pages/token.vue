@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar :title="$t('token.title')" />
-    <v-card-text>
+    <v-card-text class="w-800 mx-auto">
       <!-- eslint-disable-next-line vue/no-v-html -->
       <p v-html="$t('token.whatDoesToken')" />
 
@@ -12,7 +12,6 @@
               ref="token"
               :label="$t('token.token')"
               :value="token"
-              :rules="[() => ($t('token.rule'))]"
               hide-details
               readonly
               outlined
@@ -60,7 +59,7 @@ export default {
     try {
       this.token = await this.$axios.$get('/profile/token');
     } catch (e) {
-      this.$store.dispatch('snacks/error', 'Impossible de récupérer le token d\'authentification');
+      this.$store.dispatch('snacks/error', this.$t('token.unableToRetriveToken'));
     }
   },
   methods: {
@@ -68,10 +67,10 @@ export default {
       try {
         await navigator.clipboard.writeText(this.token);
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'La copie du token a échoué');
+        this.$store.dispatch('snacks/error', this.$t('token.copyFailed'));
         return;
       }
-      this.$store.dispatch('snacks/info', 'Token copié dans le presse papier');
+      this.$store.dispatch('snacks/info', this.$t('token.copyed'));
     },
   },
 };

@@ -2,8 +2,8 @@
   <v-card width="350" height="100%" class="flexCard">
     <v-card-text class="text-center grow">
       <v-img
-        v-if="logoUrl"
-        :src="`/api/correspondents/pictures/${logoUrl}`"
+        v-if="logoId"
+        :src="`/api/establishments/pictures/${logoId}`"
         contain
         height="100"
         class="mb-3"
@@ -58,7 +58,7 @@ export default {
     contacts() { return this.partner.contacts || {}; },
     organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
-    logoUrl() { return this.organisation.logoUrl || null; },
+    logoId() { return this.organisation.logoId || null; },
     indexCount() {
       const n = parseInt(this.index.count, 10);
       if (Number.isNaN(n)) { return '0'; }

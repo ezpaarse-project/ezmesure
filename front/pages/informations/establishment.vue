@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Informations: Établissement" />
+    <ToolBar title="Mon établissement" />
     <v-card-text>
       <v-form v-model="valid">
         <v-container>
@@ -129,10 +129,10 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store }) {
+  async asyncData({ $axios, store, $auth }) {
     let establishment = null;
     try {
-      establishment = await $axios.$get('/correspondents/myestablishment');
+      establishment = await $axios.$get(`/establishments/${$auth.state.user.email}`);
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
     }
@@ -173,15 +173,36 @@ export default {
       formData.append('logo', this.logo);
       formData.append('form', JSON.stringify(this.establishment));
 
-      try {
-        await this.$axios.$post('/correspondents/', formData);
-      } catch (e) {
-        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
-        this.loading = false;
-        return;
+      if (this.establishment.id) {
+        try {
+          await this.$axios.$patch(`/establishments/${this.establishment.id}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+        } catch (e) {
+          this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+          this.loading = false;
+          return;
+        }
+        this.$store.dispatch('snacks/success', 'Établissement mis à jour');
       }
 
-      this.$store.dispatch('snacks/success', 'Informations transmises');
+      if (!this.establishment.id) {
+        try {
+          await this.$axios.$post('/establishments', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+        } catch (e) {
+          this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+          this.loading = false;
+          return;
+        }
+        this.$store.dispatch('snacks/success', 'Informations d\'établissement transmises');
+      }
+
       this.loading = false;
     },
   },

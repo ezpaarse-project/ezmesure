@@ -28,18 +28,13 @@
       <v-btn text exact :to="localePath('/partners')" v-text="$t('menu.partners')" />
       <v-btn text exact :to="localePath('/api')" v-text="$t('menu.api')" />
 
-      <v-menu v-model="chooseLanguage" offset-y>
+      <v-menu tilev-model="chooseLanguage" offset-y>
         <template v-slot:activator="{ on }">
           <v-btn
             text
             v-on="on"
             @click.stop="chooseLanguage = !chooseLanguage"
           >
-            <v-img
-              :src="require(`@/static/images/${$i18n.locale}.png`)"
-              width="16"
-              class="mr-2"
-            />
             {{ currentLocal }}
             <v-icon v-if="chooseLanguage">
               mdi-chevron-up
@@ -49,7 +44,7 @@
             </v-icon>
           </v-btn>
         </template>
-        <v-list>
+        <v-list flat tile>
           <v-list-item
             v-for="locale in $i18n.locales"
             :key="locale.code"
@@ -58,7 +53,10 @@
             ripple
             @click.stop="chooseLanguage = !chooseLanguage"
           >
-            <v-list-item-title v-text="locale.name" />
+            <v-img :src="require(`@/static/images/${locale.code}.png`)" width="24" class="mr-2" />
+            <v-list-item-title>
+              {{ locale.name }}
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

@@ -13,7 +13,6 @@
       </slot>
     </ToolBar>
 
-
     <ToolBar v-else :title="$t('files.title')">
       <slot>
         <v-btn icon @click="deselectFiles">

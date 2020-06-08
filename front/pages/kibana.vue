@@ -12,7 +12,7 @@
         </v-btn>
       </slot>
     </ToolBar>
-    <v-card-text>
+    <v-card-text class="w-800 mx-auto">
       <!-- eslint-disable-next-line vue/no-v-html -->
       <p v-html="$t('kibana.whatDoesUsername')" />
 

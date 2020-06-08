@@ -1,48 +1,41 @@
 <template>
   <section>
-    <ToolBar title="Informations: Correspondant" />
+    <ToolBar title="Correspondant" />
     <v-card-text v-if="hasEstablishment">
       <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12">
-              <span v-for="(contact, key) in establishment.contacts" :key="key">
-                <v-text-field
-                  v-if="contact.email === user.email"
-                  ref="email"
-                  v-model="establishment.contacts[key].email"
-                  label="Adresse email *"
-                  type="email"
-                  :rules="[
-                    v => !!v || '',
-                    v => /.+@.+\..+/.test(v) || 'Veuillez saisir un email valide.',
-                  ]"
-                  placeholder="ex: john@doe.fr"
-                  outlined
-                  required
-                  :disabled="establishment.contacts[key].email.length > 0"
-                />
-              </span>
+              <v-text-field
+                ref="email"
+                v-model="contact.email"
+                label="Adresse email *"
+                type="email"
+                :rules="[
+                  v => !!v || '',
+                  v => /.+@.+\..+/.test(v) || 'Veuillez saisir un email valide.',
+                ]"
+                placeholder="ex: john@doe.fr"
+                outlined
+                required
+                :disabled="contact.email.length > 0"
+              />
             </v-col>
 
             <v-col cols="12">
               <p>Je souhaite être désigné(e) correspondant :</p>
-              <span v-for="(contact, key) in establishment.contacts" :key="key">
-                <v-checkbox
-                  v-if="contact.email === user.email"
-                  v-model="establishment.contacts[key].type"
-                  label="Technique"
-                  hide-details
-                  value="tech"
-                />
-                <v-checkbox
-                  v-if="contact.email === user.email"
-                  v-model="establishment.contacts[key].type"
-                  label="Documentaire"
-                  hide-details
-                  value="doc"
-                />
-              </span>
+              <v-checkbox
+                v-model="contact.type"
+                label="Technique"
+                hide-details
+                value="tech"
+              />
+              <v-checkbox
+                v-model="contact.type"
+                label="Documentaire"
+                hide-details
+                value="doc"
+              />
             </v-col>
           </v-row>
         </v-container>
@@ -82,12 +75,18 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store }) {
+  async asyncData({ $axios, store, $auth }) {
     let establishment = null;
+    let contact = {};
     try {
-      establishment = await $axios.$get('/correspondents/myestablishment');
+      establishment = await $axios.$get(`/establishments/correspondents/${$auth.state.user.email}`);
     } catch (e) {
-      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      store.dispatch('snacks/error', 'Impossible de récupérer les informations correspondant');
+    }
+
+    if (establishment) {
+      // eslint-disable-next-line prefer-destructuring
+      contact = establishment.contact;
     }
 
     return {
@@ -95,23 +94,20 @@ export default {
       lazy: false,
       loading: false,
       establishment,
+      contact,
     };
   },
   computed: {
-    user() { return this.$auth.user; },
     hasEstablishment() {
-      return !!this.establishment?.organisation?.name;
+      return !!this.establishment?.id;
     },
   },
   methods: {
     async save() {
       this.loading = true;
-      const formData = new FormData();
-
-      formData.append('form', JSON.stringify(this.establishment));
 
       try {
-        await this.$axios.$post('/correspondents/', formData);
+        await this.$axios.$patch(`/establishments/${this.establishment.id}/correspondent/${this.$auth.state.user.email}`, this.contact);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
         this.loading = false;

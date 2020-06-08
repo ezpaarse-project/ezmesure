@@ -1,5 +1,4 @@
 import colors from 'vuetify/lib/util/colors';
-import fr from 'vuetify/lib/locale/fr';
 
 module.exports = {
   /*
@@ -19,6 +18,7 @@ module.exports = {
   plugins: [],
   css: [
     'swagger-ui/dist/swagger-ui.css',
+    '~/assets/css/custom.scss',
   ],
   mode: 'spa',
   modules: [
@@ -60,9 +60,6 @@ module.exports = {
       cookieKey: 'ezmesure_i18n',
       alwaysRedirect: true,
       fallbackLocale: 'en',
-    },
-    vueI18n: {
-      fallbackLocale: 'fr',
     },
   },
   devModules: [

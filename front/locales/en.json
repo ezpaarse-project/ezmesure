@@ -77,8 +77,10 @@
   "token": {
     "title": "Authentication token",
     "whatDoesToken": "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: <code>Authorization: Bearer {insert the token here}</code>.",
-    "rule": "The email and password you entered don't match",
-    "token": "Token"
+    "token": "Token",
+    "unableToRetriveToken": "Unable to retrieve authentication token",
+    "copyFailed": "The copy of the token failed",
+    "clipped": "Clipped in the clipboard"
   },
   "partners": {
     "correspondents": "Correspondents",

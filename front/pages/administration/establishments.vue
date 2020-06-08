@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Administration: Établisements">
+    <ToolBar title="Établissements">
       <slot>
         <v-spacer />
 
@@ -340,7 +340,7 @@ export default {
     async refreshEstablishments() {
       let establishments;
       try {
-        establishments = await this.$axios.$get('/correspondents/list');
+        establishments = await this.$axios.$get('/establishments');
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
       }
@@ -363,7 +363,7 @@ export default {
         establishment.logoPreview = null;
 
         if (logoUrl) {
-          establishment.logoPreview = `/api/correspondents/pictures/${logoUrl}`;
+          establishment.logoPreview = `/api/establishments/pictures/${logoUrl}`;
         }
       });
 
