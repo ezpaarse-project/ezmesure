@@ -257,9 +257,8 @@ export default {
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations sushi');
     }
-    if (establishment) {
-      // eslint-disable-next-line prefer-destructuring
-      sushi = establishment.sushi;
+    if (Array.isArray(establishment?.sushi)) {
+      sushi = establishment.sushi.filter(item => (item && typeof item === 'object'));
     }
 
     return {
