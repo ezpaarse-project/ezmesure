@@ -30,7 +30,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-combobox
-                    v-model="platformSelected"
+                    v-model="selectedPlatform"
                     :items="platforms"
                     label="Plateformes"
                     item-text="vendor"
@@ -39,71 +39,73 @@
                   />
                 </v-col>
 
-                <v-col v-if="platformSelected" cols="12">
-                  <v-text-field
-                    v-model="platformSelected.vendor"
-                    label="Libellé *"
-                    :rules="[v => !!v || 'Veuillez saisir un libellé.']"
-                    outlined
-                    required
-                    disabled
-                  />
-                </v-col>
+                <template v-if="selectedPlatform">
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="selectedPlatform.vendor"
+                      label="Libellé *"
+                      :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                      outlined
+                      required
+                      disabled
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected" cols="12">
-                  <v-text-field
-                    v-model="platformSelected.package"
-                    label="Package *"
-                    :rules="[v => !!v || 'Veuillez saisir un package.']"
-                    outlined
-                    required
-                  />
-                </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="selectedPlatform.package"
+                      label="Package *"
+                      :rules="[v => !!v || 'Veuillez saisir un package.']"
+                      outlined
+                      required
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected && !platformSelected.sushiUrl" cols="12">
-                  <v-text-field
-                    v-model="platformSelected.sushiUrl"
-                    label="URL Sushi *"
-                    :rules="[v => !!v || 'Veuillez saisir une url.']"
-                    outlined
-                    required
-                  />
-                </v-col>
+                  <v-col v-if="!selectedPlatform.sushiUrl" cols="12">
+                    <v-text-field
+                      v-model="selectedPlatform.sushiUrl"
+                      label="URL Sushi *"
+                      :rules="[v => !!v || 'Veuillez saisir une url.']"
+                      outlined
+                      required
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected" cols="6">
-                  <v-text-field
-                    v-model="platformSelected.requestorId"
-                    label="Requestor Id *"
-                    :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
-                    outlined
-                    required
-                  />
-                </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="selectedPlatform.requestorId"
+                      label="Requestor Id *"
+                      :rules="[v => !!v || 'Veuillez saisir un Requestor Id.']"
+                      outlined
+                      required
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected" cols="6">
-                  <v-text-field
-                    v-model="platformSelected.customerId"
-                    label="Customer Id *"
-                    :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
-                    outlined
-                  />
-                </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="selectedPlatform.customerId"
+                      label="Customer Id *"
+                      :rules="[v => !!v || 'Veuillez saisir un Customer Id.']"
+                      outlined
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected" cols="12">
-                  <v-text-field
-                    v-model="platformSelected.apiKey"
-                    label="Clé API"
-                    outlined
-                  />
-                </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="selectedPlatform.apiKey"
+                      label="Clé API"
+                      outlined
+                    />
+                  </v-col>
 
-                <v-col v-if="platformSelected" cols="12">
-                  <v-textarea
-                    v-model="platformSelected.comment"
-                    label="Commentaire"
-                    outlined
-                  />
-                </v-col>
+                  <v-col cols="12">
+                    <v-textarea
+                      v-model="selectedPlatform.comment"
+                      label="Commentaire"
+                      outlined
+                    />
+                  </v-col>
+                </template>
               </v-row>
             </v-container>
           </v-form>
@@ -120,7 +122,7 @@
 
           <v-btn
             color="primary"
-            :disabled="!valid || !platformSelected || loading"
+            :disabled="!valid || !selectedPlatform || loading"
             :loading="loading"
             @click="save()"
           >
@@ -274,7 +276,7 @@ export default {
       valid: false,
       lazy: false,
       loading: false,
-      platformSelected: null,
+      selectedPlatform: null,
       platforms: [
         { sushiUrl: 'https://www.projectcounter.org/counter-user/acs-publicatio/', vendor: 'ACS Publications' },
         { sushiUrl: 'https://www.projectcounter.org/counter-user/adam-matthew-d/', vendor: 'Adam Matthew Digital' },
@@ -394,16 +396,17 @@ export default {
   },
   watch: {
     dialog(val) {
-      if (!val) this.platformSelected = null;
+      if (!val) this.selectedPlatform = null;
     },
   },
   methods: {
     selectPlatform() {
-      if (typeof this.platformSelected !== 'object') {
-        const exists = this.platforms.find(({ vendor }) => vendor === this.platformSelected);
+      if (typeof this.selectedPlatform !== 'object') {
+        const exists = this.platforms.some(({ vendor }) => vendor === this.selectedPlatform);
+
         if (!exists) {
-          this.platformSelected = {
-            vendor: this.platformSelected,
+          this.selectedPlatform = {
+            vendor: this.selectedPlatform,
             package: null,
             sushiUrl: null,
             requestorId: null,
@@ -423,9 +426,9 @@ export default {
         }
 
         if (!item) {
-          await this.$axios.$post(`/establishments/${this.establishment.id}/sushi`, this.platformSelected);
-          this.sushi.push(this.platformSelected);
-          this.platformSelected = null;
+          await this.$axios.$post(`/establishments/${this.establishment.id}/sushi`, this.selectedPlatform);
+          this.sushi.push(this.selectedPlatform);
+          this.selectedPlatform = null;
           this.dialog = false;
         }
       } catch (e) {
