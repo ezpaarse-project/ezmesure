@@ -32,7 +32,7 @@
                   <v-combobox
                     v-model="selectedPlatform"
                     :items="platforms"
-                    label="Plateformes"
+                    label="Plateforme"
                     item-text="vendor"
                     outlined
                     @change="selectPlatform()"
