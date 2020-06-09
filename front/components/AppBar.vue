@@ -29,14 +29,13 @@
       <v-btn text exact :to="localePath('/api')" v-text="$t('menu.api')" />
 
       <v-menu tilev-model="chooseLanguage" offset-y>
-        <template v-slot:activator="{ on }">
+        <template v-slot:activator="{ on, value }">
           <v-btn
             text
             v-on="on"
-            @click.stop="chooseLanguage = !chooseLanguage"
           >
             {{ currentLocal }}
-            <v-icon v-if="chooseLanguage">
+            <v-icon v-if="value">
               mdi-chevron-up
             </v-icon>
             <v-icon v-else>
@@ -51,7 +50,6 @@
             router
             :to="switchLocalePath(locale.code)"
             ripple
-            @click.stop="chooseLanguage = !chooseLanguage"
           >
             <v-img :src="require(`@/static/images/${locale.code}.png`)" width="24" class="mr-2" />
             <v-list-item-title>
@@ -97,7 +95,6 @@ export default {
   data() {
     return {
       sheet: false,
-      chooseLanguage: false,
     };
   },
   computed: {
