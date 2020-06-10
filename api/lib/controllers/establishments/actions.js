@@ -394,7 +394,6 @@ exports.addSushi = async function (ctx) {
   ctx.status = 200;
 
   body.id = uuidv4();
-  body.owner = ctx.state.user.email;
 
   if (body.requestorId) {
     body.requestorId = encrypter.encrypt(body.requestorId);
@@ -455,7 +454,6 @@ exports.updateSushi = async function (ctx) {
             'sushi.customerId = params.customerId;' +
             'sushi.apiKey = params.apiKey;' +
             'sushi.comment = params.comment;' +
-            'sushi.owner = params.owner;' +
           '}',
         params: body,
       },
