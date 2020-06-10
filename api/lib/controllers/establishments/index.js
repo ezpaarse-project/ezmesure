@@ -39,13 +39,8 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:email',
+  path: '/self',
   handler: getEtablishment,
-  validate: {
-    params: {
-      email: Joi.string().trim().email().required(),
-    },
-  },
 });
 
 router.route({

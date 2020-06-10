@@ -123,12 +123,12 @@ exports.getEtablishments = async function (ctx) {
 exports.getEtablishment = async function (ctx) {
   ensureIndex();
 
-  const { email } = ctx.params;
+  const { email } = ctx.state.user;
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  let establishment = await getEtablishmentData(email, [
+  const establishment = await getEtablishmentData(email, [
     'organisation.name',
     'organisation.uai',
     'organisation.website',
@@ -138,21 +138,12 @@ exports.getEtablishment = async function (ctx) {
   ]);
 
   if (!establishment) {
-    establishment = {
-      organisation: {
-        name: '',
-        uai: '',
-        website: '',
-        logoId: '',
-      },
-      index: {
-        prefix: '',
-        suggested: '',
-      },
-    };
+    ctx.throw(404, 'No assigned establishment');
+    return;
   }
 
-  const index = ctx.state.user.email.match(/@(\w+)/i);
+  const index = email.match(/@(\w+)/i);
+
   if (index && !establishment.index.prefix) {
     const [, indexPrefix] = index;
     establishment.index.suggested = indexPrefix;
