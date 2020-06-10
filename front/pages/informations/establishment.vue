@@ -132,7 +132,7 @@ export default {
   async asyncData({ $axios, store, $auth }) {
     let establishment = null;
     try {
-      establishment = await $axios.$get(`/establishments/${$auth.state.user.email}`);
+      establishment = await $axios.$get(`/establishments/${$auth.$state.user.email}`);
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
     }

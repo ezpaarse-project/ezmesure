@@ -79,7 +79,7 @@ export default {
     let establishment = null;
     let contact = {};
     try {
-      establishment = await $axios.$get(`/establishments/correspondents/${$auth.state.user.email}`);
+      establishment = await $axios.$get(`/establishments/correspondents/${$auth.$state.user.email}`);
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations correspondant');
     }
@@ -107,7 +107,7 @@ export default {
       this.loading = true;
 
       try {
-        await this.$axios.$patch(`/establishments/${this.establishment.id}/correspondent/${this.$auth.state.user.email}`, this.contact);
+        await this.$axios.$patch(`/establishments/${this.establishment.id}/correspondent/${this.$auth.$state.user.email}`, this.contact);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
         this.loading = false;
