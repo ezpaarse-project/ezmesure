@@ -56,11 +56,11 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/sushi/:email',
+  path: '/:establishmentId/sushi',
   handler: getSushiData,
   validate: {
     params: {
-      email: Joi.string().trim().email().required(),
+      establishmentId: Joi.string().trim().required(),
     },
   },
 });

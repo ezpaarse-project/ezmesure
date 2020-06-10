@@ -353,39 +353,38 @@ exports.updateCorrespondent = async function (ctx) {
 };
 
 exports.getSushiData = async function (ctx) {
-  const { email } = ctx.params;
+  const { email } = ctx.state.user;
+  const { establishmentId } = ctx.params;
 
-  ctx.type = 'json';
-  ctx.status = 200;
+  const { body: establishment, statusCode } = await elastic.getSource({
+    index: config.depositors.index,
+    id: establishmentId,
+  }, { ignore: [404] });
 
-  const establishment = await getEtablishmentData(email, [ 'sushi' ]);
-
-  if (!establishment) {
-    ctx.status = 404;
+  if (!establishment || statusCode === 404) {
+    ctx.throw(404, 'Establishment not found');
     return;
   }
 
-  const sushi = establishment.sushi.map((sushi) => {
-    if (sushi.owner === email) {
+  const contacts = Array.isArray(establishment.contacts) ? establishment.contacts : [];
+  const sushiItems = Array.isArray(establishment.sushi) ? establishment.sushi : [];
+  const isMember = contacts.some((contact) => contact.email === email);
 
-      if (sushi.requestorId) {
-        sushi.requestorId = encrypter.decrypt(sushi.requestorId);
-      }
-      if (sushi.customerId) {
-        sushi.customerId = encrypter.decrypt(sushi.customerId);
-      }
-      if (sushi.apiKey) {
-        sushi.apiKey = encrypter.decrypt(sushi.apiKey);
-      }
+  if (!isMember) {
+    ctx.throw(403, 'You are not allowed to access this establishment');
+    return;
+  }
 
-      return sushi;
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = sushiItems.map((sushiItem) => (
+    {
+      ...sushiItem,
+      requestorId: sushiItem.requestorId && encrypter.decrypt(sushiItem.requestorId),
+      customerId: sushiItem.customerId && encrypter.decrypt(sushiItem.customerId),
+      apiKey: sushiItem.apiKey && encrypter.decrypt(sushiItem.apiKey),
     }
-  });
-
-  ctx.body = {
-    id: establishment.id,
-    sushi,
-  };
+  ));
 };
 
 exports.addSushi = async function (ctx) {
