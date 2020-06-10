@@ -129,10 +129,10 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store, $auth }) {
+  async asyncData({ $axios, store }) {
     let establishment = null;
     try {
-      establishment = await $axios.$get(`/establishments/${$auth.$state.user.email}`);
+      establishment = await $axios.$get('/establishments/self');
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
     }
