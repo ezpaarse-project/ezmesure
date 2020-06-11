@@ -47,13 +47,8 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/member/:email',
+  path: '/member/self',
   handler: getSelfMember,
-  validate: {
-    params: {
-      email: Joi.string().trim().email().required(),
-    },
-  },
 });
 
 router.route({
