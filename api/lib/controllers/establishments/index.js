@@ -47,7 +47,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/member/self',
+  path: '/members/self',
   handler: getSelfMember,
 });
 
