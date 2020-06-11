@@ -429,6 +429,9 @@ exports.addSushi = async function (ctx) {
   if (body.requestorId) {
     body.requestorId = encrypter.encrypt(body.requestorId);
   }
+  if (body.consortialId) {
+    body.consortialId = encrypter.encrypt(body.consortialId);
+  }
   if (body.customerId) {
     body.customerId = encrypter.encrypt(body.customerId);
   }
@@ -461,6 +464,9 @@ exports.updateSushi = async function (ctx) {
   if (body.requestorId) {
     body.requestorId = encrypter.encrypt(body.requestorId);
   }
+  if (body.consortialId) {
+    body.consortialId = encrypter.encrypt(body.consortialId);
+  }
   if (body.customerId) {
     body.customerId = encrypter.encrypt(body.customerId);
   }
@@ -481,6 +487,7 @@ exports.updateSushi = async function (ctx) {
             'sushi.package = params.package;' +
             'sushi.sushiUrl = params.sushiUrl;' +
             'sushi.requestorId = params.requestorId;' +
+            'sushi.consortialId = params.consortialId;' +
             'sushi.customerId = params.customerId;' +
             'sushi.apiKey = params.apiKey;' +
             'sushi.comment = params.comment;' +

@@ -105,6 +105,7 @@ router.route({
       package: Joi.string().trim().required(),
       sushiUrl: Joi.string().trim().required(),
       requestorId: Joi.string().trim().empty(''),
+      consortialId: Joi.string().trim().empty(''),
       customerId: Joi.string().trim().empty(''),
       apiKey: Joi.string().trim().empty(''),
       comment: Joi.string().trim().empty(''),
