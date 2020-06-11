@@ -332,7 +332,7 @@ exports.getEtablishmentMembers = async function (ctx) {
 };
 
 exports.getSelfMember = async function (ctx) {
-  const { email } = ctx.params;
+  const { email } = ctx.state.user;
 
   ctx.type = 'json';
   ctx.status = 200;
