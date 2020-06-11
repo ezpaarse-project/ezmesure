@@ -40,7 +40,7 @@ const getEtablishmentDataByUAI = async function (uai) {
     return {
       shortName: data.sigle,
       city: data.commune,
-      establismentType: data.type_detablissement,
+      establishmentType: data.type_detablissement,
       location: {
         lon: data.longitude_x,
         lat: data.latitude_y,
@@ -179,7 +179,7 @@ exports.storeEstablishment = async function (ctx) {
 
   establishment.organisation.logoId = logoId || '';
 
-  establishment.organisation.establismentType = '';
+  establishment.organisation.establishmentType = '';
   establishment.organisation.city = '';
   establishment.organisation.location = {
     lon: 0,
@@ -207,12 +207,12 @@ exports.storeEstablishment = async function (ctx) {
 
   if (establishment.organisation.uai) {
     try {
-      const establismentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
+      const establishmentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
 
-      if (establismentUAIData) {
+      if (establishmentUAIData) {
         establishment.organisation = {
           ...establishment.organisation,
-          ...establismentUAIData,
+          ...establishmentUAIData,
         };
       }
     } catch (err) {
@@ -255,12 +255,12 @@ exports.updateEstablishment = async function (ctx) {
 
   if (establishment.organisation.uai) {
     try {
-      const establismentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
+      const establishmentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
 
-      if (establismentUAIData) {
+      if (establishmentUAIData) {
         establishment.organisation = {
           ...establishment.organisation,
-          ...establismentUAIData,
+          ...establishmentUAIData,
         };
       }
     } catch (err) {
@@ -421,10 +421,9 @@ exports.addSushi = async function (ctx) {
     id: establishmentId,
     refresh: true,
     body: {
-      doc: {
-        sushi: [
-          body,
-        ],
+      script: {
+        source: 'ctx._source.sushi.add(params)',
+        params: body,
       },
     },
   }).catch((err) => {
@@ -482,7 +481,7 @@ exports.deleteSushiData = async function (ctx) {
 
   let establishment = null;
   try {
-    establisment = await elastic.getSource({
+    establishment = await elastic.getSource({
       index: config.depositors.index,
       id: establishmentId,
       refresh: true,
@@ -492,7 +491,7 @@ exports.deleteSushiData = async function (ctx) {
     appLogger.error('Failed to update data in index', err);
   }
 
-  if (!establisment || !establisment.body) {
+  if (!establishment || !establishment.body) {
     ctx.status = 404;
     return ctx;
   }
