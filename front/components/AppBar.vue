@@ -68,7 +68,7 @@
       </template>
 
       <v-list>
-        <v-subheader v-text="$t('toolbar.navigateTo')" />
+        <v-subheader v-text="$t('menu.navigateTo')" />
 
         <v-list-item exact :to="localePath('/')" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.home')" />

@@ -39,13 +39,8 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:email',
+  path: '/self',
   handler: getEtablishment,
-  validate: {
-    params: {
-      email: Joi.string().trim().email().required(),
-    },
-  },
 });
 
 router.route({
@@ -61,11 +56,11 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/sushi/:email',
+  path: '/:establishmentId/sushi',
   handler: getSushiData,
   validate: {
     params: {
-      email: Joi.string().trim().email().required(),
+      establishmentId: Joi.string().trim().required(),
     },
   },
 });
@@ -85,7 +80,6 @@ router.route({
       vendor: Joi.string().trim().required(),
       package: Joi.string().trim().required(),
       sushiUrl: Joi.string().trim().required(),
-      owner: Joi.string().trim().empty(''),
       requestorId: Joi.string().trim().empty(''),
       customerId: Joi.string().trim().empty(''),
       apiKey: Joi.string().trim().empty(''),
@@ -158,7 +152,6 @@ router.route({
       vendor: Joi.string().trim().required(),
       package: Joi.string().trim().required(),
       sushiUrl: Joi.string().trim().required(),
-      owner: Joi.string().trim().required(),
       requestorId: Joi.string().trim().empty(''),
       customerId: Joi.string().trim().empty(''),
       apiKey: Joi.string().trim().empty(''),

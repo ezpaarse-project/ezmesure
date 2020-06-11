@@ -123,12 +123,12 @@ exports.getEtablishments = async function (ctx) {
 exports.getEtablishment = async function (ctx) {
   ensureIndex();
 
-  const { email } = ctx.params;
+  const { email } = ctx.state.user;
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  let establishment = await getEtablishmentData(email, [
+  const establishment = await getEtablishmentData(email, [
     'organisation.name',
     'organisation.uai',
     'organisation.website',
@@ -138,21 +138,12 @@ exports.getEtablishment = async function (ctx) {
   ]);
 
   if (!establishment) {
-    establishment = {
-      organisation: {
-        name: '',
-        uai: '',
-        website: '',
-        logoId: '',
-      },
-      index: {
-        prefix: '',
-        suggested: '',
-      },
-    };
+    ctx.throw(404, 'No assigned establishment');
+    return;
   }
 
-  const index = ctx.state.user.email.match(/@(\w+)/i);
+  const index = email.match(/@(\w+)/i);
+
   if (index && !establishment.index.prefix) {
     const [, indexPrefix] = index;
     establishment.index.suggested = indexPrefix;
@@ -362,39 +353,38 @@ exports.updateCorrespondent = async function (ctx) {
 };
 
 exports.getSushiData = async function (ctx) {
-  const { email } = ctx.params;
+  const { email } = ctx.state.user;
+  const { establishmentId } = ctx.params;
 
-  ctx.type = 'json';
-  ctx.status = 200;
+  const { body: establishment, statusCode } = await elastic.getSource({
+    index: config.depositors.index,
+    id: establishmentId,
+  }, { ignore: [404] });
 
-  const establishment = await getEtablishmentData(email, [ 'sushi' ]);
-
-  if (!establishment) {
-    ctx.status = 404;
+  if (!establishment || statusCode === 404) {
+    ctx.throw(404, 'Establishment not found');
     return;
   }
 
-  const sushi = establishment.sushi.map((sushi) => {
-    if (sushi.owner === email) {
+  const contacts = Array.isArray(establishment.contacts) ? establishment.contacts : [];
+  const sushiItems = Array.isArray(establishment.sushi) ? establishment.sushi : [];
+  const isMember = contacts.some((contact) => contact.email === email);
 
-      if (sushi.requestorId) {
-        sushi.requestorId = encrypter.decrypt(sushi.requestorId);
-      }
-      if (sushi.customerId) {
-        sushi.customerId = encrypter.decrypt(sushi.customerId);
-      }
-      if (sushi.apiKey) {
-        sushi.apiKey = encrypter.decrypt(sushi.apiKey);
-      }
+  if (!isMember) {
+    ctx.throw(403, 'You are not allowed to access this establishment');
+    return;
+  }
 
-      return sushi;
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = sushiItems.map((sushiItem) => (
+    {
+      ...sushiItem,
+      requestorId: sushiItem.requestorId && encrypter.decrypt(sushiItem.requestorId),
+      customerId: sushiItem.customerId && encrypter.decrypt(sushiItem.customerId),
+      apiKey: sushiItem.apiKey && encrypter.decrypt(sushiItem.apiKey),
     }
-  });
-
-  ctx.body = {
-    id: establishment.id,
-    sushi,
-  };
+  ));
 };
 
 exports.addSushi = async function (ctx) {
@@ -404,7 +394,6 @@ exports.addSushi = async function (ctx) {
   ctx.status = 200;
 
   body.id = uuidv4();
-  body.owner = ctx.state.user.email;
 
   if (body.requestorId) {
     body.requestorId = encrypter.encrypt(body.requestorId);
@@ -464,7 +453,6 @@ exports.updateSushi = async function (ctx) {
             'sushi.customerId = params.customerId;' +
             'sushi.apiKey = params.apiKey;' +
             'sushi.comment = params.comment;' +
-            'sushi.owner = params.owner;' +
           '}',
         params: body,
       },
