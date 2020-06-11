@@ -11,6 +11,7 @@ const {
   deleteEstablishments,
   deleteEstablishment,
   getEtablishment,
+  getEtablishmentMembers,
   updateEstablishment, 
   updateCorrespondent,
   getCorrespondents,
@@ -59,6 +60,17 @@ router.route({
   method: 'GET',
   path: '/:establishmentId/sushi',
   handler: getSushiData,
+  validate: {
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:establishmentId/members',
+  handler: getEtablishmentMembers,
   validate: {
     params: {
       establishmentId: Joi.string().trim().required(),

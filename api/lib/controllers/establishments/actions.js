@@ -312,6 +312,25 @@ exports.deleteEstablishment = async function (ctx) {
   });
 };
 
+exports.getEtablishmentMembers = async function (ctx) {
+  const { establishmentId } = ctx.params;
+
+  const { body: establishment, statusCode } = await elastic.getSource({
+    index: config.depositors.index,
+    id: establishmentId,
+  }, { ignore: [404] });
+
+  if (!establishment || statusCode === 404) {
+    ctx.throw(404, 'Establishment not found');
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = Array.isArray(establishment.contacts) ? establishment.contacts : [];
+};
+
 exports.getCorrespondents = async function (ctx) {
   const { email } = ctx.params;
 
