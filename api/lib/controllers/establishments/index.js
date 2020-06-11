@@ -9,6 +9,7 @@ const {
   getEtablishments,
   storeEstablishment,
   deleteEstablishments,
+  deleteEstablishment,
   getEtablishment,
   updateEstablishment, 
   updateCorrespondent,
@@ -58,6 +59,17 @@ router.route({
   method: 'GET',
   path: '/:establishmentId/sushi',
   handler: getSushiData,
+  validate: {
+    params: {
+      establishmentId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:establishmentId',
+  handler: deleteEstablishment,
   validate: {
     params: {
       establishmentId: Joi.string().trim().required(),

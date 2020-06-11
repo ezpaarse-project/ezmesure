@@ -300,6 +300,18 @@ exports.deleteEstablishments = async function (ctx) {
   }
 };
 
+exports.deleteEstablishment = async function (ctx) {
+  const { establishmentId } = ctx.params;
+
+  ctx.status = 200;
+
+  ctx.body = await elastic.delete({
+    id: establishmentId,
+    index: config.depositors.index,
+    refresh: true,
+  });
+};
+
 exports.getCorrespondents = async function (ctx) {
   const { email } = ctx.params;
 
@@ -320,7 +332,7 @@ exports.getCorrespondents = async function (ctx) {
 };
 
 exports.updateCorrespondent = async function (ctx) {
-  const { establishmentId, email } = ctx.params;
+  const { establishmentId } = ctx.params;
   const { body } = ctx.request
 
   ctx.status = 200;
