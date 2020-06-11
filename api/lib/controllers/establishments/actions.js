@@ -18,7 +18,7 @@ const instance = axios.create({
   },
 });
 
-const ensureIndex = async function () {
+const ensureIndex = async () => {
   const { body: exists } = await elastic.indices.exists({ index: config.depositors.index });
 
   if (!exists) {
@@ -29,14 +29,14 @@ const ensureIndex = async function () {
   }
 };
 
-const getEtablishmentDataByUAI = async function (uai) {
+const getEtablishmentDataByUAI = async (uai) => {
   try {
     const { data: res } = await instance.get('');
 
     if (!res) { return {}; }
 
     const data = Object.values(res).find((e) => e.code_uai === uai);
-    
+
     return {
       shortName: data.sigle,
       city: data.commune,
@@ -50,11 +50,9 @@ const getEtablishmentDataByUAI = async function (uai) {
     appLogger.error('Failed to get establishment data', err);
     return {};
   }
-
-  return {};
 };
 
-const getEtablishmentData = async function (email, source) {
+const getEtablishmentData = async (email, sourceFilter) => {
   try {
     const { body } = await elastic.search({
       index: config.depositors.index,
@@ -75,7 +73,7 @@ const getEtablishmentData = async function (email, source) {
             },
           },
         },
-        _source: source,
+        _source: sourceFilter,
       },
     });
 
@@ -87,16 +85,14 @@ const getEtablishmentData = async function (email, source) {
 
     if (!establishment) { return null; }
 
-    return {
-      id: establishment._id,
-      ...establishment._source,
-    };
+    const { _id: id, _source: source } = establishment;
+    return { ...source, id };
   } catch (error) {
     return null;
   }
 };
 
-const addLogo = async function (logo) {
+const addLogo = async (logo) => {
   try {
     const dest = path.resolve(__dirname, '..', '..', '..', 'uploads');
 
@@ -109,10 +105,9 @@ const addLogo = async function (logo) {
     appLogger.error('Failed to store logo', err);
     return null;
   }
-  return null;
 };
 
-exports.getEtablishments = async function (ctx) {
+exports.getEtablishments = async (ctx) => {
   ensureIndex();
 
   ctx.type = 'json';
@@ -120,7 +115,7 @@ exports.getEtablishments = async function (ctx) {
   ctx.body = await depositors.getFromIndex();
 };
 
-exports.getEtablishment = async function (ctx) {
+exports.getEtablishment = async (ctx) => {
   ensureIndex();
 
   const { email } = ctx.state.user;
@@ -153,13 +148,13 @@ exports.getEtablishment = async function (ctx) {
   ctx.body = establishment;
 };
 
-exports.storeEstablishment = async function (ctx) {
+exports.storeEstablishment = async (ctx) => {
   ensureIndex();
 
   const { body } = ctx.request;
   const { form } = body;
   const { logo } = ctx.request.files;
-  
+
   let logoId;
   if (logo) {
     logoId = await addLogo(logo);
@@ -224,7 +219,7 @@ exports.storeEstablishment = async function (ctx) {
   });
 };
 
-exports.updateEstablishment = async function (ctx) {
+exports.updateEstablishment = async (ctx) => {
   const { establishmentId } = ctx.params;
 
   const { body } = ctx.request;
@@ -233,7 +228,7 @@ exports.updateEstablishment = async function (ctx) {
 
   if (!body || !form) {
     ctx.status = 400;
-    return ctx;
+    return;
   }
 
   const establishment = JSON.parse(form);
@@ -275,7 +270,7 @@ exports.updateEstablishment = async function (ctx) {
   ctx.status = 200;
 };
 
-exports.deleteEstablishments = async function (ctx) {
+exports.deleteEstablishments = async (ctx) => {
   const { body } = ctx.request;
 
   const response = [];
@@ -283,6 +278,7 @@ exports.deleteEstablishments = async function (ctx) {
   if (Array.isArray(body.ids) && body.ids.length > 0) {
     for (let i = 0; i < body.ids.length; i += 1) {
       try {
+        // FIXME: use bulk query
         await elastic.delete({
           id: body.ids[i],
           index: config.depositors.index,
@@ -300,7 +296,7 @@ exports.deleteEstablishments = async function (ctx) {
   }
 };
 
-exports.deleteEstablishment = async function (ctx) {
+exports.deleteEstablishment = async (ctx) => {
   const { establishmentId } = ctx.params;
 
   ctx.status = 200;
@@ -312,7 +308,7 @@ exports.deleteEstablishment = async function (ctx) {
   });
 };
 
-exports.getEtablishmentMembers = async function (ctx) {
+exports.getEtablishmentMembers = async (ctx) => {
   const { establishmentId } = ctx.params;
 
   const { body: establishment, statusCode } = await elastic.getSource({
@@ -331,13 +327,13 @@ exports.getEtablishmentMembers = async function (ctx) {
   ctx.body = Array.isArray(establishment.contacts) ? establishment.contacts : [];
 };
 
-exports.getSelfMember = async function (ctx) {
+exports.getSelfMember = async (ctx) => {
   const { email } = ctx.state.user;
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  const establishment = await getEtablishmentData(email, [ 'contacts' ]);
+  const establishment = await getEtablishmentData(email, ['contacts']);
 
   if (!establishment) {
     ctx.status = 404;
@@ -346,13 +342,13 @@ exports.getSelfMember = async function (ctx) {
 
   ctx.body = {
     id: establishment.id,
-    contact: establishment.contacts.find(sushi => sushi.email === email) || [],
+    contact: establishment.contacts.find((sushi) => sushi.email === email) || [],
   };
 };
 
-exports.updateMember = async function (ctx) {
+exports.updateMember = async (ctx) => {
   const { establishmentId } = ctx.params;
-  const { body } = ctx.request
+  const { body } = ctx.request;
 
   ctx.status = 200;
 
@@ -366,14 +362,14 @@ exports.updateMember = async function (ctx) {
     refresh: true,
     body: {
       script: {
-        source: 'def targets = ctx._source.contacts.findAll(contact -> contact.id == params.id);' +
-          'for(contact in targets) {' +
-            'contact.id = params.id;' +
-            'contact.type = params.type;' +
-            'contact.email = params.email;' +
-            'contact.confirmed = params.confirmed;' +
-            'contact.fullName = params.fullName;' +
-          '}',
+        source: 'def targets = ctx._source.contacts.findAll(contact -> contact.id == params.id);'
+          + 'for(contact in targets) {'
+          + 'contact.id = params.id;'
+          + 'contact.type = params.type;'
+          + 'contact.email = params.email;'
+          + 'contact.confirmed = params.confirmed;'
+          + 'contact.fullName = params.fullName;'
+          + '}',
         params: body,
       },
     },
@@ -383,7 +379,7 @@ exports.updateMember = async function (ctx) {
   });
 };
 
-exports.getSushiData = async function (ctx) {
+exports.getSushiData = async (ctx) => {
   const { email } = ctx.state.user;
   const { establishmentId } = ctx.params;
 
@@ -418,9 +414,9 @@ exports.getSushiData = async function (ctx) {
   ));
 };
 
-exports.addSushi = async function (ctx) {
+exports.addSushi = async (ctx) => {
   const { establishmentId } = ctx.params;
-  const { body } = ctx.request
+  const { body } = ctx.request;
 
   ctx.status = 200;
 
@@ -438,7 +434,7 @@ exports.addSushi = async function (ctx) {
   if (body.apiKey) {
     body.apiKey = encrypter.encrypt(body.apiKey);
   }
-  
+
   await elastic.update({
     index: config.depositors.index,
     id: establishmentId,
@@ -455,9 +451,9 @@ exports.addSushi = async function (ctx) {
   });
 };
 
-exports.updateSushi = async function (ctx) {
+exports.updateSushi = async (ctx) => {
   const { establishmentId } = ctx.params;
-  const { body } = ctx.request
+  const { body } = ctx.request;
 
   ctx.status = 200;
 
@@ -473,25 +469,25 @@ exports.updateSushi = async function (ctx) {
   if (body.apiKey) {
     body.apiKey = encrypter.encrypt(body.apiKey);
   }
-  
+
   await elastic.update({
     index: config.depositors.index,
     id: establishmentId,
     refresh: true,
     body: {
       script: {
-        source: 'def targets = ctx._source.sushi.findAll(sushi -> sushi.id == params.id);' +
-          'for(sushi in targets) {' +
-            'sushi.id = params.id;' +
-            'sushi.vendor = params.vendor;' +
-            'sushi.package = params.package;' +
-            'sushi.sushiUrl = params.sushiUrl;' +
-            'sushi.requestorId = params.requestorId;' +
-            'sushi.consortialId = params.consortialId;' +
-            'sushi.customerId = params.customerId;' +
-            'sushi.apiKey = params.apiKey;' +
-            'sushi.comment = params.comment;' +
-          '}',
+        source: 'def targets = ctx._source.sushi.findAll(sushi -> sushi.id == params.id);'
+          + 'for(sushi in targets) {'
+            + 'sushi.id = params.id;'
+            + 'sushi.vendor = params.vendor;'
+            + 'sushi.package = params.package;'
+            + 'sushi.sushiUrl = params.sushiUrl;'
+            + 'sushi.requestorId = params.requestorId;'
+            + 'sushi.consortialId = params.consortialId;'
+            + 'sushi.customerId = params.customerId;'
+            + 'sushi.apiKey = params.apiKey;'
+            + 'sushi.comment = params.comment;'
+          + '}',
         params: body,
       },
     },
@@ -501,9 +497,9 @@ exports.updateSushi = async function (ctx) {
   });
 };
 
-exports.deleteSushiData = async function (ctx) {
+exports.deleteSushiData = async (ctx) => {
   const { establishmentId } = ctx.params;
-  const { body } = ctx.request
+  const { body } = ctx.request;
 
   let establishment = null;
   try {
@@ -512,22 +508,22 @@ exports.deleteSushiData = async function (ctx) {
       id: establishmentId,
       refresh: true,
     });
-  } catch(err) {
+  } catch (err) {
     ctx.status = 500;
     appLogger.error('Failed to update data in index', err);
   }
 
   if (!establishment || !establishment.body) {
     ctx.status = 404;
-    return ctx;
+    return;
   }
 
   const response = [];
 
   if (Array.isArray(body.ids) && body.ids.length > 0) {
     for (let i = 0; i < body.ids.length; i += 1) {
-      
       try {
+        // FIXME: use bulk query
         await elastic.update({
           index: config.depositors.index,
           id: establishmentId,
@@ -552,7 +548,7 @@ exports.deleteSushiData = async function (ctx) {
   }
 };
 
-exports.pictures = async function (ctx) {
+exports.pictures = async (ctx) => {
   ctx.type = 'image/png';
   ctx.status = 200;
 

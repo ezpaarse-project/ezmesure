@@ -1,8 +1,8 @@
-const fse    = require('fs-extra');
-const path   = require('path');
-const csv    = require('csv');
-const parse  = require('co-busboy');
-const zlib   = require('zlib');
+const fse = require('fs-extra');
+const path = require('path');
+const csv = require('csv');
+const parse = require('co-busboy');
+const zlib = require('zlib');
 const config = require('config');
 
 const dateIsValid = require('date-fns/isValid');
@@ -15,6 +15,18 @@ const { appLogger } = require('../../../server');
 
 const storagePath = config.get('storage.path');
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
+
+/**
+ * Create an index with a default mapping
+ * @param  {String}  index
+ * @return {Promise}
+ */
+function createIndex(index) {
+  return elastic.indices.create({
+    index,
+    body: indexTemplate,
+  }).then((res) => res.body);
+}
 
 module.exports = async function upload(ctx) {
   const { index } = ctx.request.params;
@@ -197,12 +209,12 @@ function readStream(stream, index, username, splittedFields) {
         }
         return columns;
       },
-      'skip_empty_lines: true': true,
-      'relax_column_count': true
+      skip_empty_lines: true,
+      relax_column_count: true,
     });
 
     parser.on('readable', read);
-    parser.on('error', err => { reject(err); });
+    parser.on('error', (err) => { reject(err); });
     parser.on('end', () => {
       doneReading = true;
       if (busy) { return; }
@@ -329,16 +341,4 @@ function readStream(stream, index, username, splittedFields) {
       result.errors.push(err);
     }
   }
-}
-
-/**
- * Create an index with a default mapping
- * @param  {String}  index
- * @return {Promise}
- */
-function createIndex(index) {
-  return elastic.indices.create({
-    index,
-    body: indexTemplate,
-  }).then((res) => res.body);
 }

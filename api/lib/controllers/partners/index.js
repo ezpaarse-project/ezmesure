@@ -1,6 +1,6 @@
 const router = require('koa-joi-router')();
 const { requireJwt } = require('../../services/auth');
-const { list, refresh, pictures } = require('./actions');
+const { list, refresh } = require('./actions');
 
 
 router.get('/', list);

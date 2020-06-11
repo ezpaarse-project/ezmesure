@@ -1,6 +1,7 @@
 const config = require('config');
 
 const elastic = require('./elastic');
+
 const { index } = config.get('depositors');
 const encrypter = require('../services/encrypter');
 
@@ -19,16 +20,16 @@ async function getFromIndex() {
   }
 
   const depositors = body.hits.hits.map((hit) => {
-    const depositor = hit._source;
+    const { _source: depositor, _id: id } = hit;
 
     if (!depositor) {
       return {};
     }
 
-    depositor.id = hit._id;
+    depositor.id = id;
 
-    if (!depositor.contacts.length) {
-      depositor.contacts = {};
+    if (!Array.isArray(depositor.contacts)) {
+      depositor.contacts = [];
     }
 
     if (depositor.sushi.length) {

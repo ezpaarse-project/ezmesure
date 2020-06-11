@@ -3,7 +3,7 @@ const indexTemplate = require('../utils/metrics-template');
 
 const index = '.ezmesure-metrics';
 
-exports.save = async function (ctx) {
+exports.save = async (ctx) => {
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
@@ -34,6 +34,8 @@ exports.save = async function (ctx) {
       if (metric.response.body && !metric.response.body.error) {
         metric.response.body = null;
       }
+      break;
+    default:
   }
 
   const username = ctx.state && ctx.state.user && ctx.state.user.username;

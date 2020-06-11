@@ -12,7 +12,7 @@ const {
   deleteEstablishment,
   getEtablishment,
   getEtablishmentMembers,
-  updateEstablishment, 
+  updateEstablishment,
   updateMember,
   getSelfMember,
   addSushi,
@@ -34,7 +34,8 @@ router.route({
   handler: pictures,
   validate: {
     params: {
-      id: Joi.string().trim().min(16).max(16).required(),
+      id: Joi.string().trim().min(16).max(16)
+        .required(),
     },
   },
 });
@@ -130,7 +131,7 @@ router.route({
       establishmentId: Joi.string().trim().required(),
     },
     body: {
-      ids: Joi.array().items(Joi.string().trim().guid({ version: [ 'uuidv4' ] })),
+      ids: Joi.array().items(Joi.string().trim().guid({ version: ['uuidv4'] })),
     },
   },
 });
@@ -146,7 +147,7 @@ router.route({
       email: Joi.string().trim().email().required(),
     },
     body: {
-      id: Joi.string().trim().guid({ version: [ 'uuidv4' ] }).required(),
+      id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
       type: Joi.array().items(Joi.string().trim().required()).required(),
       email: Joi.string().trim().required(),
       confirmed: Joi.boolean().required(),
@@ -165,7 +166,7 @@ router.route({
       establishmentId: Joi.string().trim().required(),
     },
     body: {
-      id: Joi.string().trim().guid({ version: [ 'uuidv4' ] }).required(),
+      id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
       vendor: Joi.string().trim().required(),
       package: Joi.string().trim().required(),
       sushiUrl: Joi.string().trim().required(),

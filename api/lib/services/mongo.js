@@ -1,21 +1,29 @@
 const { MongoClient, ObjectID } = require('mongodb');
-const config = require('config');
 
 const mongo = { ObjectID };
 
-mongo.connect = function (url, callback) {
-  if (mongo.db) { return callback(null, mongo.db); }
+mongo.connect = (url, callback) => {
+  if (mongo.db) {
+    callback(null, mongo.db);
+    return;
+  }
 
   MongoClient.connect(url, (err, database) => {
-    if (err) { return callback(err); }
+    if (err) {
+      callback(err);
+      return;
+    }
 
     mongo.db = database;
     callback(err, database);
   });
 };
 
-mongo.disconnect = function (callback) {
-  if (!mongo.db) { return callback(null); }
+mongo.disconnect = (callback) => {
+  if (!mongo.db) {
+    callback(null);
+    return;
+  }
 
   mongo.db.close((err) => {
     mongo.db = null;
@@ -23,8 +31,6 @@ mongo.disconnect = function (callback) {
   });
 };
 
-mongo.get = function (col) {
-  return (mongo.db ? mongo.db.collection(col) : null);
-};
+mongo.get = (col) => (mongo.db ? mongo.db.collection(col) : null);
 
 module.exports = mongo;
