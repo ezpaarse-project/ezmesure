@@ -114,15 +114,12 @@ router.route({
 
 router.route({
   method: 'POST',
-  path: '/:establishmentId/delete',
+  path: '/delete',
   handler: deleteEstablishments,
   validate: {
     type: 'json',
-    params: {
-      establishmentId: Joi.string().trim().required(),
-    },
     body: {
-      ids: Joi.array().items(Joi.string().trim().guid({ version: [ 'uuidv4' ] })),
+      ids: Joi.array().items(Joi.string().trim()),
     },
   },
 });

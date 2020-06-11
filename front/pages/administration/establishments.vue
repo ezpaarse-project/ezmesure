@@ -397,7 +397,7 @@ export default {
       let response;
 
       try {
-        response = await this.$axios.$post('/correspondents/delete', { ids });
+        response = await this.$axios.$post('/establishments/delete', { ids });
         if (!Array.isArray(response)) {
           throw new Error('invalid response');
         }
