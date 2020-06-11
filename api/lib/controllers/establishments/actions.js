@@ -331,7 +331,7 @@ exports.getEtablishmentMembers = async function (ctx) {
   ctx.body = Array.isArray(establishment.contacts) ? establishment.contacts : [];
 };
 
-exports.getCorrespondents = async function (ctx) {
+exports.getSelfMember = async function (ctx) {
   const { email } = ctx.params;
 
   ctx.type = 'json';
@@ -350,7 +350,7 @@ exports.getCorrespondents = async function (ctx) {
   };
 };
 
-exports.updateCorrespondent = async function (ctx) {
+exports.updateMember = async function (ctx) {
   const { establishmentId } = ctx.params;
   const { body } = ctx.request
 

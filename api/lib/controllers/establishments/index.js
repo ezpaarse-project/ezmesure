@@ -13,8 +13,8 @@ const {
   getEtablishment,
   getEtablishmentMembers,
   updateEstablishment, 
-  updateCorrespondent,
-  getCorrespondents,
+  updateMember,
+  getSelfMember,
   addSushi,
   updateSushi,
   getSushiData,
@@ -47,8 +47,8 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/correspondents/:email',
-  handler: getCorrespondents,
+  path: '/member/:email',
+  handler: getSelfMember,
   validate: {
     params: {
       email: Joi.string().trim().email().required(),
@@ -141,8 +141,8 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:establishmentId/correspondent/:email',
-  handler: updateCorrespondent,
+  path: '/:establishmentId/member/:email',
+  handler: updateMember,
   validate: {
     type: 'json',
     params: {
