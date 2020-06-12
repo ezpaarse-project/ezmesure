@@ -1,7 +1,8 @@
 <template>
   <section>
     <ToolBar title="Mon établissement" />
-    <v-card-text>
+
+    <v-card-text v-if="establishment">
       <v-form v-model="valid">
         <v-container>
           <v-row>
@@ -105,18 +106,25 @@
         </v-container>
       </v-form>
     </v-card-text>
-    <v-card-actions>
+
+    <v-card-actions v-if="establishment">
       <span class="caption">* champs obligatoires</span>
       <v-spacer />
       <v-btn
         color="primary"
-        :disabled="!valid || loading"
+        :disabled="!valid"
         :loading="loading"
         @click="save"
       >
         Sauvegarder
       </v-btn>
     </v-card-actions>
+
+    <v-card-text v-else>
+      <v-alert type="error" :value="true">
+        Les informations de votre établissement n'ont pas pu être récupérées.
+      </v-alert>
+    </v-card-text>
   </section>
 </template>
 
@@ -131,15 +139,24 @@ export default {
   },
   async asyncData({ $axios, store }) {
     let establishment = null;
+
     try {
       establishment = await $axios.$get('/establishments/self');
     } catch (e) {
-      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      if (e.response?.status === 404) {
+        establishment = {};
+      } else {
+        store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      }
+    }
+
+    if (establishment) {
+      establishment.organisation = establishment.organisation || {};
+      establishment.index = establishment.index || {};
     }
 
     return {
       valid: false,
-      lazy: false,
       logo: null,
       logoPreview: null,
       loading: false,
