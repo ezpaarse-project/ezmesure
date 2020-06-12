@@ -59,7 +59,7 @@
         Vous n'êtes rattachés à aucun établissement,
         où vous n'avez déclaré aucunes informations sur votre établissement.
       </div>
-      <a :href="'/informations/institution'">
+      <a :href="'/info/institution'">
         Déclarer des informations d'établissement.
       </a>
     </v-card-text>

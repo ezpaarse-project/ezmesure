@@ -104,7 +104,7 @@ export default {
     administration() {
       return {
         title: this.$t('menu.administration'),
-        href: '/administration',
+        href: '/admin',
         admin: true,
         children: [
           {
@@ -125,7 +125,7 @@ export default {
     informations() {
       return {
         title: this.$t('menu.informations'),
-        href: '/informations',
+        href: '/info',
         children: [
           {
             title: this.$t('menu.institution'),
