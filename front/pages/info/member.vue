@@ -75,11 +75,11 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store, $auth }) {
+  async asyncData({ $axios, store }) {
     let institution = null;
     let contact = {};
     try {
-      institution = await $axios.$get(`/institutions/correspondents/${$auth.$state.user.email}`);
+      institution = await $axios.$get('/institutions/members/self');
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations correspondant');
     }
@@ -107,7 +107,7 @@ export default {
       this.loading = true;
 
       try {
-        await this.$axios.$patch(`/institutions/${this.institution.id}/correspondent/${this.$auth.$state.user.email}`, this.contact);
+        await this.$axios.$patch(`/institutions/${this.institution.id}/members/self`, this.contact);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
         this.loading = false;

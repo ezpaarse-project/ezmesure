@@ -133,7 +133,7 @@ export default {
           },
           {
             title: this.$t('menu.correspondent'),
-            href: '/correspondent',
+            href: '/member',
           },
           {
             title: this.$t('menu.sushi'),
