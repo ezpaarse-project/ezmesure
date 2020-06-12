@@ -10,7 +10,7 @@ const authorize = require('./auth');
 const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
-const establishments = require('./establishments');
+const institutions = require('./institutions');
 
 const openapi = require('./openapi.json');
 
@@ -52,6 +52,6 @@ app.use(authorize.prefix('/profile').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
 app.use(providers.prefix('/providers').middleware());
-app.use(establishments.prefix('/establishments').middleware());
+app.use(institutions.prefix('/institutions').middleware());
 
 module.exports = app;

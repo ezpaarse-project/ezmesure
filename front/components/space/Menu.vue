@@ -108,8 +108,8 @@ export default {
         admin: true,
         children: [
           {
-            title: this.$t('menu.establishments'),
-            href: '/establishments',
+            title: this.$t('menu.institutions'),
+            href: '/institutions',
           },
           {
             title: this.$t('menu.sushi'),
@@ -128,8 +128,8 @@ export default {
         href: '/informations',
         children: [
           {
-            title: this.$t('menu.establishment'),
-            href: '/establishment',
+            title: this.$t('menu.institution'),
+            href: '/institution',
           },
           {
             title: this.$t('menu.correspondent'),

@@ -6,13 +6,13 @@ const bodyParser = require('koa-bodyparser');
 const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
-  getEtablishments,
-  storeEstablishment,
-  deleteEstablishments,
-  deleteEstablishment,
-  getEtablishment,
-  getEtablishmentMembers,
-  updateEstablishment,
+  getInstitutions,
+  storeInstitution,
+  deleteInstitutions,
+  deleteInstitution,
+  getInstitution,
+  getInstitutionMembers,
+  updateInstitution,
   updateMember,
   getSelfMember,
   addSushi,
@@ -26,7 +26,7 @@ router.get('/pictures/:id', pictures);
 
 router.use(requireJwt, requireUser);
 
-router.get('/', getEtablishments);
+router.get('/', getInstitutions);
 
 router.route({
   method: 'GET',
@@ -43,7 +43,7 @@ router.route({
 router.route({
   method: 'GET',
   path: '/self',
-  handler: getEtablishment,
+  handler: getInstitution,
 });
 
 router.route({
@@ -54,33 +54,33 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:establishmentId/sushi',
+  path: '/:institutionId/sushi',
   handler: getSushiData,
   validate: {
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
   },
 });
 
 router.route({
   method: 'GET',
-  path: '/:establishmentId/members',
-  handler: getEtablishmentMembers,
+  path: '/:institutionId/members',
+  handler: getInstitutionMembers,
   validate: {
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
   },
 });
 
 router.route({
   method: 'DELETE',
-  path: '/:establishmentId',
-  handler: deleteEstablishment,
+  path: '/:institutionId',
+  handler: deleteInstitution,
   validate: {
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
   },
 });
@@ -89,12 +89,12 @@ router.use(bodyParser());
 
 router.route({
   method: 'POST',
-  path: '/:establishmentId/sushi',
+  path: '/:institutionId/sushi',
   handler: addSushi,
   validate: {
     type: 'json',
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
     body: {
       vendor: Joi.string().trim().required(),
@@ -112,7 +112,7 @@ router.route({
 router.route({
   method: 'POST',
   path: '/delete',
-  handler: deleteEstablishments,
+  handler: deleteInstitutions,
   validate: {
     type: 'json',
     body: {
@@ -123,12 +123,12 @@ router.route({
 
 router.route({
   method: 'POST',
-  path: '/:establishmentId/sushi/delete',
+  path: '/:institutionId/sushi/delete',
   handler: deleteSushiData,
   validate: {
     type: 'json',
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
     body: {
       ids: Joi.array().items(Joi.string().trim().guid({ version: ['uuidv4'] })),
@@ -138,12 +138,12 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:establishmentId/member/:email',
+  path: '/:institutionId/member/:email',
   handler: updateMember,
   validate: {
     type: 'json',
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
       email: Joi.string().trim().email().required(),
     },
     body: {
@@ -158,12 +158,12 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:establishmentId/sushi',
+  path: '/:institutionId/sushi',
   handler: updateSushi,
   validate: {
     type: 'json',
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
     body: {
       id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
@@ -186,7 +186,7 @@ router.use(koaBody({
 router.route({
   method: 'POST',
   path: '/',
-  handler: storeEstablishment,
+  handler: storeInstitution,
   validate: {
     type: 'multipart',
   },
@@ -194,12 +194,12 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:establishmentId',
-  handler: updateEstablishment,
+  path: '/:institutionId',
+  handler: updateInstitution,
   validate: {
     type: 'multipart',
     params: {
-      establishmentId: Joi.string().trim().required(),
+      institutionId: Joi.string().trim().required(),
     },
   },
 });

@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshEstablishments">
+        <v-btn text @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -15,7 +15,7 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="establishments"
+      :items="institutions"
       :expanded.sync="expanded"
       item-key="id"
       show-select
@@ -166,7 +166,7 @@ export default {
       expanded: [],
       current: [],
       sushiData: [],
-      establishments: [],
+      institutions: [],
       valid: false,
       lazy: false,
       loading: {
@@ -186,23 +186,23 @@ export default {
     };
   },
   mounted() {
-    return this.refreshEstablishments();
+    return this.refreshInstitutions();
   },
   methods: {
-    async refreshEstablishments() {
-      let establishments;
+    async refreshInstitutions() {
+      let institutions;
       try {
-        establishments = await this.$axios.$get('/correspondents/list');
+        institutions = await this.$axios.$get('/correspondents/list');
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
       }
 
-      if (!Array.isArray(establishments)) {
-        establishments = [];
+      if (!Array.isArray(institutions)) {
+        institutions = [];
       }
 
       const hasSushi = item => Array.isArray(item.sushi) && item.sushi.length > 0;
-      this.establishments = establishments.filter(hasSushi);
+      this.institutions = institutions.filter(hasSushi);
     },
     edit(platform, key) {
       this.dialog = true;

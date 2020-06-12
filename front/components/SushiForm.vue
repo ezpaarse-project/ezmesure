@@ -111,7 +111,7 @@ export default {
     return {
       show: false,
       saving: false,
-      establishmentId: null,
+      institutionId: null,
       canEditSushiUrl: false,
       valid: false,
 
@@ -246,12 +246,12 @@ export default {
     },
   },
   methods: {
-    editSushiItem(establishmentId, sushiData = {}) {
+    editSushiItem(institutionId, sushiData = {}) {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
 
-      this.establishmentId = establishmentId;
+      this.institutionId = institutionId;
       this.sushiForm.vendor = sushiData.vendor || '';
       this.sushiForm.package = sushiData.package || '';
       this.sushiForm.sushiUrl = sushiData.sushiUrl || '';
@@ -263,8 +263,8 @@ export default {
       this.show = true;
     },
 
-    createSushiItem(establishmentId) {
-      this.editSushiItem(establishmentId);
+    createSushiItem(institutionId) {
+      this.editSushiItem(institutionId);
     },
 
     onVendorChange() {
@@ -283,9 +283,9 @@ export default {
 
       try {
         if (this.sushiForm.id) {
-          await this.$axios.$patch(`/establishments/${this.establishmentId}/sushi`, this.sushiForm);
+          await this.$axios.$patch(`/institutions/${this.institutionId}/sushi`, this.sushiForm);
         } else {
-          await this.$axios.$post(`/establishments/${this.establishmentId}/sushi`, this.sushiForm);
+          await this.$axios.$post(`/institutions/${this.institutionId}/sushi`, this.sushiForm);
           this.show = false;
         }
         this.$emit('update');

@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
         <v-btn
-          v-if="hasEstablishment"
+          v-if="hasInstitution"
           color="primary"
           @click.stop="createSushiItem"
         >
@@ -16,7 +16,7 @@
     <SushiForm ref="sushiForm" @update="refreshSushiItems" />
 
     <v-data-table
-      v-if="hasEstablishment"
+      v-if="hasInstitution"
       v-model="selected"
       :headers="headers"
       :items="sushiItems"
@@ -53,7 +53,7 @@
           Vous n'êtes rattachés à aucun établissement,
           où vous n'avez déclaré aucunes informations sur votre établissement.
         </div>
-        <a :href="'/informations/establishment'">
+        <a :href="'/informations/institution'">
           Déclarer des informations d'établissement.
         </a>
       </v-card-text>
@@ -73,16 +73,16 @@ export default {
     SushiForm,
   },
   async asyncData({ $axios, store }) {
-    let establishment = null;
+    let institution = null;
 
     try {
-      establishment = await $axios.$get('/establishments/self');
+      institution = await $axios.$get('/institutions/self');
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
     }
 
     return {
-      establishment,
+      institution,
       sushiItems: [],
       selected: [],
       refreshing: false,
@@ -102,8 +102,8 @@ export default {
     };
   },
   computed: {
-    hasEstablishment() {
-      return !!this.establishment?.id;
+    hasInstitution() {
+      return !!this.institution?.id;
     },
   },
   mounted() {
@@ -111,18 +111,18 @@ export default {
   },
   methods: {
     createSushiItem() {
-      this.$refs.sushiForm.createSushiItem(this.establishment.id);
+      this.$refs.sushiForm.createSushiItem(this.institution.id);
     },
     editSushiItem(item) {
-      this.$refs.sushiForm.editSushiItem(this.establishment.id, item);
+      this.$refs.sushiForm.editSushiItem(this.institution.id, item);
     },
     async refreshSushiItems() {
-      if (!this.hasEstablishment) { return; }
+      if (!this.hasInstitution) { return; }
 
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/establishments/${this.establishment.id}/sushi`);
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations sushi');
       }
@@ -138,7 +138,7 @@ export default {
       let response;
 
       try {
-        response = await this.$axios.$post(`/establishments/${this.establishment.id}/sushi/delete`, { ids });
+        response = await this.$axios.$post(`/institutions/${this.institution.id}/sushi/delete`, { ids });
         if (!Array.isArray(response)) {
           throw new Error('invalid response');
         }

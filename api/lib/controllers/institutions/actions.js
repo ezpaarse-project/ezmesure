@@ -29,7 +29,7 @@ const ensureIndex = async () => {
   }
 };
 
-const getEtablishmentDataByUAI = async (uai) => {
+const getInstitutionDataByUAI = async (uai) => {
   try {
     const { data: res } = await instance.get('');
 
@@ -40,19 +40,19 @@ const getEtablishmentDataByUAI = async (uai) => {
     return {
       shortName: data.sigle,
       city: data.commune,
-      establishmentType: data.type_detablissement,
+      type: data.type_detablissement,
       location: {
         lon: data.longitude_x,
         lat: data.latitude_y,
       },
     };
   } catch (err) {
-    appLogger.error('Failed to get establishment data', err);
+    appLogger.error('Failed to get institution data', err);
     return {};
   }
 };
 
-const getEtablishmentData = async (email, sourceFilter) => {
+const getInstitutionData = async (email, sourceFilter) => {
   try {
     const { body } = await elastic.search({
       index: config.depositors.index,
@@ -81,11 +81,11 @@ const getEtablishmentData = async (email, sourceFilter) => {
       return {};
     }
 
-    const establishment = body.hits.hits.shift();
+    const institution = body.hits.hits.shift();
 
-    if (!establishment) { return null; }
+    if (!institution) { return null; }
 
-    const { _id: id, _source: source } = establishment;
+    const { _id: id, _source: source } = institution;
     return { ...source, id };
   } catch (error) {
     return null;
@@ -107,7 +107,7 @@ const addLogo = async (logo) => {
   }
 };
 
-exports.getEtablishments = async (ctx) => {
+exports.getInstitutions = async (ctx) => {
   ensureIndex();
 
   ctx.type = 'json';
@@ -115,7 +115,7 @@ exports.getEtablishments = async (ctx) => {
   ctx.body = await depositors.getFromIndex();
 };
 
-exports.getEtablishment = async (ctx) => {
+exports.getInstitution = async (ctx) => {
   ensureIndex();
 
   const { email } = ctx.state.user;
@@ -123,7 +123,7 @@ exports.getEtablishment = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const establishment = await getEtablishmentData(email, [
+  const institution = await getInstitutionData(email, [
     'organisation.name',
     'organisation.uai',
     'organisation.website',
@@ -132,23 +132,23 @@ exports.getEtablishment = async (ctx) => {
     'index.suggested',
   ]);
 
-  if (!establishment) {
-    ctx.throw(404, 'No assigned establishment');
+  if (!institution) {
+    ctx.throw(404, 'No assigned institution');
     return;
   }
 
   const index = email.match(/@(\w+)/i);
 
-  if (index && !establishment.index.prefix) {
+  if (index && !institution.index.prefix) {
     const [, indexPrefix] = index;
-    establishment.index.suggested = indexPrefix;
-    establishment.index.prefix = indexPrefix;
+    institution.index.suggested = indexPrefix;
+    institution.index.prefix = indexPrefix;
   }
 
-  ctx.body = establishment;
+  ctx.body = institution;
 };
 
-exports.storeEstablishment = async (ctx) => {
+exports.storeInstitution = async (ctx) => {
   ensureIndex();
 
   const { body } = ctx.request;
@@ -160,25 +160,25 @@ exports.storeEstablishment = async (ctx) => {
     logoId = await addLogo(logo);
   }
 
-  const establishment = JSON.parse(form);
+  const institution = JSON.parse(form);
   const currentDate = new Date();
 
-  establishment.organisation.logoId = logoId || '';
+  institution.organisation.logoId = logoId || '';
 
-  establishment.organisation.establishmentType = '';
-  establishment.organisation.city = '';
-  establishment.organisation.location = {
+  institution.organisation.type = '';
+  institution.organisation.city = '';
+  institution.organisation.location = {
     lon: 0,
     lat: 0,
   };
-  establishment.organisation.domains = [];
-  establishment.auto = {
+  institution.organisation.domains = [];
+  institution.auto = {
     ezmesure: false,
     ezpaarse: false,
     report: false,
   };
-  establishment.index.count = 0;
-  establishment.contacts = [
+  institution.index.count = 0;
+  institution.contacts = [
     {
       id: uuidv4(),
       fullName: ctx.state.user.full_name,
@@ -187,22 +187,22 @@ exports.storeEstablishment = async (ctx) => {
       confirmed: false,
     },
   ];
-  establishment.sushi = [];
-  establishment.updatedAt = currentDate;
-  establishment.createdAt = currentDate;
+  institution.sushi = [];
+  institution.updatedAt = currentDate;
+  institution.createdAt = currentDate;
 
-  if (establishment.organisation.uai) {
+  if (institution.organisation.uai) {
     try {
-      const establishmentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
+      const institutionUAIData = await getInstitutionDataByUAI(institution.organisation.uai);
 
-      if (establishmentUAIData) {
-        establishment.organisation = {
-          ...establishment.organisation,
-          ...establishmentUAIData,
+      if (institutionUAIData) {
+        institution.organisation = {
+          ...institution.organisation,
+          ...institutionUAIData,
         };
       }
     } catch (err) {
-      appLogger.error('Failed to get establishment data', err);
+      appLogger.error('Failed to get institution data', err);
     }
   }
 
@@ -211,7 +211,7 @@ exports.storeEstablishment = async (ctx) => {
   await elastic.index({
     index: config.depositors.index,
     refresh: true,
-    body: establishment,
+    body: institution,
   }).catch((err) => {
     ctx.status = 500;
     appLogger.error('Failed to store data in index', err);
@@ -219,8 +219,8 @@ exports.storeEstablishment = async (ctx) => {
   });
 };
 
-exports.updateEstablishment = async (ctx) => {
-  const { establishmentId } = ctx.params;
+exports.updateInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
 
   const { body } = ctx.request;
   const { form } = body;
@@ -231,37 +231,37 @@ exports.updateEstablishment = async (ctx) => {
     return;
   }
 
-  const establishment = JSON.parse(form);
+  const institution = JSON.parse(form);
 
   let logoId;
   if (logo) {
     logoId = await addLogo(logo);
-    establishment.organisation.logoId = logoId || '';
+    institution.organisation.logoId = logoId || '';
   }
 
-  if (establishment.organisation.uai) {
+  if (institution.organisation.uai) {
     try {
-      const establishmentUAIData = await getEtablishmentDataByUAI(establishment.organisation.uai);
+      const institutionUAIData = await getInstitutionDataByUAI(institution.organisation.uai);
 
-      if (establishmentUAIData) {
-        establishment.organisation = {
-          ...establishment.organisation,
-          ...establishmentUAIData,
+      if (institutionUAIData) {
+        institution.organisation = {
+          ...institution.organisation,
+          ...institutionUAIData,
         };
       }
     } catch (err) {
-      appLogger.error('Failed to get establishment data', err);
+      appLogger.error('Failed to get institution data', err);
     }
   }
 
-  establishment.updatedAt = new Date();
+  institution.updatedAt = new Date();
 
   await elastic.update({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
     refresh: true,
     body: {
-      doc: establishment,
+      doc: institution,
     },
   }).catch((err) => {
     ctx.status = 500;
@@ -270,7 +270,7 @@ exports.updateEstablishment = async (ctx) => {
   ctx.status = 200;
 };
 
-exports.deleteEstablishments = async (ctx) => {
+exports.deleteInstitutions = async (ctx) => {
   const { body } = ctx.request;
 
   const response = [];
@@ -287,7 +287,7 @@ exports.deleteEstablishments = async (ctx) => {
         response.push({ id: body.ids[i], status: 'deleted' });
       } catch (error) {
         response.push({ id: body.ids[i], status: 'failed' });
-        appLogger.error('Failed to delete establishment', error);
+        appLogger.error('Failed to delete institution', error);
       }
     }
 
@@ -296,35 +296,35 @@ exports.deleteEstablishments = async (ctx) => {
   }
 };
 
-exports.deleteEstablishment = async (ctx) => {
-  const { establishmentId } = ctx.params;
+exports.deleteInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
 
   ctx.status = 200;
 
   ctx.body = await elastic.delete({
-    id: establishmentId,
+    id: institutionId,
     index: config.depositors.index,
     refresh: true,
   });
 };
 
-exports.getEtablishmentMembers = async (ctx) => {
-  const { establishmentId } = ctx.params;
+exports.getInstitutionMembers = async (ctx) => {
+  const { institutionId } = ctx.params;
 
-  const { body: establishment, statusCode } = await elastic.getSource({
+  const { body: institution, statusCode } = await elastic.getSource({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
   }, { ignore: [404] });
 
-  if (!establishment || statusCode === 404) {
-    ctx.throw(404, 'Establishment not found');
+  if (!institution || statusCode === 404) {
+    ctx.throw(404, 'Institution not found');
     return;
   }
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  ctx.body = Array.isArray(establishment.contacts) ? establishment.contacts : [];
+  ctx.body = Array.isArray(institution.contacts) ? institution.contacts : [];
 };
 
 exports.getSelfMember = async (ctx) => {
@@ -333,21 +333,21 @@ exports.getSelfMember = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const establishment = await getEtablishmentData(email, ['contacts']);
+  const institution = await getInstitutionData(email, ['contacts']);
 
-  if (!establishment) {
+  if (!institution) {
     ctx.status = 404;
     return;
   }
 
   ctx.body = {
-    id: establishment.id,
-    contact: establishment.contacts.find((sushi) => sushi.email === email) || [],
+    id: institution.id,
+    contact: institution.contacts.find((sushi) => sushi.email === email) || [],
   };
 };
 
 exports.updateMember = async (ctx) => {
-  const { establishmentId } = ctx.params;
+  const { institutionId } = ctx.params;
   const { body } = ctx.request;
 
   ctx.status = 200;
@@ -358,7 +358,7 @@ exports.updateMember = async (ctx) => {
 
   await elastic.update({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
     refresh: true,
     body: {
       script: {
@@ -381,24 +381,24 @@ exports.updateMember = async (ctx) => {
 
 exports.getSushiData = async (ctx) => {
   const { email } = ctx.state.user;
-  const { establishmentId } = ctx.params;
+  const { institutionId } = ctx.params;
 
-  const { body: establishment, statusCode } = await elastic.getSource({
+  const { body: institution, statusCode } = await elastic.getSource({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
   }, { ignore: [404] });
 
-  if (!establishment || statusCode === 404) {
-    ctx.throw(404, 'Establishment not found');
+  if (!institution || statusCode === 404) {
+    ctx.throw(404, 'Institution not found');
     return;
   }
 
-  const contacts = Array.isArray(establishment.contacts) ? establishment.contacts : [];
-  const sushiItems = Array.isArray(establishment.sushi) ? establishment.sushi : [];
+  const contacts = Array.isArray(institution.contacts) ? institution.contacts : [];
+  const sushiItems = Array.isArray(institution.sushi) ? institution.sushi : [];
   const isMember = contacts.some((contact) => contact.email === email);
 
   if (!isMember) {
-    ctx.throw(403, 'You are not allowed to access this establishment');
+    ctx.throw(403, 'You are not allowed to access this institution');
     return;
   }
 
@@ -415,7 +415,7 @@ exports.getSushiData = async (ctx) => {
 };
 
 exports.addSushi = async (ctx) => {
-  const { establishmentId } = ctx.params;
+  const { institutionId } = ctx.params;
   const { body } = ctx.request;
 
   ctx.status = 200;
@@ -437,7 +437,7 @@ exports.addSushi = async (ctx) => {
 
   await elastic.update({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
     refresh: true,
     body: {
       script: {
@@ -452,7 +452,7 @@ exports.addSushi = async (ctx) => {
 };
 
 exports.updateSushi = async (ctx) => {
-  const { establishmentId } = ctx.params;
+  const { institutionId } = ctx.params;
   const { body } = ctx.request;
 
   ctx.status = 200;
@@ -472,7 +472,7 @@ exports.updateSushi = async (ctx) => {
 
   await elastic.update({
     index: config.depositors.index,
-    id: establishmentId,
+    id: institutionId,
     refresh: true,
     body: {
       script: {
@@ -498,14 +498,14 @@ exports.updateSushi = async (ctx) => {
 };
 
 exports.deleteSushiData = async (ctx) => {
-  const { establishmentId } = ctx.params;
+  const { institutionId } = ctx.params;
   const { body } = ctx.request;
 
-  let establishment = null;
+  let institution = null;
   try {
-    establishment = await elastic.getSource({
+    institution = await elastic.getSource({
       index: config.depositors.index,
-      id: establishmentId,
+      id: institutionId,
       refresh: true,
     });
   } catch (err) {
@@ -513,7 +513,7 @@ exports.deleteSushiData = async (ctx) => {
     appLogger.error('Failed to update data in index', err);
   }
 
-  if (!establishment || !establishment.body) {
+  if (!institution || !institution.body) {
     ctx.status = 404;
     return;
   }
@@ -526,7 +526,7 @@ exports.deleteSushiData = async (ctx) => {
         // FIXME: use bulk query
         await elastic.update({
           index: config.depositors.index,
-          id: establishmentId,
+          id: institutionId,
           body: {
             script: {
               source: 'ctx._source.sushi.removeIf(sushi -> sushi.id == params.id)',

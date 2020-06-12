@@ -4,7 +4,7 @@
       <slot>
         <v-spacer />
 
-        <v-btn text @click="refreshEstablishments">
+        <v-btn text @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -16,7 +16,7 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="establishments"
+      :items="institutions"
       :expanded.sync="expanded"
       item-key="id"
       show-select
@@ -97,7 +97,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.establishmentType"
+                v-model="item.organisation.type"
                 label="Type d'établissement"
                 hide-details
               />
@@ -274,7 +274,7 @@
               <v-btn
                 block
                 color="primary"
-                @click="updateEstablishment(item)"
+                @click="updateInstitution(item)"
               >
                 Mettre à jour
               </v-btn>
@@ -321,28 +321,28 @@ export default {
       types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
-      establishments: [],
+      institutions: [],
     };
   },
   mounted() {
-    return this.refreshEstablishments();
+    return this.refreshInstitutions();
   },
   methods: {
-    async refreshEstablishments() {
-      let establishments;
+    async refreshInstitutions() {
+      let institutions;
       try {
-        establishments = await this.$axios.$get('/establishments');
+        institutions = await this.$axios.$get('/institutions');
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
       }
 
-      if (!Array.isArray(establishments)) {
-        establishments = [];
+      if (!Array.isArray(institutions)) {
+        institutions = [];
       }
 
-      establishments.forEach((establishment) => {
-        const users = establishment?.contacts?.users;
-        const logoUrl = establishment?.organisation?.logoUrl;
+      institutions.forEach((institution) => {
+        const users = institution?.contacts?.users;
+        const logoUrl = institution?.organisation?.logoUrl;
 
         if (Array.isArray(users)) {
           users.filter(u => u.type).forEach((user) => {
@@ -350,15 +350,15 @@ export default {
           });
         }
 
-        establishment.logo = null;
-        establishment.logoPreview = null;
+        institution.logo = null;
+        institution.logoPreview = null;
 
         if (logoUrl) {
-          establishment.logoPreview = `/api/establishments/pictures/${logoUrl}`;
+          institution.logoPreview = `/api/institutions/pictures/${logoUrl}`;
         }
       });
 
-      this.establishments = establishments;
+      this.institutions = institutions;
     },
     dragAndDrop(event) {
       if (this.$refs && this.$refs.dropZone) {
@@ -371,16 +371,16 @@ export default {
       }
     },
     upload(itemId) {
-      const establishment = this.establishments.find(etab => etab.id === itemId);
-      if (establishment) {
+      const institution = this.institutions.find(etab => etab.id === itemId);
+      if (institution) {
         if (!this.$refs.logo.files) {
-          establishment.logo = null;
-          establishment.logoPreview = null;
+          institution.logo = null;
+          institution.logoPreview = null;
           return;
         }
         // eslint-disable-next-line prefer-destructuring
-        establishment.logo = this.$refs.logo.files[0];
-        establishment.logoPreview = URL.createObjectURL(establishment.logo);
+        institution.logo = this.$refs.logo.files[0];
+        institution.logoPreview = URL.createObjectURL(institution.logo);
       }
     },
     removeLogo() {
@@ -397,7 +397,7 @@ export default {
       let response;
 
       try {
-        response = await this.$axios.$post('/establishments/delete', { ids });
+        response = await this.$axios.$post('/institutions/delete', { ids });
         if (!Array.isArray(response)) {
           throw new Error('invalid response');
         }
@@ -418,18 +418,18 @@ export default {
         this.$store.dispatch('snacks/success', `${deleted.length} élement(s) supprimé(s)`);
 
         const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
-        this.establishments = this.establishments.filter(removeDeleted);
+        this.institutions = this.institutions.filter(removeDeleted);
         this.selected = this.selected.filter(removeDeleted);
       }
     },
-    async updateEstablishment(establishment) {
+    async updateInstitution(institution) {
       const formData = new FormData();
 
-      delete establishment.logo;
-      delete establishment.logoPreview;
+      delete institution.logo;
+      delete institution.logoPreview;
 
-      formData.append('logo', establishment.logo);
-      formData.append('form', JSON.stringify(establishment));
+      formData.append('logo', institution.logo);
+      formData.append('form', JSON.stringify(institution));
 
       try {
         await this.$axios.$post('/correspondents/', formData);

@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar title="Correspondant" />
-    <v-card-text v-if="hasEstablishment">
+    <v-card-text v-if="hasInstitution">
       <v-form v-model="valid">
         <v-container>
           <v-row>
@@ -41,7 +41,7 @@
         </v-container>
       </v-form>
     </v-card-text>
-    <v-card-actions v-if="hasEstablishment">
+    <v-card-actions v-if="hasInstitution">
       <span class="caption">* champs obligatoires</span>
       <v-spacer />
       <v-btn
@@ -59,7 +59,7 @@
         Vous n'êtes rattachés à aucun établissement,
         où vous n'avez déclaré aucunes informations sur votre établissement.
       </div>
-      <a :href="'/informations/establishment'">
+      <a :href="'/informations/institution'">
         Déclarer des informations d'établissement.
       </a>
     </v-card-text>
@@ -76,30 +76,30 @@ export default {
     ToolBar,
   },
   async asyncData({ $axios, store, $auth }) {
-    let establishment = null;
+    let institution = null;
     let contact = {};
     try {
-      establishment = await $axios.$get(`/establishments/correspondents/${$auth.$state.user.email}`);
+      institution = await $axios.$get(`/institutions/correspondents/${$auth.$state.user.email}`);
     } catch (e) {
       store.dispatch('snacks/error', 'Impossible de récupérer les informations correspondant');
     }
 
-    if (establishment) {
+    if (institution) {
       // eslint-disable-next-line prefer-destructuring
-      contact = establishment.contact;
+      contact = institution.contact;
     }
 
     return {
       valid: false,
       lazy: false,
       loading: false,
-      establishment,
+      institution,
       contact,
     };
   },
   computed: {
-    hasEstablishment() {
-      return !!this.establishment?.id;
+    hasInstitution() {
+      return !!this.institution?.id;
     },
   },
   methods: {
@@ -107,7 +107,7 @@ export default {
       this.loading = true;
 
       try {
-        await this.$axios.$patch(`/establishments/${this.establishment.id}/correspondent/${this.$auth.$state.user.email}`, this.contact);
+        await this.$axios.$patch(`/institutions/${this.institution.id}/correspondent/${this.$auth.$state.user.email}`, this.contact);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
         this.loading = false;

@@ -2,14 +2,14 @@
   <section>
     <ToolBar title="Mon établissement" />
 
-    <v-card-text v-if="establishment">
+    <v-card-text v-if="institution">
       <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12" sm="6">
               <v-text-field
                 ref="name"
-                v-model="establishment.organisation.name"
+                v-model="institution.organisation.name"
                 label="Nom établissement *"
                 placeholder="ex: Université de Blancherive"
                 :rules="[v => !!v || 'Veuillez saisir un nom d\'établissement.']"
@@ -20,7 +20,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="establishment.organisation.uai"
+                v-model="institution.organisation.uai"
                 label="UAI"
                 placeholder="ex: 1234567A"
                 outlined
@@ -31,7 +31,7 @@
 
             <v-col cols="12">
               <v-text-field
-                v-model="establishment.organisation.website"
+                v-model="institution.organisation.website"
                 label="Page d'accueil établissement"
                 placeholder="ex: https://cnrs.fr/"
                 outlined
@@ -40,7 +40,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="establishment.index.prefix"
+                v-model="institution.index.prefix"
                 label="Index affecté"
                 placeholder="ex: univ-blancherive"
                 outlined
@@ -50,7 +50,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="establishment.index.suggested"
+                v-model="institution.index.suggested"
                 label="Index suggéré"
                 placeholder="ex: univ-blancherive"
                 outlined
@@ -107,7 +107,7 @@
       </v-form>
     </v-card-text>
 
-    <v-card-actions v-if="establishment">
+    <v-card-actions v-if="institution">
       <span class="caption">* champs obligatoires</span>
       <v-spacer />
       <v-btn
@@ -138,21 +138,21 @@ export default {
     ToolBar,
   },
   async asyncData({ $axios, store }) {
-    let establishment = null;
+    let institution = null;
 
     try {
-      establishment = await $axios.$get('/establishments/self');
+      institution = await $axios.$get('/institutions/self');
     } catch (e) {
       if (e.response?.status === 404) {
-        establishment = {};
+        institution = {};
       } else {
         store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
       }
     }
 
-    if (establishment) {
-      establishment.organisation = establishment.organisation || {};
-      establishment.index = establishment.index || {};
+    if (institution) {
+      institution.organisation = institution.organisation || {};
+      institution.index = institution.index || {};
     }
 
     return {
@@ -161,7 +161,7 @@ export default {
       logoPreview: null,
       loading: false,
       hoverDropzone: false,
-      establishment,
+      institution,
     };
   },
   methods: {
@@ -188,11 +188,11 @@ export default {
       const formData = new FormData();
 
       formData.append('logo', this.logo);
-      formData.append('form', JSON.stringify(this.establishment));
+      formData.append('form', JSON.stringify(this.institution));
 
-      if (this.establishment.id) {
+      if (this.institution.id) {
         try {
-          await this.$axios.$patch(`/establishments/${this.establishment.id}`, formData, {
+          await this.$axios.$patch(`/institutions/${this.institution.id}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -205,9 +205,9 @@ export default {
         this.$store.dispatch('snacks/success', 'Établissement mis à jour');
       }
 
-      if (!this.establishment.id) {
+      if (!this.institution.id) {
         try {
-          await this.$axios.$post('/establishments', formData, {
+          await this.$axios.$post('/institutions', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
