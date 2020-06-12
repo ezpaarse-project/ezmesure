@@ -2,8 +2,8 @@
   <v-card width="350" height="100%" class="flexCard">
     <v-card-text class="text-center grow">
       <v-img
-        v-if="logoId"
-        :src="`/api/institutions/pictures/${logoId}`"
+        v-if="partner.logoId"
+        :src="`/api/institutions/pictures/${partner.logoId}`"
         contain
         height="100"
         class="mb-3"
@@ -17,7 +17,7 @@
       />
 
       <div class="title">
-        {{ organisation.name }}
+        {{ partner.name }}
       </div>
       <div class="body-2">
         {{ indexCount }} <abbr :title="$t('partners.ecs')">ECs</abbr> {{ $t('partners.ecsLoaded') }}
@@ -56,9 +56,7 @@ export default {
   },
   computed: {
     contacts() { return this.partner.contacts || {}; },
-    organisation() { return this.partner.organisation || {}; },
     index() { return this.partner.index || {}; },
-    logoId() { return this.organisation.logoId || null; },
     indexCount() {
       const n = parseInt(this.index.count, 10);
       if (Number.isNaN(n)) { return '0'; }

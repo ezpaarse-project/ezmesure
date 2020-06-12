@@ -51,9 +51,7 @@ export default {
 
       const lowerSearch = this.search.toLowerCase();
 
-      return this.partners.filter(({ organisation = {}, contact = {} }) => {
-        const orgName = organisation.name;
-
+      return this.partners.filter(({ name: orgName, contact = {} }) => {
         if (orgName && orgName.toLowerCase().includes(lowerSearch)) { return true; }
         if (!contact.confirmed) { return false; }
 

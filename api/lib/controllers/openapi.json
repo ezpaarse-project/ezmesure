@@ -176,30 +176,25 @@
               }
             }
           },
-          "organisation": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "example": "University of Foobar"
-              },
-              "label": {
-                "type": "string",
-                "example": "University of Foobar"
-              },
-              "city": {
-                "type": "string",
-                "example": "Paris"
-              },
-              "logoUrl": {
-                "type": "string",
-                "example": "https://foobar.univ.fr/assets/logo.jpg"
-              },
-              "uai": {
-                "type": "string",
-                "example": "0362917P"
-              }
-            }
+          "name": {
+            "type": "string",
+            "example": "University of Foobar"
+          },
+          "label": {
+            "type": "string",
+            "example": "University of Foobar"
+          },
+          "city": {
+            "type": "string",
+            "example": "Paris"
+          },
+          "logoUrl": {
+            "type": "string",
+            "example": "https://foobar.univ.fr/assets/logo.jpg"
+          },
+          "uai": {
+            "type": "string",
+            "example": "0362917P"
           },
           "contact": {
             "type": "object",

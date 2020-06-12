@@ -9,7 +9,7 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 ref="name"
-                v-model="institution.organisation.name"
+                v-model="institution.name"
                 label="Nom établissement *"
                 placeholder="ex: Université de Blancherive"
                 :rules="[v => !!v || 'Veuillez saisir un nom d\'établissement.']"
@@ -20,7 +20,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="institution.organisation.uai"
+                v-model="institution.uai"
                 label="UAI"
                 placeholder="ex: 1234567A"
                 outlined
@@ -31,7 +31,7 @@
 
             <v-col cols="12">
               <v-text-field
-                v-model="institution.organisation.website"
+                v-model="institution.website"
                 label="Page d'accueil établissement"
                 placeholder="ex: https://cnrs.fr/"
                 outlined
@@ -151,7 +151,6 @@ export default {
     }
 
     if (institution) {
-      institution.organisation = institution.organisation || {};
       institution.index = institution.index || {};
     }
 

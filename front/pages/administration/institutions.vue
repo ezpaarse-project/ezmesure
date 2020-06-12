@@ -22,8 +22,8 @@
       show-select
       show-expand
     >
-      <template v-slot:item.organisation.website="{ item }">
-        <a :href="item.organisation.website" target="_blank" v-text="item.organisation.website" />
+      <template v-slot:item.website="{ item }">
+        <a :href="item.website" target="_blank" v-text="item.website" />
       </template>
 
       <template v-slot:item.automatisations="{ item }">
@@ -65,7 +65,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.name"
+                v-model="item.name"
                 label="Nom établissement"
                 hide-details
               />
@@ -73,7 +73,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.shortName"
+                v-model="item.shortName"
                 label="Sigle"
                 hide-details
               />
@@ -81,7 +81,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.website"
+                v-model="item.website"
                 label="Page d'accueil établissement"
                 hide-details
               />
@@ -89,7 +89,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.city"
+                v-model="item.city"
                 label="Ville"
                 hide-details
               />
@@ -97,7 +97,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.type"
+                v-model="item.type"
                 label="Type d'établissement"
                 hide-details
               />
@@ -105,7 +105,7 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.uai"
+                v-model="item.uai"
                 label="UAI"
                 hide-details
               />
@@ -114,7 +114,7 @@
 
             <v-col cols="12" sm="12">
               <v-combobox
-                v-model="item.organisation.domains"
+                v-model="item.domains"
                 label="Domains"
                 multiple
                 small-chips
@@ -175,14 +175,14 @@
 
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.location.lon"
+                v-model="item.location.lon"
                 label="Longitude"
                 hide-details
               />
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="item.organisation.location.lat"
+                v-model="item.location.lat"
                 label="Latitude"
                 hide-details
               />
@@ -311,8 +311,8 @@ export default {
       // eslint-disable-next-line global-require
       defaultLogo: require('@/static/images/logo-etab.png'),
       headers: [
-        { text: 'Etablissement', value: 'organisation.name' },
-        { text: 'Site', value: 'organisation.website' },
+        { text: 'Etablissement', value: 'name' },
+        { text: 'Site', value: 'website' },
         { text: 'Index', value: 'index.prefix' },
         { text: 'ECs', value: 'index.count' },
         { text: 'Automatisations', value: 'automatisations' },
@@ -341,8 +341,9 @@ export default {
       }
 
       institutions.forEach((institution) => {
+        institution.location = institution.location || {};
         const users = institution?.contacts?.users;
-        const logoUrl = institution?.organisation?.logoUrl;
+        const logoUrl = institution?.logoUrl;
 
         if (Array.isArray(users)) {
           users.filter(u => u.type).forEach((user) => {
@@ -432,7 +433,7 @@ export default {
       formData.append('form', JSON.stringify(institution));
 
       try {
-        await this.$axios.$post('/correspondents/', formData);
+        await this.$axios.$patch(`/institutions/${institution.id}`, formData);
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement');
         this.loading = false;

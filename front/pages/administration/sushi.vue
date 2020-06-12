@@ -175,7 +175,7 @@ export default {
       },
       dialog: false,
       headers: [
-        { text: 'Etablissement', value: 'organisation.name' },
+        { text: 'Etablissement', value: 'name' },
         { text: 'Identifiants', value: 'count' },
         { text: '', value: 'data-table-expand' },
       ],

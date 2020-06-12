@@ -124,10 +124,10 @@ exports.getInstitution = async (ctx) => {
   ctx.status = 200;
 
   const institution = await getInstitutionData(email, [
-    'organisation.name',
-    'organisation.uai',
-    'organisation.website',
-    'organisation.logo',
+    'name',
+    'uai',
+    'website',
+    'logo',
     'index.prefix',
     'index.suggested',
   ]);
@@ -160,18 +160,18 @@ exports.storeInstitution = async (ctx) => {
     logoId = await addLogo(logo);
   }
 
-  const institution = JSON.parse(form);
+  let institution = JSON.parse(form);
   const currentDate = new Date();
 
-  institution.organisation.logoId = logoId || '';
+  institution.logoId = logoId || '';
 
-  institution.organisation.type = '';
-  institution.organisation.city = '';
-  institution.organisation.location = {
+  institution.type = '';
+  institution.city = '';
+  institution.location = {
     lon: 0,
     lat: 0,
   };
-  institution.organisation.domains = [];
+  institution.domains = [];
   institution.auto = {
     ezmesure: false,
     ezpaarse: false,
@@ -191,13 +191,13 @@ exports.storeInstitution = async (ctx) => {
   institution.updatedAt = currentDate;
   institution.createdAt = currentDate;
 
-  if (institution.organisation.uai) {
+  if (institution.uai) {
     try {
-      const institutionUAIData = await getInstitutionDataByUAI(institution.organisation.uai);
+      const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
 
       if (institutionUAIData) {
-        institution.organisation = {
-          ...institution.organisation,
+        institution = {
+          ...institution,
           ...institutionUAIData,
         };
       }
@@ -231,21 +231,21 @@ exports.updateInstitution = async (ctx) => {
     return;
   }
 
-  const institution = JSON.parse(form);
+  let institution = JSON.parse(form);
 
   let logoId;
   if (logo) {
     logoId = await addLogo(logo);
-    institution.organisation.logoId = logoId || '';
+    institution.logoId = logoId || '';
   }
 
-  if (institution.organisation.uai) {
+  if (institution.uai) {
     try {
-      const institutionUAIData = await getInstitutionDataByUAI(institution.organisation.uai);
+      const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
 
       if (institutionUAIData) {
-        institution.organisation = {
-          ...institution.organisation,
+        institution = {
+          ...institution,
           ...institutionUAIData,
         };
       }

@@ -4,21 +4,15 @@ module.exports = {
   },
   mappings: {
     properties: {
-      organisation: {
-        properties: {
-          name: { type: 'keyword' },
-          shortName: { type: 'keyword' },
-          uai: { type: 'keyword' },
-          city: { type: 'keyword' },
-          website: { type: 'keyword' },
-          logoId: { type: 'keyword' },
-          establismentType: { type: 'keyword' },
-          location: {
-            type: 'geo_point',
-          },
-          domains: { type: 'keyword' },
-        },
-      },
+      name: { type: 'keyword' },
+      shortName: { type: 'keyword' },
+      uai: { type: 'keyword' },
+      city: { type: 'keyword' },
+      website: { type: 'keyword' },
+      logoId: { type: 'keyword' },
+      type: { type: 'keyword' },
+      location: { type: 'geo_point' },
+      domains: { type: 'keyword' },
       auto: {
         properties: {
           ezmesure: { type: 'boolean' },
