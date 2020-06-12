@@ -138,13 +138,14 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:institutionId/member/:email',
+  path: '/:institutionId/members/:email',
   handler: updateMember,
   validate: {
     type: 'json',
     params: {
       institutionId: Joi.string().trim().required(),
-      email: Joi.string().trim().email().required(),
+      email: Joi.string().trim().allow('self').email()
+        .required(),
     },
     body: {
       id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),

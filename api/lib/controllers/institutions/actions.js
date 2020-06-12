@@ -348,7 +348,12 @@ exports.getSelfMember = async (ctx) => {
 
 exports.updateMember = async (ctx) => {
   const { institutionId } = ctx.params;
+  let { email } = ctx.params;
   const { body } = ctx.request;
+
+  if (email === 'self') {
+    email = ctx.state.user.email;
+  }
 
   ctx.status = 200;
 
@@ -362,7 +367,7 @@ exports.updateMember = async (ctx) => {
     refresh: true,
     body: {
       script: {
-        source: 'def targets = ctx._source.contacts.findAll(contact -> contact.id == params.id);'
+        source: 'def targets = ctx._source.contacts.findAll(contact -> contact.email == params.email);'
           + 'for(contact in targets) {'
           + 'contact.id = params.id;'
           + 'contact.type = params.type;'
