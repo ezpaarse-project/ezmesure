@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar flat color="grey lighten-3">
+  <v-toolbar flat>
     <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
     <v-toolbar-title v-text="title" />
 
