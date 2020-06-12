@@ -148,7 +148,7 @@ router.route({
     },
     body: {
       id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
-      type: Joi.array().items(Joi.string().trim().required()).required(),
+      type: Joi.array().items(Joi.string().trim().valid('tech', 'doc')),
       email: Joi.string().trim().required(),
       confirmed: Joi.boolean().required(),
       fullName: Joi.string().trim().required(),
