@@ -11,6 +11,7 @@ const {
   deleteInstitutions,
   deleteInstitution,
   getInstitution,
+  getSelfInstitution,
   getInstitutionMembers,
   updateInstitution,
   updateMember,
@@ -42,8 +43,13 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/self',
+  path: '/:institutionId',
   handler: getInstitution,
+});
+router.route({
+  method: 'GET',
+  path: '/self',
+  handler: getSelfInstitution,
 });
 
 router.route({

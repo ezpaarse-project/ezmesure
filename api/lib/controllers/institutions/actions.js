@@ -116,7 +116,28 @@ exports.getInstitutions = async (ctx) => {
 };
 
 exports.getInstitution = async (ctx) => {
-  ensureIndex();
+  await ensureIndex();
+
+  const { institutionId } = ctx.params;
+
+  const { body: institution, statusCode } = await elastic.getSource({
+    index: config.depositors.index,
+    id: institutionId,
+  }, { ignore: [404] });
+
+  if (!institution || statusCode === 404) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = institution;
+};
+
+exports.getSelfInstitution = async (ctx) => {
+  await ensureIndex();
 
   const { email } = ctx.state.user;
 
