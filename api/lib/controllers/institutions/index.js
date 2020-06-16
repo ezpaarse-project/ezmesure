@@ -43,13 +43,13 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:institutionId',
-  handler: getInstitution,
+  path: '/self',
+  handler: getSelfInstitution,
 });
 router.route({
   method: 'GET',
-  path: '/self',
-  handler: getSelfInstitution,
+  path: '/:institutionId',
+  handler: getInstitution,
 });
 
 router.route({

@@ -1,6 +1,7 @@
 const config = require('config');
 
 const elastic = require('./elastic');
+const { appLogger } = require('../../server');
 
 const { index } = config.get('depositors');
 const encrypter = require('../services/encrypter');
@@ -32,11 +33,19 @@ async function getFromIndex() {
       depositor.contacts = [];
     }
 
-    if (depositor.sushi.length) {
-      for (let i = 0; i < depositor.sushi.length; i += 1) {
-        depositor.sushi[i].customerId = encrypter.decrypt(depositor.sushi[i].customerId);
-        depositor.sushi[i].requestorId = encrypter.decrypt(depositor.sushi[i].requestorId);
-      }
+    if (Array.isArray(depositor.sushi)) {
+      depositor.sushi = depositor.sushi.map((sushiItem) => {
+        const decrypted = sushiItem;
+
+        try {
+          decrypted.customerId = encrypter.decrypt(decrypted.customerId);
+          decrypted.requestorId = encrypter.decrypt(decrypted.requestorId);
+        } catch (e) {
+          appLogger.error(`Failed to decrypt Sushi item: ${e.message}`);
+        }
+
+        return decrypted;
+      });
     }
 
     return depositor;

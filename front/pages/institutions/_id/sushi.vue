@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Mes identifiants Sushi">
+    <ToolBar :title="`Identifiants Sushi - ${institution.name}`">
       <slot>
         <v-spacer />
         <v-btn
@@ -8,7 +8,10 @@
           color="primary"
           @click.stop="createSushiItem"
         >
-          Ajouter une plateforme
+          <v-icon left>
+            mdi-key-plus
+          </v-icon>
+          Ajouter
         </v-btn>
       </slot>
     </ToolBar>
@@ -72,13 +75,17 @@ export default {
     ToolBar,
     SushiForm,
   },
-  async asyncData({ $axios, store }) {
+  async asyncData({ $axios, store, params }) {
     let institution = null;
 
     try {
-      institution = await $axios.$get('/institutions/self');
+      institution = await $axios.$get(`/institutions/${params.id}`);
     } catch (e) {
-      store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      if (e.response?.status === 404) {
+        institution = {};
+      } else {
+        store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+      }
     }
 
     return {

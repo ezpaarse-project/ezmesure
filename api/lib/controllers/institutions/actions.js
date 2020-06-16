@@ -18,6 +18,16 @@ const instance = axios.create({
   },
 });
 
+const isAdmin = (user) => {
+  const roles = new Set((user && user.roles) || []);
+  return (roles.has('admin') || roles.has('superuser'));
+};
+
+const isMember = (institution, email) => {
+  const contacts = (institution && institution.contacts) || [];
+  return contacts.some((contact) => contact.email === email);
+};
+
 const ensureIndex = async () => {
   const { body: exists } = await elastic.indices.exists({ index: config.depositors.index });
 
@@ -108,7 +118,7 @@ const addLogo = async (logo) => {
 };
 
 exports.getInstitutions = async (ctx) => {
-  ensureIndex();
+  await ensureIndex();
 
   ctx.type = 'json';
 
@@ -133,7 +143,7 @@ exports.getInstitution = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  ctx.body = institution;
+  ctx.body = { id: institutionId, ...institution };
 };
 
 exports.getSelfInstitution = async (ctx) => {
@@ -170,7 +180,7 @@ exports.getSelfInstitution = async (ctx) => {
 };
 
 exports.storeInstitution = async (ctx) => {
-  ensureIndex();
+  await ensureIndex();
 
   const { body } = ctx.request;
   const { form } = body;
@@ -242,6 +252,22 @@ exports.storeInstitution = async (ctx) => {
 
 exports.updateInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  const { body: currentInstitution, statusCode } = await elastic.getSource({
+    index: config.depositors.index,
+    id: institutionId,
+  }, { ignore: [404] });
+
+  if (!currentInstitution || statusCode === 404) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  if (!isMember(currentInstitution, user.email) && !isAdmin(user)) {
+    ctx.throw(403, 'You are not authorized to update this institution data');
+    return;
+  }
 
   const { body } = ctx.request;
   const { form } = body;
@@ -331,6 +357,7 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const { institutionId } = ctx.params;
+  const { user } = ctx.state;
 
   const { body: institution, statusCode } = await elastic.getSource({
     index: config.depositors.index,
@@ -339,6 +366,11 @@ exports.getInstitutionMembers = async (ctx) => {
 
   if (!institution || statusCode === 404) {
     ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  if (!isMember(institution, user.email) && !isAdmin(user)) {
+    ctx.throw(403, 'You are not allowed to access this institution data');
     return;
   }
 
@@ -406,7 +438,7 @@ exports.updateMember = async (ctx) => {
 };
 
 exports.getSushiData = async (ctx) => {
-  const { email } = ctx.state.user;
+  const { user } = ctx.state;
   const { institutionId } = ctx.params;
 
   const { body: institution, statusCode } = await elastic.getSource({
@@ -419,11 +451,9 @@ exports.getSushiData = async (ctx) => {
     return;
   }
 
-  const contacts = Array.isArray(institution.contacts) ? institution.contacts : [];
   const sushiItems = Array.isArray(institution.sushi) ? institution.sushi : [];
-  const isMember = contacts.some((contact) => contact.email === email);
 
-  if (!isMember) {
+  if (!isMember(institution, user.email) && !isAdmin(user)) {
     ctx.throw(403, 'You are not allowed to access this institution');
     return;
   }

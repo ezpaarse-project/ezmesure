@@ -22,20 +22,21 @@
       </v-list-item>
 
       <v-list-group
-        :value="$nuxt.$route.name.indexOf(informations.title.toLowerCase()) !== -1"
+        :value="$nuxt.$route.name.includes(institution.title.toLowerCase())"
       >
         <template v-slot:activator>
           <v-list-item-title
             class="grey--text text--darken-3 uppercase"
-            v-text="informations.title"
+            v-text="institution.title"
           />
         </template>
 
         <v-list-item
-          v-for="child in informations.children"
+          v-for="child in institution.children"
           :key="child.title"
           router
-          :to="localePath({ path: `${informations.href}${child.href}` })"
+          exact
+          :to="localePath({ path: `${institution.href}${child.href}` })"
           ripple
         >
           <v-list-item-title
@@ -60,6 +61,7 @@
           v-for="child in administration.children"
           :key="child.title"
           router
+          exact
           :to="localePath({ path: `${administration.href}${child.href}` })"
           ripple
         >
@@ -111,33 +113,25 @@ export default {
             title: this.$t('menu.institutions'),
             href: '/institutions',
           },
-          {
-            title: this.$t('menu.sushi'),
-            href: '/sushi',
-          },
-          {
-            title: this.$t('menu.users'),
-            href: '/users',
-          },
         ],
       };
     },
-    informations() {
+    institution() {
       return {
-        title: this.$t('menu.informations'),
-        href: '/info',
+        title: this.$t('menu.myInstitution'),
+        href: '/institutions',
         children: [
           {
-            title: this.$t('menu.institution'),
-            href: '/institution',
+            title: this.$t('menu.profile'),
+            href: '/self',
           },
           {
-            title: this.$t('menu.correspondent'),
-            href: '/member',
+            title: this.$t('menu.members'),
+            href: '/self/members',
           },
           {
             title: this.$t('menu.sushi'),
-            href: '/sushi',
+            href: '/self/sushi',
           },
         ],
       };

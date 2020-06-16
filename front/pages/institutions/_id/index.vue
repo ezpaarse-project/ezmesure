@@ -137,11 +137,11 @@ export default {
   components: {
     ToolBar,
   },
-  async asyncData({ $axios, store }) {
+  async asyncData({ $axios, store, params }) {
     let institution = null;
 
     try {
-      institution = await $axios.$get('/institutions/self');
+      institution = await $axios.$get(`/institutions/${params.id}`);
     } catch (e) {
       if (e.response?.status === 404) {
         institution = {};
