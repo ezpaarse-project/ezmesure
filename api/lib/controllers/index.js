@@ -11,6 +11,7 @@ const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
 const institutions = require('./institutions');
+const sushi = require('./sushi');
 
 const openapi = require('./openapi.json');
 
@@ -53,5 +54,6 @@ app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
 app.use(providers.prefix('/providers').middleware());
 app.use(institutions.prefix('/institutions').middleware());
+app.use(sushi.prefix('/sushi').middleware());
 
 module.exports = app;
