@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="show" width="900">
     <v-card>
-      <v-card-title class="headline" v-text="institution.vendor" />
+      <v-card-title class="headline">
+        Établissement : {{ institution.name }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
@@ -55,9 +57,9 @@
                 <v-text-field
                   v-model="institution.uai"
                   label="UAI"
-                  hide-details
+                  hint="Unité Administrative Immatriculée."
+                  persistent-hint
                 />
-                <span class="caption">Unité Administrative Immatriculée.</span>
               </v-col>
 
               <v-col cols="12" sm="12">
@@ -144,16 +146,7 @@
                 <v-text-field
                   v-model="institution.index.prefix"
                   label="Index"
-                  hide-details
-                />
-              </v-col>
-
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.index.suggested"
-                  label="Index suggéré"
-                  hide-details
-                  disabled
+                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
                 />
               </v-col>
 
@@ -235,6 +228,15 @@ export default {
     },
     vendors() {
       return this.platforms.map(p => p.vendor);
+    },
+    members() {
+      const members = this.institution?.contacts;
+      return Array.isArray(members) ? members : [];
+    },
+    suggestedPrefix() {
+      const email = this.members[0]?.email;
+      const match = /@(\w+)/i.exec(email);
+      return match && match[1];
     },
   },
   methods: {

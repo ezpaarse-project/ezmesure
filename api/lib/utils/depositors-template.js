@@ -34,7 +34,6 @@ module.exports = {
         properties: {
           count: { type: 'long' },
           prefix: { type: 'keyword' },
-          suggested: { type: 'keyword' },
         },
       },
       createdAt: { type: 'date' },

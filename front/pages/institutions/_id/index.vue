@@ -29,7 +29,7 @@
               <span class="caption">Unité Administrative Immatriculée.</span>
             </v-col>
 
-            <v-col cols="12">
+            <v-col cols="12" sm="6">
               <v-text-field
                 v-model="institution.website"
                 label="Page d'accueil établissement"
@@ -44,21 +44,8 @@
                 label="Index affecté"
                 placeholder="ex: univ-blancherive"
                 outlined
-                hide-details
+                :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
               />
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.index.suggested"
-                label="Index suggéré"
-                placeholder="ex: univ-blancherive"
-                outlined
-                readonly
-                disabled
-                hide-details
-              />
-              <span class="caption">Basé sur le domaine de l'adresse email.</span>
             </v-col>
 
             <v-col cols="12" class="text-center">
@@ -162,6 +149,12 @@ export default {
       hoverDropzone: false,
       institution,
     };
+  },
+  computed: {
+    suggestedPrefix() {
+      const match = /@(\w+)/i.exec(this.$auth.$state?.user?.email);
+      return match && match[1];
+    },
   },
   methods: {
     upload() {

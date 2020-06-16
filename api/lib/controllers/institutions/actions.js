@@ -160,20 +160,11 @@ exports.getSelfInstitution = async (ctx) => {
     'website',
     'logo',
     'index.prefix',
-    'index.suggested',
   ]);
 
   if (!institution) {
     ctx.throw(404, 'No assigned institution');
     return;
-  }
-
-  const index = email.match(/@(\w+)/i);
-
-  if (index && !institution.index.prefix) {
-    const [, indexPrefix] = index;
-    institution.index.suggested = indexPrefix;
-    institution.index.prefix = indexPrefix;
   }
 
   ctx.body = institution;
