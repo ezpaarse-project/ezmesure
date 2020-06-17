@@ -16,7 +16,12 @@
       </slot>
     </ToolBar>
 
-    <SushiForm ref="sushiForm" @update="refreshSushiItems" />
+    <SushiForm
+      ref="sushiForm"
+      :platforms="platforms"
+      :vendors="vendors"
+      @update="refreshSushiItems"
+    />
 
     <v-data-table
       v-if="hasInstitution"
@@ -88,6 +93,13 @@ export default {
       }
     }
 
+    let platforms = [];
+    try {
+      platforms = await $axios.$get('/sushi');
+    } catch (e) {
+      store.dispatch('snacks/error', 'Impossible de récupérer les informations des plateformes sushi');
+    }
+
     return {
       institution,
       sushiItems: [],
@@ -106,11 +118,15 @@ export default {
           align: 'right',
         },
       ],
+      platforms,
     };
   },
   computed: {
     hasInstitution() {
       return !!this.institution?.id;
+    },
+    vendors() {
+      return this.platforms.map(p => p.vendor);
     },
   },
   mounted() {
