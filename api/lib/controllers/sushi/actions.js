@@ -1,4 +1,4 @@
-const counter = require('../../utils/counter.json');
+const counter = require('../../utils/sushi.json');
 
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
