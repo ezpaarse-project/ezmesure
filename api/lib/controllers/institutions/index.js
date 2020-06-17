@@ -1,6 +1,5 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const koaBody = require('koa-body');
 const bodyParser = require('koa-bodyparser');
 
 const { requireJwt, requireUser } = require('../../services/auth');
@@ -20,26 +19,11 @@ const {
   updateSushi,
   getSushiData,
   deleteSushiData,
-  pictures,
 } = require('./actions');
-
-router.get('/pictures/:id', pictures);
 
 router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
-
-router.route({
-  method: 'GET',
-  path: '/pictures/:id',
-  handler: pictures,
-  validate: {
-    params: {
-      id: Joi.string().trim().min(16).max(16)
-        .required(),
-    },
-  },
-});
 
 router.route({
   method: 'GET',
@@ -185,17 +169,12 @@ router.route({
   },
 });
 
-router.use(koaBody({
-  multipart: true,
-  uploadDir: './uploads/',
-}));
-
 router.route({
   method: 'POST',
   path: '/',
   handler: storeInstitution,
   validate: {
-    type: 'multipart',
+    type: 'json',
   },
 });
 
@@ -204,7 +183,7 @@ router.route({
   path: '/:institutionId',
   handler: updateInstitution,
   validate: {
-    type: 'multipart',
+    type: 'json',
     params: {
       institutionId: Joi.string().trim().required(),
     },

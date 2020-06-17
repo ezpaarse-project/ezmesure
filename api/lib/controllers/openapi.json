@@ -188,9 +188,9 @@
             "type": "string",
             "example": "Paris"
           },
-          "logoUrl": {
+          "logoId": {
             "type": "string",
-            "example": "https://foobar.univ.fr/assets/logo.jpg"
+            "example": "logo.png"
           },
           "uai": {
             "type": "string",

@@ -143,37 +143,15 @@ export default {
   },
   methods: {
     async refreshInstitutions() {
-      let institutions;
       try {
-        institutions = await this.$axios.$get('/institutions');
+        this.institutions = await this.$axios.$get('/institutions');
       } catch (e) {
         this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
       }
 
-      if (!Array.isArray(institutions)) {
-        institutions = [];
+      if (!Array.isArray(this.institutions)) {
+        this.institutions = [];
       }
-
-      institutions.forEach((institution) => {
-        institution.location = institution.location || {};
-        const users = institution?.contacts?.users;
-        const logoUrl = institution?.logoUrl;
-
-        if (Array.isArray(users)) {
-          users.filter(u => u.type).forEach((user) => {
-            user.type = user.type.split(',');
-          });
-        }
-
-        institution.logo = null;
-        institution.logoPreview = null;
-
-        if (logoUrl) {
-          institution.logoPreview = `/api/institutions/pictures/${logoUrl}`;
-        }
-      });
-
-      this.institutions = institutions;
     },
     editInstitution(item) {
       this.$refs.institutionForm.editInstitution(item);

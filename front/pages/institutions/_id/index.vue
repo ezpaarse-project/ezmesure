@@ -48,46 +48,53 @@
               />
             </v-col>
 
-            <v-col cols="12" class="text-center">
-              <center>
-                <section
-                  ref="dropzone"
-                  cols="12"
-                  class="text-center dropZone"
-                  :class="{ overlay: hoverDropzone }"
-                  :style="{
-                    'background-color': logoPreview ? 'transparent' : '#ccc',
-                    'background-image': `url(
-                      ${logoPreview ? logoPreview : require('@/static/images/logo-etab.png')}
-                    )`
-                  }"
-                  @dragover="hoverDropzone = true"
-                  @dragleave="hoverDropzone = false"
-                >
-                  <v-tooltip v-if="logoPreview" right>
-                    <template v-slot:activator="{ on }" class="removeLogoTooltip">
-                      <v-btn
-                        icon
-                        small
-                        color="error"
-                        class="removeLogo"
-                        v-on="on"
-                        @click="removeLogo"
-                      >
-                        <v-icon>mdi-close-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Supprimer logo</span>
-                  </v-tooltip>
-                  <input
-                    ref="logo"
-                    type="file"
-                    accept="image/*"
-                    @change="upload"
+            <v-col cols="12">
+              <v-hover v-model="hoverLogo" class="mx-auto">
+                <template v-slot:default="{ hover }">
+                  <v-card
+                    width="320"
+                    @dragover.prevent="onDragOver"
+                    @dragleave.prevent="onDragLeave"
+                    @drop.prevent="onFileDrop"
                   >
-                </section>
-                <span class="caption">320x100</span>
-              </center>
+                    <v-img
+                      contain
+                      :src="logoSrc"
+                      width="320"
+                      height="100"
+                    />
+
+                    <v-card-text class="text-center">
+                      Logo (ratio 3:1)
+                    </v-card-text>
+
+                    <input
+                      ref="logo"
+                      type="file"
+                      accept="image/*"
+                      class="d-none"
+                      @change="onLogoChange"
+                    >
+
+                    <v-fade-transition>
+                      <v-overlay v-if="hover" absolute>
+                        <div v-if="draggingFile">
+                          Déposez votre image ici
+                        </div>
+
+                        <div v-else>
+                          <v-btn v-if="logoPreview || institution.logoId" @click="removeLogo">
+                            Supprimer
+                          </v-btn>
+                          <v-btn @click="$refs.logo.click()">
+                            Modifier
+                          </v-btn>
+                        </div>
+                      </v-overlay>
+                    </v-fade-transition>
+                  </v-card>
+                </template>
+              </v-hover>
             </v-col>
           </v-row>
         </v-container>
@@ -118,6 +125,15 @@
 <script>
 import ToolBar from '~/components/space/ToolBar';
 
+const defaultLogo = require('@/static/images/logo-etab.png');
+
+const toBase64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsBinaryString(file);
+  reader.onload = () => resolve(btoa(reader.result));
+  reader.onerror = error => reject(error);
+});
+
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
@@ -143,52 +159,63 @@ export default {
 
     return {
       valid: false,
-      logo: null,
+      hoverLogo: false,
+      draggingFile: false,
+      defaultLogo,
       logoPreview: null,
       loading: false,
-      hoverDropzone: false,
       institution,
     };
   },
   computed: {
+    logoSrc() {
+      if (this.logoPreview) { return this.logoPreview; }
+      if (this.institution?.logoId) { return `/api/assets/logos/${this.institution.logoId}`; }
+      return defaultLogo;
+    },
     suggestedPrefix() {
       const match = /@(\w+)/i.exec(this.$auth.$state?.user?.email);
       return match && match[1];
     },
   },
   methods: {
-    upload() {
-      if (!this.$refs.logo.files) {
-        this.logoPreview = null;
-        this.logo = null;
-        return true;
+    async onLogoChange() {
+      this.updateLogo(this.$refs.logo.files[0]);
+      this.$refs.logo.value = '';
+    },
+    onDragOver() {
+      this.draggingFile = true;
+      this.hoverLogo = true;
+    },
+    onDragLeave() {
+      this.draggingFile = false;
+      this.hoverLogo = false;
+    },
+    onFileDrop(evt) {
+      const files = evt?.dataTransfer?.files;
+      if (files && files[0]) {
+        this.updateLogo(files[0]);
       }
-
-      const logo = this.$refs.logo.files[0];
-      const logoPreview = URL.createObjectURL(logo);
-
-      this.logo = logo;
-      this.logoPreview = logoPreview;
-      return true;
+      this.draggingFile = false;
+    },
+    async updateLogo(file) {
+      if (file.type.startsWith('image/')) {
+        const base64logo = await toBase64(file);
+        this.institution.logo = base64logo;
+        this.logoPreview = URL.createObjectURL(file);
+      }
     },
     removeLogo() {
       this.logoPreview = null;
-      this.logo = null;
+      this.institution.logo = null;
+      this.institution.logoId = null;
     },
     async save() {
       this.loading = true;
-      const formData = new FormData();
-
-      formData.append('logo', this.logo);
-      formData.append('form', JSON.stringify(this.institution));
 
       if (this.institution.id) {
         try {
-          await this.$axios.$patch(`/institutions/${this.institution.id}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          await this.$axios.$patch(`/institutions/${this.institution.id}`, this.institution);
         } catch (e) {
           this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
           this.loading = false;
@@ -199,11 +226,7 @@ export default {
 
       if (!this.institution.id) {
         try {
-          await this.$axios.$post('/institutions', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          await this.$axios.$post('/institutions', this.institution);
         } catch (e) {
           this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
           this.loading = false;
@@ -217,32 +240,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.dropZone {
-  cursor: pointer;
-  width: 320px;
-  height: 100px;
-  background-size: 320px 100px;
-  border: 1px solid #ccc;
-}
-.dropZone input[type='file'] {
-  cursor: pointer;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
-.overlay {
-  background-color: rgba(62, 62, 62, 0.3);
-  border-color: #787878;
-}
-.removeLogo {
-  float: right;
-  display: none;
-}
-.dropZone:hover > .removeLogo {
-  display: inline;
-}
-</style>

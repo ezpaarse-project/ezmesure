@@ -4,6 +4,7 @@ const path = require('path');
 const config = require('config');
 const { v4: uuidv4 } = require('uuid');
 const { randomBytes } = require('crypto');
+const sharp = require('sharp');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
 const depositors = require('../../services/depositors');
@@ -17,6 +18,8 @@ const instance = axios.create({
     'Application-ID': 'ezMESURE',
   },
 });
+
+const logosDir = path.resolve(__dirname, '..', '..', '..', 'uploads', 'logos');
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -38,6 +41,24 @@ const ensureIndex = async () => {
     });
   }
 };
+
+const saveLogo = async (base64logo) => {
+  const logoId = `${randomBytes(16).toString('hex')}.png`;
+  const logoPath = path.resolve(logosDir, logoId);
+  const logoContent = Buffer.from(base64logo, 'base64');
+
+  await fs.ensureDir(logosDir);
+  await sharp(logoContent)
+    .resize({
+      width: 600,
+      height: 200,
+      fit: sharp.fit.inside,
+    })
+    .toFormat('png')
+    .toFile(logoPath);
+
+  return logoId;
+}
 
 const getInstitutionDataByUAI = async (uai) => {
   try {
@@ -102,21 +123,6 @@ const getInstitutionData = async (email, sourceFilter) => {
   }
 };
 
-const addLogo = async (logo) => {
-  try {
-    const dest = path.resolve(__dirname, '..', '..', '..', 'uploads');
-
-    const logoId = randomBytes(16).toString('hex');
-
-    await fs.ensureDir(dest);
-    await fs.move(path.resolve(logo.path), path.resolve(dest, `${logoId}.png`));
-    return logoId;
-  } catch (err) {
-    appLogger.error('Failed to store logo', err);
-    return null;
-  }
-};
-
 exports.getInstitutions = async (ctx) => {
   await ensureIndex();
 
@@ -158,7 +164,7 @@ exports.getSelfInstitution = async (ctx) => {
     'name',
     'uai',
     'website',
-    'logo',
+    'logoId',
     'index.prefix',
   ]);
 
@@ -173,19 +179,9 @@ exports.getSelfInstitution = async (ctx) => {
 exports.storeInstitution = async (ctx) => {
   await ensureIndex();
 
-  const { body } = ctx.request;
-  const { form } = body;
-  const { logo } = ctx.request.files;
+  let { body: institution } = ctx.request;
 
-  let logoId;
-  if (logo) {
-    logoId = await addLogo(logo);
-  }
-
-  let institution = JSON.parse(form);
   const currentDate = new Date();
-
-  institution.logoId = logoId || '';
 
   institution.type = '';
   institution.city = '';
@@ -213,6 +209,12 @@ exports.storeInstitution = async (ctx) => {
   institution.updatedAt = currentDate;
   institution.createdAt = currentDate;
 
+  if (institution.logo) {
+    institution.logoId = await saveLogo(institution.logo);
+  }
+
+  delete institution.logo;
+
   if (institution.uai) {
     try {
       const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
@@ -228,54 +230,55 @@ exports.storeInstitution = async (ctx) => {
     }
   }
 
-  ctx.status = 204;
-
   await elastic.index({
     index: config.depositors.index,
     refresh: true,
     body: institution,
-  }).catch((err) => {
-    ctx.status = 500;
-    appLogger.error('Failed to store data in index', err);
-    return ctx;
   });
+
+  ctx.status = 204;
 };
 
 exports.updateInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
   const { user } = ctx.state;
 
-  const { body: currentInstitution, statusCode } = await elastic.getSource({
+  const { body: storedInstitution, statusCode } = await elastic.getSource({
     index: config.depositors.index,
     id: institutionId,
   }, { ignore: [404] });
 
-  if (!currentInstitution || statusCode === 404) {
+  if (!storedInstitution || statusCode === 404) {
     ctx.throw(404, 'Institution not found');
     return;
   }
 
-  if (!isMember(currentInstitution, user.email) && !isAdmin(user)) {
+  if (!isMember(storedInstitution, user.email) && !isAdmin(user)) {
     ctx.throw(403, 'You are not authorized to update this institution data');
     return;
   }
 
-  const { body } = ctx.request;
-  const { form } = body;
-  const { logo } = ctx.request.files;
+  let { body: institution } = ctx.request;
 
-  if (!body || !form) {
-    ctx.status = 400;
+  if (!institution) {
+    ctx.throw(400, 'body is empty');
     return;
   }
 
-  let institution = JSON.parse(form);
-
-  let logoId;
-  if (logo) {
-    logoId = await addLogo(logo);
-    institution.logoId = logoId || '';
+  if (institution.logo) {
+    institution.logoId = await saveLogo(institution.logo);
+  } else if (institution.logo === null) {
+    institution.logoId = null;
   }
+
+  if (institution.logo !== undefined) {
+    // Remove previous logo if any
+    if (storedInstitution.logoId) {
+      await fs.remove(path.resolve(logosDir, storedInstitution.logoId));
+    }
+  }
+
+  delete institution.logo;
 
   if (institution.uai) {
     try {
@@ -593,19 +596,4 @@ exports.deleteSushiData = async (ctx) => {
     ctx.status = 200;
     ctx.body = response;
   }
-};
-
-exports.pictures = async (ctx) => {
-  ctx.type = 'image/png';
-  ctx.status = 200;
-
-  const { id } = ctx.params;
-  if (id) {
-    const logoPath = path.resolve(__dirname, '..', '..', '..', 'uploads', `${id}.png`);
-    ctx.body = fs.createReadStream(logoPath);
-    return ctx;
-  }
-
-  ctx.status = 400;
-  return ctx;
 };

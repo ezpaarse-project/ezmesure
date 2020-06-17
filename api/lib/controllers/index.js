@@ -2,6 +2,9 @@
 const Koa = require('koa');
 const router = require('koa-joi-router');
 const { Joi } = require('koa-joi-router');
+const serve = require('koa-static');
+const mount = require('koa-mount');
+const path = require('path');
 
 const { renaterLogin, elasticLogin, logout } = require('./auth/auth');
 const logs = require('./logs');
@@ -44,6 +47,10 @@ publicRouter.get('/openapi.json', async (ctx) => {
   ctx.type = 'json';
   ctx.body = openapi;
 });
+
+const assetsDir = path.resolve(__dirname, '..', '..', 'uploads');
+// koa-serve doesn't work with the router
+app.use(mount('/assets', serve(assetsDir)));
 
 app.use(publicRouter.middleware());
 app.use(partners.prefix('/partners').middleware());

@@ -3,7 +3,7 @@
     <v-card-text class="text-center grow">
       <v-img
         v-if="partner.logoId"
-        :src="`/api/institutions/pictures/${partner.logoId}`"
+        :src="`/api/assets/logos/${partner.logoId}`"
         contain
         height="100"
         class="mb-3"
