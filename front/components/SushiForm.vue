@@ -187,9 +187,9 @@ export default {
       this.$refs.vendorsBox.isMenuActive = false;
 
       this.requiredFields = {
-        requestorId: platform.requestorId,
-        customerId: platform.customerId,
-        apiKey: platform.apiKey,
+        requestorId: platform?.requestorId || false,
+        customerId: platform?.customerId || false,
+        apiKey: platform?.apiKey || false,
       };
     },
 
