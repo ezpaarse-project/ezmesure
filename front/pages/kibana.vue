@@ -40,6 +40,7 @@
 
         <v-card-text>
           <v-alert
+            class="mt-1"
             :value="resetError"
             dismissible
             prominent
@@ -49,6 +50,7 @@
             {{ resetErrorText }}
           </v-alert>
           <v-alert
+            class="mt-1"
             :value="resetSuccess"
             dismissible
             prominent
