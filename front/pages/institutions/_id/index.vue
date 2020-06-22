@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar title="Mon établissement" />
+    <ToolBar :title="$t('institutions.institution.title')" />
 
     <v-card-text v-if="institution">
       <v-form v-model="valid">
@@ -10,9 +10,9 @@
               <v-text-field
                 ref="name"
                 v-model="institution.name"
-                label="Nom établissement *"
-                placeholder="ex: Université de Blancherive"
-                :rules="[v => !!v || 'Veuillez saisir un nom d\'établissement.']"
+                :label="$t('institutions.institution.name')"
+                :placeholder="$t('institutions.institution.nameExample')"
+                :rules="[v => !!v || $t('institutions.institution.nameError')]"
                 outlined
                 required
               />
@@ -21,19 +21,19 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="institution.uai"
-                label="UAI"
-                placeholder="ex: 1234567A"
+                :label="$t('institutions.institution.uai')"
+                :placeholder="$t('institutions.institution.uaiExample')"
                 outlined
                 hide-details
               />
-              <span class="caption">Unité Administrative Immatriculée.</span>
+              <span class="caption" v-text="$t('institutions.institution.uaiDescription')" />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="institution.website"
-                label="Page d'accueil établissement"
-                placeholder="ex: https://cnrs.fr/"
+                :label="$t('institutions.institution.homepage')"
+                :placeholder="$t('institutions.institution.homepageExample')"
                 outlined
               />
             </v-col>
@@ -41,8 +41,8 @@
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="institution.index.prefix"
-                label="Index affecté"
-                placeholder="ex: univ-blancherive"
+                :label="$t('institutions.institution.affectedIndex')"
+                :placeholder="$t('institutions.institution.affectedIndexExample')"
                 outlined
                 :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
               />
@@ -78,17 +78,18 @@
 
                     <v-fade-transition>
                       <v-overlay v-if="hover" absolute>
-                        <div v-if="draggingFile">
-                          Déposez votre image ici
-                        </div>
+                        <div
+                          v-if="draggingFile"
+                          v-text="$t('institutions.institution.dropImageHere')"
+                        />
 
                         <div v-else>
-                          <v-btn v-if="logoPreview || institution.logoId" @click="removeLogo">
-                            Supprimer
-                          </v-btn>
-                          <v-btn @click="$refs.logo.click()">
-                            Modifier
-                          </v-btn>
+                          <v-btn
+                            v-if="logoPreview || institution.logoId"
+                            @click="removeLogo"
+                            v-text="$t('delete')"
+                          />
+                          <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
                         </div>
                       </v-overlay>
                     </v-fade-transition>
@@ -102,22 +103,23 @@
     </v-card-text>
 
     <v-card-actions v-if="institution">
-      <span class="caption">* champs obligatoires</span>
+      <span class="caption" v-text="$t('requiredFields')" />
       <v-spacer />
       <v-btn
         color="primary"
         :disabled="!valid"
         :loading="loading"
         @click="save"
-      >
-        Sauvegarder
-      </v-btn>
+        v-text="$t('save')"
+      />
     </v-card-actions>
 
     <v-card-text v-else>
-      <v-alert type="error" :value="true">
-        Les informations de votre établissement n'ont pas pu être récupérées.
-      </v-alert>
+      <v-alert
+        type="error"
+        :value="true"
+        v-text="$t('institutions.institution.noDataFound')"
+      />
     </v-card-text>
   </section>
 </template>
@@ -149,7 +151,7 @@ export default {
       if (e.response?.status === 404) {
         institution = {};
       } else {
-        store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+        store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }
     }
 
@@ -217,22 +219,22 @@ export default {
         try {
           await this.$axios.$patch(`/institutions/${this.institution.id}`, this.institution);
         } catch (e) {
-          this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+          this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
           this.loading = false;
           return;
         }
-        this.$store.dispatch('snacks/success', 'Établissement mis à jour');
+        this.$store.dispatch('snacks/success', this.$t('institutions.institution.institutionUpdated'));
       }
 
       if (!this.institution.id) {
         try {
           await this.$axios.$post('/institutions', this.institution);
         } catch (e) {
-          this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+          this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
           this.loading = false;
           return;
         }
-        this.$store.dispatch('snacks/success', 'Informations d\'établissement transmises');
+        this.$store.dispatch('snacks/success', this.$t('institutions.institution.dataSent'));
       }
 
       this.loading = false;

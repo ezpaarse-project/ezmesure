@@ -90,6 +90,36 @@
     "search": "Search",
     "count": "Our {count} partners"
   },
+  "institutions": {
+    "institution": {
+      "title": "My institution",
+      "name": "Institution name *",
+      "nameExample": "e.g. Blancherive University",
+      "nameError": "Please enter an institution name.",
+      "uai": "RAU",
+      "uaiExample": "e.g. 1234567A",
+      "uaiDescription": "Registered Administrative Unit.",
+      "homepage": "Institution homepage",
+      "homepageExample": "e.g. https://cnrs.fr/",
+      "affectedIndex": "Affected index",
+      "affectedIndexExample": "e.g. univ-blancherive",
+      "dropImageHere": "Drop your image here",
+      "noDataFound": "Your institution's information could not be retrieved.",
+      "dataSent": "Institution informations transmitted",
+      "updated": "Institution updated"
+    },
+    "members": {
+      "title": "Members - {institutionName}",
+      "technicalCorrespondent": "Technical",
+      "documentaryCorrespondent": "Documentary",
+      "unableToRetriveMembers": "Unable to retrieve members",
+      "name": "Name",
+      "correspondent": "Correspondent"
+    },
+    "unableToRetriveInformations": "Unable to retrieve institution information",
+    "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
+    "reportInstitutionInformation": "Report institution information."
+  },
   "language": "Language",
   "refresh": "Update",
   "delete": "Remove",
@@ -97,5 +127,9 @@
   "canceled": "Canceled",
   "error": "Error",
   "reset": "Reset",
-  "copy": "Copy"
+  "copy": "Copy",
+  "modify": "Modify",
+  "save": "Save",
+  "requiredFields": "* required fields",
+  "formSendingFailed": "Sending the form failed"
 }

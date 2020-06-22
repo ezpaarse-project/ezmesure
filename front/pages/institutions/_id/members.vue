@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="`Membres - ${institution.name}`" />
+    <ToolBar :title="$t('institutions.members.title', {institutionName: institution.name })" />
 
     <v-data-table
       v-if="hasInstitution"
@@ -10,12 +10,20 @@
       item-key="email"
     >
       <template v-slot:item.correspondent="{ item }">
-        <v-chip v-if="item.type && item.type.includes('tech')" small label color="secondary">
-          Technique
-        </v-chip>
-        <v-chip v-if="item.type && item.type.includes('doc')" small label color="secondary">
-          Documentaire
-        </v-chip>
+        <v-chip
+          v-if="item.type && item.type.includes('tech')"
+          small
+          label
+          color="secondary"
+          v-text="$t('institutions.members.technicalCorrespondent')"
+        />
+        <v-chip
+          v-if="item.type && item.type.includes('doc')"
+          small
+          label
+          color="secondary"
+          v-text="$t('institutions.members.documentaryCorrespondent')"
+        />
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -29,13 +37,8 @@
     </v-data-table>
 
     <v-card-text v-else>
-      <div class="mb-2">
-        Vous n'êtes rattachés à aucun établissement,
-        où vous n'avez déclaré aucunes informations sur votre établissement.
-      </div>
-      <a :href="'/info/institution'">
-        Déclarer des informations d'établissement.
-      </a>
+      <div class="mb-2" v-text="$('institutions.notAttachedToAnyInstitution')" />
+      <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
     </v-card-text>
 
     <MemberForm ref="memberForm" @update="refreshMembers" />
@@ -53,7 +56,12 @@ export default {
     ToolBar,
     MemberForm,
   },
-  async asyncData({ $axios, store, params }) {
+  async asyncData({
+    $axios,
+    store,
+    params,
+    app,
+  }) {
     let institution = null;
 
     try {
@@ -62,7 +70,7 @@ export default {
       if (e.response?.status === 404) {
         institution = {};
       } else {
-        store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+        store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetriveInformations'));
       }
     }
 
@@ -74,7 +82,7 @@ export default {
       members: [],
       headers: [
         {
-          text: 'Name',
+          text: app.i18n.t('institutions.members.name'),
           value: 'fullName',
         },
         {
@@ -82,7 +90,7 @@ export default {
           value: 'email',
         },
         {
-          text: 'Correspondant',
+          text: app.i18n.t('institutions.members.correspondent'),
           value: 'correspondent',
         },
         {
@@ -115,7 +123,7 @@ export default {
       try {
         this.members = await this.$axios.$get(`/institutions/${this.institution.id}/members`);
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'Impossible de récupérer les membres');
+        this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));
       }
 
       this.refreshing = false;

@@ -90,6 +90,36 @@
     "search": "Rechercher",
     "count": "Nos {count} partenaires"
   },
+  "institutions": {
+    "institution": {
+      "title": "Mon établisement",
+      "name": "Nom établissement *",
+      "nameExample": "ex: Université de Blancherive",
+      "nameError": "Veuillez saisir un nom d'établissement.",
+      "uai": "UAI",
+      "uaiExample": "ex: 1234567A",
+      "uaiDescription": "Unité Administrative Immatriculée.",
+      "homepage": "Page d'accueil établissement",
+      "homepageExample": "ex: https://cnrs.fr/",
+      "affectedIndex": "Index affecté",
+      "affectedIndexExample": "ex: univ-blancherive",
+      "dropImageHere": "Déposez votre image ici",
+      "noDataFound": "Les informations de votre établissement n'ont pas pu être récupérées.",
+      "dataSent": "Informations d'établissement transmises",
+      "updated": "Établissement mis à jour"
+    },
+    "members": {
+      "title": "Membres - {institutionName}",
+      "technicalCorrespondent": "Technique",
+      "documentaryCorrespondent": "Documentaire",
+      "unableToRetriveMembers": "Impossible de récupérer les membres",
+      "name": "Nom",
+      "correspondent": "Correspondant"
+    },
+    "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
+    "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
+    "reportInstitutionInformation": "Déclarer des informations d'établissement."
+  },
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",
@@ -97,5 +127,9 @@
   "canceled": "Annulé",
   "error": "Erreur",
   "reset": "Réinitialiser",
-  "copy": "Copier"
+  "copy": "Copier",
+  "modify": "Modifier",
+  "save": "Sauvegarder",
+  "requiredFields": "* champs obligatoires",
+  "formSendingFailed": "L'envoi du formulaire a échoué"
 }
