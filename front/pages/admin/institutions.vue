@@ -8,7 +8,7 @@
           <v-icon left>
             mdi-refresh
           </v-icon>
-          Actualiser
+          {{ $t('refresh') }}
         </v-btn>
       </slot>
     </ToolBar>
@@ -61,7 +61,7 @@
               </v-icon>
             </v-btn>
           </template>
-          <span>Identifiants Sushi</span>
+          <span v-text="$t('institutions.sushi.credentials')" />
         </v-tooltip>
 
         <v-tooltip bottom :open-delay="500">
@@ -74,7 +74,7 @@
               </v-icon>
             </v-btn>
           </template>
-          <span>Membres</span>
+          <span v-text="$t('institutions.members.members')" />
         </v-tooltip>
 
         <v-tooltip bottom :open-delay="500">
@@ -87,7 +87,7 @@
               </v-icon>
             </v-btn>
           </template>
-          <span>Modifier</span>
+          <span v-text="$t('modify')" />
         </v-tooltip>
       </template>
 
@@ -95,7 +95,7 @@
         <span v-if="selected.length">
           <v-btn small color="error" class="ma-2" @click="deleteData">
             <v-icon left>mdi-delete</v-icon>
-            Supprimer ({{ selected.length }})
+            {{ $t('delete') }} ({{ selected.length }})
           </v-btn>
         </span>
       </template>
@@ -119,19 +119,6 @@ export default {
   data() {
     return {
       selected: [],
-      headers: [
-        { text: 'Etablissement', value: 'name' },
-        { text: 'Index', value: 'index.prefix' },
-        { text: 'ECs', value: 'index.count' },
-        { text: 'Automatisations', value: 'automatisations' },
-        {
-          text: 'Actions',
-          value: 'actions',
-          sortable: false,
-          width: '150px',
-          align: 'center',
-        },
-      ],
       types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
@@ -141,12 +128,29 @@ export default {
   mounted() {
     return this.refreshInstitutions();
   },
+  computed: {
+    headers() {
+      return [
+        { text: this.$t('institutions.title'), value: 'name' },
+        { text: 'Index', value: 'index.prefix' },
+        { text: 'ECs', value: 'index.count' },
+        { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
+        {
+          text: 'Actions',
+          value: 'actions',
+          sortable: false,
+          width: '150px',
+          align: 'center',
+        },
+      ];
+    },
+  },
   methods: {
     async refreshInstitutions() {
       try {
         this.institutions = await this.$axios.$get('/institutions');
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }
 
       if (!Array.isArray(this.institutions)) {
@@ -170,7 +174,7 @@ export default {
           throw new Error('invalid response');
         }
       } catch (e) {
-        this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`);
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
         return;
       }
 
@@ -178,12 +182,12 @@ export default {
       const deleted = response.filter(item => item?.status === 'deleted');
 
       failed.forEach(({ id }) => {
-        this.$store.dispatch('snacks/error', `Impossible de supprimer l'établissement ${id}`);
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
       });
 
 
       if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', `${deleted.length} élement(s) supprimé(s)`);
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
 
         const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
         this.institutions = this.institutions.filter(removeDeleted);

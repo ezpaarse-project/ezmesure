@@ -127,7 +127,8 @@
       "email": "Email address *",
       "emailExample": "e.g. john@doe.fr",
       "thisMemberIs": "This member is :",
-      "enterValidEmail": "Please enter a valid email."
+      "enterValidEmail": "Please enter a valid email.",
+      "members": "Members"
     },
     "sushi": {
       "title": "Sushi credentials - {institutionName}",
@@ -142,7 +143,8 @@
       "enterRequestorId": "Please enter a Requestor Id.",
       "enterCustomerId": "Please enter a Customer Id.",
       "enterAPIKey": "Please enter an API Key.",
-      "comment": "Comment"
+      "comment": "Comment",
+      "credentials": "Sushi credentials"
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",

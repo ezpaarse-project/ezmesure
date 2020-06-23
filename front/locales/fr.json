@@ -127,7 +127,8 @@
       "email": "Adresse email *",
       "emailExample": "ex: john@doe.fr",
       "thisMemberIs": "Ce membre est un correspondant :",
-      "enterValidEmail": "Veuillez saisir un email valide."
+      "enterValidEmail": "Veuillez saisir un email valide.",
+      "members": "Members"
     },
     "sushi": {
       "title": "Identifiants Sushi - {institutionName}",
@@ -142,7 +143,8 @@
       "enterRequestorId": "Veuillez saisir un Requestor Id.",
       "enterCustomerId": "Veuillez saisir un Customer Id.",
       "enterAPIKey": "Veuillez saisir une Clé API.",
-      "comment": "Commentaire"
+      "comment": "Commentaire",
+      "credentials": "Identifiants Sushi"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
