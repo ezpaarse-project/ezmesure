@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="`Identifiants Sushi - ${institution.name}`">
+    <ToolBar :title="$t('institutions.sushi', { institutionName: institution.name })">
       <slot>
         <v-spacer />
         <v-btn
@@ -11,7 +11,7 @@
           <v-icon left>
             mdi-key-plus
           </v-icon>
-          Ajouter
+          {{ $t('add') }}
         </v-btn>
       </slot>
     </ToolBar>
@@ -49,7 +49,7 @@
         <span v-if="selected.length">
           <v-btn small color="error" class="ma-2" @click="deleteData">
             <v-icon left>mdi-delete</v-icon>
-            Supprimer ({{ selected.length }})
+            {{ $t('delete') }} ({{ selected.length }})
           </v-btn>
         </span>
       </template>
@@ -57,13 +57,8 @@
 
     <v-card v-else tile flat color="transparent">
       <v-card-text>
-        <div class="mb-2">
-          Vous n'êtes rattachés à aucun établissement,
-          où vous n'avez déclaré aucunes informations sur votre établissement.
-        </div>
-        <a :href="'/info/institution'">
-          Déclarer des informations d'établissement.
-        </a>
+        <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
+        <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
       </v-card-text>
     </v-card>
   </section>
@@ -80,7 +75,12 @@ export default {
     ToolBar,
     SushiForm,
   },
-  async asyncData({ $axios, store, params }) {
+  async asyncData({
+    $axios,
+    store,
+    params,
+    app,
+  }) {
     let institution = null;
 
     try {
@@ -89,7 +89,7 @@ export default {
       if (e.response?.status === 404) {
         institution = {};
       } else {
-        store.dispatch('snacks/error', 'Impossible de récupérer les informations d\'établissement');
+        store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetriveInformations'));
       }
     }
 
@@ -97,7 +97,7 @@ export default {
     try {
       platforms = await $axios.$get('/sushi');
     } catch (e) {
-      store.dispatch('snacks/error', 'Impossible de récupérer les informations des plateformes sushi');
+      store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetrivePlatforms'));
     }
 
     return {
@@ -107,7 +107,7 @@ export default {
       refreshing: false,
       headers: [
         {
-          text: 'Libellé',
+          text: app.i18n.t('institutions.sushi.label'),
           value: 'name',
         },
         {
@@ -147,7 +147,7 @@ export default {
       try {
         this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`);
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'Impossible de récupérer les informations sushi');
+        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }
 
       this.refreshing = false;
@@ -166,7 +166,7 @@ export default {
           throw new Error('invalid response');
         }
       } catch (e) {
-        this.$store.dispatch('snacks/error', `Impossible de supprimer ${this.selected.length} élement(s)`);
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
         return;
       }
 
@@ -174,12 +174,12 @@ export default {
       const deleted = response.filter(item => item?.status === 'deleted');
 
       failed.forEach(({ id }) => {
-        this.$store.dispatch('snacks/error', `Impossible de supprimer l'élment ${id}`);
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
       });
 
 
       if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', `${deleted.length} élement(s) supprimé(s)`);
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
 
         const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
         this.sushiItems = this.sushiItems.filter(removeDeleted);

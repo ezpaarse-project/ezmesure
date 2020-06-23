@@ -116,6 +116,12 @@
       "name": "Name",
       "correspondent": "Correspondent"
     },
+    "sushi": {
+      "title": "Sushi credentials - {institutionName}",
+      "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
+      "label": "Label",
+      "unableToRetriveSushiData": "Unable to retrieve sushi information"
+    },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
@@ -131,5 +137,9 @@
   "modify": "Modify",
   "save": "Save",
   "requiredFields": "* required fields",
-  "formSendingFailed": "Sending the form failed"
+  "formSendingFailed": "Sending the form failed",
+  "add": "Add",
+  "cannotDeleteItems": "Cannot delete {count} item(s)",
+  "cannotDeleteItem": "Cannot remove the element {id}",
+  "itemsDeleted": "{count} element(s) deleted"
 }

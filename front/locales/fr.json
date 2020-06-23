@@ -116,6 +116,12 @@
       "name": "Nom",
       "correspondent": "Correspondant"
     },
+    "sushi": {
+      "title": "Identifiants Sushi - {institutionName}",
+      "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
+      "label": "Libellé",
+      "unableToRetriveSushiData": "Impossible de récupérer les informations sushi"
+    },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
@@ -131,5 +137,9 @@
   "modify": "Modifier",
   "save": "Sauvegarder",
   "requiredFields": "* champs obligatoires",
-  "formSendingFailed": "L'envoi du formulaire a échoué"
+  "formSendingFailed": "L'envoi du formulaire a échoué",
+  "add": "Ajouter",
+  "cannotDeleteItems": "Impossible de supprimer {count} élement(s)",
+  "cannotDeleteItem": "Impossible de supprimer l'élment {id}",
+  "itemsDeleted": "{count} élement(s) supprimé(s)"
 }
