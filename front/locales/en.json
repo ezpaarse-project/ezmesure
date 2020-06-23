@@ -91,6 +91,7 @@
     "count": "Our {count} partners"
   },
   "institutions": {
+    "title": "Institution",
     "institution": {
       "title": "My institution",
       "name": "Institution name *",
@@ -103,10 +104,17 @@
       "homepageExample": "e.g. https://cnrs.fr/",
       "affectedIndex": "Affected index",
       "affectedIndexExample": "e.g. univ-blancherive",
+      "city": "City",
+      "acronym": "Acronym",
+      "type": "Institution type",
+      "domains": "Domains",
+      "localisation": "Localisation",
+      "automations": "Automations",
       "dropImageHere": "Drop your image here",
       "noDataFound": "Your institution's information could not be retrieved.",
       "dataSent": "Institution informations transmitted",
-      "updated": "Institution updated"
+      "updated": "Institution updated",
+      "unableToUpate": "Unable to update facility"
     },
     "members": {
       "title": "Members - {institutionName}",
@@ -141,5 +149,7 @@
   "add": "Add",
   "cannotDeleteItems": "Cannot delete {count} item(s)",
   "cannotDeleteItem": "Cannot remove the element {id}",
-  "itemsDeleted": "{count} element(s) deleted"
+  "itemsDeleted": "{count} element(s) deleted",
+  "update": "Update",
+  "create": "Create"
 }

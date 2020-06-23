@@ -91,6 +91,7 @@
     "count": "Nos {count} partenaires"
   },
   "institutions": {
+    "title": "Établissement",
     "institution": {
       "title": "Mon établisement",
       "name": "Nom établissement *",
@@ -103,10 +104,17 @@
       "homepageExample": "ex: https://cnrs.fr/",
       "affectedIndex": "Index affecté",
       "affectedIndexExample": "ex: univ-blancherive",
+      "city": "Ville",
+      "acronym": "Sigle",
+      "type": "Type d'établissement",
+      "domains": "Domaines",
+      "localisation": "Localisation",
+      "automations": "Automatisations",
       "dropImageHere": "Déposez votre image ici",
       "noDataFound": "Les informations de votre établissement n'ont pas pu être récupérées.",
       "dataSent": "Informations d'établissement transmises",
-      "updated": "Établissement mis à jour"
+      "updated": "Établissement mis à jour",
+      "unableToUpate": "Impossible de mettre à jour l'établissement"
     },
     "members": {
       "title": "Membres - {institutionName}",
@@ -141,5 +149,7 @@
   "add": "Ajouter",
   "cannotDeleteItems": "Impossible de supprimer {count} élement(s)",
   "cannotDeleteItem": "Impossible de supprimer l'élment {id}",
-  "itemsDeleted": "{count} élement(s) supprimé(s)"
+  "itemsDeleted": "{count} élement(s) supprimé(s)",
+  "update": "Mettre à jour",
+  "create": "Créer"
 }

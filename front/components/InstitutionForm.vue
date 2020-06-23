@@ -2,7 +2,7 @@
   <v-dialog v-model="show" width="900">
     <v-card>
       <v-card-title class="headline">
-        Établissement : {{ institution.name }}
+        {{ $t('institutions.institution.title', { institutionName: institution.name }) }}
       </v-card-title>
 
       <v-card-text>
@@ -10,13 +10,13 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <span class="subtitle-1">Établissement :</span>
+                <span class="subtitle-1">{{ $t('institutions.title') }} :</span>
               </v-col>
 
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.name"
-                  label="Nom établissement"
+                  :label="$t('institutions.institution.title')"
                   hide-details
                 />
               </v-col>
@@ -24,7 +24,7 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.shortName"
-                  label="Sigle"
+                  :label="$t('institutions.institution.acronym')"
                   hide-details
                 />
               </v-col>
@@ -32,7 +32,7 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.website"
-                  label="Page d'accueil établissement"
+                  :label="$t('institutions.institution.homepage')"
                   hide-details
                 />
               </v-col>
@@ -40,7 +40,7 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.city"
-                  label="Ville"
+                  :label="$t('institutions.institution.city')"
                   hide-details
                 />
               </v-col>
@@ -48,7 +48,7 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.type"
-                  label="Type d'établissement"
+                  :label="$t('institutions.institution.type')"
                   hide-details
                 />
               </v-col>
@@ -56,8 +56,8 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.uai"
-                  label="UAI"
-                  hint="Unité Administrative Immatriculée."
+                  :label="$t('institutions.institution.uai')"
+                  :hint="$t('institutions.institution.uaiDescription')"
                   persistent-hint
                 />
               </v-col>
@@ -65,7 +65,7 @@
               <v-col cols="12" sm="12">
                 <v-combobox
                   v-model="institution.domains"
-                  label="Domains"
+                  :label="$t('institutions.institution.domains')"
                   multiple
                   small-chips
                   hide-details
@@ -102,17 +102,18 @@
 
                       <v-fade-transition>
                         <v-overlay v-if="hover" absolute>
-                          <div v-if="draggingFile">
-                            Déposez votre image ici
-                          </div>
+                          <div
+                            v-if="draggingFile"
+                            v-text="$t('institutions.institution.dropImageHere')"
+                          />
 
                           <div v-else>
-                            <v-btn v-if="logoPreview || institution.logoId" @click="removeLogo">
-                              Supprimer
-                            </v-btn>
-                            <v-btn @click="$refs.logo.click()">
-                              Modifier
-                            </v-btn>
+                            <v-btn
+                              v-if="logoPreview || institution.logoId"
+                              @click="removeLogo"
+                              v-text="$t('delete')"
+                            />
+                            <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
                           </div>
                         </v-overlay>
                       </v-fade-transition>
@@ -126,7 +127,7 @@
 
             <v-row>
               <v-col cols="12">
-                <span class="subtitle-1">Localisation :</span>
+                <span class="subtitle-1">{{ $t('institutions.institution.localisation') }} :</span>
               </v-col>
 
               <v-col cols="12" sm="6">
@@ -174,7 +175,7 @@
 
             <v-row>
               <v-col cols="12">
-                <span class="subtitle-1">Automatisations :</span>
+                <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
               </v-col>
               <v-col cols="4">
                 <v-checkbox v-model="institution.auto.ezpaarse" label="ezPAARSE" />
@@ -193,9 +194,7 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false">
-          Fermer
-        </v-btn>
+        <v-btn text @click="show = false" v-text="$t('close')" />
 
         <v-btn
           type="submit"
@@ -204,7 +203,7 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? 'Mettre à jour' : 'Créer'"
+          v-text="editMode ? $t('update') : $t('create')"
         />
       </v-card-actions>
     </v-card>
@@ -326,12 +325,12 @@ export default {
         }
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'Impossible de mettre à jour l\'établissement');
+        this.$store.dispatch('snacks/error', this.$t('institutions.institution.unableToUpate'));
         this.saving = false;
         return;
       }
 
-      this.$store.dispatch('snacks/success', 'Établissement mis à jour');
+      this.$store.dispatch('snacks/success', this.$t('institutions.institution.updated'));
       this.saving = false;
       this.show = false;
     },
