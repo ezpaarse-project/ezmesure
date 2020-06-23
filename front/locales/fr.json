@@ -122,13 +122,27 @@
       "documentaryCorrespondent": "Documentaire",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
       "name": "Nom",
-      "correspondent": "Correspondant"
+      "correspondent": "Correspondant",
+      "updated": "Membre mis à jour",
+      "email": "Adresse email *",
+      "emailExample": "ex: john@doe.fr",
+      "thisMemberIs": "Ce membre est un correspondant :",
+      "enterValidEmail": "Veuillez saisir un email valide."
     },
     "sushi": {
       "title": "Identifiants Sushi - {institutionName}",
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
-      "unableToRetriveSushiData": "Impossible de récupérer les informations sushi"
+      "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
+      "platform": "Plateforme *",
+      "enterLabel": "Veuillez saisir un libellé.",
+      "enterPackage": "Veuillez saisir un package",
+      "sushiUrl": "URL Sushi *",
+      "enterUrl": "Veuillez saisir une URL",
+      "enterRequestorId": "Veuillez saisir un Requestor Id.",
+      "enterCustomerId": "Veuillez saisir un Customer Id.",
+      "enterAPIKey": "Veuillez saisir une Clé API.",
+      "comment": "Commentaire"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
@@ -151,5 +165,6 @@
   "cannotDeleteItem": "Impossible de supprimer l'élment {id}",
   "itemsDeleted": "{count} élement(s) supprimé(s)",
   "update": "Mettre à jour",
-  "create": "Créer"
+  "create": "Créer",
+  "informationSubmitted": "Informations transmises"
 }

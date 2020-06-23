@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.sushi', { institutionName: institution.name })">
+    <ToolBar :title="$t('institutions.sushi.title', { institutionName: institution.name })">
       <slot>
         <v-spacer />
         <v-btn

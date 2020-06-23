@@ -122,13 +122,27 @@
       "documentaryCorrespondent": "Documentary",
       "unableToRetriveMembers": "Unable to retrieve members",
       "name": "Name",
-      "correspondent": "Correspondent"
+      "correspondent": "Correspondent",
+      "updated": "Member updated",
+      "email": "Email address *",
+      "emailExample": "e.g. john@doe.fr",
+      "thisMemberIs": "This member is :",
+      "enterValidEmail": "Please enter a valid email."
     },
     "sushi": {
       "title": "Sushi credentials - {institutionName}",
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
-      "unableToRetriveSushiData": "Unable to retrieve sushi information"
+      "unableToRetriveSushiData": "Unable to retrieve sushi information",
+      "platform": "Platform *",
+      "enterLabel": "Please enter a label.",
+      "enterPackage": "Please enter a package",
+      "sushiUrl": "Sushi URL *",
+      "enterUrl": "Please enter an URL",
+      "enterRequestorId": "Please enter a Requestor Id.",
+      "enterCustomerId": "Please enter a Customer Id.",
+      "enterAPIKey": "Please enter an API Key.",
+      "comment": "Comment"
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
@@ -151,5 +165,6 @@
   "cannotDeleteItem": "Cannot remove the element {id}",
   "itemsDeleted": "{count} element(s) deleted",
   "update": "Update",
-  "create": "Create"
+  "create": "Create",
+  "informationSubmitted": "Information submitted"
 }

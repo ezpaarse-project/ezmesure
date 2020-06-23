@@ -12,8 +12,8 @@
                   ref="vendorsBox"
                   v-model="sushiForm.vendor"
                   :items="vendors"
-                  label="Plateforme *"
-                  :rules="[v => !!v || 'Veuillez saisir un libellé.']"
+                  :label="$t('institutions.sushi.platform')"
+                  :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
                   item-text="vendor"
                   outlined
                   required
@@ -27,7 +27,7 @@
                   <v-text-field
                     v-model="sushiForm.package"
                     label="Package *"
-                    :rules="[v => !!v || 'Veuillez saisir un package.']"
+                    :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
                     outlined
                     required
                   />
@@ -36,8 +36,8 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.sushiUrl"
-                    label="URL Sushi *"
-                    :rules="[v => !!v || 'Veuillez saisir une url.']"
+                    :label="$t('institutions.sushi.sushiUrl')"
+                    :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
                     :disabled="!canEditSushiUrl"
                     outlined
                     required
@@ -49,7 +49,8 @@
                     v-model="sushiForm.requestorId"
                     :label="`Requestor Id ${(requiredFields.requestorId ? '*' : '')}`"
                     :rules="[v =>
-                      requiredFields.requestorId ? !!v || 'Veuillez saisir un Requestor Id.' : !v
+                      requiredFields.requestorId ?
+                        !!v || $t('institutions.sushi.enterRequestorId') : !v
                     ]"
                     outlined
                     :required="requiredFields.requestorId"
@@ -61,7 +62,8 @@
                     v-model="sushiForm.customerId"
                     :label="`Customer Id ${(requiredFields.customerId ? '*' : '')}`"
                     :rules="[v =>
-                      requiredFields.customerId ? !!v || 'Veuillez saisir un Customer Id.' : !v
+                      requiredFields.customerId ?
+                        !!v || $t('institutions.sushi.enterCustomerId') : !v
                     ]"
                     outlined
                   />
@@ -70,9 +72,9 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.apiKey"
-                    :label="`Clé API ${(requiredFields.apiKey ? '*' : '')}`"
+                    :label="`API Key ${(requiredFields.apiKey ? '*' : '')}`"
                     :rules="[v =>
-                      requiredFields.apiKey ? !!v || 'Veuillez saisir une Clé API.' : !v
+                      requiredFields.apiKey ? !!v || $t('institutions.sushi.enterAPIKey') : !v
                     ]"
                     outlined
                   />
@@ -81,7 +83,7 @@
                 <v-col cols="12">
                   <v-textarea
                     v-model="sushiForm.comment"
-                    label="Commentaire"
+                    :label="$t('institutions.sushi.comment')"
                     outlined
                   />
                 </v-col>
@@ -105,7 +107,7 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? 'Mettre à jour' : 'Ajouter'"
+          v-text="editMode ? $t('update') : $t('add')"
         />
       </v-card-actions>
     </v-card>
@@ -205,12 +207,12 @@ export default {
         }
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+        this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
         this.saving = false;
         return;
       }
 
-      this.$store.dispatch('snacks/success', 'Informations transmises');
+      this.$store.dispatch('snacks/success', this.$t('informationSubmitted'));
       this.saving = false;
       this.show = false;
     },

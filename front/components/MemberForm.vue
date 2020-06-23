@@ -11,13 +11,13 @@
                 <v-text-field
                   ref="email"
                   :value="memberForm.email"
-                  label="Adresse email *"
+                  :label="$t('institutions.members.email')"
                   type="email"
                   :rules="[
                     v => !!v || '',
-                    v => /.+@.+\..+/.test(v) || 'Veuillez saisir un email valide.',
+                    v => /.+@.+\..+/.test(v) || $t('institutions.members.enterValidEmail'),
                   ]"
-                  placeholder="ex: john@doe.fr"
+                  :placeholder="$t('institutions.members.emailExample')"
                   outlined
                   required
                   disabled
@@ -25,16 +25,16 @@
               </v-col>
 
               <v-col cols="12">
-                <p>Ce membre est un correspondant :</p>
+                <p v-text="$t('institutions.members.thisMemberIs')" />
                 <v-checkbox
                   v-model="memberForm.type"
-                  label="Technique"
+                  :label="$t('institutions.members.technicalCorrespondent')"
                   hide-details
                   value="tech"
                 />
                 <v-checkbox
                   v-model="memberForm.type"
-                  label="Documentaire"
+                  :label="$t('institutions.members.documentaryCorrespondent')"
                   hide-details
                   value="doc"
                 />
@@ -47,9 +47,7 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false">
-          Fermer
-        </v-btn>
+        <v-btn text @click="show = false" v-text="$t('close')" />
 
         <v-btn
           type="submit"
@@ -58,9 +56,8 @@
           text
           :disabled="!valid"
           :loading="saving"
-        >
-          Mettre à jour
-        </v-btn>
+          v-text="$t('update')"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -107,12 +104,12 @@ export default {
         await this.$axios.$patch(`/institutions/${this.institutionId}/members/${this.memberForm.email}`, this.memberForm);
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', 'L\'envoi du formulaire a échoué');
+        this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
         this.saving = false;
         return;
       }
 
-      this.$store.dispatch('snacks/success', 'Membre mis à jour');
+      this.$store.dispatch('snacks/success', this.$t('institutions.members.updated'));
       this.saving = false;
       this.show = false;
     },
