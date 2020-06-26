@@ -11,6 +11,10 @@
   },
   "servers": [
     {
+      "url": "/api",
+      "description": "Current server"
+    },
+    {
       "url": "https://ezmesure.couperin.org/api",
       "description": "Production server"
     },
