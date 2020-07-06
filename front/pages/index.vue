@@ -54,7 +54,7 @@
 
         <v-flex xs12 class="text-center">
           <v-btn
-            :to="localePath('/partners')"
+            to="/partners"
             large
             class="white primary--text"
             v-text="$t('home.discoverOurPartners')"

@@ -12,7 +12,7 @@
         v-for="link in links"
         :key="link.title"
         router
-        :to="localePath({ path: link.href })"
+        :to="{ path: link.href }"
       >
         <v-list-item-content>
           <v-list-item-title class="grey--text text--darken-3 uppercase">
@@ -36,7 +36,7 @@
           :key="child.title"
           router
           exact
-          :to="localePath({ path: `${institution.href}${child.href}` })"
+          :to="{ path: `${institution.href}${child.href}` }"
           ripple
         >
           <v-list-item-title
@@ -62,7 +62,7 @@
           :key="child.title"
           router
           exact
-          :to="localePath({ path: `${administration.href}${child.href}` })"
+          :to="{ path: `${administration.href}${child.href}` }"
           ripple
         >
           <v-list-item-title

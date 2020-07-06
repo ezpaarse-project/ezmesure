@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app clipped-left dark color="primary">
     <router-link
-      :to="localePath('/')"
+      to="/"
       :aria-label="$t('menu.homepage')"
       :title="$t('menu.homepage')"
     >
@@ -22,11 +22,11 @@
     <v-spacer />
 
     <v-toolbar-items class="hidden-sm-and-down">
-      <v-btn text exact :to="localePath('/')" v-text="$t('menu.home')" />
+      <v-btn text exact to="/" v-text="$t('menu.home')" />
       <v-btn text href="/kibana/" v-text="$t('menu.dashboard')" />
-      <v-btn text :to="localePath('/myspace')" v-text="$t('menu.myspace')" />
-      <v-btn text exact :to="localePath('/partners')" v-text="$t('menu.partners')" />
-      <v-btn text exact :to="localePath('/api')" v-text="$t('menu.api')" />
+      <v-btn text to="/myspace" v-text="$t('menu.myspace')" />
+      <v-btn text exact to="/partners" v-text="$t('menu.partners')" />
+      <v-btn text exact to="/api" v-text="$t('menu.api')" />
 
       <v-menu tilev-model="chooseLanguage" offset-y>
         <template v-slot:activator="{ on, value }">
@@ -48,8 +48,8 @@
             v-for="locale in $i18n.locales"
             :key="locale.code"
             router
-            :to="switchLocalePath(locale.code)"
             ripple
+            @click="$i18n.setLocale(locale.code)"
           >
             <v-img :src="require(`@/static/images/${locale.code}.png`)" width="24" class="mr-2" />
             <v-list-item-title>
@@ -70,19 +70,19 @@
       <v-list>
         <v-subheader v-text="$t('menu.navigateTo')" />
 
-        <v-list-item exact :to="localePath('/')" @click="sheet = false">
+        <v-list-item exact to="/" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.home')" />
         </v-list-item>
         <v-list-item href="/kibana/" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.dashboard')" />
         </v-list-item>
-        <v-list-item exact :to="localePath('/myspace')" @click="sheet = false">
+        <v-list-item exact to="/myspace" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.myspace')" />
         </v-list-item>
-        <v-list-item exact :to="localePath('/partners')" @click="sheet = false">
+        <v-list-item exact to="/partners" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.partners')" />
         </v-list-item>
-        <v-list-item exact :to="localePath('/api')" @click="sheet = false">
+        <v-list-item exact to="/api" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.api')" />
         </v-list-item>
       </v-list>
