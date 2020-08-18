@@ -30,7 +30,7 @@ router.route({
     },
     query: {
       fields: Joi.string().required().trim().min(1),
-      platform: Joi.string().trim(),
+      filter: Joi.string().trim(),
       delimiter: Joi.string().trim(),
       from: Joi.string(),
       to: Joi.string(),
