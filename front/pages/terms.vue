@@ -73,9 +73,7 @@
 
 <script>
 export default {
-  async fetch({ store }) {
-    await store.dispatch('auth/checkAuth');
-  },
+  middleware: ['auth'],
   data() {
     return {
       pleaseAccept: false,
@@ -97,7 +95,8 @@ export default {
       this.loading = true;
 
       try {
-        await this.$store.dispatch('auth/acceptTerms');
+        await this.$axios.$post('/profile/terms/accept');
+        await this.$auth.fetchUser();
         this.$router.replace({ path: '/myspace' });
       } catch (e) {
         this.error = true;

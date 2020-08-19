@@ -291,7 +291,6 @@
                         ref="token"
                         label="Token"
                         :value="token"
-                        :rules="[() => ('The email and password you entered don\'t match')]"
                         hide-details
                         readonly
                         outlined
@@ -329,13 +328,11 @@ export default {
     FileList,
     FileUploader,
   },
-  async fetch({ store, redirect, route }) {
-    await store.dispatch('auth/checkAuth');
-    const { user } = store.state.auth;
+  middleware: ['auth'],
+  async fetch({ $auth, redirect }) {
+    const acceptedTerms = $auth.user && $auth.user.metadata && $auth.user.metadata.acceptedTerms;
 
-    if (!user) {
-      redirect('/authenticate', { origin: route.fullPath });
-    } else if (!user.metadata.acceptedTerms) {
+    if (!acceptedTerms) {
       redirect('/terms');
     }
   },
@@ -353,17 +350,24 @@ export default {
       resetErrorText: '',
       refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
       selectedFiles: [],
+      token: '',
     };
   },
   computed: {
-    user() { return this.$store.state.auth.user; },
+    user() { return this.$auth.user; },
     metadata() { return (this.user && this.user.metadata) || {}; },
-    token() { return this.$store.state.auth.token; },
     nbSelectedFiles() { return this.selectedFiles.length; },
     hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
     clipboardAvailable() {
       return navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
     },
+  },
+  async mounted() {
+    try {
+      this.token = await this.$axios.$get('/profile/token');
+    } catch (e) {
+      this.$store.dispatch('snacks/error', 'Impossible de récupérer le token d\'authentification');
+    }
   },
   methods: {
     async copyTokenToClipboard() {
@@ -394,7 +398,7 @@ export default {
       this.resettingPassword = true;
 
       try {
-        await this.$store.dispatch('auth/resetPassword');
+        await this.$axios.$put('/profile/password/reset');
         this.resetSuccess = true;
       } catch (e) {
         this.resetError = true;
