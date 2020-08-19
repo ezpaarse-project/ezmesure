@@ -16,7 +16,7 @@
     "nuxt": "^2.12.2",
     "papaparse": "^5.1.0",
     "pretty-bytes": "^5.2.0",
-    "swagger-ui": "^3.23.1"
+    "swagger-ui": "^3.23.11"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.2",
