@@ -24,7 +24,7 @@
         <v-spacer />
         <v-divider />
 
-        <v-tab class="red--text" href="/Shibboleth.sso/Logout?return=/logout">
+        <v-tab class="red--text" :href="logoutUrl">
           Déconnexion
         </v-tab>
 
@@ -336,7 +336,7 @@ export default {
       redirect('/terms');
     }
   },
-  data() {
+  asyncData({ env }) {
     const currentLocation = encodeURIComponent(window.location.href);
 
     return {
@@ -349,6 +349,7 @@ export default {
       resetError: null,
       resetErrorText: '',
       refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
+      logoutUrl: env.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout',
       selectedFiles: [],
       token: '',
     };
