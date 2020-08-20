@@ -16,7 +16,10 @@ fi
 
 # Allow shibboleth to write in a mounted volume
 chown -R _shibd:_shibd /var/cache/shibboleth
-/etc/init.d/shibd start
+
+if [[ -z "$EZMESURE_DISABLE_SHIBBOLETH" ]]; then
+  /etc/init.d/shibd start
+fi
 
 # Apache gets grumpy about pre-existing PID files
 rm -f /var/run/apache2/apache2.pid

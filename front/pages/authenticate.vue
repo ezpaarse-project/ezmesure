@@ -20,7 +20,7 @@
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 
-          <v-expansion-panels accordion :value="1">
+          <v-expansion-panels accordion :value="shibbolethEnabled ? 1 : 0">
             <v-expansion-panel>
               <v-expansion-panel-header>
                 <div>
@@ -82,7 +82,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
 
-            <v-expansion-panel>
+            <v-expansion-panel v-if="shibbolethEnabled">
               <v-expansion-panel-header>
                 <div>
                   <img
@@ -117,7 +117,7 @@
 <script>
 export default {
   middleware: ['auth'],
-  data() {
+  asyncData({ env }) {
     return {
       username: '',
       password: '',
@@ -126,6 +126,7 @@ export default {
       loginFormValid: true,
       connecting: false,
       showPassword: false,
+      shibbolethEnabled: env.shibbolethEnabled,
     };
   },
   methods: {

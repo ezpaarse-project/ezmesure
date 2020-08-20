@@ -21,6 +21,9 @@ module.exports = {
     'swagger-ui/dist/swagger-ui.css',
   ],
   mode: 'spa',
+  env: {
+    shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
+  },
   modules: [
     ['@nuxtjs/proxy', {
       pathRewrite: {
@@ -61,7 +64,7 @@ module.exports = {
         tokenRequired: false,
         endpoints: {
           login: { url: '/login/local', method: 'post', propertyName: false },
-          logout: { url: '/logout', method: 'post' },
+          logout: { url: '/logout', method: 'get' },
           user: { url: '/profile', method: 'get', propertyName: false },
         },
       },

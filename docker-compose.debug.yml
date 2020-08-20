@@ -72,6 +72,7 @@ services:
     working_dir: /usr/src/app
     environment:
       - API_URL=https://${EZMESURE_DOMAIN}/api
+      - EZMESURE_DISABLE_SHIBBOLETH
       - HOST=0.0.0.0
       - PORT=8080
     command: npm run dev
