@@ -1,4 +1,4 @@
-<SecurityPolicies xmlns="urn:mace:shibboleth:2.0:native:sp:config">
+<SecurityPolicies xmlns="urn:mace:shibboleth:3.0:native:sp:config">
 
     <!-- Each policy defines a set of rules to use to secure messages. -->
 
@@ -26,7 +26,7 @@
         <PolicyRule type="Conditions"/>
         <PolicyRule type="XMLSigning" errorFatal="true"/>
     </Policy>
-    
+
     <!-- Disables known weak algorithms. -->
     <AlgorithmBlacklist includeDefaultBlacklist="true"/>
 

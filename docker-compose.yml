@@ -122,6 +122,7 @@ services:
     volumes:
       - ./rp/shibboleth:/etc/shibboleth
       - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
+      - ./rp/apache2/ssl:/etc/ssl/certificates
       - ./rp/apache2/sites-available:/etc/apache2/sites-available
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth

@@ -32,8 +32,7 @@ module.exports = {
       credentials: true,
       proxy: true,
     }],
-  ],
-  devModules: [
+    '@nuxtjs/auth',
     ['@nuxtjs/vuetify', {
       lang: {
         locales: { fr },
@@ -50,6 +49,24 @@ module.exports = {
       },
     }],
   ],
+  auth: {
+    redirect: {
+      login: '/authenticate',
+      logout: '/',
+      home: '/',
+    },
+    fullPathRedirect: false,
+    strategies: {
+      local: {
+        tokenRequired: false,
+        endpoints: {
+          login: { url: '/login/local', method: 'post', propertyName: false },
+          logout: { url: '/logout', method: 'post' },
+          user: { url: '/profile', method: 'get', propertyName: false },
+        },
+      },
+    },
+  },
   /*
   ** Customize the progress-bar color
   */

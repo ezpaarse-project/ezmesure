@@ -14,10 +14,13 @@ https://ezmesure.couperin.org
 
 ## Configuration
 
-1) Put the private key (``server.key``) and the certificate (``server.crt``) used to declare the service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
+1) Put the certificate (``server.crt``) and private key (``server.key``) used to declare the Shibboleth service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
 **NB**: the private key is critical and should not be shared.
 
-2) Set the following environment variables :
+2) Put the SSL certificate (``server.pem``) and private key (``server.key``) in ``rp/apache2/ssl``. Optional if ezMESURE runs behind proxy which takes care of handling HTTPS.
+**NB**: you can use [mkcert](https://github.com/FiloSottile/mkcert) for local development
+
+3) Set the following environment variables :
 - APPLI_APACHE_SERVERNAME
 - APPLI_APACHE_SERVERADMIN
 - APPLI_APACHE_LOGLEVEL
@@ -27,17 +30,17 @@ https://ezmesure.couperin.org
 
 **NB**: you can set them in `ezmesure.local.env.sh` and source `ezmesure.env.sh`.
 
-3) Configure shibboleth
+4) Configure shibboleth
 ```bash
   make config
 ```
-4) For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. If you don't have them yet, you can generate certificates by following these steps :
+5) For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. If you don't have them yet, you can generate certificates by following these steps :
   - Open the `certs` directory.
   - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file.
   - Run `docker-compose -f create-certs.yml up`.
   - A `certificates` directory should be created, you can just put it in both `elasticsearch/config/` and `kibana/config/`. (**NB**: you may need to `chown` it)
 
-5) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
+6) The authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
 ```
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
