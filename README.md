@@ -61,12 +61,6 @@ then apply the changes :
 sysctl -p
 ```
 
-## Plugins installation
-```
-make plugins
-docker-compose build kibana
-```
-
 ## Start
 ```bash
   docker-compose up -d
