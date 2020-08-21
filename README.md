@@ -66,7 +66,7 @@ For each node in the cluster, add certificates in `elasticsearch/config/certific
   - Run `docker-compose -f create-certs.yml up`.
   - A `certificates` directory should be created, you can just put it in both `elasticsearch/config/` and `kibana/config/`. (**NB**: you may need to `chown` it)
 
-### Setup local DNS (for dev only)
+### 4. Setup local DNS (for dev only)
 
 The Shibboleth authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts` :
 
@@ -74,7 +74,7 @@ The Shibboleth authentication process requires the user to be located at `ezmesu
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
 
-### Adjust system configuration for Elasticsearch
+### 5. Adjust system configuration for Elasticsearch
 
 Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
 
