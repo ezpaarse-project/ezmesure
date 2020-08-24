@@ -162,7 +162,7 @@ async function generateReport(task) {
     return;
   }
 
-  logger.info(`${taskId} : sending mail`);
+  logger.info(`${taskId}: sending mail`);
 
   const dashboardUrl = `${kibana.external}/${taskSource.space ? `s/${taskSource.space}/` : ''}app/kibana#/dashboard/${taskSource.dashboardId}`;
   const dashboardTitle = (dashboard && dashboard.dashboard && dashboard.dashboard.title) || '';
