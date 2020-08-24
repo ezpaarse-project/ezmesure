@@ -20,9 +20,9 @@ ezMESURE uses an Apache reverse proxy which communicates with HTTPS only. Put th
 
 **NB**: you can use [mkcert](https://github.com/FiloSottile/mkcert) for local development
 
-### 2. Set the following environment variables
+### 2. Setup environment
 
-An environment file named `ezmesure.env.sh` , which contains a set of predefined settings.
+Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overriden by `ezmesure.local.env.sh`.
 
 | name | description |
 |------|-------------|
