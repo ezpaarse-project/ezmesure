@@ -140,4 +140,4 @@ Now you can access the Kibana instance on https://localhost/kibana/ and start bu
 
 ## API
 
-The ezMESURE API is documented here : https://localhost/api
+The ezMESURE API is documented here : https://localhost/api-reference

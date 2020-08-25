@@ -34,7 +34,7 @@
       <v-btn text exact to="/partners">
         Nos partenaires
       </v-btn>
-      <v-btn text exact to="/api">
+      <v-btn text exact to="/api-reference">
         API
       </v-btn>
     </v-toolbar-items>
@@ -61,7 +61,7 @@
         <v-list-item exact to="/partners" @click="sheet = false">
           <v-list-item-title>Nos partenaires</v-list-item-title>
         </v-list-item>
-        <v-list-item exact to="/api" @click="sheet = false">
+        <v-list-item exact to="/api-reference" @click="sheet = false">
           <v-list-item-title>API</v-list-item-title>
         </v-list-item>
       </v-list>
