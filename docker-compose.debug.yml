@@ -72,7 +72,8 @@ services:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
+      - API_URL=https://${EZMESURE_DOMAIN}/api
+      - EZMESURE_DISABLE_SHIBBOLETH
       - HOST=0.0.0.0
       - PORT=8080
       - EZMESURE_ENCRYPTION_SECRET

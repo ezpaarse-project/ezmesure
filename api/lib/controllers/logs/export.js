@@ -2,6 +2,7 @@
 const { PassThrough } = require('stream');
 const crypto = require('crypto');
 const Papa = require('papaparse');
+const rison = require('rison-node');
 const elastic = require('../../services/elastic');
 
 exports.aggregate = async function aggregate(ctx) {
@@ -10,7 +11,7 @@ exports.aggregate = async function aggregate(ctx) {
     fields: rawFields = '',
     from,
     to,
-    platform,
+    filter: filterString,
     delimiter = ';',
     missing = true,
   } = ctx.request.query;
@@ -27,14 +28,50 @@ exports.aggregate = async function aggregate(ctx) {
     return;
   }
 
-  const filter = [];
+  const bool = { filter: [], must_not: [] };
 
-  if (platform) {
-    filter.push({ term: { platform } });
+  if (filterString) {
+    let filterParam;
+    try {
+      filterParam = rison.decode_object(filterString);
+    } catch (e) {
+      ctx.throw(400, 'filter has an invalid rison format');
+      return;
+    }
+
+    Object.entries(filterParam).every(([key, val]) => {
+      let value = val;
+      let negate = false;
+
+      if (typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'not')) {
+        // platform:(not:wiley)
+        value = value.not;
+        negate = true;
+      }
+
+      const filter = bool[(negate ? 'must_not' : 'filter')];
+
+      if (['string', 'number'].includes(typeof value)) {
+        // platform:wiley
+        // status:200
+        filter.push({ term: { [key]: value } });
+      } else if (Array.isArray(value) && value.every((v) => ['string', 'number'].includes(typeof v))) {
+        // platform:!(wiley,sd)
+        // status:!(200, 304)
+        filter.push({ terms: { [key]: value } });
+      } else if (typeof value === 'object' && Object.keys(value).every((v) => ['gt', 'gte', 'lt', 'lte'].includes(v))) {
+        // status:(gte:200,lt:400)
+        filter.push({ range: { [key]: value } });
+      } else {
+        ctx.throw(400, `invalid filter: '${key}' should be either a string or an array of strings`);
+        return false;
+      }
+      return true;
+    });
   }
 
   if (from || to) {
-    filter.push({
+    bool.filter.push({
       range: {
         datetime: {
           gte: from,
@@ -59,7 +96,7 @@ exports.aggregate = async function aggregate(ctx) {
       index,
       body: {
         size: 0,
-        query: filter.length > 0 ? { bool: { filter } } : undefined,
+        query: { bool },
         aggs: {
           main: {
             composite: {

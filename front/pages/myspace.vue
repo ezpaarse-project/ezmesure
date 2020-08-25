@@ -89,11 +89,14 @@ export default {
   components: {
     ToolBar,
   },
-  data() {
+  asyncData({ env }) {
     const currentLocation = encodeURIComponent(window.location.href);
 
     return {
       refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
+      logoutUrl: env.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout',
+      selectedFiles: [],
+      token: '',
     };
   },
   computed: {

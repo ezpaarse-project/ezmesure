@@ -1,5 +1,5 @@
-<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
-    xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+<SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
+    xmlns:conf="urn:mace:shibboleth:3.0:native:sp:config"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -44,44 +44,8 @@
               SAML2 SAML1
             </SSO>
 
-            <!-- [TEST OK] SP de TestShib https://www.testshib.org/configure.html -->
-            <!-- <SSO entityID="https://idp.testshib.org/idp/shibboleth">SAML2 SAML1</SSO> -->
-
-            <!--
-            md:AssertionConsumerService locations handle specific SSO protocol bindings,
-            such as SAML 2.0 POST or SAML 1.1 Artifact. The isDefault and index attributes
-            are used when sessions are initiated to determine how to tell the IdP where and
-            how to return the response.
-            -->
-            <md:AssertionConsumerService Location="/SAML2/POST" index="1"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
-            <md:AssertionConsumerService Location="/SAML2/POST-SimpleSign" index="2"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign"/>
-            <md:AssertionConsumerService Location="/SAML2/Artifact" index="3"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"/>
-            <md:AssertionConsumerService Location="/SAML2/ECP" index="4"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS"/>
-            <md:AssertionConsumerService Location="/SAML/POST" index="5"
-                Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post"/>
-            <md:AssertionConsumerService Location="/SAML/Artifact" index="6"
-                Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01"/>
-
-            <!-- LogoutInitiators enable SP-initiated local or global/single logout of sessions. -->
-            <LogoutInitiator type="Chaining" Location="/Logout" relayState="cookie">
-                <LogoutInitiator type="Global" />
-                <LogoutInitiator type="SAML2" template="bindingTemplate.html"/>
-                <LogoutInitiator type="Local" />
-            </LogoutInitiator>
-
-            <!-- md:SingleLogoutService locations handle single logout (SLO) protocol messages. -->
-            <md:SingleLogoutService Location="/SLO/SOAP"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"/>
-            <md:SingleLogoutService Location="/SLO/Redirect" conf:template="bindingTemplate.html"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"/>
-            <md:SingleLogoutService Location="/SLO/POST" conf:template="bindingTemplate.html"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
-            <md:SingleLogoutService Location="/SLO/Artifact" conf:template="bindingTemplate.html"
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"/>
+            <!-- SAML and local-only logout. -->
+            <Logout>SAML2 Local</Logout>
 
             <!-- md:ManageNameIDService locations handle NameID management (NIM) protocol messages. -->
             <md:ManageNameIDService Location="/NIM/SOAP"
@@ -92,9 +56,6 @@
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
             <md:ManageNameIDService Location="/NIM/Artifact" conf:template="bindingTemplate.html"
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"/>
-
-            <!-- SAML and local-only logout. -->
-            <!-- <Logout>SAML2 Local</Logout> -->
 
             <!-- Extension service that generates "approximate" metadata based on SP configuration. -->
             <Handler type="MetadataGenerator" Location="/Metadata" signing="false"/>
@@ -125,24 +86,20 @@
         -->
         <MetadataProvider type="Chaining">
             <!-- Metadonnées de la fédération RENATER apres le 5/12/16 -->
-	        <MetadataProvider type="XML" uri="https://metadata.federation.renater.fr/renater/main/main-idps-renater-metadata.xml"
-                backingFilePath="main-idps-renater-metadata.xml" reloadInterval="3600">
+	        <MetadataProvider type="XML" url="https://metadata.federation.renater.fr/renater/main/main-idps-renater-metadata.xml"
+                backingFilePath="/var/cache/shibboleth/main-idps-renater-metadata.xml" reloadInterval="3600">
                 <MetadataFilter type="Signature" certificate="renater-metadata-signing-cert-2016.pem"/>
             </MetadataProvider>
 
-            <!-- Metadonnées de TestShib https://www.testshib.org/configure.html -->
-            <MetadataProvider type="XML" uri="http://www.testshib.org/metadata/testshib-providers.xml"
-                backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
-
             <!-- Metadonnées des comptes CRU https://services.renater.fr/federation/participants/sac/faq -->
             <MetadataProvider type="XML" url="https://cru.renater.fr/idp/shibboleth"
-                backingFilePath="sac-metadata.xml" reloadInterval="7200" />
+                backingFilePath="/var/cache/shibboleth/sac-metadata.xml" reloadInterval="7200" />
         </MetadataProvider>
 
 
         <!-- Example of locally maintained metadata. -->
         <!--
-        <MetadataProvider type="XML" file="partner-metadata.xml"/>
+        <MetadataProvider type="XML" path="partner-metadata.xml"/>
         -->
 
         <!-- Map to extract attributes from SAML assertions. -->

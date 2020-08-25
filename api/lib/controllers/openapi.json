@@ -11,6 +11,10 @@
   },
   "servers": [
     {
+      "url": "/api",
+      "description": "Current server"
+    },
+    {
       "url": "https://ezmesure.couperin.org/api",
       "description": "Production server"
     },
@@ -872,7 +876,7 @@
               "type": "string",
               "example": "univ-foobar"
             },
-            "description": "the index that contains the consultations to be aggregated",
+            "description": "The index that contains the consultations to be aggregated",
             "required": true
           },
           {
@@ -882,13 +886,13 @@
               "type": "string",
               "enum": ["csv", "ndjson"]
             },
-            "description": "the export format",
+            "description": "The export format",
             "required": true
           },
           {
             "in": "query",
             "name": "fields",
-            "description": "comma-separated list of fields that should be aggregated",
+            "description": "Comma-separated list of fields that should be aggregated",
             "schema": {
               "type": "string",
               "example": "rtype,mime"
@@ -907,6 +911,7 @@
           {
             "in": "query",
             "name": "from",
+            "description": "Start date of the period to be aggregated",
             "schema": {
               "type": "string",
               "example": "2020-01-01"
@@ -915,6 +920,7 @@
           {
             "in": "query",
             "name": "to",
+            "description": "End date of the period to be aggregated",
             "schema": {
               "type": "string",
               "example": "2020-12-31"
@@ -922,17 +928,38 @@
           },
           {
             "in": "query",
-            "name": "platform",
-            "description": "filter aggregations for a specific platform",
+            "name": "filter",
+            "description": "A list of filters in O-Rison format, that should be applied before performing the aggregation",
             "schema": {
-              "type": "string",
-              "example": "wiley"
+              "type": "string"
+            },
+            "examples": {
+              "simple": {
+                "value": "platform:wiley,status:200",
+                "summary": "Single value",
+                "description": "Filter a single value by specifying a field and a value. Strings containing spaces should be surrounded by simple quotes `'`."
+              },
+              "multiple": {
+                "value": "platform:!(wiley,cairn),status:!(200,304)",
+                "summary": "Multiple values",
+                "description": "Filter multiple values by placing them inside `!( )`."
+              },
+              "range": {
+                "value": "status:(gte:200,lt:400)",
+                "summary": "Numeric range",
+                "description": "Filter a numeric range by using `gt`/`gte`/`lt`/`lte` inside `( )`."
+              },
+              "negate": {
+                "value": "platform:(not:wiley)",
+                "summary": "Negate filter",
+                "description": "Negate a filter by placing it inside `(not: )`"
+              }
             }
           },
           {
             "in": "query",
             "name": "delimiter",
-            "description": "Delimiter for the CSV output. Use 'tab' to get tab-seperated values.",
+            "description": "Delimiter for the CSV output. Use `tab` to get tab-seperated values.",
             "schema": {
               "type": "string",
               "example": ","

@@ -10,7 +10,6 @@ const { renaterLogin, elasticLogin, logout } = require('./auth/auth');
 const logs = require('./logs');
 const files = require('./files');
 const authorize = require('./auth');
-const providers = require('./providers');
 const partners = require('./partners');
 const metrics = require('./metrics');
 const institutions = require('./institutions');
@@ -59,8 +58,5 @@ app.use(metrics.prefix('/metrics').middleware());
 app.use(authorize.prefix('/profile').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
-app.use(providers.prefix('/providers').middleware());
-app.use(institutions.prefix('/institutions').middleware());
-app.use(sushi.prefix('/sushi').middleware());
 
 module.exports = app;

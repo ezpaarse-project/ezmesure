@@ -26,7 +26,7 @@
       <v-btn text href="/kibana/" v-text="$t('menu.dashboard')" />
       <v-btn text to="/myspace" v-text="$t('menu.myspace')" />
       <v-btn text exact to="/partners" v-text="$t('menu.partners')" />
-      <v-btn text exact to="/api" v-text="$t('menu.api')" />
+      <v-btn text exact to="/api-reference" v-text="$t('menu.api')" />
 
       <v-menu tilev-model="chooseLanguage" offset-y>
         <template v-slot:activator="{ on, value }">
@@ -82,7 +82,7 @@
         <v-list-item exact to="/partners" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.partners')" />
         </v-list-item>
-        <v-list-item exact to="/api" @click="sheet = false">
+        <v-list-item exact to="/api-reference" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.api')" />
         </v-list-item>
       </v-list>

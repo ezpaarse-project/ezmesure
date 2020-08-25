@@ -97,10 +97,11 @@ services:
       args:
         - http_proxy
         - https_proxy
+        - EZMESURE_DISABLE_SHIBBOLETH
     ports:
       - 8080:8080
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
+      - API_URL=https://${EZMESURE_DOMAIN}/api
       - PORT=8080
       - HOST=0.0.0.0
       - EZMESURE_ENCRYPTION_SECRET
@@ -120,10 +121,12 @@ services:
       - APPLI_APACHE_SERVERNAME
       - APPLI_APACHE_SERVERADMIN
       - APPLI_APACHE_LOGLEVEL
+      - EZMESURE_DISABLE_SHIBBOLETH
     working_dir: /var/www/html
     volumes:
       - ./rp/shibboleth:/etc/shibboleth
       - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
+      - ./rp/apache2/ssl:/etc/ssl/certificates
       - ./rp/apache2/sites-available:/etc/apache2/sites-available
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth
