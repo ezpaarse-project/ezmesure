@@ -24,3 +24,6 @@ stop: ## stop ezMESURE using environment variables
 cleanup-docker: ## remove docker image (needed for updating it)
 	docker-compose stop
 	docker-compose rm -f
+
+plugins: ## build plugin zip
+	./kibana/plugins/build.sh
