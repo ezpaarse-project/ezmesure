@@ -58,5 +58,7 @@ app.use(metrics.prefix('/metrics').middleware());
 app.use(authorize.prefix('/profile').middleware());
 app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
+app.use(institutions.prefix('/institutions').middleware());
+app.use(sushi.prefix('/sushi').middleware());
 
 module.exports = app;
