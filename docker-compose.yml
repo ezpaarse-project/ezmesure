@@ -41,7 +41,7 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - no_proxy
+      - no_proxy=reporting
       - ELASTICSEARCH_PASSWORD
       - ELASTICSEARCH_USERNAME
       - SERVER_BASEPATH
