@@ -45,7 +45,7 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
 
     // Back to ....... link
     core.application.register({
-      id: `${PLUGIN_APP_NAME.toLocaleLowerCase()}_back`,
+      id: `${PLUGIN_ID}_back`,
       title: `Back to ${PLUGIN_APP_NAME}`,
       euiIconType: 'editorUndo',
       category: EZMESURE_CATEGORY,
