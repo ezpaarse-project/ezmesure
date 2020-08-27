@@ -2,6 +2,8 @@
 
 cd ./kibana/plugins
 
+rm -rf kibana.zip
+
 PLUGINS=$(ls ./ -1p | grep '/$' | sed 's/\/$//')
 echo -e "Plugins found: \033[1m${PLUGINS//[$'\t\r\n']/ }\033[0m"
 
