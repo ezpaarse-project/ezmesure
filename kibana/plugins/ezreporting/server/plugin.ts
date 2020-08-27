@@ -29,7 +29,7 @@ import { EzreportingPluginSetup, EzreportingPluginStart } from './types';
 import { defineRoutes } from './routes';
 import { PluginSetupContract as FeaturesPluginSetup } from '../../../x-pack/plugins/features/server';
 
-import { PLUGIN_NAME, PLUGIN_ID, PLUGIN_ICON } from '../common';
+import { PLUGIN_NAME, PLUGIN_ID, PLUGIN_ICON, PLUGIN_APP_NAME } from '../common';
 
 export interface EzReportingDeps {
   features: FeaturesPluginSetup;
@@ -53,7 +53,7 @@ export class EzreportingPlugin
 
     features.registerFeature({
       id: PLUGIN_ID,
-      name: process.env.REPORTING_NAME || PLUGIN_NAME,
+      name: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}`,
       icon: PLUGIN_ICON,
       app: [PLUGIN_ID, 'kibana'],
       catalogue: [PLUGIN_ID],

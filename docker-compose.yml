@@ -152,7 +152,6 @@ services:
       - KIBANA_INTERNAL_URL=https://rp/kibana
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
-      - REPORTING_NAME
     links:
       - elastic
     volumes:

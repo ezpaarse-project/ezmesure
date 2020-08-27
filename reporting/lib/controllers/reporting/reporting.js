@@ -2,7 +2,6 @@ const {
   index,
   historyIndex,
   frequencies,
-  reportingName,
 } = require('config');
 const logger = require('../../logger');
 const elastic = require('../../services/elastic');
@@ -173,7 +172,6 @@ exports.list = async (ctx) => {
     tasks,
     dashboards,
     frequencies,
-    reportingName,
   };
 };
 

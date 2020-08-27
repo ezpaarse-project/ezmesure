@@ -35,7 +35,7 @@ import {
 
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 
-import { PLUGIN_ID } from '../../common';
+import { PLUGIN_ID, PLUGIN_APP_NAME, PLUGIN_NAME } from '../../common';
 import { EzreportingTable } from './table';
 import {
   EzreportingTaskEditFlyout,
@@ -269,7 +269,7 @@ export class EzreportingApp extends Component<EzreportingAppDeps, EzreportingApp
                           <FormattedMessage
                             id="ezreporting.title"
                             defaultMessage="{name}"
-                            values={{ name: reportingName }}
+                            values={{ name: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}` }}
                           />
                         </h2>
                       </EuiTitle>

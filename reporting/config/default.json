@@ -1,6 +1,4 @@
 {
-  "reportingName": "Reporting",
-  "pluginName": "ezreporting",
   "port": 3000,
   "kibana": {
     "internal": "http://localhost:5601",

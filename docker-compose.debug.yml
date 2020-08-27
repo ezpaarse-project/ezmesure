@@ -23,7 +23,6 @@ services:
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
       - REPORTING_URL=http://reporting:3000
-      - REPORTING_NAME=Reporting ezMESURE
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -109,7 +108,6 @@ services:
       - NODE_CONFIG
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
       - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - REPORTING_NAME=Reporting ezMESURE
     restart: "no"
     command: npm run dev
 

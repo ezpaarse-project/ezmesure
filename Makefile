@@ -26,4 +26,7 @@ cleanup-docker: ## remove docker image (needed for updating it)
 	docker-compose rm -f
 
 plugins: ## build plugin zip
+	sed -e "s|{{EZMESURE_APPLICATION_NAME}}|${EZMESURE_APPLICATION_NAME}|" \
+		./kibana/plugins/ezreporting/common/index.dist.ts > ./kibana/plugins/ezreporting/common/index.ts ; 
 	./kibana/plugins/build.sh
+	
