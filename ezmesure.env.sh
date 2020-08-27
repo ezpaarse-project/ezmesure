@@ -4,6 +4,7 @@ EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
 export EZMESURE_DOMAIN="ezmesure-preprod.couperin.org"
+export EZMESURE_APPLICATION_NAME="ezMESURE"
 
 export APPLI_APACHE_SERVERADMIN="ezpaarse@couperin.org"
 export APPLI_APACHE_LOGLEVEL="info ssl:warn"
