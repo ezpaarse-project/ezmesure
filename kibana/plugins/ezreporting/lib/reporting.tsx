@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import { PLUGIN_ID } from '../common';
+
 export const convertFrequency = (frequencies, frequency) => {
   const freq = frequencies.find(({ value }) => value === frequency);
   return freq ? freq.text : 'Error';
@@ -71,5 +73,5 @@ export function setToasts(notifications) {
 export let capabilities;
 
 export function setCapabilities(capa) {
-  capabilities = capa.ezreporting || {};
+  capabilities = capa[PLUGIN_ID] || {};
 }

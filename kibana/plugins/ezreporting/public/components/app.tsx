@@ -247,6 +247,20 @@ export class EzreportingApp extends Component<EzreportingAppDeps, EzreportingApp
       );
     }
 
+    let createBtn;
+    if (capabilities.create) {
+      createBtn = (
+        <EuiButton
+          fill
+          iconType="plusInCircle"
+          isDisabled={dashboards.length > 0 ? false : true}
+          onClick={() => (dashboards.length > 0 ? openEditFlyOut(null, false) : null)}
+        >
+          <FormattedMessage id="ezreporting.createNewTask" defaultMessage="New reporting task" />
+        </EuiButton>
+      );
+    }
+
     return (
       <Router basename={basename}>
         <EzreportingTaskEditFlyout
@@ -275,19 +289,7 @@ export class EzreportingApp extends Component<EzreportingAppDeps, EzreportingApp
                       </EuiTitle>
                     </EuiPageContentHeaderSection>
 
-                    <EuiPageContentHeaderSection>
-                      <EuiButton
-                        fill
-                        iconType="plusInCircle"
-                        isDisabled={dashboards.length > 0 ? false : true}
-                        onClick={() => (dashboards.length > 0 ? openEditFlyOut(null, false) : null)}
-                      >
-                        <FormattedMessage
-                          id="ezreporting.createNewTask"
-                          defaultMessage="New reporting task"
-                        />
-                      </EuiButton>
-                    </EuiPageContentHeaderSection>
+                    <EuiPageContentHeaderSection>{createBtn}</EuiPageContentHeaderSection>
                   </EuiPageContentHeader>
                   <EuiPageContentBody>
                     <EzreportingTable
