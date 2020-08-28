@@ -30,7 +30,7 @@ export function defineRoutes(router: IRouter, auth: object) {
       validate: false,
       options: {
         authRequired: true,
-        tags: [`access:${PLUGIN_ID}-read`, `access:${PLUGIN_ID}-all`],
+        tags: [`access:${PLUGIN_ID}-read`],
       },
     },
     async function (context, req, res) {
