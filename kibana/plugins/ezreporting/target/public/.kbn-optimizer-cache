@@ -5,10 +5,10 @@
     "deletedPaths": [],
     "modifiedTimes": {},
     "workerConfig": {
-      "dist": false,
+      "dist": true,
       "repoRoot": "/home/wilmouth/workspace/kibana",
       "optimizerCacheKey": "♻",
-      "browserslistEnv": "dev"
+      "browserslistEnv": "production"
     }
   },
   "cacheKey": {
