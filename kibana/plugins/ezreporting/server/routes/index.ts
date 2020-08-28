@@ -79,8 +79,8 @@ export function defineRoutes(router: IRouter, auth: object) {
       try {
         let body = req.body;
 
-        if (spaceId !== 'default') {
-          body = { ...body, spaceId };
+        if (spaceId && spaceId !== 'default') {
+          body = { ...body, space: spaceId };
         }
 
         const result = await requestApi({
@@ -130,8 +130,8 @@ export function defineRoutes(router: IRouter, auth: object) {
       try {
         let body = req.body;
 
-        if (spaceId !== 'default') {
-          body = { ...body, spaceId };
+        if (spaceId && spaceId !== 'default') {
+          body = { ...body, space: spaceId };
         }
 
         const result = await requestApi({
