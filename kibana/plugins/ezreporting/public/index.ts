@@ -20,10 +20,11 @@
 import './index.scss';
 
 import { EzreportingPlugin } from './plugin';
+import { PluginInitializerContext } from '../../../src/core/public';
 
 // This exports static code and TypeScript types,
 // as well as, Kibana Platform `plugin()` initializer.
-export function plugin() {
-  return new EzreportingPlugin();
+export function plugin(initializerContext: PluginInitializerContext) {
+  return new EzreportingPlugin(initializerContext);
 }
 export { EzreportingPluginSetup, EzreportingPluginStart } from './types';

@@ -17,7 +17,13 @@
  * under the License.
  */
 
-import { AppMountParameters, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import {
+  AppMountParameters,
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from '../../../src/core/public';
 import {
   EzreportingPluginSetup,
   EzreportingPluginStart,
@@ -38,15 +44,30 @@ interface SetupDeps {
   home?: HomePublicPluginSetup;
 }
 
+interface ClientConfigType {
+  applicationName: string;
+}
+
 export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, EzreportingPluginStart> {
+  initializerContext: PluginInitializerContext<ClientConfigType>;
+
+  constructor(initializerContext: PluginInitializerContext<ClientConfigType>) {
+    this.initializerContext = initializerContext;
+  }
+
   public setup(core: CoreSetup, { home }: SetupDeps): EzreportingPluginSetup {
+    const config = this.initializerContext.config.get<ClientConfigType>();
+    const { applicationName } = config;
+
+    EZMESURE_CATEGORY.label = applicationName;
+
     const { protocol, hostname, port } = window.location;
     const ezmesureLink = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
 
     // Back to ....... link
     core.application.register({
-      id: `${PLUGIN_APP_NAME.toLocaleLowerCase()}_back`,
-      title: `Back to ${PLUGIN_APP_NAME}`,
+      id: `${applicationName.toLocaleLowerCase()}_back`,
+      title: `Back to ${applicationName}`,
       euiIconType: 'editorUndo',
       category: EZMESURE_CATEGORY,
       mount() {
@@ -66,9 +87,14 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
         // Get start services as specified in kibana.json
         const [coreStart, depsStart] = await core.getStartServices();
 
-        coreStart.chrome.docTitle.change(`${PLUGIN_NAME} ${PLUGIN_APP_NAME}`);
+        coreStart.chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
 
-        const render = renderApp(coreStart, depsStart as AppPluginStartDependencies, params);
+        const render = renderApp(
+          coreStart,
+          depsStart as AppPluginStartDependencies,
+          params,
+          applicationName
+        );
 
         // Render the application
         return () => {
@@ -81,7 +107,7 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
     // ezReporting app in home page
     home.featureCatalogue.register({
       id: PLUGIN_ID,
-      title: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}`,
+      title: `${PLUGIN_NAME} ${applicationName}`,
       icon: PLUGIN_ICON,
       description: PLUGIN_DESCRIPTION,
       path: `/app/${PLUGIN_ID}`,

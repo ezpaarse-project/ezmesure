@@ -35,7 +35,8 @@ import {
 export const renderApp = (
   { application, notifications, http }: CoreStart,
   { navigation }: AppPluginStartDependencies,
-  { appBasePath, element }: AppMountParameters
+  { appBasePath, element }: AppMountParameters,
+  applicationName: string
 ) => {
   if (!httpClient) {
     setHttpClient(http);
@@ -47,7 +48,14 @@ export const renderApp = (
     setCapabilities(application.capabilities);
   }
 
-  ReactDOM.render(<EzreportingApp basename={appBasePath} navigation={navigation} />, element);
+  ReactDOM.render(
+    <EzreportingApp
+      basename={appBasePath}
+      navigation={navigation}
+      applicationName={applicationName}
+    />,
+    element
+  );
 
   return () => ReactDOM.unmountComponentAtNode(element);
 };

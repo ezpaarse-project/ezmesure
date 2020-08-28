@@ -196,7 +196,7 @@ export function defineRoutes(router: IRouter, auth: object) {
       },
       options: {
         authRequired: true,
-        tags: [`access:${PLUGIN_ID}-read`, `access:${PLUGIN_ID}-all`],
+        tags: [`access:${PLUGIN_ID}-all`],
       },
     },
     async function (context, req, res) {
@@ -229,7 +229,7 @@ export function defineRoutes(router: IRouter, auth: object) {
       },
       options: {
         authRequired: true,
-        tags: [`access:${PLUGIN_ID}-read`, `access:${PLUGIN_ID}-all`],
+        tags: [`access:${PLUGIN_ID}-all`],
       },
     },
     async function (context, req, res) {

@@ -5,10 +5,10 @@
     "deletedPaths": [],
     "modifiedTimes": {},
     "workerConfig": {
-      "dist": true,
+      "dist": false,
       "repoRoot": "/home/wilmouth/workspace/kibana",
       "optimizerCacheKey": "♻",
-      "browserslistEnv": "production"
+      "browserslistEnv": "dev"
     }
   },
   "cacheKey": {
@@ -25,16 +25,16 @@
       "/home/wilmouth/workspace/kibana/node_modules/lodash/package.json": 1594891241437,
       "/home/wilmouth/workspace/kibana/node_modules/style-loader/package.json": 1594891241488,
       "/home/wilmouth/workspace/kibana/packages/kbn-ui-shared-deps/public_path_module_creator.js": 1594891029206.3762,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/common/index.ts": 1598538433810.0342,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/lib/reporting.tsx": 1598538901914.0208,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/application.tsx": 1598538767306.0247,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/components/app.tsx": 1598538822890.023,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/common/index.ts": 1598538433810.034,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/lib/reporting.tsx": 1598538901914.02,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/application.tsx": 1598623251998.196,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/components/app.tsx": 1598623284690.195,
       "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/components/flyout/edit.tsx": 1597932129110.273,
       "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/components/flyout/history.tsx": 1597916264386.73,
       "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/components/table.tsx": 1597848819394.636,
       "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/index.scss": 1595255890199.425,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/index.ts": 1598434534072.6985,
-      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/plugin.ts": 1598531692182.2283,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/index.ts": 1598622648886.2134,
+      "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/plugin.ts": 1598623328470.1938,
       "/home/wilmouth/workspace/kibana/plugins/ezreporting/public/types.ts": 1597926660462.43,
       "/home/wilmouth/workspace/kibana/src/plugins/home/public/services/feature_catalogue/feature_catalogue_registry.ts": 1594891029506.3762,
       "/home/wilmouth/workspace/kibana/src/plugins/home/public/services/feature_catalogue/index.ts": 1594891029506.3762
