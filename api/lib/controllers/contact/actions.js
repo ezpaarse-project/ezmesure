@@ -10,7 +10,7 @@ exports.contact = async function (ctx) {
       from: body.email,
       to: recipients,
       subject: `Contact - ${body.object}`,
-      ...generateMail('contact', { body }),
+      ...generateMail('contact', { body, appName: config.get('appName') }),
     });
 
     ctx.status = 200;

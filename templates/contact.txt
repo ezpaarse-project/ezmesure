@@ -1,4 +1,4 @@
-Contact ezMESURE.
+Contact {{ appName }}.
 
 Email : {{ body.email }}
 Objet : {{ body.object }}
