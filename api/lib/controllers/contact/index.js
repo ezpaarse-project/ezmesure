@@ -15,6 +15,7 @@ router.route({
       email: Joi.string().trim().email().required(),
       object: Joi.string().trim().required(),
       message: Joi.string().trim().required(),
+      browser: Joi.string().trim().required(),
     },
   },
 });

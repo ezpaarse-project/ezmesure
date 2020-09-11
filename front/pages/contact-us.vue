@@ -30,6 +30,7 @@
               v-model="valid"
             >
               <v-text-field
+                v-if="!user"
                 v-model="email"
                 :rules="emailRules"
                 label="Email"
@@ -37,6 +38,17 @@
                 outlined
                 clearable
                 required
+              />
+              <v-text-field
+                v-else
+                :value="user.email"
+                :rules="emailRules"
+                label="Email"
+                name="email"
+                outlined
+                clearable
+                required
+                disabled
               />
               <v-select
                 v-model="object"
@@ -46,6 +58,7 @@
                 name="object"
                 outlined
                 required
+                return-object
               />
               <v-textarea
                 v-model="message"
@@ -54,6 +67,11 @@
                 name="message"
                 outlined
                 required
+              />
+              <v-checkbox
+                v-if="object.value === 'bugs'"
+                v-model="sendBrowser"
+                label="Envoyer la version de mon navigateur"
               />
             </v-form>
           </v-card-text>
@@ -83,11 +101,24 @@ export default {
     ],
     message: '',
     messageRules: [v => !!v || 'Un message est requis'],
-    object: '',
+    object: {},
     objectRules: [v => !!v || 'L\'objet est requis'],
-    objects: ['Demande de renseignements', 'Rapport de bugs'],
+    objects: [
+      {
+        value: 'informations',
+        text: 'Demande de renseignements',
+      },
+      {
+        value: 'bugs',
+        text: 'Rapport de bugs',
+      },
+    ],
+    sendBrowser: true,
     valid: true,
   }),
+  computed: {
+    user() { return this.$auth.user; },
+  },
   methods: {
     async validate() {
       this.$refs.form.validate();
@@ -95,16 +126,18 @@ export default {
       if (this.valid) {
         try {
           await this.$axios.post('/contact', {
-            email: this.email,
-            object: this.object,
+            email: this.user?.email || this.email,
+            object: this.object?.text,
             message: this.message,
+            browser: this.sendBrowser && this.object.value === 'bugs' ? navigator.userAgent : 'NC',
           });
           this.$store.dispatch('snacks/success', 'Votre demande de contact vient d\'être envoyé à l\'équipe.');
 
           this.email = '';
-          this.object = '';
+          this.object = {};
           this.message = '';
-          this.$refs.form.reset();
+          this.sendBrowser = true;
+          this.$refs.form.resetValidation();
         } catch (e) {
           this.$store.dispatch('snacks/error', 'L\'envoi du formulaire de contact à échoué.');
         }

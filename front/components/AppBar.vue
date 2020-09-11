@@ -38,7 +38,7 @@
         API
       </v-btn>
       <v-btn text exact to="/contact-us">
-        Nous contacter
+        Contact
       </v-btn>
     </v-toolbar-items>
 
@@ -68,7 +68,7 @@
           <v-list-item-title>API</v-list-item-title>
         </v-list-item>
         <v-list-item exact to="/contact-us" @click="sheet = false">
-          <v-list-item-title>Nous contacter</v-list-item-title>
+          <v-list-item-title>Contact</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-bottom-sheet>
