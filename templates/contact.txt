@@ -2,6 +2,6 @@ Contact {{ appName }}.
 
 Email : {{ body.email }}
 Objet : {{ body.object }}
-Navigateur : {{ body.browser }}
+{% if body.browser %}Navigateur : {{ body.browser }}{% endif %}
 Message : {{ body.message }}
 

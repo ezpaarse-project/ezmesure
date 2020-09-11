@@ -17,7 +17,7 @@
     <mj-text>
       <p>Email : <strong>{{ body.email }}</strong></p>
       <p>Objet : <strong>{{ body.object }}</strong></p>
-      <p>Navigateur : <strong>{{ body.browser }}</strong></p>
+      {% if body.browser %}<p>Navigateur : <strong>{{ body.browser }}</strong></p>{% endif %}
       <p>Message :</p>
       <p>{{ body.message }}</p>
     </mj-text>

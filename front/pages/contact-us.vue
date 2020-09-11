@@ -129,7 +129,7 @@ export default {
             email: this.user?.email || this.email,
             object: this.object?.text,
             message: this.message,
-            browser: this.sendBrowser && this.object.value === 'bugs' ? navigator.userAgent : 'NC',
+            browser: this.sendBrowser && this.object.value === 'bugs' ? navigator.userAgent : null,
           });
           this.$store.dispatch('snacks/success', 'Votre demande de contact vient d\'être envoyé à l\'équipe.');
 
