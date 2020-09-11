@@ -1,0 +1,6 @@
+Contact ezMESURE.
+
+Email : {{ body.email }}
+Objet : {{ body.object }}
+Message : {{ body.message }}
+
