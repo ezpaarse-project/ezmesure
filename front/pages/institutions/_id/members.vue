@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.members.title', {institutionName: institution.name })" />
+    <ToolBar :title="$t('institutions.members.title', { institutionName: institution.name })" />
 
     <v-data-table
       v-if="hasInstitution"
@@ -37,7 +37,7 @@
     </v-data-table>
 
     <v-card-text v-else>
-      <div class="mb-2" v-text="$('institutions.notAttachedToAnyInstitution')" />
+      <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
       <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
     </v-card-text>
 

@@ -6,19 +6,17 @@ const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
   getInstitutions,
-  storeInstitution,
+  createInstitution,
   deleteInstitutions,
   deleteInstitution,
+  validateInstitution,
   getInstitution,
   getSelfInstitution,
   getInstitutionMembers,
   updateInstitution,
   updateMember,
   getSelfMember,
-  addSushi,
-  updateSushi,
   getSushiData,
-  deleteSushiData,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -40,6 +38,21 @@ router.route({
   method: 'GET',
   path: '/members/self',
   handler: getSelfMember,
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/validated',
+  handler: validateInstitution,
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    body: {
+      value: Joi.boolean().required(),
+    },
+  },
 });
 
 router.route({
@@ -79,49 +92,12 @@ router.use(bodyParser());
 
 router.route({
   method: 'POST',
-  path: '/:institutionId/sushi',
-  handler: addSushi,
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      vendor: Joi.string().trim().required(),
-      package: Joi.string().trim().required(),
-      sushiUrl: Joi.string().trim().required(),
-      requestorId: Joi.string().trim().empty(''),
-      consortialId: Joi.string().trim().empty(''),
-      customerId: Joi.string().trim().empty(''),
-      apiKey: Joi.string().trim().empty(''),
-      comment: Joi.string().trim().empty(''),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
   path: '/delete',
   handler: deleteInstitutions,
   validate: {
     type: 'json',
     body: {
       ids: Joi.array().items(Joi.string().trim()),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
-  path: '/:institutionId/sushi/delete',
-  handler: deleteSushiData,
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      ids: Joi.array().items(Joi.string().trim().guid({ version: ['uuidv4'] })),
     },
   },
 });
@@ -148,38 +124,16 @@ router.route({
 });
 
 router.route({
-  method: 'PATCH',
-  path: '/:institutionId/sushi',
-  handler: updateSushi,
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
-      vendor: Joi.string().trim().required(),
-      package: Joi.string().trim().required(),
-      sushiUrl: Joi.string().trim().required(),
-      requestorId: Joi.string().trim().empty(''),
-      customerId: Joi.string().trim().empty(''),
-      apiKey: Joi.string().trim().empty(''),
-      comment: Joi.string().trim().empty(''),
-    },
-  },
-});
-
-router.route({
   method: 'POST',
   path: '/',
-  handler: storeInstitution,
+  handler: createInstitution,
   validate: {
     type: 'json',
   },
 });
 
 router.route({
-  method: 'PATCH',
+  method: 'PUT',
   path: '/:institutionId',
   handler: updateInstitution,
   validate: {

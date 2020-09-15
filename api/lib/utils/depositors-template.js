@@ -5,7 +5,7 @@ module.exports = {
   mappings: {
     properties: {
       name: { type: 'keyword' },
-      shortName: { type: 'keyword' },
+      acronym: { type: 'keyword' },
       uai: { type: 'keyword' },
       city: { type: 'keyword' },
       website: { type: 'keyword' },
@@ -21,13 +21,11 @@ module.exports = {
         },
       },
       sushi: { type: 'nested' },
-      contacts: {
+      members: {
         type: 'nested',
         properties: {
-          fullName: { type: 'keyword' },
-          email: { type: 'keyword' },
+          username: { type: 'keyword' },
           type: { type: 'keyword' },
-          confirmed: { type: 'boolean' },
         },
       },
       index: {

@@ -19,7 +19,6 @@
     <SushiForm
       ref="sushiForm"
       :platforms="platforms"
-      :vendors="vendors"
       @update="refreshSushiItems"
     />
 
@@ -124,9 +123,6 @@ export default {
   computed: {
     hasInstitution() {
       return !!this.institution?.id;
-    },
-    vendors() {
-      return this.platforms.map(p => p.vendor);
     },
   },
   mounted() {

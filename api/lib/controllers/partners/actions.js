@@ -1,15 +1,6 @@
-const depositors = require('../../services/depositors');
+const Institution = require('../../models/Institution');
 
 exports.list = async (ctx) => {
   ctx.type = 'json';
-  ctx.body = await depositors.getFromIndex();
-};
-
-exports.refresh = async (ctx) => {
-  ctx.type = 'json';
-
-  const result = await depositors.update();
-
-  ctx.status = result.errors ? 500 : 200;
-  ctx.body = result;
+  ctx.body = await Institution.findAllValidated();
 };

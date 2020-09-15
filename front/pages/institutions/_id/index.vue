@@ -1,165 +1,85 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.institution.title')" />
+    <ToolBar :title="$t('institutions.institution.title')">
+      <v-spacer />
+
+      <v-btn v-if="institution" color="primary" @click="editInstitution">
+        <v-icon left>
+          mdi-pencil
+        </v-icon>
+        {{ $t('modify') }}
+      </v-btn>
+    </ToolBar>
 
     <v-card-text v-if="institution">
-      <v-form v-model="valid">
-        <v-container>
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                ref="name"
-                v-model="institution.name"
-                :label="$t('institutions.institution.name')"
-                :placeholder="$t('institutions.institution.nameExample')"
-                :rules="[v => !!v || $t('institutions.institution.nameError')]"
-                outlined
-                required
-              />
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.uai"
-                :label="$t('institutions.institution.uai')"
-                :placeholder="$t('institutions.institution.uaiExample')"
-                outlined
-                hide-details
-              />
-              <span class="caption" v-text="$t('institutions.institution.uaiDescription')" />
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.website"
-                :label="$t('institutions.institution.homepage')"
-                :placeholder="$t('institutions.institution.homepageExample')"
-                outlined
-              />
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.index.prefix"
-                :label="$t('institutions.institution.affectedIndex')"
-                :placeholder="$t('institutions.institution.affectedIndexExample')"
-                outlined
-                :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
-              />
-            </v-col>
-
-            <v-col cols="12">
-              <v-hover v-model="hoverLogo" class="mx-auto">
-                <template v-slot:default="{ hover }">
-                  <v-card
-                    width="320"
-                    @dragover.prevent="onDragOver"
-                    @dragleave.prevent="onDragLeave"
-                    @drop.prevent="onFileDrop"
-                  >
-                    <v-img
-                      contain
-                      :src="logoSrc"
-                      width="320"
-                      height="100"
-                    />
-
-                    <v-card-text class="text-center">
-                      Logo (ratio 3:1)
-                    </v-card-text>
-
-                    <input
-                      ref="logo"
-                      type="file"
-                      accept="image/*"
-                      class="d-none"
-                      @change="onLogoChange"
-                    >
-
-                    <v-fade-transition>
-                      <v-overlay v-if="hover" absolute>
-                        <div
-                          v-if="draggingFile"
-                          v-text="$t('institutions.institution.dropImageHere')"
-                        />
-
-                        <div v-else>
-                          <v-btn
-                            v-if="logoPreview || institution.logoId"
-                            @click="removeLogo"
-                            v-text="$t('delete')"
-                          />
-                          <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
-                        </div>
-                      </v-overlay>
-                    </v-fade-transition>
-                  </v-card>
-                </template>
-              </v-hover>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
+      <InstitutionCard :institution="institution" />
     </v-card-text>
 
-    <v-card-actions v-if="institution">
-      <span class="caption" v-text="$t('requiredFields')" />
-      <v-spacer />
-      <v-btn
-        color="primary"
-        :disabled="!valid"
-        :loading="loading"
-        @click="save"
-        v-text="$t('save')"
-      />
-    </v-card-actions>
-
-    <v-card-text v-else>
+    <v-card-text v-else-if="failedToFetch">
       <v-alert
         type="error"
         :value="true"
-        v-text="$t('institutions.institution.noDataFound')"
+        v-text="$t('institutions.unableToRetriveInformations')"
       />
     </v-card-text>
+
+    <v-card-text v-else-if="selfInstitution">
+      <v-card class="mx-auto w-600">
+        <v-card-text class="text-center">
+          <p class="body-1" v-text="$t('institutions.notMember')" />
+          <v-btn
+            color="primary"
+            @click="createInstitution"
+            v-text="$t('institutions.declareMyInstitution')"
+          />
+        </v-card-text>
+      </v-card>
+    </v-card-text>
+
+    <v-card-text v-else>
+      <v-card class="mx-auto w-600">
+        <v-card-text class="text-center">
+          <v-icon size="50" class="mb-2">
+            mdi-ghost
+          </v-icon>
+          <p class="body-1" v-text="$t('institutions.doesNotExist')" />
+        </v-card-text>
+      </v-card>
+    </v-card-text>
+
+    <InstitutionForm ref="institutionForm" @update="refreshInstitution" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
+import InstitutionForm from '~/components/InstitutionForm';
+import InstitutionCard from '~/components/InstitutionCard';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
-
-const toBase64 = file => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsBinaryString(file);
-  reader.onload = () => resolve(btoa(reader.result));
-  reader.onerror = error => reject(error);
-});
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
+    InstitutionForm,
+    InstitutionCard,
   },
-  async asyncData({ $axios, store, params }) {
+  async asyncData({ $axios, params }) {
     let institution = null;
+    let failedToFetch = false;
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
     } catch (e) {
-      if (e.response?.status === 404) {
-        institution = {};
-      } else {
-        store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
+      if (e.response?.status !== 404) {
+        failedToFetch = true;
       }
     }
 
-    if (institution) {
-      institution.index = institution.index || {};
-    }
-
     return {
+      institutionId: params.id,
       valid: false,
       hoverLogo: false,
       draggingFile: false,
@@ -167,77 +87,27 @@ export default {
       logoPreview: null,
       loading: false,
       institution,
+      failedToFetch,
+      selfInstitution: params.id === 'self',
     };
   },
-  computed: {
-    logoSrc() {
-      if (this.logoPreview) { return this.logoPreview; }
-      if (this.institution?.logoId) { return `/api/assets/logos/${this.institution.logoId}`; }
-      return defaultLogo;
-    },
-    suggestedPrefix() {
-      const match = /@(\w+)/i.exec(this.$auth.$state?.user?.email);
-      return match && match[1];
-    },
-  },
   methods: {
-    async onLogoChange() {
-      this.updateLogo(this.$refs.logo.files[0]);
-      this.$refs.logo.value = '';
-    },
-    onDragOver() {
-      this.draggingFile = true;
-      this.hoverLogo = true;
-    },
-    onDragLeave() {
-      this.draggingFile = false;
-      this.hoverLogo = false;
-    },
-    onFileDrop(evt) {
-      const files = evt?.dataTransfer?.files;
-      if (files && files[0]) {
-        this.updateLogo(files[0]);
-      }
-      this.draggingFile = false;
-    },
-    async updateLogo(file) {
-      if (file.type.startsWith('image/')) {
-        const base64logo = await toBase64(file);
-        this.institution.logo = base64logo;
-        this.logoPreview = URL.createObjectURL(file);
+    editInstitution() {
+      if (this.institution) {
+        this.$refs.institutionForm.editInstitution(this.institution);
       }
     },
-    removeLogo() {
-      this.logoPreview = null;
-      this.institution.logo = null;
-      this.institution.logoId = null;
+    createInstitution() {
+      this.$refs.institutionForm.createInstitution();
     },
-    async save() {
-      this.loading = true;
-
-      if (this.institution.id) {
-        try {
-          await this.$axios.$patch(`/institutions/${this.institution.id}`, this.institution);
-        } catch (e) {
-          this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
-          this.loading = false;
-          return;
+    async refreshInstitution() {
+      try {
+        this.institution = await this.$axios.$get(`/institutions/${this.institutionId}`);
+      } catch (e) {
+        if (e.response?.status !== 404) {
+          this.failedToFetch = true;
         }
-        this.$store.dispatch('snacks/success', this.$t('institutions.institution.institutionUpdated'));
       }
-
-      if (!this.institution.id) {
-        try {
-          await this.$axios.$post('/institutions', this.institution);
-        } catch (e) {
-          this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
-          this.loading = false;
-          return;
-        }
-        this.$store.dispatch('snacks/success', this.$t('institutions.institution.dataSent'));
-      }
-
-      this.loading = false;
     },
   },
 };

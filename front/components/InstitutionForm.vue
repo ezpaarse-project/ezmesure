@@ -1,18 +1,14 @@
 <template>
-  <v-dialog v-model="show" width="900">
+  <v-dialog v-model="show" scrollable width="900">
     <v-card>
       <v-card-title class="headline">
-        {{ $t('institutions.institution.title', { institutionName: institution.name }) }}
+        {{ $t(editMode ? 'institutions.updateInstitution' : 'institutions.newInstitution') }}
       </v-card-title>
 
       <v-card-text>
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-container>
+          <v-container class="pa-0">
             <v-row>
-              <v-col cols="12">
-                <span class="subtitle-1">{{ $t('institutions.title') }} :</span>
-              </v-col>
-
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="institution.name"
@@ -23,7 +19,7 @@
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="institution.shortName"
+                  v-model="institution.acronym"
                   :label="$t('institutions.institution.acronym')"
                   hide-details
                 />
@@ -127,35 +123,12 @@
 
             <v-row>
               <v-col cols="12">
-                <span class="subtitle-1">{{ $t('institutions.institution.localisation') }} :</span>
-              </v-col>
-
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.location.lon"
-                  label="Longitude"
-                  hide-details
-                />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.location.lat"
-                  label="Latitude"
-                  hide-details
-                />
-              </v-col>
-            </v-row>
-
-            <v-divider />
-
-            <v-row>
-              <v-col cols="12">
                 <span class="subtitle-1">Index :</span>
               </v-col>
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="institution.index.prefix"
+                  v-model="institution.indexPrefix"
                   label="Index"
                   :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
                 />
@@ -163,7 +136,7 @@
 
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="institution.index.count"
+                  v-model="institution.indexCount"
                   label="Total ECs"
                   hide-details
                   disabled
@@ -233,9 +206,7 @@ export default {
       logoPreview: null,
 
       institution: {
-        location: {},
         auto: {},
-        index: {},
       },
     };
   },
@@ -260,6 +231,16 @@ export default {
       const match = /@(\w+)/i.exec(email);
       return match && match[1];
     },
+
+    hasRoles() {
+      return Array.isArray(this.$auth?.user?.roles) && this.$auth.user.roles.length > 0;
+    },
+    isAdmin() {
+      if (this.hasRoles) {
+        return this.$auth.user.roles.some(role => ['admin', 'superuser'].includes(role));
+      }
+      return false;
+    },
   },
   methods: {
     editInstitution(institution) {
@@ -268,9 +249,7 @@ export default {
       }
 
       this.institution = JSON.parse(JSON.stringify(institution));
-      this.institution.location = this.institution.location || {};
       this.institution.auto = this.institution.auto || {};
-      this.institution.index = this.institution.index || {};
 
       this.show = true;
     },
@@ -314,12 +293,9 @@ export default {
     async save() {
       this.saving = true;
 
-      delete this.institution.sushi;
-
-
       try {
         if (this.institution.id) {
-          await this.$axios.$patch(`/institutions/${this.institution.id}`, this.institution);
+          await this.$axios.$put(`/institutions/${this.institution.id}`, this.institution);
         } else {
           await this.$axios.$post('/institutions', this.institution);
         }

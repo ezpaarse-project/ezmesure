@@ -37,7 +37,9 @@
                   <v-text-field
                     v-model="sushiForm.sushiUrl"
                     :label="$t('institutions.sushi.sushiUrl')"
-                    :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
+                    :rules="[
+                      v => !!v || $t('institutions.sushi.enterUrl')
+                    ]"
                     :disabled="!canEditSushiUrl"
                     outlined
                     required
@@ -47,24 +49,18 @@
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.requestorId"
-                    :label="`Requestor Id ${(requiredFields.requestorId ? '*' : '')}`"
-                    :rules="[v =>
-                      requiredFields.requestorId ?
-                        !!v || $t('institutions.sushi.enterRequestorId') : !v
-                    ]"
+                    :label="`Requestor Id ${(platform.requestorId ? '*' : '')}`"
+                    :rules="platform.requestorId ? [rules.requestorId] : []"
+                    :required="platform.requestorId"
                     outlined
-                    :required="requiredFields.requestorId"
                   />
                 </v-col>
 
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.customerId"
-                    :label="`Customer Id ${(requiredFields.customerId ? '*' : '')}`"
-                    :rules="[v =>
-                      requiredFields.customerId ?
-                        !!v || $t('institutions.sushi.enterCustomerId') : !v
-                    ]"
+                    :label="`Customer Id ${(platform.customerId ? '*' : '')}`"
+                    :rules="platform.customerId ? [rules.customerId] : []"
                     outlined
                   />
                 </v-col>
@@ -72,10 +68,8 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.apiKey"
-                    :label="`API Key ${(requiredFields.apiKey ? '*' : '')}`"
-                    :rules="[v =>
-                      requiredFields.apiKey ? !!v || $t('institutions.sushi.enterAPIKey') : !v
-                    ]"
+                    :label="`API Key ${(platform.apiKey ? '*' : '')}`"
+                    :rules="platform.apiKey ? [rules.apiKey] : []"
                     outlined
                   />
                 </v-col>
@@ -121,10 +115,6 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    vendors: {
-      type: Array,
-      default: () => ([]),
-    },
   },
   data() {
     return {
@@ -133,6 +123,7 @@ export default {
       institutionId: null,
       canEditSushiUrl: false,
       valid: false,
+      platform: null,
 
       sushiForm: {
         vendor: '',
@@ -144,12 +135,19 @@ export default {
         id: null,
       },
 
-      requiredFields: {},
+      rules: {
+        requestorId: v => !!v || this.$t('institutions.sushi.enterRequestorId'),
+        customerId: v => !!v || this.$t('institutions.sushi.enterCustomerId'),
+        apiKey: v => !!v || this.$t('institutions.sushi.enterAPIKey'),
+      },
     };
   },
   computed: {
     editMode() {
       return !!this.sushiForm.id;
+    },
+    vendors() {
+      return this.platforms.map(p => p.vendor);
     },
   },
   methods: {
@@ -160,6 +158,9 @@ export default {
 
       this.institutionId = institutionId;
       this.sushiForm.vendor = sushiData.vendor || '';
+
+      this.applyVendor();
+
       this.sushiForm.package = sushiData.package || '';
       this.sushiForm.sushiUrl = sushiData.sushiUrl || '';
       this.sushiForm.requestorId = sushiData.requestorId || '';
@@ -174,25 +175,23 @@ export default {
       this.editSushiItem(institutionId);
     },
 
+    applyVendor() {
+      const vendor = this.sushiForm.vendor?.toLowerCase();
+      this.platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor);
+
+      this.sushiForm.sushiUrl = this.platform?.sushiUrl || '';
+      this.canEditSushiUrl = !this.platform?.sushiUrl;
+    },
+
     onVendorChange() {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
 
-      const vendor = this.sushiForm.vendor?.toLowerCase();
-      const platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor);
-
-      this.sushiForm.sushiUrl = platform?.sushiUrl || '';
-      this.canEditSushiUrl = !platform?.sushiUrl;
+      this.applyVendor();
 
       // workaround to hide vendors list on change
       this.$refs.vendorsBox.isMenuActive = false;
-
-      this.requiredFields = {
-        requestorId: platform?.requestorId || false,
-        customerId: platform?.customerId || false,
-        apiKey: platform?.apiKey || false,
-      };
     },
 
     async save() {

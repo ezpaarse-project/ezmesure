@@ -20,6 +20,12 @@
       item-key="id"
       show-select
     >
+      <template v-slot:item.name="{ item }">
+        <nuxt-link :to="{ path: '/institutions', params: { id: item.id } }">
+          {{ item.name }}
+        </nuxt-link>
+      </template>
+
       <template v-slot:item.automatisations="{ item }">
         <v-chip
           label
@@ -47,6 +53,18 @@
           :color="item.auto.report ? 'green' : 'grey'"
         >
           Reporting
+        </v-chip>
+      </template>
+
+      <template v-slot:item.status="{ item }">
+        <v-chip
+          label
+          small
+          :color="item.validated ? 'success' : 'default'"
+          outlined
+        >
+          <span v-if="item.validated" v-text="$t('institutions.institution.validated')" />
+          <span v-else v-text="$t('institutions.institution.notValidated')" />
         </v-chip>
       </template>
 
@@ -89,6 +107,11 @@
           </template>
           <span v-text="$t('modify')" />
         </v-tooltip>
+
+        <ValidationPopup
+          :institution-id="item.id"
+          @change="validated => item.validated = validated"
+        />
       </template>
 
       <template v-slot:footer>
@@ -108,6 +131,7 @@
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import InstitutionForm from '~/components/InstitutionForm';
+import ValidationPopup from '~/components/ValidationPopup';
 
 export default {
   layout: 'space',
@@ -115,6 +139,7 @@ export default {
   components: {
     ToolBar,
     InstitutionForm,
+    ValidationPopup,
   },
   data() {
     return {
@@ -136,10 +161,15 @@ export default {
         { text: 'ECs', value: 'index.count' },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
+          text: this.$t('institutions.institution.status'),
+          value: 'status',
+          width: '150px',
+        },
+        {
           text: 'Actions',
           value: 'actions',
           sortable: false,
-          width: '150px',
+          width: '170px',
           align: 'center',
         },
       ];
