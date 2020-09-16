@@ -4,6 +4,8 @@ module.exports = {
   },
   mappings: {
     properties: {
+      createdAt: { type: 'date' },
+      updatedAt: { type: 'date' },
       name: { type: 'keyword' },
       acronym: { type: 'keyword' },
       uai: { type: 'keyword' },
@@ -13,6 +15,8 @@ module.exports = {
       type: { type: 'keyword' },
       location: { type: 'geo_point' },
       domains: { type: 'keyword' },
+      indexPrefix: { type: 'keyword' },
+      indexCount: { type: 'long' },
       auto: {
         properties: {
           ezmesure: { type: 'boolean' },
@@ -20,7 +24,6 @@ module.exports = {
           report: { type: 'boolean' },
         },
       },
-      sushi: { type: 'nested' },
       members: {
         type: 'nested',
         properties: {
@@ -28,14 +31,6 @@ module.exports = {
           type: { type: 'keyword' },
         },
       },
-      index: {
-        properties: {
-          count: { type: 'long' },
-          prefix: { type: 'keyword' },
-        },
-      },
-      createdAt: { type: 'date' },
-      updatedAt: { type: 'date' },
     },
   },
 };
