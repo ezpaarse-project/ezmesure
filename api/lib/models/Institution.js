@@ -227,8 +227,6 @@ module.exports = class Institution {
   async save() {
     const now = new Date();
 
-    console.log(this.id, this.data);
-
     if (this.id) {
       this.data.updatedAt = new Date();
 
@@ -247,7 +245,6 @@ module.exports = class Institution {
         refresh: true,
         body: this.data,
       }).catch((e) => {
-        console.log(JSON.stringify(e, null, 2));
         return Promise.reject(new Error(e));
       });
 
