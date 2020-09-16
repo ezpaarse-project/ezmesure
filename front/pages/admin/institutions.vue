@@ -21,7 +21,7 @@
       show-select
     >
       <template v-slot:item.name="{ item }">
-        <nuxt-link :to="{ path: '/institutions', params: { id: item.id } }">
+        <nuxt-link :to="`/institutions/${item.id}`">
           {{ item.name }}
         </nuxt-link>
       </template>
