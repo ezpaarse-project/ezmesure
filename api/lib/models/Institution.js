@@ -244,9 +244,7 @@ module.exports = class Institution {
         index,
         refresh: true,
         body: this.data,
-      }).catch((e) => {
-        return Promise.reject(new Error(e));
-      });
+      }).catch((e) => Promise.reject(new Error(e)));
 
       this.id = id;
     }
