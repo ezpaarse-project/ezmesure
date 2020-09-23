@@ -49,7 +49,7 @@
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.requestorId"
-                    :label="`Requestor Id ${(platform.requestorId ? '*' : '')}`"
+                    :label="`Requestor Id ${platform.requestorId ? '*' : ''}`"
                     :rules="platform.requestorId ? [rules.requestorId] : []"
                     :required="platform.requestorId"
                     outlined
@@ -59,7 +59,7 @@
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.customerId"
-                    :label="`Customer Id ${(platform.customerId ? '*' : '')}`"
+                    :label="`Customer Id ${platform.customerId ? '*' : ''}`"
                     :rules="platform.customerId ? [rules.customerId] : []"
                     outlined
                   />
@@ -68,7 +68,7 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.apiKey"
-                    :label="`API Key ${(platform.apiKey ? '*' : '')}`"
+                    :label="`API Key ${platform.apiKey ? '*' : ''}`"
                     :rules="platform.apiKey ? [rules.apiKey] : []"
                     outlined
                   />
@@ -123,7 +123,7 @@ export default {
       institutionId: null,
       canEditSushiUrl: false,
       valid: false,
-      platform: null,
+      platform: {},
 
       sushiForm: {
         vendor: '',
@@ -177,7 +177,7 @@ export default {
 
     applyVendor() {
       const vendor = this.sushiForm.vendor?.toLowerCase();
-      this.platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor);
+      this.platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor) || {};
 
       this.sushiForm.sushiUrl = this.platform?.sushiUrl || '';
       this.canEditSushiUrl = !this.platform?.sushiUrl;
@@ -199,9 +199,9 @@ export default {
 
       try {
         if (this.sushiForm.id) {
-          await this.$axios.$patch(`/institutions/${this.institutionId}/sushi`, this.sushiForm);
+          await this.$axios.$patch(`/sushi/${this.sushiForm.id}`, this.sushiForm);
         } else {
-          await this.$axios.$post(`/institutions/${this.institutionId}/sushi`, this.sushiForm);
+          await this.$axios.$post('/sushi', { ...this.sushiForm, institutionId: this.institutionId });
           this.show = false;
         }
         this.$emit('update');

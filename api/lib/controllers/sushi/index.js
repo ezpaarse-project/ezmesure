@@ -1,5 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
+const sushiPlatforms = require('../../utils/sushi.json');
+const Sushi = require('../../models/Sushi');
 
 const {
   getAll,
@@ -15,8 +17,18 @@ router.route({
 });
 
 router.route({
+  method: 'GET',
+  path: '/platforms.json',
+  handler: (ctx) => {
+    ctx.type = 'json';
+    ctx.status = 200;
+    ctx.body = sushiPlatforms;
+  },
+});
+
+router.route({
   method: 'POST',
-  path: '/delete',
+  path: '/batch_delete',
   handler: deleteSushiData,
   validate: {
     type: 'json',
@@ -32,17 +44,7 @@ router.route({
   handler: addSushi,
   validate: {
     type: 'json',
-    body: {
-      institutionId: Joi.string().trim().required(),
-      vendor: Joi.string().trim().required(),
-      package: Joi.string().trim().required(),
-      sushiUrl: Joi.string().trim().required(),
-      requestorId: Joi.string().trim().empty(''),
-      consortialId: Joi.string().trim().empty(''),
-      customerId: Joi.string().trim().empty(''),
-      apiKey: Joi.string().trim().empty(''),
-      comment: Joi.string().trim().empty(''),
-    },
+    body: Sushi.createSchema,
   },
 });
 
@@ -55,15 +57,7 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
-    body: {
-      vendor: Joi.string().trim().required(),
-      package: Joi.string().trim().required(),
-      sushiUrl: Joi.string().trim().required(),
-      requestorId: Joi.string().trim().empty(''),
-      customerId: Joi.string().trim().empty(''),
-      apiKey: Joi.string().trim().empty(''),
-      comment: Joi.string().trim().empty(''),
-    },
+    body: Sushi.updateSchema,
   },
 });
 

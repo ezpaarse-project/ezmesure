@@ -5,8 +5,10 @@ const sharp = require('sharp');
 const { randomBytes } = require('crypto');
 const { Joi } = require('koa-joi-router');
 const elastic = require('../services/elastic');
+const typedModel = require('./TypedModel');
 
 const index = config.get('depositors.index');
+const type = 'institution';
 const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 
 const schema = {
@@ -38,10 +40,11 @@ const schema = {
   }).default(),
 };
 
-const updateSchema = {
+const createSchema = {
   ...schema,
   id: Joi.any().strip(),
   indexCount: Joi.any().strip(),
+  indexPrefix: Joi.any().strip(),
   validated: Joi.any().strip(),
   logoId: Joi.any().strip(),
   members: Joi.any().strip(),
@@ -49,142 +52,58 @@ const updateSchema = {
   createdAt: Joi.any().strip(),
 };
 
-module.exports = class Institution {
-  constructor(data, opt) {
-    this.data = {};
-    if (data) {
-      this.update(data, opt);
-    }
-  }
+const updateSchema = {
+  ...createSchema,
+};
 
-  toJSON() {
-    return { id: this.id, ...this.data };
-  }
-
-  static from(data) {
-    return new Institution(data, { schema });
-  }
-
-  update(data = {}, opt = {}) {
-    const validator = Joi.object(opt.schema || updateSchema);
-    const { value, error } = validator.validate(data, { stripUnknown: true });
-    if (error) { throw error; }
-
-    if (data.id) {
-      this.id = data.id;
-    }
-
-    this.data = { ...this.data, ...value };
-    return this;
-  }
-
-  static async findById(id) {
-    const { body, statusCode } = await elastic.getSource({ index, id }, { ignore: [404] });
-    return body && statusCode !== 404 ? Institution.from({ id, ...body }) : undefined;
-  }
-
-  static async findByUsername(username) {
-    const { body } = await elastic.search({
-      index,
-      size: 1,
-      body: {
-        query: {
-          nested: {
-            path: 'members',
-            query: {
-              bool: {
-                filter: [
-                  { term: { 'members.username': username } },
-                ],
-              },
+module.exports = class Institution extends typedModel(type, schema, createSchema, updateSchema) {
+  static findByUsername(username) {
+    return this.findOne({
+      filters: [{
+        nested: {
+          path: `${type}.members`,
+          query: {
+            bool: {
+              filter: [{ term: { [`${type}.members.username`]: username } }],
             },
           },
         },
-      },
+      }],
     });
-
-    const institution = body && body.hits && body.hits.hits && body.hits.hits[0];
-    const { _source: source, _id: id } = institution || {};
-    return source ? Institution.from({ id, ...source }) : undefined;
   }
 
-  static async findByDomain(domain) {
-    const { body } = await elastic.search({
-      index,
-      size: 100,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { domains: domain } },
-            ],
-          },
-        },
-      },
+  static findByDomain(domain) {
+    return this.findAll({
+      filters: [
+        { term: { [`${type}.domains`]: domain } },
+      ],
     });
-
-    const institution = body && body.hits && body.hits.hits && body.hits.hits[0];
-    const { _source: source, _id: id } = institution || {};
-    return source ? Institution.from({ id, ...source }) : undefined;
   }
 
-  static async findAllValidated() {
-    // FIXME: prefer scrolling
-    const { body } = await elastic.search({
-      index,
-      size: 1000,
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { validated: true } },
-            ],
-          },
-        },
-      },
+  static findAllValidated() {
+    return this.findAll({
+      filters: [
+        { term: { [`${type}.validated`]: true } },
+      ],
     });
-
-    const institutions = body && body.hits && body.hits.hits;
-
-    if (!Array.isArray(institutions)) {
-      return Promise.reject(new Error('failed to fetch institutions'));
-    }
-
-    return institutions.map(({ _source: source, _id: id }) => Institution.from({ id, ...source }));
   }
 
-  static async findAll() {
-    // FIXME: prefer scrolling
-    const { body } = await elastic.search({ index, size: 1000, ignoreUnavailable: true });
-
-    if (!Array.isArray(body && body.hits && body.hits.hits)) {
-      throw new Error('invalid elastic response');
-    }
-
-
-    const institutions = body.hits.hits.map((hit) => {
-      const { _source: institution, _id: id } = hit;
-      return institution && Institution.from({ id, ...institution });
-    });
-
-    return institutions.filter((i) => i);
-  }
-
-  static async findAndSetValidation(id, validated) {
+  static findAndSetValidation(id, validated) {
     return elastic.update({
       index,
-      id,
+      id: Institution.generateId(id),
+      refresh: true,
       body: {
-        doc: { validated },
+        doc: { [type]: { validated } },
       },
-    });
+    }).catch((e) => Promise.reject(new Error(e)));
   }
 
-  addMember(username, type = []) {
+  addMember(username, memberType = []) {
     if (!Array.isArray(this.data.members)) {
       this.data.members = [];
     }
-    this.data.members.push({ username, type });
+    this.data.members.push({ username, type: memberType });
   }
 
   hasMember(username) {
@@ -222,31 +141,5 @@ module.exports = class Institution {
     await this.removeLogo();
 
     this.data.logoId = logoId;
-  }
-
-  async save() {
-    const now = new Date();
-
-    if (this.id) {
-      this.data.updatedAt = new Date();
-
-      await elastic.index({
-        index,
-        id: this.id,
-        refresh: true,
-        body: this.data,
-      }).catch((e) => Promise.reject(new Error(e)));
-    } else {
-      this.data.updatedAt = now;
-      this.data.createdAt = now;
-
-      const { _id: id } = await elastic.index({
-        index,
-        refresh: true,
-        body: this.data,
-      }).catch((e) => Promise.reject(new Error(e)));
-
-      this.id = id;
-    }
   }
 };

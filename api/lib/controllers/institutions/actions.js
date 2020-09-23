@@ -1,14 +1,12 @@
 const axios = require('axios');
-const fs = require('fs-extra');
-const path = require('path');
 const config = require('config');
 const { v4: uuidv4 } = require('uuid');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/depositors-template');
-const encrypter = require('../../services/encrypter');
 const { appLogger } = require('../../../server');
 
 const Institution = require('../../models/Institution');
+const Sushi = require('../../models/Sushi');
 
 const depositorsIndex = config.depositors.index;
 
@@ -19,8 +17,6 @@ const instance = axios.create({
     'Application-ID': 'ezMESURE',
   },
 });
-
-const logosDir = path.resolve(__dirname, '..', '..', '..', 'uploads', 'logos');
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -118,20 +114,16 @@ exports.getInstitution = async (ctx) => {
 
   const { institutionId } = ctx.params;
 
-  const { body: institution, statusCode } = await elastic.getSource({
-    index: depositorsIndex,
-    id: institutionId,
-  }, { ignore: [404] });
+  const institution = await Institution.findById(institutionId);
 
-  if (!institution || statusCode === 404) {
+  if (!institution) {
     ctx.throw(404, 'Institution not found');
     return;
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-
-  ctx.body = { id: institutionId, ...institution };
+  ctx.body = institution;
 };
 
 exports.getSelfInstitution = async (ctx) => {
@@ -266,11 +258,7 @@ exports.deleteInstitutions = async (ctx) => {
     for (let i = 0; i < body.ids.length; i += 1) {
       try {
         // FIXME: use bulk query
-        await elastic.delete({
-          id: body.ids[i],
-          index: depositorsIndex,
-          refresh: true,
-        });
+        await Institution.deleteOne(body.ids[i]);
         response.push({ id: body.ids[i], status: 'deleted' });
       } catch (error) {
         response.push({ id: body.ids[i], status: 'failed' });
@@ -287,12 +275,7 @@ exports.deleteInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
 
   ctx.status = 200;
-
-  ctx.body = await elastic.delete({
-    id: institutionId,
-    index: depositorsIndex,
-    refresh: true,
-  });
+  ctx.body = await Institution.deleteOne(institutionId);
 };
 
 exports.getInstitutionMembers = async (ctx) => {
@@ -381,17 +364,12 @@ exports.getSushiData = async (ctx) => {
   const { user } = ctx.state;
   const { institutionId } = ctx.params;
 
-  const { body: institution, statusCode } = await elastic.getSource({
-    index: depositorsIndex,
-    id: institutionId,
-  }, { ignore: [404] });
+  const institution = await Institution.findById(institutionId);
 
-  if (!institution || statusCode === 404) {
+  if (!institution) {
     ctx.throw(404, 'Institution not found');
     return;
   }
-
-  const sushiItems = Array.isArray(institution.sushi) ? institution.sushi : [];
 
   if (!isMember(institution, user.email) && !isAdmin(user)) {
     ctx.throw(403, 'You are not allowed to access this institution');
@@ -400,12 +378,5 @@ exports.getSushiData = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = sushiItems.map((sushiItem) => (
-    {
-      ...sushiItem,
-      requestorId: sushiItem.requestorId && encrypter.decrypt(sushiItem.requestorId),
-      customerId: sushiItem.customerId && encrypter.decrypt(sushiItem.customerId),
-      apiKey: sushiItem.apiKey && encrypter.decrypt(sushiItem.apiKey),
-    }
-  ));
+  ctx.body = await Sushi.findByInstitutionId(institutionId);
 };

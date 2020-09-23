@@ -94,7 +94,7 @@ export default {
 
     let platforms = [];
     try {
-      platforms = await $axios.$get('/sushi');
+      platforms = await $axios.$get('/sushi/platforms.json');
     } catch (e) {
       store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetrivePlatforms'));
     }
@@ -157,7 +157,7 @@ export default {
       let response;
 
       try {
-        response = await this.$axios.$post(`/institutions/${this.institution.id}/sushi/delete`, { ids });
+        response = await this.$axios.$post('/sushi/batch_delete', { ids });
         if (!Array.isArray(response)) {
           throw new Error('invalid response');
         }
