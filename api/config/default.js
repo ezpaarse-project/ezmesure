@@ -52,7 +52,6 @@ module.exports = {
   },
   depositors: {
     index: 'depositors',
-    spreadsheetId: '1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU',
     cron: '0 0 0 * * *',
   },
   reportingActivityIndex: '.ezreporting-activity',
