@@ -9,6 +9,7 @@ const files = require('./files');
 const authorize = require('./auth');
 const partners = require('./partners');
 const metrics = require('./metrics');
+const contact = require('./contact');
 
 const openapi = require('./openapi.json');
 
@@ -45,6 +46,7 @@ publicRouter.get('/openapi.json', async (ctx) => {
 app.use(publicRouter.middleware());
 app.use(partners.prefix('/partners').middleware());
 app.use(metrics.prefix('/metrics').middleware());
+app.use(contact.prefix('/contact').middleware());
 
 app.use(authorize.prefix('/profile').middleware());
 app.use(logs.prefix('/logs').middleware());
