@@ -81,7 +81,12 @@
             <v-btn color="error" @click="$router.go(-1)">
               Annuler
             </v-btn>
-            <v-btn :disabled="!valid" color="primary" @click="validate">
+            <v-btn
+              :disabled="!valid"
+              :loading="loading"
+              color="primary"
+              @click="validate"
+            >
               Envoyer
             </v-btn>
           </v-card-actions>
@@ -115,6 +120,7 @@ export default {
     ],
     sendBrowser: true,
     valid: true,
+    loading: false,
   }),
   computed: {
     user() { return this.$auth.user; },
@@ -124,6 +130,7 @@ export default {
       this.$refs.form.validate();
 
       if (this.valid) {
+        this.loading = true;
         try {
           await this.$axios.post('/contact', {
             email: this.user?.email || this.email,
@@ -138,8 +145,10 @@ export default {
           this.message = '';
           this.sendBrowser = true;
           this.$refs.form.resetValidation();
+          this.loading = false;
         } catch (e) {
           this.$store.dispatch('snacks/error', 'L\'envoi du formulaire de contact à échoué.');
+          this.loading = false;
         }
       }
     },
