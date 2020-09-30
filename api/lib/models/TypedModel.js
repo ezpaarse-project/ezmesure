@@ -115,6 +115,8 @@ module.exports = (type, schema, createSchema, updateSchema) => class TypedModel 
       body: {
         query: {
           bool: {
+            minimum_should_match: opt.should ? 1 : 0,
+            should: opt.should,
             filter,
           },
         },
