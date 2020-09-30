@@ -3,6 +3,16 @@ module.exports = {
     number_of_shards: 1,
   },
   mappings: {
+    dynamic_templates: [
+      {
+        strings_as_keywords: {
+          match_mapping_type: 'string',
+          mapping: {
+            type: 'keyword',
+          },
+        },
+      },
+    ],
     properties: {
       type: { type: 'keyword' },
 
@@ -20,6 +30,7 @@ module.exports = {
           type: { type: 'keyword' },
           location: { type: 'geo_point' },
           domains: { type: 'keyword' },
+          creator: { type: 'keyword' },
           indexPrefix: { type: 'keyword' },
           indexCount: { type: 'long' },
           auto: {
@@ -27,13 +38,6 @@ module.exports = {
               ezmesure: { type: 'boolean' },
               ezpaarse: { type: 'boolean' },
               report: { type: 'boolean' },
-            },
-          },
-          members: {
-            type: 'nested',
-            properties: {
-              username: { type: 'keyword' },
-              type: { type: 'keyword' },
             },
           },
         },
