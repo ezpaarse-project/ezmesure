@@ -67,6 +67,24 @@ module.exports = (type, schema, createSchema, updateSchema) => class TypedModel 
     });
   }
 
+  static deleteByQuery(opt = {}) {
+    let filter = [{ term: { type } }];
+
+    if (Array.isArray(opt.filters)) {
+      filter = [...filter, ...opt.filters];
+    }
+
+    return elastic.deleteByQuery({
+      index,
+      refresh: true,
+      body: {
+        query: {
+          bool: { filter },
+        },
+      },
+    });
+  }
+
   static async findById(rawId) {
     const id = TypedModel.generateId(rawId);
     const { body, statusCode } = await elastic.getSource({ index, id }, { ignore: [404] });
