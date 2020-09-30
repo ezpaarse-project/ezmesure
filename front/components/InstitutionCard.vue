@@ -95,8 +95,9 @@ export default {
         { name: 'city', value: this.institution.city, icon: 'mdi-map-marker' },
         { name: 'type', value: this.institution.type, icon: 'mdi-tag' },
         { name: 'uai', value: this.institution.uai, icon: 'mdi-identifier' },
-        { name: 'indexPrefix', icon: '' },
-        { name: 'indexCount', icon: '' },
+        { name: 'role', value: this.institution.role, icon: 'mdi-shield' },
+        { name: 'indexPrefix', value: this.institution.indexPrefix, icon: 'mdi-contain-start' },
+        { name: 'indexCount', value: this.institution.indexCount, icon: 'mdi-counter' },
       ];
 
       return fields.filter(f => f.value);
