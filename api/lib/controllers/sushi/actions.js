@@ -2,6 +2,11 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const { appLogger } = require('../../../server');
 
+const isAdmin = (user) => {
+  const roles = new Set((user && user.roles) || []);
+  return (roles.has('admin') || roles.has('superuser'));
+};
+
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
@@ -10,12 +15,24 @@ exports.getAll = async (ctx) => {
 
 exports.addSushi = async (ctx) => {
   const { body } = ctx.request;
+  const { user } = ctx.state;
 
   const institution = await Institution.findById(body.institutionId);
 
   if (!institution) {
     ctx.throw(404, 'Institution not found');
     return;
+  }
+
+  if (!isAdmin(user)) {
+    if (!institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      return;
+    }
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
+    }
   }
 
   const sushiItem = new Sushi(body);
@@ -27,6 +44,7 @@ exports.addSushi = async (ctx) => {
 
 exports.updateSushi = async (ctx) => {
   const { sushiId } = ctx.params;
+  const { user } = ctx.state;
   const { body } = ctx.request;
 
   const sushiItem = await Sushi.findById(sushiId);
@@ -36,7 +54,23 @@ exports.updateSushi = async (ctx) => {
     return;
   }
 
-  // TODO: check that the user is either admin or correspondent
+  const institution = await sushiItem.getInstitution();
+
+  if (!institution) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  if (!isAdmin(user)) {
+    if (!institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      return;
+    }
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
+    }
+  }
 
   sushiItem.update(body);
 
