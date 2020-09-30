@@ -1,5 +1,6 @@
 const { Joi } = require('koa-joi-router');
 const encrypter = require('../services/encrypter');
+const Institution = require('./Institution');
 const typedModel = require('./TypedModel');
 
 const type = 'sushi';
@@ -60,6 +61,19 @@ module.exports = class Sushi extends typedModel(type, schema, createSchema, upda
       }
     });
     return super.from(d);
+  }
+
+  static deleteByInstitutionId(institutionId) {
+    this.deleteByQuery({
+      filters: [
+        { term: { [`${type}.institutionId`]: institutionId } },
+      ],
+    });
+  }
+
+  getInstitution() {
+    if (!this.id) { return null; }
+    return Institution.findById(this.id);
   }
 
   static preSave(data) {
