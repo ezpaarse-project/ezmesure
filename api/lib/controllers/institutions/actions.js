@@ -303,25 +303,6 @@ exports.getInstitutionMembers = async (ctx) => {
   ctx.body = Array.isArray(institution.members) ? institution.members : [];
 };
 
-exports.getSelfMember = async (ctx) => {
-  const { email } = ctx.state.user;
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  const institution = await getInstitutionData(email, ['members']);
-
-  if (!institution) {
-    ctx.status = 404;
-    return;
-  }
-
-  ctx.body = {
-    id: institution.id,
-    contact: institution.members.find((sushi) => sushi.email === email) || [],
-  };
-};
-
 exports.updateMember = async (ctx) => {
   const { institutionId } = ctx.params;
   let { email } = ctx.params;

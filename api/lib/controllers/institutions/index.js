@@ -15,7 +15,6 @@ const {
   getInstitutionMembers,
   updateInstitution,
   updateMember,
-  getSelfMember,
   getSushiData,
 } = require('./actions');
 
@@ -32,12 +31,6 @@ router.route({
   method: 'GET',
   path: '/:institutionId',
   handler: getInstitution,
-});
-
-router.route({
-  method: 'GET',
-  path: '/members/self',
-  handler: getSelfMember,
 });
 
 router.route({
