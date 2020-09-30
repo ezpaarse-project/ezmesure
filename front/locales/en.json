@@ -128,7 +128,9 @@
       "notValidated": "Not validated",
       "failedToUpdateValidation": "Failed to update validation",
       "attachedDomains": "Attached domains",
-      "noAttachedDomains": "There's no domain attached to this institution yet."
+      "noAttachedDomains": "There's no domain attached to this institution yet.",
+      "associatedIndex": "Associated index",
+      "associatedRole": "Associated role"
     },
     "members": {
       "title": "Members - {institutionName}",
@@ -182,5 +184,6 @@
   "itemsDeleted": "{count} element(s) deleted",
   "update": "Update",
   "create": "Create",
+  "administration": "Administration",
   "informationSubmitted": "Information submitted"
 }

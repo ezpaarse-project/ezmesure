@@ -128,7 +128,9 @@
       "notValidated": "Non validé",
       "failedToUpdateValidation": "Impossible de mettre à jour la validation",
       "attachedDomains": "Domaines rattachés",
-      "noAttachedDomains": "Il n'y a pas de domaine rattaché à cet établissement pour le moment."
+      "noAttachedDomains": "Il n'y a pas de domaine rattaché à cet établissement pour le moment.",
+      "associatedIndex": "Index associé",
+      "associatedRole": "Rôle associé"
     },
     "members": {
       "title": "Membres - {institutionName}",
@@ -182,5 +184,6 @@
   "itemsDeleted": "{count} élement(s) supprimé(s)",
   "update": "Mettre à jour",
   "create": "Créer",
+  "administration": "Administration",
   "informationSubmitted": "Informations transmises"
 }

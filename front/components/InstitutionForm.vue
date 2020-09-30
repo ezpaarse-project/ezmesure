@@ -123,31 +123,6 @@
 
             <v-row>
               <v-col cols="12">
-                <span class="subtitle-1">Index :</span>
-              </v-col>
-
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.indexPrefix"
-                  label="Index"
-                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
-                />
-              </v-col>
-
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.indexCount"
-                  label="Total ECs"
-                  hide-details
-                  disabled
-                />
-              </v-col>
-            </v-row>
-
-            <v-divider />
-
-            <v-row>
-              <v-col cols="12">
                 <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
               </v-col>
               <v-col cols="4">
@@ -158,6 +133,30 @@
               </v-col>
               <v-col cols="4">
                 <v-checkbox v-model="institution.auto.report" label="Reporting" />
+              </v-col>
+            </v-row>
+
+            <v-divider />
+
+            <v-row v-if="isAdmin">
+              <v-col cols="12">
+                <span class="subtitle-1">{{ $t('administration') }}</span>
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="institution.indexPrefix"
+                  :label="$t('institutions.institution.associatedIndex')"
+                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
+                />
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="institution.role"
+                  :label="$t('institutions.institution.associatedRole')"
+                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
+                />
               </v-col>
             </v-row>
           </v-container>
