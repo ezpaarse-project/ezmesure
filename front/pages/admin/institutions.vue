@@ -4,6 +4,12 @@
       <slot>
         <v-spacer />
 
+        <v-btn text @click="createInstitution">
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          {{ $t('add') }}
+        </v-btn>
         <v-btn text @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
@@ -189,6 +195,9 @@ export default {
     },
     editInstitution(item) {
       this.$refs.institutionForm.editInstitution(item);
+    },
+    createInstitution() {
+      this.$refs.institutionForm.createInstitution();
     },
     async deleteData() {
       if (this.selected.length === 0) {

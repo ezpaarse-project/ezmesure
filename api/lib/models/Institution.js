@@ -54,6 +54,19 @@ const updateSchema = {
   ...createSchema,
 };
 
+async function createRole(role, settings = {}) {
+  const { body } = await elastic.security.getRole({ name: role }, { ignore: [404] });
+  const existingRole = body && body[role];
+
+  if (existingRole) { return; }
+
+  await elastic.security.putRole({
+    name: role,
+    refresh: true,
+    body: settings,
+  }, { ignore: [404] });
+}
+
 class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   static findOneByCreatorOrRole(username, roles) {
     return this.findOne({
@@ -121,21 +134,14 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       throw new Error('institution has no index prefix associated');
     }
 
-    const { body } = await elastic.security.getRole({ name: role }, { ignore: [404] });
-    const existingRole = body && body[role];
-
-    if (existingRole) { return; }
-
-    await elastic.security.putRole({
-      name: role,
-      refresh: true,
-      body: {
-        indices: [{
-          names: [`${indexPrefix}*`],
-          privileges: ['all'],
-        }],
-      },
-    }, { ignore: [404] });
+    await createRole(techRole);
+    await createRole(docRole);
+    await createRole(role, {
+      indices: [{
+        names: [`${indexPrefix}*`],
+        privileges: ['all'],
+      }],
+    });
   }
 
   async migrateCreator() {
@@ -151,8 +157,11 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
     user.roles = Array.isArray(user.roles) ? user.roles : [];
 
-    if (!user.roles.includes(role)) {
-      user.roles.push(role);
+    const roles = [role, techRole, docRole];
+    const hasAllRoles = roles.every((r) => user.roles.includes(r));
+
+    if (!hasAllRoles) {
+      user.roles = Array.from(new Set(roles.concat(user.roles)));
       await elastic.security.putUser({ username: creator, refresh: true, body: user });
     }
 
