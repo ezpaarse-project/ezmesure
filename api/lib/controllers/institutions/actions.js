@@ -129,30 +129,31 @@ exports.getInstitution = async (ctx) => {
 exports.getSelfInstitution = async (ctx) => {
   await ensureIndex();
 
-  const { username } = ctx.state.user;
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  const institution = await Institution.findByUsername(username);
+  const { username, roles } = ctx.state.user;
+  const institution = await Institution.findOneByCreatorOrRole(username, roles);
 
   if (!institution) {
     ctx.throw(404, 'No assigned institution');
     return;
   }
 
+  ctx.type = 'json';
+  ctx.status = 200;
   ctx.body = institution;
 };
 
 exports.createInstitution = async (ctx) => {
   await ensureIndex();
 
+  const { user } = ctx.state;
   const { body } = ctx.request;
   const { logo } = body;
   const { username } = ctx.state.user;
 
-  const institution = new Institution(body);
-  institution.addMember(username);
+  const institution = new Institution(body, {
+    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+  });
+  institution.setCreator(username);
 
   if (logo) {
     await institution.updateLogo(logo);
@@ -196,12 +197,14 @@ exports.updateInstitution = async (ctx) => {
     return;
   }
 
-  if (!institution.hasMember(user.username) && !isAdmin(user)) {
+  if (!institution.isContact(user) && !isAdmin(user)) {
     ctx.throw(403, 'You are not authorized to update this institution data');
     return;
   }
 
-  institution.update(body);
+  institution.update(body, {
+    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+  });
 
   if (body.logo) {
     await institution.updateLogo(body.logo);
@@ -237,14 +240,29 @@ exports.updateInstitution = async (ctx) => {
 exports.validateInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
   const { user } = ctx.state;
-  const { body: { value: validated } } = ctx.request;
+  const { body = {} } = ctx.request;
+  const { value: validated } = body;
 
   if (!isAdmin(user)) {
     ctx.throw(403, 'You are not allowed to validate this institution');
     return;
   }
 
-  await Institution.findAndSetValidation(institutionId, validated);
+  const institution = await Institution.findById(institutionId);
+
+  if (!institution) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  institution.setValidation(validated);
+
+  if (validated) {
+    await institution.createRole();
+    await institution.migrateCreator();
+  }
+
+  await institution.save();
 
   ctx.status = 200;
 };
@@ -352,7 +370,7 @@ exports.getSushiData = async (ctx) => {
     return;
   }
 
-  if (!isMember(institution, user.email) && !isAdmin(user)) {
+  if (!institution.isContact(user) && !isAdmin(user)) {
     ctx.throw(403, 'You are not allowed to access this institution');
     return;
   }

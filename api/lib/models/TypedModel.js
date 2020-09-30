@@ -5,8 +5,12 @@ const elastic = require('../services/elastic');
 const { appLogger } = require('../../server');
 
 const index = config.get('depositors.index');
+const models = new Map();
 
-module.exports = (type, schema, createSchema, updateSchema) => class TypedModel {
+const registerModel = (model) => models.set(model.type, model);
+const getModel = (type) => models.get(type);
+
+const typedModel = (type, schema, createSchema, updateSchema) => class TypedModel {
   static get index() { return index; }
 
   static get type() { return type; }
@@ -164,4 +168,10 @@ module.exports = (type, schema, createSchema, updateSchema) => class TypedModel 
       this.id = id;
     }
   }
+};
+
+module.exports = {
+  registerModel,
+  getModel,
+  typedModel,
 };

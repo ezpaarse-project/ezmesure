@@ -1,7 +1,6 @@
 const { Joi } = require('koa-joi-router');
 const encrypter = require('../services/encrypter');
-const Institution = require('./Institution');
-const typedModel = require('./TypedModel');
+const { typedModel, registerModel, getModel } = require('./TypedModel');
 
 const type = 'sushi';
 const cryptedFields = ['requestorId', 'consortialId', 'customerId', 'apiKey'];
@@ -34,7 +33,7 @@ const updateSchema = {
   institutionId: Joi.any().strip(),
 };
 
-module.exports = class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
+class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
   toJSON() {
     const sushiItem = { id: this.id, ...this.data };
 
@@ -72,8 +71,8 @@ module.exports = class Sushi extends typedModel(type, schema, createSchema, upda
   }
 
   getInstitution() {
-    if (!this.id) { return null; }
-    return Institution.findById(this.id);
+    if (!this.data.institutionId) { return null; }
+    return getModel('institution').findById(this.data.institutionId);
   }
 
   static preSave(data) {
@@ -87,4 +86,7 @@ module.exports = class Sushi extends typedModel(type, schema, createSchema, upda
 
     return savedData;
   }
-};
+}
+
+registerModel(Sushi);
+module.exports = Sushi;

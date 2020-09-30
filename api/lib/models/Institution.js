@@ -1,24 +1,27 @@
 const path = require('path');
 const fs = require('fs-extra');
-const config = require('config');
 const sharp = require('sharp');
 const { randomBytes } = require('crypto');
 const { Joi } = require('koa-joi-router');
 const elastic = require('../services/elastic');
-const typedModel = require('./TypedModel');
+const { registerModel, typedModel, getModel } = require('./TypedModel');
 
-const index = config.get('depositors.index');
 const type = 'institution';
+const techRole = 'tech-contact';
+const docRole = 'doc-contact';
 const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 
 const schema = {
-  id: Joi.string().required(),
+  id: Joi.string(),
   validated: Joi.boolean().default(false),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
   indexCount: Joi.number().default(0),
   indexPrefix: Joi.string().allow(''),
+
+  creator: Joi.string().allow(null),
+  role: Joi.string().allow(null),
 
   type: Joi.string().allow(''),
   name: Joi.string().allow(''),
@@ -29,10 +32,6 @@ const schema = {
   logoId: Joi.string().empty('').allow(null),
 
   domains: Joi.array().default([]).items(Joi.string()),
-  members: Joi.array().default([]).items(Joi.object({
-    username: Joi.string(),
-    type: Joi.array().items(Joi.string()),
-  })),
   auto: Joi.object({
     ezmesure: Joi.boolean().default(false),
     ezpaarse: Joi.boolean().default(false),
@@ -47,7 +46,6 @@ const createSchema = {
   indexPrefix: Joi.any().strip(),
   validated: Joi.any().strip(),
   logoId: Joi.any().strip(),
-  members: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
@@ -56,19 +54,13 @@ const updateSchema = {
   ...createSchema,
 };
 
-module.exports = class Institution extends typedModel(type, schema, createSchema, updateSchema) {
-  static findByUsername(username) {
+class Institution extends typedModel(type, schema, createSchema, updateSchema) {
+  static findOneByCreatorOrRole(username, roles) {
     return this.findOne({
-      filters: [{
-        nested: {
-          path: `${type}.members`,
-          query: {
-            bool: {
-              filter: [{ term: { [`${type}.members.username`]: username } }],
-            },
-          },
-        },
-      }],
+      should: [
+        { bool: { filter: { terms: { [`${type}.role`]: roles } } } },
+        { bool: { filter: { term: { [`${type}.creator`]: username } } } },
+      ],
     });
   }
 
@@ -88,27 +80,83 @@ module.exports = class Institution extends typedModel(type, schema, createSchema
     });
   }
 
-  static findAndSetValidation(id, validated) {
-    return elastic.update({
-      index,
-      id: Institution.generateId(id),
+  static async deleteOne(rawId) {
+    await super.deleteOne(rawId);
+    return getModel('sushi').deleteByInstitutionId(rawId);
+  }
+
+  isValidated() {
+    return !!this.data.validated;
+  }
+
+  setValidation(validated) {
+    this.data.validated = validated;
+  }
+
+  setCreator(username) {
+    this.data.creator = username;
+  }
+
+  isContact(user) {
+    const { creator, role } = this.data;
+
+    if (!user || !user.username) { return false; }
+    if (creator && creator === user.username) { return true; }
+    if (!role || !Array.isArray(user && user.roles)) { return false; }
+
+    const roles = new Set(user.roles);
+    return roles.has(role) && (roles.has(techRole) || roles.has(docRole));
+  }
+
+  /**
+   * Create the associated role if it doesn't exist
+   */
+  async createRole() {
+    const { role, indexPrefix } = this.data;
+
+    if (!role) {
+      throw new Error('institution has no role associated');
+    }
+    if (!indexPrefix) {
+      throw new Error('institution has no index prefix associated');
+    }
+
+    const { body } = await elastic.security.getRole({ name: role }, { ignore: [404] });
+    const existingRole = body && body[role];
+
+    if (existingRole) { return; }
+
+    await elastic.security.putRole({
+      name: role,
       refresh: true,
       body: {
-        doc: { [type]: { validated } },
+        indices: [{
+          names: [`${indexPrefix}*`],
+          privileges: ['all'],
+        }],
       },
-    }).catch((e) => Promise.reject(new Error(e)));
+    }, { ignore: [404] });
   }
 
-  addMember(username, memberType = []) {
-    if (!Array.isArray(this.data.members)) {
-      this.data.members = [];
+  async migrateCreator() {
+    const { creator, role } = this.data;
+    if (!creator || !role) { return; }
+
+    const { body = {} } = await elastic.security.getUser({ username: creator }, { ignore: [404] });
+    const user = body[creator];
+
+    if (!user) {
+      throw new Error('no user matching institution creator');
     }
-    this.data.members.push({ username, type: memberType });
-  }
 
-  hasMember(username) {
-    const { members } = this.data;
-    return Array.isArray(members) ? members.some((m) => m.username === username) : false;
+    user.roles = Array.isArray(user.roles) ? user.roles : [];
+
+    if (!user.roles.includes(role)) {
+      user.roles.push(role);
+      await elastic.security.putUser({ username: creator, refresh: true, body: user });
+    }
+
+    this.data.creator = null;
   }
 
   logoPath() {
@@ -142,4 +190,7 @@ module.exports = class Institution extends typedModel(type, schema, createSchema
 
     this.data.logoId = logoId;
   }
-};
+}
+
+registerModel(Institution);
+module.exports = Institution;
