@@ -4,6 +4,7 @@
     :close-on-content-click="false"
     :nudge-width="200"
     offset-x
+    max-width="400"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-btn
@@ -19,6 +20,15 @@
     </template>
 
     <v-card>
+      <v-card-text v-if="!isValidatable">
+        <v-alert
+          dense
+          outlined
+          type="info"
+          v-text="$t('institutions.institution.notValidatable')"
+        />
+      </v-card-text>
+
       <v-card-actions>
         <v-btn
           :loading="validating"
@@ -35,6 +45,7 @@
           :loading="validating"
           color="success"
           text
+          :disabled="!isValidatable"
           @click="setValidation(true)"
         >
           <v-icon left>
@@ -50,19 +61,22 @@
 <script>
 export default {
   props: {
-    institutionId: {
-      type: String,
-      default: () => '',
+    institution: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
     return {
       show: false,
       validating: false,
+      institutionId: this.institution?.id,
     };
   },
   computed: {
-
+    isValidatable() {
+      return this.institution?.indexPrefix && this.institution?.role;
+    },
   },
   methods: {
     async setValidation(validated) {
@@ -75,7 +89,7 @@ export default {
         this.$emit('change', validated);
         this.show = false;
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institution.institution.failedToUpdateValidation'));
+        this.$store.dispatch('snacks/error', this.$t('institutions.institution.failedToUpdateValidation'));
       }
 
       this.validating = false;

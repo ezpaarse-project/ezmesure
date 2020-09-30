@@ -20,8 +20,8 @@ const schema = {
   indexCount: Joi.number().default(0),
   indexPrefix: Joi.string().allow(''),
 
-  creator: Joi.string().allow(null),
-  role: Joi.string().allow(null),
+  creator: Joi.string().allow('').allow(null),
+  role: Joi.string().allow('').allow(null),
 
   type: Joi.string().allow(''),
   name: Joi.string().allow(''),

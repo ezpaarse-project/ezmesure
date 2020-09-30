@@ -109,7 +109,7 @@
         </v-tooltip>
 
         <ValidationPopup
-          :institution-id="item.id"
+          :institution="item"
           @change="validated => item.validated = validated"
         />
       </template>
