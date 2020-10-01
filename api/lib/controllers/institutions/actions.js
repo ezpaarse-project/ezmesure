@@ -147,13 +147,17 @@ exports.createInstitution = async (ctx) => {
 
   const { user } = ctx.state;
   const { body } = ctx.request;
+  const { creator } = ctx.query.creator;
   const { logo } = body;
   const { username } = ctx.state.user;
 
   const institution = new Institution(body, {
     schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
   });
-  institution.setCreator(username);
+
+  if (!isAdmin(user) || creator === false) {
+    institution.setCreator(username);
+  }
 
   if (logo) {
     await institution.updateLogo(logo);

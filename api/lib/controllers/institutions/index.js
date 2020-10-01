@@ -122,6 +122,9 @@ router.route({
   handler: createInstitution,
   validate: {
     type: 'json',
+    query: {
+      creator: Joi.boolean(),
+    },
   },
 });
 

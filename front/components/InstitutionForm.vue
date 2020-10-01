@@ -296,7 +296,7 @@ export default {
         if (this.institution.id) {
           await this.$axios.$put(`/institutions/${this.institution.id}`, this.institution);
         } else {
-          await this.$axios.$post('/institutions', this.institution);
+          await this.$axios.$post('/institutions?creator=false', this.institution);
         }
         this.$emit('update');
       } catch (e) {
