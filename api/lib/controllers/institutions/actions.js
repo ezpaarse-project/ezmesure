@@ -273,8 +273,13 @@ exports.validateInstitution = async (ctx) => {
 
 exports.deleteInstitutions = async (ctx) => {
   const { body } = ctx.request;
-
+  const { user } = ctx.state;
   const response = [];
+
+  if (!isAdmin(user)) {
+    ctx.throw(403, 'You are not allowed to delete institutions');
+    return;
+  }
 
   if (Array.isArray(body.ids) && body.ids.length > 0) {
     for (let i = 0; i < body.ids.length; i += 1) {
@@ -295,6 +300,12 @@ exports.deleteInstitutions = async (ctx) => {
 
 exports.deleteInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+
+  if (!isAdmin(user)) {
+    ctx.throw(403, 'You are not allowed to delete institutions');
+    return;
+  }
 
   ctx.status = 200;
   ctx.body = await Institution.deleteOne(institutionId);
