@@ -23,21 +23,21 @@
 
       <v-list-group
         v-if="isBetaTester"
-        :value="$nuxt.$route.name.includes(institution.title.toLowerCase())"
+        :value="$nuxt.$route.name.includes(institutionMenu.title.toLowerCase())"
       >
         <template v-slot:activator>
           <v-list-item-title
             class="grey--text text--darken-3 uppercase"
-            v-text="institution.title"
+            v-text="institutionMenu.title"
           />
         </template>
 
         <v-list-item
-          v-for="child in institution.children"
+          v-for="child in institutionMenu.children"
           :key="child.title"
           router
           exact
-          :to="{ path: `${institution.href}${child.href}` }"
+          :to="{ path: `${institutionMenu.href}${child.href}` }"
           ripple
         >
           <v-list-item-title
@@ -93,6 +93,7 @@ export default {
   data() {
     return {
       item: 1,
+      institution: null,
     };
   },
   computed: {
@@ -117,8 +118,8 @@ export default {
         ],
       };
     },
-    institution() {
-      return {
+    institutionMenu() {
+      const menuGroup = {
         title: this.$t('menu.myInstitution'),
         href: '/institutions',
         children: [
@@ -126,16 +127,21 @@ export default {
             title: this.$t('menu.profile'),
             href: '/self',
           },
-          {
-            title: this.$t('menu.members'),
-            href: '/self/members',
-          },
-          {
-            title: this.$t('menu.sushi'),
-            href: '/self/sushi',
-          },
         ],
       };
+
+      if (this.isInstitutionContact) {
+        menuGroup.children.push({
+          title: this.$t('menu.members'),
+          href: '/self/members',
+        });
+        menuGroup.children.push({
+          title: this.$t('menu.sushi'),
+          href: '/self/sushi',
+        });
+      }
+
+      return menuGroup;
     },
     drawer: {
       get() { return this.$store.state.drawer; },
@@ -148,9 +154,30 @@ export default {
     isAdmin() {
       return this.userRoles.some(role => ['admin', 'superuser'].includes(role));
     },
+    isContact() {
+      return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
+    },
     isBetaTester() {
       return this.userRoles.includes('beta_tester');
     },
+    isInstitutionContact() {
+      if (!this.institution?.role) { return false; }
+      if (!this.isContact) { return false; }
+
+      return this.userRoles.includes(this.institution.role);
+    },
+  },
+
+  async mounted() {
+    if (!this.isBetaTester) { return; }
+
+    try {
+      this.institution = await this.$axios.$get('/institutions/self');
+    } catch (e) {
+      if (e.response?.status !== 404) {
+        this.$store.$dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
+      }
+    }
   },
 };
 </script>
