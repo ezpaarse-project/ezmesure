@@ -130,7 +130,7 @@ export default {
         ],
       };
 
-      if (this.isInstitutionContact) {
+      if (this.isInstitutionContact && this.institution?.validated) {
         menuGroup.children.push({
           title: this.$t('menu.members'),
           href: '/self/members',
