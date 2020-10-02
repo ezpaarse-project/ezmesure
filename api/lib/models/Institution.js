@@ -7,8 +7,8 @@ const elastic = require('../services/elastic');
 const { registerModel, typedModel, getModel } = require('./TypedModel');
 
 const type = 'institution';
-const techRole = 'tech-contact';
-const docRole = 'doc-contact';
+const techRole = 'tech_contact';
+const docRole = 'doc_contact';
 const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 
 const schema = {
