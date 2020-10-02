@@ -71,6 +71,14 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     });
   }
 
+  delete() {
+    return this.id && elastic.delete({
+      id: TypedModel.generateId(this.id),
+      index,
+      refresh: true,
+    }).catch((e) => Promise.reject(new Error(e)));
+  }
+
   static deleteByQuery(opt = {}) {
     let filter = [{ term: { type } }];
 
@@ -97,6 +105,28 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
       return this.from({ id, ...body[type] });
     }
     return undefined;
+  }
+
+  static async findManyById(rawIds) {
+    const ids = rawIds.map((rawId) => TypedModel.generateId(rawId));
+
+    const { body } = await elastic.search({
+      index,
+      body: {
+        query: { ids: { values: ids } },
+      },
+    }, { ignore: [404] }).catch((e) => Promise.reject(new Error(e)));
+
+    if (!Array.isArray(body && body.hits && body.hits.hits)) {
+      throw new Error('invalid elastic response');
+    }
+
+    const items = body.hits.hits.map((hit) => {
+      const { _source: source, _id: id } = hit;
+      return (source && source[type]) && this.from({ id, ...source[type] });
+    });
+
+    return items.filter((i) => i);
   }
 
   static async findOne(opt = {}) {
