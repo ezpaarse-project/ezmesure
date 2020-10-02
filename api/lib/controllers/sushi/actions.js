@@ -87,23 +87,38 @@ exports.updateSushi = async (ctx) => {
 
 exports.deleteSushiData = async (ctx) => {
   const { body } = ctx.request;
+  const { user } = ctx.state;
 
-  const response = [];
+  const institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
 
-  if (Array.isArray(body.ids) && body.ids.length > 0) {
-    for (let i = 0; i < body.ids.length; i += 1) {
-      try {
-        // FIXME: use bulk query
-        // TODO: check that the user is either admin or correspondent
-        await Sushi.deleteOne(body.ids[i]);
-        response.push({ id: body.ids[i], status: 'deleted' });
-      } catch (error) {
-        response.push({ id: body.ids[i], status: 'failed' });
-        appLogger.error('Failed to delete sushi data', error);
-      }
+  if (!isAdmin(user)) {
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage sushi credentials');
+      return;
+    }
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
+    }
+  }
+
+  const sushiItems = await Sushi.findManyById(body.ids);
+
+  const response = await Promise.all(sushiItems.map(async (sushiItem) => {
+    if (!isAdmin(user) && (sushiItem.getInstitutionId() !== institution.id)) {
+      return { id: sushiItem.id, status: 'failed' };
     }
 
-    ctx.status = 200;
-    ctx.body = response;
-  }
+
+    try {
+      await sushiItem.delete();
+      return { id: sushiItem.id, status: 'deleted' };
+    } catch (error) {
+      appLogger.error('Failed to delete sushi data', error);
+      return { id: sushiItem.id, status: 'failed' };
+    }
+  }));
+
+  ctx.status = 200;
+  ctx.body = response;
 };
