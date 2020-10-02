@@ -170,7 +170,7 @@ export default {
   },
 
   async mounted() {
-    if (!this.isAdmin || !this.isBetaTester) { return; }
+    if (!this.isAdmin && !this.isBetaTester) { return; }
 
     try {
       this.institution = await this.$axios.$get('/institutions/self');
