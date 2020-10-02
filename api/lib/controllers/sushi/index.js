@@ -2,7 +2,12 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
-const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
+const {
+  requireJwt,
+  requireUser,
+  requireTermsOfUse,
+  requireRole,
+} = require('../../services/auth');
 
 const {
   getAll,
@@ -11,7 +16,7 @@ const {
   addSushi,
 } = require('./actions');
 
-router.use(requireJwt, requireUser, requireTermsOfUse);
+router.use(requireJwt, requireUser, requireTermsOfUse, requireRole('beta_tester'));
 
 router.route({
   method: 'GET',

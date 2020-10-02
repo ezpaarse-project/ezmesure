@@ -2,7 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const bodyParser = require('koa-bodyparser');
 
-const { requireJwt, requireUser } = require('../../services/auth');
+const { requireJwt, requireUser, requireRole } = require('../../services/auth');
 
 const {
   getInstitutions,
@@ -21,6 +21,8 @@ const {
 router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
+
+router.use(requireRole('beta_tester'));
 
 router.route({
   method: 'GET',

@@ -22,6 +22,7 @@
       </v-list-item>
 
       <v-list-group
+        v-if="isBetaTester"
         :value="$nuxt.$route.name.includes(institution.title.toLowerCase())"
       >
         <template v-slot:activator>
@@ -140,13 +141,15 @@ export default {
       get() { return this.$store.state.drawer; },
       set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },
     },
-    user() { return this.$auth.user; },
-    hasRoles() { return Array.isArray(this.user.roles) && this.user.roles.length > 0; },
+    userRoles() {
+      const roles = this.$auth?.user?.roles;
+      return Array.isArray(roles) ? roles : [];
+    },
     isAdmin() {
-      if (this.user && this.hasRoles) {
-        return this.user.roles.some(role => ['admin', 'superuser'].includes(role));
-      }
-      return false;
+      return this.userRoles.some(role => ['admin', 'superuser'].includes(role));
+    },
+    isBetaTester() {
+      return this.userRoles.includes('beta_tester');
     },
   },
 };
