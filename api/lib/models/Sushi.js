@@ -70,6 +70,10 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
     });
   }
 
+  getInstitutionId() {
+    return this.data && this.data.institutionId;
+  }
+
   getInstitution() {
     if (!this.data.institutionId) { return null; }
     return getModel('institution').findById(this.data.institutionId);
