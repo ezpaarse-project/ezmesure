@@ -10,6 +10,13 @@ const isAdmin = (user) => {
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
+  const { user } = ctx.state;
+
+  if (!isAdmin(user)) {
+    ctx.throw(403, 'You are not authorized to access this route');
+    return;
+  }
+
   ctx.body = await Sushi.findAll();
 };
 
