@@ -36,10 +36,12 @@ const requireTermsOfUse = async (ctx, next) => {
   await next();
 };
 
-const requireRole = (role) => async (ctx, next) => {
+const requireAnyRole = (role) => async (ctx, next) => {
   const { user } = ctx.state;
 
-  if (!Array.isArray(user && user.roles) || !user.roles.includes(role)) {
+  const roles = Array.isArray(role) ? role : [role];
+
+  if (!Array.isArray(user && user.roles) || !user.roles.some((r) => roles.includes(r))) {
     ctx.throw(403, 'You are not authorized to use this feature');
   }
 
@@ -50,5 +52,5 @@ module.exports = {
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireRole,
+  requireAnyRole,
 };

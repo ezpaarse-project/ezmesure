@@ -6,7 +6,7 @@ const {
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireRole,
+  requireAnyRole,
 } = require('../../services/auth');
 
 const {
@@ -16,7 +16,7 @@ const {
   addSushi,
 } = require('./actions');
 
-router.use(requireJwt, requireUser, requireTermsOfUse, requireRole('beta_tester'));
+router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['beta_tester', 'admin', 'superuser']));
 
 router.route({
   method: 'GET',
