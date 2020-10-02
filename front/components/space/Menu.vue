@@ -22,7 +22,7 @@
       </v-list-item>
 
       <v-list-group
-        v-if="isBetaTester"
+        v-if="isBetaTester || isAdmin"
         :value="$nuxt.$route.name.includes(institutionMenu.title.toLowerCase())"
       >
         <template v-slot:activator>
@@ -161,6 +161,7 @@ export default {
       return this.userRoles.includes('beta_tester');
     },
     isInstitutionContact() {
+      if (this.isAdmin) { return true; }
       if (!this.institution?.role) { return false; }
       if (!this.isContact) { return false; }
 
@@ -169,7 +170,7 @@ export default {
   },
 
   async mounted() {
-    if (!this.isBetaTester) { return; }
+    if (!this.isAdmin || !this.isBetaTester) { return; }
 
     try {
       this.institution = await this.$axios.$get('/institutions/self');
