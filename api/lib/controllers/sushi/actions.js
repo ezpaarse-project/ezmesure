@@ -61,15 +61,10 @@ exports.updateSushi = async (ctx) => {
     return;
   }
 
-  const institution = await sushiItem.getInstitution();
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
   if (!isAdmin(user)) {
-    if (!institution.isContact(user)) {
+    const institution = await sushiItem.getInstitution();
+
+    if (!institution || !institution.isContact(user)) {
       ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
       return;
     }
