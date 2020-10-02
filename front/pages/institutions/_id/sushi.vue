@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.sushi.title', { institutionName: institution.name })">
+    <ToolBar :title="$t('institutions.sushi.title', { institutionName })">
       <slot>
         <v-spacer />
         <v-btn
@@ -123,6 +123,9 @@ export default {
   computed: {
     hasInstitution() {
       return !!this.institution?.id;
+    },
+    institutionName() {
+      return this.institution?.name;
     },
   },
   mounted() {
