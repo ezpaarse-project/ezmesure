@@ -22,7 +22,7 @@ router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
 
-router.use(requireAnyRole(['beta_tester', 'admin', 'superuser']));
+router.use(requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
 
 router.route({
   method: 'GET',

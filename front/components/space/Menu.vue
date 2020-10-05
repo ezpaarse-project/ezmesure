@@ -158,7 +158,7 @@ export default {
       return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
     },
     isBetaTester() {
-      return this.userRoles.includes('beta_tester');
+      return this.userRoles.includes('sushi_form_tester');
     },
     isInstitutionContact() {
       if (this.isAdmin) { return true; }
