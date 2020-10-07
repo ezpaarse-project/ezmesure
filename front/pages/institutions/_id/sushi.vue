@@ -31,10 +31,6 @@
       show-select
       item-key="id"
     >
-      <template v-slot:item.name="{ item }">
-        {{ item.vendor }}
-      </template>
-
       <template v-slot:item.actions="{ item }">
         <v-icon
           small
@@ -106,8 +102,14 @@ export default {
       refreshing: false,
       headers: [
         {
-          text: app.i18n.t('institutions.sushi.label'),
-          value: 'name',
+          text: app.i18n.t('institutions.sushi.platform'),
+          value: 'vendor',
+        },
+        {
+          text: app.i18n.t('institutions.sushi.package'),
+          value: 'package',
+          align: 'right',
+          width: '200px',
         },
         {
           text: 'Actions',
