@@ -22,6 +22,7 @@ const schema = {
 
   creator: Joi.string().allow('').allow(null),
   role: Joi.string().allow('').allow(null),
+  space: Joi.string().allow('').allow(null),
 
   type: Joi.string().allow(''),
   name: Joi.string().allow(''),
@@ -46,6 +47,9 @@ const createSchema = {
   indexPrefix: Joi.any().strip(),
   validated: Joi.any().strip(),
   logoId: Joi.any().strip(),
+  role: Joi.any().strip(),
+  creator: Joi.any().strip(),
+  space: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };

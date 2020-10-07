@@ -134,7 +134,9 @@
       "attachedDomains": "Domaines rattachés",
       "noAttachedDomains": "Il n'y a pas de domaine rattaché à cet établissement pour le moment.",
       "associatedIndex": "Index associé",
-      "associatedRole": "Rôle associé"
+      "associatedRole": "Rôle associé",
+      "associatedSpace": "Espace associé",
+      "identicalNames": "Préfixe, rôle et espace identiques"
     },
     "members": {
       "title": "Membres - {institutionName}",

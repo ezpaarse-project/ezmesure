@@ -143,19 +143,35 @@
                 <span class="subtitle-1">{{ $t('administration') }}</span>
               </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.indexPrefix"
-                  :label="$t('institutions.institution.associatedIndex')"
-                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
+              <v-col cols="12">
+                <v-checkbox
+                  v-model="identicalNames"
+                  :label="$t('institutions.institution.identicalNames')"
+                  hide-details
+                  @change="duplicatePrefix"
                 />
               </v-col>
 
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="4">
+                <v-text-field
+                  v-model="institution.indexPrefix"
+                  :label="$t('institutions.institution.associatedIndex')"
+                  @input="duplicatePrefix"
+                />
+              </v-col>
+
+              <v-col cols="12" sm="4">
                 <v-text-field
                   v-model="institution.role"
                   :label="$t('institutions.institution.associatedRole')"
-                  :hint="suggestedPrefix && `Suggestion : ${suggestedPrefix}`"
+                  :disabled="identicalNames"
+                />
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-text-field
+                  v-model="institution.space"
+                  :label="$t('institutions.institution.associatedSpace')"
+                  :disabled="identicalNames"
                 />
               </v-col>
             </v-row>
@@ -203,6 +219,7 @@ export default {
       draggingFile: false,
       defaultLogo,
       logoPreview: null,
+      identicalNames: true,
 
       institution: {
         auto: {},
@@ -225,12 +242,6 @@ export default {
       if (this.institution?.logoId) { return `/api/assets/logos/${this.institution.logoId}`; }
       return defaultLogo;
     },
-    suggestedPrefix() {
-      const email = this.members[0]?.email;
-      const match = /@(\w+)/i.exec(email);
-      return match && match[1];
-    },
-
     hasRoles() {
       return Array.isArray(this.$auth?.user?.roles) && this.$auth.user.roles.length > 0;
     },
@@ -242,6 +253,12 @@ export default {
     },
   },
   methods: {
+    duplicatePrefix() {
+      if (this.identicalNames) {
+        this.institution.space = this.institution.indexPrefix;
+        this.institution.role = this.institution.indexPrefix;
+      }
+    },
     editInstitution(institution) {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
@@ -249,6 +266,9 @@ export default {
 
       this.institution = JSON.parse(JSON.stringify(institution));
       this.institution.auto = this.institution.auto || {};
+
+      const { role, space, indexPrefix } = this.institution;
+      this.identicalNames = (role === space && role === indexPrefix);
 
       this.show = true;
     },

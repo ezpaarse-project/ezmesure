@@ -134,7 +134,9 @@
       "attachedDomains": "Attached domains",
       "noAttachedDomains": "There's no domain attached to this institution yet.",
       "associatedIndex": "Associated index",
-      "associatedRole": "Associated role"
+      "associatedRole": "Associated role",
+      "associatedSpace": "Associated space",
+      "identicalNames": "Identical prefix, role and space"
     },
     "members": {
       "title": "Members - {institutionName}",
