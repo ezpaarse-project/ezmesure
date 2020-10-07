@@ -133,10 +133,10 @@ export default {
   },
   methods: {
     createSushiItem() {
-      this.$refs.sushiForm.createSushiItem(this.institution.id);
+      this.$refs.sushiForm.createSushiItem(this.institution);
     },
     editSushiItem(item) {
-      this.$refs.sushiForm.editSushiItem(this.institution.id, item);
+      this.$refs.sushiForm.editSushiItem(this.institution, item);
     },
     async refreshSushiItems() {
       if (!this.hasInstitution) { return; }

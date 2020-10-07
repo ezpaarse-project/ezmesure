@@ -151,17 +151,17 @@ export default {
     },
   },
   methods: {
-    editSushiItem(institutionId, sushiData = {}) {
+    editSushiItem(institution, sushiData = {}) {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
 
-      this.institutionId = institutionId;
+      this.institutionId = institution?.id;
       this.sushiForm.vendor = sushiData.vendor || '';
 
       this.applyVendor();
 
-      this.sushiForm.package = sushiData.package || '';
+      this.sushiForm.package = sushiData.package || institution?.indexPrefix || '';
       this.sushiForm.sushiUrl = sushiData.sushiUrl || '';
       this.sushiForm.requestorId = sushiData.requestorId || '';
       this.sushiForm.customerId = sushiData.customerId || '';
@@ -171,8 +171,8 @@ export default {
       this.show = true;
     },
 
-    createSushiItem(institutionId) {
-      this.editSushiItem(institutionId);
+    createSushiItem(institution) {
+      this.editSushiItem(institution);
     },
 
     applyVendor() {
