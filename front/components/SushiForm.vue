@@ -12,7 +12,7 @@
                   ref="vendorsBox"
                   v-model="sushiForm.vendor"
                   :items="vendors"
-                  :label="$t('institutions.sushi.platform')"
+                  :label="`${$t('institutions.sushi.platform')} *`"
                   :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
                   item-text="vendor"
                   outlined
@@ -26,7 +26,7 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.package"
-                    label="Package *"
+                    :label="`${$t('institutions.sushi.package')} *`"
                     :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
                     outlined
                     required
@@ -36,7 +36,7 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.sushiUrl"
-                    :label="$t('institutions.sushi.sushiUrl')"
+                    :label="`${$t('institutions.sushi.sushiUrl')} *`"
                     :rules="[
                       v => !!v || $t('institutions.sushi.enterUrl')
                     ]"
@@ -49,7 +49,7 @@
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.requestorId"
-                    :label="`Requestor Id ${platform.requestorId ? '*' : ''}`"
+                    :label="requestorIdLabel"
                     :rules="platform.requestorId ? [rules.requestorId] : []"
                     :required="platform.requestorId"
                     outlined
@@ -59,7 +59,7 @@
                 <v-col cols="6">
                   <v-text-field
                     v-model="sushiForm.customerId"
-                    :label="`Customer Id ${platform.customerId ? '*' : ''}`"
+                    :label="customerIdLabel"
                     :rules="platform.customerId ? [rules.customerId] : []"
                     outlined
                   />
@@ -68,7 +68,7 @@
                 <v-col cols="12">
                   <v-text-field
                     v-model="sushiForm.apiKey"
-                    :label="`API Key ${platform.apiKey ? '*' : ''}`"
+                    :label="apiKeyLabel"
                     :rules="platform.apiKey ? [rules.apiKey] : []"
                     outlined
                   />
@@ -148,6 +148,15 @@ export default {
     },
     vendors() {
       return this.platforms.map(p => p.vendor);
+    },
+    requestorIdLabel() {
+      return `${this.$t('institutions.sushi.requestorId')} ${this.platform?.requestorId ? '*' : ''}`;
+    },
+    customerIdLabel() {
+      return `${this.$t('institutions.sushi.customerId')} ${this.platform?.customerId ? '*' : ''}`;
+    },
+    apiKeyLabel() {
+      return `${this.$t('institutions.sushi.apiKey')} ${this.platform?.apiKey ? '*' : ''}`;
     },
   },
   methods: {
