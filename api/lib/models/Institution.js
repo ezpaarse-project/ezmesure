@@ -9,6 +9,8 @@ const { registerModel, typedModel, getModel } = require('./TypedModel');
 const type = 'institution';
 const techRole = 'tech_contact';
 const docRole = 'doc_contact';
+const readOnlySuffix = '_read_only';
+
 const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 
 const schema = {
@@ -144,6 +146,12 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       indices: [{
         names: [`${indexPrefix}*`],
         privileges: ['all'],
+      }],
+    });
+    await createRole(`${role}${readOnlySuffix}`, {
+      indices: [{
+        names: [`${indexPrefix}*`],
+        privileges: ['read'],
       }],
     });
   }
