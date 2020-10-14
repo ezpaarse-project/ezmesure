@@ -262,7 +262,10 @@ exports.validateInstitution = async (ctx) => {
   institution.setValidation(validated);
 
   if (validated) {
-    await institution.createRole();
+    await institution.createSpace();
+    await institution.createBaseIndex();
+    await institution.createIndexPattern();
+    await institution.createRoles();
     await institution.migrateCreator();
   }
 

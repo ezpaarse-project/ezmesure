@@ -4,6 +4,8 @@ const sharp = require('sharp');
 const { randomBytes } = require('crypto');
 const { Joi } = require('koa-joi-router');
 const elastic = require('../services/elastic');
+const kibana = require('../services/kibana');
+const indexTemplate = require('../utils/index-template');
 const { registerModel, typedModel, getModel } = require('./TypedModel');
 
 const type = 'institution';
@@ -66,9 +68,8 @@ async function createRole(role, settings = {}) {
 
   if (existingRole) { return; }
 
-  await elastic.security.putRole({
+  await kibana.putRole({
     name: role,
-    refresh: true,
     body: settings,
   }, { ignore: [404] });
 }
@@ -128,10 +129,21 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
-   * Create the associated role if it doesn't exist
+   * Create the institution space if it doesn't exist yet
    */
-  async createRole() {
-    const { role, indexPrefix } = this.data;
+  async createSpace() {
+    const { space, name } = this.data;
+    const response = await kibana.getSpace(space);
+    if (response && response.status !== 404) { return; }
+
+    await kibana.createSpace({ id: space, name });
+  }
+
+  /**
+   * Create all necessary roles if they don't exist
+   */
+  async createRoles() {
+    const { role, indexPrefix, space } = this.data;
 
     if (!role) {
       throw new Error('institution has no role associated');
@@ -139,21 +151,79 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     if (!indexPrefix) {
       throw new Error('institution has no index prefix associated');
     }
+    if (!space) {
+      throw new Error('institution has no space associated');
+    }
 
     await createRole(techRole);
     await createRole(docRole);
     await createRole(role, {
-      indices: [{
-        names: [`${indexPrefix}*`],
-        privileges: ['all'],
+      elasticsearch: {
+        indices: [{
+          names: [`${indexPrefix}*`],
+          privileges: ['all'],
+        }],
+      },
+      kibana: [{
+        base: ['all'],
+        spaces: [space],
       }],
     });
     await createRole(`${role}${readOnlySuffix}`, {
-      indices: [{
-        names: [`${indexPrefix}*`],
-        privileges: ['read'],
+      elasticsearch: {
+        indices: [{
+          names: [`${indexPrefix}*`],
+          privileges: ['read'],
+        }],
+      },
+      kibana: [{
+        base: ['read'],
+        spaces: [space],
       }],
     });
+  }
+
+  /**
+   * Create a base index pattern if there are no patterns yet in the space
+   */
+  async createIndexPattern() {
+    const { indexPrefix, space } = this.data;
+
+    if (!indexPrefix) {
+      throw new Error('institution has no index prefix associated');
+    }
+    if (!space) {
+      throw new Error('institution has no space associated');
+    }
+
+    const { data } = await kibana.getIndexPatterns(space);
+
+    if (data && data.total === 0) {
+      await kibana.createIndexPattern(space, {
+        title: `${indexPrefix}*`,
+        timeFieldName: 'datetime',
+      });
+    }
+  }
+
+  /**
+   * Create an index matching the prefix
+   */
+  async createBaseIndex() {
+    const { indexPrefix: index } = this.data;
+
+    if (!index) {
+      throw new Error('institution has no index prefix associated');
+    }
+
+    const { body: exists } = await elastic.indices.exists({ index });
+
+    if (!exists) {
+      await elastic.indices.create({
+        index,
+        body: indexTemplate,
+      });
+    }
   }
 
   async migrateCreator() {
