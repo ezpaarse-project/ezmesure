@@ -12,6 +12,10 @@
     "password": "ELASTICSEARCH_PASSWORD",
     "apiVersion": "EZMESURE_ELASTIC_VERSION"
   },
+  "kibana": {
+    "port": "EZMESURE_KIBANA_PORT",
+    "host": "EZMESURE_KIBANA_HOST"
+  },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT"

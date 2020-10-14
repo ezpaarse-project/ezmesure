@@ -45,7 +45,9 @@ services:
     environment:
       - http_proxy
       - https_proxy
+      - no_proxy=localhost,kibana
       - EZMESURE_ELASTIC_HOST=elastic
+      - EZMESURE_KIBANA_HOST=kibana
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST=maildev

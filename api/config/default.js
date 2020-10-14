@@ -14,6 +14,10 @@ module.exports = {
     user: 'elastic',
     password: 'changeme',
   },
+  kibana: {
+    port: 5601,
+    host: 'localhost',
+  },
   smtp: {
     host: 'localhost',
     port: 25,
