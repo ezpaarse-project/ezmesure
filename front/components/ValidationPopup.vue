@@ -75,7 +75,10 @@ export default {
   },
   computed: {
     isValidatable() {
-      return this.institution?.indexPrefix && this.institution?.role;
+      if (!this.institution?.indexPrefix) { return false; }
+      if (!this.institution?.role) { return false; }
+      if (!this.institution?.space) { return false; }
+      return true;
     },
   },
   methods: {
