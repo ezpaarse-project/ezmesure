@@ -127,7 +127,7 @@
       "identity": "Identity",
       "validate": "Validate",
       "invalidate": "Invalidate",
-      "notValidatable": "Please associate a role and index prefix to the institution before you validate it.",
+      "notValidatable": "Please associate a role, space and index prefix to the institution before you validate it.",
       "validated": "Validated",
       "notValidated": "Not validated",
       "failedToUpdateValidation": "Failed to update validation",
