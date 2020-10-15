@@ -186,6 +186,7 @@
   "copy": "Copy",
   "modify": "Modify",
   "save": "Save",
+  "search": "Search",
   "requiredFields": "* required fields",
   "formSendingFailed": "Sending the form failed",
   "add": "Add",

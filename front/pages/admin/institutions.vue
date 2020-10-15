@@ -16,6 +16,16 @@
           </v-icon>
           {{ $t('refresh') }}
         </v-btn>
+
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          :label="$t('search')"
+          solo
+          dense
+          hide-details
+          style="max-width: 200px"
+        />
       </slot>
     </ToolBar>
 
@@ -23,6 +33,7 @@
       v-model="selected"
       :headers="headers"
       :items="institutions"
+      :search="search"
       item-key="id"
       show-select
     >
@@ -150,6 +161,7 @@ export default {
   data() {
     return {
       selected: [],
+      search: '',
       types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
