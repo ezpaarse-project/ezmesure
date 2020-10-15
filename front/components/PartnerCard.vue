@@ -55,10 +55,9 @@ export default {
     },
   },
   computed: {
-    contacts() { return this.partner.contacts || {}; },
-    index() { return this.partner.index || {}; },
+    contacts() { return this.partner?.contacts || {}; },
     indexCount() {
-      const n = parseInt(this.index.count, 10);
+      const n = parseInt(this.partner?.indexCount, 10);
       if (Number.isNaN(n)) { return '0'; }
       return n.toLocaleString();
     },
