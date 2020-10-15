@@ -36,7 +36,7 @@ Create an environment file named `ezmesure.local.env.sh` and export the followin
 | EZMESURE_NOTIFICATIONS_CRON | cron for recent activity (defaults to daily midnight) |
 | REPORTING_SENDER | the sender for reporting emails |
 
-### 2. Configure shibboleth
+### 3. Configure shibboleth
 
 Put the certificate (``server.crt``) and private key (``server.key``) used to declare the Shibboleth service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
 
@@ -57,7 +57,7 @@ docker-compose up -d --force-recreate front
 docker-compose restart rp
 ```
 
-### 3. Setup Elastic certificates
+### 4. Setup Elastic certificates
 
 For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. Kibana should also have certificates in `kibana/config/certificates`. If you don't have them yet, you can generate them by following these steps :
 
@@ -66,7 +66,7 @@ For each node in the cluster, add certificates in `elasticsearch/config/certific
   - Run `docker-compose -f create-certs.yml up`.
   - A `certificates` directory should be created, you can just put it in both `elasticsearch/config/` and `kibana/config/`. (**NB**: you may need to `chown` it)
 
-### 4. Setup local DNS (for dev only)
+### 5. Setup local DNS (for dev only)
 
 The Shibboleth authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts` :
 
@@ -74,7 +74,7 @@ The Shibboleth authentication process requires the user to be located at `ezmesu
 127.0.0.1 ezmesure-preprod.couperin.org
 ```
 
-### 5. Adjust system configuration for Elasticsearch
+### 6. Adjust system configuration for Elasticsearch
 
 Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
 

@@ -63,4 +63,5 @@ module.exports = {
   cypher: {
     secret: 'some-secret',
   },
+  appName: 'ezMESURE',
 };

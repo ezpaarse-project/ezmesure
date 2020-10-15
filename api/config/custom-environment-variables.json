@@ -45,5 +45,6 @@
   "reportingIndex": "REPORTING_INDEX",
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
-  }
+  },
+  "appName": "EZMESURE_APP_NAME"
 }

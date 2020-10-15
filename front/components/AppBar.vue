@@ -27,6 +27,7 @@
       <v-btn text to="/myspace" v-text="$t('menu.myspace')" />
       <v-btn text exact to="/partners" v-text="$t('menu.partners')" />
       <v-btn text exact to="/api-reference" v-text="$t('menu.api')" />
+      <v-btn text exact to="/contact-us" v-text="$t('menu.contact')" />
 
       <v-menu tilev-model="chooseLanguage" offset-y>
         <template v-slot:activator="{ on, value }">
@@ -84,6 +85,9 @@
         </v-list-item>
         <v-list-item exact to="/api-reference" @click="sheet = false">
           <v-list-item-title v-text="$t('menu.api')" />
+        </v-list-item>
+        <v-list-item exact to="/contact-us" @click="sheet = false">
+          <v-list-item-title>Contact</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-bottom-sheet>
