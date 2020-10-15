@@ -270,6 +270,7 @@ export default {
       const { role, space, indexPrefix } = this.institution;
       this.identicalNames = (role === space && role === indexPrefix);
 
+      this.logoPreview = null;
       this.show = true;
     },
 
