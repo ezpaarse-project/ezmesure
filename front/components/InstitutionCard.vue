@@ -5,7 +5,6 @@
       :src="`/api/assets/logos/${institution.logoId}`"
       contain
       height="100"
-      class="mb-3"
     />
 
     <v-divider v-if="institution.logoId" />
