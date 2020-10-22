@@ -90,6 +90,7 @@ services:
       - NODE_CONFIG
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
+      - "./data/api/uploads:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     restart: unless-stopped
 

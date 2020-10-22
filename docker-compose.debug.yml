@@ -40,6 +40,7 @@ services:
     volumes:
       - "./api:/usr/src/app"
       - "./data/api/storage:/usr/src/app/storage"
+      - "./data/api/uploads:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
     environment:
