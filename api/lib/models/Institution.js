@@ -28,6 +28,9 @@ const schema = {
   role: Joi.string().allow('').allow(null),
   space: Joi.string().allow('').allow(null),
 
+  techContactName: Joi.string().allow('').allow(null),
+  docContactName: Joi.string().allow('').allow(null),
+
   type: Joi.string().allow(''),
   name: Joi.string().allow(''),
   acronym: Joi.string().allow(''),
@@ -49,6 +52,8 @@ const createSchema = {
   id: Joi.any().strip(),
   indexCount: Joi.any().strip(),
   indexPrefix: Joi.any().strip(),
+  techContactName: Joi.any().strip(),
+  docContactName: Joi.any().strip(),
   validated: Joi.any().strip(),
   logoId: Joi.any().strip(),
   role: Joi.any().strip(),
@@ -115,6 +120,15 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
   setCreator(username) {
     this.data.creator = username;
+  }
+
+  get(prop, defaultValue) {
+    const value = this.data[prop];
+    return (typeof value === 'undefined' ? defaultValue : value);
+  }
+
+  set(prop, value) {
+    this.data[prop] = value;
   }
 
   isContact(user) {
@@ -248,6 +262,86 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     }
 
     this.data.creator = null;
+  }
+
+  /**
+   * Refresh indexCount by counting everything with the institution prefix
+   *
+   * @return {Boolean} true if a change has been saved, false otherwise
+   * @memberof Institution
+   */
+  async refreshIndexCount() {
+    const { indexPrefix } = this.data;
+    if (!indexPrefix) { return false; }
+
+    const { body = {} } = await elastic.count({ index: `${indexPrefix}*` });
+
+    if (!Number.isNaN(body.count) && this.get('indexCount') !== body.count) {
+      this.data.indexCount = body.count;
+      await this.save();
+      return true;
+    }
+
+    return false;
+  }
+
+
+  /**
+   * Refresh contact names by looking for members with either of doc or tech role
+   *
+   * @return {Boolean} true if a change has been saved, false otherwise
+   */
+  async refreshContacts() {
+    const { role } = this.data;
+    if (!role) { return false; }
+
+    const { body = {} } = await elastic.search({
+      index: '.security',
+      _source: ['full_name', 'roles'],
+      body: {
+        query: {
+          bool: {
+            filter: [
+              { terms: { roles: [techRole, docRole] } },
+              { term: { roles: role } },
+            ],
+          },
+        },
+      },
+    });
+
+    const users = body.hits && body.hits.hits;
+    let docName = '';
+    let techName = '';
+
+    if (!Array.isArray(users)) {
+      return false;
+    }
+
+    users.forEach((u) => {
+      const { _source: user } = u;
+      if (!Array.isArray(user && user.roles)) { return; }
+
+      if (!docName && user.roles.includes(docRole)) {
+        docName = user.full_name;
+      }
+
+      if (!techName && user.roles.includes(techRole)) {
+        techName = user.full_name;
+      }
+    });
+
+    const techChanged = this.get('techContactName', '') !== techName;
+    const docChanged = this.get('docContactName', '') !== docName;
+
+    if (techChanged || docChanged) {
+      this.data.docContactName = docName;
+      this.data.techContactName = techName;
+      await this.save();
+      return true;
+    }
+
+    return false;
   }
 
   logoPath() {

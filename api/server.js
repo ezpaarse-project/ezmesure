@@ -9,6 +9,7 @@ const config = require('config');
 const metrics = require('./lib/services/metrics');
 const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
+const depositors = require('./lib/services/depositors');
 
 const appLogger = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
@@ -24,6 +25,7 @@ if (mailSender) {
 }
 
 notifications.start(appLogger);
+depositors.start(appLogger);
 
 const controller = require('./lib/controllers');
 
