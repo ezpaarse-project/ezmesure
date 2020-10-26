@@ -29,16 +29,19 @@
     <v-card-text class="text-center">
       <div class="subtitle-1" v-text="$t('partners.correspondents')" />
 
-      <div v-for="(contact, key) in contacts" :ref="key" :key="key">
-        <v-tooltip v-if="contact.confirmed" right>
+      <div v-for="contact in contacts" :key="contact.name">
+        <v-tooltip right>
           <template v-slot:activator="{ on }">
-            <span v-on="on">{{ contact.fullName }}</span>
+            <span v-on="on">{{ contact.name }}</span>
           </template>
-          <span>
-            <span v-for="(type, k) in contact.type" :ref="k" :key="k">
-              {{ contactType[type].value }}
-              <v-spacer />
-            </span>
+          <span v-if="contact.type === 'tech'">
+            {{ $t('partners.technical') }}
+          </span>
+          <span v-else-if="contact.type === 'doc'">
+            {{ $t('partners.documentary') }}
+          </span>
+          <span v-else-if="contact.type === 'doc-tech'">
+            {{ $t('partners.technical') }} / {{ $t('partners.documentary') }}
           </span>
         </v-tooltip>
       </div>
@@ -55,17 +58,24 @@ export default {
     },
   },
   computed: {
-    contacts() { return this.partner?.contacts || {}; },
+    contacts() {
+      const doc = this.partner?.docContactName;
+      const tech = this.partner?.techContactName;
+
+      if (!doc && !tech) { return []; }
+      if (doc === tech) { return [{ name: doc, type: 'doc-tech' }]; }
+
+      const contacts = [];
+
+      if (doc) { contacts.push({ name: doc, type: 'doc' }); }
+      if (tech) { contacts.push({ name: tech, type: 'tech' }); }
+
+      return contacts;
+    },
     indexCount() {
       const n = parseInt(this.partner?.indexCount, 10);
       if (Number.isNaN(n)) { return '0'; }
       return n.toLocaleString();
-    },
-    contactType() {
-      return {
-        tech: { value: this.$t('partners.technical') },
-        doc: { value: this.$t('partners.documentary') },
-      };
     },
   },
 };
