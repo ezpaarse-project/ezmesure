@@ -16,6 +16,8 @@ const {
   updateInstitution,
   updateMember,
   getSushiData,
+  refreshInstitutions,
+  refreshInstitution,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -118,6 +120,7 @@ router.route({
   },
 });
 
+
 router.route({
   method: 'POST',
   path: '/',
@@ -140,6 +143,26 @@ router.route({
       institutionId: Joi.string().trim().required(),
     },
   },
+});
+
+router.use(requireAnyRole(['admin', 'superuser']));
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_refresh',
+  handler: refreshInstitution,
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_refresh',
+  handler: refreshInstitutions,
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@ const axios = require('axios');
 const config = require('config');
 const { v4: uuidv4 } = require('uuid');
 const elastic = require('../../services/elastic');
+const depositors = require('../../services/depositors');
 const indexTemplate = require('../../utils/depositors-template');
 const { appLogger } = require('../../../server');
 
@@ -375,6 +376,30 @@ exports.updateMember = async (ctx) => {
     ctx.status = 500;
     appLogger.error('Failed to update data in index', err);
   });
+};
+
+exports.refreshInstitutions = async (ctx) => {
+  const results = await depositors.refresh();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = results;
+};
+
+exports.refreshInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+  const institution = await Institution.findById(institutionId);
+
+  if (!institution) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  await institution.refreshIndexCount();
+  await institution.refreshContacts();
+
+  ctx.status = 200;
+  ctx.body = institution;
 };
 
 exports.getSushiData = async (ctx) => {
