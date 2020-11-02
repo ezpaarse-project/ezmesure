@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
+LOCAL_ENV_FILE="$SCRIPT_DIR/ezmesure.local.env.sh"
+
 EZMESURE_NODE_NAME=`hostname`
 THIS_HOST=`hostname -I | cut -d ' ' -f1`
 
@@ -39,8 +42,8 @@ export EZMESURE_ES_NODE_SEARCH_REMOTE="true"
 export ES_JAVA_OPTS="-Xms2g -Xmx2g"
 export EZMESURE_ES_MEM_LIMIT="4g"
 
-if [[ -f ezmesure.local.env.sh ]] ; then
-  source ezmesure.local.env.sh
+if [[ -f $LOCAL_ENV_FILE ]] ; then
+  source "$LOCAL_ENV_FILE"
 fi
 
 # set ezmesure Domain
