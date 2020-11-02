@@ -66,10 +66,8 @@ do
 
     read -e -p "$i: " -i "$default" answer
 
-    if [ "$i" == "EZMESURE_DOMAIN" ]
-    then
-      defaults[KIBANA_EXTERNAL_URL]="https://$answer/kibana"
-    fi
+    if [ "$i" == "EZMESURE_DOMAIN" ]; then defaults[KIBANA_EXTERNAL_URL]="https://$answer/kibana"; fi
+    if [ "$i" == "EZMESURE_NOTIFICATIONS_SENDER" ]; then defaults[REPORTING_SENDER]="$answer"; fi
 
     if [ ! -z "$answer" ]
     then
