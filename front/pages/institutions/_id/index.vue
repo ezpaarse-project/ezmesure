@@ -3,7 +3,7 @@
     <ToolBar :title="$t('institutions.institution.title')">
       <v-spacer />
 
-      <v-btn v-if="institution" color="primary" @click="editInstitution">
+      <v-btn v-if="institution && canEdit" color="primary" @click="editInstitution">
         <v-icon left>
           mdi-pencil
         </v-icon>
@@ -90,6 +90,27 @@ export default {
       failedToFetch,
       selfInstitution: params.id === 'self',
     };
+  },
+  computed: {
+    userRoles() {
+      const roles = this.$auth?.user?.roles;
+      return Array.isArray(roles) ? roles : [];
+    },
+    isAdmin() {
+      return this.userRoles.some(role => ['admin', 'superuser'].includes(role));
+    },
+    isMember() {
+      if (!this.institution?.role) { return false; }
+
+      const roles = new Set([this.institution.role, `${this.institution.role}_read_only`]);
+      return this.userRoles.some(role => roles.has(role));
+    },
+    isContact() {
+      return this.isMember && this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
+    },
+    canEdit() {
+      return this.isAdmin || this.isContact;
+    },
   },
   methods: {
     editInstitution() {
