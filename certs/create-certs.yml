@@ -1,18 +1,16 @@
 version: '2.2'
+
 services:
   create_certs:
     container_name: create_certs
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
     command: >
       bash -c '
-        if [[ ! -d config/x-pack/certificates/certificates ]]; then
-          mkdir config/x-pack/certificates/certificates;
+        if [[ ! -f /certs/bundle.zip ]]; then
+          bin/elasticsearch-certutil cert --silent --pem --in /certs/instances.yml -out /certs/bundle.zip;
         fi;
-        if [[ ! -f /local/certs/bundle.zip ]]; then
-          bin/elasticsearch-certutil cert --pem --silent --in config/x-pack/certificates/instances.yml --out config/x-pack/certificates/certificates/bundle.zip;
-          unzip config/x-pack/certificates/certificates/bundle.zip -d config/x-pack/certificates/certificates;
-        fi;
-        chgrp -R 0 config/x-pack/certificates/certificates
+        chown -R 1000:0 /certs
       '
+    user: "0"
     working_dir: /usr/share/elasticsearch
-    volumes: ['.:/usr/share/elasticsearch/config/x-pack/certificates']
+    volumes: ['.:/certs']
