@@ -148,7 +148,7 @@ exports.createInstitution = async (ctx) => {
 
   const { user } = ctx.state;
   const { body } = ctx.request;
-  const { creator } = ctx.query.creator;
+  const { creator } = ctx.query;
   const { logo } = body;
   const { username } = ctx.state.user;
 
@@ -156,7 +156,7 @@ exports.createInstitution = async (ctx) => {
     schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
   });
 
-  if (!isAdmin(user) || creator === false) {
+  if (!isAdmin(user) || creator !== false) {
     institution.setCreator(username);
   }
 
