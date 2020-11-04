@@ -303,7 +303,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
           bool: {
             filter: [
               { terms: { roles: [techRole, docRole] } },
-              { term: { roles: role } },
+              { terms: { roles: [role, `${role}${readOnlySuffix}`] } },
             ],
           },
         },
