@@ -214,6 +214,7 @@ export default {
       show: false,
       saving: false,
       valid: false,
+      saveCreator: false,
 
       hoverLogo: false,
       draggingFile: false,
@@ -274,8 +275,9 @@ export default {
       this.show = true;
     },
 
-    createInstitution() {
-      this.editInstitution({});
+    createInstitution(opts = {}) {
+      this.editInstitution({}, opts);
+      this.saveCreator = (opts.saveCreator !== false);
     },
 
     async onLogoChange() {
@@ -317,7 +319,8 @@ export default {
         if (this.institution.id) {
           await this.$axios.$put(`/institutions/${this.institution.id}`, this.institution);
         } else {
-          await this.$axios.$post('/institutions?creator=false', this.institution);
+          const params = { creator: this.saveCreator };
+          await this.$axios.$post('/institutions', this.institution, { params });
         }
         this.$emit('update');
       } catch (e) {

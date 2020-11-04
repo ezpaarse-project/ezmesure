@@ -209,7 +209,7 @@ export default {
       this.$refs.institutionForm.editInstitution(item);
     },
     createInstitution() {
-      this.$refs.institutionForm.createInstitution();
+      this.$refs.institutionForm.createInstitution({ saveCreator: false });
     },
     async deleteData() {
       if (this.selected.length === 0) {
