@@ -24,6 +24,8 @@ ezMESURE uses an Apache reverse proxy which communicates with HTTPS only. Put th
 
 Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overriden by `ezmesure.local.env.sh`.
 
+**NB**: a helper script is available at `tools/init_env.sh`.
+
 | name | description |
 |------|-------------|
 | EZMESURE_DOMAIN | the server domain |
@@ -62,9 +64,11 @@ docker-compose restart rp
 For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. Kibana should also have certificates in `kibana/config/certificates`. If you don't have them yet, you can generate them by following these steps :
 
   - Open the `certs` directory.
-  - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file.
-  - Run `docker-compose -f create-certs.yml up`.
-  - A `certificates` directory should be created, you can just put it in both `elasticsearch/config/` and `kibana/config/`. (**NB**: you may need to `chown` it)
+  - Create an [instances.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/certutil.html#certutil-silent) file. A helper script is available at `tools/init_es_instances.sh`.
+  - Run `docker-compose -f create-certs.yml run --rm create_certs`.
+  - A `bundle.zip` file should be created, just unzip it in the certificates directory (**NB**: you may need to `chown` it) :
+    - `unzip bundle.zip -d ../elasticsearch/config/certificates/`
+    - `unzip bundle.zip -d ../kibana/config/certificates/`
 
 ### 5. Setup local DNS (for dev only)
 
