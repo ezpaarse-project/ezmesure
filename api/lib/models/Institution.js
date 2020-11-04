@@ -79,8 +79,31 @@ async function createRole(role, settings = {}) {
   }, { ignore: [404] });
 }
 
+/**
+ * Remove the readonly suffix from a string
+ * @param {String} str the string to trim
+ */
+function trimReadOnlySuffix(str) {
+  if (typeof str !== 'string') { return ''; }
+  if (str.endsWith(readOnlySuffix)) {
+    return str.substring(0, str.length - readOnlySuffix.length);
+  }
+  return str;
+}
+
+/**
+ * Add the readonly suffix to a string
+ * @param {String} str the string to change
+ */
+function addReadOnlySuffix(str) {
+  return `${str || ''}${readOnlySuffix}`;
+}
+
 class Institution extends typedModel(type, schema, createSchema, updateSchema) {
-  static findOneByCreatorOrRole(username, roles) {
+  static findOneByCreatorOrRole(username, userRoles) {
+    // Remove readonly suffix so that we search with the base role
+    const roles = userRoles.map(trimReadOnlySuffix);
+
     return this.findOne({
       should: [
         { bool: { filter: { terms: { [`${type}.role`]: roles } } } },
@@ -133,13 +156,16 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
   isContact(user) {
     const { creator, role } = this.data;
+    const readOnlyRole = addReadOnlySuffix(role);
 
     if (!user || !user.username) { return false; }
     if (creator && creator === user.username) { return true; }
     if (!role || !Array.isArray(user && user.roles)) { return false; }
 
     const roles = new Set(user.roles);
-    return roles.has(role) && (roles.has(techRole) || roles.has(docRole));
+    const hasInstitutionRole = roles.has(role) || roles.has(readOnlyRole);
+    const hasContactRole = roles.has(techRole) || roles.has(docRole);
+    return hasInstitutionRole && hasContactRole;
   }
 
   /**
@@ -183,7 +209,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
         spaces: [space],
       }],
     });
-    await createRole(`${role}${readOnlySuffix}`, {
+    await createRole(addReadOnlySuffix(role), {
       elasticsearch: {
         indices: [{
           names: [`${indexPrefix}*`],
@@ -303,7 +329,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
           bool: {
             filter: [
               { terms: { roles: [techRole, docRole] } },
-              { terms: { roles: [role, `${role}${readOnlySuffix}`] } },
+              { terms: { roles: [role, addReadOnlySuffix(role)] } },
             ],
           },
         },
