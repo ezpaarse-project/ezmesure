@@ -1,0 +1,4 @@
+Une erreur est survenue sur ezMESURE.
+
+{{ message }}
+{{ error }}

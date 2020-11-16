@@ -9,10 +9,12 @@ const {
   kibana,
   puppeteerTimeout,
   logos,
+  sender,
 } = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
 const Frequency = require('./frequency');
 const logger = require('../logger');
+const { sendMail, generateMail } = require('./mail');
 
 const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
 
@@ -142,6 +144,28 @@ class Reporter {
     page.setDefaultTimeout(puppeteerTimeout);
 
     return page;
+  }
+
+  async testPuppeteer () {
+    try {
+      await this.launchBrowser();
+      await this.closeBrowser();
+      logger.info('Puppeteer : ready');
+    } catch (error) {
+      logger.error('Puppeteer : can\'t get started');
+      logger.error(error);
+      console.error(error);
+
+      await sendMail({
+        from: sender,
+        to: sender,
+        subject: `Reporting - erreur test puppeteer`,
+        ...generateMail('error', {
+          message: 'Une erreur est survenue pendant le test de puppeteer.',
+          error: error,
+        }),
+      });
+    }
   }
 
   addTask(task = {}) {
