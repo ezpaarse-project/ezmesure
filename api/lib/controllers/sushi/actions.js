@@ -83,6 +83,7 @@ exports.updateSushi = async (ctx) => {
   }
 
   ctx.status = 200;
+  ctx.body = sushiItem;
 };
 
 exports.deleteSushiData = async (ctx) => {
