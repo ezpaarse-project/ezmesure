@@ -7,6 +7,10 @@
     "license": {
       "name": "CeCILL 2.1",
       "url": "http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html"
+    },
+    "contact": {
+      "email": "ezteam@couperin.org",
+      "name": "ezTeam"
     }
   },
   "servers": [
@@ -41,8 +45,14 @@
       "description": "Get metrics from indices"
     },
     {
-      "name": "Depositors",
-      "description": "Manage depositors"
+      "name": "Institutions",
+      "description": "Manage institutions"
+    },
+    {
+      "name": "Basics"
+    },
+    {
+      "name": "Sushi"
     }
   ],
   "components": {
@@ -81,12 +91,14 @@
         "properties": {
           "error": {
             "type": "string",
-            "example": "Authentication Error"
+            "example": "Authentication Error",
+            "description": "The error message"
           }
         }
       },
       "User": {
         "type": "object",
+        "description": "",
         "properties": {
           "username": {
             "type": "string",
@@ -94,13 +106,15 @@
           },
           "roles": {
             "type": "array",
-            "items": {
-              "type": "string"
-            },
             "example": [
               "kibana_user",
               "univ-foobar"
-            ]
+            ],
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "example": "bibcnrs"
+            }
           },
           "full_name": {
             "type": "string",
@@ -108,7 +122,8 @@
           },
           "email": {
             "type": "string",
-            "example": "doo.john@ezpaarse.org"
+            "example": "doo.john@ezpaarse.org",
+            "format": "email"
           },
           "enabled": {
             "type": "boolean"
@@ -118,11 +133,13 @@
             "properties": {
               "createdAt": {
                 "type": "string",
-                "example": "2018-04-12T13:33:00.930Z"
+                "example": "2018-04-12T13:33:00.930Z",
+                "format": "date-time"
               },
               "updatedAt": {
                 "type": "string",
-                "example": "2018-05-15T03:23:43.391Z"
+                "example": "2018-05-15T03:23:43.391Z",
+                "format": "date-time"
               },
               "remoteUser": {
                 "type": "string",
@@ -164,106 +181,129 @@
           }
         }
       },
-      "Depositors": {
+      "Institution": {
+        "description": "",
         "type": "object",
         "properties": {
-          "index": {
-            "type": "object",
-            "properties": {
-              "prefix": {
-                "type": "string",
-                "example": "univ-foobar"
-              },
-              "count": {
-                "type": "integer",
-                "example": "8542"
-              }
-            }
+          "id": {
+            "type": "string",
+            "description": "Institution identifier",
+            "example": "496ccfa0-1f73-11eb-a8a0-4f0bd0a37c79",
+            "format": "uuid"
           },
           "name": {
             "type": "string",
+            "description": "Institution name",
             "example": "University of Foobar"
           },
-          "label": {
+          "acronym": {
             "type": "string",
-            "example": "University of Foobar"
+            "example": "UFO",
+            "description": "Institution acronym"
+          },
+          "website": {
+            "type": "string",
+            "description": "URL of the institution website",
+            "example": "http://univ-foobar.fr",
+            "format": "uri"
           },
           "city": {
             "type": "string",
+            "description": "City of the institution",
             "example": "Paris"
           },
-          "logoId": {
+          "type": {
+            "type": "string"
+          },
+          "domains": {
+            "type": "array",
+            "description": "Domains owned by the institution",
+            "items": {
+              "type": "string",
+              "example": "univ-foobar.fr"
+            }
+          },
+          "indexPrefix": {
             "type": "string",
-            "example": "logo.png"
+            "example": "univ-foobar",
+            "description": "The index prefix allocated to the institution"
+          },
+          "space": {
+            "type": "string",
+            "example": "univ-foobar",
+            "description": "ID of the space allocated to the institution"
+          },
+          "role": {
+            "type": "string",
+            "example": "univ-foobar",
+            "description": "Role associated to the institution. Users with this role are considered members."
           },
           "uai": {
             "type": "string",
-            "example": "0362917P"
+            "example": "0362917P",
+            "description": "UAI (Unité Administrative Immatriculée) of the institution"
           },
-          "contact": {
-            "type": "object",
-            "properties": {
-              "confirmed": {
-                "type": "boolean"
-              },
-              "tech": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string",
-                    "example": "John"
-                  },
-                  "lastName": {
-                    "type": "string",
-                    "example": "Doo"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "example": "john.doo@univ-foo.fr"
-                  }
-                }
-              },
-              "doc": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string",
-                    "example": "John"
-                  },
-                  "lastName": {
-                    "type": "string",
-                    "example": "Doo"
-                  },
-                  "mail": {
-                    "type": "string",
-                    "example": "john.doo@univ-foo.fr"
-                  }
-                }
-              }
-            }
+          "creator": {
+            "type": "string",
+            "nullable": true,
+            "description": "Username of the user that declared the institution. Removed once the institution is validated.",
+            "example": "john.doe"
+          },
+          "validated": {
+            "type": "boolean",
+            "description": "True when the institution has been validated"
+          },
+          "indexCount": {
+            "type": "number",
+            "example": 1876124,
+            "description": "Total number of documents under the institution prefix"
+          },
+          "logoId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Identifier of the institution logo image",
+            "example": "32a1c269738c43463312f09821b22323.png"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T14:29:17.849Z",
+            "description": "Datetime of the latest institution update"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2020-11-05T14:29:17.849Z",
+            "format": "date-time",
+            "description": "Datetime of the institution creation"
           },
           "auto": {
             "type": "object",
             "properties": {
-              "ezmesure": { "type": "boolean" },
-              "ezpaarse": { "type": "boolean" },
-              "report": { "type": "boolean" }
-            }
-          },
-          "location": {
-            "type": "object",
-            "properties": {
-              "lon": { "type": "number" },
-              "lar": { "type": "number" }
+              "ezpaarse": {
+                "type": "boolean",
+                "description": "True if the institution has automated log processing with ezPAARSE"
+              },
+              "ezmesure": {
+                "type": "boolean",
+                "description": "True if the institution has automated consultations' deposit into ezMESURE"
+              },
+              "report": {
+                "type": "boolean",
+                "description": "True if the institution has an automatic report setup on ezMESURE"
+              }
             }
           }
-        }
+        },
+        "required": [
+          "id"
+        ]
       },
-      "DepositorsRefresh": {
+      "InstitutionsRefresh": {
         "type": "object",
         "properties": {
           "errors": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "true if one or more institutions failed to refresh"
           },
           "items": {
             "type": "array",
@@ -272,22 +312,38 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "example": "University of Foobar"
+                  "example": "University of Foobar",
+                  "description": "name of the institution"
                 },
-                "prefix": {
+                "indexPrefix": {
                   "type": "string",
-                  "example": "univ-foobar"
+                  "example": "univ-foobar",
+                  "description": "index prefix of the institution"
                 },
-                "count": {
+                "indexCount": {
                   "type": "integer",
-                  "example": 8542
+                  "example": 8542,
+                  "description": "total number of documents stored under the index prefix"
                 },
-                "result": {
+                "docContactName": {
                   "type": "string",
-                  "example": "created"
+                  "example": "John Doe",
+                  "description": "name of the documentary contact"
+                },
+                "techContactName": {
+                  "type": "string",
+                  "example": "John Doe",
+                  "description": "name of the technical contact"
+                },
+                "updated": {
+                  "type": "boolean",
+                  "description": "true is something changed"
+                },
+                "error": {
+                  "type": "string",
+                  "description": "an error message if refresh failed"
                 }
               }
-
             }
           }
         }
@@ -298,9 +354,15 @@
           "_shards": {
             "type": "object",
             "properties": {
-              "total": { "type": "integer" },
-              "successful": { "type": "integer" },
-              "failed": { "type": "integer" }
+              "total": {
+                "type": "integer"
+              },
+              "successful": {
+                "type": "integer"
+              },
+              "failed": {
+                "type": "integer"
+              }
             }
           },
           "_all": {
@@ -312,8 +374,12 @@
                   "docs": {
                     "type": "object",
                     "properties": {
-                      "count": { "type": "integer" },
-                      "deleted": { "type": "integer" }
+                      "count": {
+                        "type": "integer"
+                      },
+                      "deleted": {
+                        "type": "integer"
+                      }
                     }
                   }
                 }
@@ -324,8 +390,12 @@
                   "docs": {
                     "type": "object",
                     "properties": {
-                      "count": { "type": "integer" },
-                      "deleted": { "type": "integer" }
+                      "count": {
+                        "type": "integer"
+                      },
+                      "deleted": {
+                        "type": "integer"
+                      }
                     }
                   }
                 }
@@ -343,8 +413,12 @@
                     "docs": {
                       "type": "object",
                       "properties": {
-                        "count": { "type": "integer" },
-                        "deleted": { "type": "integer" }
+                        "count": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "integer"
+                        }
                       }
                     }
                   }
@@ -355,8 +429,12 @@
                     "docs": {
                       "type": "object",
                       "properties": {
-                        "count": { "type": "integer" },
-                        "deleted": { "type": "integer" }
+                        "count": {
+                          "type": "integer"
+                        },
+                        "deleted": {
+                          "type": "integer"
+                        }
                       }
                     }
                   }
@@ -369,15 +447,32 @@
       "IndexInsert": {
         "type": "object",
         "properties": {
-          "took": { "type": "integer" },
-          "total": { "type": "integer" },
-          "inserted": { "type": "integer" },
-          "updated": { "type": "integer" },
-          "failed": { "type": "integer" },
+          "took": {
+            "type": "integer",
+            "description": "Response time in ms"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of consultations received"
+          },
+          "inserted": {
+            "type": "integer",
+            "description": "Number of inserted consultations"
+          },
+          "updated": {
+            "type": "integer",
+            "description": "Number of updated consultations"
+          },
+          "failed": {
+            "type": "integer",
+            "description": "Number of consultations that failed to be inserted"
+          },
           "errors": {
             "type": "array",
+            "description": "First error messages from consultations that failed to be inserted",
             "items": {
-              "type": "string"
+              "type": "string",
+              "example": "log_id is missing"
             }
           }
         }
@@ -385,21 +480,45 @@
       "IndexRemove": {
         "type": "object",
         "properties": {
-          "took": { "type": "integer" },
-          "total": { "type": "integer" },
-          "deleted": { "type": "integer" },
-          "batches": { "type": "integer" },
-          "timed_out": { "type": "boolean" },
-          "version_conflicts": { "type": "integer" },
-          "noops": { "type": "integer" },
-          "throttled_millis": { "type": "integer" },
-          "requests_per_second": { "type": "integer" },
-          "throttled_until_millis": { "type": "integer" },
+          "took": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "deleted": {
+            "type": "integer"
+          },
+          "batches": {
+            "type": "integer"
+          },
+          "timed_out": {
+            "type": "boolean"
+          },
+          "version_conflicts": {
+            "type": "integer"
+          },
+          "noops": {
+            "type": "integer"
+          },
+          "throttled_millis": {
+            "type": "integer"
+          },
+          "requests_per_second": {
+            "type": "integer"
+          },
+          "throttled_until_millis": {
+            "type": "integer"
+          },
           "retries": {
             "type": "object",
             "properties": {
-              "bulk": { "type": "integer" },
-              "search": { "type": "integer" }
+              "bulk": {
+                "type": "integer"
+              },
+              "search": {
+                "type": "integer"
+              }
             }
           },
           "failures": {
@@ -412,23 +531,50 @@
       },
       "Metrics": {
         "type": "object",
+        "x-examples": {},
         "properties": {
-          "took": { "type": "integer" },
-          "docs": { "type": "integer" },
+          "took": {
+            "type": "integer",
+            "example": 280,
+            "description": "response time in ms"
+          },
+          "docs": {
+            "type": "integer",
+            "example": 1000,
+            "description": "total number of documents"
+          },
           "dateCoverage": {
             "type": "object",
             "properties": {
-              "min": { "type": "integer" },
-              "max": { "type": "integer" }
+              "min": {
+                "type": "integer",
+                "description": "minimum date covered by the documents"
+              },
+              "max": {
+                "type": "integer",
+                "description": "maximum date covered by the documents"
+              }
             }
           },
           "metrics": {
             "type": "object",
             "properties": {
-              "days": { "type": "integer" },
-              "titles": { "type": "integer" },
-              "platforms": { "type": "integer" },
-              "indices": { "type": "integer" }
+              "days": {
+                "type": "integer",
+                "description": "number of days covered by all documents"
+              },
+              "titles": {
+                "type": "integer",
+                "description": "number of different publication titles"
+              },
+              "platforms": {
+                "type": "integer",
+                "description": "number of different platforms"
+              },
+              "indices": {
+                "type": "integer",
+                "description": "number of indices"
+              }
             }
           }
         }
@@ -438,10 +584,152 @@
         "items": {
           "type": "object",
           "properties": {
-            "name": { "type": "string" },
-            "size": { "type": "integer" },
-            "createdAt": { "type": "integer" },
-            "lastModified": { "type": "integer" }
+            "name": {
+              "type": "string",
+              "example": "ezproxy.2020.07.01.ec.csv",
+              "description": "File name"
+            },
+            "size": {
+              "type": "integer",
+              "example": 1342632,
+              "description": "File size in bytes"
+            },
+            "createdAt": {
+              "type": "string",
+              "example": "2020-11-05T16:15:27.929Z",
+              "format": "date-time",
+              "description": "File creation date"
+            },
+            "lastModified": {
+              "type": "string",
+              "example": "2020-11-05T16:15:27.929Z",
+              "format": "date-time",
+              "description": "File modification date"
+            }
+          }
+        }
+      },
+      "Sushi": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "645c4000-1f89-11eb-836f-a3005ccf2dc6",
+            "description": "ID of the sushi item"
+          },
+          "vendor": {
+            "type": "string",
+            "minLength": 1,
+            "example": "Akademiai Kiado",
+            "description": "Vendor name"
+          },
+          "sushiUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://journals.com/rest/COUNTER/v5/reports",
+            "description": "URL of the Sushi endpoint"
+          },
+          "requestorId": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "package": {
+            "type": "string",
+            "description": "ezMESURE package ID"
+          },
+          "institutionId": {
+            "type": "string",
+            "example": "f438c3f0-152b-11eb-8113-ff14fcf1fe5b",
+            "format": "uuid",
+            "description": "ID of the institution that owns the sushi item"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Last modification of the sushi item"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Creation date of the sushi item"
+          }
+        },
+        "required": [
+          "id",
+          "vendor",
+          "sushiUrl",
+          "package",
+          "institutionId",
+          "updatedAt",
+          "createdAt"
+        ]
+      },
+      "SushiPlatform": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Vendor name"
+          },
+          "sushiUrl": {
+            "type": "string",
+            "minLength": 1,
+            "description": "URL of the sushi endpoint"
+          },
+          "customerId": {
+            "type": "boolean",
+            "description": "Whether the sushi endpoint needs a customer ID"
+          },
+          "requestorId": {
+            "type": "boolean",
+            "description": "Whether the sushi endpoint needs a requestor ID"
+          },
+          "apiKey": {
+            "type": "boolean",
+            "description": "Whether the sushi endpoint needs an API key"
+          },
+          "description": {
+            "type": "string",
+            "description": "Vendor description"
+          },
+          "isNonSushi": {
+            "type": "boolean"
+          },
+          "companies": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "vendor",
+          "sushiUrl",
+          "customerId",
+          "requestorId",
+          "apiKey"
+        ],
+        "x-examples": {
+          "example-1": {
+            "vendor": "Fictive Journals",
+            "sushiUrl": "https://journals.fictive.com/sushi/reports",
+            "customerId": true,
+            "requestorId": false,
+            "apiKey": true,
+            "description": "This is a fictive sushi endpoint",
+            "isNonSushi": false,
+            "companies": "Atypon"
           }
         }
       }
@@ -460,11 +748,20 @@
                 "schema": {
                   "type": "string",
                   "example": "OK"
+                },
+                "examples": {
+                  "example-1": {
+                    "value": "OK"
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "operationId": "ping",
+        "tags": [
+          "Basics"
+        ]
       }
     },
     "/profile": {
@@ -474,7 +771,11 @@
         ],
         "summary": "Fetch profile",
         "description": "Get the profile associated with the JWT token.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "200 response",
@@ -489,7 +790,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "getProfile"
       }
     },
     "/profile/token": {
@@ -499,7 +801,11 @@
         ],
         "summary": "Get an authorization token",
         "description": "Actually requires a JWT token (typically stored in cookies). This route provides you with a token from the user space.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Token generated successfully",
@@ -515,7 +821,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "getAuthToken"
       }
     },
     "/profile/terms/accept": {
@@ -525,7 +832,11 @@
         ],
         "summary": "Accept terms of service",
         "description": "Accept terms of service. You should read them first!",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "204": {
             "description": "Terms accepted successfully"
@@ -533,7 +844,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "acceptTerms"
       }
     },
     "/profile/password/reset": {
@@ -543,7 +855,11 @@
         ],
         "summary": "Reset Kibana password",
         "description": "Reset Kibana password of the authenticated user.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "204": {
             "description": "Password successfully reset"
@@ -551,7 +867,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "resetPassword"
       }
     },
     "/logs": {
@@ -561,7 +878,11 @@
         ],
         "summary": "List existing indices",
         "description": "List the existing indices you are allowed to see.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "200 response",
@@ -576,7 +897,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "getLogs"
       }
     },
     "/logs/{index}": {
@@ -586,7 +908,11 @@
         ],
         "summary": "Insert data into an index",
         "description": "Insert access events into an index.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -619,43 +945,73 @@
                     "format": "binary"
                   }
                 }
-              }
+              },
+              "examples": {}
             },
             "text/csv": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "datetime",
-                  "log_id",
-                  "rtype",
-                  "mime",
-                  "title_id",
-                  "doi"
-                ],
-                "properties": {
-                  "datetime": { "type": "string" },
-                  "log_id": { "type": "string" },
-                  "rtype": { "type": "string", "nullable": true },
-                  "mime": { "type": "string", "nullable": true },
-                  "title_id": { "type": "string", "nullable": true },
-                  "doi": { "type": "string", "nullable": true }
-                },
-                "additionalProperties": {
-                  "type": "string"
-                },
                 "example": {
                   "datetime": "2018-03-22T11:37:42+02:00",
                   "platform": "npg",
                   "rtype": "ARTICLE",
                   "mime": "HTML",
                   "domain": "www.nature.com",
+                  "title_id": "41564",
                   "log_id": "d5d680b88def9bc4b41d4b94f22d60514e54689e",
                   "url": "https://www.nature.com/articles/s41564-018-0156-0",
-                  "status": "200"
-                }
+                  "status": "200",
+                  "doi": ""
+                },
+                "properties": {
+                  "datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "log_id": {
+                    "type": "string"
+                  },
+                  "rtype": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mime": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "doi": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "title_id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "domain": {
+                    "type": "string"
+                  },
+                  "publication_title": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "datetime",
+                  "log_id",
+                  "rtype",
+                  "mime",
+                  "doi",
+                  "title_id"
+                ]
               }
             }
-          }
+          },
+          "description": ""
         },
         "responses": {
           "200": {
@@ -674,7 +1030,8 @@
           "403": {
             "$ref": "#/components/responses/ForbiddenError"
           }
-        }
+        },
+        "operationId": "insertLogs"
       }
     },
     "/logs/{index}/events": {
@@ -684,7 +1041,11 @@
         ],
         "summary": "Remove data from an index",
         "description": "Remove access events from an index. Defaults to everything if no condition provided.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -732,7 +1093,8 @@
           "403": {
             "$ref": "#/components/responses/ForbiddenError"
           }
-        }
+        },
+        "operationId": "deleteEvents"
       }
     },
     "/logs/{index}/tops": {
@@ -742,7 +1104,11 @@
         ],
         "summary": "Get top metrics for an index",
         "description": "Get top metrics for an index.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -801,7 +1167,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "topLogs"
       }
     },
     "/logs/{index}/search": {
@@ -811,7 +1178,11 @@
         ],
         "summary": "Search in indices",
         "description": "Perform search in indices using Elasticsearch Search API.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "externalDocs": {
           "description": "More about Elasticsearch Query DSL and aggregations can be found on",
           "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html"
@@ -838,12 +1209,14 @@
                 "example": {
                   "size": 0,
                   "query": {
-                    "term" : { "platform" : "npg" }
+                    "term": {
+                      "platform": "npg"
+                    }
                   },
-                  "aggs" : {
-                    "rtypes" : {
-                      "terms" : {
-                        "field" : "rtype",
+                  "aggs": {
+                    "rtypes": {
+                      "terms": {
+                        "field": "rtype",
                         "size": 5
                       }
                     }
@@ -854,10 +1227,14 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Raw response as returned by Elasticsearch"
+          },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "searchLogs"
       }
     },
     "/logs/{index}/aggregation.{extension}": {
@@ -867,7 +1244,11 @@
         ],
         "summary": "Export all aggregated combinations of the given fields",
         "description": "Export all aggregated combinations of the given fields",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -884,7 +1265,10 @@
             "name": "extension",
             "schema": {
               "type": "string",
-              "enum": ["csv", "ndjson"]
+              "enum": [
+                "csv",
+                "ndjson"
+              ]
             },
             "description": "The export format",
             "required": true
@@ -904,8 +1288,7 @@
             "description": "Include combinations with missing values",
             "schema": {
               "type": "boolean",
-              "default": true,
-              "allowEmptyValue": false
+              "default": true
             }
           },
           {
@@ -967,38 +1350,32 @@
           }
         ],
         "responses": {
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
           "200": {
             "description": "200 response",
             "content": {
               "application/x-ndjson": {
+                "examples": {
+                  "example-1": {
+                    "value": "{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"PDF\" }, \"doc_count\": 42 }\n{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"HTML\" }, \"doc_count\": 17 }"
+                  }
+                },
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "doc_count": {
-                      "type": "integer"
-                    },
-                    "key": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "example": "{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"PDF\" }, \"doc_count\": 42 }\n{ \"key\": { \"rtype\": \"ARTICLE\", \"mime\": \"HTML\" }, \"doc_count\": 17 }"
+                  "type": "string"
                 }
               },
               "text/csv": {
                 "example": "doc_count;rtype;mime\n42;ARTICLE;PDF\n17;ARTICLE;HTML"
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
           }
-        }
+        },
+        "operationId": "aggregateLogs"
       }
     },
     "/logs/{index}/counterize": {
@@ -1008,7 +1385,11 @@
         ],
         "summary": "Export aggregated COUNTER metrics into another index",
         "description": "Export aggregated COUNTER metrics into another index",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1060,12 +1441,6 @@
           }
         },
         "responses": {
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
           "200": {
             "description": "200 response",
             "content": {
@@ -1075,8 +1450,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
           }
-        }
+        },
+        "operationId": "counterizeLogs"
       }
     },
     "/files": {
@@ -1086,7 +1468,11 @@
         ],
         "summary": "List your hosted files",
         "description": "List your hosted files.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "200 response",
@@ -1101,7 +1487,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "getFiles"
       }
     },
     "/files/{filename}": {
@@ -1111,7 +1498,11 @@
         ],
         "summary": "Remove one file from your hosted files",
         "description": "Remove one file from your hosted files.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1131,7 +1522,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "deleteFile"
       }
     },
     "/files/delete_batch": {
@@ -1141,7 +1533,11 @@
         ],
         "summary": "Remove a list of files from your hosted files",
         "description": "Remove a list of files from your hosted files.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1167,7 +1563,8 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "deleteMultipleFiles"
       }
     },
     "/metrics": {
@@ -1191,54 +1588,712 @@
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
           }
-        }
+        },
+        "operationId": "getMetrics"
       }
     },
     "/partners": {
       "get": {
         "tags": [
-          "Depositors"
+          "Institutions"
         ],
-        "summary": "Get depositors",
-        "description": "Get a list of our depositors.",
+        "summary": "Get partners",
+        "description": "Get the list of validated institutions.",
         "responses": {
           "200": {
             "description": "200 response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Depositors"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Institution"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getInstitutions"
+      }
+    },
+    "/institutions/_refresh": {
+      "post": {
+        "tags": [
+          "Institutions"
+        ],
+        "summary": "Refresh institutions",
+        "description": "Refresh dynamic institution fields (contacts, number of ECs).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionsRefresh"
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "refreshInstitutions"
+      }
+    },
+    "/institutions/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an institution",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id",
+        "description": "Get an institution by ID. Use 'self' to get the institution of the authenticated user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an institution",
+        "operationId": "delete-institutions-id",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an institution.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Institutions"
+        ]
+      },
+      "put": {
+        "summary": "Update an institution",
+        "operationId": "put-institutions-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Update an institution",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Institution"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions": {
+      "get": {
+        "summary": "Get institutions",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Institution"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-institutions",
+        "description": "Get all institutions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create an institution",
+        "operationId": "post-institutions",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "description": "Create an institution",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Institution"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/validated": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Change validation state of an institution",
+        "operationId": "put-institutions-id-validated",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Change validation state of an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ]
+      }
+    },
+    "/institutions/{id}/sushi": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get Sushi items of an institution",
+        "tags": [
+          "Institutions",
+          "Sushi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sushi"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id-sushi",
+        "description": "Get Sushi items of an institution.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/delete": {
+      "post": {
+        "summary": "Delete multiple institutions",
+        "operationId": "post-institutions-delete",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "deleted",
+                          "failed"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete multiple institutions at once.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ]
+      }
+    },
+    "/institutions/{id}/_refresh": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Refresh an institution",
+        "operationId": "post-institutions-id-_refresh",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "description": "Refresh dynamic fields (contacts, number of ECs) of a specific institution.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi": {
+      "get": {
+        "summary": "Get all Sushi items",
+        "tags": [
+          "Sushi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sushi"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-sushi",
+        "description": "Get all Sushi items",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a Sushi item",
+        "operationId": "post-sushi",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Add a new Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sushi"
+              }
+            }
           }
         }
       }
     },
-    "/partners/refresh": {
-      "post": {
+    "/sushi/platforms.json": {
+      "get": {
+        "summary": "Get known Sushi endpoints",
         "tags": [
-          "Depositors"
+          "Sushi"
         ],
-        "summary": "Refresh depositors",
-        "description": "Refresh depositors.",
-        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepositorsRefresh"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SushiPlatform"
+                  }
                 }
               }
             }
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-sushi-platforms.json",
+        "description": "Get the list of known platforms that have sushi endpoints",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi/batch_delete": {
+      "post": {
+        "summary": "Delete multiple Sushi items",
+        "operationId": "post-sushi-batch_delete",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "failed",
+                          "deleted"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Delete multiple Sushi items at once",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sushi/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "patch": {
+        "summary": "Update a Sushi item",
+        "operationId": "patch-sushi-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Update a Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sushi"
+              }
+            }
           }
         }
       }
