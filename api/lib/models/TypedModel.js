@@ -188,14 +188,18 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
       this.data.updatedAt = now;
       this.data.createdAt = now;
 
-      const { _id: id } = await elastic.index({
+      const { body } = await elastic.index({
         index,
         id: TypedModel.generateId(),
         refresh: true,
         body: { type, [type]: preSave(this.data) },
       }).catch((e) => Promise.reject(new Error(e)));
 
-      this.id = id;
+      const { _id: id } = body || {};
+
+      if (typeof id === 'string') {
+        this.id = TypedModel.trimIdPrefix(id);
+      }
     }
   }
 };
