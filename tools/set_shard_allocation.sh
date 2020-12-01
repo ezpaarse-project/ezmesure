@@ -56,7 +56,7 @@ response=$(curl -X PUT -u $ES_USR:$ES_PWD -H 'Content-Type: application/json' 'h
 
 if [ $? -ne 0 ]; then
   echo "Something went wrong"
-  exit $?
+  exit 1
 fi
 
 if [[ "$response" == *'"acknowledged":true'* ]]; then

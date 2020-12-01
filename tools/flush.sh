@@ -41,7 +41,7 @@ response=$(curl -X POST -u $ES_USR:$ES_PWD 'http://localhost:9200/_flush' -fsSL)
 
 if [ $? -ne 0 ]; then
   echo "Something went wrong"
-  exit $?
+  exit 1
 fi
 
 if [[ "$response" == *'"failed":0'* ]]; then
