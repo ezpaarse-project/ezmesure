@@ -732,6 +732,40 @@
             "companies": "Atypon"
           }
         }
+      },
+      "Member": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Member full name"
+          },
+          "roles": {
+            "type": "array",
+            "description": "Kibana roles of the member",
+            "items": {
+              "type": "string"
+            }
+          },
+          "email": {
+            "type": "string",
+            "minLength": 1,
+            "format": "email",
+            "description": "Member email"
+          },
+          "readonly": {
+            "type": "boolean",
+            "description": "Whether the member has Kibana write permission"
+          }
+        },
+        "required": [
+          "full_name",
+          "roles",
+          "email",
+          "readonly"
+        ]
       }
     }
   },
@@ -2300,6 +2334,55 @@
           }
         }
       }
+    },
+    "/institutions/{id}/members": {
+      "get": {
+        "summary": "Get institution members",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-institutions-:id-members",
+        "description": "Get the members of an institution. Must be either admin or institution contact."
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ]
     }
   }
 }
