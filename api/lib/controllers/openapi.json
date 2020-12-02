@@ -1814,6 +1814,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Conflict"
           }
         },
         "description": "Create an institution",

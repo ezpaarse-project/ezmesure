@@ -150,7 +150,17 @@ exports.createInstitution = async (ctx) => {
   const { body } = ctx.request;
   const { creator } = ctx.query;
   const { logo } = body;
-  const { username } = ctx.state.user;
+  const { username, roles } = ctx.state.user;
+
+
+  if (!isAdmin(user)) {
+    const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
+
+    if (selfInstitution) {
+      ctx.throw(409, 'You can not attach another institution to your profile');
+      return;
+    }
+  }
 
   const institution = new Institution(body, {
     schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
