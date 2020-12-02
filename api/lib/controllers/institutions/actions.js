@@ -24,11 +24,6 @@ const isAdmin = (user) => {
   return (roles.has('admin') || roles.has('superuser'));
 };
 
-const isMember = (institution, email) => {
-  const members = (institution && institution.members) || [];
-  return members.some((contact) => contact.email === email);
-};
-
 const ensureIndex = async () => {
   const { body: exists } = await elastic.indices.exists({ index: depositorsIndex });
 
@@ -329,25 +324,24 @@ exports.getInstitutionMembers = async (ctx) => {
   const { institutionId } = ctx.params;
   const { user } = ctx.state;
 
-  const { body: institution, statusCode } = await elastic.getSource({
-    index: depositorsIndex,
-    id: institutionId,
-  }, { ignore: [404] });
+  const institution = await Institution.findById(institutionId);
 
-  if (!institution || statusCode === 404) {
+  if (!institution) {
     ctx.throw(404, 'Institution not found');
     return;
   }
 
-  if (!isMember(institution, user.email) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to access this institution data');
+  if (!institution.isContact(user) && !isAdmin(user)) {
+    ctx.throw(403, 'You are not allowed to access this institution');
     return;
   }
+
+  const members = await institution.getMembers();
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  ctx.body = Array.isArray(institution.members) ? institution.members : [];
+  ctx.body = Array.isArray(members) ? members : [];
 };
 
 exports.updateMember = async (ctx) => {

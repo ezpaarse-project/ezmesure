@@ -168,6 +168,33 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     return hasInstitutionRole && hasContactRole;
   }
 
+  async getMembers() {
+    const { role } = this.data;
+
+    if (!role) { return []; }
+
+    const { body = {} } = await elastic.search({
+      index: '.security',
+      _source: ['full_name', 'roles', 'email'],
+      body: {
+        query: {
+          bool: {
+            filter: [
+              { terms: { roles: [role, addReadOnlySuffix(role)] } },
+            ],
+          },
+        },
+      },
+    });
+
+    const users = body.hits && body.hits.hits;
+
+    return Array.isArray(users) ? users.map(({ _source: source }) => ({
+      ...source,
+      readonly: !(Array.isArray(source.roles) && source.roles.includes(role)),
+    })) : [];
+  }
+
   /**
    * Create the institution space if it doesn't exist yet
    */
