@@ -11,14 +11,14 @@
     >
       <template v-slot:item.correspondent="{ item }">
         <v-chip
-          v-if="item.type && item.type.includes('tech')"
+          v-if="item.roles && item.roles.includes('tech_contact')"
           small
           label
           color="secondary"
           v-text="$t('institutions.members.technicalCorrespondent')"
         />
         <v-chip
-          v-if="item.type && item.type.includes('doc')"
+          v-if="item.roles && item.roles.includes('doc_contact')"
           small
           label
           color="secondary"
@@ -26,13 +26,13 @@
         />
       </template>
 
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          @click="editMember(item)"
-        >
-          mdi-pencil
-        </v-icon>
+      <template v-slot:item.readonly="{ item }">
+        <span v-if="item.readonly">
+          {{ $t('institutions.members.read') }}
+        </span>
+        <span v-else>
+          {{ $t('institutions.members.read') }} / {{ $t('institutions.members.write') }}
+        </span>
       </template>
     </v-data-table>
 
@@ -40,21 +40,17 @@
       <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
       <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
     </v-card-text>
-
-    <MemberForm ref="memberForm" @update="refreshMembers" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
-import MemberForm from '~/components/MemberForm';
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
-    MemberForm,
   },
   async asyncData({
     $axios,
@@ -83,22 +79,19 @@ export default {
       headers: [
         {
           text: app.i18n.t('institutions.members.name'),
-          value: 'fullName',
+          value: 'full_name',
         },
         {
           text: 'Email',
           value: 'email',
         },
         {
-          text: app.i18n.t('institutions.members.correspondent'),
-          value: 'correspondent',
+          text: app.i18n.t('institutions.members.permissions'),
+          value: 'readonly',
         },
         {
-          text: 'Actions',
-          value: 'actions',
-          sortable: false,
-          width: '100px',
-          align: 'right',
+          text: app.i18n.t('institutions.members.correspondent'),
+          value: 'correspondent',
         },
       ],
     };
@@ -112,9 +105,6 @@ export default {
     return this.refreshMembers();
   },
   methods: {
-    editMember(item) {
-      this.$refs.memberForm.editMember(this.institution.id, item);
-    },
     async refreshMembers() {
       if (!this.hasInstitution) { return; }
 
