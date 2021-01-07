@@ -1,7 +1,7 @@
 [
 	{
 		"vendor": "AOTA (American Occupational Therapy Association)",
-		"sushiUrl": "https://sitemaster.ajot.aota.org/sushi/reports",
+		"sushiUrl": "https://sitemaster.ajot.aota.org/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -11,7 +11,7 @@
 	},
 	{
 		"vendor": "APS (American Physical Society)",
-		"sushiUrl": "https://inqwell.squidsolutions.com/release/aps/sushi/reports",
+		"sushiUrl": "https://inqwell.squidsolutions.com/release/aps/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -21,7 +21,7 @@
 	},
 	{
 		"vendor": "Academy of Management",
-		"sushiUrl": "https://journals.aom.org/reports",
+		"sushiUrl": "https://journals.aom.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -31,7 +31,7 @@
 	},
 	{
 		"vendor": "Adam Matthew Digital",
-		"sushiUrl": "https://www.counter.amdigital.co.uk/CounterSushi5Api/reports",
+		"sushiUrl": "https://www.counter.amdigital.co.uk/CounterSushi5Api",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -41,7 +41,7 @@
 	},
 	{
 		"vendor": "Akademiai Kiado",
-		"sushiUrl": "https://ams.akjournals.com/rest/COUNTER/v5/reports",
+		"sushiUrl": "https://ams.akjournals.com/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -51,7 +51,7 @@
 	},
 	{
 		"vendor": "Alexander Street Press",
-		"sushiUrl": "https://pqbi.prod.proquest.com/release/sushi/asp/sushi/reports",
+		"sushiUrl": "https://pqbi.prod.proquest.com/release/sushi/asp/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -61,7 +61,7 @@
 	},
 	{
 		"vendor": "Allen Press HEPG Journals",
-		"sushiUrl": "https://hepgjournals.org/reports",
+		"sushiUrl": "https://hepgjournals.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -71,7 +71,7 @@
 	},
 	{
 		"vendor": "Allen Press Pinnacle",
-		"sushiUrl": "https://pinnacle.allenpress.com/reports",
+		"sushiUrl": "https://pinnacle.allenpress.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -81,7 +81,7 @@
 	},
 	{
 		"vendor": "Allen Press Pinnacle (AAIDD)",
-		"sushiUrl": "https://www.aaiddjournals.org/reports",
+		"sushiUrl": "https://www.aaiddjournals.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -91,7 +91,7 @@
 	},
 	{
 		"vendor": "American Chemical Society",
-		"sushiUrl": "https://pubs.acs.org/reports",
+		"sushiUrl": "https://pubs.acs.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -101,7 +101,7 @@
 	},
 	{
 		"vendor": "American College of Physicians (ACP)",
-		"sushiUrl": "https://sitemaster.annals.org/sushi/reports",
+		"sushiUrl": "https://sitemaster.annals.org/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -111,7 +111,7 @@
 	},
 	{
 		"vendor": "American Economic Association (AEA)",
-		"sushiUrl": "https://pubs.aeaweb.org/reports",
+		"sushiUrl": "https://pubs.aeaweb.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -121,7 +121,7 @@
 	},
 	{
 		"vendor": "American Heart Association",
-		"sushiUrl": "https://www.ahajournals.org/reports",
+		"sushiUrl": "https://www.ahajournals.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -131,7 +131,7 @@
 	},
 	{
 		"vendor": "American Institute of Aeronautics & Astronautics",
-		"sushiUrl": "https://arc.aiaa.org/reports",
+		"sushiUrl": "https://arc.aiaa.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -141,7 +141,7 @@
 	},
 	{
 		"vendor": "American Mathematical Society",
-		"sushiUrl": "https://counter.ams.org/counter/r5/reports",
+		"sushiUrl": "https://counter.ams.org/counter/r5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -151,7 +151,7 @@
 	},
 	{
 		"vendor": "American Medical Association",
-		"sushiUrl": "https://sitemaster.jamanetwork.com/sushi/reports",
+		"sushiUrl": "https://sitemaster.jamanetwork.com/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -161,7 +161,7 @@
 	},
 	{
 		"vendor": "American Meteorological Society",
-		"sushiUrl": "https://journals.ametsoc.org/reports",
+		"sushiUrl": "https://journals.ametsoc.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -171,7 +171,7 @@
 	},
 	{
 		"vendor": "American Physical Society",
-		"sushiUrl": "https://inqwell.squidsolutions.com/release/aps/sushi/reports",
+		"sushiUrl": "https://inqwell.squidsolutions.com/release/aps/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -181,7 +181,7 @@
 	},
 	{
 		"vendor": "American Physiological Society",
-		"sushiUrl": "https://www.physiology.org/reports",
+		"sushiUrl": "https://www.physiology.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -191,7 +191,7 @@
 	},
 	{
 		"vendor": "American Psychiatric Publishing",
-		"sushiUrl": "https://www.psychiatryonline.org/reports",
+		"sushiUrl": "https://www.psychiatryonline.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -201,7 +201,7 @@
 	},
 	{
 		"vendor": "American Public Health Association",
-		"sushiUrl": "https://ajph.aphapublications.org/reports",
+		"sushiUrl": "https://ajph.aphapublications.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -211,7 +211,7 @@
 	},
 	{
 		"vendor": "American Roentgen Ray Society",
-		"sushiUrl": "https://www.ajronline.org/reports",
+		"sushiUrl": "https://www.ajronline.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -221,7 +221,7 @@
 	},
 	{
 		"vendor": "American Society Of Civil Engineers (ASCE)",
-		"sushiUrl": "https://ascelibrary.org/reports",
+		"sushiUrl": "https://ascelibrary.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -231,7 +231,7 @@
 	},
 	{
 		"vendor": "American Society for Cell Biology",
-		"sushiUrl": "https://www.molbiolcell.org/reports",
+		"sushiUrl": "https://www.molbiolcell.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -241,7 +241,7 @@
 	},
 	{
 		"vendor": "American Society of Clinical Oncology (ASCO)",
-		"sushiUrl": "https://ascopubs.org/reports",
+		"sushiUrl": "https://ascopubs.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -251,7 +251,7 @@
 	},
 	{
 		"vendor": "American Society of Mechanical Engineers (ASME)",
-		"sushiUrl": "https://sitemaster.asmedigitalcollection.asme.org/sushi/reports",
+		"sushiUrl": "https://sitemaster.asmedigitalcollection.asme.org/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -261,7 +261,7 @@
 	},
 	{
 		"vendor": "American Speech-Language-Hearing Association",
-		"sushiUrl": "https://pubs.asha.org/reports",
+		"sushiUrl": "https://pubs.asha.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -271,7 +271,7 @@
 	},
 	{
 		"vendor": "American Thoracic Society",
-		"sushiUrl": "https://www.atsjournals.org/reports",
+		"sushiUrl": "https://www.atsjournals.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -281,7 +281,7 @@
 	},
 	{
 		"vendor": "American Veterinary Medical Association",
-		"sushiUrl": "https://avmajournals.avma.org/reports",
+		"sushiUrl": "https://avmajournals.avma.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -291,7 +291,7 @@
 	},
 	{
 		"vendor": "Annual Reviews",
-		"sushiUrl": "https://www.annualreviews.org/reports",
+		"sushiUrl": "https://www.annualreviews.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -301,7 +301,7 @@
 	},
 	{
 		"vendor": "BIR (The British Institute of Radiology)",
-		"sushiUrl": "https://www.birpublications.org/reports",
+		"sushiUrl": "https://www.birpublications.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -311,7 +311,7 @@
 	},
 	{
 		"vendor": "Berghahn Journals",
-		"sushiUrl": "https://ams.berghahnjournals.com/rest/COUNTER/v5/reports",
+		"sushiUrl": "https://ams.berghahnjournals.com/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -321,7 +321,7 @@
 	},
 	{
 		"vendor": "BioOne",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -331,7 +331,7 @@
 	},
 	{
 		"vendor": "Brepols Online",
-		"sushiUrl": "https://www.brepolsonline.net/reports",
+		"sushiUrl": "https://www.brepolsonline.net",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -341,7 +341,7 @@
 	},
 	{
 		"vendor": "Brill",
-		"sushiUrl": "https://ams.brill.com/rest/COUNTER/v5/reports",
+		"sushiUrl": "https://ams.brill.com/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -351,7 +351,7 @@
 	},
 	{
 		"vendor": "British Medical Journals (BMJ)",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -361,7 +361,7 @@
 	},
 	{
 		"vendor": "CREDO",
-		"sushiUrl": "https://search.credoreference.com/reports",
+		"sushiUrl": "https://search.credoreference.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -371,7 +371,7 @@
 	},
 	{
 		"vendor": "CSIRO (Commonwealth Scientific and Industrial Research Organisation)",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -381,7 +381,7 @@
 	},
 	{
 		"vendor": "Cambridge Core",
-		"sushiUrl": "https://event-aggregation-api-prod-platform.prod.aop.cambridge.org/reports",
+		"sushiUrl": "https://event-aggregation-api-prod-platform.prod.aop.cambridge.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -391,7 +391,7 @@
 	},
 	{
 		"vendor": "Cambridge University Press",
-		"sushiUrl": "http:/counter5.cambridge.org/reports",
+		"sushiUrl": "http:/counter5.cambridge.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -401,7 +401,7 @@
 	},
 	{
 		"vendor": "Chemical Society of Japan",
-		"sushiUrl": "https://www.journal.csj.jp/reports",
+		"sushiUrl": "https://www.journal.csj.jp",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -411,7 +411,7 @@
 	},
 	{
 		"vendor": "DeGruyter (Walter De Gruyter)",
-		"sushiUrl": "https:/ams.degruyter.com/rest/COUNTER/v5/reports",
+		"sushiUrl": "https:/ams.degruyter.com/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -421,7 +421,7 @@
 	},
 	{
 		"vendor": "DesLibris",
-		"sushiUrl": "https://connect.liblynx.com/sushi/r5/reports",
+		"sushiUrl": "https://connect.liblynx.com/sushi/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -431,7 +431,7 @@
 	},
 	{
 		"vendor": "Duke University Press (Euclid)",
-		"sushiUrl": "https://sitemaster.read.dukeupress.edu/sushi/reports",
+		"sushiUrl": "https://sitemaster.read.dukeupress.edu/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -441,7 +441,7 @@
 	},
 	{
 		"vendor": "Duncker & Humblot",
-		"sushiUrl": "https://elibrary.duncker-humblot.com/sushi/reports",
+		"sushiUrl": "https://elibrary.duncker-humblot.com/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -451,7 +451,7 @@
 	},
 	{
 		"vendor": "EBSCOhost",
-		"sushiUrl": "https://sushi.ebscohost.com/R5/reports",
+		"sushiUrl": "https://sushi.ebscohost.com/R5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -461,7 +461,7 @@
 	},
 	{
 		"vendor": "Edinburgh University Press",
-		"sushiUrl": "https://www.euppublishing.com/reports",
+		"sushiUrl": "https://www.euppublishing.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -471,7 +471,7 @@
 	},
 	{
 		"vendor": "Edward Elgar Publishing",
-		"sushiUrl": "https:/ams.elgaronline.com/rest/COUNTER/v5/reports",
+		"sushiUrl": "https:/ams.elgaronline.com/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -481,7 +481,7 @@
 	},
 	{
 		"vendor": "Elsevier Engineering Village",
-		"sushiUrl": "https://api.elsevier.com/sushi/reports",
+		"sushiUrl": "https://api.elsevier.com/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -491,7 +491,7 @@
 	},
 	{
 		"vendor": "Elsevier ScienceDirect",
-		"sushiUrl": "https://api.elsevier.com/sushi/reports",
+		"sushiUrl": "https://api.elsevier.com/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -501,7 +501,7 @@
 	},
 	{
 		"vendor": "Elsevier Scopus",
-		"sushiUrl": "https://api.elsevier.com/sushi/reports",
+		"sushiUrl": "https://api.elsevier.com/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -511,7 +511,7 @@
 	},
 	{
 		"vendor": "Emerald Insight",
-		"sushiUrl": "https://connect.liblynx.com/sushi/r5/reports",
+		"sushiUrl": "https://connect.liblynx.com/sushi/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -521,7 +521,7 @@
 	},
 	{
 		"vendor": "FASEB",
-		"sushiUrl": "https://www.fasebj.org/reports",
+		"sushiUrl": "https://www.fasebj.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -531,7 +531,7 @@
 	},
 	{
 		"vendor": "Future Medicine",
-		"sushiUrl": "https://www.futuremedicine.com/reports",
+		"sushiUrl": "https://www.futuremedicine.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -541,7 +541,7 @@
 	},
 	{
 		"vendor": "Gale",
-		"sushiUrl": "https://sushi5.galegroup.com/sushi/reports",
+		"sushiUrl": "https://sushi5.galegroup.com/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -551,7 +551,7 @@
 	},
 	{
 		"vendor": "GeoscienceWorld",
-		"sushiUrl": "https://sitemaster.geoscienceworld.org/sushi/reports",
+		"sushiUrl": "https://sitemaster.geoscienceworld.org/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -561,7 +561,7 @@
 	},
 	{
 		"vendor": "Guilford Press",
-		"sushiUrl": "https://guilfordjournals.com/reports",
+		"sushiUrl": "https://guilfordjournals.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -571,7 +571,7 @@
 	},
 	{
 		"vendor": "Harvard Education Publishing Group",
-		"sushiUrl": "https://hepgjournals.org/reports",
+		"sushiUrl": "https://hepgjournals.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -581,7 +581,7 @@
 	},
 	{
 		"vendor": "Health Affairs",
-		"sushiUrl": "https://www.healthaffairs.org/reports",
+		"sushiUrl": "https://www.healthaffairs.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -591,7 +591,7 @@
 	},
 	{
 		"vendor": "HighWire Press",
-		"sushiUrl": "https://hwdpapi.highwire.org/sushi/reports",
+		"sushiUrl": "https://hwdpapi.highwire.org/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": true,
@@ -600,7 +600,7 @@
 	},
 	{
 		"vendor": "ICE Virtual Library (Institution of Civil Engineers)",
-		"sushiUrl": "https://www.icevirtuallibrary.com/reports",
+		"sushiUrl": "https://www.icevirtuallibrary.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -610,7 +610,7 @@
 	},
 	{
 		"vendor": "IEEE Xplore",
-		"sushiUrl": "https://c5sushi.mpsinsight.com/c5sushi/services/reports",
+		"sushiUrl": "https://c5sushi.mpsinsight.com/c5sushi/services",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -620,7 +620,7 @@
 	},
 	{
 		"vendor": "IGI Global",
-		"sushiUrl": "https://sushi5.igi-global.com/reports",
+		"sushiUrl": "https://sushi5.igi-global.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -630,7 +630,7 @@
 	},
 	{
 		"vendor": "INFORMS",
-		"sushiUrl": "https://pubsonline.informs.org/reports",
+		"sushiUrl": "https://pubsonline.informs.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -640,7 +640,7 @@
 	},
 	{
 		"vendor": "Inderscience",
-		"sushiUrl": "https://inderscienceonline.com/reports",
+		"sushiUrl": "https://inderscienceonline.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -650,7 +650,7 @@
 	},
 	{
 		"vendor": "Ingentaconnect",
-		"sushiUrl": "https://www.ingentaconnect.com/sushiadmin/statistics/sushi/reports",
+		"sushiUrl": "https://www.ingentaconnect.com/sushiadmin/statistics/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -660,7 +660,7 @@
 	},
 	{
 		"vendor": "JSTOR",
-		"sushiUrl": "https://www.jstor.org/sushi/reports",
+		"sushiUrl": "https://www.jstor.org/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -670,7 +670,7 @@
 	},
 	{
 		"vendor": "Journal of Neurosurgery (JNS)",
-		"sushiUrl": "https://ams.thejns.org/rest/COUNTER/v5/reports",
+		"sushiUrl": "https://ams.thejns.org/rest/COUNTER/v5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -680,7 +680,7 @@
 	},
 	{
 		"vendor": "Journal of Orthopaedic & Sports Physical Therapy (JOSPT)",
-		"sushiUrl": "https://www.jospt.org/reports",
+		"sushiUrl": "https://www.jospt.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -690,7 +690,7 @@
 	},
 	{
 		"vendor": "Journal of Studies on Alcohol and Drugs / Rutgers University Press (JSAD)",
-		"sushiUrl": "https://www.jsad.com/reports",
+		"sushiUrl": "https://www.jsad.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -700,7 +700,7 @@
 	},
 	{
 		"vendor": "Karger",
-		"sushiUrl": "https://counter.karger.com/reports",
+		"sushiUrl": "https://counter.karger.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -710,7 +710,7 @@
 	},
 	{
 		"vendor": "Liverpool University Press",
-		"sushiUrl": "https://online.liverpooluniversitypress.co.uk/reports",
+		"sushiUrl": "https://online.liverpooluniversitypress.co.uk",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -720,7 +720,7 @@
 	},
 	{
 		"vendor": "MGG Online",
-		"sushiUrl": "https://www.mgg-online.com/mgg/sushi/reports",
+		"sushiUrl": "https://www.mgg-online.com/mgg/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -730,7 +730,7 @@
 	},
 	{
 		"vendor": "MIT Press",
-		"sushiUrl": "https://www.mitpressjournals.org/reports",
+		"sushiUrl": "https://www.mitpressjournals.org",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -740,7 +740,7 @@
 	},
 	{
 		"vendor": "Mark Allen Group",
-		"sushiUrl": "https://www.magonlinelibrary.com/reports",
+		"sushiUrl": "https://www.magonlinelibrary.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -750,7 +750,7 @@
 	},
 	{
 		"vendor": "Mary Ann Liebert",
-		"sushiUrl": "https://www.liebertpub.com/reports",
+		"sushiUrl": "https://www.liebertpub.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -760,7 +760,7 @@
 	},
 	{
 		"vendor": "MathSciNet (American Mathematical Society)",
-		"sushiUrl": "https://mathscinet.ams.org/counter/r5/reports",
+		"sushiUrl": "https://mathscinet.ams.org/counter/r5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -770,7 +770,7 @@
 	},
 	{
 		"vendor": "McGraw-Hill",
-		"sushiUrl": "https://www.mhebooklibrary.com/reports",
+		"sushiUrl": "https://www.mhebooklibrary.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -790,7 +790,7 @@
 	},
 	{
 		"vendor": "Morgan and Claypook Publishers",
-		"sushiUrl": "https://www.morganclaypool.com/reports",
+		"sushiUrl": "https://www.morganclaypool.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -800,7 +800,7 @@
 	},
 	{
 		"vendor": "NEJM (New England Journal of Medicine)",
-		"sushiUrl": "https://www.nejm.org/reports",
+		"sushiUrl": "https://www.nejm.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -810,7 +810,7 @@
 	},
 	{
 		"vendor": "NRC Press",
-		"sushiUrl": "https://www.nrcresearchpress.com/reports",
+		"sushiUrl": "https://www.nrcresearchpress.com",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -820,7 +820,7 @@
 	},
 	{
 		"vendor": "Newsbank",
-		"sushiUrl": "https://stats.newsbank.com/sushi_r5/servlet/reports",
+		"sushiUrl": "https://stats.newsbank.com/sushi_r5/servlet",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -830,7 +830,7 @@
 	},
 	{
 		"vendor": "OECD iLibrary",
-		"sushiUrl": "https://www.oecd-ilibrary.org/counter5/sushi/reports",
+		"sushiUrl": "https://www.oecd-ilibrary.org/counter5/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -840,7 +840,7 @@
 	},
 	{
 		"vendor": "Ovid",
-		"sushiUrl": "https://stats.ovid.com/C5/sushi/reports",
+		"sushiUrl": "https://stats.ovid.com/C5/sushi",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -850,7 +850,7 @@
 	},
 	{
 		"vendor": "Oxford (Books)",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -860,7 +860,7 @@
 	},
 	{
 		"vendor": "Oxford (Journals)",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -870,7 +870,7 @@
 	},
 	{
 		"vendor": "Philosophy Documentation Centre",
-		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5/reports",
+		"sushiUrl": "https://sushi5.scholarlyiq.com/counter/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -880,7 +880,7 @@
 	},
 	{
 		"vendor": "Physical Society of Japan",
-		"sushiUrl": "https://journals.jps.jp/reports",
+		"sushiUrl": "https://journals.jps.jp",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -890,7 +890,7 @@
 	},
 	{
 		"vendor": "ProQuest",
-		"sushiUrl": "https://sushi.proquest.com/counter/r5/reports",
+		"sushiUrl": "https://sushi.proquest.com/counter/r5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -900,7 +900,7 @@
 	},
 	{
 		"vendor": "ProQuest Ebook Central",
-		"sushiUrl": "https://pqbi.prod.proquest.com/release/sushi/ebooks/r5/reports",
+		"sushiUrl": "https://pqbi.prod.proquest.com/release/sushi/ebooks/r5",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -910,7 +910,7 @@
 	},
 	{
 		"vendor": "Project HOPE (Health Affairs)",
-		"sushiUrl": "https://hope.atyponinsights.com/counter5/reports",
+		"sushiUrl": "https://hope.atyponinsights.com/counter5",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -920,7 +920,7 @@
 	},
 	{
 		"vendor": "Project MUSE",
-		"sushiUrl": "https://about.muse.jhu.edu/lib/counter5/sushi/reports",
+		"sushiUrl": "https://about.muse.jhu.edu/lib/counter5/sushi",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -930,7 +930,7 @@
 	},
 	{
 		"vendor": "RSNA (Radiological Society of North America)",
-		"sushiUrl": "https://pubs.rsna.org/reports",
+		"sushiUrl": "https://pubs.rsna.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -940,7 +940,7 @@
 	},
 	{
 		"vendor": "Royal Society",
-		"sushiUrl": "https://royalsocietypublishing.org/reports",
+		"sushiUrl": "https://royalsocietypublishing.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -950,7 +950,7 @@
 	},
 	{
 		"vendor": "Royal Society of Chemistry",
-		"sushiUrl": "https://c5sushi.mpsinsight.com/c5sushi/services/reports",
+		"sushiUrl": "https://c5sushi.mpsinsight.com/c5sushi/services",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -960,7 +960,7 @@
 	},
 	{
 		"vendor": "SAGE Ebooks (Sage SecureCenter)",
-		"sushiUrl": "https://securecenter.sagepub.com/SushiService/reports",
+		"sushiUrl": "https://securecenter.sagepub.com/SushiService",
 		"customerId": false,
 		"requestorId": true,
 		"apiKey": false,
@@ -970,7 +970,7 @@
 	},
 	{
 		"vendor": "SAGE Journals",
-		"sushiUrl": "https://journals.sagepub.com/reports",
+		"sushiUrl": "https://journals.sagepub.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -980,7 +980,7 @@
 	},
 	{
 		"vendor": "SIAM (Society for Industrial and Applied Mathematics)",
-		"sushiUrl": "https://epubs.siam.org/reports",
+		"sushiUrl": "https://epubs.siam.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -990,7 +990,7 @@
 	},
 	{
 		"vendor": "Scitation - AIP (American Institute of Physics)",
-		"sushiUrl": "https://www.scitation.org/reports",
+		"sushiUrl": "https://www.scitation.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1000,7 +1000,7 @@
 	},
 	{
 		"vendor": "Society of Exploration Geophysicists",
-		"sushiUrl": "https://library.seg.org/reports",
+		"sushiUrl": "https://library.seg.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1010,7 +1010,7 @@
 	},
 	{
 		"vendor": "Springer Nature",
-		"sushiUrl": "https://counter.public.springernature.app/reports",
+		"sushiUrl": "https://counter.public.springernature.app",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": true,
@@ -1020,7 +1020,7 @@
 	},
 	{
 		"vendor": "Taylor & Francis Ebooks (Books)",
-		"sushiUrl": "https://api.taylorandfrancis.com/v2/counterreports/reports",
+		"sushiUrl": "https://api.taylorandfrancis.com/v2/counterreports",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1030,7 +1030,7 @@
 	},
 	{
 		"vendor": "Taylor & Francis Online (Journals)",
-		"sushiUrl": "https://www.tandfonline.com/reports",
+		"sushiUrl": "https://www.tandfonline.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -1040,7 +1040,7 @@
 	},
 	{
 		"vendor": "UCLA Journals",
-		"sushiUrl": "https://uclajournals.org/reports",
+		"sushiUrl": "https://uclajournals.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1050,7 +1050,7 @@
 	},
 	{
 		"vendor": "University of Chicago Press",
-		"sushiUrl": "https://www.journals.uchicago.edu/reports",
+		"sushiUrl": "https://www.journals.uchicago.edu",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -1060,7 +1060,7 @@
 	},
 	{
 		"vendor": "University of Toronto Press",
-		"sushiUrl": "https://www.utpjournals.press/reports",
+		"sushiUrl": "https://www.utpjournals.press",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -1070,7 +1070,7 @@
 	},
 	{
 		"vendor": "Vandenhoeck & Ruprecht",
-		"sushiUrl": "https://www.vr-elibrary.de/reports",
+		"sushiUrl": "https://www.vr-elibrary.de",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1080,7 +1080,7 @@
 	},
 	{
 		"vendor": "Wiley Online Library",
-		"sushiUrl": "https://onlinelibrary.wiley.com/reports",
+		"sushiUrl": "https://onlinelibrary.wiley.com",
 		"customerId": true,
 		"requestorId": true,
 		"apiKey": false,
@@ -1090,7 +1090,7 @@
 	},
 	{
 		"vendor": "World Bank",
-		"sushiUrl": "https://elibrary.worldbank.org/reports",
+		"sushiUrl": "https://elibrary.worldbank.org",
 		"customerId": true,
 		"requestorId": false,
 		"apiKey": false,
@@ -1100,7 +1100,7 @@
 	},
 	{
 		"vendor": "World Scientific",
-		"sushiUrl": "https://www.worldscientific.com/reports",
+		"sushiUrl": "https://www.worldscientific.com",
 		"customerId": true,
     "requestorId": false,
 		"apiKey": false,
