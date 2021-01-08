@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import React, { useState, Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import {
@@ -27,27 +27,34 @@ import {
   EuiLink,
   EuiTextColor,
   EuiIcon,
-  EuiText,
+  EuiImage,
   EuiToolTip,
+  EuiBadge,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import moment from 'moment';
 
 import { openFlyOut as openEditFlyOut } from './flyout/edit';
 import { openFlyOut as openHistoryFlyOut } from './flyout/history';
-import { convertFrequency, toasts, capabilities } from '../../lib/reporting';
+import { convertFrequency, toasts, capabilities, httpClient } from '../../lib/reporting';
+import printer from '../../public/images/printer.png';
 
 interface Props {
   tasks: any[];
+  spaces: any[];
   frequencies: any[];
   dashboards: any[];
-  removeTaskHandler(task: object): void;
-  downloadReport(taskId: string): any;
+  admin: boolean;
+  onSelectionChangeHandler(tasksId: any[]): void;
 }
 
 interface State {
   itemIdToExpandedRowMap: object;
   pageIndex: number;
   pageSize: number;
+  sortField: string;
+  sortDirection: string;
+  tasksInProgress: object;
 }
 
 export class EzreportingTable extends Component<Props, State> {
@@ -58,6 +65,9 @@ export class EzreportingTable extends Component<Props, State> {
       itemIdToExpandedRowMap: {},
       pageIndex: 0,
       pageSize: 10,
+      sortField: 'namespace',
+      sortDirection: 'asc',
+      tasksInProgress: {},
     };
   }
 
@@ -74,7 +84,20 @@ export class EzreportingTable extends Component<Props, State> {
       ? reporting.emails.join(', ')
       : reporting.emails;
 
+    const dsh = this.props.dashboards.find(({ id, namespace }) => {
+      if (id !== item.dashboardId && namespace !== item.namespace) {
+        return false;
+      }
+      return true;
+    });
+
     const listItems = [
+      {
+        title: (
+          <FormattedMessage id="ezReporting.dashboardDescription" defaultMessage="Description" />
+        ),
+        description: dsh.description || 'N/A',
+      },
       {
         title: (
           <FormattedMessage
@@ -98,18 +121,28 @@ export class EzreportingTable extends Component<Props, State> {
     return this.setState({ itemIdToExpandedRowMap });
   };
 
-  onTableChange = ({ page = {} }) => {
+  onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
+    const { field: sortField, direction: sortDirection } = sort;
 
     this.setState({
       pageIndex,
       pageSize,
+      sortField,
+      sortDirection,
     });
   };
 
   render() {
-    const { pageIndex, pageSize, itemIdToExpandedRowMap } = this.state;
-    const { tasks, dashboards, frequencies } = this.props;
+    const { pageIndex, pageSize, itemIdToExpandedRowMap, sortField, sortDirection, } = this.state;
+    const {
+      tasks,
+      tasksInProgress,
+      spaces,
+      dashboards,
+      frequencies,
+      onSelectionChangeHandler,
+    } = this.props;
 
     const actions = [];
 
@@ -139,40 +172,28 @@ export class EzreportingTable extends Component<Props, State> {
       });
     }
 
-    if (capabilities.save) {
+    if (capabilities.edit) {
       actions.push({
-        name: i18n.translate('ezReporting.generate', { defaultMessage: 'Generate' }),
-        description: i18n.translate('ezReporting.generate', { defaultMessage: 'Generate' }),
-        icon: 'importAction',
+        name: i18n.translate('ezReporting.clone', { defaultMessage: 'Clone' }),
+        description: i18n.translate('ezReporting.clone', { defaultMessage: 'Clone' }),
+        icon: 'copy',
         type: 'icon',
         color: 'primary',
         onClick: (el) => {
           if (el.exists) {
-            return this.props
-              .downloadReport(el._id)
-              .then(() => {
-                return toasts.addInfo({
-                  title: 'Information',
-                  text: (
-                    <FormattedMessage
-                      id="ezReporting.generated"
-                      defaultMessage="Your report will be sent to you by email"
-                    />
-                  ),
-                });
-              })
-              .catch(() => {
-                return toasts.addDanger({
-                  title: 'Error',
-                  text: (
-                    <FormattedMessage
-                      id="ezReporting.generationError"
-                      defaultMessage="An error occurred while downloading report."
-                    />
-                  ),
-                });
-              });
+            return openEditFlyOut(el, false);
           }
+
+          return toasts.addDanger({
+            title: 'Error',
+            text: (
+              <FormattedMessage
+                id="ezReporting.dashboardNotFound"
+                values={{ DASHBOARD_ID: el.dashboardId }}
+                defaultMessage="Dashboard nof found or remove (id: {DASHBOARD_ID})"
+              />
+            ),
+          });
         },
       });
     }
@@ -192,47 +213,74 @@ export class EzreportingTable extends Component<Props, State> {
       });
     }
 
-    if (capabilities.delete) {
-      actions.push({
-        name: i18n.translate('ezReporting.delete', { defaultMessage: 'Delete' }),
-        description: i18n.translate('ezReporting.delete', { defaultMessage: 'Delete' }),
-        icon: 'trash',
-        type: 'icon',
-        color: 'danger',
-        onClick: (el) => {
-          this.props.removeTaskHandler(el);
-        },
-      });
-    }
-
     const columns = [
       {
+        field: 'dashboardId',
         name: i18n.translate('ezReporting.dashboard', { defaultMessage: 'Dashboard' }),
         description: i18n.translate('ezReporting.dashboardName', {
           defaultMessage: 'Dashboard name',
         }),
         align: 'left',
-        render: ({ dashboardId, reporting }) => {
+        render: (dashboardId, { _id, reporting }) => {
           if (dashboardId) {
             const dashboard = dashboards.find(({ id }) => id === dashboardId);
             if (dashboard) {
+              let print;
               if (reporting.print) {
-                const content = (
-                  <FormattedMessage
-                    id="ezReporting.optimizedForPrinting"
-                    defaultMessage="Optimized for printing"
-                  />
-                );
-                return (
-                  <span>
-                    <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink> {' '}
-                    <EuiToolTip position="right" content={content}>
-                      <EuiText>&#128438;</EuiText>
+                print = (
+                  <Fragment>
+                    {' '}
+                    <EuiToolTip
+                      position="right"
+                      content={i18n.translate('ezReporting.optimizedForPrinting', {
+                        defaultMessage: 'Optimized for printing',
+                      })}
+                    >
+                      <EuiImage
+                        alt={i18n.translate('ezReporting.optimizedForPrinting', {
+                          defaultMessage: 'Optimized for printing',
+                        })}
+                        size={14}
+                        url={printer}
+                      />
                     </EuiToolTip>
-                  </span>
+                  </Fragment>
                 );
               }
-              return <EuiLink href={`kibana#/dashboard/${dashboardId}`}>{dashboard.name}</EuiLink>;
+
+              let dashboardLink = `/app/kibana#/dashboard/${dashboardId}`;
+              if (this.props.admin && dashboard.namespace !== 'default') {
+                dashboardLink = `/s/${dashboard.namespace}${dashboardLink}`;
+              }
+
+              const taskStatus = tasksInProgress[_id];
+              let statusIcon;
+
+              if (taskStatus) {
+                const { status, log } = taskStatus;
+
+                if (status && status !== 'error') {
+                  statusIcon = <EuiLoadingSpinner size="m" />;
+                }
+                if (status && status === 'error') {
+                  statusIcon = (
+                    <EuiToolTip position="bottom" content={log}>
+                      <EuiIcon type="alert" />
+                    </EuiToolTip>
+                  );
+                }
+              }
+
+              return (
+                <Fragment>
+                  {statusIcon}
+                  &nbsp;
+                  <EuiLink href={httpClient.basePath.prepend(dashboardLink)}>
+                    {dashboard.name}
+                  </EuiLink>
+                  &nbsp;{print}
+                </Fragment>
+              );
             }
           }
 
@@ -246,21 +294,25 @@ export class EzreportingTable extends Component<Props, State> {
               />
             </EuiTextColor>
           );
+          return '';
         },
       },
       {
+        field: 'reporting.frequency',
         name: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
         description: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
-        render: ({ reporting }) => convertFrequency(frequencies, reporting.frequency),
+        render: (frequency) => convertFrequency(frequencies, frequency),
+        sortable: true,
         align: 'center',
       },
       {
+        field: 'reporting.sentAt',
         name: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
         description: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
         align: 'center',
-        render: ({ reporting }) => {
-          if (reporting.sentAt && reporting.sentAt !== '1970-01-01T12:00:00.000Z') {
-            return moment(reporting.sentAt).format('YYYY-MM-DD');
+        render: (sentAt) => {
+          if (sentAt && sentAt !== '1970-01-01T12:00:00.000Z') {
+            return moment(sentAt).format('YYYY-MM-DD');
           }
 
           return '-';
@@ -285,6 +337,20 @@ export class EzreportingTable extends Component<Props, State> {
       },
     ];
 
+    if (this.props.admin) {
+      columns.splice(1, 0, {
+        field: 'namespace',
+        name: i18n.translate('ezReporting.space', { defaultMessage: 'Space' }),
+        description: i18n.translate('ezReporting.space', { defaultMessage: 'Space' }),
+        render: (namespace) => {
+          const space = spaces.find(({ name }) => name === namespace);
+          return <EuiBadge color={space.color}>{namespace || '-'}</EuiBadge>;
+        },
+        sortable: true,
+        align: 'center',
+      });
+    }
+
     const pagination = {
       pageIndex,
       pageSize,
@@ -293,18 +359,52 @@ export class EzreportingTable extends Component<Props, State> {
       hidePerPageOptions: false,
     };
 
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
+    };
+
     const startIndex = pageIndex * pageSize;
     const endIndex = Math.min(startIndex + pageSize, tasks.length);
 
+    const selection = {
+      selectable: (task) => task?._id,
+      selectableMessage: (selectable) =>
+        !selectable
+          ? i18n.translate('ezReporting.invalidTask', { defaultMessage: 'Invalid task' })
+          : undefined,
+      onSelectionChange: onSelectionChangeHandler,
+    };
+
+    const items = tasks.slice(startIndex, endIndex).sort((a, b) => {
+      let first = sortField.split('.').reduce((o, i) => o[i], a);
+      let second = sortField.split('.').reduce((o, i) => o[i], b);
+
+      if (sortField === 'reporting.frequency') {
+        first = convertFrequency(frequencies, first);
+        second = convertFrequency(frequencies, second);
+      }
+
+      if (sortDirection === 'asc') {
+        return first > second;
+      }
+      return first < second;
+    });
+
     return (
       <EuiBasicTable
-        items={tasks.slice(startIndex, endIndex)}
+        items={items}
         itemId="_id"
         itemIdToExpandedRowMap={itemIdToExpandedRowMap}
         isExpandable={true}
         hasActions={true}
         columns={columns}
         pagination={pagination}
+        sorting={sorting}
+        isSelectable={true}
+        selection={selection}
         onChange={this.onTableChange}
       />
     );

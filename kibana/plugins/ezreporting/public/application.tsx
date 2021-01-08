@@ -19,7 +19,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AppMountParameters, CoreStart } from '../../../src/core/public';
+import { AppMountParameters, CoreStart, ScopedHistory } from '../../../src/core/public';
 import { AppPluginStartDependencies } from './types';
 import { EzreportingApp } from './components/app';
 
@@ -35,8 +35,9 @@ import {
 export const renderApp = (
   { application, notifications, http }: CoreStart,
   { navigation }: AppPluginStartDependencies,
-  { appBasePath, element }: AppMountParameters,
-  applicationName: string
+  { element }: AppMountParameters,
+  applicationName: string,
+  admin: boolean
 ) => {
   if (!httpClient) {
     setHttpClient(http);
@@ -50,9 +51,10 @@ export const renderApp = (
 
   ReactDOM.render(
     <EzreportingApp
-      basename={appBasePath}
+      basename={http.basePath.get()}
       navigation={navigation}
       applicationName={applicationName}
+      admin={admin}
     />,
     element
   );

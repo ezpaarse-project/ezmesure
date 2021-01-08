@@ -35,6 +35,8 @@ import {
   EuiForm,
   EuiCheckbox,
   EuiSpacer,
+  EuiHealth,
+  EuiHighlight,
 } from '@elastic/eui';
 import { get, set } from 'lodash';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -45,8 +47,13 @@ import { httpClient, toasts, ms2Str, defaultTask, capabilities } from '../../../
 interface Props {
   dashboards: any[];
   frequencies: any[];
+  spaces: any[];
+  admin: boolean;
   editTaskHandler(task: object): Promise<object>;
   saveTaskHandler(task: object): Promise<object>;
+  onChangeSpaceHandler(spaces: any[]): void;
+  dashboardsBySpace: any[];
+  currentSpaces: any[];
 }
 
 interface State {
@@ -57,6 +64,7 @@ interface State {
   receivers: any[];
   mailErrorMessages: any[];
   dashboardErrorMessages: any[];
+  spaceErrorMessages: any[];
 }
 
 let openFlyOutHandler;
@@ -81,6 +89,7 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
       receivers: [],
       mailErrorMessages: [],
       dashboardErrorMessages: [],
+      spaceErrorMessages: [],
     };
 
     openFlyOutHandler = this.open;
@@ -117,6 +126,19 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
 
   close = () => {
     this.setState({ isFlyoutVisible: false });
+  };
+
+  onChangeSpace = (selectedSpaces) => {
+    const currentTask = { ...this.state.currentTask };
+
+    if (!selectedSpaces.length) {
+      currentTask.namespace = '';
+      this.setState({ currentTask });
+    }
+
+    currentTask.namespace = selectedSpaces[0].label;
+    this.setState({ currentTask });
+    this.props.onChangeSpaceHandler(selectedSpaces);
   };
 
   onChangeDashboard = (selectedDashboards) => {
@@ -159,24 +181,41 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
     event.preventDefault();
     const { email, receivers } = this.state;
 
-    try {
-      const body = JSON.stringify({ email });
-      const resp = await httpClient.post('/api/ezreporting/email', { body });
+    const emailsList = email.split(',') || [email];
 
-      const exists = receivers.includes(email);
+    const wrongEmails = [];
+    for (let i = 0; i < emailsList.length; i += 1) {
+      try {
+        const body = JSON.stringify({ email: emailsList[i] });
+        await httpClient.post('/api/ezreporting/email', { body });
 
+        const exists = receivers.includes(emailsList[i]);
+        if (!exists) {
+          receivers.push(emailsList[i]);
+        }
+      } catch (e) {
+        wrongEmails.push(emailsList[i]);
+      }
+    }
+
+    if (!wrongEmails.length) {
       this.setState({
         email: '',
         mailErrorMessages: [],
-        receivers: exists ? receivers : receivers.concat([email]),
+        receivers,
       });
-    } catch (error) {
+    }
+
+    if (wrongEmails.length) {
+      const mailErrorMessages = wrongEmails.map((emailAddress) => {
+        return i18n.translate('ezReporting.pleaseEnterValidEmail', {
+          values: { EMAIL_ADDRESS: emailAddress },
+          defaultMessage: `Please enter a valid email address ({EMAIL_ADDRESS})`,
+        });
+      });
       this.setState({
-        mailErrorMessages: [
-          i18n.translate('ezReporting.pleaseEnterValidEmail', {
-            defaultMessage: 'Please enter a valid email address',
-          }),
-        ],
+        mailErrorMessages,
+        email: wrongEmails.join(','),
       });
     }
   };
@@ -188,7 +227,7 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
   };
 
   saveOrUpdate = () => {
-    if (capabilities.save) {
+    if (capabilities.create) {
       const { edit, currentTask, receivers } = this.state;
 
       set(currentTask, 'reporting.emails', receivers);
@@ -216,42 +255,24 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
       edit,
       mailErrorMessages,
       dashboardErrorMessages,
+      spaceErrorMessages,
       receivers,
     } = this.state;
-    const { dashboards, frequencies } = this.props;
+    const { dashboards, frequencies, admin, spaces, dashboardsBySpace, currentSpaces } = this.props;
 
-    const flytOut = (
-      <EuiFlyout onClose={this.close} size="m">
-        <EuiFlyoutHeader hasBorder>
-          <EuiFlexGroup alignItems="center">
-            <EuiFlexItem>
-              <EuiTitle size="s">
-                <h3 id="flyoutTitle">
-                  <FormattedMessage
-                    defaultMessage="Log event document details"
-                    id="xpack.infra.logFlyout.flyoutTitle"
-                  />
-                </h3>
-              </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>lortem</EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlyoutHeader>
-        <EuiFlyoutBody>lorem</EuiFlyoutBody>
-      </EuiFlyout>
-    );
-
-    const dashboardList = dashboards.map((dashboard) => ({
+    let dashboardList = admin ? dashboardsBySpace : dashboards;
+    dashboardList = dashboardList.map((dashboard) => ({
       value: dashboard.id,
       label: dashboard.name,
     }));
 
     const invalidMail = mailErrorMessages.length > 0;
     const invalidDashboard = dashboardErrorMessages.length > 0;
+    const invalidSpace = spaceErrorMessages.length > 0;
     const invalidForm = invalidDashboard || receivers.length === 0;
 
     let saveBtn;
-    if (capabilities.save) {
+    if (capabilities.create) {
       saveBtn = (
         <EuiFormRow fullWidth={true}>
           <EuiButton
@@ -313,10 +334,56 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
       );
     }
 
-    const selectedDashboards = dashboardList.filter(d => d.value === currentTask.dashboardId);
+    const selectedDashboards = dashboardList.filter((d) => d.value === currentTask.dashboardId);
+
+    let spaceSelector;
+    if (admin) {
+      const spacesList = spaces.map((space) => ({
+        value: space.id,
+        label: space.name,
+        color: space.color,
+      }));
+
+      const renderOption = (option, searchValue, contentClassName) => {
+        const { color, label, value } = option;
+        return (
+          <EuiHealth color={color}>
+            <span className={contentClassName}>
+              <EuiHighlight search={searchValue}>{label}</EuiHighlight>
+            </span>
+          </EuiHealth>
+        );
+      };
+
+      spaceSelector = (
+        <EuiFormRow
+          fullWidth
+          label={<FormattedMessage id="ezReporting.space" defaultMessage="Space" />}
+          isInvalid={invalidSpace}
+          error={spaceErrorMessages}
+        >
+          <EuiComboBox
+            fullWidth
+            placeholder={i18n.translate('ezReporting.selectSpace', {
+              defaultMessage: 'Select a space',
+            })}
+            singleSelection
+            options={spacesList}
+            selectedOptions={currentSpaces}
+            onChange={this.onChangeSpace}
+            renderOption={renderOption}
+            isClearable={true}
+            isInvalid={invalidSpace}
+            data-test-subj="spaceSearch"
+          />
+        </EuiFormRow>
+      );
+    }
 
     const flyOutContent = (
       <EuiForm>
+        {spaceSelector}
+
         <EuiFormRow
           fullWidth={true}
           label={<FormattedMessage id="ezReporting.dashboard" defaultMessage="Dashboard" />}
@@ -345,7 +412,9 @@ export class EzreportingTaskEditFlyout extends Component<Props, State> {
             fullWidth={true}
             options={frequencies}
             value={currentTask.reporting.frequency}
-            aria-label={<FormattedMessage id="ezReporting.frequency" defaultMessage="Frequency" />}
+            aria-label={i18n.translate('ezReporting.frequency', {
+              defaultMessage: 'Frequency',
+            })}
             onChange={this.onChangeFrequency}
           />
         </EuiFormRow>

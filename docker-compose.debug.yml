@@ -4,7 +4,7 @@ services:
     extends:
       file: docker-compose.yml
       service: elastic
-
+  
   kibana:
     build:
       context: ./kibana
@@ -23,6 +23,7 @@ services:
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
       - REPORTING_URL=http://reporting:3000
+      - REPORTING_NAME=Reporting ezMESURE
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped

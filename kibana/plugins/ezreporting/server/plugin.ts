@@ -67,7 +67,7 @@ export class EzreportingPlugin
             all: [],
             read: [],
           },
-          ui: ['create', 'edit', 'save', 'delete', 'show'],
+          ui: ['create', 'edit', 'save', 'download', 'delete', 'show'],
         },
         read: {
           app: [PLUGIN_ID, 'kibana'],

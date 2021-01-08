@@ -7,7 +7,8 @@
   "requiredPlugins": [
     "navigation",
     "features",
-    "home"
+    "home",
+    "management"
   ],
   "optionalPlugins": [],
   "configPath": [

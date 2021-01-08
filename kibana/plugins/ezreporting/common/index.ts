@@ -23,7 +23,7 @@ export const PLUGIN_NAME = 'Reporting';
 export const PLUGIN_DESCRIPTION = `Manage your reports generated from ${PLUGIN_APP_NAME}.`;
 export const PLUGIN_ICON = 'reportingApp';
 export const API_URL = 'http://localhost:4000';
-export const EZMESURE_CATEGORY = {
+export const CATEGORY = {
   id: `${PLUGIN_APP_NAME.toLowerCase()}_category`,
   label: PLUGIN_APP_NAME,
   euiIconType: '',

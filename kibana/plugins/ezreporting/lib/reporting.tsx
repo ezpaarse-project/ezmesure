@@ -34,6 +34,7 @@ export const defaultTask = (dashboardId) => ({
     createdAt: '',
     print: false,
   },
+  namespace: '',
 });
 
 export const ms2Str = (time) => {

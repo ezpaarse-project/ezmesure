@@ -29,19 +29,15 @@ import {
   EzreportingPluginStart,
   AppPluginStartDependencies,
 } from './types';
-import {
-  PLUGIN_NAME,
-  PLUGIN_DESCRIPTION,
-  PLUGIN_ID,
-  PLUGIN_ICON,
-  EZMESURE_CATEGORY,
-  PLUGIN_APP_NAME,
-} from '../common';
 import { HomePublicPluginSetup } from '../../../src/plugins/home/public';
+import { ManagementSetup } from '../../../src/plugins/management/public';
 import { FeatureCatalogueCategory } from '../../../src/plugins/home/public/services/feature_catalogue';
+import { PLUGIN_NAME, PLUGIN_DESCRIPTION, PLUGIN_ID, PLUGIN_ICON, CATEGORY } from '../common';
+import logo from './images/logo.png';
 
 interface SetupDeps {
   home?: HomePublicPluginSetup;
+  management: ManagementSetup;
 }
 
 interface ClientConfigType {
@@ -55,24 +51,22 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
     this.initializerContext = initializerContext;
   }
 
-  public setup(core: CoreSetup, { home }: SetupDeps): EzreportingPluginSetup {
+  public setup(core: CoreSetup, { home, management }: SetupDeps): EzreportingPluginSetup {
     const config = this.initializerContext.config.get<ClientConfigType>();
     const { applicationName } = config;
 
-    EZMESURE_CATEGORY.label = applicationName;
+    CATEGORY.label = applicationName;
 
     const { protocol, hostname, port } = window.location;
     const ezmesureLink = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
 
-    // Back to ....... link
+    // Back to PLUGIN_NAME link
     core.application.register({
       id: `${applicationName.toLocaleLowerCase()}_back`,
       title: `Back to ${applicationName}`,
       euiIconType: 'editorUndo',
-      category: EZMESURE_CATEGORY,
-      mount() {
-        return (window.location.href = ezmesureLink);
-      },
+      category: CATEGORY,
+      mount: () => (window.location.href = ezmesureLink),
     });
 
     // ezReporting app
@@ -80,7 +74,7 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
       id: PLUGIN_ID,
       title: PLUGIN_NAME,
       euiIconType: PLUGIN_ICON,
-      category: EZMESURE_CATEGORY,
+      category: CATEGORY,
       async mount(params: AppMountParameters) {
         // Load application bundle
         const { renderApp } = await import('./application');
@@ -89,11 +83,52 @@ export class EzreportingPlugin implements Plugin<EzreportingPluginSetup, Ezrepor
 
         coreStart.chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
 
+        const admin = false;
+
         const render = renderApp(
           coreStart,
           depsStart as AppPluginStartDependencies,
           params,
-          applicationName
+          applicationName,
+          admin
+        );
+
+        // Render the application
+        return () => {
+          coreStart.chrome.docTitle.reset();
+          render();
+        };
+      },
+    });
+
+    // Menagement section
+    const managementSection = `${applicationName.toLowerCase()}_admin`;
+    management.sections.register({
+      id: managementSection,
+      title: applicationName,
+      order: 1000,
+      icon: logo,
+    });
+    management.sections.getSection(managementSection)!.registerApp({
+      id: PLUGIN_ID,
+      title: PLUGIN_NAME,
+      order: 99,
+      async mount(params: AppMountParameters) {
+        // Load application bundle
+        const { renderApp } = await import('./application');
+        // Get start services as specified in kibana.json
+        const [coreStart, depsStart] = await core.getStartServices();
+
+        coreStart.chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
+
+        const admin = true;
+
+        const render = renderApp(
+          coreStart,
+          depsStart as AppPluginStartDependencies,
+          params,
+          applicationName,
+          admin
         );
 
         // Render the application

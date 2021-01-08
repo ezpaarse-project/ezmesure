@@ -26,8 +26,12 @@ import { requestApi } from '../lib/api';
 export function defineRoutes(router: IRouter, auth: object) {
   router.get(
     {
-      path: '/api/ezreporting/tasks',
-      validate: false,
+      path: '/api/ezreporting/tasks/{place}',
+      validate: {
+        params: schema.object({
+          place: schema.string(),
+        }),
+      },
       options: {
         authRequired: true,
         tags: [`access:${PLUGIN_ID}-read`],
@@ -36,10 +40,13 @@ export function defineRoutes(router: IRouter, auth: object) {
     async function (context, req, res) {
       const { spaceId } = context.core?.savedObjects?.client;
       const { username } = auth.get(req).state;
+      const { place } = req.params;
 
       try {
         const result = await requestApi({
-          url: `/reporting/tasks/${spaceId === 'default' ? '' : spaceId}?user=${username}`,
+          url: `/reporting/tasks/${spaceId === 'default' ? '' : spaceId}?user=${username}${
+            place === 'admin' ? '&admin=true' : ''
+          }`,
         });
 
         return res.ok({
@@ -62,6 +69,7 @@ export function defineRoutes(router: IRouter, auth: object) {
           frequency: schema.string(),
           emails: schema.arrayOf(schema.string()),
           print: schema.boolean(),
+          space: schema.maybe(schema.string()),
         }),
       },
       options: {
@@ -78,6 +86,10 @@ export function defineRoutes(router: IRouter, auth: object) {
 
       try {
         let body = req.body;
+
+        if (body.space && body.space === 'default') {
+          delete body.space;
+        }
 
         if (spaceId && spaceId !== 'default') {
           body = { ...body, space: spaceId };
@@ -112,6 +124,7 @@ export function defineRoutes(router: IRouter, auth: object) {
           frequency: schema.string(),
           emails: schema.arrayOf(schema.string()),
           print: schema.boolean(),
+          space: schema.maybe(schema.string()),
         }),
       },
       options: {
@@ -129,6 +142,10 @@ export function defineRoutes(router: IRouter, auth: object) {
 
       try {
         let body = req.body;
+
+        if (body.space && body.space === 'default') {
+          delete body.space;
+        }
 
         if (spaceId && spaceId !== 'default') {
           body = { ...body, space: spaceId };
@@ -160,9 +177,6 @@ export function defineRoutes(router: IRouter, auth: object) {
       options: {
         authRequired: true,
         tags: [`access:${PLUGIN_ID}-all`],
-        body: {
-          accepts: ['application/json'],
-        },
       },
     },
     async function (context, req, res) {
@@ -170,14 +184,47 @@ export function defineRoutes(router: IRouter, auth: object) {
       const { taskId } = req.params;
 
       try {
+        const body = req.body;
+
         const result = await requestApi({
           method: 'DELETE',
           url: `/reporting/tasks/${taskId}?user=${username}`,
         });
 
-        return res.ok({
-          body: result.body,
+        return res.ok();
+      } catch (error) {
+        return res.internalError({
+          body: error,
         });
+      }
+    }
+  );
+
+  router.get(
+    {
+      path: '/api/ezreporting/tasks/{taskId}/download',
+      validate: {
+        params: schema.object({
+          taskId: schema.string(),
+        }),
+      },
+      options: {
+        authRequired: true,
+        tags: [`access:${PLUGIN_ID}-all`],
+      },
+    },
+    async function (context, req, res) {
+      const { username } = auth.get(req).state;
+      const { taskId } = req.params;
+
+      try {
+        const body = req.body;
+
+        const result = await requestApi({
+          url: `/reporting/tasks/${taskId}/download?user=${username}`,
+        });
+
+        return res.ok();
       } catch (error) {
         return res.internalError({
           body: error,
@@ -211,37 +258,6 @@ export function defineRoutes(router: IRouter, auth: object) {
         return res.ok({
           body: JSON.parse(result.body),
         });
-      } catch (error) {
-        return res.internalError({
-          body: error,
-        });
-      }
-    }
-  );
-
-  router.get(
-    {
-      path: '/api/ezreporting/tasks/{taskId}/download',
-      validate: {
-        params: schema.object({
-          taskId: schema.string(),
-        }),
-      },
-      options: {
-        authRequired: true,
-        tags: [`access:${PLUGIN_ID}-all`],
-      },
-    },
-    async function (context, req, res) {
-      const { username } = auth.get(req).state;
-      const { taskId } = req.params;
-
-      try {
-        const result = await requestApi({
-          url: `/reporting/tasks/${taskId}/download?user=${username}`,
-        });
-
-        return res.ok();
       } catch (error) {
         return res.internalError({
           body: error,
