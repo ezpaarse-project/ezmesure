@@ -14,6 +14,7 @@ const {
   deleteSushiData,
   updateSushi,
   addSushi,
+  fetchSushi,
 } = require('./actions');
 
 router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
@@ -66,6 +67,23 @@ router.route({
       sushiId: Joi.string().trim().required(),
     },
     body: Sushi.updateSchema,
+  },
+});
+
+requireAnyRole(['admin', 'superuser']);
+
+router.route({
+  method: 'POST',
+  path: '/:sushiId/_fetch',
+  handler: fetchSushi,
+  validate: {
+    type: 'json',
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+    body: {
+      target: Joi.string().trim().required(),
+    },
   },
 });
 
