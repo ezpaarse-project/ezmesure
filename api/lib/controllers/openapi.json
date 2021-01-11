@@ -2333,6 +2333,37 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "get-sushi-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Get a Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ]
       }
     },
     "/institutions/{id}/members": {
