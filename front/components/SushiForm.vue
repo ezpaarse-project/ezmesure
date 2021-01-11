@@ -91,7 +91,7 @@
         <v-spacer />
 
         <v-btn text @click="show = false">
-          Fermer
+          {{ $t('close') }}
         </v-btn>
 
         <v-btn
