@@ -1,5 +1,9 @@
 <template>
   <v-toolbar flat :dark="dark">
+    <slot name="nav-icon">
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+    </slot>
+
     <v-toolbar-title v-text="title" />
 
     <slot />
