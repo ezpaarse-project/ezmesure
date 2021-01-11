@@ -1,6 +1,5 @@
 <template>
-  <v-toolbar flat>
-    <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+  <v-toolbar flat :dark="dark">
     <v-toolbar-title v-text="title" />
 
     <slot />
@@ -13,6 +12,10 @@ export default {
     title: {
       type: String,
       default: () => '',
+    },
+    dark: {
+      type: Boolean,
+      default: () => false,
     },
   },
   computed: {
