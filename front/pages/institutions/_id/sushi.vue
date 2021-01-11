@@ -1,7 +1,27 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.sushi.title', { institutionName })">
-      <slot>
+    <ToolBar
+      :title="toolbarTitle"
+      :dark="hasSelection"
+    >
+      <template v-if="hasSelection" v-slot:nav-icon>
+        <v-btn icon @click="clearSelection">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+
+      <template v-if="hasSelection" v-slot:default>
+        <v-spacer />
+
+        <v-btn text @click="deleteData">
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          {{ $t('delete') }}
+        </v-btn>
+      </template>
+
+      <template v-else v-slot:default>
         <v-spacer />
 
         <v-text-field
@@ -38,7 +58,7 @@
           </v-icon>
           {{ $t('add') }}
         </v-btn>
-      </slot>
+      </template>
     </ToolBar>
 
     <SushiForm
@@ -64,15 +84,6 @@
         >
           mdi-pencil
         </v-icon>
-      </template>
-
-      <template v-slot:footer>
-        <span v-if="selected.length">
-          <v-btn small color="error" class="ma-2" @click="deleteData">
-            <v-icon left>mdi-delete</v-icon>
-            {{ $t('delete') }} ({{ selected.length }})
-          </v-btn>
-        </span>
       </template>
     </v-data-table>
 
@@ -156,6 +167,16 @@ export default {
     institutionName() {
       return this.institution?.name;
     },
+    hasSelection() {
+      return this.selected.length > 0;
+    },
+    toolbarTitle() {
+      if (this.hasSelection) {
+        return this.$t('nSelected', { count: this.selected.length });
+      }
+
+      return this.$t('institutions.sushi.title', { institutionName: this.institutionName });
+    },
   },
   mounted() {
     return this.refreshSushiItems();
@@ -180,8 +201,13 @@ export default {
 
       this.refreshing = false;
     },
+
+    clearSelection() {
+      this.selected = [];
+    },
+
     async deleteData() {
-      if (this.selected.length === 0) {
+      if (!this.hasSelection) {
         return;
       }
 

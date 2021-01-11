@@ -195,6 +195,7 @@
   "modify": "Modifier",
   "save": "Sauvegarder",
   "search": "Rechercher",
+  "nSelected": "{count} sélectionné(s)",
   "requiredFields": "* champs obligatoires",
   "formSendingFailed": "L'envoi du formulaire a échoué",
   "add": "Ajouter",

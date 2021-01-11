@@ -195,6 +195,7 @@
   "modify": "Modify",
   "save": "Save",
   "search": "Search",
+  "nSelected": "{count} selected",
   "requiredFields": "* required fields",
   "formSendingFailed": "Sending the form failed",
   "add": "Add",
