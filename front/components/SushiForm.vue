@@ -1,91 +1,132 @@
 <template>
-  <v-dialog v-model="show" width="600">
+  <v-dialog v-model="show" width="700">
     <v-card>
       <v-card-title class="headline" v-text="sushiForm.vendor" />
 
       <v-card-text>
         <v-form id="sushiForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-combobox
-                  ref="vendorsBox"
-                  v-model="sushiForm.vendor"
-                  :items="vendors"
-                  :label="`${$t('institutions.sushi.platform')} *`"
-                  :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
-                  item-text="vendor"
-                  outlined
-                  required
-                  autofocus
-                  @change="onVendorChange"
-                />
-              </v-col>
+          <v-combobox
+            ref="vendorsBox"
+            v-model="sushiForm.vendor"
+            :items="vendors"
+            :label="`${$t('institutions.sushi.platform')} *`"
+            :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
+            item-text="vendor"
+            outlined
+            required
+            autofocus
+            @change="onVendorChange"
+          />
 
-              <template v-if="sushiForm.vendor">
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="sushiForm.package"
-                    :label="`${$t('institutions.sushi.package')} *`"
-                    :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
-                    outlined
-                    required
-                  />
-                </v-col>
+          <v-text-field
+            v-model="sushiForm.package"
+            :label="`${$t('institutions.sushi.package')} *`"
+            :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
+            outlined
+            required
+          />
 
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="sushiForm.sushiUrl"
-                    :label="`${$t('institutions.sushi.sushiUrl')} *`"
-                    :rules="[
-                      v => !!v || $t('institutions.sushi.enterUrl')
-                    ]"
-                    :disabled="!canEditSushiUrl"
-                    outlined
-                    required
-                  />
-                </v-col>
+          <v-text-field
+            v-model="sushiForm.sushiUrl"
+            :label="`${$t('institutions.sushi.sushiUrl')} *`"
+            :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
+            :disabled="!canEditSushiUrl"
+            outlined
+            required
+          />
 
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="sushiForm.requestorId"
-                    :label="requestorIdLabel"
-                    :rules="platform.requestorId ? [rules.requestorId] : []"
-                    :required="platform.requestorId"
-                    outlined
-                  />
-                </v-col>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                v-model="sushiForm.requestorId"
+                :label="requestorIdLabel"
+                :rules="platform.requestorId ? [rules.requestorId] : []"
+                :required="platform.requestorId"
+                outlined
+              />
+            </v-col>
 
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="sushiForm.customerId"
-                    :label="customerIdLabel"
-                    :rules="platform.customerId ? [rules.customerId] : []"
-                    outlined
-                  />
-                </v-col>
+            <v-col cols="6">
+              <v-text-field
+                v-model="sushiForm.customerId"
+                :label="customerIdLabel"
+                :rules="platform.customerId ? [rules.customerId] : []"
+                outlined
+              />
+            </v-col>
+          </v-row>
 
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="sushiForm.apiKey"
-                    :label="apiKeyLabel"
-                    :rules="platform.apiKey ? [rules.apiKey] : []"
-                    outlined
-                  />
-                </v-col>
+          <v-text-field
+            v-model="sushiForm.apiKey"
+            :label="apiKeyLabel"
+            :rules="platform.apiKey ? [rules.apiKey] : []"
+            outlined
+          />
 
-                <v-col cols="12">
-                  <v-textarea
-                    v-model="sushiForm.comment"
-                    :label="$t('institutions.sushi.comment')"
-                    outlined
-                  />
-                </v-col>
-              </template>
-            </v-row>
-          </v-container>
+          <v-textarea
+            v-model="sushiForm.comment"
+            :label="$t('institutions.sushi.comment')"
+            outlined
+          />
         </v-form>
       </v-card-text>
+
+      <v-divider />
+
+      <v-expansion-panels flat tile>
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            {{ $t('advancedSettings') }}
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
+
+            <v-btn
+              type="submit"
+              color="primary"
+              class="mb-2"
+              small
+              outlined
+              @click="addParam"
+            >
+              <v-icon left>
+                mdi-plus
+              </v-icon>
+              {{ $t('add') }}
+            </v-btn>
+
+            <template v-for="(param, index) in sushiForm.params">
+              <v-row :key="index">
+                <v-col>
+                  <v-text-field
+                    v-model="param.name"
+                    :label="$t('name')"
+                    hide-details
+                    outlined
+                    dense
+                  />
+                </v-col>
+
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="param.value"
+                    :label="$t('value')"
+                    hide-details
+                    outlined
+                    dense
+                  />
+                </v-col>
+
+                <v-col class="shrink">
+                  <v-btn icon @click="removeParam(index)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </template>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
       <v-card-actions>
         <v-spacer />
@@ -133,6 +174,7 @@ export default {
         apiKey: '',
         comment: '',
         id: null,
+        params: [],
       },
 
       rules: {
@@ -176,7 +218,13 @@ export default {
       this.sushiForm.customerId = sushiData.customerId || '';
       this.sushiForm.apiKey = sushiData.apiKey || '';
       this.sushiForm.comment = sushiData.comment || '';
+      this.sushiForm.params = sushiData.params;
       this.sushiForm.id = sushiData.id;
+
+      if (!Array.isArray(this.sushiForm.params)) {
+        this.sushiForm.params = [];
+      }
+
       this.show = true;
     },
 
@@ -203,8 +251,18 @@ export default {
       this.$refs.vendorsBox.isMenuActive = false;
     },
 
+    addParam() {
+      this.sushiForm.params.unshift({ name: '', value: '' });
+    },
+
+    removeParam(index) {
+      this.$delete(this.sushiForm.params, index);
+    },
+
     async save() {
       this.saving = true;
+
+      this.sushiForm.params = this.sushiForm.params.filter(param => param.name);
 
       try {
         if (this.sushiForm.id) {

@@ -174,12 +174,16 @@
       "enterCustomerId": "Please enter a Customer Id.",
       "enterAPIKey": "Please enter an API Key.",
       "comment": "Comment",
-      "credentials": "Sushi credentials"
+      "credentials": "Sushi credentials",
+      "pleaseEnterParams": "If requests to the Sushi endpoint require additional parameters in the querystring, enter them below."
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "advancedSettings": "Advanced settings",
+  "name": "Name",
+  "value": "Value",
   "language": "Language",
   "refresh": "Update",
   "delete": "Remove",
