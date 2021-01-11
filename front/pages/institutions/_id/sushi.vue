@@ -3,9 +3,24 @@
     <ToolBar :title="$t('institutions.sushi.title', { institutionName })">
       <slot>
         <v-spacer />
+
         <v-btn
           v-if="hasInstitution"
           color="primary"
+          text
+          :loading="refreshing"
+          @click.stop="refreshSushiItems"
+        >
+          <v-icon left>
+            mdi-refresh
+          </v-icon>
+          {{ $t('refresh') }}
+        </v-btn>
+
+        <v-btn
+          v-if="hasInstitution"
+          color="primary"
+          text
           @click.stop="createSushiItem"
         >
           <v-icon left>
