@@ -4,6 +4,16 @@
       <slot>
         <v-spacer />
 
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          :label="$t('search')"
+          solo
+          dense
+          hide-details
+          style="max-width: 200px"
+        />
+
         <v-btn
           v-if="hasInstitution"
           color="primary"
@@ -43,6 +53,7 @@
       :headers="headers"
       :items="sushiItems"
       :loading="refreshing"
+      :search="search"
       show-select
       item-key="id"
     >
@@ -115,6 +126,7 @@ export default {
       sushiItems: [],
       selected: [],
       refreshing: false,
+      search: '',
       headers: [
         {
           text: app.i18n.t('institutions.sushi.platform'),
