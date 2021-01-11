@@ -22,6 +22,11 @@ const schema = {
   customerId: Joi.string().trim().allow(''),
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
+
+  params: Joi.array().items(Joi.object({
+    name: Joi.string().trim().required(),
+    value: Joi.string().trim().allow(''),
+  })),
 };
 
 const createSchema = {
