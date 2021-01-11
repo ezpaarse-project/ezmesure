@@ -28,6 +28,30 @@ exports.getAll = async (ctx) => {
   ctx.body = await Sushi.findAll();
 };
 
+exports.getOne = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const { user } = ctx.state;
+
+  const sushiItem = await Sushi.findById(sushiId);
+
+  if (!sushiItem) {
+    ctx.throw(404, 'Sushi item not found');
+    return;
+  }
+
+  if (!isAdmin(user)) {
+    const institution = await sushiItem.getInstitution();
+
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      return;
+    }
+  }
+
+  ctx.status = 200;
+  ctx.body = sushiItem;
+};
+
 exports.addSushi = async (ctx) => {
   const { body } = ctx.request;
   const { user } = ctx.state;

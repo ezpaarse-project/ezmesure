@@ -11,6 +11,7 @@ const {
 
 const {
   getAll,
+  getOne,
   deleteSushiData,
   updateSushi,
   addSushi,
@@ -54,6 +55,18 @@ router.route({
   validate: {
     type: 'json',
     body: Sushi.createSchema,
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId',
+  handler: getOne,
+  validate: {
+    type: 'json',
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
   },
 });
 
