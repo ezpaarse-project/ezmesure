@@ -113,6 +113,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     const { body } = await elastic.search({
       index,
       body: {
+        size: ids.length,
         query: { ids: { values: ids } },
       },
     }, { ignore: [404] }).catch((e) => Promise.reject(new Error(e)));
