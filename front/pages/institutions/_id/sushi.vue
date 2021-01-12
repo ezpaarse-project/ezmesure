@@ -31,6 +31,7 @@
           solo
           dense
           hide-details
+          autocomplete="off"
           style="max-width: 200px"
         />
 
