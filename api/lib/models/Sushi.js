@@ -106,12 +106,20 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
 
     const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
 
+    const params = {};
+    if (Array.isArray(this.data.params)) {
+      this.data.params.forEach((param) => {
+        if (param) { params[param.name] = param.value; }
+      });
+    }
+
     return sushiService.getReport(this.data.sushiUrl, {
       requestorId: this.data.requestorId,
       customerId: this.data.customerId,
       apiKey: this.data.apiKey,
       beginDate: prevMonth,
       endDate: prevMonth,
+      params,
     });
   }
 }
