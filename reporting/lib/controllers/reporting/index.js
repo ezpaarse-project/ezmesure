@@ -65,7 +65,7 @@ const validate = {
   type: 'json',
   failure: 400,
   body: {
-    dashboardId: Joi.string().guid().required(),
+    dashboardId: Joi.string().trim().min(1).required(),
     space: Joi.string(),
     frequency: Joi.string().required().valid(frequencies.map((f) => f.value)),
     emails: Joi.array().items(Joi.string().email()).min(1),
