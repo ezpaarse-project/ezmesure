@@ -1,7 +1,6 @@
-const isSameMonth = require('date-fns/isSameMonth');
-const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
-const isFirstDayOfMonth = require('date-fns/isFirstDayOfMonth');
+const fs = require('fs-extra');
 const format = require('date-fns/format');
+const subMonths = require('date-fns/subMonths');
 
 const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
@@ -156,11 +155,21 @@ exports.deleteSushiData = async (ctx) => {
   ctx.body = response;
 };
 
-exports.fetchSushi = async (ctx) => {
+exports.downloadReport = async (ctx) => {
   const { sushiId } = ctx.params;
-  const { body } = ctx.request;
+  const { query = {} } = ctx.request;
   const { user } = ctx.state;
-  const index = body.target;
+  let { beginDate, endDate } = query;
+
+  if (!beginDate && !endDate) {
+    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    beginDate = prevMonth;
+    endDate = prevMonth;
+  } else if (beginDate) {
+    endDate = beginDate;
+  } else {
+    beginDate = endDate;
+  }
 
   const sushi = await Sushi.findById(sushiId);
 
@@ -169,83 +178,51 @@ exports.fetchSushi = async (ctx) => {
     return;
   }
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username: user.username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': user.username },
-  });
-  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
+  const institution = sushi.getInstitution();
 
-  if (!canWrite) {
-    ctx.throw(403, `you don't have permission to write in ${index}`);
-  }
-
-  const { data: report } = await sushi.getReport();
-
-  if (!report) {
-    ctx.throw(502, 'Sushi endpoint returned an empty response');
-  }
-
-  const exceptions = sushiService.getExceptions(report);
-
-  if (exceptions.length > 0) {
-    const errors = exceptions.map((e) => e.Message);
-    ctx.status = 502;
-    ctx.body = { errors };
-    return;
-  }
-
-  const { valid, errors } = sushiService.validateReport(report);
-
-  if (!valid) {
-    ctx.status = 502;
-    ctx.body = { errors };
-    return;
-  }
-
-  const { body: exists } = await elastic.indices.exists({ index });
-
-  if (!exists) {
-    await elastic.indices.create({
-      index,
-      body: publisherIndexTemplate,
-    });
-  }
-
-  const bulk = [];
-  const response = {
-    inserted: 0,
-    updated: 0,
-    failed: 0,
-    errors: [],
-  };
-
-  const addError = (message) => {
-    response.failed += 1;
-    if (response.errors.length < 9) {
-      response.errors.push(message);
-    }
-  };
-
-  report.Report_Items.forEach((reportItem) => {
-    if (!Array.isArray(reportItem.Item_ID)) {
-      addError('Item has no Item_ID');
+  if (!isAdmin(user)) {
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage sushi credentials');
       return;
     }
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
+    }
+  }
 
-    const item = {
-      platform: reportItem.Platform,
-      publication_title: reportItem.Title,
-      publication_year: reportItem.YOP,
-      publisher: reportItem.Publisher,
-      data_type: reportItem.Data_Type,
-      section_type: reportItem.Section_Type,
-      access_type: reportItem.Access_Type,
-      access_method: reportItem.Access_Method,
-    };
+  const sushiData = { sushi, beginDate, endDate };
+  const reportPath = sushiService.getReportPath(sushiData);
+  const reportTmpPath = sushiService.getReportTmpPath(sushiData);
+
+  if (await fs.pathExists(reportPath)) {
+    ctx.status = 200;
+    ctx.body = fs.createReadStream(reportPath);
+    return;
+  }
+
+  let message;
+
+  if (await fs.pathExists(reportTmpPath)) {
+    message = 'download is in progress, please retry this link later';
+  } else {
+    message = 'download initiated, please retry this link later';
+
+    sushiService.downloadReport(sushiData)
+      .then(() => {
+        appLogger.info(`Report downloaded: ${reportPath}`);
+      })
+      .catch((err) => {
+        if (err.code !== 'E_TMP_FILE_EXISTS') {
+          appLogger.error(`Failed to download report ${reportPath}: ${err.message}`);
+        }
+      });
+  }
+
+  ctx.set('Retry-After', 10);
+  ctx.status = 202;
+  ctx.body = { message };
+};
 
     if (Array.isArray(reportItem.Item_Dates)) {
       reportItem.Item_Dates.forEach((itemDate) => {

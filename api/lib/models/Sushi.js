@@ -82,6 +82,10 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
     return this.data && this.data.institutionId;
   }
 
+  getPackage() {
+    return this.data && this.data.package;
+  }
+
   getInstitution() {
     if (!this.data.institutionId) { return null; }
     return getModel('institution').findById(this.data.institutionId);
@@ -99,7 +103,7 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
     return savedData;
   }
 
-  getReport() {
+  getReport(options) {
     if (!this.data.sushiUrl) {
       throw new Error('sushiUrl not set');
     }
@@ -120,6 +124,7 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
       beginDate: prevMonth,
       endDate: prevMonth,
       params,
+      stream: options && options.stream,
     });
   }
 }

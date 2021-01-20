@@ -15,7 +15,7 @@ const {
   deleteSushiData,
   updateSushi,
   addSushi,
-  fetchSushi,
+  downloadReport,
 } = require('./actions');
 
 router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
@@ -85,6 +85,21 @@ router.route({
 
 requireAnyRole(['admin', 'superuser']);
 
+router.route({
+  method: 'GET',
+  path: '/:sushiId/report.json',
+  handler: downloadReport,
+  validate: {
+    type: 'json',
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+    },
+  },
+});
 router.route({
   method: 'POST',
   path: '/:sushiId/_fetch',
