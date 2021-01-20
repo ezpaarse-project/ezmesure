@@ -35,6 +35,10 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     return { id: this.id, ...this.data };
   }
 
+  getId() {
+    return this.id;
+  }
+
   static trimIdPrefix(id) {
     return id.startsWith(`${type}:`) ? id.slice(type.length + 1) : id;
   }
