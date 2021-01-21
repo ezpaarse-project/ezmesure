@@ -1,20 +1,33 @@
+const subMonths = require('date-fns/subMonths');
+const isSameMonth = require('date-fns/isSameMonth');
+const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
+const isFirstDayOfMonth = require('date-fns/isFirstDayOfMonth');
+const format = require('date-fns/format');
+
+const os = require('os');
 const config = require('config');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs-extra');
+const EventEmitter = require('events');
 
 const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats').default;
 const definitions = require('../utils/sushi-definitions.json');
 const { appLogger } = require('../../server');
 
+const elastic = require('../services/elastic');
+const Task = require('../models/Task');
+const publisherIndexTemplate = require('../utils/publisher-template');
 
-const storageDir = config.get('storage.path');
-const tmpDir = '/tmp/sushi';
+const storageDir = path.resolve(config.get('storage.path'), 'sushi');
+const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 const ajv = new Ajv({ schemas: [definitions], strict: false });
 addFormats(ajv);
-const validateReport = ajv.getSchema('#/definitions/COUNTER_title_report');
+const validateReportSchema = ajv.getSchema('#/definitions/COUNTER_title_report');
+
+const downloads = new Map();
 
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
@@ -80,68 +93,415 @@ async function downloadReport(options = {}) {
   const reportPath = getReportPath(options);
   const tmpPath = getReportTmpPath(options);
 
-  if (await fs.pathExists(tmpPath)) {
-    const err = new Error('Temporary file already exist');
-    err.code = 'E_TMP_FILE_EXISTS';
-    throw err;
-  }
-
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
 
-  function unlinkTmpFile() {
-    fs.unlink(tmpPath).catch((err) => {
-      appLogger.error(`Failed to delete ${tmpPath}: ${err.message}`);
-    });
-  }
-
   const response = await sushi.getReport({ ...options, stream: true });
 
+  // TODO: handle "try again later" and timeouts
+
   if (!response) {
-    unlinkTmpFile();
     throw new Error('sushi endpoint didn\'t respond');
   }
   if (response.status !== 200) {
-    unlinkTmpFile();
     throw new Error(`sushi endpoint responded with status ${response.status}`);
   }
   if (!response.data) {
-    unlinkTmpFile();
     throw new Error('sushi endpoint didn\'t return any data');
   }
 
-  try {
-    await new Promise((resolve, reject) => {
-      response.data.pipe(fs.createWriteStream(tmpPath))
-        .on('finish', resolve)
-        .on('error', reject);
-    });
+  await new Promise((resolve, reject) => {
+    response.data.pipe(fs.createWriteStream(tmpPath))
+      .on('finish', resolve)
+      .on('error', reject);
+  });
 
-    await fs.move(tmpPath, reportPath);
-  } catch (e) {
-    unlinkTmpFile();
-    throw e;
-  }
+  await fs.move(tmpPath, reportPath);
 }
 
-    return { valid, errors };
-  },
+function getOngoingDownload(options = {}) {
+  return downloads.get(getReportPath(options));
+}
 
-  getExceptions(report) {
-    if (!report || !report.Report_Header) { return []; }
+function initiateDownload(options = {}) {
+  const reportPath = getReportPath(options);
+  const tmpPath = getReportTmpPath(options);
 
-    const header = report.Report_Header;
-    const exceptions = Array.isArray(header.Exceptions) ? header.Exceptions : [];
+  let emitter = downloads.get(reportPath);
+  if (emitter) {
+    return emitter;
+  }
 
-    if (header.Exception) {
-      exceptions.push(header.Exception);
+  emitter = new EventEmitter();
+  downloads.set(reportPath, emitter);
+
+  downloadReport(options)
+    .then(() => {
+      emitter.emit('finish', reportPath);
+      downloads.delete(reportPath);
+    })
+    .catch((err) => {
+      emitter.emit('error', err);
+      downloads.delete(reportPath);
+      fs.remove(tmpPath).catch((e) => {
+        appLogger.error(`Failed to delete ${tmpPath}: ${e.message}`);
+      });
+    });
+
+  return emitter;
+}
+
+function validateReport(report) {
+  const valid = validateReportSchema(report);
+  const { errors } = validateReportSchema;
+
+  return { valid, errors };
+}
+
+function getExceptions(report) {
+  if (!report || !report.Report_Header) { return []; }
+
+  const header = report.Report_Header;
+  const exceptions = Array.isArray(header.Exceptions) ? header.Exceptions : [];
+
+  if (header.Exception) {
+    exceptions.push(header.Exception);
+  }
+
+  return exceptions;
+}
+
+async function importSushiReport(options = {}) {
+  const {
+    sushi,
+    task,
+    index,
+    user,
+    beginDate,
+    endDate,
+  } = options;
+
+  const sushiData = { sushi, beginDate, endDate };
+  const reportPath = getReportPath(sushiData);
+  let report;
+
+  function saveTask() {
+    return task.save().catch((err) => {
+      appLogger.error('Failed to save sushi task');
+      appLogger.error(err.message);
+    });
+  }
+
+  try {
+    report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      task.fail([`Fail to read report file ${reportPath}`, e.message]);
+      saveTask();
+      return;
+    }
+  }
+
+  if (report) {
+    task.log('info', 'Found local COUNTER report');
+  } else {
+    try {
+      await new Promise((resolve, reject) => {
+        let download = getOngoingDownload(sushiData);
+
+        if (download) {
+          task.log('info', 'Report is already being downloaded, waiting for completion');
+        } else {
+          task.log('info', 'Report download initiated, waiting for completion');
+          download = initiateDownload(sushiData);
+        }
+
+        saveTask();
+        download.on('finish', () => {
+          task.log('info', 'Report downloaded');
+          resolve();
+        });
+        download.on('error', reject);
+      });
+    } catch (e) {
+      task.fail(['Failed to download the COUNTER report', e.message]);
+      saveTask();
+      return;
     }
 
-    return exceptions;
+    try {
+      report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+    } catch (e) {
+      task.fail(['Fail to read downloaded report file', e.message]);
+      saveTask();
+      return;
+    }
+  }
+
+  task.log('info', 'Validating COUNTER report');
+  await saveTask();
+
+  const { valid, errors } = validateReport(report);
+
+  if (!valid) {
+    task.fail(['The report is not valid', ...errors]);
+    saveTask();
+    return;
+  }
+
+  const exceptions = getExceptions(report);
+
+  if (exceptions.length > 0) {
+    const errorMessages = exceptions.map((e) => e.Message);
+
+    task.fail(['Sushi endpoint returned exceptions', ...errorMessages]);
+    saveTask();
+    return;
+  }
+
+  task.log('info', `Importing report into '${index}'`);
+  await saveTask();
+
+  let indexExists;
+  try {
+    const { body: response } = await elastic.indices.exists({ index });
+    indexExists = response;
+  } catch (e) {
+    task.fail([`Failed to check that index '${index}' exists`, e.message]);
+    saveTask();
+    return;
+  }
+
+  if (!indexExists) {
+    try {
+      await elastic.indices.create({
+        index,
+        body: publisherIndexTemplate,
+      });
+    } catch (e) {
+      task.fail([`Failed to create index '${index}'`, e.message]);
+      saveTask();
+      return;
+    }
+  }
+
+  const bulk = [];
+  const response = {
+    inserted: 0,
+    updated: 0,
+    failed: 0,
+    errors: [],
+  };
+
+  const addError = (message) => {
+    response.failed += 1;
+    if (response.errors.length < 9) {
+      response.errors.push(message);
+    }
+  };
+
+  report.Report_Items.forEach((reportItem) => {
+    if (!Array.isArray(reportItem.Item_ID)) {
+      addError('Item has no Item_ID');
+      return;
+    }
+
+    const item = {
+      platform: reportItem.Platform,
+      publication_title: reportItem.Title,
+      publication_year: reportItem.YOP,
+      publisher: reportItem.Publisher,
+      data_type: reportItem.Data_Type,
+      section_type: reportItem.Section_Type,
+      access_type: reportItem.Access_Type,
+      access_method: reportItem.Access_Method,
+    };
+
+    if (Array.isArray(reportItem.Item_Dates)) {
+      reportItem.Item_Dates.forEach((itemDate) => {
+        if (!itemDate) { return; }
+        if (typeof itemDate.Type !== 'string') { return; }
+        if (itemDate.Type.toLowerCase() === 'publication_date') {
+          item.publication_date = itemDate.Value;
+        }
+      });
+    }
+
+    reportItem.Item_ID.forEach((identifier) => {
+      if (!identifier) { return; }
+      if (typeof identifier.Type !== 'string') { return; }
+
+      switch (identifier.Type.toLowerCase()) {
+        case 'doi':
+          item.doi = identifier.Value;
+          break;
+        case 'print_issn':
+          item.print_identifier = identifier.Value;
+          break;
+        case 'online_issn':
+          item.online_identifier = identifier.Value;
+          break;
+        default:
+      }
+    });
+
+    reportItem.Performance.forEach((performance) => {
+      if (!Array.isArray(performance.Instance)) { return; }
+
+      const period = performance.Period;
+      const perfBeginDate = new Date(period.Begin_Date);
+      const perfEndDate = new Date(period.End_Date);
+
+      if (!isSameMonth(perfBeginDate, perfEndDate)) {
+        addError(`Item performance cover more than a month: ${perfBeginDate} -> ${perfEndDate}`);
+        return;
+      }
+      if (!isFirstDayOfMonth(perfBeginDate) || !isLastDayOfMonth(perfEndDate)) {
+        addError(`Item performance does not cover the entire month: ${perfBeginDate} -> ${perfEndDate}`);
+        return;
+      }
+
+      const idFields = [
+        'print_identifier',
+        'online_identifier',
+        'publication_date',
+        'publication_year',
+        'publication_title',
+        'platform',
+      ];
+
+      const date = format(perfBeginDate, 'yyyy-MM');
+      const id = [date, ...idFields.map((f) => (item[f] || ''))].join('|');
+
+      const itemPerf = { ...item, date };
+
+      performance.Instance.forEach((instance) => {
+        if (!instance) { return; }
+        if (typeof instance.Metric_Type !== 'string') { return; }
+
+
+        switch (instance.Metric_Type.toLowerCase()) {
+          case 'unique_item_requests':
+            itemPerf.uniqueItemRequests = instance.Count;
+            break;
+          case 'total_item_requests':
+            itemPerf.totalItemRequests = instance.Count;
+            break;
+          case 'unique_item_investigations':
+            itemPerf.uniqueItemInvestigations = instance.Count;
+            break;
+          case 'total_item_investigations':
+            itemPerf.totalItemInvestigations = instance.Count;
+            break;
+          case 'unique_title_investigations':
+            itemPerf.uniqueTitleInvestigations = instance.Count;
+            break;
+          case 'unique_title_requests':
+            itemPerf.uniqueTitleRequests = instance.Count;
+            break;
+          default:
+        }
+      });
+
+      bulk.push({ index: { _index: index, _id: id } });
+      bulk.push(itemPerf);
+    });
+  });
+
+  let bulkResult;
+
+  if (bulk.length > 0) {
+    try {
+      const result = await elastic.bulk(
+        { body: bulk },
+        { headers: { 'es-security-runas-user': user.username } },
+      );
+      bulkResult = result.body;
+    } catch (e) {
+      task.fail(['Failed to import performance items', e.message]).catch((err) => {
+        appLogger.error('Failed to save sushi task');
+        appLogger.error(err);
+      });
+      saveTask();
+      return;
+    }
+  }
+
+  const resultItems = (bulkResult && bulkResult.items) || [];
+
+  resultItems.forEach((i) => {
+    if (!i.index) {
+      response.failed += 1;
+    } else if (i.index.result === 'created') {
+      response.inserted += 1;
+    } else if (i.index.result === 'updated') {
+      response.updated += 1;
+    } else {
+      if (response.errors.length < 10) {
+        response.errors.push(i.index.error);
+      }
+      response.failed += 1;
+    }
+  });
+
+  task.log('info', 'Sushi harvesting terminated');
+  task.setResult(response);
+  task.done();
+  await saveTask();
+  appLogger.info(`Sushi report ${sushi.getId()} imported`);
+}
+
+async function initSushiImport(opts = {}) {
+  const options = opts || {};
+  const {
+    sushi,
+    institution,
+    beginDate,
+    endDate,
+  } = options;
+
+  if (!beginDate && !endDate) {
+    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    options.beginDate = prevMonth;
+    options.endDate = prevMonth;
+  } else if (beginDate) {
+    options.endDate = beginDate;
+  } else {
+    options.beginDate = endDate;
+  }
+
+  const task = new Task({
+    status: 'ongoing',
+    sushiId: sushi.getId(),
+    institutionId: institution.getId(),
+  });
+
+  task.log('info', 'Sushi import task initiated');
+  task.log('info', `Period: from ${options.beginDate} to ${options.endDate}`);
+  await task.save();
+
+  importSushiReport({ ...options, task })
+    .catch((err) => {
+      appLogger.info(`Failed to import sushi report ${sushi.getId()}: ${err.message}`);
+      task.fail(['Failed to import sushi report', err.message]);
+      task.save().catch((e) => {
+        appLogger.error('Failed to save sushi task');
+        appLogger.error(e);
+      });
+    });
+
+  return task;
+}
+
 module.exports = {
   getReport,
+  validateReport,
   getReportFilename,
   getReportPath,
   getReportTmpPath,
   downloadReport,
+  getOngoingDownload,
+  initiateDownload,
+  getExceptions,
+  initSushiImport,
 };

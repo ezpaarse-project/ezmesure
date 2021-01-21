@@ -6,7 +6,6 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
-const publisherIndexTemplate = require('../../utils/publisher-template');
 const { appLogger } = require('../../../server');
 
 const isAdmin = (user) => {
@@ -193,7 +192,6 @@ exports.downloadReport = async (ctx) => {
 
   const sushiData = { sushi, beginDate, endDate };
   const reportPath = sushiService.getReportPath(sushiData);
-  const reportTmpPath = sushiService.getReportTmpPath(sushiData);
 
   if (await fs.pathExists(reportPath)) {
     ctx.status = 200;
@@ -203,19 +201,17 @@ exports.downloadReport = async (ctx) => {
 
   let message;
 
-  if (await fs.pathExists(reportTmpPath)) {
+  if (sushiService.getOngoingDownload(sushiData)) {
     message = 'download is in progress, please retry this link later';
   } else {
     message = 'download initiated, please retry this link later';
 
-    sushiService.downloadReport(sushiData)
-      .then(() => {
-        appLogger.info(`Report downloaded: ${reportPath}`);
+    sushiService.initiateDownload(sushiData)
+      .on('finish', (filePath) => {
+        appLogger.info(`Report downloaded at ${filePath}`);
       })
-      .catch((err) => {
-        if (err.code !== 'E_TMP_FILE_EXISTS') {
-          appLogger.error(`Failed to download report ${reportPath}: ${err.message}`);
-        }
+      .on('error', (err) => {
+        appLogger.error(`Failed to download report ${reportPath}: ${err.message}`);
       });
   }
 
@@ -224,128 +220,53 @@ exports.downloadReport = async (ctx) => {
   ctx.body = { message };
 };
 
-    if (Array.isArray(reportItem.Item_Dates)) {
-      reportItem.Item_Dates.forEach((itemDate) => {
-        if (!itemDate) { return; }
-        if (typeof itemDate.Type !== 'string') { return; }
-        if (itemDate.Type.toLowerCase() === 'publication_date') {
-          item.publication_date = itemDate.Value;
-        }
-      });
+exports.importSushi = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const { body } = ctx.request;
+  const { user } = ctx.state;
+  const index = body.target;
+
+  const sushi = await Sushi.findById(sushiId);
+
+  if (!sushi) {
+    ctx.throw(404, 'Sushi item not found');
+    return;
+  }
+
+  const institution = await sushi.getInstitution();
+
+  if (!isAdmin(user)) {
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage sushi credentials');
+      return;
     }
-
-    reportItem.Item_ID.forEach((identifier) => {
-      if (!identifier) { return; }
-      if (typeof identifier.Type !== 'string') { return; }
-
-      switch (identifier.Type.toLowerCase()) {
-        case 'doi':
-          item.doi = identifier.value;
-          break;
-        case 'print_issn':
-          item.print_identifier = identifier.value;
-          break;
-        case 'online_issn':
-          item.online_identifier = identifier.value;
-          break;
-        default:
-      }
-    });
-
-    reportItem.Performance.forEach((performance) => {
-      if (!Array.isArray(performance.Instance)) { return; }
-
-      const period = performance.Period;
-      const beginDate = new Date(period.Begin_Date);
-      const endDate = new Date(period.End_Date);
-
-      if (!isSameMonth(beginDate, endDate)) {
-        addError(`Item performance cover more than a month: ${beginDate} -> ${endDate}`);
-        return;
-      }
-      if (!isFirstDayOfMonth(beginDate) || !isLastDayOfMonth(endDate)) {
-        addError(`Item performance does not cover the entire month: ${beginDate} -> ${endDate}`);
-        return;
-      }
-
-      const idFields = [
-        'print_identifier',
-        'online_identifier',
-        'publication_date',
-        'publication_year',
-        'publication_title',
-        'platform',
-      ];
-
-      const date = format(beginDate, 'yyyy-MM');
-      const id = [date, ...idFields.map((f) => (item[f] || ''))].join('|');
-
-      const itemPerf = { ...item, date };
-
-      performance.Instance.forEach((instance) => {
-        if (!instance) { return; }
-        if (typeof instance.Metric_Type !== 'string') { return; }
-
-
-        switch (instance.Metric_Type.toLowerCase()) {
-          case 'unique_item_requests':
-            itemPerf.uniqueItemRequests = instance.Count;
-            break;
-          case 'total_item_requests':
-            itemPerf.totalItemRequests = instance.Count;
-            break;
-          case 'unique_item_investigations':
-            itemPerf.uniqueItemInvestigations = instance.Count;
-            break;
-          case 'total_item_investigations':
-            itemPerf.totalItemInvestigations = instance.Count;
-            break;
-          case 'unique_title_investigations':
-            itemPerf.uniqueTitleInvestigations = instance.Count;
-            break;
-          case 'unique_title_requests':
-            itemPerf.uniqueTitleRequests = instance.Count;
-            break;
-          default:
-        }
-      });
-
-      bulk.push({ index: { _index: index, _id: id } });
-      bulk.push(itemPerf);
-    });
-  });
-
-  let bulkResult;
-
-  if (bulk.length > 0) {
-    try {
-      const result = await elastic.bulk(
-        { body: bulk },
-        { headers: { 'es-security-runas-user': user.username } },
-      );
-      bulkResult = result.body;
-    } catch (e) {
-      throw new Error(e);
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
     }
   }
 
-  const resultItems = (bulkResult && bulkResult.items) || [];
+  const { body: perm } = await elastic.security.hasPrivileges({
+    username: user.username,
+    body: {
+      index: [{ names: [index], privileges: ['write'] }],
+    },
+  }, {
+    headers: { 'es-security-runas-user': user.username },
+  });
+  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
 
-  resultItems.forEach((i) => {
-    if (!i.index) {
-      response.failed += 1;
-    } else if (i.index.result === 'created') {
-      response.inserted += 1;
-    } else if (i.index.result === 'updated') {
-      response.updated += 1;
-    } else {
-      if (response.errors.length < 10) {
-        response.errors.push(i.index.error);
-      }
-      response.failed += 1;
-    }
+  if (!canWrite) {
+    ctx.throw(403, `you don't have permission to write in ${index}`);
+  }
+
+  const task = await sushiService.initSushiImport({
+    sushi,
+    institution,
+    user,
+    index,
   });
 
   ctx.type = 'json';
-  ctx.body = response;
+  ctx.body = task;
 };

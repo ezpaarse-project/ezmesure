@@ -15,6 +15,7 @@ const {
   deleteSushiData,
   updateSushi,
   addSushi,
+  importSushi,
   downloadReport,
 } = require('./actions');
 
@@ -100,10 +101,11 @@ router.route({
     },
   },
 });
+
 router.route({
   method: 'POST',
-  path: '/:sushiId/_fetch',
-  handler: fetchSushi,
+  path: '/:sushiId/_import',
+  handler: importSushi,
   validate: {
     type: 'json',
     params: {
