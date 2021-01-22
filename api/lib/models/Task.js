@@ -44,6 +44,14 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     });
   }
 
+  static async findByStatus(status) {
+    return this.findAll({
+      filters: [
+        { terms: { [`${type}.status`]: status } },
+      ],
+    });
+  }
+
   static async findBySushiId(sushiId) {
     return this.findAll({
       filters: [

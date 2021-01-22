@@ -19,6 +19,11 @@ router.route({
   method: 'GET',
   path: '/',
   handler: getAll,
+  validate: {
+    params: {
+      status: Joi.string().trim().min(1),
+    },
+  },
 });
 
 router.route({

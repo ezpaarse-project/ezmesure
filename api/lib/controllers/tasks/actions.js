@@ -9,13 +9,19 @@ exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
   const { user } = ctx.state;
+  const { query = {} } = ctx.request;
+  const { status } = query;
 
   if (!isAdmin(user)) {
     ctx.throw(403, 'You are not authorized to access this route');
     return;
   }
 
-  ctx.body = await Task.findAll();
+  if (typeof status === 'string') {
+    ctx.body = await Task.findByStatus(status.split(',').map((s) => s.trim()));
+  } else {
+    ctx.body = await Task.findAll();
+  }
 };
 
 exports.getOne = async (ctx) => {
