@@ -471,7 +471,7 @@ async function initSushiImport(opts = {}) {
   }
 
   const task = new Task({
-    status: 'ongoing',
+    status: 'running',
     sushiId: sushi.getId(),
     institutionId: institution.getId(),
   });
