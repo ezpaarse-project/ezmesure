@@ -1,4 +1,4 @@
-# ezPLugin
+# ez_reporting
 
 A Kibana plugin
 
