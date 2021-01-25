@@ -1,0 +1,9 @@
+{
+  "serverSourcePatterns": [
+    "{common,lib,node_modules,server}/**/*",
+    "yarn.lock",
+    "tsconfig.json",
+    "package.json",
+    "kibana.json"
+  ]
+}

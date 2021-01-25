@@ -1,9 +1,0 @@
-{
-  "name": "public",
-  "version": "7.9.1",
-  "author": "ezTEAM",
-  "license": "ISC",
-  "dependencies": {
-    "@hapi/address": "^4.1.0"
-  }
-}
