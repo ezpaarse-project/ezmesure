@@ -418,6 +418,9 @@ exports.history = async (ctx) => {
   logger.info('reporting/history');
   ctx.action = 'reporting/history';
 
+  ctx.type = 'json';
+  ctx.status = 200;
+
   const { taskId: id } = ctx.request.params;
   ctx.taskId = id;
 
@@ -453,10 +456,9 @@ exports.history = async (ctx) => {
 
     const hits = data && data.hits && data.hits.hits;
 
-    if (hits) {
-      ctx.type = 'json';
-      ctx.status = 200;
+    ctx.body = [];
 
+    if (hits) {
       ctx.body = hits.map((historyItem) => {
         const { _source: historySource, _id: historyId } = historyItem;
 
