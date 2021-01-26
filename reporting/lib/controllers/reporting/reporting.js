@@ -190,7 +190,7 @@ exports.list = async (ctx) => {
       username: user,
     });
     if (body && body[user]) {
-      isAdmin = body[user].roles.includes('superuser');
+      isAdmin = body[user].roles.includes('superuser') || body[user].roles.includes('admin');
     }
   } catch (e) {}
 
