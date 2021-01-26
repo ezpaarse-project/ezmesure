@@ -280,6 +280,10 @@ exports.store = async (ctx) => {
     return;
   }
 
+  if (body.space === 'default' || body.space === '') {
+    delete body.space;
+  }
+
   const now = new Date();
   body.createdAt = now;
   body.updatedAt = now;

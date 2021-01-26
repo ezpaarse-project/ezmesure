@@ -79,7 +79,7 @@ const validate = {
     frequency: Joi.string().trim().required().valid(frequencies.map((f) => f.value)),
     emails: Joi.array().items(Joi.string().trim().email()).min(1),
     print: Joi.boolean().required(),
-    space: Joi.string().trim().optional(),
+    space: Joi.string().trim().allow(null, ''),
   },
 };
 

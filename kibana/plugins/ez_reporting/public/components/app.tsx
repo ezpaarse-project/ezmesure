@@ -233,8 +233,8 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
           title: 'Success',
           text: (
             <FormattedMessage
-              id="ezreporting.editingSuccess"
-              defaultMessage="Task edited successfully."
+              id="ezreporting.creationSuccess"
+              defaultMessage="Task saved successfully."
             />
           ),
         });
