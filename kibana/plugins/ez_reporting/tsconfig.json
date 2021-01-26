@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./target",
-    "skipLibCheck": true
+    "skipLibCheck": false,
+    "removeComments": true
   },
   "include": [
     "index.ts",

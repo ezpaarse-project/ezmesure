@@ -161,6 +161,7 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         });
       })
       .catch((err) => {
+        console.log(err);
         if (err.code === 403) {
           this.setState({ accessDenied: true });
         }

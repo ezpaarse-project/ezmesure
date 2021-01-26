@@ -111,8 +111,8 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     const appManagementSection = management.sections.register({
       id: managementSection,
       title: applicationName,
+      tip: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
       order: 1000,
-      icon: logo,
     });
     appManagementSection.registerApp({
       id: PLUGIN_ID,
@@ -159,17 +159,17 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
       //   id: PLUGIN_ID,
       //   title: `${PLUGIN_NAME} ${applicationName}`,
       //   subtitle: `${PLUGIN_NAME} ${applicationName}`,
-      //   description: PLUGIN_DESCRIPTION,
+      //   description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
       //   icon: PLUGIN_ICON,
       //   path: `/app/${PLUGIN_ID}`,
-      //   appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION],
+      //   appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName)],
       // });
 
       home.featureCatalogue.register({
         id: PLUGIN_ID,
         title: `${PLUGIN_NAME} ${applicationName}`,
         subtitle: `${PLUGIN_NAME} ${applicationName}`,
-        description: PLUGIN_DESCRIPTION,
+        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
         icon: PLUGIN_ICON,
         path: `/app/${PLUGIN_ID}`,
         showOnHomePage: true,
@@ -181,7 +181,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         id: `${PLUGIN_ID}_management`,
         title: `Management - ${PLUGIN_NAME} ${applicationName}`,
         subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
-        description: PLUGIN_DESCRIPTION,
+        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
         icon: PLUGIN_ICON,
         path: `/app/management/${managementSection}/${PLUGIN_ID}`,
         showOnHomePage: true,

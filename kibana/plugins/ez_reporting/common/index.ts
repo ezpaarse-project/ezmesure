@@ -18,9 +18,9 @@
  */
 
 export const PLUGIN_APP_NAME = 'ezMESURE';
-export const PLUGIN_ID = `${PLUGIN_APP_NAME.toLowerCase()}_reporting`;
+export const PLUGIN_ID = `ezreporting`;
 export const PLUGIN_NAME = 'Reporting';
-export const PLUGIN_DESCRIPTION = `Manage your reports generated from ${PLUGIN_APP_NAME}.`;
+export const PLUGIN_DESCRIPTION = `Manage your reports generated from %APP_NAME%.`;
 export const PLUGIN_ICON = 'reportingApp';
 export const API_URL = 'http://localhost:4000';
 export const CATEGORY = {
