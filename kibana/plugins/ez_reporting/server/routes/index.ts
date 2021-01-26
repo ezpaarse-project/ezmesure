@@ -85,11 +85,7 @@ export function defineRoutes(router: IRouter, auth: object) {
       const { username } = auth.get(req).state;
 
       try {
-        let body = req.body;
-
-        if (body.space && body.space === 'default') {
-          delete body.space;
-        }
+        let { body } = req;
 
         if (spaceId && spaceId !== 'default') {
           body = { ...body, space: spaceId };

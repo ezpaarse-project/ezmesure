@@ -123,18 +123,20 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       const tmp = JSON.parse(JSON.stringify(tasksInProgress));
 
       tasks.forEach(({ _id }) => {
-        httpClient.get(`/api/ezreporting/tasks/${_id}/history`).then(([history]) => {
-          const { status, logs, startTime, endTime } = history;
+        httpClient.get(`/api/ezreporting/tasks/${_id}/history`).then((histories) => {
+          if (histories.length) {
+            const { status, logs, startTime, endTime } = histories.shift();
 
-          if (status !== 'success') {
-            if (new Date(endTime).toISOString() <= new Date().toISOString()) {
-              const log = logs.find(({ type }) => type === 'error');
-              tmp[_id] = {
-                status,
-                log: log ? log.message : '',
-                startTime,
-                endTime,
-              };
+            if (status !== 'success') {
+              if (new Date(endTime).toISOString() <= new Date().toISOString()) {
+                const log = logs.find(({ type }) => type === 'error');
+                tmp[_id] = {
+                  status,
+                  log: log ? log.message : '',
+                  startTime,
+                  endTime,
+                };
+              }
             }
           }
         });
