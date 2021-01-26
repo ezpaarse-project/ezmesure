@@ -107,7 +107,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     });
 
     // Menagement section
-    const managementSection = `${applicationName.toLowerCase()}_admin`;
+    const managementSection = `${applicationName.toLowerCase()}`;
     const appManagementSection = management.sections.register({
       id: managementSection,
       title: applicationName,
@@ -183,7 +183,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
         description: PLUGIN_DESCRIPTION,
         icon: PLUGIN_ICON,
-        path: `/app/management/ezmesure/${PLUGIN_ID}`,
+        path: `/app/management/${managementSection}/${PLUGIN_ID}`,
         showOnHomePage: true,
         category: FeatureCatalogueCategory.ADMIN,
         solutionId: `${PLUGIN_NAME} ${applicationName}`,
