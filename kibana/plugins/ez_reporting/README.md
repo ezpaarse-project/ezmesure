@@ -1,6 +1,6 @@
 # ez_reporting
 
-A Kibana plugin
+A Kibana plugin to manage reporting tasks
 
 ---
 

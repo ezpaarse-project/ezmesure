@@ -178,12 +178,12 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
       });
 
       home.featureCatalogue.register({
-        id: `${PLUGIN_ID}_administration`,
-        title: `${PLUGIN_NAME} ${applicationName}`,
-        subtitle: `${PLUGIN_NAME} ${applicationName}`,
+        id: `${PLUGIN_ID}_management`,
+        title: `Management - ${PLUGIN_NAME} ${applicationName}`,
+        subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
         description: PLUGIN_DESCRIPTION,
         icon: PLUGIN_ICON,
-        path: `/app/management/ezmesure_admin/${PLUGIN_ID}`,
+        path: `/app/management/ezmesure/${PLUGIN_ID}`,
         showOnHomePage: true,
         category: FeatureCatalogueCategory.ADMIN,
         solutionId: `${PLUGIN_NAME} ${applicationName}`,
