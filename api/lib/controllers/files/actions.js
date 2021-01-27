@@ -91,7 +91,7 @@ exports.deleteOne = async function (ctx) {
   const domain = email.split('@')[1];
 
   const relativePath = path.join(domain, username, fileName);
-  const filePath     = path.resolve(storagePath, relativePath);
+  const filePath = path.resolve(storagePath, relativePath);
 
   ctx.metadata = { path: relativePath };
 
@@ -110,7 +110,6 @@ exports.deleteMany = async function (ctx) {
 
   const domain = email.split('@')[1];
   const { body } = ctx.request;
-  console.log(body);
   const fileNames = body && body.entries;
 
   if (!fileNames) {
@@ -121,7 +120,7 @@ exports.deleteMany = async function (ctx) {
     return ctx.throw(400, 'entries should be an array of file names');
   }
 
-  const relativePaths = fileNames.map(fileName => path.join(domain, username, fileName));
+  const relativePaths = fileNames.map((fileName) => path.join(domain, username, fileName));
 
   ctx.metadata = { path: relativePaths };
 
@@ -140,7 +139,7 @@ function validateFile(filePath) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
     let emptyLines = 0;
-    let readLimit = 50;
+    const readLimit = 50;
     let columns;
     let err;
 
@@ -153,11 +152,11 @@ function validateFile(filePath) {
     Papa.parse(stream, {
       delimiter: ';',
       complete: () => resolve(err),
-      error: error => reject(error),
+      error: (error) => reject(error),
       step: ({ data: row, errors }, parser) => {
         lineNumber += 1;
 
-        if (row.filter(f => f.trim()).length === 0) {
+        if (row.filter((f) => f.trim()).length === 0) {
           emptyLines += 1;
           return;
         }

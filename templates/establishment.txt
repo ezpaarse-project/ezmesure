@@ -1,0 +1,3 @@
+Mise à jour ou création de données établissement
+
+L'utilisateur {{ user }} vient de mettre à jour ou de créer les données de l'établissement : {{ establishment }}

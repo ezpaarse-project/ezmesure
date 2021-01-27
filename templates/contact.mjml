@@ -1,0 +1,27 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Contact {{ appName }}</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Contact {{ appName }}.</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      <p>Email : <strong>{{ body.email }}</strong></p>
+      <p>Objet : <strong>{{ body.object }}</strong></p>
+      {% if body.browser %}<p>Navigateur : <strong>{{ body.browser }}</strong></p>{% endif %}
+      <p>Message :</p>
+      <p>{{ body.message }}</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

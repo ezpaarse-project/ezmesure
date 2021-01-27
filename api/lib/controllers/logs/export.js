@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const Papa = require('papaparse');
 const rison = require('rison-node');
 const elastic = require('../../services/elastic');
+const publisherTemplate = require('../../utils/publisher-template');
 
 exports.aggregate = async function aggregate(ctx) {
   const { index, extension } = ctx.request.params;
@@ -203,33 +204,7 @@ exports.counter5 = async function counter5(ctx) {
   if (!exists) {
     await elastic.indices.create({
       index: destIndex,
-      body: {
-        settings: {
-          number_of_shards: 1,
-        },
-        mappings: {
-          dynamic_templates: [
-            {
-              strings_as_keywords: {
-                match_mapping_type: 'string',
-                mapping: {
-                  type: 'keyword',
-                },
-              },
-            },
-          ],
-          properties: {
-            print_identifier: { type: 'keyword' },
-            online_identifier: { type: 'keyword' },
-            publication_date: { type: 'keyword' },
-            publication_title: { type: 'keyword' },
-            platform: { type: 'keyword' },
-            totalItemInvestigations: { type: 'integer' },
-            totalItemRequests: { type: 'integer' },
-            date: { type: 'date', format: 'yyyy-MM' },
-          },
-        },
-      },
+      body: publisherTemplate,
     });
   }
 

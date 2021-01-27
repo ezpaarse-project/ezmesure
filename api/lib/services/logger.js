@@ -3,10 +3,11 @@ const winston = require('winston');
 module.exports = function logger(loggersConfig) {
   const transports = [];
 
-  for (const key in loggersConfig) {
-    if (!loggersConfig[key]) continue;
-    transports.push(new (winston.transports[key])(loggersConfig[key]));
-  }
+  Object.entries(loggersConfig).forEach(([key, value]) => {
+    if (value) {
+      transports.push(new (winston.transports[key])(value));
+    }
+  });
 
   return winston.createLogger({ transports });
 };

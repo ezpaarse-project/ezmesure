@@ -12,6 +12,10 @@
     "password": "ELASTICSEARCH_PASSWORD",
     "apiVersion": "EZMESURE_ELASTIC_VERSION"
   },
+  "kibana": {
+    "port": "EZMESURE_KIBANA_PORT",
+    "host": "EZMESURE_KIBANA_HOST"
+  },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT"
@@ -38,5 +42,9 @@
     "cron": "EZMESURE_DEPOSITORS_CRON"
   },
   "reportingActivityIndex": "REPORTING_ACTIVITY_INDEX",
-  "reportingIndex": "REPORTING_INDEX"
+  "reportingIndex": "REPORTING_INDEX",
+  "cypher": {
+    "secret": "EZMESURE_ENCRYPTION_SECRET"
+  },
+  "appName": "EZMESURE_APP_NAME"
 }

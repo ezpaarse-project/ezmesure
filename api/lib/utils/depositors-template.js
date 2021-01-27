@@ -3,51 +3,61 @@ module.exports = {
     number_of_shards: 1,
   },
   mappings: {
+    dynamic_templates: [
+      {
+        strings_as_keywords: {
+          match_mapping_type: 'string',
+          mapping: {
+            type: 'keyword',
+          },
+        },
+      },
+    ],
     properties: {
-      organisation: {
+      type: { type: 'keyword' },
+
+      // Institution
+      institution: {
         properties: {
+          createdAt: { type: 'date' },
+          updatedAt: { type: 'date' },
           name: { type: 'keyword' },
-          label: { type: 'keyword' },
+          acronym: { type: 'keyword' },
           uai: { type: 'keyword' },
           city: { type: 'keyword' },
           website: { type: 'keyword' },
-          logoUrl: { type: 'keyword' },
-        },
-      },
-      auto: {
-        properties: {
-          ezmesure: { type: 'boolean' },
-          ezpaarse: { type: 'boolean' },
-          report: { type: 'boolean' },
-        },
-      },
-      contact: {
-        properties: {
-          confirmed: { type: 'boolean' },
-          doc: {
+          logoId: { type: 'keyword' },
+          type: { type: 'keyword' },
+          location: { type: 'geo_point' },
+          domains: { type: 'keyword' },
+          creator: { type: 'keyword' },
+          indexPrefix: { type: 'keyword' },
+          indexCount: { type: 'long' },
+          auto: {
             properties: {
-              firstName: { type: 'keyword' },
-              lastName: { type: 'keyword' },
-              mail: { type: 'keyword' },
-            },
-          },
-          tech: {
-            properties: {
-              firstName: { type: 'keyword' },
-              lastName: { type: 'keyword' },
-              mail: { type: 'keyword' },
+              ezmesure: { type: 'boolean' },
+              ezpaarse: { type: 'boolean' },
+              report: { type: 'boolean' },
             },
           },
         },
       },
-      index: {
+
+      // Sushi items
+      sushi: {
         properties: {
-          count: { type: 'long' },
-          prefix: { type: 'keyword' },
+          createdAt: { type: 'date' },
+          updatedAt: { type: 'date' },
+          institutionId: { type: 'keyword' },
+          vendor: { type: 'keyword' },
+          package: { type: 'keyword' },
+          sushiUrl: { type: 'keyword' },
+          requestorId: { type: 'keyword' },
+          consortialId: { type: 'keyword' },
+          customerId: { type: 'keyword' },
+          apiKey: { type: 'keyword' },
+          comment: { type: 'keyword' },
         },
-      },
-      location: {
-        type: 'geo_point',
       },
     },
   },

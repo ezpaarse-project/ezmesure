@@ -14,12 +14,12 @@ nunjucks.configure(templatesDir);
 const images = fs.readdirSync(imagesDir);
 
 module.exports = {
-  async sendMail(mailOptions, options) {
-    mailOptions = mailOptions || {};
-    mailOptions.attachments = mailOptions.attachments || [];
+  async sendMail(mailOptions) {
+    const options = mailOptions || {};
+    options.attachments = options.attachments || [];
 
     images.forEach((image) => {
-      mailOptions.attachments.push({
+      options.attachments.push({
         filename: image,
         path: path.resolve(imagesDir, image),
         cid: image,
@@ -27,9 +27,12 @@ module.exports = {
     });
 
     return new Promise((resolve, reject) => {
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) { return reject(err); }
-        resolve(info);
+      transporter.sendMail(options, (err, info) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(info);
+        }
       });
     });
   },
@@ -47,5 +50,5 @@ module.exports = {
     const { html, errors } = mjml2html(mjmlTemplate);
 
     return { html, text, errors };
-  }
+  },
 };

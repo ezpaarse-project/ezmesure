@@ -70,7 +70,9 @@ services:
     environment:
       - http_proxy
       - https_proxy
+      - no_proxy=localhost,kibana
       - EZMESURE_ELASTIC_HOST=elastic
+      - EZMESURE_KIBANA_HOST=kibana
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST
@@ -80,13 +82,15 @@ services:
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
+      - EZMESURE_ENCRYPTION_SECRET
+      - EZMESURE_KIBANA_TIMEOUT
       - SERVER_HOST
       - SERVER_PORT
-      - EZMESURE_KIBANA_TIMEOUT
       - NODE_ENV
       - NODE_CONFIG
     volumes:
       - "./data/api/storage:/usr/src/app/storage"
+      - "./data/api/uploads:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     restart: unless-stopped
 
@@ -96,12 +100,14 @@ services:
       args:
         - http_proxy
         - https_proxy
+        - EZMESURE_DISABLE_SHIBBOLETH
     ports:
       - 8080:8080
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}.couperin.org/api
+      - API_URL=https://${EZMESURE_DOMAIN}/api
       - PORT=8080
       - HOST=0.0.0.0
+      - EZMESURE_ENCRYPTION_SECRET
     restart: unless-stopped
 
   rp:
@@ -118,6 +124,7 @@ services:
       - APPLI_APACHE_SERVERNAME
       - APPLI_APACHE_SERVERADMIN
       - APPLI_APACHE_LOGLEVEL
+      - EZMESURE_DISABLE_SHIBBOLETH
     working_dir: /var/www/html
     volumes:
       - ./rp/shibboleth:/etc/shibboleth

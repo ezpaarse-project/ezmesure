@@ -9,7 +9,50 @@ const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const sender = config.get('notifications.sender');
 
-exports.renaterLogin = async function (ctx) {
+function generateToken(user) {
+  if (!user) { return null; }
+
+  const { username, email } = user;
+  return jwt.sign({ username, email }, secret);
+}
+
+function decode(value) {
+  if (typeof value !== 'string') { return value; }
+
+  return Buffer.from(value, 'binary').toString('utf8');
+}
+
+function randomString() {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(5, (err, buffer) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffer.toString('hex'));
+      }
+    });
+  });
+}
+
+function sendWelcomeMail(user, password) {
+  return sendMail({
+    from: sender,
+    to: user.email,
+    subject: 'Bienvenue sur ezMESURE !',
+    ...generateMail('welcome', { user, password }),
+  });
+}
+
+function sendNewPassword(user, password) {
+  return sendMail({
+    from: sender,
+    to: user.email,
+    subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
+    ...generateMail('new-password', { user, password }),
+  });
+}
+
+exports.renaterLogin = async (ctx) => {
   const { query } = ctx.request;
   const headers = ctx.request.header;
   const props = {
@@ -29,11 +72,13 @@ exports.renaterLogin = async function (ctx) {
   };
 
   if (!props.metadata.idp) {
-    return ctx.throw(400, 'IDP not found in Shibboleth headers');
+    ctx.throw(400, 'IDP not found in Shibboleth headers');
+    return;
   }
 
   if (!props.email) {
-    return ctx.throw(400, 'email not found in Shibboleth headers');
+    ctx.throw(400, 'email not found in Shibboleth headers');
+    return;
   }
 
   const username = props.email.split('@')[0].toLowerCase();
@@ -44,7 +89,9 @@ exports.renaterLogin = async function (ctx) {
     ctx.action = 'user/register';
     ctx.metadata = { username };
 
-    props.metadata.createdAt = props.metadata.updatedAt = new Date();
+    const now = new Date();
+    props.metadata.createdAt = now;
+    props.metadata.updatedAt = now;
     props.metadata.acceptedTerms = false;
     props.password = await randomString();
 
@@ -52,7 +99,8 @@ exports.renaterLogin = async function (ctx) {
     user = await elastic.security.findUser({ username });
 
     if (!user) {
-      return ctx.throw(500, 'Failed to save user data');
+      ctx.throw(500, 'Failed to save user data');
+      return;
     }
 
     try {
@@ -74,7 +122,8 @@ exports.renaterLogin = async function (ctx) {
       await elastic.security.putUser({ username, body: props });
       user = props;
     } catch (e) {
-      return ctx.throw(500, 'Failed to update user data');
+      ctx.throw(500, 'Failed to update user data');
+      return;
     }
   } else {
     ctx.action = 'user/connection';
@@ -85,7 +134,7 @@ exports.renaterLogin = async function (ctx) {
   ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
-exports.elasticLogin = async function (ctx) {
+exports.elasticLogin = async (ctx) => {
   const { username, password } = ctx.request.body;
   const basicString = Buffer.from(`${username}:${password}`).toString('base64');
   let user;
@@ -117,11 +166,12 @@ exports.elasticLogin = async function (ctx) {
   ctx.status = 200;
 };
 
-exports.acceptTerms = async function (ctx) {
+exports.acceptTerms = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    return;
   }
 
   user.metadata.acceptedTerms = true;
@@ -130,11 +180,12 @@ exports.acceptTerms = async function (ctx) {
   ctx.status = 204;
 };
 
-exports.resetPassword = async function (ctx) {
+exports.resetPassword = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    return;
   }
 
   const newPassword = await randomString();
@@ -149,63 +200,25 @@ exports.resetPassword = async function (ctx) {
   ctx.status = 204;
 };
 
-exports.getUser = async function (ctx) {
+exports.getUser = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    return;
   }
 
   ctx.status = 200;
   ctx.body = user;
 };
 
-exports.getToken = async function (ctx) {
+exports.getToken = async (ctx) => {
   ctx.status = 200;
   ctx.body = generateToken(ctx.state.user);
 };
 
-function generateToken(user) {
-  if (!user) { return null; }
 
-  const { username, email } = user;
-  return jwt.sign({ username, email }, secret);
-}
-
-exports.logout = async function (ctx) {
+exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, null, { httpOnly: true });
   ctx.redirect(decodeURIComponent('/myspace'));
 };
-
-function decode(value) {
-  if (typeof value !== 'string') { return value; }
-
-  return Buffer.from(value, 'binary').toString('utf8');
-}
-
-function randomString() {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(5, (err, buffer) => {
-      if (err) { return reject(err); }
-      resolve(buffer.toString('hex'));
-    });
-  });
-}
-
-function sendWelcomeMail(user, password) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user, password }),
-  });
-}
-
-function sendNewPassword(user, password) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, password }),
-  });
-}

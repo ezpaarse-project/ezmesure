@@ -9,13 +9,15 @@ const requireJwt = jwt({
 
 const requireUser = async (ctx, next) => {
   if (!ctx.state.user || !ctx.state.user.username) {
-    return ctx.throw(401, 'no username in the token');
+    ctx.throw(401, 'no username in the token');
+    return;
   }
 
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    return ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    return;
   }
 
   ctx.state.user = user;
@@ -27,7 +29,20 @@ const requireTermsOfUse = async (ctx, next) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user.metadata.acceptedTerms) {
-    return ctx.throw(403, 'You must accept the terms of use before using this service');
+    ctx.throw(403, 'You must accept the terms of use before using this service');
+    return;
+  }
+
+  await next();
+};
+
+const requireAnyRole = (role) => async (ctx, next) => {
+  const { user } = ctx.state;
+
+  const roles = Array.isArray(role) ? role : [role];
+
+  if (!Array.isArray(user && user.roles) || !user.roles.some((r) => roles.includes(r))) {
+    ctx.throw(403, 'You are not authorized to use this feature');
   }
 
   await next();
@@ -37,4 +52,5 @@ module.exports = {
   requireJwt,
   requireUser,
   requireTermsOfUse,
+  requireAnyRole,
 };

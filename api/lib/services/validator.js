@@ -1,11 +1,11 @@
-const mandatoryFields = new Set([
+const mandatoryFields = [
   'datetime',
   'log_id',
   'rtype',
   'mime',
   'title_id',
   'doi',
-]);
+];
 
 function validationError(message) {
   const err = new Error(message);
@@ -17,11 +17,11 @@ function validationError(message) {
  * Validate the columns of a CSV
  * @param {Array<String>} columns
  */
-exports.validateColumns = function (columns) {
-  for (const field of mandatoryFields) {
-    if (!columns.includes(field)) {
-      throw validationError(`Le champ "${field}" est manquant`);
-    }
+exports.validateColumns = (columns) => {
+  const missingFields = mandatoryFields.filter((field) => !columns.includes(field));
+
+  if (missingFields.length > 0) {
+    throw validationError(`Champs manquants: ${missingFields.join(', ')}`);
   }
 };
 
@@ -29,14 +29,14 @@ exports.validateColumns = function (columns) {
  * Validate an EC
  * @param {Object} ec
  */
-exports.validateEvent = function (ec, lineNumber) {
+exports.validateEvent = (ec, lineNumber) => {
   if (!ec.log_id) {
     throw validationError(`Ligne #${lineNumber}: champ "log_id" vide`);
   }
   if (!ec.datetime) {
     throw validationError(`Ligne #${lineNumber}: champ "datetime" vide`);
   }
-  if (isNaN(Date.parse(ec.datetime))) {
+  if (Number.isNaN(Date.parse(ec.datetime))) {
     throw validationError(`Ligne #${lineNumber}: champ "datetime" invalide, le fichier a-t-il été modifié ?`);
   }
   if (ec.date && !/^\d{4}-\d{2}-\d{2}$/.test(ec.date)) {

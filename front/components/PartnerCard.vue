@@ -2,37 +2,48 @@
   <v-card width="350" height="100%" class="flexCard">
     <v-card-text class="text-center grow">
       <v-img
-        :src="logoUrl"
+        v-if="partner.logoId"
+        :src="`/api/assets/logos/${partner.logoId}`"
+        contain
+        height="100"
+        class="mb-3"
+      />
+
+      <v-img
+        v-else
         contain
         height="100"
         class="mb-3"
       />
 
       <div class="title">
-        {{ organisation.label || organisation.name }}
+        {{ partner.name }}
       </div>
       <div class="body-2">
-        {{ indexCount }} <abbr title="Événements de consultation">ECs</abbr> chargés
+        {{ indexCount }} <abbr :title="$t('partners.ecs')">ECs</abbr> {{ $t('partners.ecsLoaded') }}
       </div>
     </v-card-text>
 
     <v-divider />
 
     <v-card-text class="text-center">
-      <div class="subtitle-1">
-        Correspondants
-      </div>
+      <div class="subtitle-1" v-text="$t('partners.correspondents')" />
 
-      <div>
-        Documentaire :
-        <span v-if="docName" class="text--primary">{{ docName }}</span>
-        <span v-else>non confirmé</span>
-      </div>
-
-      <div>
-        Technique :
-        <span v-if="techName" class="text--primary">{{ techName }}</span>
-        <span v-else>non confirmé</span>
+      <div v-for="contact in contacts" :key="contact.name">
+        <v-tooltip right>
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ contact.name }}</span>
+          </template>
+          <span v-if="contact.type === 'tech'">
+            {{ $t('partners.technical') }}
+          </span>
+          <span v-else-if="contact.type === 'doc'">
+            {{ $t('partners.documentary') }}
+          </span>
+          <span v-else-if="contact.type === 'doc-tech'">
+            {{ $t('partners.technical') }} / {{ $t('partners.documentary') }}
+          </span>
+        </v-tooltip>
       </div>
     </v-card-text>
   </v-card>
@@ -47,24 +58,22 @@ export default {
     },
   },
   computed: {
-    contact() { return this.partner.contact || {}; },
-    organisation() { return this.partner.organisation || {}; },
-    index() { return this.partner.index || {}; },
-    logoUrl() { return this.organisation.logoUrl; },
-    docName() {
-      if (!this.contact.confirmed) { return null; }
-      if (!this.contact.doc) { return null; }
-      const { firstName = '', lastName = '' } = this.contact.doc;
-      return `${lastName} ${firstName}`;
-    },
-    techName() {
-      if (!this.contact.confirmed) { return null; }
-      if (!this.contact.tech) { return null; }
-      const { firstName = '', lastName = '' } = this.contact.tech;
-      return `${lastName} ${firstName}`;
+    contacts() {
+      const doc = this.partner?.docContactName;
+      const tech = this.partner?.techContactName;
+
+      if (!doc && !tech) { return []; }
+      if (doc === tech) { return [{ name: doc, type: 'doc-tech' }]; }
+
+      const contacts = [];
+
+      if (doc) { contacts.push({ name: doc, type: 'doc' }); }
+      if (tech) { contacts.push({ name: tech, type: 'tech' }); }
+
+      return contacts;
     },
     indexCount() {
-      const n = parseInt(this.index.count, 10);
+      const n = parseInt(this.partner?.indexCount, 10);
       if (Number.isNaN(n)) { return '0'; }
       return n.toLocaleString();
     },

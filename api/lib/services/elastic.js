@@ -17,11 +17,11 @@ const client = new Client({
   },
 });
 
-client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => function (params, options) {
-  const { username } = params;
-  options = options || {};
+client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => (params, opts) => {
+  const { username: name } = params;
+  const options = opts || {};
 
-  if (!username) {
+  if (!name) {
     throw new ConfigurationError('Missing required parameter: username');
   }
 
@@ -31,8 +31,8 @@ client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => func
 
   return makeRequest({
     method: 'GET',
-    path: `/_security/user/${username}`,
-  }, options).then(({ body }) => body && body[username]);
+    path: `/_security/user/${name}`,
+  }, options).then(({ body }) => body && body[name]);
 });
 
 module.exports = client;

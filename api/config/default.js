@@ -14,6 +14,10 @@ module.exports = {
     user: 'elastic',
     password: 'changeme',
   },
+  kibana: {
+    port: 5601,
+    host: 'localhost',
+  },
   smtp: {
     host: 'localhost',
     port: 25,
@@ -52,9 +56,12 @@ module.exports = {
   },
   depositors: {
     index: 'depositors',
-    spreadsheetId: '1cgK6Tvd2No-rqYzyE6OIIbS7VHZdudQGm5TuiOUc0uU',
     cron: '0 0 0 * * *',
   },
   reportingActivityIndex: '.ezreporting-activity',
-  reportingIndex: '.ezreporting'
+  reportingIndex: '.ezreporting',
+  cypher: {
+    secret: 'some-secret',
+  },
+  appName: 'ezMESURE',
 };
