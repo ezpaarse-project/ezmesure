@@ -1,0 +1,31 @@
+FROM debian:latest
+
+ENV NVM_DIR /usr/local/nvm
+
+ENV NODE_ENV development
+ENV KIBANA_VERSION 7.9
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh \
+  && apt-get update \
+  && apt-get install -y curl git \
+  && apt-get -y autoclean \
+  && mkdir -p /kibana \
+  && cd /kibana \
+  && git clone https://github.com/elastic/kibana.git . --progress --verbose \
+  && export NODE_VERSION=$(cat .nvmrc) \
+  && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.2/install.sh | bash
+RUN source $NVM_DIR/nvm.sh \
+  && nvm install $NODE_VERSION \
+  && nvm alias default $NODE_VERSION \
+  && nvm use default \
+  && node -v \
+  && npm -v \
+  && npm i -G yarn \
+  && yarn kbn bootstrap
+
+WORKDIR /app
+
+EXPOSE 5601
+EXPOSE 5603
+
+CMD ["yarn", "start"]

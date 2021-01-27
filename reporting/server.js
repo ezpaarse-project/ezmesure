@@ -9,6 +9,7 @@ const roles = require('./lib/services/roles');
 const indexes = require('./lib/services/indexes');
 const activity = require('./lib/services/activity');
 const controller = require('./lib/controllers');
+const puppeteer = require('./lib/services/puppeteer');
 const { generatePendingReports } = require('./lib/services/reporting');
 
 const env = process.env.NODE_ENV || 'development';
@@ -18,6 +19,9 @@ roles.findOrCreate();
 
 // check if indexes exists
 indexes.findOrCreate();
+
+// try if puppeteer can be launched
+puppeteer.testPuppeteer();
 
 // CronTab for reporting job
 const job = new CronJob(cron, () => {

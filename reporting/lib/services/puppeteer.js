@@ -9,10 +9,12 @@ const {
   kibana,
   puppeteerTimeout,
   logos,
+  sender,
 } = require('config');
 const { getDashboard, buildDashboardUrl } = require('./dashboard');
 const Frequency = require('./frequency');
 const logger = require('../logger');
+const { sendMail, generateMail } = require('./mail');
 
 const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
 
@@ -51,6 +53,11 @@ function positionElements(page, viewport) {
     // eslint-disable-next-line no-undef
     const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
     const pageHeight = vp.height - vp.margin.top - vp.margin.bottom;
+
+    if (visualizations && visualizations.length) {
+      const grid = document.querySelector('.dshLayout--viewing');
+      grid.style.height = `${pageHeight * (visualizations.length - 1)}px`;
+    }
 
     visualizations.forEach((visualization, index) => {
       visualization.style.setProperty('top', `${(pageHeight) * index}px`, 'important');
@@ -137,6 +144,28 @@ class Reporter {
     page.setDefaultTimeout(puppeteerTimeout);
 
     return page;
+  }
+
+  async testPuppeteer () {
+    try {
+      await this.launchBrowser();
+      await this.closeBrowser();
+      logger.info('Puppeteer : ready');
+    } catch (error) {
+      logger.error('Puppeteer : can\'t get started');
+      logger.error(error);
+      console.error(error);
+
+      await sendMail({
+        from: sender,
+        to: sender,
+        subject: `Reporting - erreur test puppeteer`,
+        ...generateMail('error', {
+          message: 'Une erreur est survenue pendant le test de puppeteer.',
+          error: error,
+        }),
+      });
+    }
   }
 
   addTask(task = {}) {
@@ -263,10 +292,27 @@ class Reporter {
 
     let styles = await loadStyles();
 
+    styles += `
+      #dashboardChrome {
+        display: none;
+        height: 0;
+        width: 0;
+      }
+      body {
+        padding: 0 !important;
+        min-width: ${viewport.width}px !important;
+        width: ${viewport.width}px !important;
+      }
+    `;
+
     if (print) {
       styles += `
+        body {
+          min-width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
+          width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
+        }
         dashboard-app .react-grid-item {
-          position: fixed;
+          position: fixed !important;
           left: 0 !important;
           background-color: inherit !important;
           z-index: 1 !important;
@@ -274,6 +320,8 @@ class Reporter {
           height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
           transform: none !important;
           -webkit-transform: none !important;
+          box-shadow: none;
+          -webkit-box-shadow: none;
         }
       `;
     }

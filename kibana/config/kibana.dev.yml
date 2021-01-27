@@ -1,0 +1,6 @@
+elasticsearch.hosts:
+    - http://localhost:9200/
+elasticsearch.username: steven
+elasticsearch.password: steven
+elasticsearch.ssl.verificationMode: none
+server.rewriteBasePath: false

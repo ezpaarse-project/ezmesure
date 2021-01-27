@@ -1,0 +1,16 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Une erreur est survenue sur ezMESURE</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text>{{ message }}</mj-text>
+    <mj-text>Erreur : <strong>{{ error }}</strong></mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

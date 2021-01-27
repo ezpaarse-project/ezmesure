@@ -19,11 +19,11 @@ server.rewriteBasePath: false
 # elasticsearch.hosts: ${ELASTICSEARCH_URL}
 
 ##xpack.monitoring.enabled: true
-xpack.reporting.kibanaServer.protocol: "https"
+# xpack.reporting.kibanaServer.protocol: "https"
 # this value must be hard set
-xpack.reporting.kibanaServer.port: 443
-xpack.reporting.capture.browser.chromium.proxy.enabled: true
-xpack.reporting.capture.browser.chromium.proxy.server: "http://proxyout.inist.fr:8080"
+# xpack.reporting.kibanaServer.port: 443
+# xpack.reporting.capture.browser.chromium.proxy.enabled: true
+# xpack.reporting.capture.browser.chromium.proxy.server: "http://proxyout.inist.fr:8080"
 # xpack.reporting.capture.browser.chromium.proxy.bypass "elastic"
 
 #logging.verbose: true

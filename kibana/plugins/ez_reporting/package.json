@@ -1,0 +1,15 @@
+{
+  "name": "ezReporting",
+  "version": "2.0.0",
+  "author": "ezTEAM",
+  "license": "ISC",
+  "private": true,
+  "scripts": {
+    "build": "yarn plugin-helpers build",
+    "plugin-helpers": "node ../../scripts/plugin_helpers",
+    "kbn": "node ../../scripts/kbn"
+  },
+  "dependencies": {
+    "@hapi/address": "^4.1.0"
+  }
+}
