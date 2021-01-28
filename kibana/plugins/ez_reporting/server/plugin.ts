@@ -23,25 +23,38 @@ import {
   CoreStart,
   Plugin,
   Logger,
-  DEFAULT_APP_CATEGORIES,
 } from '../../../src/core/server';
 
 import { EzReportingPluginSetup, EzReportingPluginStart } from './types';
 import { defineRoutes } from './routes';
 import { PluginSetupContract as FeaturesPluginSetup } from '../../../x-pack/plugins/features/server';
 
-import { PLUGIN_NAME, PLUGIN_ID, PLUGIN_ICON, PLUGIN_APP_NAME } from '../common';
+import { PLUGIN_NAME, PLUGIN_ID, PLUGIN_ICON, PLUGIN_APP_NAME, PLUGIN_DESCRIPTION } from '../common';
 
 export interface EzReportingDeps {
   features: FeaturesPluginSetup;
+}
+
+interface ServerConfigType {
+  applicationName: string;
+}
+
+export enum AlertType {
+  ErrorCount = 'ezreporting.error_rate', // ErrorRate was renamed to ErrorCount but the key is kept as `error_rate` for backwards-compat.
+  TransactionErrorRate = 'ezreporting.transaction_error_rate',
+  TransactionDuration = 'ezreporting.transaction_duration',
+  TransactionDurationAnomaly = 'ezreporting.transaction_duration_anomaly',
 }
 
 export class EzreportingPlugin
   implements Plugin<EzReportingPluginSetup, EzReportingPluginStart, EzReportingDeps> {
   private readonly logger: Logger;
 
+  initializerContext: PluginInitializerContext<ServerConfigType>;
+
   constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
+    this.initializerContext = initializerContext;
   }
 
   public setup(core: CoreSetup, { features }: EzReportingDeps) {
@@ -52,32 +65,58 @@ export class EzreportingPlugin
     // Register server side APIs
     defineRoutes(router, core.http.auth);
 
+    const applicationName = process.env.EZMESURE_APPLICATION_NAME || PLUGIN_APP_NAME;
+
+    const featuresCategory = {
+      id: `${applicationName.toLowerCase()}`,
+      label: `${PLUGIN_NAME} ${applicationName}`,
+      ariaLabel:`${PLUGIN_NAME} ${applicationName}`,
+      order: 1000,
+      euiIconType: 'reportingApp',
+    };
+
     features.registerKibanaFeature({
       id: PLUGIN_ID,
       name: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}`,
       icon: PLUGIN_ICON,
-      navLinkId: PLUGIN_ID,
-      category: DEFAULT_APP_CATEGORIES.kibana,
-      app: [PLUGIN_ID, 'kibana'],
+      category: featuresCategory,
+      app: [PLUGIN_ID],
       catalogue: [PLUGIN_ID],
+      privilegesTooltip: PLUGIN_DESCRIPTION,
+      management: {
+        insightsAndAlerting: ['triggersActions'],
+      },
+      alerting: Object.values(AlertType),
       privileges: {
         all: {
-          app: [PLUGIN_ID, 'kibana'],
+          app: [PLUGIN_ID],
           api: [`${PLUGIN_ID}-read`, `${PLUGIN_ID}-all`],
           catalogue: [PLUGIN_ID],
           savedObject: {
             all: [],
             read: [],
           },
+          alerting: {
+            all: Object.values(AlertType),
+          },
+          management: {
+            insightsAndAlerting: ['triggersActions'],
+          },
           ui: ['create', 'edit', 'save', 'download', 'delete', 'show'],
         },
         read: {
-          app: [PLUGIN_ID, 'kibana'],
+          app: [PLUGIN_ID],
           api: [`${PLUGIN_ID}-read`],
           catalogue: [PLUGIN_ID],
           savedObject: {
             all: [],
             read: [],
+          },
+          alerting: {
+            all: Object.values(AlertType),
+          },
+          management: {
+            insightsAndAlerting: ['triggersActions'],
           },
           ui: [],
         },

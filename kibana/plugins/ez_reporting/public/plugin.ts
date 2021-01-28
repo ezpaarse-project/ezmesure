@@ -65,7 +65,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
 
     // Back to PLUGIN_NAME link
     core.application.register({
-      id: `${applicationName.toLocaleLowerCase()}_back`,
+      id: `${PLUGIN_ID}_back`,
       title: `Back to ${applicationName}`,
       euiIconType: 'editorUndo',
       category: CATEGORY,
