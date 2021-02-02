@@ -4,6 +4,7 @@ const subMonths = require('date-fns/subMonths');
 
 const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
+const Task = require('../../models/Task');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../../server');
@@ -48,6 +49,30 @@ exports.getOne = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = sushiItem;
+};
+
+exports.getTasks = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const { user } = ctx.state;
+
+  const sushiItem = await Sushi.findById(sushiId);
+
+  if (!sushiItem) {
+    ctx.throw(404, 'Sushi item not found');
+    return;
+  }
+
+  if (!isAdmin(user)) {
+    const institution = await sushiItem.getInstitution();
+
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to view the Sushi tasks of this institution');
+      return;
+    }
+  }
+
+  ctx.status = 200;
+  ctx.body = await Task.findBySushiId(sushiId);
 };
 
 exports.addSushi = async (ctx) => {
