@@ -124,6 +124,8 @@ router.route({
     },
     body: {
       target: Joi.string().trim().required(),
+      beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
     },
   },
 });

@@ -247,9 +247,13 @@ exports.downloadReport = async (ctx) => {
 
 exports.importSushi = async (ctx) => {
   const { sushiId } = ctx.params;
-  const { body } = ctx.request;
+  const { body = {} } = ctx.request;
   const { user } = ctx.state;
-  const index = body.target;
+  const {
+    target: index,
+    beginDate,
+    endDate,
+  } = body;
 
   const sushi = await Sushi.findById(sushiId);
 
@@ -290,6 +294,8 @@ exports.importSushi = async (ctx) => {
     institution,
     user,
     index,
+    beginDate,
+    endDate,
   });
 
   ctx.type = 'json';
