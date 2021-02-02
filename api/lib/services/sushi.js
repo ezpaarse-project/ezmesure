@@ -286,6 +286,7 @@ async function importSushiReport(options = {}) {
   }
 
   const bulk = [];
+  const bulkSize = 2000;
   const response = {
     inserted: 0,
     updated: 0,
@@ -408,12 +409,13 @@ async function importSushiReport(options = {}) {
     });
   });
 
-  let bulkResult;
+  for (let offset = 0; offset <= bulk.length; offset += bulkSize) {
+    let bulkResult;
 
-  if (bulk.length > 0) {
     try {
+      // eslint-disable-next-line no-await-in-loop
       const result = await elastic.bulk(
-        { body: bulk },
+        { body: bulk.slice(offset, offset + bulkSize) },
         { headers: { 'es-security-runas-user': user.username } },
       );
       bulkResult = result.body;
@@ -425,24 +427,26 @@ async function importSushiReport(options = {}) {
       saveTask();
       return;
     }
-  }
 
-  const resultItems = (bulkResult && bulkResult.items) || [];
+    const resultItems = (bulkResult && bulkResult.items) || [];
 
-  resultItems.forEach((i) => {
-    if (!i.index) {
-      response.failed += 1;
-    } else if (i.index.result === 'created') {
-      response.inserted += 1;
-    } else if (i.index.result === 'updated') {
-      response.updated += 1;
-    } else {
-      if (response.errors.length < 10) {
-        response.errors.push(i.index.error);
+    resultItems.forEach((i) => {
+      if (!i.index) {
+        response.failed += 1;
+      } else if (i.index.result === 'created') {
+        response.inserted += 1;
+      } else if (i.index.result === 'updated') {
+        response.updated += 1;
+      } else {
+        if (response.errors.length < 10) {
+          response.errors.push(i.index.error);
+        }
+        response.failed += 1;
       }
-      response.failed += 1;
-    }
-  });
+    });
+
+    task.setResult(response);
+  }
 
   task.log('info', 'Sushi harvesting terminated');
   task.setResult(response);
