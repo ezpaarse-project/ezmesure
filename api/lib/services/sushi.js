@@ -241,20 +241,20 @@ async function importSushiReport(options = {}) {
   task.log('info', 'Validating COUNTER report');
   await saveTask();
 
-  const { valid, errors } = validateReport(report);
-
-  if (!valid) {
-    task.fail(['The report is not valid', ...errors]);
-    saveTask();
-    return;
-  }
-
   const exceptions = getExceptions(report);
 
   if (exceptions.length > 0) {
     const errorMessages = exceptions.map((e) => e.Message);
 
     task.fail(['Sushi endpoint returned exceptions', ...errorMessages]);
+    saveTask();
+    return;
+  }
+
+  const { valid, errors } = validateReport(report);
+
+  if (!valid) {
+    task.fail(['The report is not valid', ...errors]);
     saveTask();
     return;
   }
