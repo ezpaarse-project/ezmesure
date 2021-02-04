@@ -140,6 +140,10 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
   }
 
   static async findAll(opt = {}) {
+    const sort = opt.sort || [{
+      [`${type}.createdAt`]: 'desc',
+    }];
+
     let filter = [{ term: { type } }];
 
     if (Array.isArray(opt.filters)) {
@@ -152,6 +156,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
       size: opt.size || 1000,
       ignoreUnavailable: true,
       body: {
+        sort,
         query: {
           bool: {
             minimum_should_match: opt.should ? 1 : 0,
