@@ -31,7 +31,7 @@ function hasPrivileges(privileges) {
       };
       return;
     }
-    
+
     try {
       const { body: perm } = await elastic.security.hasPrivileges({
         user,
@@ -74,7 +74,7 @@ const validate = {
   type: 'json',
   failure: 400,
   body: {
-    dashboardId: Joi.string().trim().guid().required(),
+    dashboardId: Joi.string().trim().min(1).required(),
     space: Joi.string().trim(),
     frequency: Joi.string().trim().required().valid(frequencies.map((f) => f.value)),
     emails: Joi.array().items(Joi.string().trim().email()).min(1),
