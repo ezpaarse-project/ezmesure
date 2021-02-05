@@ -68,6 +68,8 @@
       @update="refreshSushiItems"
     />
 
+    <SushiHistory ref="sushiHistory" />
+
     <v-data-table
       v-if="hasInstitution"
       v-model="selected"
@@ -85,6 +87,13 @@
         >
           mdi-pencil
         </v-icon>
+
+        <v-icon
+          small
+          @click="showSushiItemHistory(item)"
+        >
+          mdi-history
+        </v-icon>
       </template>
     </v-data-table>
 
@@ -100,6 +109,7 @@
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import SushiForm from '~/components/SushiForm';
+import SushiHistory from '~/components/SushiHistory';
 
 export default {
   layout: 'space',
@@ -107,6 +117,7 @@ export default {
   components: {
     ToolBar,
     SushiForm,
+    SushiHistory,
   },
   async asyncData({
     $axios,
@@ -188,6 +199,9 @@ export default {
     },
     editSushiItem(item) {
       this.$refs.sushiForm.editSushiItem(this.institution, item);
+    },
+    showSushiItemHistory(item) {
+      this.$refs.sushiHistory.showSushiItem(item);
     },
     async refreshSushiItems() {
       if (!this.hasInstitution) { return; }

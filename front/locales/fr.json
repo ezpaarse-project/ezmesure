@@ -181,9 +181,21 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
+  "tasks": {
+    "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
+    "status": {
+      "pending": "En attente",
+      "running": "En cours",
+      "finished": "Terminé",
+      "error": "Erreur"
+    }
+  },
   "advancedSettings": "Paramètres avancés",
   "name": "Nom",
   "value": "Valeur",
+  "status": "Statut",
+  "date": "Date",
+  "history": "Historique",
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",
@@ -205,5 +217,6 @@
   "update": "Mettre à jour",
   "create": "Créer",
   "administration": "Administration",
-  "informationSubmitted": "Informations transmises"
+  "informationSubmitted": "Informations transmises",
+  "invalidDate": "Date invalide"
 }

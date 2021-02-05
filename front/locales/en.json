@@ -181,9 +181,21 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "tasks": {
+    "failedToFetchTasks": "Failed to fetch tasks list",
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "finished": "Finished",
+      "error": "Error"
+    }
+  },
   "advancedSettings": "Advanced settings",
   "name": "Name",
   "value": "Value",
+  "status": "Status",
+  "date": "Date",
+  "history": "History",
   "language": "Language",
   "refresh": "Update",
   "delete": "Remove",
@@ -205,5 +217,6 @@
   "update": "Update",
   "create": "Create",
   "administration": "Administration",
-  "informationSubmitted": "Information submitted"
+  "informationSubmitted": "Information submitted",
+  "invalidDate": "Invalid date"
 }
