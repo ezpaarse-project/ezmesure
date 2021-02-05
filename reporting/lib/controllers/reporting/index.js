@@ -22,25 +22,44 @@ function hasPrivileges(privileges) {
   return async (ctx, next) => {
     const { user } = ctx.query;
 
-    const { body: perm } = await elastic.security.hasPrivileges({
-      user,
-      body: {
-        index: [{ names: [index], privileges }],
-      },
-    }, {
-      headers: { 'es-security-runas-user': user },
-    });
+    if (!user) {
+      ctx.status = 400;
+      ctx.type = 'json';
+      ctx.body = {
+        error: 'No user specified.',
+        code: 400,
+      };
+      return;
+    }
 
-    const perms = (perm && perm.index && perm.index[index]) || {};
-    const canMakeAction = privileges.every((privilege) => perms[privilege]);
+    try {
+      const { body: perm } = await elastic.security.hasPrivileges({
+        user,
+        body: {
+          index: [{ names: [index], privileges }],
+        },
+      }, {
+        headers: { 'es-security-runas-user': user },
+      });
 
-    if (canMakeAction) {
-      await next();
-    } else {
+      const perms = (perm && perm.index && perm.index[index]) || {};
+      const canMakeAction = privileges.every((privilege) => perms[privilege]);
+
+      if (canMakeAction) {
+        await next();
+      } else {
+        ctx.status = 403;
+        ctx.type = 'json';
+        ctx.body = {
+          error: 'You have no rights to access this page.',
+          code: 403,
+        };
+      }
+    } catch (e) {
       ctx.status = 403;
       ctx.type = 'json';
       ctx.body = {
-        error: 'You have no rights to access this page.',
+        error: 'You are not authorize to access this page.',
         code: 403,
       };
     }
@@ -49,16 +68,6 @@ function hasPrivileges(privileges) {
 
 route.get('/tasks/:space?', hasPrivileges(['read']), list);
 
-route.delete('/tasks/:taskId?', {
-  validate: {
-    failure: 400,
-    continueOnError: true,
-    params: {
-      taskId: Joi.string().required(),
-    },
-  },
-}, hasPrivileges(['delete']), del);
-
 app.use(bodyParser());
 
 const validate = {
@@ -66,10 +75,10 @@ const validate = {
   failure: 400,
   body: {
     dashboardId: Joi.string().trim().min(1).required(),
-    space: Joi.string(),
-    frequency: Joi.string().required().valid(frequencies.map((f) => f.value)),
-    emails: Joi.array().items(Joi.string().email()).min(1),
+    frequency: Joi.string().trim().required().valid(frequencies.map((f) => f.value)),
+    emails: Joi.array().items(Joi.string().trim().email()).min(1),
     print: Joi.boolean().required(),
+    space: Joi.string().trim().allow(null, ''),
   },
 };
 
@@ -85,6 +94,16 @@ route.patch('/tasks/:taskId?', {
 }, hasPrivileges(['write']), update);
 
 route.get('/tasks/:taskId?/history', hasPrivileges(['read']), history);
+
+route.delete('/tasks/:taskId?', {
+  validate: {
+    failure: 400,
+    continueOnError: true,
+    params: {
+      taskId: Joi.string().required(),
+    },
+  },
+}, hasPrivileges(['delete']), del);
 
 route.get('/tasks/:taskId?/download', hasPrivileges(['create']), download);
 

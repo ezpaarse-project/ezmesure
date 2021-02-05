@@ -52,6 +52,7 @@ exports.save = async function save(ctx) {
 
   return elastic.index({
     index,
+    refresh: true,
     body: metric,
   }).then((res) => res.body);
 };

@@ -1,4 +1,4 @@
-FROM node:10.15.3
+FROM node:12.18.3
 
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 

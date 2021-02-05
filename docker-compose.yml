@@ -1,7 +1,7 @@
 version: '2'
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     ports:
       - 9200:9200
       - 9300:9300
@@ -41,7 +41,7 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - no_proxy
+      - no_proxy=reporting
       - ELASTICSEARCH_PASSWORD
       - ELASTICSEARCH_USERNAME
       - SERVER_BASEPATH
@@ -54,7 +54,7 @@ services:
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
       - REPORTING_URL=http://reporting:3000
-      - REPORTING_NAME
+      - EZMESURE_APPLICATION_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped

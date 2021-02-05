@@ -1,6 +1,4 @@
 {
-  "reportingName": "REPORTING_NAME",
-  "pluginName": "REPORTING_PLUGIN_NAME",
   "port": "REPORTING_PORT",
   "kibana": {
     "internal": "KIBANA_INTERNAL_URL",
