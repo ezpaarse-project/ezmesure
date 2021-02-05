@@ -59,6 +59,28 @@ module.exports = {
           comment: { type: 'keyword' },
         },
       },
+
+      // Task items
+      task: {
+        properties: {
+          createdAt: { type: 'date' },
+          updatedAt: { type: 'date' },
+          sushiId: { type: 'keyword' },
+          institutionId: { type: 'keyword' },
+          status: { type: 'keyword' },
+          runningTime: { type: 'long' },
+          logs: {
+            properties: {
+              date: { type: 'date' },
+              type: { type: 'keyword' },
+              message: { type: 'keyword' },
+            },
+          },
+          result: {
+            type: 'object',
+          },
+        },
+      },
     },
   },
 };
