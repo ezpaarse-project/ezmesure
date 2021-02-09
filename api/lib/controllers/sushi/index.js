@@ -18,6 +18,7 @@ const {
   importSushi,
   downloadReport,
   getTasks,
+  getAvailableReports,
 } = require('./actions');
 
 router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
@@ -75,6 +76,17 @@ router.route({
   method: 'GET',
   path: '/:sushiId/tasks',
   handler: getTasks,
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/reports',
+  handler: getAvailableReports,
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),

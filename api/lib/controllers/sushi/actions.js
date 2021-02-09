@@ -179,6 +179,52 @@ exports.deleteSushiData = async (ctx) => {
   ctx.body = response;
 };
 
+exports.getAvailableReports = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const { user } = ctx.state;
+
+  const sushi = await Sushi.findById(sushiId);
+
+  if (!sushi) {
+    ctx.throw(404, 'Sushi item not found');
+    return;
+  }
+
+  const institution = sushi.getInstitution();
+
+  if (!isAdmin(user)) {
+    if (!institution || !institution.isContact(user)) {
+      ctx.throw(403, 'You are not authorized to manage sushi credentials');
+      return;
+    }
+    if (!institution.isValidated()) {
+      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      return;
+    }
+  }
+
+  const { data: reports } = await sushiService.getAvailableReports(sushi);
+
+  const exceptions = sushiService.getExceptions(reports);
+
+  if (exceptions.length > 0) {
+    ctx.status = 502;
+    ctx.body = { exceptions: exceptions.map((e) => e.Message) };
+    return;
+  }
+
+  const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+
+  if (!Array.isArray(reports) || !reports.every(isValidReport)) {
+    ctx.status = 502;
+    ctx.body = { error: 'The Sushi endpoint responded with invalid data' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = reports;
+};
+
 exports.downloadReport = async (ctx) => {
   const { sushiId } = ctx.params;
   const { query = {} } = ctx.request;
