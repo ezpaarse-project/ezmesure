@@ -31,6 +31,47 @@ const downloads = new Map();
 
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
+/**
+ * Download a report, if not found locally or currently being downloaded
+ * @param {Object} options sushi
+ *                         beginDate
+ *                         endDate
+ */
+async function getAvailableReports(sushi) {
+  const {
+    sushiUrl,
+    requestorId,
+    customerId,
+    apiKey,
+  } = sushi.getData();
+
+  const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
+  const params = typeof sushi.params === 'object' ? sushi.params : {};
+
+  if (requestorId) { params.requestor_id = requestorId; }
+  if (customerId) { params.customer_id = customerId; }
+  if (apiKey) { params.api_key = apiKey; }
+
+  const response = await axios({
+    method: 'get',
+    url: `${baseUrl}/reports`,
+    responseType: 'json',
+    params,
+  });
+
+  if (!response) {
+    throw new Error('sushi endpoint didn\'t respond');
+  }
+  if (response.status !== 200) {
+    throw new Error(`sushi endpoint responded with status ${response.status}`);
+  }
+  if (!response.data) {
+    throw new Error('sushi endpoint didn\'t return any data');
+  }
+
+  return response;
+}
+
 async function getReport(endpointUrl, opts) {
   if (typeof endpointUrl !== 'string') {
     throw new TypeError('baseUrl should be a string');
@@ -506,6 +547,7 @@ module.exports = {
   getReportFilename,
   getReportPath,
   getReportTmpPath,
+  getAvailableReports,
   downloadReport,
   getOngoingDownload,
   initiateDownload,
