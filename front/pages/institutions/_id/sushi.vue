@@ -69,6 +69,7 @@
     />
 
     <SushiHistory ref="sushiHistory" />
+    <ReportsDialog ref="reportsDialog" />
 
     <v-data-table
       v-if="hasInstitution"
@@ -86,6 +87,13 @@
           @click="editSushiItem(item)"
         >
           mdi-pencil
+        </v-icon>
+
+        <v-icon
+          small
+          @click="showAvailableReports(item)"
+        >
+          mdi-file-search
         </v-icon>
 
         <v-icon
@@ -110,6 +118,7 @@
 import ToolBar from '~/components/space/ToolBar';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
+import ReportsDialog from '~/components/ReportsDialog';
 
 export default {
   layout: 'space',
@@ -118,6 +127,7 @@ export default {
     ToolBar,
     SushiForm,
     SushiHistory,
+    ReportsDialog,
   },
   async asyncData({
     $axios,
@@ -194,6 +204,9 @@ export default {
     return this.refreshSushiItems();
   },
   methods: {
+    showAvailableReports(item) {
+      this.$refs.reportsDialog.showReports(item);
+    },
     createSushiItem() {
       this.$refs.sushiForm.createSushiItem(this.institution);
     },

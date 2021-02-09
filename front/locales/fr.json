@@ -190,7 +190,12 @@
       "error": "Erreur"
     }
   },
+  "reports": {
+    "availableReports": "Rapports disponibles",
+    "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles"
+  },
   "advancedSettings": "Paramètres avancés",
+  "identifier": "Identifiant",
   "name": "Nom",
   "value": "Valeur",
   "status": "Statut",

@@ -190,14 +190,19 @@
       "error": "Error"
     }
   },
+  "reports": {
+    "availableReports": "Available reports",
+    "failedToFetchReports": "Failed to fetch the list of available reports"
+  },
   "advancedSettings": "Advanced settings",
+  "identifier": "Identifier",
   "name": "Name",
   "value": "Value",
   "status": "Status",
   "date": "Date",
   "history": "History",
   "language": "Language",
-  "refresh": "Update",
+  "refresh": "Refresh",
   "delete": "Remove",
   "close": "Close",
   "canceled": "Canceled",
