@@ -159,13 +159,16 @@ function validateReport(report) {
 }
 
 function getExceptions(report) {
-  if (!report || !report.Report_Header) { return []; }
+  if (!report) { return []; }
 
-  const header = report.Report_Header;
+  const header = report.Report_Header || {};
   const exceptions = Array.isArray(header.Exceptions) ? header.Exceptions : [];
 
   if (header.Exception) {
     exceptions.push(header.Exception);
+  }
+  if (report.Exception) {
+    exceptions.push(report.Exception);
   }
 
   return exceptions;
