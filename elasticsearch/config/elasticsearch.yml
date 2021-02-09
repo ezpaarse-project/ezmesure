@@ -33,6 +33,3 @@ path.logs: /usr/share/elasticsearch/logs
 
 # Disallow searches with too many agregations
 search.max_buckets: 10000
-
-# api key
-xpack.security.authc.api_key.enabled: true

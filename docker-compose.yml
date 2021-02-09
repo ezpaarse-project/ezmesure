@@ -22,6 +22,7 @@ services:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - bootstrap.memory_lock=true
       - ES_JAVA_OPTS
+      - xpack.security.authc.api_key.enabled=true
     ulimits:
       memlock:
         soft: -1
