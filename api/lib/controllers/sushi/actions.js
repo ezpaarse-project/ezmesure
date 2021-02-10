@@ -203,7 +203,32 @@ exports.getAvailableReports = async (ctx) => {
     }
   }
 
-  const { data: reports } = await sushiService.getAvailableReports(sushi);
+  let reports;
+
+  try {
+    const { data } = await sushiService.getAvailableReports(sushi);
+    reports = data;
+  } catch (e) {
+    let { message } = e;
+    const data = (e && e.response && e.response.data) || {};
+    const {
+      Code: code,
+      Severity: severity,
+      Message: msg,
+    } = data;
+
+    if (msg) {
+      message = severity ? `[${severity}] ` : '';
+      message += code ? `[#${code}] ` : '';
+      message += msg;
+    }
+
+    ctx.status = 502;
+    ctx.body = {
+      exceptions: [message],
+    };
+    return;
+  }
 
   const exceptions = sushiService.getExceptions(reports);
 
@@ -216,8 +241,7 @@ exports.getAvailableReports = async (ctx) => {
   const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
   if (!Array.isArray(reports) || !reports.every(isValidReport)) {
-    ctx.status = 502;
-    ctx.body = { error: 'The Sushi endpoint responded with invalid data' };
+    ctx.throw(502, 'The Sushi endpoint responded with invalid data');
     return;
   }
 
