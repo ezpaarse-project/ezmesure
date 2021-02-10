@@ -14,17 +14,31 @@
         </v-btn>
       </v-toolbar>
 
-      <v-card-text>
-        <v-alert
-          v-for="(message, index) in exceptions"
-          :key="index"
-          :value="true"
-          type="error"
-          outlined
-          dense
-          icon="mdi-alert-circle"
-        >
-          {{ message }}
+      <v-card-text v-if="hasExceptions">
+        <v-alert text color="error">
+          <v-row align="center" no-gutters>
+            <v-col
+              class="grow"
+              v-text="$t('reports.sushiReturnedErrors')"
+            />
+            <v-col class="shrink">
+              <v-btn
+                color="error"
+                small
+                outlined
+                @click="editSushiItem"
+                v-text="$t('reports.checkCredentials')"
+              />
+            </v-col>
+          </v-row>
+
+          <ul>
+            <li
+              v-for="(message, index) in exceptions"
+              :key="index"
+              v-text="message"
+            />
+          </ul>
         </v-alert>
       </v-card-text>
 
@@ -83,6 +97,11 @@ export default {
       this.exceptions = [];
       this.show = true;
       this.refreshReports();
+    },
+
+    editSushiItem() {
+      this.show = false;
+      this.$emit('editItem', this.sushi);
     },
 
     async refreshReports() {

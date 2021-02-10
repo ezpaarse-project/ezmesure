@@ -191,6 +191,8 @@
     }
   },
   "reports": {
+    "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
+    "checkCredentials": "Vérifier les identifiants",
     "availableReports": "Rapports disponibles",
     "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles"
   },

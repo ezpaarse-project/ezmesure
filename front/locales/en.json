@@ -191,6 +191,8 @@
     }
   },
   "reports": {
+    "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
+    "checkCredentials": "Check credentials",
     "availableReports": "Available reports",
     "failedToFetchReports": "Failed to fetch the list of available reports"
   },

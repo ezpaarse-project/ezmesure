@@ -69,7 +69,7 @@
     />
 
     <SushiHistory ref="sushiHistory" />
-    <ReportsDialog ref="reportsDialog" />
+    <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
 
     <v-data-table
       v-if="hasInstitution"
