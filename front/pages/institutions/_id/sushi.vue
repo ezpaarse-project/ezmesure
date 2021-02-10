@@ -82,26 +82,36 @@
       item-key="id"
     >
       <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          @click="editSushiItem(item)"
-        >
-          mdi-pencil
-        </v-icon>
+        <v-menu>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              small
+              color="primary"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ $t('actions') }}
+              <v-icon right>
+                mdi-menu-down
+              </v-icon>
+            </v-btn>
+          </template>
 
-        <v-icon
-          small
-          @click="showAvailableReports(item)"
-        >
-          mdi-file-search
-        </v-icon>
-
-        <v-icon
-          small
-          @click="showSushiItemHistory(item)"
-        >
-          mdi-history
-        </v-icon>
+          <v-list>
+            <v-list-item
+              v-for="action in itemActions"
+              :key="action.icon"
+              @click="action.callback(item)"
+            >
+              <v-list-item-icon>
+                <v-icon>{{ action.icon }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="action.label" />
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
     </v-data-table>
 
@@ -160,6 +170,7 @@ export default {
       selected: [],
       refreshing: false,
       search: '',
+      platforms,
       headers: [
         {
           text: app.i18n.t('institutions.sushi.platform'),
@@ -175,11 +186,10 @@ export default {
           text: 'Actions',
           value: 'actions',
           sortable: false,
-          width: '100px',
+          width: '150px',
           align: 'right',
         },
       ],
-      platforms,
     };
   },
   computed: {
@@ -198,6 +208,25 @@ export default {
       }
 
       return this.$t('institutions.sushi.title', { institutionName: this.institutionName });
+    },
+    itemActions() {
+      return [
+        {
+          icon: 'mdi-pencil',
+          label: this.$t('modify'),
+          callback: this.editSushiItem,
+        },
+        {
+          icon: 'mdi-file-search',
+          label: this.$t('reports.availableReports'),
+          callback: this.showAvailableReports,
+        },
+        {
+          icon: 'mdi-history',
+          label: this.$t('history'),
+          callback: this.showSushiItemHistory,
+        },
+      ];
     },
   },
   mounted() {
