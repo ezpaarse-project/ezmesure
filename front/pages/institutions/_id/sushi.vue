@@ -183,7 +183,7 @@ export default {
           width: '200px',
         },
         {
-          text: 'Actions',
+          text: '',
           value: 'actions',
           sortable: false,
           width: '150px',
