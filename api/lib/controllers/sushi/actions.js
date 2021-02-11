@@ -204,41 +204,26 @@ exports.getAvailableReports = async (ctx) => {
   }
 
   let reports;
+  let exceptions;
 
   try {
     const { data } = await sushiService.getAvailableReports(sushi);
     reports = data;
   } catch (e) {
-    const exceptions = sushiService.getExceptions(e && e.response && e.response.data);
-    const messages = exceptions.filter((exception) => exception.Message).map((exception) => {
-      const {
-        Code: code,
-        Severity: severity,
-        Message: msg,
-      } = exception;
+    exceptions = sushiService.getExceptions(e && e.response && e.response.data);
 
-      let message = severity ? `[${severity}] ` : '';
-      message += code ? `[#${code}] ` : '';
-      message += msg;
-      return message;
-    });
-
-    if (messages.length === 0) {
-      messages.push(e.message);
+    if (!Array.isArray(exceptions) || exceptions.length === 0) {
+      ctx.throw(502, e);
     }
-
-    ctx.status = 502;
-    ctx.body = {
-      exceptions: messages,
-    };
-    return;
   }
 
-  const exceptions = sushiService.getExceptions(reports);
+  if (!Array.isArray(exceptions) || exceptions.length === 0) {
+    exceptions = sushiService.getExceptions(reports);
+  }
 
   if (exceptions.length > 0) {
     ctx.status = 502;
-    ctx.body = { exceptions: exceptions.map((e) => e.Message) };
+    ctx.body = { exceptions };
     return;
   }
 
@@ -246,7 +231,6 @@ exports.getAvailableReports = async (ctx) => {
 
   if (!Array.isArray(reports) || !reports.every(isValidReport)) {
     ctx.throw(502, 'The Sushi endpoint responded with invalid data');
-    return;
   }
 
   ctx.status = 200;

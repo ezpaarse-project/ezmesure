@@ -34,7 +34,7 @@
 
           <ul>
             <li
-              v-for="(message, index) in exceptions"
+              v-for="(message, index) in exceptionStrings"
               :key="index"
               v-text="message"
             />
@@ -89,6 +89,20 @@ export default {
         },
       ];
     },
+    exceptionStrings() {
+      return this.exceptions.map((exception) => {
+        const {
+          Code: code,
+          Severity: severity,
+          Message: msg,
+        } = exception;
+
+        let message = severity ? `[${severity}] ` : '';
+        message += code ? `[#${code}] ` : '';
+        message += msg;
+        return message;
+      });
+    },
   },
   methods: {
     showReports(sushiData = {}) {
@@ -114,10 +128,14 @@ export default {
         this.reports = await this.$axios.$get(`/sushi/${this.sushi.id}/reports`);
       } catch (e) {
         const exceptions = e?.response?.data?.exceptions;
+        const error = e?.response?.data?.error;
 
         if (Array.isArray(exceptions)) {
           this.exceptions = exceptions;
+        } else if (typeof error === 'string') {
+          this.exceptions = [{ Message: error }];
         }
+
         this.$store.dispatch('snacks/error', this.$t('reports.failedToFetchReports'));
       }
 
