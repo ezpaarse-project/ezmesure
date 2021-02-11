@@ -213,6 +213,7 @@
   "reset": "Reset",
   "copy": "Copy",
   "modify": "Modify",
+  "duplicate": "Duplicate",
   "save": "Save",
   "search": "Search",
   "nSelected": "{count} selected",

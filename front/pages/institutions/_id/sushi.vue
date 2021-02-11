@@ -217,6 +217,11 @@ export default {
           callback: this.editSushiItem,
         },
         {
+          icon: 'mdi-content-copy',
+          label: this.$t('duplicate'),
+          callback: this.duplicateItem,
+        },
+        {
           icon: 'mdi-file-search',
           label: this.$t('reports.availableReports'),
           callback: this.showAvailableReports,
@@ -241,6 +246,9 @@ export default {
     },
     editSushiItem(item) {
       this.$refs.sushiForm.editSushiItem(this.institution, item);
+    },
+    duplicateItem(item) {
+      this.$refs.sushiForm.editSushiItem(this.institution, { ...item, id: undefined });
     },
     showSushiItemHistory(item) {
       this.$refs.sushiHistory.showSushiItem(item);
