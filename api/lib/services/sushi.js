@@ -199,17 +199,25 @@ function validateReport(report) {
   return { valid, errors };
 }
 
-function getExceptions(report) {
-  if (!report) { return []; }
+function getExceptions(sushiResponse) {
+  if (!sushiResponse) { return []; }
 
-  const header = report.Report_Header || {};
+  if (sushiResponse.Message) {
+    return [sushiResponse];
+  }
+
+  if (Array.isArray(sushiResponse) && sushiResponse.some((item) => (item && item.Message))) {
+    return sushiResponse;
+  }
+
+  const header = sushiResponse.Report_Header || {};
   const exceptions = Array.isArray(header.Exceptions) ? header.Exceptions : [];
 
   if (header.Exception) {
     exceptions.push(header.Exception);
   }
-  if (report.Exception) {
-    exceptions.push(report.Exception);
+  if (sushiResponse.Exception) {
+    exceptions.push(sushiResponse.Exception);
   }
 
   return exceptions;

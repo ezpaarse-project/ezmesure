@@ -209,23 +209,27 @@ exports.getAvailableReports = async (ctx) => {
     const { data } = await sushiService.getAvailableReports(sushi);
     reports = data;
   } catch (e) {
-    let { message } = e;
-    const data = (e && e.response && e.response.data) || {};
-    const {
-      Code: code,
-      Severity: severity,
-      Message: msg,
-    } = data;
+    const exceptions = sushiService.getExceptions(e && e.response && e.response.data);
+    const messages = exceptions.filter((exception) => exception.Message).map((exception) => {
+      const {
+        Code: code,
+        Severity: severity,
+        Message: msg,
+      } = exception;
 
-    if (msg) {
-      message = severity ? `[${severity}] ` : '';
+      let message = severity ? `[${severity}] ` : '';
       message += code ? `[#${code}] ` : '';
       message += msg;
+      return message;
+    });
+
+    if (messages.length === 0) {
+      messages.push(e.message);
     }
 
     ctx.status = 502;
     ctx.body = {
-      exceptions: [message],
+      exceptions: messages,
     };
     return;
   }
