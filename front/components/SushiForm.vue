@@ -30,7 +30,6 @@
             v-model="sushiForm.sushiUrl"
             :label="`${$t('institutions.sushi.sushiUrl')} *`"
             :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
-            :disabled="!canEditSushiUrl"
             outlined
             required
           />
@@ -164,7 +163,6 @@ export default {
       show: false,
       saving: false,
       institutionId: null,
-      canEditSushiUrl: false,
       valid: false,
       platform: {},
 
@@ -233,7 +231,6 @@ export default {
       this.platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor) || {};
 
       this.sushiForm.sushiUrl = this.platform?.sushiUrl || '';
-      this.canEditSushiUrl = !this.platform?.sushiUrl;
     },
 
     onVendorChange() {
