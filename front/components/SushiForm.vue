@@ -39,9 +39,9 @@
             <v-col cols="6">
               <v-text-field
                 v-model="sushiForm.requestorId"
-                :label="requestorIdLabel"
-                :rules="platform.requestorId ? [rules.requestorId] : []"
-                :required="platform.requestorId"
+                :label="$t('institutions.sushi.requestorId')"
+                :hint="platform.requestorId ? $t('institutions.sushi.necessaryField') : null"
+                :persistent-hint="platform.requestorId && !sushiForm.requestorId"
                 outlined
               />
             </v-col>
@@ -49,8 +49,9 @@
             <v-col cols="6">
               <v-text-field
                 v-model="sushiForm.customerId"
-                :label="customerIdLabel"
-                :rules="platform.customerId ? [rules.customerId] : []"
+                :label="$t('institutions.sushi.customerId')"
+                :hint="platform.customerId ? $t('institutions.sushi.necessaryField') : null"
+                :persistent-hint="platform.customerId && !sushiForm.customerId"
                 outlined
               />
             </v-col>
@@ -58,8 +59,9 @@
 
           <v-text-field
             v-model="sushiForm.apiKey"
-            :label="apiKeyLabel"
-            :rules="platform.apiKey ? [rules.apiKey] : []"
+            :label="$t('institutions.sushi.apiKey')"
+            :hint="platform.apiKey ? $t('institutions.sushi.necessaryField') : null"
+            :persistent-hint="platform.apiKey && !sushiForm.apiKey"
             outlined
           />
 
@@ -175,12 +177,6 @@ export default {
         comment: '',
         id: null,
         params: [],
-      },
-
-      rules: {
-        requestorId: v => !!v || this.$t('institutions.sushi.enterRequestorId'),
-        customerId: v => !!v || this.$t('institutions.sushi.enterCustomerId'),
-        apiKey: v => !!v || this.$t('institutions.sushi.enterAPIKey'),
       },
     };
   },

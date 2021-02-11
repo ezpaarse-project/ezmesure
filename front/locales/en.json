@@ -166,6 +166,7 @@
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "API key",
+      "necessaryField": "This field may be necessary",
       "enterLabel": "Please enter a label.",
       "enterPackage": "Please enter a package",
       "sushiUrl": "Sushi URL",
