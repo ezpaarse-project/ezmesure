@@ -226,6 +226,7 @@
   "itemsDeleted": "{count} élement(s) supprimé(s)",
   "update": "Mettre à jour",
   "create": "Créer",
+  "actions": "Actions",
   "administration": "Administration",
   "informationSubmitted": "Informations transmises",
   "invalidDate": "Date invalide"

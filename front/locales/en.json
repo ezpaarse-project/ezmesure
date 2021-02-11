@@ -226,6 +226,7 @@
   "itemsDeleted": "{count} element(s) deleted",
   "update": "Update",
   "create": "Create",
+  "actions": "Actions",
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
   "invalidDate": "Invalid date"
