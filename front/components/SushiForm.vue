@@ -1,7 +1,8 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title class="headline" v-text="sushiForm.vendor" />
+      <v-card-title v-if="sushiForm.id" class="headline" v-text="sushiForm.vendor" />
+      <v-card-title v-else class="headline" v-text="$t('institutions.sushi.addCredentials')" />
 
       <v-card-text>
         <v-form id="sushiForm" ref="form" v-model="valid" @submit.prevent="save">

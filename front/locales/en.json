@@ -158,6 +158,7 @@
     },
     "sushi": {
       "title": "Sushi credentials - {institutionName}",
+      "addCredentials": "Add credentials",
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
       "unableToRetriveSushiData": "Unable to retrieve sushi information",

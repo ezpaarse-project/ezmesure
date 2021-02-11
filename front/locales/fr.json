@@ -158,6 +158,7 @@
     },
     "sushi": {
       "title": "Identifiants Sushi - {institutionName}",
+      "addCredentials": "Ajouter des identifiants",
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
       "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
