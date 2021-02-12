@@ -6,7 +6,6 @@ const format = require('date-fns/format');
 
 const os = require('os');
 const config = require('config');
-const querystring = require('querystring');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs-extra');
