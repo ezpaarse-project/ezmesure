@@ -6,6 +6,7 @@ const format = require('date-fns/format');
 
 const os = require('os');
 const config = require('config');
+const querystring = require('querystring');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs-extra');
@@ -43,14 +44,23 @@ async function getAvailableReports(sushi) {
     requestorId,
     customerId,
     apiKey,
+    params: sushiParams,
   } = sushi.getData();
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
-  const params = typeof sushi.params === 'object' ? sushi.params : {};
+  const params = {};
 
   if (requestorId) { params.requestor_id = requestorId; }
   if (customerId) { params.customer_id = customerId; }
   if (apiKey) { params.api_key = apiKey; }
+
+  if (Array.isArray(sushiParams)) {
+    sushiParams.forEach((param) => {
+      if (param.name) {
+        params[param.name] = param.value;
+      }
+    });
+  }
 
   const response = await axios({
     method: 'get',
