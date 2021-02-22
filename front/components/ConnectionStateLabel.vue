@@ -62,9 +62,9 @@ export default {
     icon() {
       switch (this.state?.success) {
         case true:
-          return 'mdi-close-network-outline';
-        case false:
           return 'mdi-check-network-outline';
+        case false:
+          return 'mdi-close-network-outline';
         default:
           return 'mdi-help-network-outline';
       }
