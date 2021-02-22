@@ -78,6 +78,7 @@
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
+      :items-per-page="15"
       show-select
       item-key="id"
     >
