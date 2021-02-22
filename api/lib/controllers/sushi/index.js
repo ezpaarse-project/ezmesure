@@ -2,12 +2,30 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
+const { appLogger } = require('../../../server');
 const {
   requireJwt,
   requireUser,
   requireTermsOfUse,
   requireAnyRole,
 } = require('../../services/auth');
+
+function saveSushiConnectionState(ctx, next) {
+  return next().finally(() => {
+    const { sushiId } = ctx.params;
+    const success = ctx.status >= 200 && ctx.status < 400;
+
+
+    Sushi.setConnectionStateById(sushiId, { date: new Date(), success })
+      .then(() => {
+        appLogger.info(`Sushi ${sushiId}: connection state changed to ${success ? 'success' : 'failure'}`);
+      })
+      .catch((e) => {
+        appLogger.error('Failed to save sushi connection status');
+        appLogger.error(e);
+      });
+  });
+}
 
 const {
   getAll,
@@ -86,7 +104,7 @@ router.route({
 router.route({
   method: 'GET',
   path: '/:sushiId/reports',
-  handler: getAvailableReports,
+  handler: [saveSushiConnectionState, getAvailableReports],
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
