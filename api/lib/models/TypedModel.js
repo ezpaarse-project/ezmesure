@@ -105,6 +105,18 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     });
   }
 
+  static async updateById(rawId, doc = {}) {
+    const id = TypedModel.generateId(rawId);
+
+    return elastic.update({
+      index,
+      id,
+      body: { doc },
+    }, {
+      ignore: [404],
+    });
+  }
+
   static async findById(rawId) {
     const id = TypedModel.generateId(rawId);
     const { body, statusCode } = await elastic.getSource({ index, id }, { ignore: [404] });
