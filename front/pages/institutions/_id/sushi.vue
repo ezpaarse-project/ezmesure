@@ -82,6 +82,10 @@
       show-select
       item-key="id"
     >
+      <template v-slot:item.connectionState="{ item }">
+        <ConnectionStateLabel :state="item.connectionState" />
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <v-menu>
           <template v-slot:activator="{ on, attrs }">
@@ -130,6 +134,7 @@ import ToolBar from '~/components/space/ToolBar';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
+import ConnectionStateLabel from '~/components/ConnectionStateLabel';
 
 export default {
   layout: 'space',
@@ -139,6 +144,7 @@ export default {
     SushiForm,
     SushiHistory,
     ReportsDialog,
+    ConnectionStateLabel,
   },
   async asyncData({
     $axios,
@@ -172,14 +178,24 @@ export default {
       refreshing: false,
       search: '',
       platforms,
-      headers: [
+    };
+  },
+  computed: {
+    headers() {
+      return [
         {
-          text: app.i18n.t('institutions.sushi.platform'),
+          text: this.$t('institutions.sushi.platform'),
           value: 'vendor',
         },
         {
-          text: app.i18n.t('institutions.sushi.package'),
+          text: this.$t('institutions.sushi.package'),
           value: 'package',
+          align: 'right',
+          width: '200px',
+        },
+        {
+          text: this.$t('sushi.connection.state'),
+          value: 'connectionState',
           align: 'right',
           width: '200px',
         },
@@ -190,10 +206,8 @@ export default {
           width: '150px',
           align: 'right',
         },
-      ],
-    };
-  },
-  computed: {
+      ];
+    },
     hasInstitution() {
       return !!this.institution?.id;
     },

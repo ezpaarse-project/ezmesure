@@ -192,6 +192,15 @@
       "error": "Error"
     }
   },
+  "sushi": {
+    "connection": {
+      "state": "Connection state",
+      "lastConnection": "Last connection",
+      "operational": "Operational",
+      "failed": "Failed",
+      "untested": "Untested"
+    }
+  },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
     "checkCredentials": "Check credentials",
