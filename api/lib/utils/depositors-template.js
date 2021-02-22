@@ -57,6 +57,12 @@ module.exports = {
           customerId: { type: 'keyword' },
           apiKey: { type: 'keyword' },
           comment: { type: 'keyword' },
+          connectionState: {
+            properties: {
+              date: { type: 'date' },
+              success: { type: 'boolean' },
+            },
+          },
         },
       },
 

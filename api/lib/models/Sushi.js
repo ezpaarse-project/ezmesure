@@ -23,6 +23,11 @@ const schema = {
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
 
+  connectionState: Joi.object({
+    date: Joi.date(),
+    success: Joi.boolean(),
+  }),
+
   params: Joi.array().items(Joi.object({
     name: Joi.string().trim().required(),
     value: Joi.string().trim().allow(''),
@@ -42,12 +47,6 @@ const updateSchema = {
 };
 
 class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
-  toJSON() {
-    const sushiItem = { id: this.id, ...this.data };
-
-    return sushiItem;
-  }
-
   static async findByInstitutionId(institutionId) {
     return this.findAll({
       filters: [
@@ -75,6 +74,19 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
       filters: [
         { term: { [`${type}.institutionId`]: institutionId } },
       ],
+    });
+  }
+
+  static setConnectionStateById(sushiId, value = {}) {
+    const { date, success } = value;
+
+    return this.updateById(sushiId, {
+      [type]: {
+        connectionState: {
+          date: date || new Date(),
+          success: !!success,
+        },
+      },
     });
   }
 
