@@ -63,6 +63,12 @@ module.exports = {
               success: { type: 'boolean' },
             },
           },
+          params: {
+            properties: {
+              name: { type: 'keyword' },
+              value: { type: 'keyword' },
+            },
+          },
         },
       },
 
