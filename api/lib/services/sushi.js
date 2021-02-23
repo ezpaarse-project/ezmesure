@@ -81,24 +81,46 @@ async function getAvailableReports(sushi) {
   return response;
 }
 
-async function getReport(endpointUrl, opts) {
-  if (typeof endpointUrl !== 'string') {
-    throw new TypeError('baseUrl should be a string');
-  }
-
-  const baseUrl = endpointUrl.trim().replace(/\/+$/, '');
-
+async function getReport(sushi, opts = {}) {
   const options = opts || {};
-  const params = typeof options.params === 'object' ? options.params : {};
 
-  if (options.requestorId) { params.requestor_id = options.requestorId; }
-  if (options.customerId) { params.customer_id = options.customerId; }
-  if (options.apiKey) { params.api_key = options.apiKey; }
+  const {
+    sushiUrl,
+    requestorId,
+    customerId,
+    apiKey,
+    params: sushiParams,
+  } = sushi.getData();
 
-  if (options.beginDate && options.endDate) {
-    params.begin_date = options.beginDate;
-    params.end_date = options.endDate;
+  const {
+    beginDate,
+    endDate,
+    stream,
+  } = options;
+
+  if (!sushiUrl) {
+    throw new Error('sushiUrl not set');
   }
+
+  const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
+  const params = {};
+
+  if (Array.isArray(sushiParams)) {
+    sushiParams.forEach((param) => {
+      if (param) {
+        params[param.name] = param.value;
+      }
+    });
+  }
+
+  if (requestorId) { params.requestor_id = requestorId; }
+  if (customerId) { params.customer_id = customerId; }
+  if (apiKey) { params.api_key = apiKey; }
+
+  const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+
+  params.begin_date = beginDate || endDate || prevMonth;
+  params.end_date = endDate || beginDate || prevMonth;
 
   params.Attributes_To_Show = 'Access_Type|Access_Method|Section_Type|Data_Type|YOP';
   params.Access_Type = 'Controlled|OA_Gold';
@@ -107,7 +129,7 @@ async function getReport(endpointUrl, opts) {
   return axios({
     method: 'get',
     url: `${baseUrl}/reports/tr`,
-    responseType: options.stream ? 'stream' : 'json',
+    responseType: stream ? 'stream' : 'json',
     params,
   });
 }
@@ -146,7 +168,7 @@ async function downloadReport(options = {}) {
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
 
-  const response = await sushi.getReport({ ...options, stream: true });
+  const response = await getReport(sushi, { ...options, stream: true });
 
   // TODO: handle "try again later" and timeouts
 
@@ -524,19 +546,7 @@ async function initSushiImport(opts = {}) {
   const {
     sushi,
     institution,
-    beginDate,
-    endDate,
   } = options;
-
-  if (!beginDate && !endDate) {
-    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
-    options.beginDate = prevMonth;
-    options.endDate = prevMonth;
-  } else if (beginDate) {
-    options.endDate = beginDate;
-  } else {
-    options.beginDate = endDate;
-  }
 
   const task = new Task({
     status: 'running',

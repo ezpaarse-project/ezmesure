@@ -1,8 +1,5 @@
 const { Joi } = require('koa-joi-router');
-const format = require('date-fns/format');
-const subMonths = require('date-fns/subMonths');
 const encrypter = require('../services/encrypter');
-const sushiService = require('../services/sushi');
 const { typedModel, registerModel, getModel } = require('./TypedModel');
 
 const type = 'sushi';
@@ -113,31 +110,6 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
     });
 
     return savedData;
-  }
-
-  getReport(options) {
-    if (!this.data.sushiUrl) {
-      throw new Error('sushiUrl not set');
-    }
-
-    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
-
-    const params = {};
-    if (Array.isArray(this.data.params)) {
-      this.data.params.forEach((param) => {
-        if (param) { params[param.name] = param.value; }
-      });
-    }
-
-    return sushiService.getReport(this.data.sushiUrl, {
-      requestorId: this.data.requestorId,
-      customerId: this.data.customerId,
-      apiKey: this.data.apiKey,
-      beginDate: prevMonth,
-      endDate: prevMonth,
-      params,
-      stream: options && options.stream,
-    });
   }
 }
 
