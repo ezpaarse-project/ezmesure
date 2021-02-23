@@ -86,6 +86,10 @@
         <ConnectionStateLabel :state="item.connectionState" />
       </template>
 
+      <template v-slot:item.connectionState.date="{ item }">
+        <LocalDate v-if="item.connectionState" :date="item.connectionState.date" />
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <v-menu>
           <template v-slot:activator="{ on, attrs }">
@@ -135,6 +139,7 @@ import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
 import ConnectionStateLabel from '~/components/ConnectionStateLabel';
+import LocalDate from '~/components/LocalDate';
 
 export default {
   layout: 'space',
@@ -145,6 +150,7 @@ export default {
     SushiHistory,
     ReportsDialog,
     ConnectionStateLabel,
+    LocalDate,
   },
   async asyncData({
     $axios,
@@ -198,6 +204,18 @@ export default {
           value: 'connectionState',
           align: 'right',
           width: '200px',
+          sort: (a, b) => {
+            if (a?.success === b?.success) { return 0; }
+            if (a?.success === true) { return 1; }
+            if (b?.success === true) { return -1; }
+            return (a?.success === false) ? 1 : -1;
+          },
+        },
+        {
+          text: this.$t('sushi.connection.lastConnection'),
+          value: 'connectionState.date',
+          align: 'right',
+          width: '220px',
         },
         {
           text: '',
