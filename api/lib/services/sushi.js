@@ -510,6 +510,9 @@ async function importSushiReport(options = {}) {
   }
 
   task.log('info', 'Sushi harvesting terminated');
+  task.log('info', `Inserted items: ${response.inserted}`);
+  task.log('info', `Updated items: ${response.updated}`);
+  task.log('info', `Failed insertions: ${response.failed}`);
   task.setResult(response);
   task.done();
   await saveTask();
