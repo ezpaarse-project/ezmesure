@@ -275,6 +275,8 @@ async function importSushiReport(options = {}) {
     });
   }
 
+  task.newStep('download');
+
   try {
     report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
   } catch (e) {
@@ -321,6 +323,8 @@ async function importSushiReport(options = {}) {
     }
   }
 
+  task.endStep('download');
+  task.newStep('validation');
   task.log('info', 'Validating COUNTER report');
   await saveTask();
 
@@ -343,6 +347,8 @@ async function importSushiReport(options = {}) {
   }
 
   task.log('info', `Importing report into '${index}'`);
+  task.endStep('validation');
+  task.newStep('import');
   await saveTask();
 
   let indexExists;
@@ -535,6 +541,7 @@ async function importSushiReport(options = {}) {
   task.log('info', `Inserted items: ${response.inserted}`);
   task.log('info', `Updated items: ${response.updated}`);
   task.log('info', `Failed insertions: ${response.failed}`);
+  task.endStep('import');
   task.setResult(response);
   task.done();
   await saveTask();
