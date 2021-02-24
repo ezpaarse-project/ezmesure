@@ -261,7 +261,7 @@ export default {
         },
         {
           icon: 'mdi-history',
-          label: this.$t('history'),
+          label: this.$t('tasks.history'),
           callback: this.showSushiItemHistory,
         },
       ];

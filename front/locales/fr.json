@@ -186,6 +186,7 @@
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
+    "history": "Historique des tâches",
     "status": {
       "pending": "En attente",
       "running": "En cours",
@@ -225,7 +226,6 @@
   "status": "Statut",
   "date": "Date",
   "duration": "Durée",
-  "history": "Historique",
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",

@@ -186,6 +186,7 @@
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
+    "history": "Tasks history",
     "status": {
       "pending": "Pending",
       "running": "Running",
@@ -225,7 +226,6 @@
   "status": "Status",
   "date": "Date",
   "duration": "Duration",
-  "history": "History",
   "language": "Language",
   "refresh": "Refresh",
   "delete": "Remove",
