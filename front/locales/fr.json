@@ -185,11 +185,22 @@
   },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
+    "logs": "Logs",
     "status": {
       "pending": "En attente",
       "running": "En cours",
       "finished": "Terminé",
       "error": "Erreur"
+    },
+    "steps": {
+      "title": "Étapes",
+      "startedOn": "Démarrée le {date}",
+      "terminatedIn": "Terminée en {duration}",
+      "labels": {
+        "download": "Téléchargement du rapport",
+        "validation": "Validation du rapport",
+        "import": "Importation dans Elasticsearch"
+      }
     }
   },
   "sushi": {
@@ -213,6 +224,7 @@
   "value": "Valeur",
   "status": "Statut",
   "date": "Date",
+  "duration": "Durée",
   "history": "Historique",
   "language": "Langue",
   "refresh": "Actualiser",

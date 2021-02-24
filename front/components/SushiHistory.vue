@@ -37,8 +37,28 @@
         </template>
 
         <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length" class="pa-0">
-            <Logs flat :logs="item.logs" />
+          <td :colspan="headers.length">
+            <v-timeline align-top dense>
+              <template v-if="item.steps">
+                <v-timeline-item hide-dot>
+                  <div class="subtitle-1" v-text="$t('tasks.steps.title')" />
+                </v-timeline-item>
+
+                <StepTimelineItem
+                  v-for="(step, index) in item.steps"
+                  :key="index"
+                  :step="step"
+                />
+              </template>
+
+              <v-timeline-item hide-dot>
+                <div class="subtitle-1" v-text="$t('tasks.logs')" />
+              </v-timeline-item>
+
+              <v-timeline-item hide-dot class="mb-4">
+                <Logs :logs="item.logs" />
+              </v-timeline-item>
+            </v-timeline>
           </td>
         </template>
       </v-data-table>
@@ -61,12 +81,14 @@ import Logs from '~/components/Logs';
 import TaskLabel from '~/components/TaskLabel';
 import LocalDate from '~/components/LocalDate';
 import LocalDuration from '~/components/LocalDuration';
+import StepTimelineItem from '~/components/StepTimelineItem';
 
 export default {
   components: {
     Logs,
     TaskLabel,
     LocalDate,
+    StepTimelineItem,
     LocalDuration,
   },
   data() {

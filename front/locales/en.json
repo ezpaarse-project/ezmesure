@@ -185,11 +185,22 @@
   },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
+    "logs": "Logs",
     "status": {
       "pending": "Pending",
       "running": "Running",
       "finished": "Finished",
       "error": "Error"
+    },
+    "steps": {
+      "title": "Steps",
+      "startedOn": "Started on {date}",
+      "terminatedIn": "Terminated in {duration}",
+      "labels": {
+        "download": "Report download",
+        "validation": "Report validation",
+        "import": "Import in Elasticsearch"
+      }
     }
   },
   "sushi": {
@@ -213,6 +224,7 @@
   "value": "Value",
   "status": "Status",
   "date": "Date",
+  "duration": "Duration",
   "history": "History",
   "language": "Language",
   "refresh": "Refresh",
