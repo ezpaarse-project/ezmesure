@@ -264,6 +264,11 @@ export default {
           label: this.$t('tasks.history'),
           callback: this.showSushiItemHistory,
         },
+        {
+          icon: 'mdi-identifier',
+          label: this.$t('sushi.copyId'),
+          callback: this.copySushiId,
+        },
       ];
     },
   },
@@ -271,6 +276,21 @@ export default {
     return this.refreshSushiItems();
   },
   methods: {
+    async copySushiId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('sushi.unableToCopyId'));
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(item.id);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('sushi.unableToCopyId'));
+        return;
+      }
+
+      this.$store.dispatch('snacks/info', this.$t('sushi.idCopied'));
+    },
     showAvailableReports(item) {
       this.$refs.reportsDialog.showReports(item);
     },

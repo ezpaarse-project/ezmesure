@@ -205,6 +205,9 @@
     }
   },
   "sushi": {
+    "copyId": "Copier l'ID",
+    "unableToCopyId": "Impossible de copier dans le presse-papier",
+    "idCopied": "ID copié dans le presse-papier",
     "connection": {
       "state": "État de la connexion",
       "lastConnection": "Dernière connexion",

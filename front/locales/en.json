@@ -205,6 +205,9 @@
     }
   },
   "sushi": {
+    "copyId": "Copy ID",
+    "unableToCopyId": "Unable to copy in the clipboard",
+    "idCopied": "ID copied in the clipboard",
     "connection": {
       "state": "Connection state",
       "lastConnection": "Last connection",
