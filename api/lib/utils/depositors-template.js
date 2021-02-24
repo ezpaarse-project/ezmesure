@@ -88,6 +88,14 @@ module.exports = {
               message: { type: 'keyword' },
             },
           },
+          steps: {
+            properties: {
+              label: { type: 'keyword' },
+              status: { type: 'keyword' },
+              startTime: { type: 'date' },
+              took: { type: 'long' },
+            },
+          },
           result: {
             type: 'object',
           },
