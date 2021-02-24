@@ -19,6 +19,13 @@ const schema = {
     message: Joi.string().trim(),
   })),
 
+  steps: Joi.array().items(Joi.object({
+    label: Joi.string().trim(),
+    status: Joi.string().trim(),
+    startTime: Joi.date(),
+    took: Joi.number(),
+  })),
+
   result: Joi.object(),
 };
 
@@ -94,6 +101,40 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     this.data.result = result;
   }
 
+  newStep(label) {
+    if (!Array.isArray(this.data.steps)) {
+      this.data.steps = [];
+    }
+
+    this.data.steps.push({
+      label,
+      startTime: new Date(),
+      status: 'running',
+      took: 0,
+    });
+  }
+
+  endStep(label, opts = {}) {
+    if (!Array.isArray(this.data.steps)) { return; }
+
+    const step = this.data.steps.find((s) => s.label === label);
+    if (!step) { return; }
+
+    const { success = true } = opts;
+    step.took = Date.now() - step.startTime;
+    step.status = success ? 'finished' : 'failed';
+  }
+
+  endRunningSteps(opts = {}) {
+    if (!Array.isArray(this.data.steps)) { return; }
+
+    this.data.steps
+      .filter((step) => step.status === 'running')
+      .forEach((step) => {
+        this.endStep(step.label, opts);
+      });
+  }
+
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();
@@ -113,6 +154,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     }
 
     this.updateRunningTime();
+    this.endRunningSteps({ success: false });
   }
 
   log(logType, message) {
