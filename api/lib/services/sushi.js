@@ -270,7 +270,14 @@ async function importSushiReport(options = {}) {
 
   function saveTask() {
     return task.save().catch((err) => {
-      appLogger.error('Failed to save sushi task');
+      appLogger.error(`Failed to save sushi task ${task.getId()}`);
+      appLogger.error(err.message);
+    });
+  }
+
+  function deleteReportFile() {
+    return fs.unlink(reportPath).catch((err) => {
+      appLogger.error(`Failed to delete report file ${reportPath}`);
       appLogger.error(err.message);
     });
   }
@@ -288,7 +295,7 @@ async function importSushiReport(options = {}) {
   }
 
   if (report) {
-    task.log('info', 'Found local COUNTER report');
+    task.log('info', 'Found a local COUNTER report file');
   } else {
     try {
       await new Promise((resolve, reject) => {
@@ -311,6 +318,7 @@ async function importSushiReport(options = {}) {
     } catch (e) {
       task.fail(['Failed to download the COUNTER report', e.message]);
       saveTask();
+      deleteReportFile();
       return;
     }
 
@@ -319,6 +327,7 @@ async function importSushiReport(options = {}) {
     } catch (e) {
       task.fail(['Fail to read downloaded report file', e.message]);
       saveTask();
+      deleteReportFile();
       return;
     }
   }
@@ -334,6 +343,7 @@ async function importSushiReport(options = {}) {
     const errorMessages = exceptions.map((e) => e.Message);
 
     task.fail(['Sushi endpoint returned exceptions', ...errorMessages]);
+    deleteReportFile();
     saveTask();
     return;
   }
@@ -342,6 +352,7 @@ async function importSushiReport(options = {}) {
 
   if (!valid) {
     task.fail(['The report is not valid', ...errors]);
+    deleteReportFile();
     saveTask();
     return;
   }
