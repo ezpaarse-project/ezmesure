@@ -28,6 +28,10 @@
           <LocalDate :date="item.createdAt" />
         </template>
 
+        <template v-slot:item.runningTime="{ item }">
+          <LocalDuration :ms="item.runningTime" />
+        </template>
+
         <template v-slot:item.status="{ item }">
           <TaskLabel :status="item.status" />
         </template>
@@ -56,12 +60,14 @@
 import Logs from '~/components/Logs';
 import TaskLabel from '~/components/TaskLabel';
 import LocalDate from '~/components/LocalDate';
+import LocalDuration from '~/components/LocalDuration';
 
 export default {
   components: {
     Logs,
     TaskLabel,
     LocalDate,
+    LocalDuration,
   },
   data() {
     return {
@@ -84,7 +90,13 @@ export default {
           align: 'left',
           text: this.$t('date'),
           value: 'createdAt',
-        }, {
+        },
+        {
+          align: 'left',
+          text: this.$t('duration'),
+          value: 'runningTime',
+        },
+        {
           align: 'left',
           text: this.$t('status'),
           value: 'status',
