@@ -15,7 +15,9 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
   },
-  plugins: [],
+  plugins: [
+    { src: '~/plugins/dates.js' },
+  ],
   css: [
     'swagger-ui/dist/swagger-ui.css',
     '~/assets/css/custom.scss',
