@@ -2,7 +2,12 @@
   <v-dialog v-model="show" width="800">
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
-        <v-toolbar-title v-text="$t('history')" />
+        <v-toolbar-title>
+          {{ $t('tasks.history') }}
+          <div class="caption">
+            {{ sushiVendor }} - {{ sushiPackage }}
+          </div>
+        </v-toolbar-title>
 
         <v-spacer />
 
