@@ -146,6 +146,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();
+    this.emit('finish');
   }
 
   updateRunningTime() {
@@ -163,6 +164,21 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
 
     this.updateRunningTime();
     this.endRunningSteps({ success: false });
+    this.emit('finish');
+  }
+
+  on(eventName, callback) {
+    if (typeof eventName !== 'string' || typeof callback !== 'function') { return; }
+    if (!this.listeners) { this.listeners = new Map(); }
+    this.listeners.set(eventName, callback);
+  }
+
+  emit(eventName, ...args) {
+    if (typeof eventName !== 'string' || !this.listeners) { return; }
+    const listener = this.listeners.get(eventName);
+    if (typeof listener === 'function') {
+      listener(...args);
+    }
   }
 
   log(logType, message) {
