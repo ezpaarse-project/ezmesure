@@ -11,6 +11,12 @@ const path = require('path');
 const fs = require('fs-extra');
 const EventEmitter = require('events');
 
+// Workaround because axios fails make HTTP requests over a HTTPS proxy
+// https://github.com/axios/axios/issues/3459
+const HttpsProxyAgent = require('https-proxy-agent');
+
+const httpsAgent = process.env.https_proxy && new HttpsProxyAgent(process.env.https_proxy);
+
 const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats').default;
 const definitions = require('../utils/sushi-definitions.json');
@@ -66,6 +72,8 @@ async function getAvailableReports(sushi) {
     url: `${baseUrl}/reports`,
     responseType: 'json',
     params,
+    httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
+    proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
   });
 
   if (!response) {
@@ -131,6 +139,8 @@ async function getReport(sushi, opts = {}) {
     url: `${baseUrl}/reports/tr`,
     responseType: stream ? 'stream' : 'json',
     params,
+    httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
+    proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
   });
 }
 
