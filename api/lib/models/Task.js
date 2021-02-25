@@ -101,6 +101,11 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     this.data.result = result;
   }
 
+  getStep(label) {
+    if (!Array.isArray(this.data.steps)) { return null; }
+    return this.data.steps.find((s) => s.label === label);
+  }
+
   newStep(label) {
     if (!Array.isArray(this.data.steps)) {
       this.data.steps = [];
@@ -115,9 +120,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   endStep(label, opts = {}) {
-    if (!Array.isArray(this.data.steps)) { return; }
-
-    const step = this.data.steps.find((s) => s.label === label);
+    const step = this.getStep(label);
     if (!step) { return; }
 
     const { success = true } = opts;
@@ -133,6 +136,11 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
       .forEach((step) => {
         this.endStep(step.label, opts);
       });
+  }
+
+  hasCompletedStep(label) {
+    const step = this.getStep(label);
+    return !!(step && step.status === 'finished');
   }
 
   done() {
