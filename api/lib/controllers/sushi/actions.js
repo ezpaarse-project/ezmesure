@@ -356,6 +356,21 @@ exports.importSushi = async (ctx) => {
     endDate,
   });
 
+  task.on('finish', () => {
+    const validationStep = task.getStep('validation') || {};
+    const date = validationStep.startTime || new Date();
+    const success = validationStep.status === 'finished';
+
+    Sushi.setConnectionStateById(sushiId, { date, success })
+      .then(() => {
+        appLogger.info(`Sushi ${sushiId}: connection state changed to ${success ? 'success' : 'failure'}`);
+      })
+      .catch((e) => {
+        appLogger.error('Failed to save sushi connection status');
+        appLogger.error(e);
+      });
+  });
+
   ctx.type = 'json';
   ctx.body = task;
 };
