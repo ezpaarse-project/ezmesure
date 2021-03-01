@@ -68,7 +68,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   static deleteByInstitutionId(institutionId) {
-    this.deleteByQuery({
+    return this.deleteByQuery({
       filters: [
         { term: { [`${type}.institutionId`]: institutionId } },
       ],
@@ -76,7 +76,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   static deleteBySushiId(sushiId) {
-    this.deleteByQuery({
+    return this.deleteByQuery({
       filters: [
         { term: { [`${type}.sushiId`]: sushiId } },
       ],
