@@ -29,10 +29,18 @@ notifications.start(appLogger);
 depositors.start(appLogger);
 
 // Change the status of tasks that was running when the server went down
-Task.interruptRunningTasks().catch((err) => {
-  appLogger.error('Failed to change status of interrupted tasks');
-  appLogger.error(err.message);
-});
+Task.interruptRunningTasks()
+  .then(({ body = {} }) => {
+    const { updated } = body;
+    if (Number.isInteger(updated) && updated > 0) {
+      appLogger.info(`${updated} running task(s) was marked as interrupted`);
+    } else {
+      appLogger.info('No running tasks were found');
+    }
+  }).catch((err) => {
+    appLogger.error('Failed to change status of interrupted tasks');
+    appLogger.error(err.message);
+  });
 
 const controller = require('./lib/controllers');
 
