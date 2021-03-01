@@ -105,6 +105,29 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     });
   }
 
+  static updateByQuery(opt = {}) {
+    const { script, params } = opt || {};
+    if (!script) { return Promise.resolve(); }
+
+    let filter = [{ term: { type } }];
+
+    if (Array.isArray(opt.filters)) {
+      filter = [...filter, ...opt.filters];
+    }
+
+    return elastic.updateByQuery({
+      index,
+      refresh: true,
+      body: {
+        query: {
+          bool: { filter },
+        },
+        script,
+        params,
+      },
+    });
+  }
+
   static async updateById(rawId, doc = {}) {
     const id = TypedModel.generateId(rawId);
 
