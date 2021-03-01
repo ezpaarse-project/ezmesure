@@ -18,6 +18,7 @@ const colors = new Map([
   ['running', 'blue'],
   ['finished', 'green'],
   ['error', 'red'],
+  ['interrupted', 'red'],
 ]);
 
 const icons = new Map([
@@ -25,6 +26,7 @@ const icons = new Map([
   ['running', 'mdi-play'],
   ['finished', 'mdi-check'],
   ['error', 'mdi-alert-circle-outline'],
+  ['interrupted', 'mdi-progress-close'],
 ]);
 
 export default {

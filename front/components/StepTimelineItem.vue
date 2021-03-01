@@ -21,12 +21,14 @@ const statusColors = new Map([
   ['running', 'blue'],
   ['finished', 'green'],
   ['failed', 'red'],
+  ['interrupted', 'red'],
 ]);
 
 const statusIcons = new Map([
   ['running', 'mdi-play'],
   ['finished', 'mdi-check'],
-  ['failed', 'mdi-alert-circle-outline'],
+  ['failed', 'mdi-close'],
+  ['interrupted', 'mdi-close'],
 ]);
 
 export default {
