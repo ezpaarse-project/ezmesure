@@ -83,6 +83,25 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     });
   }
 
+  static interruptRunningTasks() {
+    return this.updateByQuery({
+      filters: [
+        { term: { [`${type}.status`]: 'running' } },
+      ],
+      script: `
+        ctx._source.${type}.status = 'interrupted';
+
+        if (ctx._source.${type}.steps instanceof List) {
+          for(step in ctx._source.${type}.steps) {
+            if (step.status == 'running') {
+              step.status = 'interrupted';
+            }
+          }
+        }
+      `,
+    });
+  }
+
   getSushi() {
     if (!this.data.sushiId) { return null; }
     return getModel('sushi').findById(this.data.sushiId);
