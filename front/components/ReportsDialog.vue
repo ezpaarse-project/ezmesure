@@ -2,7 +2,12 @@
   <v-dialog v-model="show" width="800">
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
-        <v-toolbar-title v-text="$t('reports.availableReports')" />
+        <v-toolbar-title>
+          {{ $t('reports.availableReports') }}
+          <div class="caption">
+            {{ sushiVendor }} - {{ sushiPackage }}
+          </div>
+        </v-toolbar-title>
 
         <v-spacer />
 
@@ -76,6 +81,8 @@ export default {
   computed: {
     hasSushiItem() { return !!this.sushi?.id; },
     hasExceptions() { return this.exceptions.length > 0; },
+    sushiVendor() { return this.sushi?.vendor; },
+    sushiPackage() { return this.sushi?.package; },
     headers() {
       return [
         {
