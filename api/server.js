@@ -10,6 +10,7 @@ const metrics = require('./lib/services/metrics');
 const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
 const depositors = require('./lib/services/depositors');
+const Task = require('./lib/models/Task');
 
 const appLogger = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
@@ -26,6 +27,12 @@ if (mailSender) {
 
 notifications.start(appLogger);
 depositors.start(appLogger);
+
+// Change the status of tasks that was running when the server went down
+Task.interruptRunningTasks().catch((err) => {
+  appLogger.error('Failed to change status of interrupted tasks');
+  appLogger.error(err.message);
+});
 
 const controller = require('./lib/controllers');
 
