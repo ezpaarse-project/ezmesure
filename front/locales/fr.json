@@ -177,7 +177,8 @@
       "enterAPIKey": "Veuillez saisir une Clé API.",
       "comment": "Commentaire",
       "credentials": "Identifiants Sushi",
-      "pleaseEnterParams": "Si les requêtes vers l'endpoint Sushi nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous."
+      "pleaseEnterParams": "Si les requêtes vers l'endpoint Sushi nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
+      "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",

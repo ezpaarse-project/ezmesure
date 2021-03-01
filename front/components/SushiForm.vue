@@ -35,6 +35,17 @@
             required
           />
 
+          <v-alert
+            :value="looksLikeSoapUrl"
+            dense
+            outlined
+            type="warning"
+            icon="mdi-alert-outline"
+            transition="scale-transition"
+          >
+            {{ $t('institutions.sushi.soapWarning') }}
+          </v-alert>
+
           <v-row>
             <v-col cols="6">
               <v-text-field
@@ -194,6 +205,10 @@ export default {
     },
     apiKeyLabel() {
       return `${this.$t('institutions.sushi.apiKey')} ${this.platform?.apiKey ? '*' : ''}`;
+    },
+    looksLikeSoapUrl() {
+      if (typeof this.sushiForm?.sushiUrl !== 'string') { return false; }
+      return this.sushiForm?.sushiUrl.toLowerCase().includes('soap');
     },
   },
   methods: {
