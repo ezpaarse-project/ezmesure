@@ -190,7 +190,7 @@ exports.getAvailableReports = async (ctx) => {
     return;
   }
 
-  const institution = sushi.getInstitution();
+  const institution = await sushi.getInstitution();
 
   if (!isAdmin(user)) {
     if (!institution || !institution.isContact(user)) {
