@@ -15,6 +15,7 @@ function saveSushiConnectionState(ctx, next) {
     const { sushiId } = ctx.params;
     const success = ctx.status >= 200 && ctx.status < 400;
 
+    if (!success && ctx.status !== 502) { return; }
 
     Sushi.setConnectionStateById(sushiId, { date: new Date(), success })
       .then(() => {
