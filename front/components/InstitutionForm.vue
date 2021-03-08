@@ -7,175 +7,183 @@
 
       <v-card-text>
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-container class="pa-0">
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.name"
-                  :label="$t('institutions.institution.title')"
-                  hide-details
-                />
-              </v-col>
+          <v-row>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.name"
+                :label="$t('institutions.institution.title')"
+                hide-details
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.acronym"
-                  :label="$t('institutions.institution.acronym')"
-                  hide-details
-                />
-              </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.acronym"
+                :label="$t('institutions.institution.acronym')"
+                hide-details
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.website"
-                  :label="$t('institutions.institution.homepage')"
-                  hide-details
-                />
-              </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.website"
+                :label="$t('institutions.institution.homepage')"
+                hide-details
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.city"
-                  :label="$t('institutions.institution.city')"
-                  hide-details
-                />
-              </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.city"
+                :label="$t('institutions.institution.city')"
+                hide-details
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.type"
-                  :label="$t('institutions.institution.type')"
-                  hide-details
-                />
-              </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.type"
+                :label="$t('institutions.institution.type')"
+                hide-details
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="institution.uai"
-                  :label="$t('institutions.institution.uai')"
-                  :hint="$t('institutions.institution.uaiDescription')"
-                  persistent-hint
-                />
-              </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.uai"
+                :label="$t('institutions.institution.uai')"
+                :hint="$t('institutions.institution.uaiDescription')"
+                persistent-hint
+                outlined
+              />
+            </v-col>
 
-              <v-col cols="12" sm="12">
-                <v-combobox
-                  v-model="institution.domains"
-                  :label="$t('institutions.institution.domains')"
-                  multiple
-                  small-chips
-                  hide-details
-                />
-              </v-col>
+            <v-col cols="12" sm="12">
+              <v-combobox
+                v-model="institution.domains"
+                :label="$t('institutions.institution.domains')"
+                outlined
+                multiple
+                small-chips
+                hide-details
+              />
+            </v-col>
 
-              <v-col cols="12">
-                <v-hover v-model="hoverLogo" class="mx-auto">
-                  <template v-slot:default="{ hover }">
-                    <v-card
+            <v-col cols="12">
+              <v-hover v-model="hoverLogo" class="mx-auto">
+                <template v-slot:default="{ hover }">
+                  <v-card
+                    width="320"
+                    @dragover.prevent="onDragOver"
+                    @dragleave.prevent="onDragLeave"
+                    @drop.prevent="onFileDrop"
+                  >
+                    <v-img
+                      contain
+                      :src="logoSrc"
                       width="320"
-                      @dragover.prevent="onDragOver"
-                      @dragleave.prevent="onDragLeave"
-                      @drop.prevent="onFileDrop"
+                      height="100"
+                    />
+
+                    <v-card-text class="text-center">
+                      Logo (ratio 3:1)
+                    </v-card-text>
+
+                    <input
+                      ref="logo"
+                      type="file"
+                      accept="image/*"
+                      class="d-none"
+                      @change="onLogoChange"
                     >
-                      <v-img
-                        contain
-                        :src="logoSrc"
-                        width="320"
-                        height="100"
-                      />
 
-                      <v-card-text class="text-center">
-                        Logo (ratio 3:1)
-                      </v-card-text>
+                    <v-fade-transition>
+                      <v-overlay v-if="hover" absolute>
+                        <div
+                          v-if="draggingFile"
+                          v-text="$t('institutions.institution.dropImageHere')"
+                        />
 
-                      <input
-                        ref="logo"
-                        type="file"
-                        accept="image/*"
-                        class="d-none"
-                        @change="onLogoChange"
-                      >
-
-                      <v-fade-transition>
-                        <v-overlay v-if="hover" absolute>
-                          <div
-                            v-if="draggingFile"
-                            v-text="$t('institutions.institution.dropImageHere')"
+                        <div v-else>
+                          <v-btn
+                            v-if="logoPreview || institution.logoId"
+                            @click="removeLogo"
+                            v-text="$t('delete')"
                           />
+                          <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
+                        </div>
+                      </v-overlay>
+                    </v-fade-transition>
+                  </v-card>
+                </template>
+              </v-hover>
+            </v-col>
+          </v-row>
 
-                          <div v-else>
-                            <v-btn
-                              v-if="logoPreview || institution.logoId"
-                              @click="removeLogo"
-                              v-text="$t('delete')"
-                            />
-                            <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
-                          </div>
-                        </v-overlay>
-                      </v-fade-transition>
-                    </v-card>
-                  </template>
-                </v-hover>
-              </v-col>
-            </v-row>
+          <v-divider />
 
-            <v-divider />
+          <v-row>
+            <v-col cols="12">
+              <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
+            </v-col>
+            <v-col cols="4">
+              <v-checkbox v-model="institution.auto.ezpaarse" label="ezPAARSE" />
+            </v-col>
+            <v-col cols="4">
+              <v-checkbox v-model="institution.auto.ezmesure" label="ezMESURE" />
+            </v-col>
+            <v-col cols="4">
+              <v-checkbox v-model="institution.auto.report" label="Reporting" />
+            </v-col>
+          </v-row>
 
-            <v-row>
-              <v-col cols="12">
-                <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
-              </v-col>
-              <v-col cols="4">
-                <v-checkbox v-model="institution.auto.ezpaarse" label="ezPAARSE" />
-              </v-col>
-              <v-col cols="4">
-                <v-checkbox v-model="institution.auto.ezmesure" label="ezMESURE" />
-              </v-col>
-              <v-col cols="4">
-                <v-checkbox v-model="institution.auto.report" label="Reporting" />
-              </v-col>
-            </v-row>
+          <v-divider />
 
-            <v-divider />
+          <v-row v-if="isAdmin">
+            <v-col cols="12">
+              <span class="subtitle-1">{{ $t('administration') }}</span>
+            </v-col>
 
-            <v-row v-if="isAdmin">
-              <v-col cols="12">
-                <span class="subtitle-1">{{ $t('administration') }}</span>
-              </v-col>
+            <v-col cols="12">
+              <v-checkbox
+                v-model="identicalNames"
+                :label="$t('institutions.institution.identicalNames')"
+                hide-details
+                @change="duplicatePrefix"
+              />
+            </v-col>
 
-              <v-col cols="12">
-                <v-checkbox
-                  v-model="identicalNames"
-                  :label="$t('institutions.institution.identicalNames')"
-                  hide-details
-                  @change="duplicatePrefix"
-                />
-              </v-col>
+            <v-col cols="12" sm="4">
+              <v-text-field
+                v-model="institution.indexPrefix"
+                :label="$t('institutions.institution.associatedIndex')"
+                outlined
+                @input="duplicatePrefix"
+              />
+            </v-col>
 
-              <v-col cols="12" sm="4">
-                <v-text-field
-                  v-model="institution.indexPrefix"
-                  :label="$t('institutions.institution.associatedIndex')"
-                  @input="duplicatePrefix"
-                />
-              </v-col>
-
-              <v-col cols="12" sm="4">
-                <v-text-field
-                  v-model="institution.role"
-                  :label="$t('institutions.institution.associatedRole')"
-                  :disabled="identicalNames"
-                />
-              </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field
-                  v-model="institution.space"
-                  :label="$t('institutions.institution.associatedSpace')"
-                  :disabled="identicalNames"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
+            <v-col cols="12" sm="4">
+              <v-text-field
+                v-model="institution.role"
+                :label="$t('institutions.institution.associatedRole')"
+                :disabled="identicalNames"
+                outlined
+              />
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-text-field
+                v-model="institution.space"
+                :label="$t('institutions.institution.associatedSpace')"
+                :disabled="identicalNames"
+                outlined
+              />
+            </v-col>
+          </v-row>
         </v-form>
       </v-card-text>
 
