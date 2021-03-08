@@ -44,6 +44,7 @@ const schema = {
     ezmesure: Joi.boolean().default(false),
     ezpaarse: Joi.boolean().default(false),
     report: Joi.boolean().default(false),
+    sushi: Joi.boolean().default(false),
   }).default(),
 };
 

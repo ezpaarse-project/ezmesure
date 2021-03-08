@@ -125,24 +125,43 @@
             </v-col>
           </v-row>
 
-          <v-divider />
+          <v-divider class="my-3" />
 
-          <v-row>
+          <v-row no-gutters>
             <v-col cols="12">
               <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
             </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.ezpaarse" label="ezPAARSE" />
+            <v-col cols="12">
+              <v-checkbox
+                v-model="institution.auto.ezpaarse"
+                :label="$t('institutions.institution.auto.ezpaarse')"
+                hide-details
+              />
             </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.ezmesure" label="ezMESURE" />
+            <v-col cols="12">
+              <v-checkbox
+                v-model="institution.auto.ezmesure"
+                :label="$t('institutions.institution.auto.ezmesure')"
+                hide-details
+              />
             </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.report" label="Reporting" />
+            <v-col cols="12">
+              <v-checkbox
+                v-model="institution.auto.report"
+                :label="$t('institutions.institution.auto.reporting')"
+                hide-details
+              />
+            </v-col>
+            <v-col cols="12">
+              <v-checkbox
+                v-model="institution.auto.sushi"
+                :label="$t('institutions.institution.auto.sushi')"
+                hide-details
+              />
             </v-col>
           </v-row>
 
-          <v-divider />
+          <v-divider class="my-3" />
 
           <v-row v-if="isAdmin">
             <v-col cols="12">

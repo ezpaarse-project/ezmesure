@@ -38,6 +38,7 @@ module.exports = {
               ezmesure: { type: 'boolean' },
               ezpaarse: { type: 'boolean' },
               report: { type: 'boolean' },
+              sushi: { type: 'boolean' },
             },
           },
         },

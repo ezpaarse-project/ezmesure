@@ -137,7 +137,13 @@
       "associatedIndex": "Associated index",
       "associatedRole": "Associated role",
       "associatedSpace": "Associated space",
-      "identicalNames": "Identical prefix, role and space"
+      "identicalNames": "Identical prefix, role and space",
+      "auto": {
+        "ezpaarse": "Log processing with ezPAARSE",
+        "ezmesure": "Transfers into ezMESURE",
+        "reporting": "Periodic usage reports",
+        "sushi": "SUSHI harvesting"
+      }
     },
     "members": {
       "title": "Members - {institutionName}",
