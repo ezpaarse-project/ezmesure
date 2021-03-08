@@ -89,7 +89,14 @@
     "technical": "Technique",
     "documentary": "Documentaire",
     "search": "Rechercher",
-    "count": "Nos {count} partenaires"
+    "count": "Nos {count} partenaires",
+    "automated": "Automatisé",
+    "auto": {
+      "ezpaarse": "ezPAARSE",
+      "ezmesure": "ezMESURE",
+      "report": "Reporting",
+      "sushi": "SUSHI"
+    }
   },
   "institutions": {
     "title": "Établissement",

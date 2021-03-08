@@ -24,6 +24,25 @@
       </div>
     </v-card-text>
 
+    <v-divider v-if="hasAutomation" />
+
+    <v-card-text v-if="hasAutomation" class="text-center">
+      <div class="subtitle-1">
+        {{ $t('partners.automated') }}
+      </div>
+      <v-chip
+        v-for="auto in automations"
+        :key="auto.label"
+        :color="auto.color"
+        small
+        label
+        dark
+        class="mr-1 mb-1"
+      >
+        {{ $t(`partners.auto.${auto.label}`) }}
+      </v-chip>
+    </v-card-text>
+
     <v-divider />
 
     <v-card-text class="text-center">
@@ -76,6 +95,17 @@ export default {
       const n = parseInt(this.partner?.indexCount, 10);
       if (Number.isNaN(n)) { return '0'; }
       return n.toLocaleString();
+    },
+    automations() {
+      return [
+        { label: 'ezpaarse', color: 'teal', automated: this.partner?.auto?.ezpaarse },
+        { label: 'ezmesure', color: 'purple', automated: this.partner?.auto?.ezmesure },
+        { label: 'report', color: 'blue', automated: this.partner?.auto?.report },
+        { label: 'sushi', color: 'red', automated: this.partner?.auto?.sushi },
+      ].filter(auto => auto.automated);
+    },
+    hasAutomation() {
+      return this.automations.length > 0;
     },
   },
 };
