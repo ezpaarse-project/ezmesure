@@ -11,17 +11,43 @@
       />
     </v-layout>
 
-    <v-layout row justify-center align-center>
-      <v-flex xs12 sm8 md6 lg4>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="6" md="5" lg="4">
         <v-text-field
           v-model="search"
           :label="$t('partners.search')"
           solo
           max-width="200"
           append-icon="mdi-magnify"
+          hide-details
         />
-      </v-flex>
-    </v-layout>
+      </v-col>
+      <v-col cols="12" sm="6" md="5" lg="4">
+        <v-select
+          v-model="selectedAutomations"
+          :items="automations"
+          :item-text="item => $t(`partners.auto.${item.label}`)"
+          item-value="label"
+          :label="$t('partners.automated')"
+          solo
+          multiple
+          hide-details
+          max-width="200"
+        >
+          <template v-slot:selection="{ item }">
+            <v-chip
+              :color="item.color"
+              label
+              dark
+              close
+              @click:close="deselectAutomation(item.label)"
+            >
+              {{ $t(`partners.auto.${item.label}`) }}
+            </v-chip>
+          </template>
+        </v-select>
+      </v-col>
+    </v-row>
 
     <v-layout row wrap justify-center>
       <v-flex v-for="(partner, index) in filteredPartners" :key="index" shrink>
@@ -42,28 +68,50 @@ export default {
     return {
       partners: await app.$axios.$get('/partners'),
       search: '',
+      selectedAutomations: [],
+      automations: [
+        { label: 'ezpaarse', color: 'teal' },
+        { label: 'ezmesure', color: 'purple' },
+        { label: 'report', color: 'blue' },
+        { label: 'sushi', color: 'red' },
+      ],
     };
   },
 
   computed: {
     filteredPartners() {
-      if (!this.search) { return this.partners; }
+      const search = this.search.toLowerCase();
+      const automations = this.selectedAutomations;
 
-      const lowerSearch = this.search.toLowerCase();
+      if (!search && automations.length === 0) { return this.partners; }
 
-      return this.partners.filter(({ name: orgName, contact = {} }) => {
-        if (orgName && orgName.toLowerCase().includes(lowerSearch)) { return true; }
-        if (!contact.confirmed) { return false; }
+      return this.partners.filter((partner) => {
+        const {
+          name: orgName,
+          techContactName,
+          docContactName,
+          auto = {},
+        } = partner;
 
-        const { doc = {}, tech = {} } = contact;
+        if (search) {
+          if (orgName && orgName.toLowerCase().includes(search)) { return true; }
+          if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
+          if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
+          return false;
+        }
 
-        if (typeof doc.firstName === 'string' && doc.firstName.toLowerCase().includes(lowerSearch)) { return true; }
-        if (typeof doc.lastName === 'string' && doc.lastName.toLowerCase().includes(lowerSearch)) { return true; }
-        if (typeof tech.firstName === 'string' && tech.firstName.toLowerCase().includes(lowerSearch)) { return true; }
-        if (typeof tech.lastName === 'string' && tech.lastName.toLowerCase().includes(lowerSearch)) { return true; }
+        if (automations.length > 0) {
+          return automations.some(label => auto?.[label]);
+        }
 
         return false;
       });
+    },
+  },
+
+  methods: {
+    deselectAutomation(label) {
+      this.selectedAutomations = this.selectedAutomations.filter(l => l !== label);
     },
   },
 };
