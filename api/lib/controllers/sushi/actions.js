@@ -190,9 +190,10 @@ exports.getAvailableReports = async (ctx) => {
     return;
   }
 
-  const institution = await sushi.getInstitution();
 
   if (!isAdmin(user)) {
+    const institution = await sushi.getInstitution();
+
     if (!institution || !institution.isContact(user)) {
       ctx.throw(403, 'You are not authorized to manage sushi credentials');
       return;
