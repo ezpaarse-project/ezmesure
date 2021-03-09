@@ -31,6 +31,8 @@ module.exports = {
           location: { type: 'geo_point' },
           domains: { type: 'keyword' },
           creator: { type: 'keyword' },
+          techContactName: { type: 'keyword' },
+          docContactName: { type: 'keyword' },
           indexPrefix: { type: 'keyword' },
           indexCount: { type: 'long' },
           auto: {
