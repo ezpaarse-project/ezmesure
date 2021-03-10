@@ -22,7 +22,7 @@ services:
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
-      - REPORTING_URL=http://reporting:3000
+      - REPORTING_URL=${EZMESURE_REPORTING_URL:-http://reporting:3000}
       - EZMESURE_APPLICATION_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
@@ -47,8 +47,10 @@ services:
       - http_proxy
       - https_proxy
       - no_proxy=localhost,kibana
-      - EZMESURE_ELASTIC_HOST=elastic
-      - EZMESURE_KIBANA_HOST=kibana
+      - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
+      - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
+      - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST=maildev
@@ -97,14 +99,14 @@ services:
       - https_proxy
       - no_proxy=localhost,rp
       - REPORTING_PORT=3000
-      - REPORTING_ELASTIC_HOST=elastic
-      - REPORTING_ELASTIC_PORT=9200
+      - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
       - REPORTING_SMTP_HOST=maildev
       - REPORTING_SMTP_PORT=25
       - REPORTING_SENDER
       - REPORTING_INDEX=.ezreporting
       - REPORTING_FREQUENCIES
-      - KIBANA_INTERNAL_URL=https://rp/kibana
+      - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
