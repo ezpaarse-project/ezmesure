@@ -1,6 +1,7 @@
 const { Joi } = require('koa-joi-router');
 const encrypter = require('../services/encrypter');
 const { typedModel, registerModel, getModel } = require('./TypedModel');
+const { appLogger } = require('../../server');
 
 const type = 'sushi';
 const cryptedFields = ['requestorId', 'consortialId', 'customerId', 'apiKey'];
@@ -59,7 +60,7 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
         try {
           d[field] = encrypter.decrypt(d[field]);
         } catch (e) {
-          this.logger.error(`Failed to decrypt sushi field "${field}" of ${data.id} : ${e.message}`);
+          appLogger.error(`Failed to decrypt sushi field "${field}" of ${data.id} : ${e.message}`);
         }
       }
     });
