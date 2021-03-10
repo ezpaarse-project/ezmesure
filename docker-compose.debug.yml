@@ -4,7 +4,7 @@ services:
     extends:
       file: docker-compose.yml
       service: elastic
-  
+
   kibana:
     build:
       context: ./kibana
@@ -53,17 +53,12 @@ services:
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST=maildev
       - EZMESURE_SMTP_PORT=25
-      - EZMESURE_GOOGLE_EMAIL
-      - EZMESURE_GOOGLE_PRIVATE_KEY
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
-      - SERVER_HOST
-      - SERVER_PORT
-      - EZMESURE_KIBANA_TIMEOUT
+      - EZMESURE_ENCRYPTION_SECRET
       - NODE_ENV
       - NODE_CONFIG
-      - EZMESURE_ENCRYPTION_SECRET
     restart: "no"
     command: npm run dev
 
@@ -79,7 +74,6 @@ services:
       - EZMESURE_DISABLE_SHIBBOLETH
       - HOST=0.0.0.0
       - PORT=8080
-      - EZMESURE_ENCRYPTION_SECRET
     command: npm run dev
     restart: "no"
 
