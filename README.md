@@ -38,6 +38,19 @@ Create an environment file named `ezmesure.local.env.sh` and export the followin
 | EZMESURE_NOTIFICATIONS_CRON | cron for recent activity (defaults to daily midnight) |
 | REPORTING_SENDER | the sender for reporting emails |
 
+If all services are not hosted on the same machine, set the following variables (URLs should not have trailing slashes) :
+
+| name | description |
+|------|-------------|
+| EZMESURE_FRONT_URL     | Base URL of the front website. Must be reachable by the `reverse proxy`. |
+| EZMESURE_API_URL       | Base URL of the API. Must be reachable by the `reverse proxy`. |
+| EZMESURE_REPORTING_URL | Base URL of the reporting service. Must be reachable by `Kibana`. |
+| KIBANA_INTERNAL_URL    | Kibana URL used by the `reporting` service in order to access dashboards. Must pass through the `reverse proxy` (ie. RP address + `/kibana`). |
+| EZMESURE_KIBANA_HOST   | Kibana host. Must be reachable by the `reverse proxy` and the `API`. |
+| EZMESURE_KIBANA_PORT   | Kibana port. |
+| EZMESURE_ELASTIC_HOST  | Elasticsearch host. Must be reachable by the `API` and `reporting` service |
+| EZMESURE_ELASTIC_PORT  | Elasticsearch port. |
+
 ### 3. Configure shibboleth
 
 Put the certificate (``server.crt``) and private key (``server.key``) used to declare the Shibboleth service provider in the [fédération d'identités Education-Recherche](https://federation.renater.fr/registry?action=get_all) in ``rp/shibboleth/ssl/``.  
