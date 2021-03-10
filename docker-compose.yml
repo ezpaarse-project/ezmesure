@@ -53,8 +53,8 @@ services:
       - KIBANA_DEFAULTAPPID
       - XPACK_REPORTING_KIBANASERVER_HOSTNAME
       - APPLI_APACHE_SERVERNAME
-      - REPORTING_URL=http://reporting:3000
-      - REPORTING_NAME
+      - REPORTING_URL=${EZMESURE_REPORTING_URL:-http://reporting:3000}
+      - EZMESURE_APPLICATION_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     restart: unless-stopped
@@ -71,8 +71,10 @@ services:
       - http_proxy
       - https_proxy
       - no_proxy=localhost,kibana
-      - EZMESURE_ELASTIC_HOST=elastic
-      - EZMESURE_KIBANA_HOST=kibana
+      - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
+      - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
+      - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
       - ELASTICSEARCH_PASSWORD
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST
@@ -119,6 +121,9 @@ services:
       - APPLI_APACHE_SERVERADMIN
       - APPLI_APACHE_LOGLEVEL
       - EZMESURE_DISABLE_SHIBBOLETH
+      - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
+      - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
+      - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
     working_dir: /var/www/html
     volumes:
       - ./rp/shibboleth:/etc/shibboleth
@@ -142,8 +147,8 @@ services:
       - https_proxy
       - no_proxy=localhost,rp
       - REPORTING_PORT=3000
-      - REPORTING_ELASTIC_HOST=elastic
-      - REPORTING_ELASTIC_PORT=9200
+      - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
       - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
       - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - REPORTING_SMTP_HOST=${EZMESURE_SMTP_HOST}
@@ -151,7 +156,7 @@ services:
       - REPORTING_SENDER
       - REPORTING_INDEX=.ezreporting
       - REPORTING_FREQUENCIES
-      - KIBANA_INTERNAL_URL=https://rp/kibana
+      - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
       - KIBANA_EXTERNAL_URL
       - NODE_CONFIG
       - REPORTING_NAME
