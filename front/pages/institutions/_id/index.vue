@@ -66,9 +66,18 @@ export default {
     InstitutionForm,
     InstitutionCard,
   },
-  async asyncData({ $axios, params }) {
+  async asyncData({
+    $axios,
+    params,
+    $auth,
+    redirect,
+  }) {
     let institution = null;
     let failedToFetch = false;
+
+    if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
+      return redirect({ name: 'myspace' });
+    }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);

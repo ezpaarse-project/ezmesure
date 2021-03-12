@@ -57,8 +57,14 @@ export default {
     store,
     params,
     app,
+    $auth,
+    redirect,
   }) {
     let institution = null;
+
+    if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
+      return redirect({ name: 'myspace' });
+    }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
