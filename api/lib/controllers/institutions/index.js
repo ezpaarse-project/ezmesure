@@ -24,13 +24,31 @@ router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
 
-router.use(requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
+router.route({
+  method: 'GET',
+  path: '/:institutionId/sushi',
+  handler: [
+    requireAnyRole(['sushi_form', 'admin', 'superuser']),
+    getSushiData,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
 
 router.route({
   method: 'GET',
   path: '/self',
-  handler: getSelfInstitution,
+  handler: [
+    requireAnyRole(['institution_form', 'sushi_form', 'admin', 'superuser']),
+    getSelfInstitution,
+  ],
 });
+
+router.use(requireAnyRole(['institution_form', 'admin', 'superuser']));
+
 router.route({
   method: 'GET',
   path: '/:institutionId',
@@ -48,17 +66,6 @@ router.route({
     },
     body: {
       value: Joi.boolean().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:institutionId/sushi',
-  handler: getSushiData,
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
     },
   },
 });
