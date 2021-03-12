@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.members.title', { institutionName: institution.name })" />
+    <ToolBar :title="$t('institutions.members.title', { institutionName })" />
 
     <v-data-table
       v-if="hasInstitution"
@@ -99,6 +99,9 @@ export default {
   computed: {
     hasInstitution() {
       return !!this.institution?.id;
+    },
+    institutionName() {
+      return this.institution?.name;
     },
   },
   mounted() {
