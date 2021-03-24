@@ -15,6 +15,7 @@ const metrics = require('./metrics');
 const institutions = require('./institutions');
 const sushi = require('./sushi');
 const contact = require('./contact');
+const onisep = require('./onisep');
 
 const openapi = require('./openapi.json');
 
@@ -62,5 +63,6 @@ app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
 app.use(institutions.prefix('/institutions').middleware());
 app.use(sushi.prefix('/sushi').middleware());
+app.use(onisep.prefix('/onisep').middleware());
 
 module.exports = app;
