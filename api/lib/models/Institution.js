@@ -22,7 +22,7 @@ const schema = {
   createdAt: Joi.date(),
 
   indexCount: Joi.number().default(0),
-  indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]+$/).allow(''),
+  indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]*$/).allow(''),
 
   creator: Joi.string().allow('').allow(null),
   role: Joi.string().allow('').allow(null),
