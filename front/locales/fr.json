@@ -137,7 +137,8 @@
       "associatedIndex": "Index associé",
       "associatedRole": "Rôle associé",
       "associatedSpace": "Espace associé",
-      "identicalNames": "Préfixe, rôle et espace identiques"
+      "identicalNames": "Préfixe, rôle et espace identiques",
+      "mustMatch": "Doit correspondre à : {pattern}"
     },
     "members": {
       "title": "Membres - {institutionName}",

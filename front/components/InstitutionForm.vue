@@ -151,6 +151,7 @@
               <v-text-field
                 v-model="institution.indexPrefix"
                 :label="$t('institutions.institution.associatedIndex')"
+                :rules="indexPrefixRules"
                 outlined
                 @input="duplicatePrefix"
               />
@@ -221,6 +222,17 @@ export default {
       institution: {
         auto: {},
       },
+
+      indexPrefixRules: [
+        (value) => {
+          const pattern = /^[a-z0-9][a-z0-9_.-]*$/;
+
+          if (value === '' || pattern.test(value)) {
+            return true;
+          }
+          return this.$t('institutions.institution.mustMatch', { pattern: pattern.toString() });
+        },
+      ],
     };
   },
   computed: {
