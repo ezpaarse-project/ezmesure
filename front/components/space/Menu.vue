@@ -133,6 +133,9 @@ export default {
           title: this.$t('menu.profile'),
           href: '/self',
         });
+      }
+
+      if (this.canAccessMembers) {
         menuGroup.children.push({
           title: this.$t('menu.members'),
           href: '/self/members',
@@ -163,13 +166,10 @@ export default {
       return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
     },
     canAccessInstitution() {
-      if (this.isAdmin) { return true; }
-
-      if (!this.institution?.validated) { return false; }
-      if (!this.institutionFeatureEnabled) { return false; }
-      if (!this.isInstitutionContact) { return false; }
-
-      return true;
+      return this.isAdmin || this.institutionFeatureEnabled;
+    },
+    canAccessMembers() {
+      return this.canAccessInstitution && this.isInstitutionContact;
     },
     canAccessSushi() {
       if (this.isAdmin) { return true; }
