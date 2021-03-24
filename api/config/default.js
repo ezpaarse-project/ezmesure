@@ -58,6 +58,10 @@ module.exports = {
     index: 'depositors',
     cron: '0 0 0 * * *',
   },
+  onisep: {
+    index: 'onisep',
+    cron: '0 0 0 * * *',
+  },
   reportingActivityIndex: '.ezreporting-activity',
   reportingIndex: '.ezreporting',
   cypher: {

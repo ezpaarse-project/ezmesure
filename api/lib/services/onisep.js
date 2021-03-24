@@ -1,10 +1,12 @@
 
+const config = require('config');
 const axios = require('axios');
+const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
 const indexTemplate = require('../utils/onisep-template');
 
-const index = 'onisep';
+const { cron, index } = config.get('onisep');
 
 async function insertDocuments(docs = []) {
   const result = {
@@ -109,7 +111,53 @@ function search(queryString) {
   });
 }
 
+async function startCron(appLogger) {
+  let indexExists = true;
+
+  try {
+    const { body } = await elastic.indices.exists({ index });
+    indexExists = body;
+  } catch (e) {
+    appLogger.error(`Failed to check the index '${index}' exists: ${e.message}`);
+  }
+
+  const job = new CronJob({
+    cronTime: cron,
+    runOnInit: !indexExists,
+    onTick: async () => {
+      let result;
+
+      appLogger.info('Refreshing Onisep data');
+
+      try {
+        result = await update();
+      } catch (e) {
+        appLogger.error(`Failed to update Onisep data : ${e.message}`);
+        return;
+      }
+
+      const {
+        inserted = 0,
+        updated = 0,
+        failed = 0,
+        errors,
+      } = (result || {});
+
+      appLogger.info(`Onisep data refreshed: ${inserted} inserted, ${updated} updated, ${failed} failed`);
+
+      if (Array.isArray(errors)) {
+        errors.forEach((error) => {
+          appLogger.error(`Onisep refresh: ${error}`);
+        });
+      }
+    },
+  });
+
+  job.start();
+}
+
 module.exports = {
+  startCron,
   update,
   search,
 };
