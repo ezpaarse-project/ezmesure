@@ -63,17 +63,6 @@
               />
             </v-col>
 
-            <v-col cols="12" sm="12">
-              <v-combobox
-                v-model="institution.domains"
-                :label="$t('institutions.institution.domains')"
-                outlined
-                multiple
-                small-chips
-                hide-details
-              />
-            </v-col>
-
             <v-col cols="12">
               <v-hover v-model="hoverLogo" class="mx-auto">
                 <template v-slot:default="{ hover }">
@@ -166,7 +155,6 @@
                 @input="duplicatePrefix"
               />
             </v-col>
-
             <v-col cols="12" sm="4">
               <v-text-field
                 v-model="institution.role"
