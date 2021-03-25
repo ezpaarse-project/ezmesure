@@ -138,7 +138,11 @@
       "associatedRole": "Associated role",
       "associatedSpace": "Associated space",
       "identicalNames": "Identical prefix, role and space",
-      "mustMatch": "Must match: {pattern}"
+      "mustMatch": "Must match: {pattern}",
+      "searchOnisep": "Search among known institutions",
+      "searchOnisepHint": "Search an institution by name, location, UAI code, siret number...",
+      "searchEmpty": "No institution matches the query.",
+      "searchFailed": "Oops! The search failed."
     },
     "members": {
       "title": "Members - {institutionName}",
@@ -196,6 +200,7 @@
   "modify": "Modify",
   "save": "Save",
   "search": "Search",
+  "apply": "Apply",
   "nSelected": "{count} selected",
   "requiredFields": "* required fields",
   "formSendingFailed": "Sending the form failed",

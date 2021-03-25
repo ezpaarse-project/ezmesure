@@ -138,7 +138,11 @@
       "associatedRole": "Rôle associé",
       "associatedSpace": "Espace associé",
       "identicalNames": "Préfixe, rôle et espace identiques",
-      "mustMatch": "Doit correspondre à : {pattern}"
+      "mustMatch": "Doit correspondre à : {pattern}",
+      "searchOnisep": "Chercher parmi les établissements connus",
+      "searchOnisepHint": "Chercher un établissement par nom, localité, code UAI, numéro de siret...",
+      "searchEmpty": "Aucun établissement ne correspond à la recherche.",
+      "searchFailed": "Oups! La recherche a échoué."
     },
     "members": {
       "title": "Membres - {institutionName}",
@@ -196,6 +200,7 @@
   "modify": "Modifier",
   "save": "Sauvegarder",
   "search": "Rechercher",
+  "apply": "Appliquer",
   "nSelected": "{count} sélectionné(s)",
   "requiredFields": "* champs obligatoires",
   "formSendingFailed": "L'envoi du formulaire a échoué",

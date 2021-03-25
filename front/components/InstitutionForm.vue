@@ -6,6 +6,16 @@
       </v-card-title>
 
       <v-card-text>
+        <v-row align="center">
+          <v-col class="grow">
+            <OnisepSearch v-model="onisepData" />
+          </v-col>
+          <v-col class="shrink">
+            <v-btn color="primary" :disabled="!onisepData" @click="applyOnisepData">
+              {{ $t('apply') }}
+            </v-btn>
+          </v-col>
+        </v-row>
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
           <v-row>
             <v-col cols="12" sm="6">
@@ -196,6 +206,8 @@
 </template>
 
 <script>
+import OnisepSearch from '~/components/OnisepSearch';
+
 const defaultLogo = require('@/static/images/logo-etab.png');
 
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -206,12 +218,17 @@ const toBase64 = file => new Promise((resolve, reject) => {
 });
 
 export default {
+  components: {
+    OnisepSearch,
+  },
   data() {
     return {
       show: false,
       saving: false,
       valid: false,
       saveCreator: false,
+
+      onisepData: null,
 
       hoverLogo: false,
       draggingFile: false,
@@ -280,6 +297,7 @@ export default {
       this.identicalNames = (role === space && role === indexPrefix);
 
       this.logoPreview = null;
+      this.onisepData = null;
       this.show = true;
     },
 
@@ -318,6 +336,26 @@ export default {
       this.logoPreview = null;
       this.institution.logo = null;
       this.institution.logoId = null;
+    },
+
+    applyOnisepData() {
+      if (!this.onisepData) { return; }
+
+      if (this.onisepData.nom) {
+        this.institution.name = this.onisepData.nom;
+      }
+      if (this.onisepData.code_uai) {
+        this.institution.uai = this.onisepData.code_uai;
+      }
+      if (this.onisepData.type_detablissement) {
+        this.institution.type = this.onisepData.type_detablissement;
+      }
+      if (this.onisepData.commune) {
+        this.institution.city = this.onisepData.commune;
+      }
+      if (this.onisepData.sigle) {
+        this.institution.acronym = this.onisepData.sigle;
+      }
     },
 
     async save() {
