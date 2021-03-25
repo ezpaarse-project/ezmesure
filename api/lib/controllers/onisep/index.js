@@ -17,7 +17,7 @@ router.route({
   handler: getOnisepData,
   validate: {
     query: {
-      q: Joi.string().trim(),
+      q: Joi.string().trim().allow(''),
     },
   },
 });
