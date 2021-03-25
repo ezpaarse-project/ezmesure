@@ -342,19 +342,19 @@ export default {
       if (!this.onisepData) { return; }
 
       if (this.onisepData.nom) {
-        this.institution.name = this.onisepData.nom;
+        this.$set(this.institution, 'name', this.onisepData.nom);
       }
       if (this.onisepData.code_uai) {
-        this.institution.uai = this.onisepData.code_uai;
+        this.$set(this.institution, 'uai', this.onisepData.code_uai);
       }
       if (this.onisepData.type_detablissement) {
-        this.institution.type = this.onisepData.type_detablissement;
+        this.$set(this.institution, 'type', this.onisepData.type_detablissement);
       }
       if (this.onisepData.commune) {
-        this.institution.city = this.onisepData.commune;
+        this.$set(this.institution, 'city', this.onisepData.commune);
       }
       if (this.onisepData.sigle) {
-        this.institution.acronym = this.onisepData.sigle;
+        this.$set(this.institution, 'acronym', this.onisepData.sigle);
       }
     },
 
