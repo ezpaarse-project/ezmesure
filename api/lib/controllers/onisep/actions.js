@@ -3,11 +3,19 @@ const onisep = require('../../services/onisep');
 exports.getOnisepData = async (ctx) => {
   const { q: query } = ctx.query;
 
-  const { body: results } = await onisep.search(query);
+  const { body } = await onisep.search(query);
+
+  const results = (body && body.hits && body.hits.hits);
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = results && results.hits;
+
+  if (Array.isArray(results)) {
+    // eslint-disable-next-line no-underscore-dangle
+    ctx.body = results.map((r) => r && r._source);
+  } else {
+    ctx.body = [];
+  }
 };
 
 exports.refreshOnisepData = async (ctx) => {
