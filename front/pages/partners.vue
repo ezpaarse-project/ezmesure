@@ -73,7 +73,6 @@ export default {
         { label: 'ezpaarse', color: 'teal' },
         { label: 'ezmesure', color: 'purple' },
         { label: 'report', color: 'blue' },
-        { label: 'sushi', color: 'red' },
       ],
     };
   },
