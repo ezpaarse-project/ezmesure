@@ -64,7 +64,7 @@ async function recreateIndex() {
 async function update() {
   const { data } = await axios({
     method: 'get',
-    url: 'https://api.opendata.onisep.fr/downloads/57da952417293/57da952417293.json',
+    url: 'https://www.data.gouv.fr/fr/datasets/r/5fb6d2e3-609c-481d-9104-350e9ca134fa',
     timeout: 30000,
     headers: {
       'Application-ID': 'ezMESURE',
@@ -75,8 +75,22 @@ async function update() {
     return Promise.reject(new Error('Got invalid response from the OpenData API'));
   }
 
+  const docs = data
+    .filter((doc) => doc && doc.fields)
+    .map((doc) => {
+      const { fields, geometry } = doc;
+
+      // fields.coordonnees can be wrong, so we use geometry.coordinates instead
+      if (Array.isArray(geometry && geometry.coordinates)) {
+        const [lon, lat] = geometry.coordinates;
+        fields.coordonnees = { lat, lon };
+      }
+
+      return fields;
+    });
+
   await recreateIndex();
-  return insertDocuments(data);
+  return insertDocuments(docs);
 }
 
 function search(queryString) {
@@ -86,15 +100,19 @@ function search(queryString) {
     query.query_string = {
       query: `*${queryString}*`,
       fields: [
-        'code_uai',
-        'n_siret',
-        'nom',
+        'aca_nom',
+        'siren',
+        'dep_nom',
+        'siret',
+        'localisation',
+        'uucr_nom',
+        'nom_court',
+        'identifiant_ror',
+        'reg_nom',
         'sigle',
-        'universite',
-        'commune',
-        'departement',
-        'academie',
-        'region',
+        'uai',
+        'uo_lib_officiel',
+        'uo_lib',
       ],
     };
   } else {

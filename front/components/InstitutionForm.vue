@@ -341,17 +341,20 @@ export default {
     applyOpenDataData() {
       if (!this.openData) { return; }
 
-      if (this.openData.nom) {
-        this.$set(this.institution, 'name', this.openData.nom);
+      if (this.openData.uo_lib_officiel) {
+        this.$set(this.institution, 'name', this.openData.uo_lib_officiel);
       }
-      if (this.openData.code_uai) {
-        this.$set(this.institution, 'uai', this.openData.code_uai);
+      if (this.openData.url) {
+        this.$set(this.institution, 'website', this.openData.url);
       }
-      if (this.openData.type_detablissement) {
-        this.$set(this.institution, 'type', this.openData.type_detablissement);
+      if (this.openData.uai) {
+        this.$set(this.institution, 'uai', this.openData.uai);
       }
-      if (this.openData.commune) {
-        this.$set(this.institution, 'city', this.openData.commune);
+      if (this.openData.type_d_etablissement) {
+        this.$set(this.institution, 'type', this.openData.type_d_etablissement);
+      }
+      if (this.openData.com_nom) {
+        this.$set(this.institution, 'city', this.openData.com_nom);
       }
       if (this.openData.sigle) {
         this.$set(this.institution, 'acronym', this.openData.sigle);

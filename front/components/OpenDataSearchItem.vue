@@ -19,20 +19,17 @@ export default {
   },
   computed: {
     title() {
-      return this.item?.sigle ? `${this.item?.nom} (${this.item?.sigle})` : `${this.item?.nom}`;
+      const name = this.item.uo_lib_officiel || this.item.uo_lib;
+      return this.item?.sigle ? `${name} (${this.item?.sigle})` : `${name}`;
     },
     subtitle() {
       const {
-        commune,
-        departement,
-        region,
-        code_uai: uai,
-        n_siret: siret,
+        localisation,
+        uai,
       } = (this.item || {});
 
-      let str = `${commune || departement || region}`;
+      let str = `${localisation}`;
       if (uai) { str += ` - UAI ${uai}`; }
-      if (siret) { str += ` - Siret ${siret}`; }
       return str;
     },
   },

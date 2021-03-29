@@ -9,7 +9,7 @@
     :no-data-text="$t('institutions.institution.searchOpenDataHint')"
     no-filter
     clearable
-    item-text="nom"
+    item-text="uo_lib_officiel"
     :label="$t('institutions.institution.searchOpenData')"
     prepend-icon="mdi-database-search"
     return-object
