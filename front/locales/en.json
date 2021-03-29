@@ -139,8 +139,8 @@
       "associatedSpace": "Associated space",
       "identicalNames": "Identical prefix, role and space",
       "mustMatch": "Must match: {pattern}",
-      "searchOnisep": "Search among known institutions",
-      "searchOnisepHint": "Search an institution by name, location, UAI code, siret number...",
+      "searchOpenData": "Search among known institutions",
+      "searchOpenDataHint": "Search an institution by name, location, UAI code, siret number...",
       "searchEmpty": "No institution matches the query.",
       "searchFailed": "Oops! The search failed."
     },

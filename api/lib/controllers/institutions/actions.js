@@ -12,7 +12,7 @@ const Sushi = require('../../models/Sushi');
 const depositorsIndex = config.depositors.index;
 
 const instance = axios.create({
-  baseURL: 'https://api.opendata.onisep.fr/downloads/57da952417293/57da952417293.json',
+  baseURL: 'https://api.opendata.opendata.fr/downloads/57da952417293/57da952417293.json',
   timeout: 30000,
   headers: {
     'Application-ID': 'ezMESURE',

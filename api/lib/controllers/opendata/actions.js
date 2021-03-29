@@ -1,9 +1,9 @@
-const onisep = require('../../services/onisep');
+const opendata = require('../../services/opendata');
 
-exports.getOnisepData = async (ctx) => {
+exports.getOpenData = async (ctx) => {
   const { q: query } = ctx.query;
 
-  const { body } = await onisep.search(query);
+  const { body } = await opendata.search(query);
 
   const results = (body && body.hits && body.hits.hits);
 
@@ -18,8 +18,8 @@ exports.getOnisepData = async (ctx) => {
   }
 };
 
-exports.refreshOnisepData = async (ctx) => {
-  const result = await onisep.update();
+exports.refreshOpenData = async (ctx) => {
+  const result = await opendata.update();
 
   ctx.type = 'json';
   ctx.status = 200;

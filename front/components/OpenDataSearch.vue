@@ -6,27 +6,27 @@
     :search-input.sync="search"
     :error="error"
     :error-messages="errorMessages"
-    :no-data-text="$t('institutions.institution.searchOnisepHint')"
+    :no-data-text="$t('institutions.institution.searchOpenDataHint')"
     no-filter
     clearable
     item-text="nom"
-    :label="$t('institutions.institution.searchOnisep')"
+    :label="$t('institutions.institution.searchOpenData')"
     prepend-icon="mdi-database-search"
     return-object
   >
     <template v-slot:item="{ item }">
-      <OnisepSearchItem :item="item" />
+      <OpenDataSearchItem :item="item" />
     </template>
   </v-autocomplete>
 </template>
 
 <script>
 import debounce from 'lodash.debounce';
-import OnisepSearchItem from '~/components/OnisepSearchItem';
+import OpenDataSearchItem from '~/components/OpenDataSearchItem';
 
 export default {
   components: {
-    OnisepSearchItem,
+    OpenDataSearchItem,
   },
   props: {
     value: {
@@ -69,7 +69,7 @@ export default {
       this.error = false;
 
       try {
-        const { data } = await this.$axios.get('/onisep', { params: { q: this.search } });
+        const { data } = await this.$axios.get('/opendata', { params: { q: this.search } });
         this.items = Array.isArray(data) ? data : [];
       } catch (e) {
         this.error = true;

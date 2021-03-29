@@ -4,9 +4,9 @@ const axios = require('axios');
 const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
-const indexTemplate = require('../utils/onisep-template');
+const indexTemplate = require('../utils/opendata-template');
 
-const { cron, index } = config.get('onisep');
+const { cron, index } = config.get('opendata');
 
 async function insertDocuments(docs = []) {
   const result = {
@@ -72,7 +72,7 @@ async function update() {
   });
 
   if (!Array.isArray(data)) {
-    return Promise.reject(new Error('Got invalid response from the Onisep API'));
+    return Promise.reject(new Error('Got invalid response from the OpenData API'));
   }
 
   await recreateIndex();
@@ -127,12 +127,12 @@ async function startCron(appLogger) {
     onTick: async () => {
       let result;
 
-      appLogger.info('Refreshing Onisep data');
+      appLogger.info('Refreshing OpenData');
 
       try {
         result = await update();
       } catch (e) {
-        appLogger.error(`Failed to update Onisep data : ${e.message}`);
+        appLogger.error(`Failed to update OpenData : ${e.message}`);
         return;
       }
 
@@ -143,11 +143,11 @@ async function startCron(appLogger) {
         errors,
       } = (result || {});
 
-      appLogger.info(`Onisep data refreshed: ${inserted} inserted, ${updated} updated, ${failed} failed`);
+      appLogger.info(`OpenData refreshed: ${inserted} inserted, ${updated} updated, ${failed} failed`);
 
       if (Array.isArray(errors)) {
         errors.forEach((error) => {
-          appLogger.error(`Onisep refresh: ${error}`);
+          appLogger.error(`OpenData refresh: ${error}`);
         });
       }
     },

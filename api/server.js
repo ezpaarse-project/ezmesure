@@ -10,7 +10,7 @@ const metrics = require('./lib/services/metrics');
 const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
 const depositors = require('./lib/services/depositors');
-const onisep = require('./lib/services/onisep');
+const opendata = require('./lib/services/opendata');
 
 const appLogger = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
@@ -27,7 +27,7 @@ if (mailSender) {
 
 notifications.start(appLogger);
 depositors.start(appLogger);
-onisep.startCron(appLogger);
+opendata.startCron(appLogger);
 
 const controller = require('./lib/controllers');
 

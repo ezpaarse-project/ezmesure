@@ -8,10 +8,10 @@
       <v-card-text>
         <v-row align="center">
           <v-col class="grow">
-            <OnisepSearch v-model="onisepData" />
+            <OpenDataSearch v-model="openData" />
           </v-col>
           <v-col class="shrink">
-            <v-btn color="primary" :disabled="!onisepData" @click="applyOnisepData">
+            <v-btn color="primary" :disabled="!openData" @click="applyOpenDataData">
               {{ $t('apply') }}
             </v-btn>
           </v-col>
@@ -206,7 +206,7 @@
 </template>
 
 <script>
-import OnisepSearch from '~/components/OnisepSearch';
+import OpenDataSearch from '~/components/OpenDataSearch';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
 
@@ -219,7 +219,7 @@ const toBase64 = file => new Promise((resolve, reject) => {
 
 export default {
   components: {
-    OnisepSearch,
+    OpenDataSearch,
   },
   data() {
     return {
@@ -228,7 +228,7 @@ export default {
       valid: false,
       saveCreator: false,
 
-      onisepData: null,
+      openData: null,
 
       hoverLogo: false,
       draggingFile: false,
@@ -297,7 +297,7 @@ export default {
       this.identicalNames = (role === space && role === indexPrefix);
 
       this.logoPreview = null;
-      this.onisepData = null;
+      this.openData = null;
       this.show = true;
     },
 
@@ -338,23 +338,23 @@ export default {
       this.institution.logoId = null;
     },
 
-    applyOnisepData() {
-      if (!this.onisepData) { return; }
+    applyOpenDataData() {
+      if (!this.openData) { return; }
 
-      if (this.onisepData.nom) {
-        this.$set(this.institution, 'name', this.onisepData.nom);
+      if (this.openData.nom) {
+        this.$set(this.institution, 'name', this.openData.nom);
       }
-      if (this.onisepData.code_uai) {
-        this.$set(this.institution, 'uai', this.onisepData.code_uai);
+      if (this.openData.code_uai) {
+        this.$set(this.institution, 'uai', this.openData.code_uai);
       }
-      if (this.onisepData.type_detablissement) {
-        this.$set(this.institution, 'type', this.onisepData.type_detablissement);
+      if (this.openData.type_detablissement) {
+        this.$set(this.institution, 'type', this.openData.type_detablissement);
       }
-      if (this.onisepData.commune) {
-        this.$set(this.institution, 'city', this.onisepData.commune);
+      if (this.openData.commune) {
+        this.$set(this.institution, 'city', this.openData.commune);
       }
-      if (this.onisepData.sigle) {
-        this.$set(this.institution, 'acronym', this.onisepData.sigle);
+      if (this.openData.sigle) {
+        this.$set(this.institution, 'acronym', this.openData.sigle);
       }
     },
 
