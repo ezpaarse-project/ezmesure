@@ -91,6 +91,10 @@
     "search": "Rechercher",
     "count": "Nos {count} partenaires",
     "automated": "Automatisé",
+    "links": "Liens",
+    "noContacts": "Pas de correspondants",
+    "noAutomations": "Pas de services automatisés",
+    "noLinks": "Pas de liens",
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
