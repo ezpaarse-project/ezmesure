@@ -64,7 +64,13 @@ async function recreateIndex() {
 async function update() {
   const { data } = await axios({
     method: 'get',
-    url: 'https://www.data.gouv.fr/fr/datasets/r/5fb6d2e3-609c-481d-9104-350e9ca134fa',
+    // url: 'https://www.data.gouv.fr/fr/datasets/r/5fb6d2e3-609c-481d-9104-350e9ca134fa',
+    url: 'https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-principaux-etablissements-enseignement-superieur/download',
+    params: {
+      format: 'json',
+      timezone: 'Europe/Berlin',
+      use_labels_for_header: false,
+    },
     timeout: 30000,
     headers: {
       'Application-ID': 'ezMESURE',
