@@ -100,19 +100,19 @@ function search(queryString) {
     query.query_string = {
       query: `*${queryString}*`,
       fields: [
-        'aca_nom',
+        'uo_lib_officiel^3',
+        'uo_lib^3',
+        'aca_nom^2',
+        'localisation^2',
         'siren',
         'dep_nom',
         'siret',
-        'localisation',
         'uucr_nom',
         'nom_court',
         'identifiant_ror',
         'reg_nom',
         'sigle',
         'uai',
-        'uo_lib_officiel',
-        'uo_lib',
       ],
     };
   } else {
