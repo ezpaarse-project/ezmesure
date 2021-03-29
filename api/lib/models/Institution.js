@@ -39,6 +39,11 @@ const schema = {
   uai: Joi.string().allow(''),
   logoId: Joi.string().empty('').allow(null),
 
+  twitterUrl: Joi.string().allow(''),
+  linkedinUrl: Joi.string().allow(''),
+  youtubeUrl: Joi.string().allow(''),
+  facebookUrl: Joi.string().allow(''),
+
   domains: Joi.array().default([]).items(Joi.string()),
   auto: Joi.object({
     ezmesure: Joi.boolean().default(false),

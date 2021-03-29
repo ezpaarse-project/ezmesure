@@ -73,6 +73,51 @@
               />
             </v-col>
 
+            <v-divider />
+
+            <v-col cols="12">
+              <span class="subtitle-1">
+                {{ $t('institutions.institution.socialNetworks') }}
+              </span>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.twitterUrl"
+                :label="$t('institutions.institution.twitterUrl')"
+                append-icon="mdi-twitter"
+                hide-details
+                outlined
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.linkedinUrl"
+                :label="$t('institutions.institution.linkedinUrl')"
+                append-icon="mdi-linkedin"
+                hide-details
+                outlined
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.youtubeUrl"
+                :label="$t('institutions.institution.youtubeUrl')"
+                append-icon="mdi-youtube"
+                hide-details
+                outlined
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="institution.facebookUrl"
+                :label="$t('institutions.institution.facebookUrl')"
+                append-icon="mdi-facebook"
+                hide-details
+                outlined
+              />
+            </v-col>
+
             <v-col cols="12">
               <v-hover v-model="hoverLogo" class="mx-auto">
                 <template v-slot:default="{ hover }">
@@ -341,24 +386,24 @@ export default {
     applyOpenDataData() {
       if (!this.openData) { return; }
 
-      if (this.openData.uo_lib_officiel) {
-        this.$set(this.institution, 'name', this.openData.uo_lib_officiel);
-      }
-      if (this.openData.url) {
-        this.$set(this.institution, 'website', this.openData.url);
-      }
-      if (this.openData.uai) {
-        this.$set(this.institution, 'uai', this.openData.uai);
-      }
-      if (this.openData.type_d_etablissement) {
-        this.$set(this.institution, 'type', this.openData.type_d_etablissement);
-      }
-      if (this.openData.com_nom) {
-        this.$set(this.institution, 'city', this.openData.com_nom);
-      }
-      if (this.openData.sigle) {
-        this.$set(this.institution, 'acronym', this.openData.sigle);
-      }
+      const fields = [
+        ['name', 'uo_lib_officiel'],
+        ['website', 'url'],
+        ['uai', 'uai'],
+        ['type', 'type_d_etablissement'],
+        ['city', 'com_nom'],
+        ['acronym', 'sigle'],
+        ['twitterUrl', 'compte_twitter'],
+        ['linkedinUrl', 'compte_linkedin'],
+        ['youtubeUrl', 'compte_youtube'],
+        ['facebookUrl', 'compte_facebook'],
+      ];
+
+      fields.forEach(([institutionKey, openDataKey]) => {
+        if (this.openData[openDataKey]) {
+          this.$set(this.institution, institutionKey, this.openData[openDataKey]);
+        }
+      });
     },
 
     async save() {

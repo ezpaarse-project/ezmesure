@@ -149,7 +149,12 @@
       "searchOpenData": "Search among known institutions",
       "searchOpenDataHint": "Search an institution by name, location, UAI code, siret number...",
       "searchEmpty": "No institution matches the query.",
-      "searchFailed": "Oops! The search failed."
+      "searchFailed": "Oops! The search failed.",
+      "socialNetworks": "Social networks",
+      "twitterUrl": "Twitter URL",
+      "linkedinUrl": "Linkedin URL",
+      "youtubeUrl": "Youtube URL",
+      "facebookUrl": "Facebook URL"
     },
     "members": {
       "title": "Members - {institutionName}",

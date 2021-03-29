@@ -149,7 +149,12 @@
       "searchOpenData": "Chercher parmi les établissements connus",
       "searchOpenDataHint": "Chercher un établissement par nom, localité, code UAI, numéro de siret...",
       "searchEmpty": "Aucun établissement ne correspond à la recherche.",
-      "searchFailed": "Oups! La recherche a échoué."
+      "searchFailed": "Oups! La recherche a échoué.",
+      "socialNetworks": "Réseaux sociaux",
+      "twitterUrl": "URL Twitter",
+      "linkedinUrl": "URL Linkedin",
+      "youtubeUrl": "URL Youtube",
+      "facebookUrl": "URL Facebook"
     },
     "members": {
       "title": "Membres - {institutionName}",
