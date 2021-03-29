@@ -99,6 +99,7 @@ function search(queryString) {
   if (queryString) {
     query.query_string = {
       query: `*${queryString}*`,
+      default_operator: 'and',
       fields: [
         'uo_lib_officiel^3',
         'uo_lib^3',
