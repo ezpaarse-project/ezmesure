@@ -69,28 +69,6 @@ router.route({
 router.use(bodyParser());
 
 router.route({
-  method: 'PATCH',
-  path: '/:institutionId/members/:email',
-  handler: updateMember,
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-      email: Joi.string().trim().allow('self').email()
-        .required(),
-    },
-    body: {
-      id: Joi.string().trim().guid({ version: ['uuidv4'] }).required(),
-      type: Joi.array().items(Joi.string().trim().valid('tech', 'doc')),
-      email: Joi.string().trim().required(),
-      confirmed: Joi.boolean().required(),
-      fullName: Joi.string().trim().required(),
-    },
-  },
-});
-
-
-router.route({
   method: 'POST',
   path: '/',
   handler: createInstitution,
