@@ -169,7 +169,7 @@ export default {
       return this.isAdmin || this.institutionFeatureEnabled;
     },
     canAccessMembers() {
-      return this.canAccessInstitution && this.isInstitutionContact;
+      return this.canAccessInstitution && (this.isAdmin || this.isInstitutionContact);
     },
     canAccessSushi() {
       if (this.isAdmin) { return true; }
