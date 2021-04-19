@@ -66,30 +66,7 @@ router.route({
   },
 });
 
-router.route({
-  method: 'DELETE',
-  path: '/:institutionId',
-  handler: deleteInstitution,
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-
 router.use(bodyParser());
-
-router.route({
-  method: 'POST',
-  path: '/delete',
-  handler: deleteInstitutions,
-  validate: {
-    type: 'json',
-    body: {
-      ids: Joi.array().items(Joi.string().trim()),
-    },
-  },
-});
 
 router.route({
   method: 'PATCH',
@@ -138,6 +115,29 @@ router.route({
 });
 
 router.use(requireAnyRole(['admin', 'superuser']));
+
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId',
+  handler: deleteInstitution,
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/delete',
+  handler: deleteInstitutions,
+  validate: {
+    type: 'json',
+    body: {
+      ids: Joi.array().items(Joi.string().trim()),
+    },
+  },
+});
 
 router.route({
   method: 'PUT',
