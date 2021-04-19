@@ -20,7 +20,10 @@ const requireUser = async (ctx, next) => {
     return;
   }
 
+  const roles = new Set(user.roles || []);
+
   ctx.state.user = user;
+  ctx.state.userIsAdmin = (roles.has('admin') || roles.has('superuser'));
 
   await next();
 };
