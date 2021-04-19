@@ -56,21 +56,6 @@ router.route({
 });
 
 router.route({
-  method: 'PUT',
-  path: '/:institutionId/validated',
-  handler: validateInstitution,
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      value: Joi.boolean().required(),
-    },
-  },
-});
-
-router.route({
   method: 'GET',
   path: '/:institutionId/members',
   handler: getInstitutionMembers,
@@ -153,6 +138,21 @@ router.route({
 });
 
 router.use(requireAnyRole(['admin', 'superuser']));
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/validated',
+  handler: validateInstitution,
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    body: {
+      value: Joi.boolean().required(),
+    },
+  },
+});
 
 router.route({
   method: 'POST',
