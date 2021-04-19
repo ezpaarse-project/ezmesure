@@ -1,4 +1,3 @@
-const axios = require('axios');
 const config = require('config');
 const { v4: uuidv4 } = require('uuid');
 const elastic = require('../../services/elastic');
@@ -10,14 +9,6 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 
 const depositorsIndex = config.depositors.index;
-
-const instance = axios.create({
-  baseURL: 'https://api.opendata.opendata.fr/downloads/57da952417293/57da952417293.json',
-  timeout: 30000,
-  headers: {
-    'Application-ID': 'ezMESURE',
-  },
-});
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -32,69 +23,6 @@ const ensureIndex = async () => {
       index: depositorsIndex,
       body: indexTemplate,
     });
-  }
-};
-
-const getInstitutionDataByUAI = async (uai) => {
-  try {
-    const { data: res } = await instance.get('');
-
-    if (!res) { return {}; }
-
-    const data = Object.values(res).find((e) => e.code_uai === uai);
-
-    return {
-      acronym: data.sigle,
-      city: data.commune,
-      type: data.type_detablissement,
-      location: {
-        lon: data.longitude_x,
-        lat: data.latitude_y,
-      },
-    };
-  } catch (err) {
-    appLogger.error('Failed to get institution data', err);
-    return {};
-  }
-};
-
-const getInstitutionData = async (email, sourceFilter) => {
-  try {
-    const { body } = await elastic.search({
-      index: depositorsIndex,
-      body: {
-        query: {
-          nested: {
-            path: 'members',
-            query: {
-              bool: {
-                must: [
-                  {
-                    match: {
-                      'members.email': email,
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-        _source: sourceFilter,
-      },
-    });
-
-    if (!body || !body.hits || !body.hits.hits) {
-      return {};
-    }
-
-    const institution = body.hits.hits.shift();
-
-    if (!institution) { return null; }
-
-    const { _id: id, _source: source } = institution;
-    return { ...source, id };
-  } catch (error) {
-    return null;
   }
 };
 
