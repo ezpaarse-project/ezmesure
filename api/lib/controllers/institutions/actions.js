@@ -92,21 +92,6 @@ exports.createInstitution = async (ctx) => {
 
   ctx.status = 201;
   ctx.body = institution;
-
-  // if (institution.uai) {
-  //   try {
-  //     const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
-
-  //     if (institutionUAIData) {
-  //       institution = {
-  //         ...institution,
-  //         ...institutionUAIData,
-  //       };
-  //     }
-  //   } catch (err) {
-  //     appLogger.error('Failed to get institution data', err);
-  //   }
-  // }
 };
 
 exports.updateInstitution = async (ctx) => {
@@ -127,21 +112,6 @@ exports.updateInstitution = async (ctx) => {
   } else if (body.logo === null) {
     await institution.removeLogo();
   }
-
-  // if (institution.uai) {
-  //   try {
-  //     const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
-
-  //     if (institutionUAIData) {
-  //       institution = {
-  //         ...institution,
-  //         ...institutionUAIData,
-  //       };
-  //     }
-  //   } catch (err) {
-  //     appLogger.error('Failed to get institution data', err);
-  //   }
-  // }
 
   try {
     await institution.save();
