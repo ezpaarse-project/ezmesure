@@ -135,14 +135,14 @@ export default {
         });
       }
 
-      if (this.canAccessMembers) {
+      if (this.institution && this.canAccessMembers) {
         menuGroup.children.push({
           title: this.$t('menu.members'),
           href: '/self/members',
         });
       }
 
-      if (this.canAccessSushi) {
+      if (this.institution && this.canAccessSushi) {
         menuGroup.children.push({
           title: this.$t('menu.sushi'),
           href: '/self/sushi',
