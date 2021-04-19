@@ -3,6 +3,7 @@ const { Joi } = require('koa-joi-router');
 const bodyParser = require('koa-bodyparser');
 
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
+const Institution = require('../../models/Institution');
 
 const {
   getInstitutions,
@@ -20,6 +21,38 @@ const {
   refreshInstitution,
 } = require('./actions');
 
+/**
+ * Middleware that fetches an institution and put it in ctx.state.institution
+ * Assumes that the route param institutionId is present
+ */
+async function fetchInstitution(ctx, next) {
+  const { institutionId } = ctx.params;
+
+  const institution = await Institution.findById(institutionId);
+
+  if (!institution) {
+    ctx.throw(404, 'Institution not found');
+    return;
+  }
+
+  ctx.state.institution = institution;
+  await next();
+}
+
+/**
+ * Middleware that checks that user is either admin or institution contact
+ * Assumes that ctx.state contains institution and user
+ */
+function requireContact(ctx, next) {
+  const { user, institution, userIsAdmin } = ctx.state;
+
+  if (userIsAdmin) { return next(); }
+  if (user && institution && institution.isContact(user)) { return next(); }
+
+  ctx.throw(403, 'You are not allowed to access this institution');
+  return undefined;
+}
+
 router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
@@ -29,6 +62,8 @@ router.route({
   path: '/:institutionId/sushi',
   handler: [
     requireAnyRole(['sushi_form', 'admin', 'superuser']),
+    fetchInstitution,
+    requireContact,
     getSushiData,
   ],
   validate: {
@@ -52,13 +87,20 @@ router.use(requireAnyRole(['institution_form', 'admin', 'superuser']));
 router.route({
   method: 'GET',
   path: '/:institutionId',
-  handler: getInstitution,
+  handler: [
+    fetchInstitution,
+    getInstitution,
+  ],
 });
 
 router.route({
   method: 'GET',
   path: '/:institutionId/members',
-  handler: getInstitutionMembers,
+  handler: [
+    fetchInstitution,
+    requireContact,
+    getInstitutionMembers,
+  ],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
@@ -83,7 +125,11 @@ router.route({
 router.route({
   method: 'PUT',
   path: '/:institutionId',
-  handler: updateInstitution,
+  handler: [
+    fetchInstitution,
+    requireContact,
+    updateInstitution,
+  ],
   validate: {
     type: 'json',
     params: {
@@ -120,7 +166,10 @@ router.route({
 router.route({
   method: 'PUT',
   path: '/:institutionId/validated',
-  handler: validateInstitution,
+  handler: [
+    fetchInstitution,
+    validateInstitution,
+  ],
   validate: {
     type: 'json',
     params: {
@@ -135,7 +184,10 @@ router.route({
 router.route({
   method: 'POST',
   path: '/:institutionId/_refresh',
-  handler: refreshInstitution,
+  handler: [
+    fetchInstitution,
+    refreshInstitution,
+  ],
   validate: {
     type: 'json',
     params: {

@@ -36,18 +36,9 @@ exports.getInstitutions = async (ctx) => {
 exports.getInstitution = async (ctx) => {
   await ensureIndex();
 
-  const { institutionId } = ctx.params;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = ctx.state.institution;
 };
 
 exports.getSelfInstitution = async (ctx) => {
@@ -119,24 +110,11 @@ exports.createInstitution = async (ctx) => {
 };
 
 exports.updateInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
+  const { user, institution } = ctx.state;
   const { body } = ctx.request;
 
   if (!body) {
     ctx.throw(400, 'body is empty');
-    return;
-  }
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not authorized to update this institution data');
     return;
   }
 
@@ -176,22 +154,9 @@ exports.updateInstitution = async (ctx) => {
 };
 
 exports.validateInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
   const { body = {} } = ctx.request;
   const { value: validated } = body;
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to validate this institution');
-    return;
-  }
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
+  const { institution } = ctx.state;
 
   institution.setValidation(validated);
 
@@ -210,13 +175,7 @@ exports.validateInstitution = async (ctx) => {
 
 exports.deleteInstitutions = async (ctx) => {
   const { body } = ctx.request;
-  const { user } = ctx.state;
   const response = [];
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to delete institutions');
-    return;
-  }
 
   if (Array.isArray(body.ids) && body.ids.length > 0) {
     for (let i = 0; i < body.ids.length; i += 1) {
@@ -237,34 +196,13 @@ exports.deleteInstitutions = async (ctx) => {
 
 exports.deleteInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
-  const { user } = ctx.state;
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to delete institutions');
-    return;
-  }
 
   ctx.status = 200;
   ctx.body = await Institution.deleteOne(institutionId);
 };
 
 exports.getInstitutionMembers = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to access this institution');
-    return;
-  }
-
-  const members = await institution.getMembers();
+  const members = await ctx.state.institution.getMembers();
 
   ctx.type = 'json';
   ctx.status = 200;
@@ -319,38 +257,15 @@ exports.refreshInstitutions = async (ctx) => {
 };
 
 exports.refreshInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  await institution.refreshIndexCount();
-  await institution.refreshContacts();
+  await ctx.state.institution.refreshIndexCount();
+  await ctx.state.institution.refreshContacts();
 
   ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = ctx.state.institution;
 };
 
 exports.getSushiData = async (ctx) => {
-  const { user } = ctx.state;
-  const { institutionId } = ctx.params;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to access this institution');
-    return;
-  }
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findByInstitutionId(institutionId);
+  ctx.body = await Sushi.findByInstitutionId(ctx.state.institution.id);
 };
