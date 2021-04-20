@@ -14,6 +14,7 @@ const {
   getInstitution,
   getSelfInstitution,
   getInstitutionMembers,
+  addInstitutionMember,
   updateInstitution,
   updateMember,
   getSushiData,
@@ -104,6 +105,26 @@ router.route({
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/members/:username',
+  handler: [
+    fetchInstitution,
+    requireContact,
+    addInstitutionMember,
+  ],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+    },
+    body: {
+      readonly: Joi.boolean().default(true),
     },
   },
 });

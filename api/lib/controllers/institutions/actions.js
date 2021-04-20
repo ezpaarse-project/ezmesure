@@ -180,10 +180,46 @@ exports.getInstitutionMembers = async (ctx) => {
   ctx.body = Array.isArray(members) ? members : [];
 };
 
-exports.updateMember = async (ctx) => {
-  const { institutionId } = ctx.params;
-  let { email } = ctx.params;
-  const { body } = ctx.request;
+exports.addInstitutionMember = async (ctx) => {
+  const { institution, user } = ctx.state;
+  const { username } = ctx.params;
+  const { body = {} } = ctx.request;
+  const { readonly = true } = body;
+
+  const role = institution.getRole();
+  const readonlyRole = institution.getRole({ readonly: true });
+
+  if (!role) {
+    ctx.throw(409, 'The institution has no role set');
+  }
+  if (user.username === username) {
+    ctx.throw(403, 'You are not allowed to change your own roles');
+  }
+
+  const member = await elastic.security.findUser({ username });
+
+  if (!member) {
+    ctx.throw(404, 'User not found');
+  }
+
+  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  userRoles.add(readonly ? readonlyRole : role);
+  userRoles.delete(readonly ? role : readonlyRole);
+
+  member.roles = Array.from(userRoles);
+
+  try {
+    await elastic.security.putUser({ username, refresh: true, body: member });
+  } catch (e) {
+    ctx.throw(500, 'Failed to update user roles');
+    appLogger.error('Failed to update user roles', e);
+  }
+
+  ctx.status = 200;
+  ctx.body = { message: 'user updated' };
+};
+
 
   if (email === 'self') {
     email = ctx.state.user.email;
