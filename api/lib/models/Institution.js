@@ -159,6 +159,17 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     this.data[prop] = value;
   }
 
+  getRole(opts = {}) {
+    const role = this.get('role');
+
+    if (role) {
+      const readonly = opts && opts.readonly;
+      return readonly ? addReadOnlySuffix(role) : role;
+    }
+
+    return null;
+  }
+
   isContact(user) {
     const { creator, role } = this.data;
     const readOnlyRole = addReadOnlySuffix(role);
