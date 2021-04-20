@@ -220,38 +220,48 @@ exports.addInstitutionMember = async (ctx) => {
   ctx.body = { message: 'user updated' };
 };
 
+exports.removeInstitutionMember = async (ctx) => {
+  const { institution, user } = ctx.state;
+  const { username } = ctx.params;
 
-  if (email === 'self') {
-    email = ctx.state.user.email;
+  const role = institution.getRole();
+  const readonlyRole = institution.getRole({ readonly: true });
+
+  if (!role) {
+    ctx.throw(409, 'The institution has no role set');
+  }
+  if (user.username === username) {
+    ctx.throw(403, 'You are not allowed to change your own roles');
+  }
+
+  const member = await elastic.security.findUser({ username });
+
+  if (!member) {
+    ctx.throw(404, 'User not found');
+  }
+
+  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  if (!userRoles.has(role) && !userRoles.has(readonlyRole)) {
+    ctx.status = 200;
+    ctx.body = { message: 'nothing to do' };
+    return;
+  }
+
+  userRoles.delete(role);
+  userRoles.delete(readonlyRole);
+
+  member.roles = Array.from(userRoles);
+
+  try {
+    await elastic.security.putUser({ username: member.username, refresh: true, body: member });
+  } catch (e) {
+    ctx.throw(500, 'Failed to update user roles');
+    appLogger.error('Failed to update user roles', e);
   }
 
   ctx.status = 200;
-
-  if (!body.id) {
-    body.id = uuidv4();
-  }
-
-  await elastic.update({
-    index: depositorsIndex,
-    id: institutionId,
-    refresh: true,
-    body: {
-      script: {
-        source: 'def targets = ctx._source.members.findAll(contact -> contact.email == params.email);'
-          + 'for(contact in targets) {'
-          + 'contact.id = params.id;'
-          + 'contact.type = params.type;'
-          + 'contact.email = params.email;'
-          + 'contact.confirmed = params.confirmed;'
-          + 'contact.fullName = params.fullName;'
-          + '}',
-        params: body,
-      },
-    },
-  }).catch((err) => {
-    ctx.status = 500;
-    appLogger.error('Failed to update data in index', err);
-  });
+  ctx.body = { message: 'user updated' };
 };
 
 exports.refreshInstitutions = async (ctx) => {

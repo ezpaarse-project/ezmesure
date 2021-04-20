@@ -15,8 +15,8 @@ const {
   getSelfInstitution,
   getInstitutionMembers,
   addInstitutionMember,
+  removeInstitutionMember,
   updateInstitution,
-  updateMember,
   getSushiData,
   refreshInstitutions,
   refreshInstitution,
@@ -125,6 +125,22 @@ router.route({
     },
     body: {
       readonly: Joi.boolean().default(true),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId/members/:username',
+  handler: [
+    fetchInstitution,
+    requireContact,
+    removeInstitutionMember,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
     },
   },
 });
