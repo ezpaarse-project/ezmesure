@@ -157,7 +157,7 @@ export default {
           width: '200px',
         },
         {
-          text: 'Actions',
+          text: app.i18n.t('actions'),
           value: 'actions',
           sortable: false,
           width: '100px',

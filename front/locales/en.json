@@ -178,7 +178,9 @@
       "members": "Members",
       "addMember": "Add a member",
       "failedToAdd": "Failed to add member, please try again later",
-      "failedToSearch": "The search failed, please try again"
+      "failedToSearch": "The search failed, please try again",
+      "failedToRemoveMember": "Failed to remove the member",
+      "removeFromMember": "Remove {name} from members ?"
     },
     "sushi": {
       "title": "Sushi credentials - {institutionName}",
@@ -206,12 +208,14 @@
     "reportInstitutionInformation": "Report institution information."
   },
   "advancedSettings": "Advanced settings",
+  "actions": "Actions",
   "name": "Name",
   "value": "Value",
   "language": "Language",
   "refresh": "Update",
   "delete": "Remove",
   "close": "Close",
+  "cancel": "Cancel",
   "canceled": "Canceled",
   "error": "Error",
   "reset": "Reset",
@@ -230,5 +234,6 @@
   "update": "Update",
   "create": "Create",
   "administration": "Administration",
-  "informationSubmitted": "Information submitted"
+  "informationSubmitted": "Information submitted",
+  "areYouSure": "Are you sure ?"
 }

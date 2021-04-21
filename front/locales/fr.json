@@ -178,7 +178,9 @@
       "members": "Members",
       "addMember": "Ajouter un membre",
       "failedToAdd": "L'ajout du membre a échoué, veuillez réessayer ultérieurement",
-      "failedToSearch": "La recherche a échoué, veuillez réessayer"
+      "failedToSearch": "La recherche a échoué, veuillez réessayer",
+      "failedToRemoveMember": "La suppression du membre a échoué",
+      "removeFromMember": "Retirer {name} des membres ?"
     },
     "sushi": {
       "title": "Identifiants Sushi - {institutionName}",
@@ -206,12 +208,14 @@
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
   "advancedSettings": "Paramètres avancés",
+  "actions": "Actions",
   "name": "Nom",
   "value": "Valeur",
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",
   "close": "Fermer",
+  "cancel": "Annuler",
   "canceled": "Annulé",
   "error": "Erreur",
   "reset": "Réinitialiser",
@@ -230,5 +234,6 @@
   "update": "Mettre à jour",
   "create": "Créer",
   "administration": "Administration",
-  "informationSubmitted": "Informations transmises"
+  "informationSubmitted": "Informations transmises",
+  "areYouSure": "Êtes-vous sûr ?"
 }
