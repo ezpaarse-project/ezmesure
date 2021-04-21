@@ -175,7 +175,10 @@
       "emailExample": "e.g. john@doe.fr",
       "thisMemberIs": "This member is :",
       "enterValidEmail": "Please enter a valid email.",
-      "members": "Members"
+      "members": "Members",
+      "addMember": "Add a member",
+      "failedToAdd": "Failed to add member, please try again later",
+      "failedToSearch": "The search failed, please try again"
     },
     "sushi": {
       "title": "Sushi credentials - {institutionName}",

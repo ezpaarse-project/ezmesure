@@ -1,6 +1,12 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.members.title', { institutionName })" />
+    <ToolBar :title="$t('institutions.members.title', { institutionName })">
+      <v-spacer />
+      <MemberMenu
+        :institution-id="institution.id"
+        @added="refreshMembers"
+      />
+    </ToolBar>
 
     <v-data-table
       v-if="hasInstitution"
@@ -45,12 +51,14 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
+import MemberMenu from '~/components/MemberMenu';
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
+    MemberMenu,
   },
   async asyncData({
     $axios,
