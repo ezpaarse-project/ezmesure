@@ -2,7 +2,7 @@
   <section>
     <ToolBar :title="$t('institutions.members.title', { institutionName })">
       <v-spacer />
-      <MemberMenu
+      <MemberSearch
         :institution-id="institution.id"
         @added="refreshMembers"
       />
@@ -51,14 +51,14 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
-import MemberMenu from '~/components/MemberMenu';
+import MemberSearch from '~/components/MemberSearch';
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
-    MemberMenu,
+    MemberSearch,
   },
   async asyncData({
     $axios,
