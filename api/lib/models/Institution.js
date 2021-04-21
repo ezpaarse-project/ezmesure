@@ -191,7 +191,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
     const { body = {} } = await elastic.search({
       index: '.security',
-      _source: ['full_name', 'roles', 'email'],
+      _source: ['full_name', 'roles', 'email', 'username'],
       body: {
         query: {
           bool: {
