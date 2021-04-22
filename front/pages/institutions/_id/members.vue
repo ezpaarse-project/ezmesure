@@ -13,6 +13,7 @@
       :headers="headers"
       :items="members"
       :loading="refreshing"
+      sort-by="full_name"
       item-key="email"
     >
       <template v-slot:item.correspondent="{ item }">
