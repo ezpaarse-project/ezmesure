@@ -44,6 +44,7 @@
       <template v-slot:item.actions="{ item }">
         <MemberActions
           :member="item"
+          @permissions="updateMember(item)"
           @delete="removeMember(item)"
         />
       </template>
@@ -54,6 +55,11 @@
       <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
     </v-card-text>
 
+    <MemberUpdateDialog
+      ref="updateDialog"
+      :institution-id="institution.id"
+      @updated="refreshMembers"
+    />
     <MemberDeleteDialog
       ref="deleteDialog"
       :institution-id="institution.id"
@@ -67,6 +73,7 @@ import ToolBar from '~/components/space/ToolBar';
 import MemberActions from '~/components/MemberActions';
 import MemberSearch from '~/components/MemberSearch';
 import MemberDeleteDialog from '~/components/MemberDeleteDialog';
+import MemberUpdateDialog from '~/components/MemberUpdateDialog';
 
 export default {
   layout: 'space',
@@ -76,6 +83,7 @@ export default {
     MemberActions,
     MemberSearch,
     MemberDeleteDialog,
+    MemberUpdateDialog,
   },
   async asyncData({
     $axios,
@@ -160,6 +168,9 @@ export default {
       this.refreshing = false;
     },
 
+    updateMember(member) {
+      this.$refs.updateDialog.updateMember(member);
+    },
     removeMember(member) {
       this.$refs.deleteDialog.confirmRemove(member);
     },

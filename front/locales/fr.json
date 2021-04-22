@@ -180,7 +180,12 @@
       "failedToAdd": "L'ajout du membre a échoué, veuillez réessayer ultérieurement",
       "failedToSearch": "La recherche a échoué, veuillez réessayer",
       "failedToRemoveMember": "La suppression du membre a échoué",
-      "removeFromMember": "Retirer {name} des membres ?"
+      "removeFromMember": "Retirer {name} des membres ?",
+      "changePermissions": "Changer les permissions",
+      "permissionsOf": "Permissions de {name}",
+      "readPermDesc": "L'utilisateur peut consulter les tableaux de bord Kibana, sans les modifier.",
+      "writePermDesc": "L'utilisateur peut consulter et modifier les tableaux de bord Kibana.",
+      "failedToUpdatePerms": "La mise à jour des permissions a échoué"
     },
     "sushi": {
       "title": "Identifiants Sushi - {institutionName}",

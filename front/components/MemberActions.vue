@@ -52,6 +52,11 @@ export default {
     actions() {
       return [
         {
+          icon: 'mdi-shield',
+          label: this.$t('institutions.members.changePermissions'),
+          callback: () => { this.$emit('permissions'); },
+        },
+        {
           icon: 'mdi-delete',
           label: this.$t('delete'),
           callback: () => { this.$emit('delete'); },
