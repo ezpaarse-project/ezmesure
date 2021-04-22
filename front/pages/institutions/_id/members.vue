@@ -3,7 +3,7 @@
     <ToolBar :title="$t('institutions.members.title', { institutionName })">
       <v-spacer />
       <MemberSearch
-        :institution-id="institution.id"
+        :institution-id="institutionId"
         @added="refreshMembers"
       />
     </ToolBar>
@@ -57,12 +57,12 @@
 
     <MemberUpdateDialog
       ref="updateDialog"
-      :institution-id="institution.id"
+      :institution-id="institutionId"
       @updated="refreshMembers"
     />
     <MemberDeleteDialog
       ref="deleteDialog"
-      :institution-id="institution.id"
+      :institution-id="institutionId"
       @removed="refreshMembers"
     />
   </section>
@@ -148,6 +148,9 @@ export default {
     },
     institutionName() {
       return this.institution?.name;
+    },
+    institutionId() {
+      return this.institution?.id;
     },
   },
   mounted() {
