@@ -181,7 +181,7 @@ exports.getInstitutionMembers = async (ctx) => {
 };
 
 exports.addInstitutionMember = async (ctx) => {
-  const { institution, user } = ctx.state;
+  const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
   const { body = {} } = ctx.request;
   const { readonly = true } = body;
@@ -192,14 +192,14 @@ exports.addInstitutionMember = async (ctx) => {
   if (!role) {
     ctx.throw(409, 'The institution has no role set');
   }
-  if (user.username === username) {
-    ctx.throw(403, 'You are not allowed to change your own roles');
-  }
 
   const member = await elastic.security.findUser({ username });
 
   if (!member) {
     ctx.throw(404, 'User not found');
+  }
+  if (institution.isContact(member) && !userIsAdmin) {
+    ctx.throw(409, 'You can\'t update an institution contact');
   }
 
   const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
@@ -221,7 +221,7 @@ exports.addInstitutionMember = async (ctx) => {
 };
 
 exports.removeInstitutionMember = async (ctx) => {
-  const { institution, user } = ctx.state;
+  const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
 
   const role = institution.getRole();
@@ -230,14 +230,14 @@ exports.removeInstitutionMember = async (ctx) => {
   if (!role) {
     ctx.throw(409, 'The institution has no role set');
   }
-  if (user.username === username) {
-    ctx.throw(403, 'You are not allowed to change your own roles');
-  }
 
   const member = await elastic.security.findUser({ username });
 
   if (!member) {
     ctx.throw(404, 'User not found');
+  }
+  if (institution.isContact(member) && !userIsAdmin) {
+    ctx.throw(409, 'You can\'t remove an institution contact');
   }
 
   const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
