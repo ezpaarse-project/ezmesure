@@ -4,7 +4,7 @@
       <v-btn
         small
         color="primary"
-        :disabled="isContact"
+        :disabled="isContact && !isAdmin"
         v-bind="attrs"
         v-on="on"
       >
@@ -44,6 +44,9 @@ export default {
     return {};
   },
   computed: {
+    isAdmin() {
+      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+    },
     isContact() {
       const isTech = this.member?.roles?.includes('tech_contact');
       const isDoc = this.member?.roles?.includes('doc_contact');
