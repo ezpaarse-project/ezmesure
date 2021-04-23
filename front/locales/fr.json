@@ -166,6 +166,7 @@
       "documentaryCorrespondent": "Documentaire",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
       "name": "Nom",
+      "username": "Identifiant",
       "correspondent": "Correspondant",
       "permissions": "Permissions Kibana",
       "read": "Lecture",

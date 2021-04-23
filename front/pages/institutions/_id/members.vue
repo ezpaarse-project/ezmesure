@@ -14,7 +14,7 @@
       :items="members"
       :loading="refreshing"
       sort-by="full_name"
-      item-key="email"
+      item-key="username"
     >
       <template v-slot:item.correspondent="{ item }">
         <v-chip
@@ -122,8 +122,8 @@ export default {
           value: 'full_name',
         },
         {
-          text: 'Email',
-          value: 'email',
+          text: app.i18n.t('institutions.members.username'),
+          value: 'username',
         },
         {
           text: app.i18n.t('institutions.members.permissions'),
