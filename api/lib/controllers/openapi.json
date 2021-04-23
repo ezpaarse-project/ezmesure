@@ -749,12 +749,6 @@
               "type": "string"
             }
           },
-          "email": {
-            "type": "string",
-            "minLength": 1,
-            "format": "email",
-            "description": "Member email"
-          },
           "readonly": {
             "type": "boolean",
             "description": "Whether the member has Kibana write permission"
@@ -763,7 +757,6 @@
         "required": [
           "full_name",
           "roles",
-          "email",
           "readonly"
         ]
       }
@@ -2462,10 +2455,10 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "description": "Forbidden"
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "Conflict"
@@ -2537,8 +2530,10 @@
     },
     "/users": {
       "get": {
-        "summary": "Your GET endpoint",
-        "tags": [],
+        "summary": "List users",
+        "tags": [
+          "Institutions"
+        ],
         "responses": {
           "200": {
             "description": "OK",
