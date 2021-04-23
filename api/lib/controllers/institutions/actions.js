@@ -200,6 +200,18 @@ exports.addInstitutionMember = async (ctx) => {
   if (institution.isContact(member) && !userIsAdmin) {
     ctx.throw(409, 'You can\'t update an institution contact');
   }
+  if (!institution.isMember(member)) {
+    const memberInstitution = await Institution.findOneByCreatorOrRole(
+      member.username,
+      member.roles,
+    );
+
+    if (memberInstitution) {
+      ctx.throw(409, 'The user belongs to another institution');
+      return;
+    }
+  }
+
 
   const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
 

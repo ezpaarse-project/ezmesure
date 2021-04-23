@@ -107,7 +107,7 @@ function addReadOnlySuffix(str) {
 class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   static findOneByCreatorOrRole(username, userRoles) {
     // Remove readonly suffix so that we search with the base role
-    const roles = userRoles.map(trimReadOnlySuffix);
+    const roles = Array.isArray(userRoles) ? userRoles.map(trimReadOnlySuffix) : [];
 
     return this.findOne({
       should: [
@@ -171,17 +171,24 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   isContact(user) {
+    if (!this.isMember(user)) { return false; }
+    if (!Array.isArray(user && user.roles)) { return false; }
+
+    const roles = new Set(user.roles);
+    return (roles.has(techRole) || roles.has(docRole));
+  }
+
+  isMember(user) {
+    if (!user || !user.username) { return false; }
+
     const { creator, role } = this.data;
     const readOnlyRole = addReadOnlySuffix(role);
 
-    if (!user || !user.username) { return false; }
     if (creator && creator === user.username) { return true; }
     if (!role || !Array.isArray(user && user.roles)) { return false; }
 
     const roles = new Set(user.roles);
-    const hasInstitutionRole = roles.has(role) || roles.has(readOnlyRole);
-    const hasContactRole = roles.has(techRole) || roles.has(docRole);
-    return hasInstitutionRole && hasContactRole;
+    return (roles.has(role) || roles.has(readOnlyRole));
   }
 
   async getMembers() {
