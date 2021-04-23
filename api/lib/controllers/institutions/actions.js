@@ -1,5 +1,4 @@
 const config = require('config');
-const { v4: uuidv4 } = require('uuid');
 const elastic = require('../../services/elastic');
 const depositors = require('../../services/depositors');
 const indexTemplate = require('../../utils/depositors-template');
