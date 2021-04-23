@@ -60,8 +60,8 @@ export default {
           callback: () => { this.$emit('permissions'); },
         },
         {
-          icon: 'mdi-delete',
-          label: this.$t('delete'),
+          icon: 'mdi-account-off',
+          label: this.$t('revoke'),
           callback: () => { this.$emit('delete'); },
         },
       ];

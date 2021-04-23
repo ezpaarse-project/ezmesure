@@ -220,6 +220,7 @@
   "language": "Language",
   "refresh": "Update",
   "delete": "Remove",
+  "revoke": "Revoke",
   "close": "Close",
   "cancel": "Cancel",
   "canceled": "Canceled",
