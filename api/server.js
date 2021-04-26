@@ -5,6 +5,7 @@ const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('koa-cors');
 const config = require('config');
+const { STATUS_CODES } = require('http');
 
 const metrics = require('./lib/services/metrics');
 const logger = require('./lib/services/logger');
@@ -83,7 +84,15 @@ app.use(async (ctx, next) => {
     if (ctx.headerSent || !ctx.writable) { return; }
 
     if (env !== 'development') {
-      ctx.body = { error: error.message };
+      let { message } = error;
+
+      if (!error.expose) {
+        message = STATUS_CODES[ctx.status] || STATUS_CODES[500];
+      }
+
+      ctx.body = {
+        error: message,
+      };
       return;
     }
 
