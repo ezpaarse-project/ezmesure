@@ -5,8 +5,10 @@ const Koa = require('koa');
 const mount = require('koa-mount');
 const cors = require('koa-cors');
 const config = require('config');
+const path = require('path');
 const { STATUS_CODES } = require('http');
 
+const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
 const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
@@ -39,6 +41,12 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   headers: ['Content-Type', 'Authorization'],
 }));
+
+i18n(app, {
+  dir: path.resolve(__dirname, 'locales'),
+  defaultLocale: 'en',
+  cookieName: 'ezmesure_i18n',
+});
 
 // Server logs
 app.use(async (ctx, next) => {
