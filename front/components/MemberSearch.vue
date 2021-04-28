@@ -62,9 +62,9 @@
             type="error"
             dense
             outlined
-            :value="failedToAdd"
+            :value="!!addMemberError"
           >
-            {{ $t('institutions.members.failedToAdd') }}
+            {{ addMemberError }}
           </v-alert>
         </v-form>
       </v-card-text>
@@ -107,7 +107,7 @@ export default {
       showMemberMenu: false,
       loading: false,
       addingMember: false,
-      failedToAdd: false,
+      addMemberError: null,
       failedToSearch: false,
       search: null,
       selected: null,
@@ -149,7 +149,7 @@ export default {
       this.search = null;
       this.selected = null;
       this.selectedPermission = 'read';
-      this.failedToAdd = false;
+      this.addMemberError = null;
       this.failedToSearch = false;
     },
 
@@ -180,7 +180,7 @@ export default {
       if (!this.selected?.username || !this.institutionId) { return; }
 
       this.addingMember = true;
-      this.failedToAdd = false;
+      this.addMemberError = null;
 
       const { username } = this.selected;
       const readonly = this.selectedPermission !== 'write';
@@ -190,7 +190,8 @@ export default {
         this.showMemberMenu = false;
         this.$emit('added');
       } catch (e) {
-        this.failedToAdd = true;
+        const message = e?.response?.data?.error;
+        this.addMemberError = message || this.$t('institutions.members.failedToAdd');
       }
 
       this.addingMember = false;
