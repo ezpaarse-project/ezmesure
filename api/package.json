@@ -36,6 +36,7 @@
     "date-fns": "^2.2.1",
     "fs-extra": "^7.0.0",
     "googleapis": "^22.2.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.6.1",
     "koa-body": "^4.1.1",
