@@ -1,0 +1,59 @@
+nothingToDo: Nothing to do
+userUpdated: User updated
+
+errors:
+  emptyBody: request body is empty
+  termsOfUse: You must accept the terms of use before using this service
+  unauthorized: You are not authorized to access this route
+
+  auth:
+    reservedUser: cannot login as reserved user
+    noEmailInHeaders: email not found in Shibboleth headers
+    IDPNotFound: IDP not found in Shibboleth headers
+    noUsername: no username in the token
+    unableToFetchUser: Unable to fetch user data, please log in again
+
+  sushi:
+    unauthorized: You are not authorized to manage sushi credentials
+    institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"
+    notFound: Sushi item not found
+    emptyEndpointResponse: Sushi endpoint returned an empty response
+
+  institution:
+    notFound: Institution not found
+    unauthorized: You are not allowed to access this institution
+    noRole: The institution has no role set
+    notAssigned: No assigned institution
+    alreadyAttached: You can not attach another institution to your profile
+
+  members:
+    alreadyMember: The user belongs to another institution
+    cannotRemoveContact: You can't remove an institution contact
+    cannotUpdateContact: You can't update an institution contact
+
+  user:
+    notFound: User not found
+    noEmail: mandatory email is missing from user profile
+    failedToSave: Failed to save user data
+    failedToUpdateRoles: Failed to update user roles
+
+  users:
+    failedToQuery: failed to query users
+
+  files:
+    wrongEntriesFormat: entries should be an array of file names
+    missingEntries: "missing required field: entries"
+    unsupportedType: unsupported file type
+
+  perms:
+    feature: You are not authorized to use this feature
+    readIndex: you don't have permission to read in %s
+    writeInIndex: you don't have permission to write in %s
+    deleteIndex: you don't have permission to delete %s
+    deleteFromIndex: you don't have permission to delete from %s
+
+  aggregate:
+    invalidFilter: "invalid filter: '%s' should be either a string or an array of strings"
+    missingFields: "missing mandatory param: fields"
+    invalidFilterFormat: filter has an invalid rison format
+    invalidPeriod: Invalid period

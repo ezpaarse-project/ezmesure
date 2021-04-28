@@ -1,0 +1,59 @@
+nothingToDo: Rien à faire
+userUpdated: Utilisateur mis à jour
+
+errors:
+  emptyBody: Le corps de la requête est vide
+  termsOfUse: Vous devez acceptez les conditions d'utilisation avant d'utiliser ce service
+  unauthorized: Vous n'êtes pas autorisés à utiliser cette route
+
+  auth:
+    reservedUser: vous ne pouvez pas vous connecter avec un utilisateur réservé
+    noEmailInHeaders: Email introuvable dans les headers Shibboleth
+    IDPNotFound: IDP introuvable dans les headers Shibboleth
+    noUsername: Nom d'utilisateur introuvable dans le token
+    unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
+
+  sushi:
+    unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
+    institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
+    notFound: Item SUSHI introuvable
+    emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
+
+  institution:
+    notFound: Établissement introuvableah tiens, la config ng
+    unauthorized: Vous n'êtes pas autorisé à accéder à cet établissement
+    noRole: L'établissement n'a pas de rôle associé
+    notAssigned: Pas d'établissement associé
+    alreadyAttached: Vous ne pouvez associer un autre établissement à votre profil
+
+  members:
+    alreadyMember: L'utilisateur appartient à une autre institution
+    cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
+    cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
+
+  user:
+    notFound: Utilisateur introuvable
+    noEmail: L'email obligatoire est absent du profil utilisateur
+    failedToSave: Impossible de sauvegarder les données utilisateur
+    failedToUpdateRoles: Impossible de mettre à jour les rôles de l'utilisateur
+
+  users:
+    failedToQuery: Impossible de récupérer les utilisateurs
+
+  files:
+    wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
+    missingEntries: "Champ requis manquant: entries"
+    unsupportedType: Type de fichier non supporté
+
+  perms:
+    feature: Vous n'êtes pas autorisé à utiliser cette fonctionnalité
+    readIndex: Vous n'avez pas l'autorisation de lire dans %s
+    writeInIndex: Vous n'avez pas l'autorisation d'écrire dans %s
+    deleteIndex: Vous n'avez pas l'autorisation de supprimer %s
+    deleteFromIndex: Vous n'avez pas l'autorisation de supprimer dans %s
+
+  aggregate:
+    invalidFilter: "Filtre invalide : '%s' devrait être une chaîne de caractère, ou une liste de chaînes de caractères"
+    missingFields: "Champ requis manquant : fields"
+    invalidFilterFormat: Le filtre présente un format rison invalide
+    invalidPeriod: Période invalide
