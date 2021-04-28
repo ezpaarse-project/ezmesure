@@ -32,7 +32,7 @@ async function fetchInstitution(ctx, next) {
   const institution = await Institution.findById(institutionId);
 
   if (!institution) {
-    ctx.throw(404, 'Institution not found');
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
     return;
   }
 
@@ -50,7 +50,7 @@ function requireContact(ctx, next) {
   if (userIsAdmin) { return next(); }
   if (user && institution && institution.isContact(user)) { return next(); }
 
-  ctx.throw(403, 'You are not allowed to access this institution');
+  ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
   return undefined;
 }
 

@@ -15,7 +15,7 @@ exports.upload = async function (ctx) {
   ctx.action = 'file/upload';
 
   if (!/\.(csv|gz)$/i.test(fileName)) {
-    return ctx.throw(400, 'unsupported file type');
+    return ctx.throw(400, ctx.$t('errors.files.unsupportedType'));
   }
 
   fileName = fileName.replace(/\s/g, '_');
@@ -54,7 +54,7 @@ exports.list = async function (ctx) {
   const { username, email } = ctx.state.user;
 
   if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
   const userDir = path.resolve(storagePath, email.split('@')[1], username);
@@ -85,7 +85,7 @@ exports.deleteOne = async function (ctx) {
   const { username, email } = ctx.state.user;
 
   if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
   const domain = email.split('@')[1];
@@ -105,7 +105,7 @@ exports.deleteMany = async function (ctx) {
   const { username, email } = ctx.state.user;
 
   if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
   const domain = email.split('@')[1];
@@ -113,11 +113,11 @@ exports.deleteMany = async function (ctx) {
   const fileNames = body && body.entries;
 
   if (!fileNames) {
-    return ctx.throw(400, 'missing required field: entries');
+    return ctx.throw(400, ctx.$t('errors.files.missingEntries'));
   }
 
   if (!Array.isArray(fileNames)) {
-    return ctx.throw(400, 'entries should be an array of file names');
+    return ctx.throw(400, ctx.$t('errors.files.wrongEntriesFormat'));
   }
 
   const relativePaths = fileNames.map((fileName) => path.join(domain, username, fileName));
@@ -169,6 +169,7 @@ function validateFile(filePath) {
           err = errors[0];
 
           if (err.type === 'Quotes') {
+            // FIXME: translate me!
             err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
           }
 

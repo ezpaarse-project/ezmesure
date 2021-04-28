@@ -50,11 +50,11 @@ module.exports = async function upload(ctx) {
   const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
   if (!canWrite) {
-    return ctx.throw(403, `you don't have permission to write in ${index}`);
+    return ctx.throw(403, ctx.$t('errors.perms.writeInIndex', index));
   }
 
   if (!email) {
-    return ctx.throw(400, 'mandatory email is missing from user profile');
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
   const { body: exists } = await elastic.indices.exists({ index });

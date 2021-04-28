@@ -27,7 +27,7 @@ exports.list = async (ctx) => {
   const users = body.hits && body.hits.hits;
 
   if (!Array.isArray(users)) {
-    ctx.throw(500, 'failed to query users');
+    ctx.throw(500, ctx.$t('errors.users.failedToQuery'));
   }
 
   ctx.type = 'json';

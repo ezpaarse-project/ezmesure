@@ -47,7 +47,7 @@ exports.getSelfInstitution = async (ctx) => {
   const institution = await Institution.findOneByCreatorOrRole(username, roles);
 
   if (!institution) {
-    ctx.throw(404, 'No assigned institution');
+    ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
     return;
   }
 
@@ -70,7 +70,7 @@ exports.createInstitution = async (ctx) => {
     const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
 
     if (selfInstitution) {
-      ctx.throw(409, 'You can not attach another institution to your profile');
+      ctx.throw(409, ctx.$t('errors.institution.alreadyAssigned'));
       return;
     }
   }
@@ -98,7 +98,7 @@ exports.updateInstitution = async (ctx) => {
   const { body } = ctx.request;
 
   if (!body) {
-    ctx.throw(400, 'body is empty');
+    ctx.throw(400, ctx.$t('errors.emptyBody'));
     return;
   }
 
@@ -189,16 +189,16 @@ exports.addInstitutionMember = async (ctx) => {
   const readonlyRole = institution.getRole({ readonly: true });
 
   if (!role) {
-    ctx.throw(409, 'The institution has no role set');
+    ctx.throw(409, ctx.$t('errors.institution.noRole'));
   }
 
   const member = await elastic.security.findUser({ username });
 
   if (!member) {
-    ctx.throw(404, 'User not found');
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
   if (institution.isContact(member) && !userIsAdmin) {
-    ctx.throw(409, 'You can\'t update an institution contact');
+    ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
   }
   if (!institution.isMember(member)) {
     const memberInstitution = await Institution.findOneByCreatorOrRole(
@@ -207,7 +207,7 @@ exports.addInstitutionMember = async (ctx) => {
     );
 
     if (memberInstitution) {
-      ctx.throw(409, 'The user belongs to another institution');
+      ctx.throw(409, ctx.$t('errors.members.alreadyMember'));
       return;
     }
   }
@@ -223,8 +223,7 @@ exports.addInstitutionMember = async (ctx) => {
   try {
     await elastic.security.putUser({ username, refresh: true, body: member });
   } catch (e) {
-    ctx.throw(500, 'Failed to update user roles');
-    appLogger.error('Failed to update user roles', e);
+    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
   }
 
   ctx.status = 200;
@@ -239,23 +238,23 @@ exports.removeInstitutionMember = async (ctx) => {
   const readonlyRole = institution.getRole({ readonly: true });
 
   if (!role) {
-    ctx.throw(409, 'The institution has no role set');
+    ctx.throw(409, ctx.$t('errors.institution.noRole'));
   }
 
   const member = await elastic.security.findUser({ username });
 
   if (!member) {
-    ctx.throw(404, 'User not found');
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
   if (institution.isContact(member) && !userIsAdmin) {
-    ctx.throw(409, 'You can\'t remove an institution contact');
+    ctx.throw(409, ctx.$t('errors.members.cannotRemoveContact'));
   }
 
   const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
 
   if (!userRoles.has(role) && !userRoles.has(readonlyRole)) {
     ctx.status = 200;
-    ctx.body = { message: 'nothing to do' };
+    ctx.body = { message: ctx.$t('nothingToDo') };
     return;
   }
 
@@ -267,12 +266,11 @@ exports.removeInstitutionMember = async (ctx) => {
   try {
     await elastic.security.putUser({ username: member.username, refresh: true, body: member });
   } catch (e) {
-    ctx.throw(500, 'Failed to update user roles');
-    appLogger.error('Failed to update user roles', e);
+    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
   }
 
   ctx.status = 200;
-  ctx.body = { message: 'user updated' };
+  ctx.body = { message: ctx.$t('userUpdated') };
 };
 
 exports.refreshInstitutions = async (ctx) => {

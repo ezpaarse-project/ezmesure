@@ -25,7 +25,7 @@ exports.aggregate = async function aggregate(ctx) {
   const csvColumns = ['doc_count', ...aggregatedFields];
 
   if (aggregatedFields.length === 0) {
-    ctx.throw(400, 'missing mandatory "fields" param');
+    ctx.throw(400, ctx.$t('errors.aggregate.missingFields'));
     return;
   }
 
@@ -36,7 +36,7 @@ exports.aggregate = async function aggregate(ctx) {
     try {
       filterParam = rison.decode_object(filterString);
     } catch (e) {
-      ctx.throw(400, 'filter has an invalid rison format');
+      ctx.throw(400, ctx.$t('errors.aggregate.invalidFilterFormat'));
       return;
     }
 
@@ -64,7 +64,7 @@ exports.aggregate = async function aggregate(ctx) {
         // status:(gte:200,lt:400)
         filter.push({ range: { [key]: value } });
       } else {
-        ctx.throw(400, `invalid filter: '${key}' should be either a string or an array of strings`);
+        ctx.throw(400, ctx.$t('errors.aggregate.invalidFilter'));
         return false;
       }
       return true;
@@ -191,11 +191,11 @@ exports.counter5 = async function counter5(ctx) {
   const canWrite = perm && perm.index && perm.index[destIndex] && perm.index[destIndex].write;
 
   if (!canRead) {
-    ctx.throw(403, `you don't have permission to read in ${sourceIndex}`);
+    ctx.throw(403, ctx.$t('errors.perms.readIndex', sourceIndex));
     return;
   }
   if (!canWrite) {
-    ctx.throw(403, `you don't have permission to write in ${destIndex}`);
+    ctx.throw(403, ctx.$t('errors.perms.writeInIndex', destIndex));
     return;
   }
 

@@ -29,7 +29,7 @@ exports.deleteIndice = async function (ctx) {
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index].delete_index;
 
   if (!canDelete) {
-    return ctx.throw(403, `you don't have permission to delete ${index}`);
+    ctx.throw(403, ctx.$t('errors.perms.deleteIndex', index));
   }
 
   const { body } = await elastic.indices.delete({
@@ -58,7 +58,7 @@ exports.deleteEvents = async function (ctx) {
   const canDelete = perm && perm.index && perm.index[index] && perm.index[index].delete_index;
 
   if (!canDelete) {
-    return ctx.throw(403, `you don't have permission to delete from ${index}`);
+    ctx.throw(403, ctx.$t('errors.perms.deleteFrom', index));
   }
 
   const query = {};
@@ -146,7 +146,7 @@ exports.tops = async function (ctx) {
     case 'all':
       break;
     default:
-      this.throw(400, 'Invalid period');
+      ctx.throw(400, ctx.$t('errors.aggregate.invalidPeriod'));
       break;
   }
 
