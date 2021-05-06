@@ -5,6 +5,9 @@ const route = router();
 const { Joi } = router;
 const bodyParser = require('koa-bodyparser');
 const { index, frequencies } = require('config');
+const views = require('../../services/views.js');
+const nunjucks = require('nunjucks');
+const path = require('path');
 
 const {
   list,
@@ -13,6 +16,7 @@ const {
   del,
   history,
   download,
+  render,
 } = require('./reporting');
 const elastic = require('../../services/elastic');
 
@@ -46,6 +50,12 @@ function hasPrivileges(privileges) {
     }
   };
 }
+nunjucks.configure(path.resolve(process.cwd(), 'lib', 'views'), {});
+
+route.get('/render', [
+  views(nunjucks)
+], render);
+
 
 route.get('/tasks/:space?', hasPrivileges(['read']), list);
 

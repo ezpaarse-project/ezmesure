@@ -411,3 +411,7 @@ exports.download = async (ctx) => {
     ctx.status(500);
   }
 };
+
+exports.render = async (ctx) => {
+    await ctx.render('toto', {name: 'totatato'});
+};

@@ -3,6 +3,8 @@ const mount = require('koa-mount');
 const cors = require('@koa/cors');
 const { port, cron } = require('config');
 const { CronJob } = require('cron');
+const serve = require('koa-static');
+const path = require('path');
 
 const logger = require('./lib/logger');
 const roles = require('./lib/services/roles');
@@ -97,6 +99,8 @@ app.on('error', (err, ctx = {}) => {
 
   logger.error(`url=${url}, status=${ctx.status}, error=${err.message}, stack=${err.stack}`);
 });
+
+app.use(serve(path.resolve(process.cwd(), 'node_modules', 'bootstrap', 'dist')));
 
 app.use(mount('/', controller));
 
