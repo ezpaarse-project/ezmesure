@@ -1,0 +1,41 @@
+{% macro render(id) %}
+<div class="card mx-1 my-3">
+  <div class="card-body">
+    <h5 class="card-title">Diagramme circulaire</h5>
+    <div class="card-text text-center">
+      <div id="{{ id }}"></div>
+    </div>
+  </div>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    vegaEmbed(
+      '#{{ id }}',
+      {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "description": "A basic pie chart example.",
+        "width": 200,
+        "height": 220,
+        "padding": 5,
+        "data": {
+          "values": [
+            { "category": 1, "value": 4 },
+            { "category": 2, "value": 6 },
+            { "category": 3, "value": 10 },
+            { "category": 4, "value": 3 },
+            { "category": 5, "value": 7 },
+            { "category": 6, "value": 8 }
+          ]
+        },
+        "mark": { "type": "arc", "innerRadius": 50 },
+        "encoding": {
+          "theta": { "field": "value", "type": "quantitative" },
+          "color": { "field": "category", "type": "nominal" }
+        },
+        "view": { "stroke": null }
+      },
+      { actions: false }
+    );
+  });
+</script>
+{% endmacro %}

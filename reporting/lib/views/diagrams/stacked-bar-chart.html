@@ -1,0 +1,47 @@
+{% macro render(id) %}
+<div class="card mx-1 my-3">
+  <div class="card-body">
+    <h5 class="card-title">Diagramme à barres</h5>
+    <div class="card-text text-center">
+      <div id="{{ id }}"></div>
+    </div>
+  </div>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    vegaEmbed(
+      '#{{ id }}',
+      {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "description": "A basic stacked bar chart example.",
+        "width": 500,
+        "height": 190,
+        "padding": 5,
+        "autosize": "fit-x",
+
+        "data": {
+          "values": [
+            { "a": 0, "b": 28, "color": "blue" }, { "a": 0, "b": 55, "color": "orange" },
+            { "a": 1, "b": 43, "color": "blue" }, { "a": 1, "b": 91, "color": "orange" },
+            { "a": 2, "b": 81, "color": "blue" }, { "a": 2, "b": 53, "color": "orange" },
+            { "a": 3, "b": 19, "color": "blue" }, { "a": 3, "b": 87, "color": "orange" },
+            { "a": 4, "b": 52, "color": "blue" }, { "a": 4, "b": 48, "color": "orange" },
+            { "a": 5, "b": 24, "color": "blue" }, { "a": 5, "b": 49, "color": "orange" },
+            { "a": 6, "b": 87, "color": "blue" }, { "a": 6, "b": 66, "color": "orange" },
+            { "a": 7, "b": 17, "color": "blue" }, { "a": 7, "b": 27, "color": "orange" },
+            { "a": 8, "b": 68, "color": "blue" }, { "a": 8, "b": 16, "color": "orange" },
+            { "a": 9, "b": 49, "color": "blue" }, { "a": 9, "b": 15, "color": "orange" }
+          ]
+        },
+        "mark": { "type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3 },
+        "encoding": {
+          "x": { "field": "a", "type": "nominal", "axis": { "title": "", "labelAngle": 0 } },
+          "y": { "field": "b", "type": "quantitative", "axis": { "title": "", "grid": false } },
+          "color": { "field": "color" }
+        }
+      },
+      { actions: false }
+    );
+  });
+</script>
+{% endmacro %}

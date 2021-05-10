@@ -412,6 +412,10 @@ exports.download = async (ctx) => {
   }
 };
 
-exports.render = async (ctx) => {
-    await ctx.render('toto', {name: 'totatato'});
+exports.renderNotOptimized = async (ctx) => {
+  await ctx.render('not-optimized', { etablissement: 'bibCNRS - NON OPTIMISÉ' });
+};
+
+exports.renderOptimized = async (ctx) => {
+  await ctx.render('optimized', { etablissement: 'bibCNRS - OPTIMISÉ' });
 };
