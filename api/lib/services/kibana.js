@@ -75,15 +75,18 @@ client.createIndexPattern = (spaceId, opts) => {
     throw new Error('Missing required parameter: timeFieldName');
   }
 
-  return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes }, {  });
+  return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes });
 };
 
-client.getIndexPatterns = (spaceId) => {
-  const options = {
-    params: { type: 'index-pattern' },
+client.getIndexPatterns = (spaceId, opts) => {
+  const options = opts || {};
+  const params = {
+    type: 'index-pattern',
+    page: options.page || 1,
+    per_page: options.perPage || 50,
   };
 
-  return axiosClient.get(`/s/${spaceId}/api/saved_objects/_find`, options);
+  return axiosClient.get(`/s/${spaceId}/api/saved_objects/_find`, { params });
 };
 
 module.exports = client;
