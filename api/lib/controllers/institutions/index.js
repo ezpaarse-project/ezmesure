@@ -10,7 +10,6 @@ const {
   createInstitution,
   deleteInstitutions,
   deleteInstitution,
-  validateInstitution,
   getInstitution,
   getSelfInstitution,
   getInstitutionMembers,
@@ -24,6 +23,12 @@ const {
 
 const {
   getInstitutionState,
+  validateInstitution,
+  createInstitutionSpace,
+  createInstitutionIndex,
+  createInstitutionIndexPattern,
+  createInstitutionRoles,
+  migrateInstitutionCreator,
 } = require('./admin');
 
 /**
@@ -230,6 +235,33 @@ router.route({
     },
   },
 });
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_create_space',
+  handler: [fetchInstitution, createInstitutionSpace],
+});
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_create_index',
+  handler: [fetchInstitution, createInstitutionIndex],
+});
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_create_index_pattern',
+  handler: [fetchInstitution, createInstitutionIndexPattern],
+});
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_create_roles',
+  handler: [fetchInstitution, createInstitutionRoles],
+});
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_migrate_creator',
+  handler: [fetchInstitution, migrateInstitutionCreator],
+});
+
 
 router.route({
   method: 'POST',

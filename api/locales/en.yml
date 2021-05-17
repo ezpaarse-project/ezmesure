@@ -1,5 +1,7 @@
 nothingToDo: Nothing to do
 userUpdated: User updated
+indexCreated: Index created
+creatorMigrated: Creator migrated
 
 errors:
   emptyBody: request body is empty
@@ -25,6 +27,11 @@ errors:
     noRole: The institution has no role set
     notAssigned: No assigned institution
     alreadyAttached: You can not attach another institution to your profile
+    noSpaceSet: Institution has no space set
+    noPrefixSet: Institution has no index prefix set
+    noRoleSet: Institution has no role set
+    noBaseIndex: Institution base index does not exist
+    noSpace: Institution space does not exist
 
   members:
     alreadyMember: The user belongs to another institution

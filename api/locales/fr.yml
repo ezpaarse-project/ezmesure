@@ -1,5 +1,7 @@
 nothingToDo: Rien à faire
 userUpdated: Utilisateur mis à jour
+indexCreated: index créé
+creatorMigrated: Créateur migré
 
 errors:
   emptyBody: Le corps de la requête est vide
@@ -25,6 +27,11 @@ errors:
     noRole: L'établissement n'a pas de rôle associé
     notAssigned: Pas d'établissement associé
     alreadyAttached: Vous ne pouvez associer un autre établissement à votre profil
+    noSpaceSet: L'établissement n'a pas d'espace associé
+    noPrefixSet: L'établissement n'a pas de préfixe d'index associé
+    noRoleSet: L'établissement n'a pas de rôle associé
+    noBaseIndex: L'index de base de l'établissment n'existe pas
+    noSpace: L'espace de l'établissement n'existe pas
 
   members:
     alreadyMember: L'utilisateur appartient à une autre institution
