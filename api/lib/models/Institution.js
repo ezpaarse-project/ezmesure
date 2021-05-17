@@ -72,11 +72,13 @@ const updateSchema = {
   ...createSchema,
 };
 
-async function createRole(role, settings = {}) {
+async function getRole(role) {
   const { body } = await elastic.security.getRole({ name: role }, { ignore: [404] });
-  const existingRole = body && body[role];
+  return body && body[role];
+}
 
-  if (existingRole) { return; }
+async function createRole(role, settings = {}) {
+  if (await getRole(role)) { return; }
 
   await kibana.putRole({
     name: role,
@@ -219,6 +221,21 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
+   * Get the institution space
+   */
+  async getSpace() {
+    const { space } = this.data;
+
+    if (!space) {
+      return null;
+    }
+
+    const { data = {}, status } = await kibana.getSpace(space);
+
+    return status === 200 ? data : null;
+  }
+
+  /**
    * Create the institution space if it doesn't exist yet
    */
   async createSpace() {
@@ -227,6 +244,24 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     if (response && response.status !== 404) { return; }
 
     await kibana.createSpace({ id: space, name });
+  }
+
+  /**
+   * Check that the institution roles exist
+   */
+  async checkRoles() {
+    const { role } = this.data;
+
+    return {
+      base: {
+        name: role,
+        exists: !!role && !!await getRole(role),
+      },
+      readonly: {
+        name: role && addReadOnlySuffix(role),
+        exists: !!role && !!await getRole(addReadOnlySuffix(role)),
+      },
+    };
   }
 
   /**
@@ -274,6 +309,42 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
+   * Get the index patterns of the institution
+   */
+  async getIndexPatterns() {
+    const { space } = this.data;
+
+    if (!space) {
+      return { total: 0, list: [] };
+    }
+
+    const { data } = await kibana.getIndexPatterns(space);
+    let patterns = data && data.saved_objects;
+
+    if (!Array.isArray(patterns)) {
+      patterns = [];
+    }
+
+    return {
+      total: (data && data.total) || 0,
+      list: patterns.map((obj) => {
+        const { id, updatedAt } = obj || {};
+        let { attributes } = obj || {};
+
+        if (typeof attributes !== 'object') {
+          attributes = {};
+        }
+
+        return {
+          id,
+          updatedAt,
+          ...attributes,
+        };
+      }),
+    };
+  }
+
+  /**
    * Create a base index pattern if there are no patterns yet in the space
    */
   async createIndexPattern() {
@@ -294,6 +365,22 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
         timeFieldName: 'datetime',
       });
     }
+  }
+
+
+  /**
+   * Get the indices of the institution
+   */
+  async getIndices() {
+    const { indexPrefix } = this.data;
+
+    if (!indexPrefix) {
+      return [];
+    }
+
+    const { body } = await elastic.indices.get({ index: `${indexPrefix}*`, allowNoIndices: true });
+
+    return Object.keys(body);
   }
 
   /**

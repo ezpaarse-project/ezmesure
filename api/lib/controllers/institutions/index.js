@@ -22,6 +22,10 @@ const {
   refreshInstitution,
 } = require('./actions');
 
+const {
+  getInstitutionState,
+} = require('./admin');
+
 /**
  * Middleware that fetches an institution and put it in ctx.state.institution
  * Assumes that the route param institutionId is present
@@ -198,6 +202,15 @@ router.route({
       ids: Joi.array().items(Joi.string().trim()),
     },
   },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/state',
+  handler: [
+    fetchInstitution,
+    getInstitutionState,
+  ],
 });
 
 router.route({
