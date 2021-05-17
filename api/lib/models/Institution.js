@@ -412,6 +412,20 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
+   * Get the base index of the institution
+   */
+  async checkBaseIndex() {
+    const { indexPrefix: index } = this.data;
+
+    if (!index) {
+      return false;
+    }
+
+    const { body: exists } = await elastic.indices.exists({ index });
+    return exists;
+  }
+
+  /**
    * Create an index matching the prefix
    */
   async createBaseIndex() {
