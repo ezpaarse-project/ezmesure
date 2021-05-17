@@ -77,13 +77,23 @@ async function getRole(role) {
   return body && body[role];
 }
 
+/**
+ * Create a role with given settings
+ * @param {String} role the role to create
+ * @param {Object} settings role settings
+ * @returns {Boolean} true if the role has been created, false if it already exists
+ */
 async function createRole(role, settings = {}) {
-  if (await getRole(role)) { return; }
+  if (await getRole(role)) {
+    return { created: false };
+  }
 
   await kibana.putRole({
     name: role,
     body: settings,
   }, { ignore: [404] });
+
+  return { created: true };
 }
 
 /**
@@ -280,32 +290,46 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       throw new Error('institution has no space associated');
     }
 
-    await createRole(techRole);
-    await createRole(docRole);
-    await createRole(role, {
-      elasticsearch: {
-        indices: [{
-          names: [`${indexPrefix}*`],
-          privileges: ['all'],
-        }],
+    return [
+      {
+        name: techRole,
+        ...await createRole(techRole),
       },
-      kibana: [{
-        base: ['all'],
-        spaces: [space],
-      }],
-    });
-    await createRole(addReadOnlySuffix(role), {
-      elasticsearch: {
-        indices: [{
-          names: [`${indexPrefix}*`],
-          privileges: ['read'],
-        }],
+      {
+        name: docRole,
+        ...await createRole(docRole),
       },
-      kibana: [{
-        base: ['read'],
-        spaces: [space],
-      }],
-    });
+      {
+        name: role,
+        ...await createRole(role, {
+          elasticsearch: {
+            indices: [{
+              names: [`${indexPrefix}*`],
+              privileges: ['all'],
+            }],
+          },
+          kibana: [{
+            base: ['all'],
+            spaces: [space],
+          }],
+        }),
+      },
+      {
+        name: addReadOnlySuffix(role),
+        ...await createRole(addReadOnlySuffix(role), {
+          elasticsearch: {
+            indices: [{
+              names: [`${indexPrefix}*`],
+              privileges: ['read'],
+            }],
+          },
+          kibana: [{
+            base: ['read'],
+            spaces: [space],
+          }],
+        }),
+      },
+    ];
   }
 
   /**
