@@ -11,3 +11,16 @@ exports.getInstitutionState = async (ctx) => {
     roles: await institution.checkRoles(),
   };
 };
+
+exports.validateInstitution = async (ctx) => {
+  const { body = {} } = ctx.request;
+  const { value: validated } = body;
+  const { institution } = ctx.state;
+
+  institution.setValidation(validated);
+  await institution.save();
+
+  ctx.status = 200;
+  ctx.body = institution;
+};
+

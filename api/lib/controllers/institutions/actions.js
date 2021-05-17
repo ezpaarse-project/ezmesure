@@ -122,26 +122,6 @@ exports.updateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.validateInstitution = async (ctx) => {
-  const { body = {} } = ctx.request;
-  const { value: validated } = body;
-  const { institution } = ctx.state;
-
-  institution.setValidation(validated);
-
-  if (validated) {
-    await institution.createSpace();
-    await institution.createBaseIndex();
-    await institution.createIndexPattern();
-    await institution.createRoles();
-    await institution.migrateCreator();
-  }
-
-  await institution.save();
-
-  ctx.status = 200;
-};
-
 exports.deleteInstitutions = async (ctx) => {
   const { body } = ctx.request;
   const response = [];
