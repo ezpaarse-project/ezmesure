@@ -250,10 +250,14 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
    */
   async createSpace() {
     const { space, name } = this.data;
-    const response = await kibana.getSpace(space);
-    if (response && response.status !== 404) { return; }
+    const { data: existingSpace, status } = await kibana.getSpace(space);
 
-    await kibana.createSpace({ id: space, name });
+    if (status === 200 && existingSpace) {
+      return existingSpace;
+    }
+
+    const { data } = await kibana.createSpace({ id: space, name });
+    return data;
   }
 
   /**
