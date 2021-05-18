@@ -412,8 +412,60 @@ exports.download = async (ctx) => {
   }
 };
 
+const parameters = {
+  barChart: {
+    description: 'A simple bar chart with embedded data.',
+    height: 200,
+    width: 400,
+    data: {
+      values: [
+        { a: 'A', b: 28 }, { a: 'B', b: 55 }, { a: 'C', b: 43 },
+        { a: 'D', b: 91 }, { a: 'E', b: 81 }, { a: 'F', b: 53 },
+        { a: 'G', b: 19 }, { a: 'H', b: 87 },
+      ],
+    },
+  },
+  donut: {
+    description: 'A basic pie chart example.',
+    height: 200,
+    width: 220,
+    data: {
+      values: [
+        { category: 1, value: 4 },
+        { category: 2, value: 6 },
+        { category: 3, value: 10 },
+        { category: 4, value: 3 },
+        { category: 5, value: 7 },
+        { category: 6, value: 8 },
+      ],
+    },
+  },
+  stackedBarChart: {
+    description: 'A basic stacked bar chart example.',
+    height: 190,
+    width: 500,
+    data: {
+      values: [
+        { a: 0, b: 28, color: 'blue' }, { a: 0, b: 55, color: 'orange' },
+        { a: 1, b: 43, color: 'blue' }, { a: 1, b: 91, color: 'orange' },
+        { a: 2, b: 81, color: 'blue' }, { a: 2, b: 53, color: 'orange' },
+        { a: 3, b: 19, color: 'blue' }, { a: 3, b: 87, color: 'orange' },
+        { a: 4, b: 52, color: 'blue' }, { a: 4, b: 48, color: 'orange' },
+        { a: 5, b: 24, color: 'blue' }, { a: 5, b: 49, color: 'orange' },
+        { a: 6, b: 87, color: 'blue' }, { a: 6, b: 66, color: 'orange' },
+        { a: 7, b: 17, color: 'blue' }, { a: 7, b: 27, color: 'orange' },
+        { a: 8, b: 68, color: 'blue' }, { a: 8, b: 16, color: 'orange' },
+        { a: 9, b: 49, color: 'blue' }, { a: 9, b: 15, color: 'orange' },
+      ],
+    },
+  },
+};
+
 exports.renderNotOptimized = async (ctx) => {
-  await ctx.render('not-optimized', { etablissement: 'bibCNRS - NON OPTIMISÉ' });
+  await ctx.render('not-optimized', {
+    etablissement: 'bibCNRS - NON OPTIMISÉ',
+    parameters,
+  });
 };
 
 exports.renderOptimized = async (ctx) => {

@@ -1,4 +1,4 @@
-{% macro render(id) %}
+{% macro render(id, description, height, width, data) %}
 <div class="card mx-1 my-3">
   <div class="card-body">
     <h5 class="card-title">Diagramme circulaire</h5>
@@ -13,20 +13,11 @@
       '#{{ id }}',
       {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "description": "A basic pie chart example.",
-        "width": 200,
-        "height": 220,
+        "description": {{ description | dump | safe }},
+        "width": {{ width | dump | safe }},
+        "height": {{ height | dump | safe }},
         "padding": 5,
-        "data": {
-          "values": [
-            { "category": 1, "value": 4 },
-            { "category": 2, "value": 6 },
-            { "category": 3, "value": 10 },
-            { "category": 4, "value": 3 },
-            { "category": 5, "value": 7 },
-            { "category": 6, "value": 8 }
-          ]
-        },
+        "data": {{ data | dump | safe }},
         "mark": { "type": "arc", "innerRadius": 50 },
         "encoding": {
           "theta": { "field": "value", "type": "quantitative" },

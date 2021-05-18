@@ -14,28 +14,28 @@
   <div class="row">
     <div class="col">
       {% import "diagrams/bar-chart.html" as barChart %}
-      {{ barChart.render('bar-chart-1') }}
+      {{ barChart.render('bar-chart-1', parameters.barChart.description, parameters.barChart.height, parameters.barChart.width, parameters.barChart.data) }}
 
     </div>
     <div class="col">
       {% import "diagrams/donut.html" as donut %}
-      {{ donut.render('donut-1') }}
+      {{ donut.render('donut-1', parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
     </div>
   </div>
 
   <div class="row">
     <div class="col">
       {% import "diagrams/stacked-bar-chart.html" as sBarChart %}
-      {{ sBarChart.render('s-bar-chart-1') }}
+      {{ sBarChart.render('s-bar-chart-1', parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
     </div>
     <div class="col">
-      {{ donut.render('donut-2') }}
+      {{ donut.render('donut-2', parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
     </div>
   </div>
 
   <div class="row">
     <div class="col">
-      {{ donut.render('donut-3') }}
+      {{ donut.render('donut-3', parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
     </div>
   </div>
 
