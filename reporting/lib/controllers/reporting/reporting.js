@@ -471,3 +471,7 @@ exports.renderNotOptimized = async (ctx) => {
 exports.renderOptimized = async (ctx) => {
   await ctx.render('optimized', { etablissement: 'bibCNRS - OPTIMISÉ' });
 };
+
+exports.renderBibCNRS = async (ctx) => {
+  await ctx.render('bibCNRS', { etablissement: 'BibCNRS', parameters });
+};

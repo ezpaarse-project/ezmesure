@@ -18,6 +18,7 @@ const {
   download,
   renderOptimized,
   renderNotOptimized,
+  renderBibCNRS,
 } = require('./reporting');
 const elastic = require('../../services/elastic');
 
@@ -56,6 +57,7 @@ nunjucks.configure(path.resolve(process.cwd(), 'lib', 'views'), { noCache: true,
 
 route.get('/render-not-optimized', views(nunjucks), renderNotOptimized);
 route.get('/render-optimized', views(nunjucks), renderOptimized);
+route.get('/render-bibCNRS', views(nunjucks), renderBibCNRS);
 
 route.get('/tasks/:space?', hasPrivileges(['read']), list);
 

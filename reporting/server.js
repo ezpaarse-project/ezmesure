@@ -104,6 +104,7 @@ app.use(serve(path.resolve(process.cwd(), 'node_modules', 'bootstrap', 'dist')))
 app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega-lite', 'build')));
 app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega-embed', 'build')));
 app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega', 'build')));
+app.use(serve(path.resolve(process.cwd(), 'assets', 'images')));
 
 app.use(mount('/', controller));
 

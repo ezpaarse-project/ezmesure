@@ -1,7 +1,7 @@
-{% macro render(id, description, height, width, data) %}
+{% macro render(id, title, description, height, width, data) %}
 <div class="card mx-1 my-3">
   <div class="card-body">
-    <h5 class="card-title">Diagramme à barres</h5>
+    <h5 class="card-title">{{ title }}</h5>
     <div class="card-text text-center">
       <div id="{{ id }}"></div>
     </div>
@@ -12,20 +12,23 @@
     vegaEmbed(
       '#{{ id }}',
       {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "description": {{ description | dump | safe }},
-        "width": {{ width | dump | safe }},
-        "height": {{ height | dump | safe }},
-        "padding": 5,
-        "autosize": "fit-x",
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        description: {{ description | dump | safe }},
+        width: {{ width | dump | safe }},
+        height: {{ height | dump | safe }},
+        padding: 5,
+        autosize: "fit-x",
 
-        "data": {{ data | dump | safe }},
-        "mark": { "type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3 },
-        "encoding": {
-          "x": { "field": "a", "type": "nominal", "axis": { "title": "", "labelAngle": 0 } },
-          "y": { "field": "b", "type": "quantitative", "axis": { "title": "", "grid": false } },
-          "color": { "field": "color" }
-        }
+        data: {{ data | dump | safe }},
+        mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
+        encoding: {
+          x: { field: "a", type: "nominal", axis: { title: "", labelAngle: 0 } },
+          y: { field: "b", type: "quantitative", axis: { title: "", grid: false } },
+          color: { field: "color" }
+        },
+        config: {
+          view: { stroke: 'transparent' },
+        },
       },
       { actions: false }
     );

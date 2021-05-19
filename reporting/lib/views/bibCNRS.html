@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% set title = "Etablissement: report 1" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <div class="card mx-1 my-3">
+        <div class="card-body">
+          <header class="text-center mt-5">
+            <h3>Rapport hebdomadaire des consultations {{ etablissement }}</h3>
+            <p>Rapport couvrant la période du */*/2021, 00:00 au */*/2021, 00:00</p>
+            <img class = "oui" src="/logo.png" alt=" a" style="width: 400px;"> <!-- insertion logo établissement -->
+          </header>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card mx-1 my-3">
+        <div class="card-body" style="display: grid;">
+          <div class="metrics text-center" style="grid-column: 1;">
+            <h4>Metrique 1</h4>
+            <p>Description</p>
+          </div>
+          <div class="metrics text-center" style="grid-column: 2;">
+            <h4>Metrique 2</h4>
+            <p>Description</p>
+          </div>
+          <div class="metrics text-center" style="grid-column: 3;">
+            <h4>Metrique 3</h4>
+            <p>Description</p>
+          </div>
+          <div class="metrics text-center" style="grid-column: 4;">
+            <h4>Metrique 4</h4>
+            <p>Description</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      {% import "diagrams/bar-chart.html" as barChart %}
+      {{ barChart.render('bar-chart-1', "Histo-instituts", parameters.barChart.description, parameters.barChart.height, parameters.barChart.width, parameters.barChart.data) }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-5">
+      {% import "diagrams/donut.html" as donut %}
+      {{ donut.render('donut-1', "Table-instituts", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
+    </div>
+    <div class="col-7">
+      {{ donut.render('donut-2', "Table-top-10-labo", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-8">
+      {% import "diagrams/stacked-bar-chart.html" as sBarChart %}
+      {{ sBarChart.render('s-bar-chart-1', "Pie-rtype", parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
+    </div>
+    <div class="col-4">
+      {{ donut.render('donut-3', "Table-top-10-rtype", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-7">
+      {{ donut.render('donut-4', "Table-top-20-plateform", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
+    </div>
+    <div class="col-5">
+      {{ donut.render('donut-5', "Pie-doi", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}
+    </div>
+  </div>
+
+  <div class="row">
+    {{ sBarChart.render('s-bar-chart-2', "Table-top-10-articles", parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
+  </div>
+
+  <footer class="text-center">
+    <p class="page">Page 1/1</p>
+  </footer>
+</div>
+
+{% endblock %}
