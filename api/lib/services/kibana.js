@@ -21,6 +21,8 @@ const axiosClient = axios.create({
 
 const client = {};
 
+client.getSpaces = () => axiosClient.get('/api/spaces/space');
+
 client.getSpace = (id) => {
   if (!id) {
     throw new Error('Missing required parameter: id');
@@ -96,6 +98,5 @@ client.findObjects = (options) => {
   return axiosClient.get(`${spacePrefix}/api/saved_objects/_find`, { params });
 };
 
-client.getSpaces = () => axiosClient.get('/api/spaces/space');
 
 module.exports = client;
