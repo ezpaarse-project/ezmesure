@@ -49,6 +49,9 @@ errors:
   users:
     failedToQuery: failed to query users
 
+  spaces:
+    failedToQuery: failed to query spaces
+
   files:
     wrongEntriesFormat: entries should be an array of file names
     missingEntries: "missing required field: entries"

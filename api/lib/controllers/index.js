@@ -17,6 +17,7 @@ const sushi = require('./sushi');
 const contact = require('./contact');
 const opendata = require('./opendata');
 const users = require('./users');
+const spaces = require('./spaces');
 
 const openapi = require('./openapi.json');
 
@@ -66,5 +67,6 @@ app.use(institutions.prefix('/institutions').middleware());
 app.use(sushi.prefix('/sushi').middleware());
 app.use(opendata.prefix('/opendata').middleware());
 app.use(users.prefix('/users').middleware());
+app.use(spaces.prefix('/spaces').middleware());
 
 module.exports = app;

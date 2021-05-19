@@ -49,6 +49,9 @@ errors:
   users:
     failedToQuery: Impossible de récupérer les utilisateurs
 
+  spaces:
+    failedToQuery: Impossible de récupérer les espaces
+
   files:
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
     missingEntries: "Champ requis manquant: entries"

@@ -89,4 +89,6 @@ client.getIndexPatterns = (spaceId, opts) => {
   return axiosClient.get(`/s/${spaceId}/api/saved_objects/_find`, { params });
 };
 
+client.getSpaces = () => axiosClient.get('/api/spaces/space');
+
 module.exports = client;
