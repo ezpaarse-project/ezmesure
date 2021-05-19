@@ -347,7 +347,11 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       return [];
     }
 
-    const { data } = await kibana.getIndexPatterns(space, { perPage: 1000 });
+    const { data } = await kibana.findObjects({
+      spaceId: space,
+      type: 'index-pattern',
+      perPage: 1000,
+    });
     let patterns = data && data.saved_objects;
 
     if (!Array.isArray(patterns)) {

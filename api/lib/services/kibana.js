@@ -78,15 +78,22 @@ client.createIndexPattern = (spaceId, opts) => {
   return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes });
 };
 
-client.getIndexPatterns = (spaceId, opts) => {
-  const options = opts || {};
+client.findObjects = (options) => {
+  const {
+    type,
+    spaceId,
+    page,
+    perPage,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
   const params = {
-    type: 'index-pattern',
-    page: options.page || 1,
-    per_page: options.perPage || 50,
+    type,
+    page: page || 1,
+    per_page: perPage || 50,
   };
 
-  return axiosClient.get(`/s/${spaceId}/api/saved_objects/_find`, { params });
+  return axiosClient.get(`${spacePrefix}/api/saved_objects/_find`, { params });
 };
 
 client.getSpaces = () => axiosClient.get('/api/spaces/space');
