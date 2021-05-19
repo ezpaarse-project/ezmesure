@@ -216,6 +216,11 @@ router.route({
     fetchInstitution,
     getInstitutionState,
   ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
 });
 
 router.route({
@@ -240,11 +245,21 @@ router.route({
   method: 'POST',
   path: '/:institutionId/_create_space',
   handler: [fetchInstitution, createInstitutionSpace],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
 });
 router.route({
   method: 'POST',
   path: '/:institutionId/_create_index',
   handler: [fetchInstitution, createInstitutionIndex],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
 });
 router.route({
   method: 'POST',
@@ -264,11 +279,23 @@ router.route({
   method: 'POST',
   path: '/:institutionId/_create_roles',
   handler: [fetchInstitution, createInstitutionRoles],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
 });
 router.route({
   method: 'POST',
   path: '/:institutionId/_migrate_creator',
   handler: [fetchInstitution, migrateInstitutionCreator],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
 });
 
 
@@ -280,7 +307,6 @@ router.route({
     refreshInstitution,
   ],
   validate: {
-    type: 'json',
     params: {
       institutionId: Joi.string().trim().required(),
     },
