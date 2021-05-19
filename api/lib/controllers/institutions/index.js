@@ -250,6 +250,15 @@ router.route({
   method: 'POST',
   path: '/:institutionId/_create_index_pattern',
   handler: [fetchInstitution, createInstitutionIndexPattern],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    body: {
+      suffix: Joi.string().trim().regex(/^[a-z0-9_.*-]+$/i),
+    },
+  },
 });
 router.route({
   method: 'POST',

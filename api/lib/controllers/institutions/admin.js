@@ -64,6 +64,8 @@ exports.createInstitutionIndex = async (ctx) => {
 
 exports.createInstitutionIndexPattern = async (ctx) => {
   const { institution } = ctx.state;
+  const { body = {} } = ctx.request;
+  const { suffix } = body || {};
 
   if (!institution.get('space')) {
     ctx.throw(409, ctx.$t('errors.institution.noSpaceSet'));
@@ -72,18 +74,20 @@ exports.createInstitutionIndexPattern = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.institution.noPrefixSet'));
   }
 
-  const indexExists = await institution.checkBaseIndex();
-  if (!indexExists) {
-    ctx.throw(409, ctx.$t('errors.institution.noBaseIndex'));
-  }
-
   const space = await institution.getSpace();
   if (!space) {
     ctx.throw(409, ctx.$t('errors.institution.noSpace'));
   }
 
-  await institution.createIndexPattern();
-  ctx.status = 200;
+  const patterns = await institution.getIndexPatterns({ suffix: suffix || '*' });
+
+  if (patterns.length > 0) {
+    ctx.throw(409, ctx.$t('errors.institution.patternExists'));
+  }
+
+  await institution.createIndexPattern({ suffix: suffix || '*' });
+  ctx.status = 201;
+  ctx.body = { message: ctx.$t('indexPatternCreated') };
 };
 
 exports.createInstitutionRoles = async (ctx) => {

@@ -1,6 +1,7 @@
 nothingToDo: Nothing to do
 userUpdated: User updated
 indexCreated: Index created
+indexPatternCreated: Index pattern created
 creatorMigrated: Creator migrated
 
 errors:
@@ -32,6 +33,7 @@ errors:
     noRoleSet: Institution has no role set
     noBaseIndex: Institution base index does not exist
     noSpace: Institution space does not exist
+    patternExists: The index pattern already exists
 
   members:
     alreadyMember: The user belongs to another institution

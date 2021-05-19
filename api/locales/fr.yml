@@ -1,6 +1,7 @@
 nothingToDo: Rien à faire
 userUpdated: Utilisateur mis à jour
 indexCreated: index créé
+indexPatternCreated: index pattern créé
 creatorMigrated: Créateur migré
 
 errors:
@@ -32,6 +33,7 @@ errors:
     noRoleSet: L'établissement n'a pas de rôle associé
     noBaseIndex: L'index de base de l'établissment n'existe pas
     noSpace: L'espace de l'établissement n'existe pas
+    patternExists: L'index pattern existe déjà
 
   members:
     alreadyMember: L'utilisateur appartient à une autre institution

@@ -339,43 +339,46 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   /**
    * Get the index patterns of the institution
    */
-  async getIndexPatterns() {
-    const { space } = this.data;
+  async getIndexPatterns(opts) {
+    const { suffix } = opts || {};
+    const { space, indexPrefix } = this.data;
 
-    if (!space) {
-      return { total: 0, list: [] };
+    if (!space || (suffix && !indexPrefix)) {
+      return [];
     }
 
-    const { data } = await kibana.getIndexPatterns(space);
+    const { data } = await kibana.getIndexPatterns(space, { perPage: 1000 });
     let patterns = data && data.saved_objects;
 
     if (!Array.isArray(patterns)) {
       patterns = [];
     }
 
-    return {
-      total: (data && data.total) || 0,
-      list: patterns.map((obj) => {
-        const { id, updatedAt } = obj || {};
-        let { attributes } = obj || {};
+    if (suffix) {
+      patterns = patterns.filter((obj) => {
+        const title = obj && obj.attributes && obj.attributes.title;
+        return title === `${indexPrefix}${suffix}`;
+      });
+    }
 
-        if (typeof attributes !== 'object') {
-          attributes = {};
-        }
+    return patterns.map((obj) => {
+      const { id, updatedAt, attributes } = obj || {};
+      const { title, timeFieldName } = attributes || {};
 
-        return {
-          id,
-          updatedAt,
-          ...attributes,
-        };
-      }),
-    };
+      return {
+        id,
+        updatedAt,
+        title,
+        timeFieldName,
+      };
+    });
   }
 
   /**
    * Create a base index pattern if there are no patterns yet in the space
    */
-  async createIndexPattern() {
+  async createIndexPattern(opts) {
+    const { suffix } = opts || {};
     const { indexPrefix, space } = this.data;
 
     if (!indexPrefix) {
@@ -385,11 +388,11 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       throw new Error('institution has no space associated');
     }
 
-    const { data } = await kibana.getIndexPatterns(space);
+    const patterns = await this.getIndexPatterns({ suffix });
 
-    if (data && data.total === 0) {
+    if (Array.isArray(patterns) || patterns.length === 0) {
       await kibana.createIndexPattern(space, {
-        title: `${indexPrefix}*`,
+        title: `${indexPrefix}${suffix || '*'}`,
         timeFieldName: 'datetime',
       });
     }
