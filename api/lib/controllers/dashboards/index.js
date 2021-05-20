@@ -2,6 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const {
+  copyDashboard,
   exportDashboard,
   importDashboard,
   listDashboards,
@@ -45,6 +46,27 @@ router.route({
     body: {
       version: Joi.string().trim().required().regex(/^[\d.]+$/),
       objects: Joi.array().items(Joi.object()),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_copy',
+  handler: copyDashboard,
+  validate: {
+    type: 'json',
+    query: {
+      force: Joi.boolean().default(false),
+    },
+    body: {
+      source: {
+        space: Joi.string().trim(),
+        dashboard: Joi.string().trim().required(),
+      },
+      target: {
+        space: Joi.string().trim().required(),
+      },
     },
   },
 });

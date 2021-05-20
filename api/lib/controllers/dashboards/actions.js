@@ -68,3 +68,39 @@ exports.importDashboard = async (ctx) => {
   ctx.body = data;
 };
 
+exports.copyDashboard = async (ctx) => {
+  const { body = {}, query = {} } = ctx.request;
+  const { force } = query;
+  const { source, target } = body;
+
+  const { status } = await kibana.getObject({
+    type: 'dashboard',
+    id: source.dashboard,
+    spaceId: source.space,
+  });
+
+  if (status === 404) {
+    ctx.throw(404, 'dashboard not found');
+  }
+
+  const { data } = await kibana.exportDashboard({
+    dashboardId: source.dashboard,
+    spaceId: source.space,
+  });
+
+  if (!data || !data.version || !Array.isArray(data.objects)) {
+    ctx.throw(500, 'failed to export dashboard');
+  }
+
+  const { data: importResponse } = await kibana.importDashboard({
+    data,
+    spaceId: target.space,
+    force,
+  });
+
+  if (!importResponse || !Array.isArray(importResponse.objects)) {
+    ctx.throw(500, 'failed to import dashboard');
+  }
+
+  ctx.body = importResponse;
+};
