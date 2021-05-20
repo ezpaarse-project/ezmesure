@@ -2,6 +2,7 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const {
+  exportDashboard,
   listDashboards,
 } = require('./actions');
 
