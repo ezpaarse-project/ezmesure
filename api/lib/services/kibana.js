@@ -123,4 +123,19 @@ client.exportDashboard = (opts) => {
   return axiosClient.get(`${spacePrefix}/api/kibana/dashboards/export`, { params });
 };
 
+client.importDashboard = (opts) => {
+  const {
+    data,
+    spaceId,
+    force,
+  } = opts || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const params = {
+    force: !!force,
+  };
+
+  return axiosClient.post(`${spacePrefix}/api/kibana/dashboards/import`, data, { params });
+};
+
 module.exports = client;

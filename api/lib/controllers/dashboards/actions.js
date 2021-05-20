@@ -44,3 +44,27 @@ exports.exportDashboard = async (ctx) => {
   ctx.body = data;
 };
 
+exports.importDashboard = async (ctx) => {
+  const { query = {}, body } = ctx.request;
+  const { space: spaceId, force } = query;
+
+  const { status } = await kibana.getSpace(spaceId);
+
+  if (status === 404) {
+    ctx.throw(404, 'space not found');
+  }
+
+  const { data } = await kibana.importDashboard({
+    data: body,
+    spaceId,
+    force,
+  });
+
+  if (!data || !Array.isArray(data.objects)) {
+    ctx.throw(500, 'failed to import dashboard');
+  }
+
+  ctx.status = 200;
+  ctx.body = data;
+};
+
