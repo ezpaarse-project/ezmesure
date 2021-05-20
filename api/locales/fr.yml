@@ -49,8 +49,16 @@ errors:
   users:
     failedToQuery: Impossible de récupérer les utilisateurs
 
+  space:
+    notFound: Espace introuvable
+
   spaces:
     failedToQuery: Impossible de récupérer les espaces
+
+  dashboards:
+    notFound: Tableau de bord introuvable
+    failedToExport: Impossible d'exporter le tableau de bord
+    failedToImport: Impossible d'importer le tableau de bord
 
   files:
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"

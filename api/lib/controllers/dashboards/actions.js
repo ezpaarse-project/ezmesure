@@ -28,7 +28,7 @@ exports.exportDashboard = async (ctx) => {
   });
 
   if (status === 404) {
-    ctx.throw(404, 'dashboard not found');
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound'));
   }
 
   const { data } = await kibana.exportDashboard({
@@ -37,7 +37,7 @@ exports.exportDashboard = async (ctx) => {
   });
 
   if (!data || !data.version || !Array.isArray(data.objects)) {
-    ctx.throw(500, 'failed to export dashboard');
+    ctx.throw(500, ctx.$t('errors.dashboard.failedToExport'));
   }
 
   ctx.status = 200;
@@ -51,7 +51,7 @@ exports.importDashboard = async (ctx) => {
   const { status } = await kibana.getSpace(spaceId);
 
   if (status === 404) {
-    ctx.throw(404, 'space not found');
+    ctx.throw(404, 'errors.space.notFound');
   }
 
   const { data } = await kibana.importDashboard({
@@ -61,7 +61,7 @@ exports.importDashboard = async (ctx) => {
   });
 
   if (!data || !Array.isArray(data.objects)) {
-    ctx.throw(500, 'failed to import dashboard');
+    ctx.throw(500, ctx.$t('errors.dashboard.failedToImport'));
   }
 
   ctx.status = 200;
@@ -80,7 +80,7 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (status === 404) {
-    ctx.throw(404, 'dashboard not found');
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound'));
   }
 
   const { data } = await kibana.exportDashboard({
@@ -89,7 +89,7 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!data || !data.version || !Array.isArray(data.objects)) {
-    ctx.throw(500, 'failed to export dashboard');
+    ctx.throw(500, ctx.$t('errors.dashboard.failedToExport'));
   }
 
   const { data: importResponse } = await kibana.importDashboard({
@@ -99,7 +99,7 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!importResponse || !Array.isArray(importResponse.objects)) {
-    ctx.throw(500, 'failed to import dashboard');
+    ctx.throw(500, ctx.$t('errors.dashboard.failedToImport'));
   }
 
   ctx.body = importResponse;

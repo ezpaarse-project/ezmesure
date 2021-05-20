@@ -49,8 +49,16 @@ errors:
   users:
     failedToQuery: failed to query users
 
+  space:
+    notFound: Space not found
+
   spaces:
     failedToQuery: failed to query spaces
+
+  dashboards:
+    notFound: Dashboard not found
+    failedToExport: Failed to export dashboard
+    failedToImport: Failed to import dashboard
 
   files:
     wrongEntriesFormat: entries should be an array of file names
