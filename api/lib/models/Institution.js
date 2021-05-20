@@ -256,7 +256,11 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       return existingSpace;
     }
 
-    const { data } = await kibana.createSpace({ id: space, name });
+    const { data } = await kibana.createSpace({
+      id: space,
+      name: space,
+      description: name,
+    });
     return data;
   }
 
