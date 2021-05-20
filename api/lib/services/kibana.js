@@ -80,6 +80,17 @@ client.createIndexPattern = (spaceId, opts) => {
   return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes });
 };
 
+client.getObject = (options) => {
+  const {
+    type,
+    id,
+    spaceId,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  return axiosClient.get(`${spacePrefix}/api/saved_objects/${type}/${id}`, { validateStatus: allowNotFound });
+};
+
 client.findObjects = (options) => {
   const {
     type,
