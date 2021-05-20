@@ -109,5 +109,18 @@ client.findObjects = (options) => {
   return axiosClient.get(`${spacePrefix}/api/saved_objects/_find`, { params });
 };
 
+client.exportDashboard = (opts) => {
+  const {
+    dashboardId,
+    spaceId,
+  } = opts || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const params = {
+    dashboard: dashboardId,
+  };
+
+  return axiosClient.get(`${spacePrefix}/api/kibana/dashboards/export`, { params });
+};
 
 module.exports = client;

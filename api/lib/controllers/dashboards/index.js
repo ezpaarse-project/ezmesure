@@ -18,4 +18,16 @@ router.route({
   },
 });
 
+router.route({
+  method: 'GET',
+  path: '/_export',
+  handler: exportDashboard,
+  validate: {
+    query: {
+      space: Joi.string().trim(),
+      dashboard: Joi.string().trim().required(),
+    },
+  },
+});
+
 module.exports = router;
