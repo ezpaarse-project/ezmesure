@@ -72,7 +72,7 @@ exports.exportDashboard = async (ctx) => {
   });
 
   if (status === 404) {
-    ctx.throw(404, ctx.$t('errors.dashboard.notFound'));
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound', dashboardId));
   }
 
   const { data } = await kibana.exportDashboard({
@@ -81,7 +81,7 @@ exports.exportDashboard = async (ctx) => {
   });
 
   if (!data || !data.version || !Array.isArray(data.objects)) {
-    ctx.throw(500, ctx.$t('errors.dashboard.failedToExport'));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', dashboardId, spaceId));
   }
 
   ctx.status = 200;
@@ -99,14 +99,14 @@ exports.importDashboard = async (ctx) => {
   const { status } = await kibana.getSpace(spaceId);
 
   if (status === 404) {
-    ctx.throw(409, ctx.$t('errors.space.notFound'));
+    ctx.throw(409, ctx.$t('errors.space.notFound', spaceId));
   }
 
   if (indexPattern) {
     const pattern = await findIndexPattern(spaceId, indexPattern);
 
     if (!pattern || !pattern.id) {
-      ctx.throw(409, ctx.$t('errors.indexPattern.notFound'));
+      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', indexPattern, spaceId || 'default'));
     }
 
     body.objects = patchIndexPattern(body.objects, pattern.id);
@@ -119,7 +119,7 @@ exports.importDashboard = async (ctx) => {
   });
 
   if (!data || !Array.isArray(data.objects)) {
-    ctx.throw(500, ctx.$t('errors.dashboard.failedToImport'));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToImport', spaceId));
   }
 
   ctx.status = 200;
@@ -138,13 +138,13 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (status === 404) {
-    ctx.throw(404, ctx.$t('errors.dashboard.notFound'));
+    ctx.throw(404, ctx.$t('errors.dashboard.notFound', source.dashboard));
   }
 
   const { status: spaceStatus } = await kibana.getSpace(target.space);
 
   if (spaceStatus === 404) {
-    ctx.throw(409, ctx.$t('errors.space.notFound'));
+    ctx.throw(409, ctx.$t('errors.space.notFound', target.space));
   }
 
   const { data: dashboard } = await kibana.exportDashboard({
@@ -153,14 +153,14 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!dashboard || !dashboard.version || !Array.isArray(dashboard.objects)) {
-    ctx.throw(500, ctx.$t('errors.dashboard.failedToExport'));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', source.dashboard, source.space));
   }
 
   if (target.indexPattern) {
     const pattern = await findIndexPattern(target.space, target.indexPattern);
 
     if (!pattern || !pattern.id) {
-      ctx.throw(409, ctx.$t('errors.indexPattern.notFound'));
+      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', target.indexPattern, target.space || 'default'));
     }
 
     dashboard.objects = patchIndexPattern(dashboard.objects, pattern.id);
@@ -173,7 +173,7 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!importResponse || !Array.isArray(importResponse.objects)) {
-    ctx.throw(500, ctx.$t('errors.dashboard.failedToImport'));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToImport', target.space));
   }
 
   ctx.body = importResponse;

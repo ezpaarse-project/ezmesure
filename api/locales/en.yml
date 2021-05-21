@@ -50,18 +50,18 @@ errors:
     failedToQuery: failed to query users
 
   space:
-    notFound: Space not found
+    notFound: Space [%s] not found
 
   spaces:
     failedToQuery: failed to query spaces
 
-  dashboards:
-    notFound: Dashboard not found
-    failedToExport: Failed to export dashboard
-    failedToImport: Failed to import dashboard
+  dashboard:
+    notFound: Dashboard [%s] not found
+    failedToExport: Failed to export dashboard [%s] from space [%s]
+    failedToImport: Failed to import dashboard into space [%s]
 
   indexPattern:
-    notFound: Index pattern not found
+    notFound: Index pattern [%s] not found in space [%s]
 
   files:
     wrongEntriesFormat: entries should be an array of file names

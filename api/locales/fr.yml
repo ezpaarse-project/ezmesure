@@ -50,16 +50,18 @@ errors:
     failedToQuery: Impossible de récupérer les utilisateurs
 
   space:
-    notFound: Espace introuvable
+    notFound: Espace [%s] introuvable
 
   spaces:
     failedToQuery: Impossible de récupérer les espaces
 
-  dashboards:
-    notFound: Tableau de bord introuvable
+  dashboard:
+    notFound: Tableau de bord [%s] introuvable
+    failedToExport: Impossible d'exporter le tableau de bord [%s] depuis l'espace [%s]
+    failedToImport: Impossible d'importer le tableau de bord dans l'espace [%s]
 
   indexPattern:
-    notFound: Index pattern introuvable
+    notFound: Index pattern [%s] introuvable dans l'espace [%s]
 
   files:
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
