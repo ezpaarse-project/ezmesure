@@ -10,3 +10,27 @@ exports.list = async (ctx) => {
   ctx.type = 'json';
   ctx.body = spaces;
 };
+
+exports.listIndexPatterns = async (ctx) => {
+  const { spaceId } = ctx.request.params;
+
+  const { status } = await kibana.getSpace(spaceId);
+
+  if (status === 404) {
+    ctx.throw(404, ctx.$t('errors.space.notFound'));
+  }
+
+  const { data } = await kibana.findObjects({
+    spaceId,
+    type: 'index-pattern',
+    perPage: 1000,
+  });
+  let patterns = data && data.saved_objects;
+
+  if (!Array.isArray(patterns)) {
+    patterns = [];
+  }
+
+  ctx.status = 200;
+  ctx.body = patterns;
+};
