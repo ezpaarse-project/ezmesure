@@ -57,8 +57,9 @@ errors:
 
   dashboards:
     notFound: Tableau de bord introuvable
-    failedToExport: Impossible d'exporter le tableau de bord
-    failedToImport: Impossible d'importer le tableau de bord
+
+  indexPattern:
+    notFound: Index pattern introuvable
 
   files:
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"

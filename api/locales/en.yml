@@ -60,6 +60,9 @@ errors:
     failedToExport: Failed to export dashboard
     failedToImport: Failed to import dashboard
 
+  indexPattern:
+    notFound: Index pattern not found
+
   files:
     wrongEntriesFormat: entries should be an array of file names
     missingEntries: "missing required field: entries"

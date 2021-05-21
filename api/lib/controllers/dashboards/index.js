@@ -41,6 +41,7 @@ router.route({
     type: 'json',
     query: {
       space: Joi.string().trim(),
+      'index-pattern': Joi.string().trim(),
       force: Joi.boolean().default(false),
     },
     body: {
@@ -66,6 +67,7 @@ router.route({
       },
       target: {
         space: Joi.string().trim().required(),
+        indexPattern: Joi.string().trim(),
       },
     },
   },
