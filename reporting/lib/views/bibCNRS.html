@@ -42,8 +42,8 @@
 
   <div class="row">
     <div class="col">
-      {% import "diagrams/bar-chart.html" as barChart %}
-      {{ barChart.render('bar-chart-1', "Histo-instituts", parameters.barChart.description, parameters.barChart.height, parameters.barChart.width, parameters.barChart.data) }}
+      {% import "diagrams/stacked-bar-chart.html" as sBarChart %}
+      {{ sBarChart.render('s-bar-chart-1', "Histo-instituts", parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
     </div>
   </div>
 
@@ -59,8 +59,8 @@
 
   <div class="row">
     <div class="col-8">
-      {% import "diagrams/stacked-bar-chart.html" as sBarChart %}
-      {{ sBarChart.render('s-bar-chart-1', "Pie-rtype", parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
+      {% import "diagrams/bar-chart.html" as barChart %}
+      {{ barChart.render('bar-chart-1', "Pie-rtype", parameters.barChart.description, parameters.barChart.height, parameters.barChart.width, parameters.barChart.data) }}
     </div>
     <div class="col-4">
       {{ donut.render('donut-3', "Table-top-10-rtype", parameters.donut.description, parameters.donut.height, parameters.donut.width, parameters.donut.data) }}

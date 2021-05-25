@@ -1,0 +1,67 @@
+{
+    "took" : 14,
+    "timed_out" : false,
+    "_shards" : {
+      "total" : 45,
+      "successful" : 45,
+      "skipped" : 0,
+      "failed" : 0
+    },
+    "hits" : {
+      "total" : {
+        "value" : 10000,
+        "relation" : "gte"
+      },
+      "max_score" : null,
+      "hits" : [ ]
+    },
+    "aggregations" : {
+      "2" : {
+        "doc_count_error_upper_bound" : 2280,
+        "sum_other_doc_count" : 164039,
+        "buckets" : [
+          {
+            "key" : "UMR5287",
+            "doc_count" : 5244
+          },
+          {
+            "key" : "UMR9198",
+            "doc_count" : 4353
+          },
+          {
+            "key" : "UMR9002",
+            "doc_count" : 3132
+          },
+          {
+            "key" : "UMR5293",
+            "doc_count" : 3063
+          },
+          {
+            "key" : "UMR9018",
+            "doc_count" : 2718
+          },
+          {
+            "key" : "UMR9197",
+            "doc_count" : 2630
+          },
+          {
+            "key" : "UMR3244",
+            "doc_count" : 2601
+          },
+          {
+            "key" : "UMR7275",
+            "doc_count" : 2585
+          },
+          {
+            "key" : "UMR7592",
+            "doc_count" : 2485
+          },
+          {
+            "key" : "UMR5077",
+            "doc_count" : 2435
+          }
+        ]
+      }
+    }
+  }
+  

@@ -1,0 +1,28 @@
+{
+    "took": 43,
+    "timed_out": false,
+    "_shards": {
+      "total": 45,
+      "successful": 45,
+      "skipped": 35,
+      "failed": 0
+    },
+    "hits": {
+      "total": 42276,
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "2": {
+        "buckets": {
+          "with DOI": {
+            "doc_count": 34611
+          },
+          "without DOI": {
+            "doc_count": 7665
+          }
+        }
+      }
+    },
+    "status": 200
+  }

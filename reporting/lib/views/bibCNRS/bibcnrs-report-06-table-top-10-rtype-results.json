@@ -1,0 +1,64 @@
+{
+    "took": 46,
+    "timed_out": false,
+    "_shards": {
+      "total": 45,
+      "successful": 45,
+      "skipped": 35,
+      "failed": 0
+    },
+    "hits": {
+      "total": 63823,
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "2": {
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 33,
+        "buckets": [
+          {
+            "key": "ARTICLE",
+            "doc_count": 42339
+          },
+          {
+            "key": "ABS",
+            "doc_count": 12785
+          },
+          {
+            "key": "RECORD_VIEW",
+            "doc_count": 6504
+          },
+          {
+            "key": "BOOK_SECTION",
+            "doc_count": 1710
+          },
+          {
+            "key": "REF",
+            "doc_count": 202
+          },
+          {
+            "key": "BOOK",
+            "doc_count": 155
+          },
+          {
+            "key": "FIGURE",
+            "doc_count": 56
+          },
+          {
+            "key": "BLAST",
+            "doc_count": 14
+          },
+          {
+            "key": "ENCYCLOPAEDIA_ENTRY",
+            "doc_count": 14
+          },
+          {
+            "key": "ANALYSIS",
+            "doc_count": 11
+          }
+        ]
+      }
+    },
+    "status": 200
+  }

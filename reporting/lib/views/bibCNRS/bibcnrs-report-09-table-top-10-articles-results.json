@@ -1,0 +1,168 @@
+{
+    "took": 86,
+    "timed_out": false,
+    "_shards": {
+      "total": 45,
+      "successful": 45,
+      "skipped": 35,
+      "failed": 0
+    },
+    "hits": {
+      "total": 63823,
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "2": {
+        "doc_count_error_upper_bound": 260,
+        "sum_other_doc_count": 34535,
+        "buckets": [
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "Nature Publishing Group",
+                  "doc_count": 1333
+                }
+              ]
+            },
+            "key": "Nature",
+            "doc_count": 1333
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "American Association for the Advancement of Science",
+                  "doc_count": 1169
+                }
+              ]
+            },
+            "key": "Science",
+            "doc_count": 1169
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "American Chemical Society",
+                  "doc_count": 839
+                }
+              ]
+            },
+            "key": "Journal of the American Chemical Society",
+            "doc_count": 839
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "Wiley",
+                  "doc_count": 603
+                }
+              ]
+            },
+            "key": "Angewandte Chemie International Edition",
+            "doc_count": 603
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "American Chemical Society",
+                  "doc_count": 509
+                }
+              ]
+            },
+            "key": "Organic Letters",
+            "doc_count": 509
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "National Academy of Sciences",
+                  "doc_count": 476
+                }
+              ]
+            },
+            "key": "PNAS",
+            "doc_count": 476
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "American Chemical Society",
+                  "doc_count": 437
+                }
+              ]
+            },
+            "key": "The Journal of Organic Chemistry",
+            "doc_count": 437
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "Nature Publishing Group",
+                  "doc_count": 364
+                }
+              ]
+            },
+            "key": "Nature Communications",
+            "doc_count": 364
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "Elsevier BV",
+                  "doc_count": 161
+                },
+                {
+                  "key": "Elsevier",
+                  "doc_count": 127
+                }
+              ]
+            },
+            "key": "Cell",
+            "doc_count": 288
+          },
+          {
+            "3": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "Royal Society of Chemistry",
+                  "doc_count": 248
+                }
+              ]
+            },
+            "key": "Chemical Communications",
+            "doc_count": 248
+          }
+        ]
+      }
+    },
+    "status": 200
+  }

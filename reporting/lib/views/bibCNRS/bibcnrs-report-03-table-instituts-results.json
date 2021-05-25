@@ -1,0 +1,67 @@
+{
+    "took" : 11,
+    "timed_out" : false,
+    "_shards" : {
+      "total" : 45,
+      "successful" : 45,
+      "skipped" : 0,
+      "failed" : 0
+    },
+    "hits" : {
+      "total" : {
+        "value" : 10000,
+        "relation" : "gte"
+      },
+      "max_score" : null,
+      "hits" : [ ]
+    },
+    "aggregations" : {
+      "2" : {
+        "doc_count_error_upper_bound" : 0,
+        "sum_other_doc_count" : 0,
+        "buckets" : [
+          {
+            "key" : "bibcnrs-insb",
+            "doc_count" : 123564
+          },
+          {
+            "key" : "bibcnrs-inc",
+            "doc_count" : 28979
+          },
+          {
+            "key" : "bibcnrs-inshs",
+            "doc_count" : 11845
+          },
+          {
+            "key" : "bibcnrs-insu",
+            "doc_count" : 10843
+          },
+          {
+            "key" : "bibcnrs-insis",
+            "doc_count" : 8923
+          },
+          {
+            "key" : "bibcnrs-inee",
+            "doc_count" : 8491
+          },
+          {
+            "key" : "bibcnrs-inp",
+            "doc_count" : 5460
+          },
+          {
+            "key" : "bibcnrs-ins2i",
+            "doc_count" : 675
+          },
+          {
+            "key" : "bibcnrs-in2p3",
+            "doc_count" : 528
+          },
+          {
+            "key" : "bibcnrs-insmi",
+            "doc_count" : 261
+          }
+        ]
+      }
+    }
+  }
+  

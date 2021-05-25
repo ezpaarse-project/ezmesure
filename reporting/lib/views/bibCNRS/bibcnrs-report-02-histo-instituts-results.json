@@ -1,0 +1,381 @@
+{
+  "took" : 45,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 45,
+    "successful" : 45,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "2" : {
+      "buckets" : [
+        {
+          "key_as_string" : "2021-05-11T22:00:00.000Z",
+          "key" : 1620770400000,
+          "doc_count" : 29167,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 19213
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 4080
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 1483
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 1318
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 1275
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 861
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 750
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 81
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 61
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 45
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-12T22:00:00.000Z",
+          "key" : 1620856800000,
+          "doc_count" : 19799,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 10565
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 2831
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 2471
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 1385
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 1209
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 729
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 435
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 85
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 50
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 39
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-13T22:00:00.000Z",
+          "key" : 1620943200000,
+          "doc_count" : 25997,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 15448
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 3999
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 1602
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 1546
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 1466
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 993
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 695
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 111
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 104
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 33
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-14T22:00:00.000Z",
+          "key" : 1621029600000,
+          "doc_count" : 16269,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 8694
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 2208
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 1583
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 1248
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 1216
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 702
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 462
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 110
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 35
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 11
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-15T22:00:00.000Z",
+          "key" : 1621116000000,
+          "doc_count" : 14585,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 9068
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 1753
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 840
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 831
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 771
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 686
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 572
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 36
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 25
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 3
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-16T22:00:00.000Z",
+          "key" : 1621202400000,
+          "doc_count" : 44093,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 27780
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 6894
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 2038
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 2010
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 1980
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 1653
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 1503
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 96
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 81
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 58
+              }
+            ]
+          }
+        },
+        {
+          "key_as_string" : "2021-05-17T22:00:00.000Z",
+          "key" : 1621288800000,
+          "doc_count" : 49848,
+          "3" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "bibcnrs-insb",
+                "doc_count" : 32908
+              },
+              {
+                "key" : "bibcnrs-inc",
+                "doc_count" : 7258
+              },
+              {
+                "key" : "bibcnrs-insu",
+                "doc_count" : 2354
+              },
+              {
+                "key" : "bibcnrs-inshs",
+                "doc_count" : 2053
+              },
+              {
+                "key" : "bibcnrs-insis",
+                "doc_count" : 1946
+              },
+              {
+                "key" : "bibcnrs-inee",
+                "doc_count" : 1881
+              },
+              {
+                "key" : "bibcnrs-inp",
+                "doc_count" : 1045
+              },
+              {
+                "key" : "bibcnrs-ins2i",
+                "doc_count" : 209
+              },
+              {
+                "key" : "bibcnrs-in2p3",
+                "doc_count" : 146
+              },
+              {
+                "key" : "bibcnrs-insmi",
+                "doc_count" : 48
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

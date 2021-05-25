@@ -105,6 +105,7 @@ app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega-lite', 'build'))
 app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega-embed', 'build')));
 app.use(serve(path.resolve(process.cwd(), 'node_modules', 'vega', 'build')));
 app.use(serve(path.resolve(process.cwd(), 'assets', 'images')));
+app.use(serve(path.resolve(process.cwd(), 'lib', 'views', 'bibCNRS')));
 
 app.use(mount('/', controller));
 

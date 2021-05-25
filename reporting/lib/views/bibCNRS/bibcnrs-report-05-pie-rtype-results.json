@@ -1,0 +1,127 @@
+{
+    "took" : 17,
+    "timed_out" : false,
+    "_shards" : {
+      "total" : 45,
+      "successful" : 45,
+      "skipped" : 0,
+      "failed" : 0
+    },
+    "hits" : {
+      "total" : {
+        "value" : 10000,
+        "relation" : "gte"
+      },
+      "max_score" : null,
+      "hits" : [ ]
+    },
+    "aggregations" : {
+      "2" : {
+        "doc_count_error_upper_bound" : 0,
+        "sum_other_doc_count" : 0,
+        "buckets" : [
+          {
+            "key" : "SEARCH",
+            "doc_count" : 118892
+          },
+          {
+            "key" : "ARTICLE",
+            "doc_count" : 42463
+          },
+          {
+            "key" : "ABS",
+            "doc_count" : 12830
+          },
+          {
+            "key" : "TOC",
+            "doc_count" : 6528
+          },
+          {
+            "key" : "RECORD_VIEW",
+            "doc_count" : 6508
+          },
+          {
+            "key" : "ANALYSIS",
+            "doc_count" : 5112
+          },
+          {
+            "key" : "OPENURL",
+            "doc_count" : 1721
+          },
+          {
+            "key" : "BOOK_SECTION",
+            "doc_count" : 1710
+          },
+          {
+            "key" : "QUERY",
+            "doc_count" : 534
+          },
+          {
+            "key" : "REF",
+            "doc_count" : 202
+          },
+          {
+            "key" : "BOOK",
+            "doc_count" : 155
+          },
+          {
+            "key" : "FIGURE",
+            "doc_count" : 56
+          },
+          {
+            "key" : "MAP",
+            "doc_count" : 52
+          },
+          {
+            "key" : "BLAST",
+            "doc_count" : 14
+          },
+          {
+            "key" : "ENCYCLOPAEDIA_ENTRY",
+            "doc_count" : 14
+          },
+          {
+            "key" : "BOOKSERIE",
+            "doc_count" : 13
+          },
+          {
+            "key" : "PREVIEW",
+            "doc_count" : 10
+          },
+          {
+            "key" : "SUPPL",
+            "doc_count" : 8
+          },
+          {
+            "key" : "FULLTEXT",
+            "doc_count" : 7
+          },
+          {
+            "key" : "NOTICE",
+            "doc_count" : 3
+          },
+          {
+            "key" : "GRAPH",
+            "doc_count" : 2
+          },
+          {
+            "key" : "TOOLS",
+            "doc_count" : 2
+          },
+          {
+            "key" : "BOOK_CHAPTER",
+            "doc_count" : 1
+          },
+          {
+            "key" : "DOWNLOAD",
+            "doc_count" : 1
+          },
+          {
+            "key" : "INDEX",
+            "doc_count" : 1
+          }
+        ]
+      }
+    }
+  }
+  

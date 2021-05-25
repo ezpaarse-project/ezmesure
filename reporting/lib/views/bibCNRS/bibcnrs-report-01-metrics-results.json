@@ -1,0 +1,33 @@
+{
+    "took" : 47,
+    "timed_out" : false,
+    "_shards" : {
+      "total" : 45,
+      "successful" : 45,
+      "skipped" : 0,
+      "failed" : 0
+    },
+    "hits" : {
+      "total" : {
+        "value" : 10000,
+        "relation" : "gte"
+      },
+      "max_score" : null,
+      "hits" : [ ]
+    },
+    "aggregations" : {
+      "unit" : {
+        "value" : 866
+      },
+      "min" : {
+        "value" : 1.620811624E12
+      },
+      "max" : {
+        "value" : 1.621375177E12
+      },
+      "platform_name" : {
+        "value" : 62
+      }
+    }
+  }
+  

@@ -8,6 +8,7 @@ const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
+const histo = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
 
 async function getMetadata(taskId) {
   const { body: data } = await elastic.getSource({
@@ -445,18 +446,8 @@ const parameters = {
     height: 190,
     width: 500,
     data: {
-      values: [
-        { a: 0, b: 28, color: 'blue' }, { a: 0, b: 55, color: 'orange' },
-        { a: 1, b: 43, color: 'blue' }, { a: 1, b: 91, color: 'orange' },
-        { a: 2, b: 81, color: 'blue' }, { a: 2, b: 53, color: 'orange' },
-        { a: 3, b: 19, color: 'blue' }, { a: 3, b: 87, color: 'orange' },
-        { a: 4, b: 52, color: 'blue' }, { a: 4, b: 48, color: 'orange' },
-        { a: 5, b: 24, color: 'blue' }, { a: 5, b: 49, color: 'orange' },
-        { a: 6, b: 87, color: 'blue' }, { a: 6, b: 66, color: 'orange' },
-        { a: 7, b: 17, color: 'blue' }, { a: 7, b: 27, color: 'orange' },
-        { a: 8, b: 68, color: 'blue' }, { a: 8, b: 16, color: 'orange' },
-        { a: 9, b: 49, color: 'blue' }, { a: 9, b: 15, color: 'orange' },
-      ],
+      values: histo.aggregations[2].buckets
+        .map((tab) => tab[3].buckets),
     },
   },
 };

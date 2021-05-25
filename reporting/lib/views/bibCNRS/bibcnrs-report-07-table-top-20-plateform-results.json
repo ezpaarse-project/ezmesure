@@ -1,0 +1,108 @@
+{
+    "took": 44,
+    "timed_out": false,
+    "_shards": {
+      "total": 45,
+      "successful": 45,
+      "skipped": 35,
+      "failed": 0
+    },
+    "hits": {
+      "total": 63823,
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "2": {
+        "doc_count_error_upper_bound": 1,
+        "sum_other_doc_count": 1476,
+        "buckets": [
+          {
+            "key": "Science Direct",
+            "doc_count": 15004
+          },
+          {
+            "key": "National Center for Biotechnology Information",
+            "doc_count": 13022
+          },
+          {
+            "key": "Nature Publishing Group",
+            "doc_count": 4948
+          },
+          {
+            "key": "American Chemical Society",
+            "doc_count": 4913
+          },
+          {
+            "key": "Web of Science",
+            "doc_count": 4532
+          },
+          {
+            "key": "Wiley",
+            "doc_count": 4451
+          },
+          {
+            "key": "HighWire",
+            "doc_count": 2562
+          },
+          {
+            "key": "Royal Society of Chemistry",
+            "doc_count": 1983
+          },
+          {
+            "key": "Scopus",
+            "doc_count": 1977
+          },
+          {
+            "key": "Springer",
+            "doc_count": 1917
+          },
+          {
+            "key": "CAIRN",
+            "doc_count": 1860
+          },
+          {
+            "key": "JSTOR",
+            "doc_count": 896
+          },
+          {
+            "key": "Cell Press",
+            "doc_count": 863
+          },
+          {
+            "key": "silverchair",
+            "doc_count": 654
+          },
+          {
+            "key": "OpenEdition Journals",
+            "doc_count": 514
+          },
+          {
+            "key": "Oxford University Press",
+            "doc_count": 501
+          },
+          {
+            "key": "Taylor & Francis",
+            "doc_count": 431
+          },
+          {
+            "key": "EbscoHost",
+            "doc_count": 417
+          },
+          {
+            "key": "IOP Science",
+            "doc_count": 359
+          },
+          {
+            "key": "Sage Journals",
+            "doc_count": 334
+          },
+          {
+            "key": "PLOS",
+            "doc_count": 209
+          }
+        ]
+      }
+    },
+    "status": 200
+  }

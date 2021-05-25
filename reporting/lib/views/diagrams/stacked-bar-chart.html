@@ -22,8 +22,8 @@
         data: {{ data | dump | safe }},
         mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
         encoding: {
-          x: { field: "a", type: "nominal", axis: { title: "", labelAngle: 0 } },
-          y: { field: "b", type: "quantitative", axis: { title: "", grid: false } },
+          x: { field: "key", type: "nominal", axis: { title: "", labelAngle: 0 } },
+          y: { field: "doc_count", type: "quantitative", axis: { title: "", grid: false } },
           color: { field: "color" }
         },
         config: {
