@@ -9,6 +9,14 @@ const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
 const histo = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
+const diag1bibCNRS = require('../../views/bibCNRS/bibcnrs-report-01-metrics-results.json');
+const diag3bibCNRS = require('../../views/bibCNRS/bibcnrs-report-03-table-instituts-results.json');
+const diag4bibCNRS = require('../../views/bibCNRS/bibcnrs-report-04-table-top-10-labo-results.json');
+const diag5bibCNRS = require('../../views/bibCNRS/bibcnrs-report-05-pie-rtype-results.json');
+const diag6bibCNRS = require('../../views/bibCNRS/bibcnrs-report-06-table-top-10-rtype-results.json');
+const diag7bibCNRS = require('../../views/bibCNRS/bibcnrs-report-07-table-top-20-plateform-results.json');
+const diag8bibCNRS = require('../../views/bibCNRS/bibcnrs-report-08-pie-doi-results.json');
+const diag9bibCNRS = require('../../views/bibCNRS/bibcnrs-report-09-table-top-10-articles-results.json');
 
 async function getMetadata(taskId) {
   const { body: data } = await elastic.getSource({
@@ -430,6 +438,58 @@ function histogramme(data) {
 }
 
 const parameters = {
+  diag1bibCNRS: {
+    data: [{ key: 'consultations', value: diag1bibCNRS.hits.total },
+      { key: 'units', value: diag1bibCNRS.aggregations[4].value },
+      { key: 'platforms', value: diag1bibCNRS.aggregations[6].value }],
+  },
+  diag3bibCNRS: {
+    data: diag3bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    columns: ['Name', 'Consultations'],
+  },
+  diag4bibCNRS: {
+    data: diag4bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    columns: ['Name', 'Consultations'],
+  },
+  diag5bibCNRS: {
+    description: 'A simple pie chart with embedded data.',
+    height: 200,
+    width: 220,
+    theta: 'count',
+    color: 'key',
+    data: {
+      values: diag5bibCNRS.aggregations[2].buckets.map((elt) => ({
+        key: elt.key,
+        count: elt.doc_count,
+      })),
+    },
+  },
+  diag6bibCNRS: {
+    data: diag6bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    columns: ['Name', 'Consultations'],
+  },
+  diag7bibCNRS: {
+    data: diag7bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    columns: ['Name', 'Consultations'],
+  },
+  diag8bibCNRS: {
+    description: 'A simple pie chart with embedded data.',
+    height: 200,
+    width: 220,
+    theta: 'count',
+    color: 'key',
+    data: {
+      values: [{ key: 'with_DOI', count: diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count },
+        { key: 'without_DOI', count: diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count },
+      ],
+    },
+  },
+  diag9bibCNRS: {
+    data: diag9bibCNRS.aggregations[2].buckets.map((elt) => [
+      elt.key, elt[3].buckets[0].key, elt.doc_count,
+    ]),
+    columns: ['Type', 'Name', 'Consultations'],
+  },
   barChart: {
     description: 'A simple bar chart with embedded data.',
     height: 200,

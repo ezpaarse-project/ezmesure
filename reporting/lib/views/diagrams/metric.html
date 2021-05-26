@@ -1,0 +1,14 @@
+{% macro render(data) %}
+<div class="card mx-1 my-3">
+  <div class="card-body mt-5 mb-4" style="display: grid;">
+    {% set i = 1 %}
+    {% for metric in data %}
+    <div class="metrics text-center" style="grid-column: {{ i }};">
+      <h3><strong>{{ metric.value }}</strong></h3>
+      <p>{{ metric.key }}</p>
+    </div>
+    {% set i = i + 1 %}
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}

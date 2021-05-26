@@ -1,0 +1,27 @@
+{% macro render(title, columns, data) %}
+<div class="card mx-1 my-3">
+  <div class="card-body">
+    <h5 class="card-title">{{ title }}</h5>
+    <div class="card-text text-center">
+      <table class="table">
+        <thead>
+          <tr>
+            {% for name in columns %}
+            <th scope="col">{{ name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in data %}
+          <tr>
+            {% for j in i %}
+            <td>{{ j }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endmacro %}

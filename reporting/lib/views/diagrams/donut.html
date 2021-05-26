@@ -1,4 +1,4 @@
-{% macro render(id, title, description, height, width, data) %}
+{% macro render(id, title, description, height, width, theta, color, data) %}
 <div class="card mx-1 my-3">
   <div class="card-body">
     <h5 class="card-title">{{ title }}</h5>
@@ -20,8 +20,8 @@
         "data": {{ data | dump | safe }},
         "mark": { "type": "arc", "innerRadius": 50 },
         "encoding": {
-          "theta": { "field": "value", "type": "quantitative" },
-          "color": { "field": "category", "type": "nominal" }
+          "theta": { "field": {{ theta | dump | safe }}, "type": "quantitative" },
+          "color": { "field": {{ color | dump | safe }}, "type": "nominal" }
         },
         "view": { "stroke": null }
       },

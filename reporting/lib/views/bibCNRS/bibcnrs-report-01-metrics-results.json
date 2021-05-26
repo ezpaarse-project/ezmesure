@@ -1,33 +1,32 @@
 {
-    "took" : 47,
-    "timed_out" : false,
-    "_shards" : {
-      "total" : 45,
-      "successful" : 45,
-      "skipped" : 0,
-      "failed" : 0
+  "took": 60,
+  "timed_out": false,
+  "_shards": {
+    "total": 45,
+    "successful": 45,
+    "skipped": 35,
+    "failed": 0
+  },
+  "hits": {
+    "total": 74117,
+    "max_score": null,
+    "hits": []
+  },
+  "aggregations": {
+    "1": {
+      "value": 1621327331000,
+      "value_as_string": "2021-05-18T08:42:11.000Z"
     },
-    "hits" : {
-      "total" : {
-        "value" : 10000,
-        "relation" : "gte"
-      },
-      "max_score" : null,
-      "hits" : [ ]
+    "2": {
+      "value": 1621893589000,
+      "value_as_string": "2021-05-24T21:59:49.000Z"
     },
-    "aggregations" : {
-      "unit" : {
-        "value" : 866
-      },
-      "min" : {
-        "value" : 1.620811624E12
-      },
-      "max" : {
-        "value" : 1.621375177E12
-      },
-      "platform_name" : {
-        "value" : 62
-      }
+    "4": {
+      "value": 846
+    },
+    "6": {
+      "value": 57
     }
-  }
-  
+  },
+  "status": 200
+}
