@@ -22,9 +22,9 @@
         data: {{ data | dump | safe }},
         mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
         encoding: {
-          x: { field: "key", type: "nominal", axis: { title: "", labelAngle: 0 } },
-          y: { field: "doc_count", type: "quantitative", axis: { title: "", grid: false } },
-          color: { field: "color" }
+          x: { timeUnit: "monthdate", field: "date", type: "ordinal", axis: { title: "" } },
+          y: { field: "count", type: "quantitative", axis: { title: "" } },
+          color: { field: "key" }
         },
         config: {
           view: { stroke: 'transparent' },

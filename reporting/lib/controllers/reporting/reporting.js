@@ -413,6 +413,22 @@ exports.download = async (ctx) => {
   }
 };
 
+function histogramme(data) {
+  const values = [];
+
+  data.aggregations['2'].buckets.forEach((bucket) => {
+    bucket['3'].buckets.forEach((el) => {
+      values.push({
+        date: bucket.key_as_string,
+        key: el.key,
+        count: el.doc_count,
+      });
+    });
+  });
+
+  return values;
+}
+
 const parameters = {
   barChart: {
     description: 'A simple bar chart with embedded data.',
@@ -443,11 +459,10 @@ const parameters = {
   },
   stackedBarChart: {
     description: 'A basic stacked bar chart example.',
-    height: 190,
-    width: 500,
+    height: 400,
+    width: 1000,
     data: {
-      values: histo.aggregations[2].buckets
-        .map((tab) => tab[3].buckets),
+      values: histogramme(histo),
     },
   },
 };
