@@ -4,15 +4,14 @@
 
 {% import "diagrams/stacked-bar-chart.html" as sBarChart %}
 {% import "diagrams/table.html" as table %}
-{% import "diagrams/bar-chart.html" as barChart %}
 {% import "diagrams/donut.html" as donut %}
-    {% import "diagrams/metric.html" as metric %}
+{% import "diagrams/metric.html" as metric %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <div class="card mx-1 my-3">
+<div class="container-fluid px-4">
+  <div class="row mt-4">
+    <div class="col-6">
+      <div class="card h-100">
         <div class="card-body">
           <header class="text-center mt-5">
             <h3>Rapport hebdomadaire des consultations {{ etablissement }}</h3>
@@ -22,18 +21,18 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-6">
       {{ metric.render(parameters.diag1bibCNRS.data) }}
     </div>
   </div>
 
-  <div class="row">
+  <div class="row mt-4">
     <div class="col">
-      {{ sBarChart.render('s-bar-chart-1', "Histo-instituts", parameters.stackedBarChart.description, parameters.stackedBarChart.height, parameters.stackedBarChart.width, parameters.stackedBarChart.data) }}
+      {{ sBarChart.render('s-bar-chart-1', "Histo-instituts", parameters.diag2bibCNRS.description, parameters.diag2bibCNRS.height, parameters.diag2bibCNRS.width, parameters.diag2bibCNRS.data) }}
     </div>
   </div>
 
-  <div class="row">
+  <div class="row mt-4">
     <div class="col-5">
       {{ table.render("Table-instituts", parameters.diag3bibCNRS.columns, parameters.diag3bibCNRS.data) }}
     </div>
@@ -42,7 +41,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row mt-4">
     <div class="col-8">
       {{ donut.render('donut-1', "Pie-rtype", parameters.diag5bibCNRS.description, parameters.diag5bibCNRS.height, parameters.diag5bibCNRS.width, parameters.diag5bibCNRS.theta, parameters.diag5bibCNRS.color, parameters.diag5bibCNRS.data) }}
     </div>
@@ -51,7 +50,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row mt-4">
     <div class="col-7">
       {{ table.render("Table-top-20-plateform", parameters.diag7bibCNRS.columns, parameters.diag7bibCNRS.data) }}
     </div>
@@ -60,8 +59,10 @@
     </div>
   </div>
 
-  <div class="row">
-    {{ table.render("Table-top-10-articles", parameters.diag9bibCNRS.columns, parameters.diag9bibCNRS.data) }}
+  <div class="row mt-4">
+    <div class="col-12">
+      {{ table.render("Table-top-10-articles", parameters.diag9bibCNRS.columns, parameters.diag9bibCNRS.data) }}
+    </div>
   </div>
 
   <footer class="text-center">

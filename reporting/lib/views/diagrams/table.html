@@ -1,8 +1,8 @@
 {% macro render(title, columns, data) %}
-<div class="card mx-1 my-3">
-  <div class="card-body">
+<div class="card h-100">
+  <div class="card-body align-items-center">
     <h5 class="card-title">{{ title }}</h5>
-    <div class="card-text text-center">
+    <div class="card-text">
       <table class="table">
         <thead>
           <tr>
@@ -12,10 +12,10 @@
           </tr>
         </thead>
         <tbody>
-          {% for i in data %}
+          {% for object in data %}
           <tr>
-            {% for j in i %}
-            <td>{{ j }}</td>
+            {% for attribute in object %}
+            <td>{{ attribute }}</td>
             {% endfor %}
           </tr>
           {% endfor %}

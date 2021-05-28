@@ -1,10 +1,8 @@
 {% macro render(id, title, description, height, width, theta, color, data) %}
-<div class="card mx-1 my-3">
-  <div class="card-body">
-    <h5 class="card-title">{{ title }}</h5>
-    <div class="card-text text-center">
-      <div id="{{ id }}"></div>
-    </div>
+<div class="card h-100 align-middle">
+  <div class="card-body align-items-center">
+    <h5 id="donut-{{ id }}" class="card-title">{{ title }}</h5>
+    <div id="{{ id }}"></div>
   </div>
 </div>
 <script>
@@ -14,15 +12,23 @@
       {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": {{ description | dump | safe }},
-        "width": {{ width | dump | safe }},
-        "height": {{ height | dump | safe }},
+        "width": document.querySelector('#donut-{{ id }}').clientWidth,
+        "height": document.querySelector('#donut-{{ id }}').clientHeight,
         "padding": 5,
+        "autosize": "fit",
         "data": {{ data | dump | safe }},
-        "mark": { "type": "arc", "innerRadius": 50 },
         "encoding": {
-          "theta": { "field": {{ theta | dump | safe }}, "type": "quantitative" },
-          "color": { "field": {{ color | dump | safe }}, "type": "nominal" }
+          "theta": { "field": {{ theta | dump | safe }}, "type": "quantitative", "stack": true },
+          "color": { "field": {{ color | dump | safe }}, "type": "nominal", "legend": { "direction": "vertical", "orient": "mid-right"} }
         },
+        "layer": [{
+          "mark": { "type": "arc", "radius": 150, "radius2": 200 },
+        }, {
+          "mark": {"type": "text", "radius": 220 },
+          "encoding": {
+            "text": {"field": "percent", "type": "nominal"}
+          }
+        }],
         "view": { "stroke": null }
       },
       { actions: false }

@@ -8,8 +8,8 @@ const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
-const histo = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
 const diag1bibCNRS = require('../../views/bibCNRS/bibcnrs-report-01-metrics-results.json');
+const diag2bibCNRS = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
 const diag3bibCNRS = require('../../views/bibCNRS/bibcnrs-report-03-table-instituts-results.json');
 const diag4bibCNRS = require('../../views/bibCNRS/bibcnrs-report-04-table-top-10-labo-results.json');
 const diag5bibCNRS = require('../../views/bibCNRS/bibcnrs-report-05-pie-rtype-results.json');
@@ -437,40 +437,55 @@ function histogramme(data) {
   return values;
 }
 
+function pie(data) {
+  const total = data.aggregations[2].buckets.reduce((accum, item) => accum + item.doc_count, 0);
+
+  return data.aggregations[2].buckets.map((elt) => ({
+    key: elt.key,
+    percent: `${((elt.doc_count / total) * 100).toFixed(2) > 2 ? `${((elt.doc_count / total) * 100).toFixed(2)}%` : ''}`,
+    count: elt.doc_count,
+  }));
+}
+
 const parameters = {
   diag1bibCNRS: {
     data: [{ key: 'consultations', value: diag1bibCNRS.hits.total },
       { key: 'units', value: diag1bibCNRS.aggregations[4].value },
       { key: 'platforms', value: diag1bibCNRS.aggregations[6].value }],
   },
+  diag2bibCNRS: {
+    description: 'A basic stacked bar chart example.',
+    height: 400,
+    width: 1000,
+    data: {
+      values: histogramme(diag2bibCNRS),
+    },
+  },
   diag3bibCNRS: {
     data: diag3bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
-    columns: ['Name', 'Consultations'],
+    columns: ['Institute name', 'Number of consultations'],
   },
   diag4bibCNRS: {
     data: diag4bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
-    columns: ['Name', 'Consultations'],
+    columns: ['Laboratory name', 'Number of consultations'],
   },
   diag5bibCNRS: {
     description: 'A simple pie chart with embedded data.',
-    height: 200,
-    width: 220,
+    height: 250,
+    width: 280,
     theta: 'count',
     color: 'key',
     data: {
-      values: diag5bibCNRS.aggregations[2].buckets.map((elt) => ({
-        key: elt.key,
-        count: elt.doc_count,
-      })),
+      values: pie(diag5bibCNRS),
     },
   },
   diag6bibCNRS: {
     data: diag6bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
-    columns: ['Name', 'Consultations'],
+    columns: ['Type', 'Number of consultations'],
   },
   diag7bibCNRS: {
     data: diag7bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
-    columns: ['Name', 'Consultations'],
+    columns: ['Platform name', 'Number of consultations'],
   },
   diag8bibCNRS: {
     description: 'A simple pie chart with embedded data.',
@@ -488,42 +503,7 @@ const parameters = {
     data: diag9bibCNRS.aggregations[2].buckets.map((elt) => [
       elt.key, elt[3].buckets[0].key, elt.doc_count,
     ]),
-    columns: ['Type', 'Name', 'Consultations'],
-  },
-  barChart: {
-    description: 'A simple bar chart with embedded data.',
-    height: 200,
-    width: 400,
-    data: {
-      values: [
-        { a: 'A', b: 28 }, { a: 'B', b: 55 }, { a: 'C', b: 43 },
-        { a: 'D', b: 91 }, { a: 'E', b: 81 }, { a: 'F', b: 53 },
-        { a: 'G', b: 19 }, { a: 'H', b: 87 },
-      ],
-    },
-  },
-  donut: {
-    description: 'A basic pie chart example.',
-    height: 200,
-    width: 220,
-    data: {
-      values: [
-        { category: 1, value: 4 },
-        { category: 2, value: 6 },
-        { category: 3, value: 10 },
-        { category: 4, value: 3 },
-        { category: 5, value: 7 },
-        { category: 6, value: 8 },
-      ],
-    },
-  },
-  stackedBarChart: {
-    description: 'A basic stacked bar chart example.',
-    height: 400,
-    width: 1000,
-    data: {
-      values: histogramme(histo),
-    },
+    columns: ['Article name', 'Institution', 'Number of consultations'],
   },
 };
 
