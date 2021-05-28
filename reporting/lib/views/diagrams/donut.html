@@ -1,6 +1,6 @@
 {% macro render(id, title, description, height, width, theta, color, data) %}
-<div class="card h-100 align-middle">
-  <div class="card-body align-items-center">
+<div class="card h-100">
+  <div class="card-body align-items-center justify-content-center">
     <h5 id="donut-{{ id }}" class="card-title">Diagram {{ title }}</h5>
     <div id="{{ id }}"></div>
   </div>
@@ -15,7 +15,6 @@
         "width": document.querySelector('#donut-{{ id }}').clientWidth,
         "height": document.querySelector('#donut-{{ id }}').clientHeight,
         "padding": 5,
-        "autosize": "fit-x",
         "data": {{ data | dump | safe }},
         "encoding": {
           "theta": { "field": {{ theta | dump | safe }}, "type": "quantitative", "stack": true },
