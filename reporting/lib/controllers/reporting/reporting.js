@@ -494,8 +494,16 @@ const parameters = {
     theta: 'count',
     color: 'key',
     data: {
-      values: [{ key: 'with_DOI', count: diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count },
-        { key: 'without_DOI', count: diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count },
+      values: [{
+        key: 'with_DOI',
+        percent: `${((diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count / diag8bibCNRS.hits.total) * 100).toFixed(2)}%`,
+        count: diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count,
+      },
+      {
+        key: 'without_DOI',
+        percent: `${((diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count / diag8bibCNRS.hits.total) * 100).toFixed(2)}%`,
+        count: diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count,
+      },
       ],
     },
   },

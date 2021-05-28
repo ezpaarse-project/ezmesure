@@ -43,7 +43,7 @@
 
   <div class="row mt-4">
     <div class="col-8">
-      {{ donut.render('donut-1', "Pie-rtype", parameters.diag5bibCNRS.description, parameters.diag5bibCNRS.height, parameters.diag5bibCNRS.width, parameters.diag5bibCNRS.theta, parameters.diag5bibCNRS.color, parameters.diag5bibCNRS.data) }}
+      {{ donut.render('donut-1', "row types", parameters.diag5bibCNRS.description, parameters.diag5bibCNRS.height, parameters.diag5bibCNRS.width, parameters.diag5bibCNRS.theta, parameters.diag5bibCNRS.color, parameters.diag5bibCNRS.data) }}
     </div>
     <div class="col-4">
       {{ table.render("Table-top-10-rtype", parameters.diag6bibCNRS.columns, parameters.diag6bibCNRS.data) }}
@@ -55,7 +55,7 @@
       {{ table.render("Table-top-20-plateform", parameters.diag7bibCNRS.columns, parameters.diag7bibCNRS.data) }}
     </div>
     <div class="col-5">
-      {{ donut.render('donut-2', "Pie-doi", parameters.diag8bibCNRS.description, parameters.diag8bibCNRS.height, parameters.diag8bibCNRS.width, parameters.diag8bibCNRS.theta, parameters.diag8bibCNRS.color, parameters.diag8bibCNRS.data) }}
+      {{ donut.render('donut-2', "DOI", parameters.diag8bibCNRS.description, parameters.diag8bibCNRS.height, parameters.diag8bibCNRS.width, parameters.diag8bibCNRS.theta, parameters.diag8bibCNRS.color, parameters.diag8bibCNRS.data) }}
     </div>
   </div>
 
@@ -64,7 +64,7 @@
       {{ table.render("Table-top-10-articles", parameters.diag9bibCNRS.columns, parameters.diag9bibCNRS.data) }}
     </div>
   </div>
-
+  <br>
   <footer class="text-center">
     <p class="page">Page 1/1</p>
   </footer>
