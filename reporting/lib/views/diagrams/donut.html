@@ -1,24 +1,25 @@
 {% macro render(id, title, description, height, width, theta, color, data) %}
 <div class="card h-100">
-  <div class="card-body align-items-center justify-content-center">
+  <div class="card-body" id="donut-card-{{ id }}">
     <h5 class="card-title">Diagram {{ title }}</h5>
-    <p class="card-text" id="donut-{{ id }}">
-      <div id="{{ id }}"></div>
+    <p class="card-text">
+      <div id="{{ id }}" style="width: 100%"></div>
     </p>
   </div>
 </div>
 <script>
   window.addEventListener('load', () => {
-    const width = document.querySelector('#donut-{{ id }}').clientWidth;
-    const height = document.querySelector('#donut-{{ id }}').clientHeight;
     vegaEmbed(
       '#{{ id }}',
       {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": {{ description | dump | safe }},
-        "width": width,
-        "height": height,
-        "autosize": "fit-x",
+        "width": "container",
+        "height": document.querySelector('#donut-card-{{ id }}').clientHeight,
+        "autosize": {
+          "type": "fit-x",
+          "resize": true,
+        },
         "padding": 5,
         "data": {{ data | dump | safe }},
         "encoding": {
@@ -26,9 +27,9 @@
           "color": { "field": {{ color | dump | safe }}, "type": "nominal", "legend": { "direction": "vertical", "title": {{ title | dump | safe }} } }
         },
         "layer": [{
-          "mark": { "type": "arc", "radius": 150, "radius2": 200 },
+          "mark": { "type": "arc", "innerRadius": 180, "outerRadius": 200 },
         }, {
-          "mark": {"type": "text", "radius": 220 },
+          "mark": {"type": "text", "radius": 225 }, 
           "encoding": {
             "text": {"field": "percent", "type": "nominal"}
           }
