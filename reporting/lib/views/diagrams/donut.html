@@ -1,19 +1,24 @@
 {% macro render(id, title, description, height, width, theta, color, data) %}
 <div class="card h-100">
   <div class="card-body align-items-center justify-content-center">
-    <h5 id="donut-{{ id }}" class="card-title">Diagram {{ title }}</h5>
-    <div id="{{ id }}"></div>
+    <h5 class="card-title">Diagram {{ title }}</h5>
+    <p class="card-text" id="donut-{{ id }}">
+      <div id="{{ id }}"></div>
+    </p>
   </div>
 </div>
 <script>
   window.addEventListener('load', () => {
+    const width = document.querySelector('#donut-{{ id }}').clientWidth;
+    const height = document.querySelector('#donut-{{ id }}').clientHeight;
     vegaEmbed(
       '#{{ id }}',
       {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": {{ description | dump | safe }},
-        "width": document.querySelector('#donut-{{ id }}').clientWidth,
-        "height": document.querySelector('#donut-{{ id }}').clientHeight,
+        "width": width,
+        "height": height,
+        "autosize": "fit-x",
         "padding": 5,
         "data": {{ data | dump | safe }},
         "encoding": {
