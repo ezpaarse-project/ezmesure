@@ -162,15 +162,6 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     this.data.creator = username;
   }
 
-  get(prop, defaultValue) {
-    const value = this.data[prop];
-    return (typeof value === 'undefined' ? defaultValue : value);
-  }
-
-  set(prop, value) {
-    this.data[prop] = value;
-  }
-
   getRole(opts = {}) {
     const role = this.get('role');
 
