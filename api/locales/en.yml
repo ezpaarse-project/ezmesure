@@ -28,12 +28,12 @@ errors:
     noRole: The institution has no role set
     notAssigned: No assigned institution
     alreadyAttached: You can not attach another institution to your profile
-    noSpaceSet: Institution has no space set
-    noPrefixSet: Institution has no index prefix set
-    noRoleSet: Institution has no role set
-    noBaseIndex: Institution base index does not exist
-    noSpace: Institution space does not exist
-    patternExists: The index pattern already exists
+    noSpaceSet: Institution [%s] has no space set
+    noPrefixSet: Institution [%s] has no index prefix set
+    noRoleSet: Institution [%s] has no role set
+    noBaseIndex: The base index [%s] of the institution [%s] does not exist
+    noSpace: The space [%s] of the institution [%s] does not exist
+    patternExists: The index pattern [%s] already exists in the space [%s]
 
   members:
     alreadyMember: The user belongs to another institution

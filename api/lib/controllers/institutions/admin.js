@@ -28,7 +28,7 @@ exports.createInstitutionSpace = async (ctx) => {
   const { institution } = ctx.state;
 
   if (!institution.get('space')) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
 
   let space = await institution.getSpace();
@@ -47,7 +47,7 @@ exports.createInstitutionIndex = async (ctx) => {
   const { institution } = ctx.state;
 
   if (!institution.get('indexPrefix')) {
-    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
   }
 
   const indexExists = await institution.checkBaseIndex();
@@ -68,21 +68,22 @@ exports.createInstitutionIndexPattern = async (ctx) => {
   const { suffix } = body || {};
 
   if (!institution.get('space')) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
   if (!institution.get('indexPrefix')) {
-    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
   }
 
   const space = await institution.getSpace();
   if (!space) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpace'));
+    ctx.throw(409, ctx.$t('errors.institution.noSpace', institution.get('space'), institution.id));
   }
 
   const patterns = await institution.getIndexPatterns({ suffix: suffix || '*' });
 
   if (patterns.length > 0) {
-    ctx.throw(409, ctx.$t('errors.institution.patternExists'));
+    const pattern = patterns[0] && patterns[0].title;
+    ctx.throw(409, ctx.$t('errors.institution.patternExists', pattern));
   }
 
   await institution.createIndexPattern({ suffix: suffix || '*' });
@@ -94,13 +95,13 @@ exports.createInstitutionRoles = async (ctx) => {
   const { institution } = ctx.state;
 
   if (!institution.get('space')) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
   if (!institution.get('indexPrefix')) {
-    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
   }
   if (!institution.get('role')) {
-    ctx.throw(409, ctx.$t('errors.institution.noRoleSet'));
+    ctx.throw(409, ctx.$t('errors.institution.noRoleSet', institution.id));
   }
 
   ctx.status = 200;

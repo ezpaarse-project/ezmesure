@@ -23,17 +23,17 @@ errors:
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
 
   institution:
-    notFound: Établissement introuvableah tiens, la config ng
+    notFound: Établissement introuvable
     unauthorized: Vous n'êtes pas autorisé à accéder à cet établissement
     noRole: L'établissement n'a pas de rôle associé
     notAssigned: Pas d'établissement associé
     alreadyAttached: Vous ne pouvez associer un autre établissement à votre profil
-    noSpaceSet: L'établissement n'a pas d'espace associé
-    noPrefixSet: L'établissement n'a pas de préfixe d'index associé
-    noRoleSet: L'établissement n'a pas de rôle associé
-    noBaseIndex: L'index de base de l'établissment n'existe pas
-    noSpace: L'espace de l'établissement n'existe pas
-    patternExists: L'index pattern existe déjà
+    noSpaceSet: L'établissement [%s] n'a pas d'espace associé
+    noPrefixSet: L'établissement [%s] n'a pas de préfixe d'index associé
+    noRoleSet: L'établissement [%s] n'a pas de rôle associé
+    noBaseIndex: L'index de base [%s] de l'établissement [%s] n'existe pas
+    noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
+    patternExists: L'index pattern [%s] existe déjà dans l'espace [%s]
 
   members:
     alreadyMember: L'utilisateur appartient à une autre institution
