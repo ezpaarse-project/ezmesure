@@ -16,18 +16,17 @@
         "description": {{ description | dump | safe }},
         "width": "container",
         "height": document.querySelector('#donut-card-{{ id }}').clientHeight,
+        "padding": 5,
         "autosize": {
           "type": "fit-x",
-          "resize": true,
         },
-        "padding": 5,
         "data": {{ data | dump | safe }},
         "encoding": {
           "theta": { "field": {{ theta | dump | safe }}, "type": "quantitative", "stack": true },
-          "color": { "field": {{ color | dump | safe }}, "type": "nominal", "legend": { "direction": "vertical", "title": {{ title | dump | safe }} } }
+          "color": { "field": {{ color | dump | safe }}, "type": "nominal", "legend": { "direction": "vertical", "orient": "right", "title": {{ title | dump | safe }} } }
         },
         "layer": [{
-          "mark": { "type": "arc", "innerRadius": 180, "outerRadius": 200 },
+          "mark": { "type": "arc", "innerRadius": document.querySelector('#donut-card-{{ id }}').clientWidth/4, "outerRadius": document.querySelector('#donut-card-{{ id }}').clientWidth/4 + 20 },
         }, {
           "mark": {"type": "text", "radius": 225 }, 
           "encoding": {
