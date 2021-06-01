@@ -1,9 +1,9 @@
 {% macro render(id, title, description, height, width, data) %}
 <div class="card h-100">
-  <div class="card-body align-items-center">
+  <div class="card-body" id="s-bar-chart-card-{{ id }}">
     <h5 class="card-title">{{ title }}</h5>
-    <div class="card-text text-center">
-      <div id="{{ id }}"></div>
+    <div class="card-text">
+      <div id="{{ id }}" style="width: 100%; height: 100%"></div>
     </div>
   </div>
 </div>
@@ -14,11 +14,11 @@
       {
         $schema: "https://vega.github.io/schema/vega-lite/v5.json",
         description: {{ description | dump | safe }},
-        width: {{ width | dump | safe }},
-        height: {{ height | dump | safe }},
+        width: "container",
         padding: 5,
-        autosize: "fit-x",
-
+        autosize: {
+          type: "fit-x",
+        },
         data: {{ data | dump | safe }},
         mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
         encoding: {
