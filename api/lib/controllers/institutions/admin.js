@@ -38,7 +38,7 @@ exports.createInstitutionSpace = async (ctx) => {
   if (space) {
     ctx.status = 200;
   } else {
-    space = await institution.createSpace({ suffix });
+    space = await institution.createSpace(body);
     ctx.status = 201;
   }
 

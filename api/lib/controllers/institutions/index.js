@@ -252,6 +252,10 @@ router.route({
     },
     body: {
       suffix: Joi.string().trim().regex(/^[a-z0-9_-]+$/i),
+      name: Joi.string().trim(),
+      description: Joi.string().trim(),
+      initials: Joi.string().trim().min(1).max(2),
+      color: Joi.string().trim(),
     },
   },
 });

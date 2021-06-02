@@ -241,8 +241,14 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
    * Create the institution space if it doesn't exist yet
    */
   async createSpace(opts) {
-    const { suffix } = opts || {};
-    const { space, name } = this.data;
+    const {
+      suffix,
+      name,
+      description,
+      initials,
+      color,
+    } = opts || {};
+    const { space, name: institutionName } = this.data;
 
     const spaceId = `${space}${suffix || ''}`;
 
@@ -254,8 +260,10 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
     const { data } = await kibana.createSpace({
       id: spaceId,
-      name: spaceId,
-      description: name,
+      name: name || spaceId,
+      description: description || institutionName,
+      initials,
+      color,
     });
     return data;
   }
