@@ -246,8 +246,12 @@ router.route({
   path: '/:institutionId/_create_space',
   handler: [fetchInstitution, createInstitutionSpace],
   validate: {
+    type: 'json',
     params: {
       institutionId: Joi.string().trim().required(),
+    },
+    body: {
+      suffix: Joi.string().trim().regex(/^[a-z0-9_-]+$/i),
     },
   },
 });

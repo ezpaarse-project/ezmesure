@@ -224,14 +224,15 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   /**
    * Get the institution space
    */
-  async getSpace() {
+  async getSpace(opts) {
+    const { suffix } = opts || {};
     const { space } = this.data;
 
     if (!space) {
       return null;
     }
 
-    const { data = {}, status } = await kibana.getSpace(space);
+    const { data = {}, status } = await kibana.getSpace(`${space}${suffix || ''}`);
 
     return status === 200 ? data : null;
   }
@@ -239,17 +240,21 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   /**
    * Create the institution space if it doesn't exist yet
    */
-  async createSpace() {
+  async createSpace(opts) {
+    const { suffix } = opts || {};
     const { space, name } = this.data;
-    const { data: existingSpace, status } = await kibana.getSpace(space);
+
+    const spaceId = `${space}${suffix || ''}`;
+
+    const { data: existingSpace, status } = await kibana.getSpace(spaceId);
 
     if (status === 200 && existingSpace) {
       return existingSpace;
     }
 
     const { data } = await kibana.createSpace({
-      id: space,
-      name: space,
+      id: spaceId,
+      name: spaceId,
       description: name,
     });
     return data;

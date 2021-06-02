@@ -26,17 +26,19 @@ exports.validateInstitution = async (ctx) => {
 
 exports.createInstitutionSpace = async (ctx) => {
   const { institution } = ctx.state;
+  const { body = {} } = ctx.request;
+  const { suffix } = body || {};
 
   if (!institution.get('space')) {
     ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
 
-  let space = await institution.getSpace();
+  let space = await institution.getSpace({ suffix });
 
   if (space) {
     ctx.status = 200;
   } else {
-    space = await institution.createSpace();
+    space = await institution.createSpace({ suffix });
     ctx.status = 201;
   }
 
