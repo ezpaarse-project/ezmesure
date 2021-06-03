@@ -42,21 +42,27 @@
   </div>
 
   <div class="row mt-4">
-    <div class="col">
+    <div class="col-12">
       {{ donut.render('donut-1', "row types", parameters.diag5bibCNRS.description, parameters.diag5bibCNRS.height, parameters.diag5bibCNRS.width, parameters.diag5bibCNRS.theta, parameters.diag5bibCNRS.color, parameters.diag5bibCNRS.data) }}
     </div>
-    <div class="col">
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
       {{ table.render("Table-top-10-rtype", parameters.diag6bibCNRS.columns, parameters.diag6bibCNRS.data) }}
     </div>
   </div>
 
   <div class="row mt-4">
-    <div class="col">
+    <div class="col-12">
       {{ table.render("Table-top-20-plateform", parameters.diag7bibCNRS.columns, parameters.diag7bibCNRS.data) }}
     </div>
-    <div class="col">
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
       {{ donut.render('donut-2', "DOI", parameters.diag8bibCNRS.description, parameters.diag8bibCNRS.height, parameters.diag8bibCNRS.width, parameters.diag8bibCNRS.theta, parameters.diag8bibCNRS.color, parameters.diag8bibCNRS.data) }}
-    </div>
+  </div>
   </div>
 
   <div class="row mt-4">

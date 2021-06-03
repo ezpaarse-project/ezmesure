@@ -11,7 +11,9 @@ const printPDF = async () => {
   await page.goto('http://localhost:4000/reporting/render-bibCNRS');
 
   const pdf = await page.pdf({
-    format: 'A4',
+    height: '800px',
+    width: '28cm',
+    preferCSSPageSize: true,
   });
 
   const ws = fs.createWriteStream(path.resolve(__dirname, 'monPDF.pdf'));

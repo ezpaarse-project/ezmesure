@@ -3,11 +3,11 @@
   <div class="card-body align-items-center">
     <h5 class="card-title">{{ title }}</h5>
     <div class="card-text">
-      <table class="table table-responsive table-sm" style="white-space: nowrap; width: 1%;">
+      <table class="table align-middle" style="white-space: nowrap; width: 1%; table-layout: fixed; width: 100%;">
         <thead>
           <tr>
             {% for name in columns %}
-            <th scope="col" style="white-space: nowrap; width: 1%;">{{ name }}</th>
+            <th style="text-align: center;">{{ name }}</th>
             {% endfor %}
           </tr>
         </thead>
@@ -15,7 +15,7 @@
           {% for object in data %}
           <tr>
             {% for attribute in object %}
-            <td style="white-space: nowrap; width: 1%;">{{ attribute }}</td>
+            <td style="white-space: nowrap; width: 1%; text-align: center">{{ attribute }}</td>
             {% endfor %}
           </tr>
           {% endfor %}

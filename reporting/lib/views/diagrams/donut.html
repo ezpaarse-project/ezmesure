@@ -2,9 +2,9 @@
 <div class="card h-100">
   <div class="card-body" id="donut-card-{{ id }}">
     <h5 class="card-title">Diagram {{ title }}</h5>
-    <p class="card-text">
-      <div id="{{ id }}" style="width: 100%"></div>
-    </p>
+    <div class="card-text">
+      <div id="{{ id }}" style="width: 100%; height: 100%"></div>
+    </div>
   </div>
 </div>
 <script>
@@ -28,12 +28,12 @@
         "layer": [{
           "mark": { "type": "arc", "innerRadius": document.querySelector('#donut-card-{{ id }}').clientWidth/4, "outerRadius": document.querySelector('#donut-card-{{ id }}').clientWidth/4 + 20 },
         }, {
-          "mark": {"type": "text", "radius": 225 }, 
+          "mark": {"type": "text", "radius": document.querySelector('#donut-card-{{ id }}').clientWidth/4 + 40 }, 
           "encoding": {
             "text": {"field": "percent", "type": "nominal"}
           }
         }],
-        "view": { "stroke": null }
+        "view": { "stroke": 'transparent' }
       },
       { actions: false }
     );
