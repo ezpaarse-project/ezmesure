@@ -16,64 +16,60 @@
           <header class="text-center mt-5">
             <h3>Rapport hebdomadaire des consultations {{ etablissement }}</h3>
             <p>Rapport couvrant la période du */*/2021, 00:00 au */*/2021, 00:00</p>
-            <img class = "oui" src="/logo.png" alt="ezMesure" style="width: 400px;"> <!-- insertion logo établissement -->
+            <img class = "oui" src="/logo.png" alt="ezMesure" style="width: 80%;"> <!-- insertion logo établissement -->
           </header>
         </div>
       </div>
     </div>
     <div class="col-6">
-      {{ metric.render(parameters.diag1bibCNRS.data) }}
+      {{ metric.render(parameters.bibCNRSdiag1) }}
     </div>
   </div>
 
-  <div class="row mt-4">
+  <div class="row mt-4" style="page-break-after: always;">
     <div class="col">
-      {{ sBarChart.render('s-bar-chart-1', "Histo-instituts", parameters.diag2bibCNRS.description, parameters.diag2bibCNRS.height, parameters.diag2bibCNRS.width, parameters.diag2bibCNRS.data) }}
+      {{ sBarChart.render(parameters.bibCNRSdiag2) }}
     </div>
   </div>
 
-  <div class="row mt-4">
-    <div class="col-5">
-      {{ table.render("Table-instituts", parameters.diag3bibCNRS.columns, parameters.diag3bibCNRS.data) }}
+  <div class="row mt-4" style="page-break-after: always;">
+    <div class="col">
+      {{ table.render(parameters.bibCNRSdiag3) }}
     </div>
-    <div class="col-7">
-      {{ table.render("Table-top-10-labo", parameters.diag4bibCNRS.columns, parameters.diag4bibCNRS.data) }}
+    <div class="col">
+      {{ table.render(parameters.bibCNRSdiag4) }}
     </div>
+  </div>
+
+  <div class="row mt-4" style="page-break-after: always;">
+    <div class="col-12">
+      {{ donut.render(parameters.bibCNRSdiag5) }}
+    </div>
+  </div>
+
+  <div class="row mt-4" style="page-break-after: always;">
+    <div class="col-12">
+      {{ table.render(parameters.bibCNRSdiag6) }}
+    </div>
+  </div>
+
+  <div class="row mt-4" style="page-break-after: always;">
+    <div class="col-12">
+      {{ table.render(parameters.bibCNRSdiag7) }}
+    </div>
+  </div>
+
+  <div class="row mt-4" style="page-break-after: always;">
+    <div class="col-12">
+      {{ donut.render(parameters.bibCNRSdiag8) }}
+  </div>
   </div>
 
   <div class="row mt-4">
     <div class="col-12">
-      {{ donut.render('donut-1', "row types", parameters.diag5bibCNRS.description, parameters.diag5bibCNRS.height, parameters.diag5bibCNRS.width, parameters.diag5bibCNRS.theta, parameters.diag5bibCNRS.color, parameters.diag5bibCNRS.data) }}
+      {{ table.render(parameters.bibCNRSdiag9) }}
     </div>
   </div>
-
-  <div class="row mt-4">
-    <div class="col-12">
-      {{ table.render("Table-top-10-rtype", parameters.diag6bibCNRS.columns, parameters.diag6bibCNRS.data) }}
-    </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col-12">
-      {{ table.render("Table-top-20-plateform", parameters.diag7bibCNRS.columns, parameters.diag7bibCNRS.data) }}
-    </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col-12">
-      {{ donut.render('donut-2', "DOI", parameters.diag8bibCNRS.description, parameters.diag8bibCNRS.height, parameters.diag8bibCNRS.width, parameters.diag8bibCNRS.theta, parameters.diag8bibCNRS.color, parameters.diag8bibCNRS.data) }}
-  </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col-12">
-      {{ table.render("Table-top-10-articles", parameters.diag9bibCNRS.columns, parameters.diag9bibCNRS.data) }}
-    </div>
-  </div>
-  <br>
-  <footer class="text-center">
-    <p class="page">Page 1/1</p>
-  </footer>
 </div>
 
 {% endblock %}

@@ -1,18 +1,18 @@
-{% macro render(title, columns, data) %}
+{% macro render(params) %}
 <div class="card h-100">
   <div class="card-body align-items-center">
-    <h5 class="card-title">{{ title }}</h5>
+    <h5 class="card-title">{{ params.title }}</h5>
     <div class="card-text">
-      <table class="table align-middle" style="white-space: nowrap; width: 1%; table-layout: fixed; width: 100%;">
+      <table class="table align-middle" style="white-space: nowrap; width: 1%; table-layout: fixed; width: 100%; font-size: 12px;">
         <thead>
           <tr>
-            {% for name in columns %}
+            {% for name in params.columns %}
             <th style="text-align: center;">{{ name }}</th>
             {% endfor %}
           </tr>
         </thead>
         <tbody>
-          {% for object in data %}
+          {% for object in params.data %}
           <tr>
             {% for attribute in object %}
             <td style="white-space: nowrap; width: 1%; text-align: center">{{ attribute }}</td>

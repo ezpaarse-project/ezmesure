@@ -448,49 +448,53 @@ function pie(data) {
 }
 
 const parameters = {
-  diag1bibCNRS: {
+  bibCNRSdiag1: {
     data: [{ key: 'consultations', value: diag1bibCNRS.hits.total },
       { key: 'units', value: diag1bibCNRS.aggregations[4].value },
       { key: 'platforms', value: diag1bibCNRS.aggregations[6].value }],
   },
-  diag2bibCNRS: {
+  bibCNRSdiag2: {
+    id: 's-bar-chart-1',
+    title: 'Histo-instituts',
     description: 'A basic stacked bar chart example.',
-    height: 400,
-    width: 1000,
     data: {
       values: histogramme(diag2bibCNRS),
     },
   },
-  diag3bibCNRS: {
+  bibCNRSdiag3: {
+    title: 'Table-instituts',
     data: diag3bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
     columns: ['Institute name', 'Number of consultations'],
   },
-  diag4bibCNRS: {
+  bibCNRSdiag4: {
+    title: 'Table-top-10-labo',
     data: diag4bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
     columns: ['Laboratory name', 'Number of consultations'],
   },
-  diag5bibCNRS: {
+  bibCNRSdiag5: {
+    id: 'donut-1',
+    title: 'Row types',
     description: 'A simple pie chart with embedded data.',
-    height: 250,
-    width: 280,
     theta: 'count',
     color: 'key',
     data: {
       values: pie(diag5bibCNRS),
     },
   },
-  diag6bibCNRS: {
+  bibCNRSdiag6: {
+    title: 'Table-top-10-rtype',
     data: diag6bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
     columns: ['Type', 'Number of consultations'],
   },
-  diag7bibCNRS: {
+  bibCNRSdiag7: {
+    title: 'Table-top-20-plateform',
     data: diag7bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
     columns: ['Platform name', 'Number of consultations'],
   },
-  diag8bibCNRS: {
+  bibCNRSdiag8: {
+    id: 'donut-2',
+    title: 'DOI',
     description: 'A simple pie chart with embedded data.',
-    height: 200,
-    width: 220,
     theta: 'count',
     color: 'key',
     data: {
@@ -507,7 +511,8 @@ const parameters = {
       ],
     },
   },
-  diag9bibCNRS: {
+  bibCNRSdiag9: {
+    title: 'Table-top-10-articles',
     data: diag9bibCNRS.aggregations[2].buckets.map((elt) => [
       elt.key, elt[3].buckets[0].key, elt.doc_count,
     ]),

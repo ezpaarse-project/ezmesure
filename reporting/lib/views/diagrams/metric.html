@@ -1,8 +1,8 @@
-{% macro render(data) %}
+{% macro render(params) %}
 <div class="card h-100">
   <div class="card-body align-items-center" style="display: grid;">
     <div class="row">
-      {% for metric in data %}
+      {% for metric in params.data %}
         <div class="col text-center">
           <h3><strong>{{ metric.value }}</strong></h3>
           <p>{{ metric.key }}</p>
