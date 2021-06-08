@@ -1,14 +1,30 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const formatDate = require('date-fns/format');
+const { fr } = require('date-fns/locale');
+const {
+  sendMail,
+  generateMail,
+} = require('./lib/services/mail');
 
 const printPDF = async () => {
   const browser = await puppeteer.launch({
+    ignoreHTTPSErrors: true,
     headless: true,
+    slowMo: 10,
+    ignoreDefaultArgs: ['--enable-automation'],
+    defaultViewport: null,
+    args: [
+      '--no-sandbox',
+      '--no-zygote',
+      '--disable-setuid-sandbox', // Absolute trust of the open content in chromium
+      '--disable-dev-shm-usage',
+    ],
   });
 
   const page = await browser.newPage();
-  await page.goto('http://localhost:4000/reporting/render-bibCNRS');
+  await page.goto('http://localhost:3000/reporting/render-bibCNRS');
 
   const pdf = await page.pdf({
     format: 'A4',
@@ -18,6 +34,25 @@ const printPDF = async () => {
     margin: {
       bottom: '50px',
     },
+  });
+
+  await sendMail({
+    from: 'reporting@vega.fr',
+    to: 'a@a.fr, b@b.fr',
+    subject: 'Reporting ezMESURE',
+    attachments: [{
+      contentType: 'application/pdf',
+      filename: 'reporting.pdf',
+      content: pdf,
+      cid: '1d168869-b93d-4163-aeec-4f7fdb0eb44f',
+    }],
+    ...generateMail('reporting', {
+      reportingDate: formatDate(new Date(), 'PPPP', { local: fr }),
+      title: 'Reporting Vega',
+      frequency: 'Hebdomadaire',
+      dashboardUrl: 'https://google.fr',
+      optimizedForPrinting: false,
+    }),
   });
 
   try {
