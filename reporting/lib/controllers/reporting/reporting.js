@@ -8,15 +8,15 @@ const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
-const diag1bibCNRS = require('../../views/bibCNRS/bibcnrs-report-01-metrics-results.json');
-const diag2bibCNRS = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
-const diag3bibCNRS = require('../../views/bibCNRS/bibcnrs-report-03-table-instituts-results.json');
-const diag4bibCNRS = require('../../views/bibCNRS/bibcnrs-report-04-table-top-10-labo-results.json');
-const diag5bibCNRS = require('../../views/bibCNRS/bibcnrs-report-05-pie-rtype-results.json');
-const diag6bibCNRS = require('../../views/bibCNRS/bibcnrs-report-06-table-top-10-rtype-results.json');
-const diag7bibCNRS = require('../../views/bibCNRS/bibcnrs-report-07-table-top-20-plateform-results.json');
-const diag8bibCNRS = require('../../views/bibCNRS/bibcnrs-report-08-pie-doi-results.json');
-const diag9bibCNRS = require('../../views/bibCNRS/bibcnrs-report-09-table-top-10-articles-results.json');
+const bibCNRSdiag1 = require('../../views/bibCNRS/bibcnrs-report-01-metrics-results.json');
+const bibCNRSdiag2 = require('../../views/bibCNRS/bibcnrs-report-02-histo-instituts-results.json');
+const bibCNRSdiag3 = require('../../views/bibCNRS/bibcnrs-report-03-table-instituts-results.json');
+const bibCNRSdiag4 = require('../../views/bibCNRS/bibcnrs-report-04-table-top-10-labo-results.json');
+const bibCNRSdiag5 = require('../../views/bibCNRS/bibcnrs-report-05-pie-rtype-results.json');
+const bibCNRSdiag6 = require('../../views/bibCNRS/bibcnrs-report-06-table-top-10-rtype-results.json');
+const bibCNRSdiag7 = require('../../views/bibCNRS/bibcnrs-report-07-table-top-20-plateform-results.json');
+const bibCNRSdiag8 = require('../../views/bibCNRS/bibcnrs-report-08-pie-doi-results.json');
+const bibCNRSdiag9 = require('../../views/bibCNRS/bibcnrs-report-09-table-top-10-articles-results.json');
 
 async function getMetadata(taskId) {
   const { body: data } = await elastic.getSource({
@@ -421,54 +421,75 @@ exports.download = async (ctx) => {
   }
 };
 
-function histogramme(data) {
+function elastic2vega(etablissement, diagram, data) {
   const values = [];
-
-  data.aggregations['2'].buckets.forEach((bucket) => {
-    bucket['3'].buckets.forEach((el) => {
-      values.push({
-        date: bucket.key_as_string,
-        key: el.key,
-        count: el.doc_count,
+  if (etablissement === 'bibCNRS') {
+    if (diagram === 'histogramme') {
+      data.aggregations['2'].buckets.forEach((bucket) => {
+        bucket['3'].buckets.forEach((el) => {
+          values.push({
+            date: bucket.key_as_string,
+            key: el.key,
+            count: el.doc_count,
+          });
+        });
       });
-    });
-  });
+      return values;
+    } if (diagram === 'pie') {
+      const total = data.aggregations[2].buckets.reduce((accum, item) => accum + item.doc_count, 0);
 
+      return data.aggregations[2].buckets.map((elt) => ({
+        key: elt.key,
+        percent: `${((elt.doc_count / total) * 100).toFixed(2) > 2 ? `${((elt.doc_count / total) * 100).toFixed(2)}%` : ''}`,
+        count: elt.doc_count,
+      }));
+    } if (diagram === 'table2columns') {
+      return data.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]);
+    } if (diagram === 'table3columns') {
+      return data.aggregations[2].buckets.map((elt) => [
+        elt.key, elt[3].buckets[0].key, elt.doc_count,
+      ]);
+    } if (diagram === 'doi') {
+      return [{
+        key: 'with_DOI',
+        percent: `${((data.aggregations[2].buckets['with DOI'].doc_count / data.hits.total) * 100).toFixed(2)}%`,
+        count: data.aggregations[2].buckets['with DOI'].doc_count,
+      },
+      {
+        key: 'without_DOI',
+        percent: `${((data.aggregations[2].buckets['without DOI'].doc_count / data.hits.total) * 100).toFixed(2)}%`,
+        count: data.aggregations[2].buckets['without DOI'].doc_count,
+      },
+      ];
+    } if (diagram === 'metrics') {
+      return [{ key: 'consultations', value: data.hits.total },
+        { key: 'units', value: data.aggregations[4].value },
+        { key: 'platforms', value: data.aggregations[6].value }];
+    }
+  }
   return values;
-}
-
-function pie(data) {
-  const total = data.aggregations[2].buckets.reduce((accum, item) => accum + item.doc_count, 0);
-
-  return data.aggregations[2].buckets.map((elt) => ({
-    key: elt.key,
-    percent: `${((elt.doc_count / total) * 100).toFixed(2) > 2 ? `${((elt.doc_count / total) * 100).toFixed(2)}%` : ''}`,
-    count: elt.doc_count,
-  }));
 }
 
 const parameters = {
   bibCNRSdiag1: {
-    data: [{ key: 'consultations', value: diag1bibCNRS.hits.total },
-      { key: 'units', value: diag1bibCNRS.aggregations[4].value },
-      { key: 'platforms', value: diag1bibCNRS.aggregations[6].value }],
+    data: elastic2vega('bibCNRS', 'metrics', bibCNRSdiag1),
   },
   bibCNRSdiag2: {
     id: 's-bar-chart-1',
     title: 'Histo-instituts',
     description: 'A basic stacked bar chart example.',
     data: {
-      values: histogramme(diag2bibCNRS),
+      values: elastic2vega('bibCNRS', 'histogramme', bibCNRSdiag2),
     },
   },
   bibCNRSdiag3: {
     title: 'Table-instituts',
-    data: diag3bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    data: elastic2vega('bibCNRS', 'table2columns', bibCNRSdiag3),
     columns: ['Institute name', 'Number of consultations'],
   },
   bibCNRSdiag4: {
     title: 'Table-top-10-labo',
-    data: diag4bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    data: elastic2vega('bibCNRS', 'table2columns', bibCNRSdiag4),
     columns: ['Laboratory name', 'Number of consultations'],
   },
   bibCNRSdiag5: {
@@ -478,17 +499,17 @@ const parameters = {
     theta: 'count',
     color: 'key',
     data: {
-      values: pie(diag5bibCNRS),
+      values: elastic2vega('bibCNRS', 'pie', bibCNRSdiag5),
     },
   },
   bibCNRSdiag6: {
     title: 'Table-top-10-rtype',
-    data: diag6bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    data: elastic2vega('bibCNRS', 'table2columns', bibCNRSdiag6),
     columns: ['Type', 'Number of consultations'],
   },
   bibCNRSdiag7: {
     title: 'Table-top-20-plateform',
-    data: diag7bibCNRS.aggregations[2].buckets.map((elt) => [elt.key, elt.doc_count]),
+    data: elastic2vega('bibCNRS', 'table2columns', bibCNRSdiag7),
     columns: ['Platform name', 'Number of consultations'],
   },
   bibCNRSdiag8: {
@@ -498,24 +519,12 @@ const parameters = {
     theta: 'count',
     color: 'key',
     data: {
-      values: [{
-        key: 'with_DOI',
-        percent: `${((diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count / diag8bibCNRS.hits.total) * 100).toFixed(2)}%`,
-        count: diag8bibCNRS.aggregations[2].buckets['with DOI'].doc_count,
-      },
-      {
-        key: 'without_DOI',
-        percent: `${((diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count / diag8bibCNRS.hits.total) * 100).toFixed(2)}%`,
-        count: diag8bibCNRS.aggregations[2].buckets['without DOI'].doc_count,
-      },
-      ],
+      values: elastic2vega('bibCNRS', 'doi', bibCNRSdiag8),
     },
   },
   bibCNRSdiag9: {
     title: 'Table-top-10-articles',
-    data: diag9bibCNRS.aggregations[2].buckets.map((elt) => [
-      elt.key, elt[3].buckets[0].key, elt.doc_count,
-    ]),
+    data: elastic2vega('bibCNRS', 'table3columns', bibCNRSdiag9),
     columns: ['Article name', 'Institution', 'Number of consultations'],
   },
 };
