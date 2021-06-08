@@ -22,8 +22,8 @@
         },
         data: {{ params.data | dump | safe }},
         encoding: {
-          theta: { field: {{ params.theta | dump | safe }}, type: "quantitative", stack: true },
-          color: { field: {{ params.color | dump | safe }}, type: "nominal", legend: { direction: "vertical", orient: "right", title: {{ params.title | dump | safe }} } }
+          theta: {{ params.theta | dump | safe }},
+          color: {{ params.color | dump | safe }}
         },
         layer: [{
           mark: { type: "arc", innerRadius: document.querySelector('#donut-card-{{ params.id }}').clientWidth/4, outerRadius: document.querySelector('#donut-card-{{ params.id }}').clientWidth/4 + 20 },

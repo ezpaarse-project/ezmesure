@@ -478,6 +478,13 @@ const parameters = {
     id: 's-bar-chart-1',
     title: 'Histo-instituts',
     description: 'A basic stacked bar chart example.',
+    x: {
+      timeUnit: 'monthdate', field: 'date', type: 'ordinal', axis: { title: '' },
+    },
+    y: {
+      field: 'count', type: 'quantitative', axis: { title: '' },
+    },
+    color: { field: 'key' },
     data: {
       values: elastic2vega('bibCNRS', 'histogramme', bibCNRSdiag2),
     },
@@ -496,8 +503,8 @@ const parameters = {
     id: 'donut-1',
     title: 'Row types',
     description: 'A simple pie chart with embedded data.',
-    theta: 'count',
-    color: 'key',
+    theta: { field: 'count', type: 'quantitative', stack: true },
+    color: { field: 'key', type: 'nominal', legend: { direction: 'vertical', orient: 'right', title: 'row types' } },
     data: {
       values: elastic2vega('bibCNRS', 'pie', bibCNRSdiag5),
     },
@@ -516,8 +523,8 @@ const parameters = {
     id: 'donut-2',
     title: 'DOI',
     description: 'A simple pie chart with embedded data.',
-    theta: 'count',
-    color: 'key',
+    theta: { field: 'count', type: 'quantitative', stack: true },
+    color: { field: 'key', type: 'nominal', legend: { direction: 'vertical', orient: 'right', title: 'row types' } },
     data: {
       values: elastic2vega('bibCNRS', 'doi', bibCNRSdiag8),
     },

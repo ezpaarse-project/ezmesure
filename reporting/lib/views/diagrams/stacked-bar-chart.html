@@ -22,9 +22,9 @@
         data: {{ params.data | dump | safe }},
         mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
         encoding: {
-          x: { timeUnit: "monthdate", field: "date", type: "ordinal", axis: { title: "" } },
-          y: { field: "count", type: "quantitative", axis: { title: "" } },
-          color: { field: "key" }
+          x: {{ params.x | dump | safe }},
+          y: {{ params.y | dump | safe }},
+          color: {{ params.color | dump | safe }}
         },
         config: {
           view: { stroke: 'transparent' },
