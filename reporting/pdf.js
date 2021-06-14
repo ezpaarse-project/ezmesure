@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const formatDate = require('date-fns/format');
 const { fr } = require('date-fns/locale');
+const { Command } = require('commander');
 const {
   sendMail,
   generateMail,
@@ -36,9 +37,21 @@ const printPDF = async () => {
     },
   });
 
+  const program = new Command();
+
+  program.version('0.0.1');
+  program.option('-m, --mail <string>', 'specifying to which mail you want to send the report');
+
+  program.parse(process.argv);
+
+  const options = program.opts();
+  const { mail } = options;
+
+  console.log(mail);
+
   await sendMail({
     from: 'reporting@vega.fr',
-    to: 'a@a.fr, b@b.fr',
+    to: mail || 'a@a.fr, b@b.fr',
     subject: 'Reporting ezMESURE',
     attachments: [{
       contentType: 'application/pdf',
