@@ -29,27 +29,25 @@
   ],
   "tags": [
     {
-      "name": "Indices",
-      "description": "Manage your indices"
+      "name": "Administration"
     },
     {
-      "name": "Authentication",
-      "description": "Everything related to your profile"
-    },
-    {
-      "name": "Files",
-      "description": "Manage your hosted files"
-    },
-    {
-      "name": "Metrics",
-      "description": "Get metrics from indices"
-    },
-    {
-      "name": "Institutions",
-      "description": "Manage institutions"
+      "name": "Authentication"
     },
     {
       "name": "Basics"
+    },
+    {
+      "name": "Files"
+    },
+    {
+      "name": "Indices"
+    },
+    {
+      "name": "Institutions"
+    },
+    {
+      "name": "Metrics"
     },
     {
       "name": "Sushi"
@@ -102,7 +100,8 @@
         "properties": {
           "username": {
             "type": "string",
-            "example": "john.doo"
+            "example": "john.doo",
+            "readOnly": true
           },
           "roles": {
             "type": "array",
@@ -189,7 +188,8 @@
             "type": "string",
             "description": "Institution identifier",
             "example": "496ccfa0-1f73-11eb-a8a0-4f0bd0a37c79",
-            "format": "uuid"
+            "format": "uuid",
+            "readOnly": true
           },
           "name": {
             "type": "string",
@@ -245,9 +245,9 @@
           },
           "creator": {
             "type": "string",
-            "nullable": true,
             "description": "Username of the user that declared the institution. Removed once the institution is validated.",
-            "example": "john.doe"
+            "example": "john.doe",
+            "nullable": true
           },
           "validated": {
             "type": "boolean",
@@ -260,9 +260,9 @@
           },
           "logoId": {
             "type": "string",
-            "nullable": true,
             "description": "Identifier of the institution logo image",
-            "example": "32a1c269738c43463312f09821b22323.png"
+            "example": "32a1c269738c43463312f09821b22323.png",
+            "nullable": true
           },
           "updatedAt": {
             "type": "string",
@@ -617,7 +617,8 @@
             "type": "string",
             "format": "uuid",
             "example": "645c4000-1f89-11eb-836f-a3005ccf2dc6",
-            "description": "ID of the sushi item"
+            "description": "ID of the sushi item",
+            "readOnly": true
           },
           "vendor": {
             "type": "string",
@@ -758,6 +759,66 @@
           "full_name",
           "roles",
           "readonly"
+        ]
+      },
+      "Space": {
+        "description": "A kibana Space",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "id": "toulouse-publisher",
+            "name": "Espace Toulouse",
+            "description": "espace éditeur de Toulouse",
+            "initials": "TL",
+            "color": "#000000",
+            "disabledFeatures": []
+          }
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The space ID",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The display name of the space"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The description of the space"
+          },
+          "initials": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The initials shown in the space avatar",
+            "maxLength": 2
+          },
+          "color": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The hexadecimal color code used in the space avatar",
+            "pattern": "^#([a-f0-9]{6}|[a-f0-9]{3})$",
+            "example": "#6e557e"
+          },
+          "disabledFeatures": {
+            "type": "array",
+            "description": "The list of disabled features for the space",
+            "items": {
+              "type": "string"
+            }
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The data-URL encoded image to display in the space avatar"
+          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       }
     }
@@ -2568,6 +2629,541 @@
             "name": "q",
             "description": "a query for searching"
           }
+        ]
+      }
+    },
+    "/institutions/{id}/state": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ],
+      "get": {
+        "summary": "Get institution state",
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "space": {
+                        "id": "toulouse",
+                        "name": "toulouse",
+                        "description": "Université Toulouse-II",
+                        "disabledFeatures": []
+                      },
+                      "indices": [
+                        "toulouse",
+                        "toulouse-foo",
+                        "toulouse-foobar"
+                      ],
+                      "indexPatterns": [
+                        {
+                          "id": "902cf200-b97c-11eb-aae3-e9a25566a440",
+                          "title": "toulouse*",
+                          "timeFieldName": "datetime"
+                        },
+                        {
+                          "id": "34a502d0-b391-11e9-8339-63cd4d0c5d94",
+                          "title": "univ-example",
+                          "timeFieldName": "datetime"
+                        }
+                      ],
+                      "roles": {
+                        "base": {
+                          "name": "toulouse",
+                          "exists": true
+                        },
+                        "readonly": {
+                          "name": "toulouse_read_only",
+                          "exists": true
+                        }
+                      }
+                    }
+                  },
+                  "properties": {
+                    "space": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "disabledFeatures": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "indices": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "indexPatterns": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeFieldName": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title"
+                        ]
+                      }
+                    },
+                    "roles": {
+                      "type": "object",
+                      "required": [
+                        "base",
+                        "readonly"
+                      ],
+                      "properties": {
+                        "base": {
+                          "type": "object",
+                          "required": [
+                            "exists"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        "readonly": {
+                          "type": "object",
+                          "required": [
+                            "exists"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "space",
+                    "indices",
+                    "indexPatterns",
+                    "roles"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-institutions-id-state",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Get the current state of an institution (list spaces, indices, index patterns and roles)",
+        "x-internal": false
+      }
+    },
+    "/institutions/{id}/_create_space": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ],
+      "post": {
+        "summary": "Create institution space",
+        "operationId": "post-institutions-id-_create_space",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Create the space of an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Institutions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "suffix": {
+                    "type": "string",
+                    "description": "Suffix added to the base space ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The display name of the space"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the space"
+                  },
+                  "initials": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2,
+                    "description": "The initials shown in the space avatar"
+                  },
+                  "color": {
+                    "type": "string",
+                    "pattern": "^#([a-f0-9]{6}|[a-f0-9]{3})$",
+                    "description": "The hexadecimal color code used in the space avatar"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/institutions/{id}/_create_index": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Create institution index",
+        "operationId": "post-institutions-id-_create_index",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Create the base index of an institution",
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/_create_index_pattern": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Create an institution index pattern",
+        "tags": [
+          "Administration",
+          "Institutions"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "get-institutions-id-_create_index_pattern",
+        "description": "Create an index pattern in the institution space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "suffix": {
+                    "type": "string",
+                    "description": "A suffix to add to the base index pattern"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/institutions/{id}/_create_roles": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Create institution roles",
+        "operationId": "post-institutions-id-_create_roles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The role name"
+                      },
+                      "created": {
+                        "type": "boolean",
+                        "description": "Wether the role has been created or not"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Register the institution roles in Elasticsearch",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Institutions"
+        ]
+      }
+    },
+    "/institutions/{id}/_migrate_creator": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Migrate institution creator",
+        "operationId": "post-institutions-id-_migrate_creator",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Migrate institution creator by giving him the institution roles",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Institutions"
         ]
       }
     }
