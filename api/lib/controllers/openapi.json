@@ -47,6 +47,9 @@
       "name": "Institutions"
     },
     {
+      "name": "Kibana"
+    },
+    {
       "name": "Metrics"
     },
     {
@@ -90,7 +93,15 @@
           "error": {
             "type": "string",
             "example": "Authentication Error",
-            "description": "The error message"
+            "description": "The error message",
+            "readOnly": true
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "exclusiveMaximum": true,
+            "maximum": 600,
+            "readOnly": true
           }
         }
       },
@@ -819,6 +830,126 @@
         "required": [
           "id",
           "name"
+        ]
+      },
+      "KibanaSavedObject": {
+        "title": "KibanaSavedObject",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "error": {
+            "$ref": "#/components/schemas/KibanaSavedObjectError"
+          },
+          "attributes": {
+            "type": "object"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KibanaSavedObjectReference"
+            }
+          },
+          "migrationVersion": {
+            "type": "object"
+          },
+          "namespaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "originId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "references",
+          "migrationVersion"
+        ],
+        "description": ""
+      },
+      "KibanaSavedObjectReference": {
+        "title": "KibanaSavedObjectReference",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "KibanaSavedObjectError": {
+        "title": "KibanaSavedObjectError",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "KibanaDashboardImportResponse": {
+        "title": "KibanaDashboardImportResponse",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KibanaSavedObject"
+            }
+          }
+        },
+        "required": [
+          "objects"
+        ]
+      },
+      "KibanaDashboardExportResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^[\\d.]+$"
+          },
+          "objects": {
+            "$ref": "#/components/schemas/KibanaSavedObject"
+          }
+        },
+        "required": [
+          "version",
+          "objects"
         ]
       }
     }
@@ -3103,7 +3234,14 @@
             "description": "Forbidden"
           },
           "409": {
-            "description": "Conflict"
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "description": "Register the institution roles in Elasticsearch",
@@ -3164,6 +3302,365 @@
         "tags": [
           "Administration",
           "Institutions"
+        ]
+      }
+    },
+    "/dashboards": {
+      "get": {
+        "summary": "List dashboards",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KibanaSavedObject"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-dashboards",
+        "description": "List dashboards",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "Get dashboards with a specific space ID"
+          }
+        ]
+      }
+    },
+    "/spaces": {
+      "get": {
+        "summary": "List spaces",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Space"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-spaces",
+        "description": "List spaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboards/_copy": {
+      "post": {
+        "summary": "Copy a dashboard from one space to another",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "post-dashboards-_copy",
+        "description": "Copy a dashboard from one space to another",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "space": {
+                        "type": "string",
+                        "description": "ID of the source space"
+                      },
+                      "dashboard": {
+                        "type": "string",
+                        "description": "ID of the source dashboard"
+                      }
+                    },
+                    "required": [
+                      "dashboard"
+                    ]
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "space": {
+                        "type": "string",
+                        "description": "ID of the space where the dashboard should be imported"
+                      },
+                      "indexPattern": {
+                        "type": "string",
+                        "description": "An index pattern to use instead of the one included in the imported objects"
+                      }
+                    },
+                    "required": [
+                      "space"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "force",
+            "description": "Override existing objects"
+          }
+        ]
+      }
+    },
+    "/dashboards/_export": {
+      "get": {
+        "summary": "Export a dashboard",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardExportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "get-dashboards-_export",
+        "description": "Export a dashboard",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "ID of the space where the dashboard is located"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "dashboard",
+            "description": "ID of the dashboard that should be exported"
+          }
+        ]
+      }
+    },
+    "/dashboards/_import": {
+      "post": {
+        "summary": "Import a dashboard",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "post-dashboards-_import",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Import a dashboard into a given space",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KibanaDashboardExportResponse"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "The space where the dashboard should be imported"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "index-pattern",
+            "description": "Replace the index-pattern of imported objects"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "force",
+            "description": "Override existing objects"
+          }
+        ]
+      }
+    },
+    "/spaces/{id}/index-patterns": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "List index patterns in a space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KibanaSavedObject"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-spaces-id-index-patterns",
+        "description": "List index patterns in a space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     }
