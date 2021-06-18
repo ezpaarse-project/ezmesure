@@ -2994,9 +2994,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "suffix": {
+                  "id": {
                     "type": "string",
-                    "description": "Suffix added to the base space ID"
+                    "pattern": "^[a-z0-9][a-z0-9_.-]*$",
+                    "description": "The space ID"
                   },
                   "name": {
                     "type": "string",

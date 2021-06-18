@@ -34,6 +34,7 @@ errors:
     noBaseIndex: The base index [%s] of the institution [%s] does not exist
     noSpace: The space [%s] of the institution [%s] does not exist
     patternExists: The index pattern [%s] already exists in the space [%s]
+    forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
 
   members:
     alreadyMember: The user belongs to another institution

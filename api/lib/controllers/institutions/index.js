@@ -251,7 +251,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
     },
     body: {
-      suffix: Joi.string().trim().regex(/^[a-z0-9_-]+$/i),
+      id: Joi.string().trim().regex(/^[a-z0-9][a-z0-9_.-]*$/i),
       name: Joi.string().trim(),
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),

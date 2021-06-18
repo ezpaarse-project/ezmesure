@@ -34,6 +34,7 @@ errors:
     noBaseIndex: L'index de base [%s] de l'établissement [%s] n'existe pas
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
     patternExists: L'index pattern [%s] existe déjà dans l'espace [%s]
+    forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
   members:
     alreadyMember: L'utilisateur appartient à une autre institution

@@ -27,13 +27,19 @@ exports.validateInstitution = async (ctx) => {
 exports.createInstitutionSpace = async (ctx) => {
   const { institution } = ctx.state;
   const { body = {} } = ctx.request;
-  const { suffix } = body || {};
+  const { id } = body || {};
 
-  if (!institution.get('space')) {
+  const spaceName = institution.get('space');
+
+  if (!spaceName) {
     ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
 
-  let space = await institution.getSpace({ suffix });
+  if (typeof id === 'string' && !id.startsWith(spaceName)) {
+    ctx.throw(409, ctx.$t('errors.institution.forbiddenSpaceName', id, institution.id, spaceName));
+  }
+
+  let space = await institution.getSpace(id);
 
   if (space) {
     ctx.status = 200;

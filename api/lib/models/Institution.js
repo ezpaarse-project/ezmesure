@@ -224,15 +224,14 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   /**
    * Get the institution space
    */
-  async getSpace(opts) {
-    const { suffix } = opts || {};
+  async getSpace(id) {
     const { space } = this.data;
 
-    if (!space) {
+    if (typeof space !== 'string' || space.length === 0) {
       return null;
     }
 
-    const { data = {}, status } = await kibana.getSpace(`${space}${suffix || ''}`);
+    const { data = {}, status } = await kibana.getSpace(id || space);
 
     return status === 200 ? data : null;
   }
@@ -259,7 +258,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
    */
   async createSpace(opts) {
     const {
-      suffix,
+      id,
       name,
       description,
       initials,
@@ -267,7 +266,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     } = opts || {};
     const { space, name: institutionName } = this.data;
 
-    const spaceId = `${space}${suffix || ''}`;
+    const spaceId = id || space;
 
     const { data: existingSpace, status } = await kibana.getSpace(spaceId);
 
