@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('config');
+const qs = require('qs');
 
 const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
@@ -17,6 +18,7 @@ const axiosClient = axios.create({
     // Kibana won't accept any request without this
     'kbn-xsrf': true,
   },
+  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 
 const client = {};
@@ -111,7 +113,7 @@ client.findObjects = (options) => {
 
 client.exportDashboard = (opts) => {
   const {
-    dashboardId,
+    dashboardId, // Can be an array
     spaceId,
   } = opts || {};
 

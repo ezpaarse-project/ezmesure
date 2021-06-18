@@ -51,6 +51,7 @@
     "nodemailer": "^4.6.8",
     "nunjucks": "^3.2.0",
     "papaparse": "^5.1.0",
+    "qs": "^6.10.1",
     "rison-node": "^2.1.0",
     "sharp": "^0.25.4",
     "slugify": "^1.3.5",

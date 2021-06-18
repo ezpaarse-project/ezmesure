@@ -65,23 +65,27 @@ exports.exportDashboard = async (ctx) => {
   const { query = {} } = ctx.request;
   const { space: spaceId, dashboard: dashboardId } = query;
 
-  const { status } = await kibana.getObject({
-    type: 'dashboard',
-    id: dashboardId,
-    spaceId,
-  });
+  const dashboardIds = Array.isArray(dashboardId) ? dashboardId : [dashboardId];
 
-  if (status === 404) {
-    ctx.throw(404, ctx.$t('errors.dashboard.notFound', dashboardId));
+  for (let i = 0; i < dashboardIds.length; i += 1) {
+    const { status } = await kibana.getObject({ // eslint-disable-line no-await-in-loop
+      type: 'dashboard',
+      id: dashboardIds[i],
+      spaceId,
+    });
+
+    if (status === 404) {
+      ctx.throw(404, ctx.$t('errors.dashboard.notFound', dashboardIds[i]));
+    }
   }
 
   const { data } = await kibana.exportDashboard({
-    dashboardId,
+    dashboardId: dashboardIds,
     spaceId,
   });
 
   if (!data || !data.version || !Array.isArray(data.objects)) {
-    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', dashboardId, spaceId));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', dashboardIds, spaceId));
   }
 
   ctx.status = 200;
@@ -131,14 +135,18 @@ exports.copyDashboard = async (ctx) => {
   const { force } = query;
   const { source, target } = body;
 
-  const { status } = await kibana.getObject({
-    type: 'dashboard',
-    id: source.dashboard,
-    spaceId: source.space,
-  });
+  const sourceDashboards = Array.isArray(source.dashboard) ? source.dashboard : [source.dashboard];
 
-  if (status === 404) {
-    ctx.throw(404, ctx.$t('errors.dashboard.notFound', source.dashboard));
+  for (let i = 0; i < sourceDashboards.length; i += 1) {
+    const { status } = await kibana.getObject({ // eslint-disable-line no-await-in-loop
+      type: 'dashboard',
+      id: sourceDashboards[i],
+      spaceId: source.space,
+    });
+
+    if (status === 404) {
+      ctx.throw(404, ctx.$t('errors.dashboard.notFound', sourceDashboards[i]));
+    }
   }
 
   const { status: spaceStatus } = await kibana.getSpace(target.space);
@@ -148,12 +156,12 @@ exports.copyDashboard = async (ctx) => {
   }
 
   const { data: dashboard } = await kibana.exportDashboard({
-    dashboardId: source.dashboard,
+    dashboardId: sourceDashboards,
     spaceId: source.space,
   });
 
   if (!dashboard || !dashboard.version || !Array.isArray(dashboard.objects)) {
-    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', source.dashboard, source.space));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', sourceDashboards, source.space));
   }
 
   if (target.indexPattern) {

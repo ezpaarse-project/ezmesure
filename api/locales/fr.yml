@@ -58,8 +58,8 @@ errors:
 
   dashboard:
     notFound: Tableau de bord [%s] introuvable
-    failedToExport: Impossible d'exporter le tableau de bord [%s] depuis l'espace [%s]
-    failedToImport: Impossible d'importer le tableau de bord dans l'espace [%s]
+    failedToExport: Impossible d'exporter les tableaux de bord [%s] depuis l'espace [%s]
+    failedToImport: Impossible d'importer les tableaux de bord dans l'espace [%s]
 
   indexPattern:
     notFound: Index pattern [%s] introuvable dans l'espace [%s]

@@ -28,7 +28,10 @@ router.route({
   validate: {
     query: {
       space: Joi.string().trim(),
-      dashboard: Joi.string().trim().required(),
+      dashboard: Joi.alternatives(
+        Joi.array().items(Joi.string().trim()),
+        Joi.string().trim(),
+      ).required(),
     },
   },
 });
@@ -63,7 +66,10 @@ router.route({
     body: {
       source: {
         space: Joi.string().trim(),
-        dashboard: Joi.string().trim().required(),
+        dashboard: Joi.alternatives(
+          Joi.array().items(Joi.string().trim()),
+          Joi.string().trim(),
+        ).required(),
       },
       target: {
         space: Joi.string().trim().required(),

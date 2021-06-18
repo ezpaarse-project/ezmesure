@@ -58,8 +58,8 @@ errors:
 
   dashboard:
     notFound: Dashboard [%s] not found
-    failedToExport: Failed to export dashboard [%s] from space [%s]
-    failedToImport: Failed to import dashboard into space [%s]
+    failedToExport: Failed to export dashboards [%s] from space [%s]
+    failedToImport: Failed to import dashboards into space [%s]
 
   indexPattern:
     notFound: Index pattern [%s] not found in space [%s]

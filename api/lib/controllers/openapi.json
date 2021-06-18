@@ -3429,8 +3429,11 @@
                         "description": "ID of the source space"
                       },
                       "dashboard": {
-                        "type": "string",
-                        "description": "ID of the source dashboard"
+                        "type": "array",
+                        "description": "ID of one or more source dashboards",
+                        "items": {
+                          "type": "string"
+                        }
                       }
                     },
                     "required": [
@@ -3517,11 +3520,17 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "array"
             },
             "in": "query",
             "name": "dashboard",
-            "description": "ID of the dashboard that should be exported"
+            "description": "ID of one or more dashboards to be exported",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
           }
         ]
       }
