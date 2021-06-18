@@ -238,6 +238,23 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
+   * Get all institution spaces
+   */
+  async getSpaces() {
+    const { space } = this.data;
+
+    if (typeof space !== 'string' || space.length === 0) {
+      return [];
+    }
+
+    const { data = [], status } = await kibana.getSpaces();
+
+    if (status !== 200 || !Array.isArray(data)) { return []; }
+
+    return data.filter((s) => s && typeof s.id === 'string' && s.id.startsWith(space));
+  }
+
+  /**
    * Create the institution space if it doesn't exist yet
    */
   async createSpace(opts) {

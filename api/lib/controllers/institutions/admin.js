@@ -5,7 +5,7 @@ exports.getInstitutionState = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
-    space: await institution.getSpace(),
+    spaces: await institution.getSpaces(),
     indices: await institution.getIndices(),
     indexPatterns: await institution.getIndexPatterns(),
     roles: await institution.checkRoles(),
