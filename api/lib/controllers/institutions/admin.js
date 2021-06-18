@@ -73,18 +73,23 @@ exports.createInstitutionIndex = async (ctx) => {
 exports.createInstitutionIndexPattern = async (ctx) => {
   const { institution } = ctx.state;
   const { body = {} } = ctx.request;
-  const { suffix } = body || {};
+  const { suffix, spaceId } = body || {};
 
-  if (!institution.get('space')) {
+  const spaceName = institution.get('space');
+
+  if (!spaceName) {
     ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
   }
   if (!institution.get('indexPrefix')) {
     ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
   }
+  if (typeof spaceId === 'string' && !spaceId.startsWith(spaceName)) {
+    ctx.throw(409, ctx.$t('errors.institution.forbiddenSpaceName', spaceId, institution.id, spaceName));
+  }
 
-  const space = await institution.getSpace();
+  const space = await institution.getSpace(spaceId);
   if (!space) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpace', institution.get('space'), institution.id));
+    ctx.throw(409, ctx.$t('errors.institution.noSpace', spaceId || spaceName, institution.id));
   }
 
   const patterns = await institution.getIndexPatterns({ suffix: suffix || '*' });

@@ -5,6 +5,8 @@ const bodyParser = require('koa-bodyparser');
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const Institution = require('../../models/Institution');
 
+const spaceIdPattern = /^[a-z0-9][a-z0-9_.-]*$/i;
+
 const {
   getInstitutions,
   createInstitution,
@@ -251,7 +253,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
     },
     body: {
-      id: Joi.string().trim().regex(/^[a-z0-9][a-z0-9_.-]*$/i),
+      id: Joi.string().trim().regex(spaceIdPattern),
       name: Joi.string().trim(),
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),
@@ -280,6 +282,7 @@ router.route({
     },
     body: {
       suffix: Joi.string().trim().regex(/^[a-z0-9_.*-]+$/i),
+      spaceId: Joi.string().trim().regex(spaceIdPattern),
     },
   },
 });

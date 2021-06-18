@@ -3159,7 +3159,12 @@
                 "properties": {
                   "suffix": {
                     "type": "string",
-                    "description": "A suffix to add to the base index pattern"
+                    "description": "A suffix to add to the base index pattern",
+                    "default": "*"
+                  },
+                  "spaceId": {
+                    "type": "string",
+                    "description": "ID of the space where the index pattern should be created"
                   }
                 }
               }
