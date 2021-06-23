@@ -1,13 +1,22 @@
+const kibana = require('../../services/kibana');
 
 exports.getInstitutionState = async (ctx) => {
   const { institution } = ctx.state;
 
+  const spaces = await institution.getSpaces();
+
+  const patterns = await Promise.all(
+    spaces
+      .filter((space) => space && space.id)
+      .map((space) => kibana.getIndexPatterns({ spaceId: space.id, perPage: 1000 })),
+  );
+
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
-    spaces: await institution.getSpaces(),
+    spaces,
     indices: await institution.getIndices(),
-    indexPatterns: await institution.getIndexPatterns(),
+    indexPatterns: patterns.reduce((acc, current) => [...acc, ...current], []),
     roles: await institution.checkRoles(),
   };
 };

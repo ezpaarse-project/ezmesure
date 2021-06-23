@@ -82,6 +82,33 @@ client.createIndexPattern = (spaceId, opts) => {
   return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes });
 };
 
+client.getIndexPatterns = async (opts) => {
+  const options = {
+    ...(opts || {}),
+    type: 'index-pattern',
+  };
+
+  const { data } = await client.findObjects(options);
+  let patterns = data && data.saved_objects;
+
+  if (!Array.isArray(patterns)) {
+    patterns = [];
+  }
+
+  return patterns.map((obj) => {
+    const { id, updatedAt, attributes } = obj || {};
+    const { title, timeFieldName } = attributes || {};
+
+    return {
+      spaceId: options.spaceId || null,
+      id,
+      updatedAt,
+      title,
+      timeFieldName,
+    };
+  });
+};
+
 client.getObject = (options) => {
   const {
     type,
