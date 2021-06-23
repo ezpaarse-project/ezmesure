@@ -2857,6 +2857,10 @@
                           "timeFieldName": {
                             "type": "string",
                             "minLength": 1
+                          },
+                          "spaceId": {
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
