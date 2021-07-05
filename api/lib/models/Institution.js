@@ -403,31 +403,6 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   /**
-   * Create a base index pattern if there are no patterns yet in the space
-   */
-  async createIndexPattern(opts) {
-    const { suffix } = opts || {};
-    const { indexPrefix, space } = this.data;
-
-    if (!indexPrefix) {
-      throw new Error('institution has no index prefix associated');
-    }
-    if (!space) {
-      throw new Error('institution has no space associated');
-    }
-
-    const patterns = await this.getIndexPatterns({ suffix });
-
-    if (Array.isArray(patterns) || patterns.length === 0) {
-      await kibana.createIndexPattern(space, {
-        title: `${indexPrefix}${suffix || '*'}`,
-        timeFieldName: 'datetime',
-      });
-    }
-  }
-
-
-  /**
    * Get the indices of the institution
    */
   async getIndices() {

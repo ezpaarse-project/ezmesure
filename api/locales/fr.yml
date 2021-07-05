@@ -33,7 +33,6 @@ errors:
     noRoleSet: L'établissement [%s] n'a pas de rôle associé
     noBaseIndex: L'index de base [%s] de l'établissement [%s] n'existe pas
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
-    patternExists: L'index pattern [%s] existe déjà dans l'espace [%s]
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
   members:
@@ -63,6 +62,8 @@ errors:
 
   indexPattern:
     notFound: Index pattern [%s] introuvable dans l'espace [%s]
+    alreadyExists: L'index pattern [%s] existe déjà dans l'espace [%s]
+    noIndexMatching: L'index pattern [%s] ne correspond à aucun index
 
   files:
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"

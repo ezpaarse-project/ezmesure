@@ -33,7 +33,6 @@ errors:
     noRoleSet: Institution [%s] has no role set
     noBaseIndex: The base index [%s] of the institution [%s] does not exist
     noSpace: The space [%s] of the institution [%s] does not exist
-    patternExists: The index pattern [%s] already exists in the space [%s]
     forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
 
   members:
@@ -63,6 +62,8 @@ errors:
 
   indexPattern:
     notFound: Index pattern [%s] not found in space [%s]
+    alreadyExists: The index pattern [%s] already exists in the space [%s]
+    noIndexMatching: The index pattern [%s] doesn't match any index
 
   files:
     wrongEntriesFormat: entries should be an array of file names

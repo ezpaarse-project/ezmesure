@@ -6,9 +6,11 @@ const {
   list,
   listIndexPatterns,
   createSpace,
+  createIndexPattern,
 } = require('./actions');
 
 const spaceIdPattern = /^[a-z0-9][a-z0-9_.-]*$/i;
+const indexPatternRegex = /^[a-z0-9][a-z0-9_.-]*\*?$/;
 
 router.use(requireJwt, requireUser, requireAnyRole(['admin', 'superuser']));
 
@@ -44,6 +46,22 @@ router.route({
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),
       color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:spaceId/index-patterns',
+  handler: createIndexPattern,
+  validate: {
+    type: 'json',
+    params: {
+      spaceId: Joi.string().trim().required().regex(spaceIdPattern),
+    },
+    body: {
+      title: Joi.string().trim().regex(indexPatternRegex).required(),
+      timeFieldName: Joi.string().trim().default('datetime'),
     },
   },
 });

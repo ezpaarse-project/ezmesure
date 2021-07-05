@@ -5,8 +5,6 @@ const bodyParser = require('koa-bodyparser');
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const Institution = require('../../models/Institution');
 
-const spaceIdPattern = /^[a-z0-9][a-z0-9_.-]*$/i;
-
 const {
   getInstitutions,
   createInstitution,
@@ -27,7 +25,6 @@ const {
   getInstitutionState,
   validateInstitution,
   createInstitutionIndex,
-  createInstitutionIndexPattern,
   createInstitutionRoles,
   migrateInstitutionCreator,
 } = require('./admin');
@@ -249,21 +246,6 @@ router.route({
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-router.route({
-  method: 'POST',
-  path: '/:institutionId/_create_index_pattern',
-  handler: [fetchInstitution, createInstitutionIndexPattern],
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      suffix: Joi.string().trim().regex(/^[a-z0-9_.*-]+$/i),
-      spaceId: Joi.string().trim().regex(spaceIdPattern),
     },
   },
 });
