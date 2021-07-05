@@ -26,7 +26,6 @@ const {
 const {
   getInstitutionState,
   validateInstitution,
-  createInstitutionSpace,
   createInstitutionIndex,
   createInstitutionIndexPattern,
   createInstitutionRoles,
@@ -243,24 +242,6 @@ router.route({
   },
 });
 
-router.route({
-  method: 'POST',
-  path: '/:institutionId/_create_space',
-  handler: [fetchInstitution, createInstitutionSpace],
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    body: {
-      id: Joi.string().trim().regex(spaceIdPattern),
-      name: Joi.string().trim(),
-      description: Joi.string().trim(),
-      initials: Joi.string().trim().min(1).max(2),
-      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
-    },
-  },
-});
 router.route({
   method: 'POST',
   path: '/:institutionId/_create_index',

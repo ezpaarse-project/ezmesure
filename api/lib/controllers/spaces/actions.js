@@ -34,3 +34,26 @@ exports.listIndexPatterns = async (ctx) => {
   ctx.status = 200;
   ctx.body = patterns;
 };
+
+exports.createSpace = async (ctx) => {
+  const { spaceId } = ctx.request.params;
+  const { body = {} } = ctx.request;
+
+  const { data: space, status } = await kibana.getSpace(spaceId);
+
+  if (status === 200) {
+    ctx.status = 200;
+    ctx.body = space;
+    return;
+  }
+
+  const { data: newSpace } = await kibana.createSpace({
+    ...body,
+    id: spaceId,
+    name: body.name || spaceId,
+  });
+
+  ctx.status = 201;
+  ctx.body = newSpace;
+};
+
