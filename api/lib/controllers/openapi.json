@@ -3020,76 +3020,6 @@
         "x-internal": false
       }
     },
-    "/institutions/{id}/_create_index": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "Create institution index",
-        "operationId": "post-institutions-id-_create_index",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "409": {
-            "description": "Conflict"
-          }
-        },
-        "description": "Create the base index of an institution",
-        "tags": [
-          "Institutions",
-          "Administration"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
     "/institutions/{id}/_create_roles": {
       "parameters": [
         {
@@ -3203,6 +3133,87 @@
         "tags": [
           "Administration",
           "Institutions"
+        ]
+      }
+    },
+    "/indices": {
+      "parameters": [],
+      "put": {
+        "summary": "Create an index",
+        "operationId": "post-indices",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "acknowledged": {
+                      "type": "boolean"
+                    },
+                    "shards_acknowledged": {
+                      "type": "boolean"
+                    },
+                    "index": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "acknowledged",
+                    "shards_acknowledged",
+                    "index"
+                  ],
+                  "x-examples": {
+                    "example-1": {
+                      "acknowledged": true,
+                      "shards_acknowledged": true,
+                      "index": "toulouse-foobarfoo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Initialize an index with an access events oriented mapping",
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },
