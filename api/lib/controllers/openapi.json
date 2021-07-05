@@ -1285,7 +1285,57 @@
           }
         },
         "operationId": "insertLogs"
-      }
+      },
+      "delete": {
+        "summary": "Delete an index",
+        "operationId": "delete-logs-index",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "acknowledge": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "acknowledge"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an index",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Indices"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "index",
+          "in": "path",
+          "required": true,
+          "description": "name of the index"
+        }
+      ]
     },
     "/logs/{index}/events": {
       "delete": {
