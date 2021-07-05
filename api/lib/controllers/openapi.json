@@ -832,6 +832,40 @@
           "name"
         ]
       },
+      "IndexPattern": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/KibanaSavedObject"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "$ref": "#/components/schemas/IndexPatternAttributes"
+              }
+            }
+          }
+        ],
+        "description": "A Kibana index pattern"
+      },
+      "IndexPatternAttributes": {
+        "title": "IndexPatternAttributes",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "timeFieldName": {
+            "type": "string"
+          },
+          "allowNoIndex": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
       "KibanaSavedObject": {
         "title": "KibanaSavedObject",
         "type": "object",
@@ -2936,99 +2970,6 @@
         "x-internal": false
       }
     },
-    "/institutions/{id}/_create_space": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "description": "ID of the institution"
-        }
-      ],
-      "post": {
-        "summary": "Create institution space",
-        "operationId": "post-institutions-id-_create_space",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Space"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Space"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "description": "Create the space of an institution",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Administration",
-          "Institutions"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9][a-z0-9_.-]*$",
-                    "description": "The space ID"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "The display name of the space"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "The description of the space"
-                  },
-                  "initials": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 2,
-                    "description": "The initials shown in the space avatar"
-                  },
-                  "color": {
-                    "type": "string",
-                    "pattern": "^#([a-f0-9]{6}|[a-f0-9]{3})$",
-                    "description": "The hexadecimal color code used in the space avatar"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/institutions/{id}/_create_index": {
       "parameters": [
         {
@@ -3097,84 +3038,6 @@
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/institutions/{id}/_create_index_pattern": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "Create an institution index pattern",
-        "tags": [
-          "Administration",
-          "Institutions"
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "409": {
-            "description": "Conflict"
-          }
-        },
-        "operationId": "get-institutions-id-_create_index_pattern",
-        "description": "Create an index pattern in the institution space",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "suffix": {
-                    "type": "string",
-                    "description": "A suffix to add to the base index pattern",
-                    "default": "*"
-                  },
-                  "spaceId": {
-                    "type": "string",
-                    "description": "ID of the space where the index pattern should be created"
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/institutions/{id}/_create_roles": {
@@ -3659,6 +3522,56 @@
             "bearerAuth": []
           }
         ]
+      },
+      "post": {
+        "summary": "Create an index pattern",
+        "operationId": "post-spaces-id-index-patterns",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexPattern"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Create an index pattern in a given space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexPatternAttributes"
+              }
+            }
+          }
+        }
       }
     },
     "/spaces/{id}": {
