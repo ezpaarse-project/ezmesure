@@ -34,7 +34,7 @@ services:
       service: rp
 
   api:
-    image: node:10.15.3
+    image: node:14.17.1
     ports:
       - 3000:3000
     volumes:
