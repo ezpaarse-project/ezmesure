@@ -60,6 +60,9 @@ errors:
     failedToExport: Impossible d'exporter les tableaux de bord [%s] depuis l'espace [%s]
     failedToImport: Impossible d'importer les tableaux de bord dans l'espace [%s]
 
+  index:
+    alreadyExists: L'index [%s] existe déjà
+
   indexPattern:
     notFound: Index pattern [%s] introuvable dans l'espace [%s]
     alreadyExists: L'index pattern [%s] existe déjà dans l'espace [%s]

@@ -60,6 +60,9 @@ errors:
     failedToExport: Failed to export dashboards [%s] from space [%s]
     failedToImport: Failed to import dashboards into space [%s]
 
+  index:
+    alreadyExists: Index [%s] already exists
+
   indexPattern:
     notFound: Index pattern [%s] not found in space [%s]
     alreadyExists: The index pattern [%s] already exists in the space [%s]
