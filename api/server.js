@@ -10,13 +10,10 @@ const { STATUS_CODES } = require('http');
 
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
-const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
 const depositors = require('./lib/services/depositors');
 const opendata = require('./lib/services/opendata');
-
-const appLogger = logger(config.get('logs.app'));
-const httpLogger = logger(config.get('logs.http'));
+const { appLogger, httpLogger } = require('./lib/services/logger');
 
 module.exports = { appLogger };
 

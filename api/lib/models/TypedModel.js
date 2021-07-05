@@ -2,7 +2,7 @@ const config = require('config');
 const uuid = require('uuid');
 const { Joi } = require('koa-joi-router');
 const elastic = require('../services/elastic');
-const { appLogger } = require('../../server');
+const { appLogger } = require('../services/logger');
 
 const index = config.get('depositors.index');
 const models = new Map();

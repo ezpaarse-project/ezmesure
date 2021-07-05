@@ -8,7 +8,7 @@ const Sushi = require('../../models/Sushi');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const publisherIndexTemplate = require('../../utils/publisher-template');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
