@@ -18,7 +18,7 @@ exports.getSpace = async (ctx) => {
   const { data: space, status } = await kibana.getSpace(spaceId);
 
   if (status === 404) {
-    ctx.throw(409, ctx.$t('errors.space.notFound', spaceId));
+    ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
   }
 
   ctx.type = 'json';
