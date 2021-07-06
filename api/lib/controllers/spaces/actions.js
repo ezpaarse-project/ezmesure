@@ -37,14 +37,13 @@ exports.listIndexPatterns = async (ctx) => {
 };
 
 exports.createSpace = async (ctx) => {
-  const { spaceId } = ctx.request.params;
   const { body = {} } = ctx.request;
+  const { spaceId } = body;
 
-  const { data: space, status } = await kibana.getSpace(spaceId);
+  const { status } = await kibana.getSpace(spaceId);
 
   if (status === 200) {
-    ctx.status = 200;
-    ctx.body = space;
+    ctx.throw(409, ctx.$t('errors.space.alreadyExists', spaceId));
     return;
   }
 

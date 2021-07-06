@@ -51,6 +51,7 @@ errors:
 
   space:
     notFound: Space [%s] not found
+    alreadyExists: Space [%s] already exists
 
   spaces:
     failedToQuery: failed to query spaces

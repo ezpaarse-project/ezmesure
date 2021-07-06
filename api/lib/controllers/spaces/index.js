@@ -32,16 +32,13 @@ router.route({
 });
 
 router.route({
-  method: 'PUT',
-  path: '/:spaceId',
+  method: 'POST',
+  path: '/',
   handler: createSpace,
   validate: {
     type: 'json',
-    params: {
-      spaceId: Joi.string().trim().required().regex(spaceIdPattern),
-    },
     body: {
-      id: Joi.any().strip(),
+      id: Joi.string().trim().required().regex(spaceIdPattern),
       name: Joi.string().trim(),
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),

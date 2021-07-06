@@ -51,6 +51,7 @@ errors:
 
   space:
     notFound: Espace [%s] introuvable
+    alreadyExists: L'espace [%s] existe déjà
 
   spaces:
     failedToQuery: Impossible de récupérer les espaces
