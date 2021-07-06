@@ -38,7 +38,7 @@ exports.listIndexPatterns = async (ctx) => {
 
 exports.createSpace = async (ctx) => {
   const { body = {} } = ctx.request;
-  const { spaceId } = body;
+  const { id: spaceId } = body;
 
   const { status } = await kibana.getSpace(spaceId);
 
