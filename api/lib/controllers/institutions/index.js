@@ -24,7 +24,6 @@ const {
 const {
   getInstitutionState,
   validateInstitution,
-  createInstitutionRoles,
   migrateInstitutionCreator,
 } = require('./admin');
 
@@ -240,17 +239,6 @@ router.route({
 
 router.route({
   method: 'POST',
-  path: '/:institutionId/_create_roles',
-  handler: [fetchInstitution, createInstitutionRoles],
-  validate: {
-    type: 'json',
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-router.route({
-  method: 'POST',
   path: '/:institutionId/_migrate_creator',
   handler: [fetchInstitution, migrateInstitutionCreator],
   validate: {
@@ -260,7 +248,6 @@ router.route({
     },
   },
 });
-
 
 router.route({
   method: 'POST',

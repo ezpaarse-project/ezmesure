@@ -33,23 +33,6 @@ exports.validateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.createInstitutionRoles = async (ctx) => {
-  const { institution } = ctx.state;
-
-  if (!institution.get('space')) {
-    ctx.throw(409, ctx.$t('errors.institution.noSpaceSet', institution.id));
-  }
-  if (!institution.get('indexPrefix')) {
-    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
-  }
-  if (!institution.get('role')) {
-    ctx.throw(409, ctx.$t('errors.institution.noRoleSet', institution.id));
-  }
-
-  ctx.status = 200;
-  ctx.body = await institution.createRoles();
-};
-
 exports.migrateInstitutionCreator = async (ctx) => {
   const { institution } = ctx.state;
 
