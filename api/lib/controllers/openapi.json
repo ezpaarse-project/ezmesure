@@ -857,9 +857,6 @@
           },
           "timeFieldName": {
             "type": "string"
-          },
-          "allowNoIndex": {
-            "type": "boolean"
           }
         },
         "required": [
