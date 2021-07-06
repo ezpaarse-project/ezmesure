@@ -33,25 +33,6 @@ exports.validateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.createInstitutionIndex = async (ctx) => {
-  const { institution } = ctx.state;
-
-  if (!institution.get('indexPrefix')) {
-    ctx.throw(409, ctx.$t('errors.institution.noPrefixSet', institution.id));
-  }
-
-  const indexExists = await institution.checkBaseIndex();
-
-  if (indexExists) {
-    ctx.status = 200;
-    ctx.body = { message: ctx.$t('nothingToDo') };
-  } else {
-    await institution.createBaseIndex();
-    ctx.status = 201;
-    ctx.body = { message: ctx.$t('indexCreated') };
-  }
-};
-
 exports.createInstitutionRoles = async (ctx) => {
   const { institution } = ctx.state;
 
