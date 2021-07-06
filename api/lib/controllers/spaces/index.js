@@ -7,6 +7,7 @@ const {
   listIndexPatterns,
   createSpace,
   createIndexPattern,
+  getSpace,
 } = require('./actions');
 
 const spaceIdPattern = /^[a-z0-9][a-z0-9_.-]*$/i;
@@ -18,6 +19,17 @@ router.route({
   method: 'GET',
   path: '/',
   handler: list,
+});
+
+router.route({
+  method: 'GET',
+  path: '/:spaceId',
+  handler: getSpace,
+  validate: {
+    params: {
+      spaceId: Joi.string().trim().required(),
+    },
+  },
 });
 
 router.route({

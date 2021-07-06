@@ -12,6 +12,19 @@ exports.list = async (ctx) => {
   ctx.body = spaces;
 };
 
+exports.getSpace = async (ctx) => {
+  const { spaceId } = ctx.request.params;
+
+  const { data: space, status } = await kibana.getSpace(spaceId);
+
+  if (status === 404) {
+    ctx.throw(409, ctx.$t('errors.space.notFound', spaceId));
+  }
+
+  ctx.type = 'json';
+  ctx.body = space;
+};
+
 exports.listIndexPatterns = async (ctx) => {
   const { spaceId } = ctx.request.params;
 
