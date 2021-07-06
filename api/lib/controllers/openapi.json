@@ -3133,8 +3133,17 @@
         ]
       }
     },
-    "/indices": {
-      "parameters": [],
+    "/indices/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
       "put": {
         "summary": "Create an index",
         "operationId": "post-indices",
