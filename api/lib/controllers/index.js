@@ -20,6 +20,7 @@ const users = require('./users');
 const dashboards = require('./dashboards');
 const spaces = require('./spaces');
 const indices = require('./indices');
+const roles = require('./roles');
 
 const openapi = require('./openapi.json');
 
@@ -72,5 +73,6 @@ app.use(users.prefix('/users').middleware());
 app.use(dashboards.prefix('/dashboards').middleware());
 app.use(spaces.prefix('/spaces').middleware());
 app.use(indices.prefix('/indices').middleware());
+app.use(roles.prefix('/roles').middleware());
 
 module.exports = app;
