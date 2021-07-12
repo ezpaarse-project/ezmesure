@@ -1,6 +1,18 @@
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
 
+exports.getIndex = async (ctx) => {
+  const { index } = ctx.request.params;
+
+  const { body = {}, status } = await elastic.indices.get({ index }, { ignore: [404] });
+
+  if (status === 404 || body.status === 404) {
+    ctx.throw(404, ctx.$t('errors.index.notFound', index));
+  }
+
+  ctx.body = body;
+};
+
 exports.createIndex = async (ctx) => {
   const { index } = ctx.request.params;
 
