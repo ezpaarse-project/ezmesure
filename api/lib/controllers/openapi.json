@@ -3847,6 +3847,41 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get a role",
+        "operationId": "get-roles-roleName",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaRole"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Get a role by its name",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/users/{username}": {
