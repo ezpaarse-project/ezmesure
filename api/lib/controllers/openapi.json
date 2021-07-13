@@ -1107,6 +1107,25 @@
         "required": [
           "kibana"
         ]
+      },
+      "ElasticsearchIndex": {
+        "title": "ElasticsearchIndex",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "aliases": {
+            "type": "object",
+            "readOnly": true
+          },
+          "mappings": {
+            "type": "object",
+            "readOnly": true
+          },
+          "settings": {
+            "type": "object",
+            "readOnly": true
+          }
+        }
       }
     }
   },
@@ -3274,6 +3293,47 @@
           "Institutions",
           "Administration"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get an index",
+        "operationId": "get-indices-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ElasticsearchIndex"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "description": "Get information about an index",
         "security": [
           {
             "bearerAuth": []
