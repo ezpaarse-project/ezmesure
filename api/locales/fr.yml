@@ -49,6 +49,9 @@ errors:
   users:
     failedToQuery: Impossible de récupérer les utilisateurs
 
+  role:
+    notFound: Rôle [%s] introuvable
+
   space:
     notFound: Espace [%s] introuvable
     alreadyExists: L'espace [%s] existe déjà

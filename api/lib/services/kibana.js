@@ -69,6 +69,16 @@ client.putRole = (opts) => {
   return axiosClient.put(`/api/security/role/${options.name}`, options.body || {});
 };
 
+client.getRole = (name) => {
+  if (!name) {
+    throw new Error('Missing required parameter: name');
+  }
+
+  return axiosClient.get(`/api/security/role/${name}`, { validateStatus: allowNotFound });
+};
+
+client.getRoles = () => axiosClient.get('/api/security/role');
+
 client.createIndexPattern = (spaceId, opts) => {
   const attributes = opts || {};
 

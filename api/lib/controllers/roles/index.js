@@ -3,12 +3,36 @@ const { Joi } = require('koa-joi-router');
 
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const {
+  listRoles,
+  getRole,
   createRole,
 } = require('./actions');
 
 const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
 
 router.use(requireJwt, requireUser, requireAnyRole(['admin', 'superuser']));
+
+router.route({
+  method: 'GET',
+  path: '/',
+  handler: listRoles,
+  validate: {
+    query: {
+      reserved: Joi.boolean().default(false),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:roleName',
+  handler: getRole,
+  validate: {
+    params: {
+      roleName: Joi.string().trim().required().regex(roleNamePattern),
+    },
+  },
+});
 
 router.route({
   method: 'PUT',
