@@ -29,6 +29,24 @@ exports.getRole = async (ctx) => {
   ctx.body = data;
 };
 
+exports.deleteRole = async (ctx) => {
+  const { roleName: name } = ctx.request.params;
+
+  try {
+    await kibana.deleteRole(name);
+  } catch (e) {
+    const status = e && e.response && e.response.status;
+
+    if (status === 404) {
+      ctx.throw(404, ctx.$t('errors.role.notFound', name));
+    } else {
+      ctx.throw(e);
+    }
+  }
+
+  ctx.status = 204;
+};
+
 exports.createRole = async (ctx) => {
   const { roleName: name } = ctx.request.params;
   const { body = {} } = ctx.request;

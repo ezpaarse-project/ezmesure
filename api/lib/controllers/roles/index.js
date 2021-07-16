@@ -6,6 +6,7 @@ const {
   listRoles,
   getRole,
   createRole,
+  deleteRole,
 } = require('./actions');
 
 const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
@@ -27,6 +28,17 @@ router.route({
   method: 'GET',
   path: '/:roleName',
   handler: getRole,
+  validate: {
+    params: {
+      roleName: Joi.string().trim().required().regex(roleNamePattern),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:roleName',
+  handler: deleteRole,
   validate: {
     params: {
       roleName: Joi.string().trim().required().regex(roleNamePattern),
