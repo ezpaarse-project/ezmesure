@@ -64,17 +64,17 @@ router.route({
       force: Joi.boolean().default(false),
     },
     body: {
-      source: {
+      source: Joi.object({
         space: Joi.string().trim(),
         dashboard: Joi.alternatives(
           Joi.array().items(Joi.string().trim()),
           Joi.string().trim(),
         ).required(),
-      },
-      target: {
+      }).required(),
+      target: Joi.object({
         space: Joi.string().trim().required(),
         indexPattern: Joi.string().trim(),
-      },
+      }).required(),
     },
   },
 });
