@@ -54,6 +54,9 @@
     },
     {
       "name": "Sushi"
+    },
+    {
+      "name": "Users"
     }
   ],
   "components": {
@@ -3951,9 +3954,6 @@
     "/users": {
       "get": {
         "summary": "List users",
-        "tags": [
-          "Institutions"
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3988,6 +3988,9 @@
             "name": "q",
             "description": "a query for searching"
           }
+        ],
+        "tags": [
+          "Users"
         ]
       }
     },
@@ -4004,9 +4007,6 @@
       ],
       "get": {
         "summary": "Get a user",
-        "tags": [
-          "Administration"
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4034,7 +4034,86 @@
           {
             "bearerAuth": []
           }
+        ],
+        "tags": [
+          "Users"
         ]
+      },
+      "put": {
+        "summary": "Update a user",
+        "operationId": "put-users-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Update a user",
+        "tags": [
+          "Users",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     }
   }

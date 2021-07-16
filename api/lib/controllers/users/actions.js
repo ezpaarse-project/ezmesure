@@ -49,3 +49,17 @@ exports.list = async (ctx) => {
   ctx.type = 'json';
   ctx.body = users.map((user) => user._source); // eslint-disable-line no-underscore-dangle
 };
+
+exports.updateUser = async (ctx) => {
+  const { username } = ctx.params;
+  const { body } = ctx.request;
+
+  const { body: result } = await elastic.security.putUser({
+    username,
+    body,
+    refresh: true,
+  });
+
+  ctx.status = (result && result.created) ? 201 : 200;
+  ctx.body = result;
+};
