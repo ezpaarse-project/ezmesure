@@ -1752,6 +1752,16 @@
           {
             "bearerAuth": []
           }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "creator",
+            "description": "if set to false, the authenticated user will not be registered as the institution creator (requires admin permissions)"
+          }
         ]
       }
     },
