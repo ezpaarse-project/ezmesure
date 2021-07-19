@@ -173,7 +173,15 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     return null;
   }
 
+  isCreator(user) {
+    if (!user || !user.username) { return false; }
+    const { creator } = this.data;
+
+    return (creator && creator === user.username);
+  }
+
   isContact(user) {
+    if (this.isCreator(user)) { return true; }
     if (!this.isMember(user)) { return false; }
     if (!Array.isArray(user && user.roles)) { return false; }
 
@@ -184,10 +192,9 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   isMember(user) {
     if (!user || !user.username) { return false; }
 
-    const { creator, role } = this.data;
+    const { role } = this.data;
     const readOnlyRole = addReadOnlySuffix(role);
 
-    if (creator && creator === user.username) { return true; }
     if (!role || !Array.isArray(user && user.roles)) { return false; }
 
     const roles = new Set(user.roles);
