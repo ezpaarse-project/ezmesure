@@ -57,6 +57,7 @@ exports.getSelfInstitution = async (ctx) => {
 };
 
 exports.createInstitution = async (ctx) => {
+  ctx.action = 'institutions/create';
   await ensureIndex();
 
   const { user } = ctx.state;
@@ -65,6 +66,9 @@ exports.createInstitution = async (ctx) => {
   const { logo } = body;
   const { username, roles } = ctx.state.user;
 
+  ctx.metadata = {
+    institutionName: body.name,
+  };
 
   if (!isAdmin(user)) {
     const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
@@ -89,13 +93,20 @@ exports.createInstitution = async (ctx) => {
 
   await institution.save();
 
+  ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
   ctx.body = institution;
 };
 
 exports.updateInstitution = async (ctx) => {
+  ctx.action = 'institutions/update';
   const { user, institution } = ctx.state;
   const { body } = ctx.request;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+  };
 
   if (!body) {
     ctx.throw(400, ctx.$t('errors.emptyBody'));
@@ -160,10 +171,18 @@ exports.getInstitutionMembers = async (ctx) => {
 };
 
 exports.addInstitutionMember = async (ctx) => {
+  ctx.action = 'institutions/addMember';
+
   const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
   const { body = {} } = ctx.request;
   const { readonly = true } = body;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+    username,
+  };
 
   const role = institution.getRole();
   const readonlyRole = institution.getRole({ readonly: true });
@@ -211,8 +230,17 @@ exports.addInstitutionMember = async (ctx) => {
 };
 
 exports.removeInstitutionMember = async (ctx) => {
+  ctx.action = 'institutions/removeMember';
+
   const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
+
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+    username,
+  };
 
   const role = institution.getRole();
   const readonlyRole = institution.getRole({ readonly: true });
