@@ -41,6 +41,8 @@ async function getEzMesureMetrics() {
                   'file/delete-many',
                   'user/register',
                   'indices/insert',
+                  'institutions/create',
+                  'institutions/update',
                 ],
               },
             },
@@ -87,11 +89,19 @@ async function getEzMesureMetrics() {
       datetime: toLocaleDate(_source.datetime),
     }));
 
+  const institutions = actions
+    .filter((a) => a._source.action.startsWith('institutions/'))
+    .map(({ _source }) => ({
+      ..._source,
+      datetime: toLocaleDate(_source.datetime),
+    }));
+
   return {
     actions,
     files,
     users,
     insertions,
+    institutions,
   };
 }
 
@@ -173,6 +183,7 @@ async function sendNotifications() {
     files,
     users,
     insertions,
+    institutions,
   } = await getEzMesureMetrics();
   const { actions: reportingActions = [], reportings } = await getReportingActivity();
 
@@ -191,6 +202,7 @@ async function sendNotifications() {
       users,
       insertions,
       reportings,
+      institutions,
     }),
   });
 
