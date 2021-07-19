@@ -2,6 +2,22 @@ Activité récente
 ================
 
 {% if users.length -%}
+- {{ users.length }} enregistrements
+{% endif -%}
+{% if files.length -%}
+- {{ files.length }} dépôts de fichiers
+{% endif -%}
+{% if insertions.length -%}
+- {{ insertions.length }} chargements
+{% endif -%}
+{% if reportings.length -%}
+- {{ reportings.length }} mises à jour de tâches de reporting
+{% endif -%}
+{% if institutions.length -%}
+- {{ institutions.length }} mises à jour d'établissements
+{% endif %}
+
+{% if users.length -%}
 Enregistrements ({{ users.length }})
   {% for action in users -%}
     [{{ action.datetime }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }}) [{{ action.datetime }}]
@@ -11,9 +27,9 @@ Enregistrements ({{ users.length }})
 {% if files.length -%}
 Dépôts de fichiers ({{ files.length }})
   {% for action in files -%}
-    {% for path in action.path -%}
-      [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
-    {% endfor %}
+  {% for path in action.path -%}
+    [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
+  {% endfor %}
   {%- endfor %}
 {% endif -%}
 
