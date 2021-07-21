@@ -38,7 +38,7 @@ router.route({
       email: Joi.string().trim().email(),
       full_name: Joi.string().trim(),
       metadata: Joi.object().unknown(true),
-      password: Joi.string().trim(),
+      password: Joi.string().trim().min(6),
       roles: Joi.array().items(Joi.string().trim()).required(),
     },
   },
