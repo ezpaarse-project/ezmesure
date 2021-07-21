@@ -1,17 +1,19 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
+const handleElasticErrors = require('../../utils/elastic-error-handler');
+
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const { list, getUser, updateUser } = require('./actions');
 
 router.use(requireJwt, requireUser);
 
-router.get('/', list);
+router.get('/', [handleElasticErrors, list]);
 
 router.route({
   method: 'GET',
   path: '/:username',
-  handler: getUser,
+  handler: [handleElasticErrors, getUser],
   validate: {
     params: {
       username: Joi.string().trim().required(),
@@ -24,7 +26,7 @@ router.use(requireAnyRole(['admin', 'superuser']));
 router.route({
   method: 'PUT',
   path: '/:username',
-  handler: updateUser,
+  handler: [handleElasticErrors, updateUser],
   validate: {
     type: 'json',
     params: {
