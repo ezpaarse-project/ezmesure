@@ -37,7 +37,7 @@ router.route({
       full_name: Joi.string().trim(),
       metadata: Joi.object().unknown(true),
       password: Joi.string().trim(),
-      roles: Joi.array().items(Joi.string().trim()),
+      roles: Joi.array().items(Joi.string().trim()).required(),
     },
   },
 });
