@@ -55,6 +55,7 @@ router.route({
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),
       color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
+      disabledFeatures: Joi.array().items(Joi.string()),
     },
   },
 });
