@@ -210,6 +210,7 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       index: '.security',
       _source: ['full_name', 'roles', 'username'],
       body: {
+        size: 1000,
         query: {
           bool: {
             filter: [
@@ -446,7 +447,9 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
 
   async migrateCreator() {
     const { creator, role } = this.data;
-    if (!creator || !role) { return; }
+    if (!creator || !role) {
+      throw new Error('');
+    }
 
     const { body = {} } = await elastic.security.getUser({ username: creator }, { ignore: [404] });
     const user = body[creator];
