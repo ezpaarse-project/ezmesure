@@ -242,7 +242,6 @@ router.route({
   path: '/:institutionId/_migrate_creator',
   handler: [fetchInstitution, migrateInstitutionCreator],
   validate: {
-    type: 'json',
     params: {
       institutionId: Joi.string().trim().required(),
     },
