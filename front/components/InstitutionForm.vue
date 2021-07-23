@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="show" scrollable width="900">
+  <v-dialog
+    v-model="show"
+    scrollable
+    persistent
+    width="900"
+  >
     <v-card>
       <v-card-title class="headline">
         {{ $t(editMode ? 'institutions.updateInstitution' : 'institutions.newInstitution') }}
