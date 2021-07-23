@@ -233,17 +233,20 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false" v-text="$t('close')" />
+        <v-btn text @click="show = false" v-text="$t('cancel')" />
 
         <v-btn
           type="submit"
           form="institutionForm"
           color="primary"
-          text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('create')"
-        />
+        >
+          <v-icon left>
+            mdi-content-save
+          </v-icon>
+          {{ editMode ? $t('update') : $t('create') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
