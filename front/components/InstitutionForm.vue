@@ -8,14 +8,13 @@
       <v-card-text>
         <v-row align="center">
           <v-col class="grow">
-            <OpenDataSearch v-model="openData" />
-          </v-col>
-          <v-col class="shrink">
-            <v-btn color="primary" :disabled="!openData" @click="applyOpenDataData">
-              {{ $t('apply') }}
-            </v-btn>
+            <OpenDataSearch
+              v-model="openData"
+              @input="applyOpenData"
+            />
           </v-col>
         </v-row>
+
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
           <v-row>
             <v-col cols="12" sm="6">
@@ -383,7 +382,7 @@ export default {
       this.institution.logoId = null;
     },
 
-    applyOpenDataData() {
+    applyOpenData() {
       if (!this.openData) { return; }
 
       const fields = [
@@ -400,9 +399,7 @@ export default {
       ];
 
       fields.forEach(([institutionKey, openDataKey]) => {
-        if (this.openData[openDataKey]) {
-          this.$set(this.institution, institutionKey, this.openData[openDataKey]);
-        }
+        this.$set(this.institution, institutionKey, this.openData[openDataKey] || '');
       });
     },
 
