@@ -70,6 +70,23 @@ exports.createSpace = async (ctx) => {
   ctx.body = newSpace;
 };
 
+exports.updateSpace = async (ctx) => {
+  const { spaceId } = ctx.request.params;
+  const { body = {} } = ctx.request;
+
+  const { status } = await kibana.getSpace(spaceId);
+
+  if (status === 404) {
+    ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
+    return;
+  }
+
+  const { data: newSpace } = await kibana.updateSpace(body);
+
+  ctx.status = 200;
+  ctx.body = newSpace;
+};
+
 exports.createIndexPattern = async (ctx) => {
   const { spaceId } = ctx.request.params;
   const { body = {} } = ctx.request;

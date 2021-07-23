@@ -6,6 +6,7 @@ const {
   list,
   listIndexPatterns,
   createSpace,
+  updateSpace,
   createIndexPattern,
   getSpace,
 } = require('./actions');
@@ -49,6 +50,26 @@ router.route({
   handler: createSpace,
   validate: {
     type: 'json',
+    body: {
+      id: Joi.string().trim().required().regex(spaceIdPattern),
+      name: Joi.string().trim(),
+      description: Joi.string().trim(),
+      initials: Joi.string().trim().min(1).max(2),
+      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
+      disabledFeatures: Joi.array().items(Joi.string()),
+    },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:spaceId',
+  handler: updateSpace,
+  validate: {
+    type: 'json',
+    params: {
+      spaceId: Joi.string().trim().required().regex(spaceIdPattern),
+    },
     body: {
       id: Joi.string().trim().required().regex(spaceIdPattern),
       name: Joi.string().trim(),
