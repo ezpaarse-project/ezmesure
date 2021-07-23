@@ -72,7 +72,7 @@ router.route({
     },
     body: {
       id: Joi.string().trim().required().regex(spaceIdPattern),
-      name: Joi.string().trim(),
+      name: Joi.string().trim().required(),
       description: Joi.string().trim(),
       initials: Joi.string().trim().min(1).max(2),
       color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
