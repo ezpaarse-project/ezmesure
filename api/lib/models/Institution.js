@@ -117,6 +117,10 @@ function addReadOnlySuffix(str) {
 }
 
 class Institution extends typedModel(type, schema, createSchema, updateSchema) {
+  static docRole() { return docRole; }
+
+  static techRole() { return techRole; }
+
   static findOneByCreatorOrRole(username, userRoles) {
     // Remove readonly suffix so that we search with the base role
     const roles = Array.isArray(userRoles) ? userRoles.map(trimReadOnlySuffix) : [];
