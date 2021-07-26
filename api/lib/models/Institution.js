@@ -185,7 +185,6 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   isContact(user) {
-    if (this.isCreator(user)) { return true; }
     if (!this.isMember(user)) { return false; }
     if (!Array.isArray(user && user.roles)) { return false; }
 

@@ -49,14 +49,19 @@ async function fetchInstitution(ctx, next) {
  * Middleware that checks that user is either admin or institution contact
  * Assumes that ctx.state contains institution and user
  */
-function requireContact(ctx, next) {
-  const { user, institution, userIsAdmin } = ctx.state;
+function requireContact(opts = {}) {
+  const { allowCreator } = opts;
 
-  if (userIsAdmin) { return next(); }
-  if (user && institution && institution.isContact(user)) { return next(); }
+  return (ctx, next) => {
+    const { user, institution, userIsAdmin } = ctx.state;
 
-  ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
-  return undefined;
+    if (userIsAdmin) { return next(); }
+    if (user && institution && institution.isContact(user)) { return next(); }
+    if (allowCreator && user && institution && institution.isCreator(user)) { return next(); }
+
+    ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
+    return undefined;
+  };
 }
 
 router.use(requireJwt, requireUser);
@@ -69,7 +74,7 @@ router.route({
   handler: [
     requireAnyRole(['sushi_form', 'admin', 'superuser']),
     fetchInstitution,
-    requireContact,
+    requireContact(),
     getSushiData,
   ],
   validate: {
@@ -104,7 +109,7 @@ router.route({
   path: '/:institutionId/members',
   handler: [
     fetchInstitution,
-    requireContact,
+    requireContact(),
     getInstitutionMembers,
   ],
   validate: {
@@ -119,7 +124,7 @@ router.route({
   path: '/:institutionId/members/:username',
   handler: [
     fetchInstitution,
-    requireContact,
+    requireContact(),
     addInstitutionMember,
   ],
   validate: {
@@ -141,7 +146,7 @@ router.route({
   path: '/:institutionId/members/:username',
   handler: [
     fetchInstitution,
-    requireContact,
+    requireContact(),
     removeInstitutionMember,
   ],
   validate: {
@@ -171,7 +176,7 @@ router.route({
   path: '/:institutionId',
   handler: [
     fetchInstitution,
-    requireContact,
+    requireContact({ allowCreator: true }),
     updateInstitution,
   ],
   validate: {
