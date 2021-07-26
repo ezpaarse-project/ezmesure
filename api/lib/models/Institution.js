@@ -239,11 +239,17 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       members = [];
     }
 
-    return members.map(({ _source: source }) => ({
-      ...source,
-      readonly: !(Array.isArray(source.roles) && source.roles.includes(role)),
-      creator: creator && (source.username === creator),
-    }));
+    return members.map(({ _source: source }) => {
+      const userRoles = new Set(Array.isArray(source.roles) ? source.roles : []);
+
+      return {
+        ...source,
+        readonly: !userRoles.has(role),
+        docContact: userRoles.has(Institution.docRole()),
+        techContact: userRoles.has(Institution.techRole()),
+        creator: creator && (source.username === creator),
+      };
+    });
   }
 
   /**
