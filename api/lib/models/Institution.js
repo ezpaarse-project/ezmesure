@@ -206,9 +206,18 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   async getMembers() {
-    const { role } = this.data;
+    const { role, creator } = this.data;
 
-    if (!role) { return []; }
+    if (!role && !creator) { return []; }
+
+    const should = [];
+
+    if (role) {
+      should.push({ terms: { roles: [role, addReadOnlySuffix(role)] } });
+    }
+    if (creator) {
+      should.push({ term: { username: creator } });
+    }
 
     const { body = {} } = await elastic.search({
       index: '.security',
@@ -217,20 +226,24 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
         size: 1000,
         query: {
           bool: {
-            filter: [
-              { terms: { roles: [role, addReadOnlySuffix(role)] } },
-            ],
+            should,
+            minimum_should_match: 1,
           },
         },
       },
     });
 
-    const users = body.hits && body.hits.hits;
+    let members = body.hits && body.hits.hits;
 
-    return Array.isArray(users) ? users.map(({ _source: source }) => ({
+    if (!Array.isArray(members)) {
+      members = [];
+    }
+
+    return members.map(({ _source: source }) => ({
       ...source,
       readonly: !(Array.isArray(source.roles) && source.roles.includes(role)),
-    })) : [];
+      creator: creator && (source.username === creator),
+    }));
   }
 
   /**
