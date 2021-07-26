@@ -26,14 +26,14 @@
     >
       <template v-slot:item.correspondent="{ item }">
         <v-chip
-          v-if="item.roles && item.roles.includes('tech_contact')"
+          v-if="item.techContact"
           small
           label
           color="secondary"
           v-text="$t('institutions.members.technicalCorrespondent')"
         />
         <v-chip
-          v-if="item.roles && item.roles.includes('doc_contact')"
+          v-if="item.docContact"
           small
           label
           color="secondary"

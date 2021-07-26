@@ -48,8 +48,8 @@ export default {
       return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
     },
     isContact() {
-      const isTech = this.member?.roles?.includes('tech_contact');
-      const isDoc = this.member?.roles?.includes('doc_contact');
+      const isTech = this.member?.techContact;
+      const isDoc = this.member?.docContact;
       return (isTech || isDoc);
     },
     actions() {
