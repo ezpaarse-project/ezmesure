@@ -187,6 +187,21 @@ router.route({
   },
 });
 
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId/creator',
+  handler: [
+    fetchInstitution,
+    requireContact(),
+    deleteInstitutionCreator,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
 router.use(requireAnyRole(['admin', 'superuser']));
 
 router.route({
@@ -240,17 +255,6 @@ router.route({
     },
     body: {
       value: Joi.boolean().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'DELETE',
-  path: '/:institutionId/creator',
-  handler: [fetchInstitution, deleteInstitutionCreator],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
     },
   },
 });
