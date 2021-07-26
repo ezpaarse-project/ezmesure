@@ -176,7 +176,11 @@ exports.addInstitutionMember = async (ctx) => {
   const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
   const { body = {} } = ctx.request;
-  const { readonly = true } = body;
+  const {
+    readonly = true,
+    docContact,
+    techContact,
+  } = body;
 
   ctx.metadata = {
     institutionId: institution.id,
@@ -196,9 +200,13 @@ exports.addInstitutionMember = async (ctx) => {
   if (!member) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
+
+  // Only admins can update institution contacts
   if (institution.isContact(member) && !userIsAdmin) {
     ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
   }
+
+  // If the user is not already a member, check if it belongs to another institution
   if (!institution.isMember(member)) {
     const memberInstitution = await Institution.findOneByCreatorOrRole(
       member.username,
@@ -211,11 +219,17 @@ exports.addInstitutionMember = async (ctx) => {
     }
   }
 
-
   const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
 
   userRoles.add(readonly ? readonlyRole : role);
   userRoles.delete(readonly ? role : readonlyRole);
+
+  if (userIsAdmin) {
+    if (docContact === true) { userRoles.add(Institution.docRole()); }
+    if (docContact === false) { userRoles.delete(Institution.docRole()); }
+    if (techContact === true) { userRoles.add(Institution.techRole()); }
+    if (techContact === false) { userRoles.delete(Institution.techRole()); }
+  }
 
   member.roles = Array.from(userRoles);
 

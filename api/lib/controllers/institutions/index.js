@@ -130,6 +130,8 @@ router.route({
     },
     body: {
       readonly: Joi.boolean().default(true),
+      docContact: Joi.boolean(),
+      techContact: Joi.boolean(),
     },
   },
 });
