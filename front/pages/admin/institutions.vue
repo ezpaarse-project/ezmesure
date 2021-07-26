@@ -10,7 +10,7 @@
           </v-icon>
           {{ $t('add') }}
         </v-btn>
-        <v-btn text @click="refreshInstitutions">
+        <v-btn text :loading="refreshing" @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -34,6 +34,7 @@
       :headers="headers"
       :items="institutions"
       :search="search"
+      :loading="refreshing"
       item-key="id"
       show-select
     >
@@ -162,6 +163,7 @@ export default {
     return {
       selected: [],
       search: '',
+      refreshing: false,
       types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
@@ -195,6 +197,8 @@ export default {
   },
   methods: {
     async refreshInstitutions() {
+      this.refreshing = true;
+
       try {
         this.institutions = await this.$axios.$get('/institutions');
       } catch (e) {
@@ -204,6 +208,8 @@ export default {
       if (!Array.isArray(this.institutions)) {
         this.institutions = [];
       }
+
+      this.refreshing = false;
     },
     editInstitution(item) {
       this.$refs.institutionForm.editInstitution(item);
