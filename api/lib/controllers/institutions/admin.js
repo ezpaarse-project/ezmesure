@@ -33,15 +33,14 @@ exports.validateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.migrateInstitutionCreator = async (ctx) => {
+exports.deleteInstitutionCreator = async (ctx) => {
   const { institution } = ctx.state;
 
   if (institution.get('creator')) {
-    await institution.migrateCreator();
-    ctx.body = { message: ctx.$t('creatorMigrated') };
-  } else {
-    ctx.body = { message: ctx.$t('nothingToDo') };
+    await institution.setCreator(null);
+    await institution.save();
   }
 
   ctx.status = 200;
+  ctx.body = institution;
 };

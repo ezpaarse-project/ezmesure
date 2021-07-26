@@ -24,7 +24,7 @@ const {
 const {
   getInstitutionState,
   validateInstitution,
-  migrateInstitutionCreator,
+  deleteInstitutionCreator,
 } = require('./admin');
 
 /**
@@ -240,9 +240,9 @@ router.route({
 });
 
 router.route({
-  method: 'POST',
-  path: '/:institutionId/_migrate_creator',
-  handler: [fetchInstitution, migrateInstitutionCreator],
+  method: 'DELETE',
+  path: '/:institutionId/creator',
+  handler: [fetchInstitution, deleteInstitutionCreator],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
