@@ -31,6 +31,14 @@
           color="secondary"
           v-text="$t('institutions.members.documentaryCorrespondent')"
         />
+        <v-chip
+          v-if="item.creator"
+          small
+          label
+          color="secondary"
+          outlined
+          v-text="$t('institutions.members.creator')"
+        />
       </template>
 
       <template v-slot:item.readonly="{ item }">

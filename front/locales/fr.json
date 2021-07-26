@@ -164,6 +164,7 @@
       "title": "Membres - {institutionName}",
       "technicalCorrespondent": "Technique",
       "documentaryCorrespondent": "Documentaire",
+      "creator": "Créateur",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
       "name": "Nom",
       "username": "Identifiant",
