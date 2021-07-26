@@ -2,6 +2,14 @@
   <section>
     <ToolBar :title="$t('institutions.members.title', { institutionName })">
       <v-spacer />
+
+      <v-btn text :loading="refreshing" @click="refreshMembers">
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        {{ $t('refresh') }}
+      </v-btn>
+
       <MemberSearch
         :institution-id="institutionId"
         @added="refreshMembers"
