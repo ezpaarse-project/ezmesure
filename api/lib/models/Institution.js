@@ -449,32 +449,6 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     }
   }
 
-  async migrateCreator() {
-    const { creator, role } = this.data;
-    if (!creator || !role) {
-      throw new Error('');
-    }
-
-    const { body = {} } = await elastic.security.getUser({ username: creator }, { ignore: [404] });
-    const user = body[creator];
-
-    if (!user) {
-      throw new Error('no user matching institution creator');
-    }
-
-    user.roles = Array.isArray(user.roles) ? user.roles : [];
-
-    const roles = [role, techRole, docRole];
-    const hasAllRoles = roles.every((r) => user.roles.includes(r));
-
-    if (!hasAllRoles) {
-      user.roles = Array.from(new Set(roles.concat(user.roles)));
-      await elastic.security.putUser({ username: creator, refresh: true, body: user });
-    }
-
-    this.data.creator = null;
-  }
-
   /**
    * Refresh indexCount by counting everything with the institution prefix
    *
