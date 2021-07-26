@@ -239,6 +239,11 @@ exports.addInstitutionMember = async (ctx) => {
     ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
   }
 
+  if (institution.isCreator(member)) {
+    institution.setCreator(null);
+    await institution.save();
+  }
+
   ctx.status = 200;
   ctx.body = { message: 'user updated' };
 };
