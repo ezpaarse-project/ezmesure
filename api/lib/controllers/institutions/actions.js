@@ -207,7 +207,7 @@ exports.addInstitutionMember = async (ctx) => {
   }
 
   // If the user is not already a member, check if it belongs to another institution
-  if (!institution.isMember(member)) {
+  if (!institution.isMember(member) && !institution.isCreator(member)) {
     const memberInstitution = await Institution.findOneByCreatorOrRole(
       member.username,
       member.roles,
