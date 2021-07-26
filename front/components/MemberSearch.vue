@@ -56,13 +56,28 @@
             :label="$t('institutions.members.permissions')"
             dense
             outlined
+            hide-details
           />
+
+          <template v-if="isAdmin">
+            <v-checkbox
+              v-model="docContact"
+              :label="$t('institutions.members.documentaryCorrespondent')"
+              hide-details
+            />
+            <v-checkbox
+              v-model="techContact"
+              :label="$t('institutions.members.technicalCorrespondent')"
+              hide-details
+            />
+          </template>
 
           <v-alert
             type="error"
             dense
             outlined
             :value="!!addMemberError"
+            class="mt-4"
           >
             {{ addMemberError }}
           </v-alert>
@@ -112,10 +127,15 @@ export default {
       search: null,
       selected: null,
       selectedPermission: 'read',
+      techContact: false,
+      docContact: false,
       users: [],
     };
   },
   computed: {
+    isAdmin() {
+      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+    },
     errorMessages() {
       return this.failedToSearch ? [this.$t('institutions.members.failedToSearch')] : [];
     },
@@ -186,7 +206,11 @@ export default {
       const readonly = this.selectedPermission !== 'write';
 
       try {
-        await this.$axios.put(`/institutions/${this.institutionId}/members/${username}`, { readonly });
+        await this.$axios.put(`/institutions/${this.institutionId}/members/${username}`, {
+          readonly,
+          docContact: this.isAdmin ? this.docContact : undefined,
+          techContact: this.isAdmin ? this.techContact : undefined,
+        });
         this.showMemberMenu = false;
         this.$emit('added');
       } catch (e) {

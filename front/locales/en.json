@@ -161,8 +161,10 @@
     },
     "members": {
       "title": "Members - {institutionName}",
-      "technicalCorrespondent": "Technical",
-      "documentaryCorrespondent": "Documentary",
+      "technical": "Technical",
+      "documentary": "Documentary",
+      "technicalCorrespondent": "Technical correspondent",
+      "documentaryCorrespondent": "Documentary correspondent",
       "creator": "Creator",
       "unableToRetriveMembers": "Unable to retrieve members",
       "name": "Name",

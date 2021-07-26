@@ -26,6 +26,19 @@
         <p v-else>
           {{ $t('institutions.members.writePermDesc') }}
         </p>
+
+        <template v-if="isAdmin">
+          <v-checkbox
+            v-model="docContact"
+            :label="$t('institutions.members.documentaryCorrespondent')"
+            hide-details
+          />
+          <v-checkbox
+            v-model="techContact"
+            :label="$t('institutions.members.technicalCorrespondent')"
+            hide-details
+          />
+        </template>
       </v-card-text>
 
       <v-card-actions>
@@ -59,13 +72,22 @@ export default {
       username: '',
       fullName: '',
       readonly: true,
+      docContact: false,
+      techContact: false,
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+    },
   },
   methods: {
     updateMember(memberData = {}) {
       this.username = memberData?.username || '';
       this.fullName = memberData?.full_name || ''; // eslint-disable-line camelcase
       this.readonly = memberData?.readonly !== false;
+      this.docContact = memberData?.docContact === true;
+      this.techContact = memberData?.techContact === true;
       this.show = true;
     },
 
@@ -75,7 +97,11 @@ export default {
       this.saving = true;
 
       const url = `/institutions/${this.institutionId}/members/${this.username}`;
-      const body = { readonly: this.readonly };
+      const body = {
+        readonly: this.readonly,
+        docContact: this.isAdmin ? this.docContact : undefined,
+        techContact: this.isAdmin ? this.techContact : undefined,
+      };
 
       try {
         await this.$axios.$put(url, body);

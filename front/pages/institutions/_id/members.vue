@@ -30,14 +30,14 @@
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.technicalCorrespondent')"
+          v-text="$t('institutions.members.technical')"
         />
         <v-chip
           v-if="item.docContact"
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.documentaryCorrespondent')"
+          v-text="$t('institutions.members.documentary')"
         />
         <v-chip
           v-if="item.creator"

@@ -161,8 +161,10 @@
     },
     "members": {
       "title": "Membres - {institutionName}",
-      "technicalCorrespondent": "Technique",
-      "documentaryCorrespondent": "Documentaire",
+      "technical": "Technique",
+      "documentary": "Documentaire",
+      "technicalCorrespondent": "Correspondant technique",
+      "documentaryCorrespondent": "Correspondant documentaire",
       "creator": "Créateur",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
       "name": "Nom",
