@@ -139,7 +139,6 @@
       "identity": "Identité",
       "validate": "Valider",
       "invalidate": "Invalider",
-      "notValidatable": "Veuillez associer un rôle, un espace et un préfixe d'index à l'établissement avant de le valider.",
       "validated": "Validé",
       "notValidated": "Non validé",
       "failedToUpdateValidation": "Impossible de mettre à jour la validation",
