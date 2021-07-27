@@ -220,6 +220,20 @@
               <v-row>
                 <v-col cols="12">
                   <v-checkbox
+                    v-model="institution.validated"
+                    :label="$t('institutions.institution.valid')"
+                    hide-details
+                    class="mt-0"
+                  />
+                  <v-checkbox
+                    v-model="institution.hidePartner"
+                    :label="$t('institutions.institution.hidePartner')"
+                    hide-details
+                  />
+                </v-col>
+
+                <v-col cols="12">
+                  <v-checkbox
                     v-model="identicalNames"
                     :label="$t('institutions.institution.identicalNames')"
                     hide-details

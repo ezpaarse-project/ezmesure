@@ -27,6 +27,7 @@ const schema = {
   creator: Joi.string().allow('').allow(null),
   role: Joi.string().allow('').allow(null),
   space: Joi.string().allow('').allow(null),
+  hidePartner: Joi.boolean().default(false),
 
   techContactName: Joi.string().allow('').allow(null),
   docContactName: Joi.string().allow('').allow(null),
@@ -64,6 +65,7 @@ const createSchema = {
   role: Joi.any().strip(),
   creator: Joi.any().strip(),
   space: Joi.any().strip(),
+  hidePartner: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
@@ -145,6 +147,9 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     return this.findAll({
       filters: [
         { term: { [`${type}.validated`]: true } },
+      ],
+      must_not: [
+        { term: { [`${type}.hidePartner`]: true } },
       ],
     });
   }

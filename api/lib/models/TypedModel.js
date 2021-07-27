@@ -161,6 +161,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
           bool: {
             minimum_should_match: opt.should ? 1 : 0,
             should: opt.should,
+            must_not: opt.must_not,
             filter,
           },
         },
