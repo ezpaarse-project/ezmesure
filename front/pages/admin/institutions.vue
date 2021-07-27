@@ -103,6 +103,15 @@
           </template>
 
           <v-list>
+            <v-list-item @click="editInstitution(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('modify')" />
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item :href="`/institutions/${item.id}/sushi`">
               <v-list-item-icon>
                 <v-icon>mdi-key</v-icon>
@@ -118,15 +127,6 @@
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title v-text="$t('institutions.members.members')" />
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item @click="editInstitution(item)">
-              <v-list-item-icon>
-                <v-icon>mdi-pencil</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title v-text="$t('modify')" />
               </v-list-item-content>
             </v-list-item>
 
