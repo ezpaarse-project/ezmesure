@@ -182,7 +182,7 @@
       "emailExample": "ex: john@doe.fr",
       "thisMemberIs": "Ce membre est un correspondant :",
       "enterValidEmail": "Veuillez saisir un email valide.",
-      "members": "Members",
+      "members": "Membres",
       "addMember": "Ajouter un membre",
       "failedToAdd": "L'ajout du membre a échoué, veuillez réessayer ultérieurement",
       "failedToSearch": "La recherche a échoué, veuillez réessayer",

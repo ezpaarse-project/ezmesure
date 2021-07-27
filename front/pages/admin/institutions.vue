@@ -87,49 +87,50 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-tooltip bottom :open-delay="500">
+        <v-menu>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-bind="attrs" small icon :href="`/institutions/${item.id}/sushi`" v-on="on"
+              small
+              color="primary"
+              v-bind="attrs"
+              v-on="on"
             >
-              <v-icon small>
-                mdi-key
+              {{ $t('actions') }}
+              <v-icon right>
+                mdi-menu-down
               </v-icon>
             </v-btn>
           </template>
-          <span v-text="$t('institutions.sushi.credentials')" />
-        </v-tooltip>
 
-        <v-tooltip bottom :open-delay="500">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs" small icon :href="`/institutions/${item.id}/members`" v-on="on"
-            >
-              <v-icon small>
-                mdi-account-multiple
-              </v-icon>
-            </v-btn>
-          </template>
-          <span v-text="$t('institutions.members.members')" />
-        </v-tooltip>
+          <v-list>
+            <v-list-item :href="`/institutions/${item.id}/sushi`">
+              <v-list-item-icon>
+                <v-icon>mdi-key</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('institutions.sushi.credentials')" />
+              </v-list-item-content>
+            </v-list-item>
 
-        <v-tooltip bottom :open-delay="500">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs" small icon @click="editInstitution(item)" v-on="on"
-            >
-              <v-icon small>
-                mdi-pencil
-              </v-icon>
-            </v-btn>
-          </template>
-          <span v-text="$t('modify')" />
-        </v-tooltip>
+            <v-list-item :href="`/institutions/${item.id}/members`">
+              <v-list-item-icon>
+                <v-icon>mdi-account-multiple</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('institutions.members.members')" />
+              </v-list-item-content>
+            </v-list-item>
 
-        <ValidationPopup
-          :institution="item"
-          @change="validated => item.validated = validated"
-        />
+            <v-list-item @click="editInstitution(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('modify')" />
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
 
       <template v-slot:footer>
@@ -149,7 +150,6 @@
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import InstitutionForm from '~/components/InstitutionForm';
-import ValidationPopup from '~/components/ValidationPopup';
 
 export default {
   layout: 'space',
@@ -157,7 +157,6 @@ export default {
   components: {
     ToolBar,
     InstitutionForm,
-    ValidationPopup,
   },
   data() {
     return {
