@@ -39,6 +39,16 @@
             hide-details
           />
         </template>
+
+        <v-alert
+          type="error"
+          dense
+          outlined
+          :value="!!saveError"
+          class="mt-4"
+        >
+          {{ saveError }}
+        </v-alert>
       </v-card-text>
 
       <v-card-actions>
@@ -69,6 +79,7 @@ export default {
     return {
       show: false,
       saving: false,
+      saveError: null,
       username: '',
       fullName: '',
       readonly: true,
@@ -95,6 +106,7 @@ export default {
       if (!this.username || !this.institutionId) { return; }
 
       this.saving = true;
+      this.saveError = null;
 
       const url = `/institutions/${this.institutionId}/members/${this.username}`;
       const body = {
@@ -108,7 +120,8 @@ export default {
         this.show = false;
         this.$emit('updated');
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.members.failedToUpdatePerms'));
+        const message = e?.response?.data?.error;
+        this.saveError = message || this.$t('institutions.members.failedToUpdatePerms');
       }
 
       this.saving = false;
