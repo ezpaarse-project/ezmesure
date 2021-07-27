@@ -72,9 +72,9 @@ router.route({
         ).required(),
       }).required(),
       target: Joi.object({
-        space: Joi.string().trim().required(),
+        space: Joi.string().trim(),
         indexPattern: Joi.string().trim(),
-      }).required(),
+      }),
     },
   },
 });
