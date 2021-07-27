@@ -1,6 +1,8 @@
 const kibana = require('../../services/kibana');
 const elastic = require('../../services/elastic');
 
+const { DEFAULT_SPACE } = kibana;
+
 exports.list = async (ctx) => {
   const { data: spaces } = await kibana.getSpaces();
 
@@ -99,7 +101,7 @@ exports.createIndexPattern = async (ctx) => {
   }
 
   const { data } = await kibana.findObjects({
-    spaceId,
+    spaceId: spaceId === DEFAULT_SPACE ? null : spaceId,
     type: 'index-pattern',
     perPage: 1000,
   });
@@ -125,7 +127,7 @@ exports.createIndexPattern = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.indexPattern.noIndexMatching', body.title));
   }
 
-  const space = spaceId === 'default' ? spaceId : undefined;
+  const space = spaceId === DEFAULT_SPACE ? null : spaceId;
   const { data: createdIndexPattern } = await kibana.createIndexPattern(space, body);
 
   ctx.status = 201;

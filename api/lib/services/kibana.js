@@ -21,7 +21,9 @@ const axiosClient = axios.create({
   paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 
-const client = {};
+const client = {
+  DEFAULT_SPACE: 'default',
+};
 
 client.getSpaces = () => axiosClient.get('/api/spaces/space');
 
