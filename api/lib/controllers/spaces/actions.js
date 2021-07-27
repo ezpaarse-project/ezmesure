@@ -125,7 +125,8 @@ exports.createIndexPattern = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.indexPattern.noIndexMatching', body.title));
   }
 
-  const { data: createdIndexPattern } = await kibana.createIndexPattern(spaceId, body);
+  const space = spaceId === 'default' ? spaceId : undefined;
+  const { data: createdIndexPattern } = await kibana.createIndexPattern(space, body);
 
   ctx.status = 201;
   ctx.body = createdIndexPattern;
