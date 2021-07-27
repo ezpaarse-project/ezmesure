@@ -128,6 +128,8 @@
       "acronym": "Sigle",
       "type": "Type d'établissement",
       "domains": "Domaines",
+      "general": "Général",
+      "logo": "Logo",
       "localisation": "Localisation",
       "automations": "Automatisations",
       "dropImageHere": "Déposez votre image ici",

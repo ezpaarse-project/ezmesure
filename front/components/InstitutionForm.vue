@@ -21,108 +21,123 @@
         </v-row>
 
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.name"
-                :label="$t('institutions.institution.title')"
-                hide-details
-                outlined
-              />
-            </v-col>
+          <v-card outlined>
+            <v-card-title>
+              {{ $t('institutions.institution.general') }}
+            </v-card-title>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.acronym"
-                :label="$t('institutions.institution.acronym')"
-                hide-details
-                outlined
-              />
-            </v-col>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.name"
+                    :label="$t('institutions.institution.title')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.website"
-                :label="$t('institutions.institution.homepage')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.acronym"
+                    :label="$t('institutions.institution.acronym')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.city"
-                :label="$t('institutions.institution.city')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.website"
+                    :label="$t('institutions.institution.homepage')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.type"
-                :label="$t('institutions.institution.type')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.city"
+                    :label="$t('institutions.institution.city')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.uai"
-                :label="$t('institutions.institution.uai')"
-                :hint="$t('institutions.institution.uaiDescription')"
-                persistent-hint
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.type"
+                    :label="$t('institutions.institution.type')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-divider />
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.uai"
+                    :label="$t('institutions.institution.uai')"
+                    :hint="$t('institutions.institution.uaiDescription')"
+                    persistent-hint
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
 
-            <v-col cols="12">
-              <span class="subtitle-1">
-                {{ $t('institutions.institution.socialNetworks') }}
-              </span>
-            </v-col>
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.socialNetworks') }}
+            </v-card-title>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.twitterUrl"
-                :label="$t('institutions.institution.twitterUrl')"
-                append-icon="mdi-twitter"
-                hide-details
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.linkedinUrl"
-                :label="$t('institutions.institution.linkedinUrl')"
-                append-icon="mdi-linkedin"
-                hide-details
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.youtubeUrl"
-                :label="$t('institutions.institution.youtubeUrl')"
-                append-icon="mdi-youtube"
-                hide-details
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.facebookUrl"
-                :label="$t('institutions.institution.facebookUrl')"
-                append-icon="mdi-facebook"
-                hide-details
-                outlined
-              />
-            </v-col>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.twitterUrl"
+                    :label="$t('institutions.institution.twitterUrl')"
+                    append-icon="mdi-twitter"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.linkedinUrl"
+                    :label="$t('institutions.institution.linkedinUrl')"
+                    append-icon="mdi-linkedin"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.youtubeUrl"
+                    :label="$t('institutions.institution.youtubeUrl')"
+                    append-icon="mdi-youtube"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.facebookUrl"
+                    :label="$t('institutions.institution.facebookUrl')"
+                    append-icon="mdi-facebook"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
 
-            <v-col cols="12">
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.logo') }}
+            </v-card-title>
+            <v-card-text>
               <v-hover v-model="hoverLogo" class="mx-auto">
                 <template v-slot:default="{ hover }">
                   <v-card
@@ -170,68 +185,76 @@
                   </v-card>
                 </template>
               </v-hover>
-            </v-col>
-          </v-row>
+            </v-card-text>
+          </v-card>
 
-          <v-divider />
-
-          <v-row>
-            <v-col cols="12">
-              <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
-            </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.ezpaarse" label="ezPAARSE" />
-            </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.ezmesure" label="ezMESURE" />
-            </v-col>
-            <v-col cols="4">
-              <v-checkbox v-model="institution.auto.report" label="Reporting" />
-            </v-col>
-          </v-row>
-
-          <v-divider />
-
-          <v-row v-if="isAdmin">
-            <v-col cols="12">
-              <span class="subtitle-1">{{ $t('administration') }}</span>
-            </v-col>
-
-            <v-col cols="12">
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.automations') }}
+            </v-card-title>
+            <v-card-text>
               <v-checkbox
-                v-model="identicalNames"
-                :label="$t('institutions.institution.identicalNames')"
+                v-model="institution.auto.ezpaarse"
+                :label="$t('partners.auto.ezpaarse')"
                 hide-details
-                @change="duplicatePrefix"
               />
-            </v-col>
+              <v-checkbox
+                v-model="institution.auto.ezmesure"
+                :label="$t('partners.auto.ezmesure')"
+                hide-details
+              />
+              <v-checkbox
+                v-model="institution.auto.report"
+                :label="$t('partners.auto.report')"
+                hide-details
+              />
+            </v-card-text>
+          </v-card>
 
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.indexPrefix"
-                :label="$t('institutions.institution.associatedIndex')"
-                :rules="indexPrefixRules"
-                outlined
-                @input="duplicatePrefix"
-              />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.role"
-                :label="$t('institutions.institution.associatedRole')"
-                :disabled="identicalNames"
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.space"
-                :label="$t('institutions.institution.associatedSpace')"
-                :disabled="identicalNames"
-                outlined
-              />
-            </v-col>
-          </v-row>
+          <v-card v-if="isAdmin" outlined class="mt-4">
+            <v-card-title>
+              {{ $t('administration') }}
+            </v-card-title>
+
+            <v-card-text>
+              <v-row>
+                <v-col cols="12">
+                  <v-checkbox
+                    v-model="identicalNames"
+                    :label="$t('institutions.institution.identicalNames')"
+                    hide-details
+                    @change="duplicatePrefix"
+                  />
+                </v-col>
+
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.indexPrefix"
+                    :label="$t('institutions.institution.associatedIndex')"
+                    :rules="indexPrefixRules"
+                    outlined
+                    @input="duplicatePrefix"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.role"
+                    :label="$t('institutions.institution.associatedRole')"
+                    :disabled="identicalNames"
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.space"
+                    :label="$t('institutions.institution.associatedSpace')"
+                    :disabled="identicalNames"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
         </v-form>
       </v-card-text>
 

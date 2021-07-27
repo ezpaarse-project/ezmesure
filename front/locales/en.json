@@ -128,6 +128,8 @@
       "acronym": "Acronym",
       "type": "Institution type",
       "domains": "Domains",
+      "general": "General",
+      "logo": "Logo",
       "localisation": "Localisation",
       "automations": "Automations",
       "dropImageHere": "Drop your image here",
