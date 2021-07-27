@@ -129,6 +129,15 @@
                 <v-list-item-title v-text="$t('modify')" />
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item @click="copyInstitutionId(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-identifier</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('copyId')" />
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
       </template>
@@ -249,6 +258,19 @@ export default {
         this.institutions = this.institutions.filter(removeDeleted);
         this.selected = this.selected.filter(removeDeleted);
       }
+    },
+    async copyInstitutionId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(item.id);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('idCopied'));
     },
   },
 };

@@ -219,6 +219,9 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "copyId": "Copy ID",
+  "unableToCopyId": "Unable to copy in the clipboard",
+  "idCopied": "ID copied in the clipboard",
   "advancedSettings": "Advanced settings",
   "actions": "Actions",
   "name": "Name",
