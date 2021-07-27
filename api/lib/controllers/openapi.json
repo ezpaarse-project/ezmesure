@@ -1296,10 +1296,7 @@
                         "type": "string",
                         "description": "An index pattern to use instead of the one included in the imported objects"
                       }
-                    },
-                    "required": [
-                      "space"
-                    ]
+                    }
                   }
                 }
               }

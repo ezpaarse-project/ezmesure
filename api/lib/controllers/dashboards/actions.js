@@ -1,5 +1,7 @@
 const kibana = require('../../services/kibana');
 
+const DEFAULT_SPACE = 'default';
+
 /**
  * Find an index pattern with the given title
  * @param {String} spaceId ID of the space to look into
@@ -100,17 +102,17 @@ exports.importDashboard = async (ctx) => {
     'index-pattern': indexPattern,
   } = query;
 
-  const { status } = await kibana.getSpace(spaceId);
+  const { status } = await kibana.getSpace(spaceId || DEFAULT_SPACE);
 
   if (status === 404) {
-    ctx.throw(409, ctx.$t('errors.space.notFound', spaceId));
+    ctx.throw(409, ctx.$t('errors.space.notFound', spaceId || DEFAULT_SPACE));
   }
 
   if (indexPattern) {
     const pattern = await findIndexPattern(spaceId, indexPattern);
 
     if (!pattern || !pattern.id) {
-      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', indexPattern, spaceId || 'default'));
+      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', indexPattern, spaceId || DEFAULT_SPACE));
     }
 
     body.objects = patchIndexPattern(body.objects, pattern.id);
@@ -133,7 +135,7 @@ exports.importDashboard = async (ctx) => {
 exports.copyDashboard = async (ctx) => {
   const { body = {}, query = {} } = ctx.request;
   const { force } = query;
-  const { source, target } = body;
+  const { source = {}, target = {} } = body;
 
   const sourceDashboards = Array.isArray(source.dashboard) ? source.dashboard : [source.dashboard];
 
@@ -149,10 +151,10 @@ exports.copyDashboard = async (ctx) => {
     }
   }
 
-  const { status: spaceStatus } = await kibana.getSpace(target.space);
+  const { status: spaceStatus } = await kibana.getSpace(target.space || DEFAULT_SPACE);
 
   if (spaceStatus === 404) {
-    ctx.throw(409, ctx.$t('errors.space.notFound', target.space));
+    ctx.throw(409, ctx.$t('errors.space.notFound', target.space || DEFAULT_SPACE));
   }
 
   const { data: dashboard } = await kibana.exportDashboard({
@@ -161,14 +163,14 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!dashboard || !dashboard.version || !Array.isArray(dashboard.objects)) {
-    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', sourceDashboards, source.space));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToExport', sourceDashboards, source.space || DEFAULT_SPACE));
   }
 
   if (target.indexPattern) {
     const pattern = await findIndexPattern(target.space, target.indexPattern);
 
     if (!pattern || !pattern.id) {
-      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', target.indexPattern, target.space || 'default'));
+      ctx.throw(409, ctx.$t('errors.indexPattern.notFound', target.indexPattern, target.space || DEFAULT_SPACE));
     }
 
     dashboard.objects = patchIndexPattern(dashboard.objects, pattern.id);
@@ -181,7 +183,7 @@ exports.copyDashboard = async (ctx) => {
   });
 
   if (!importResponse || !Array.isArray(importResponse.objects)) {
-    ctx.throw(409, ctx.$t('errors.dashboard.failedToImport', target.space));
+    ctx.throw(409, ctx.$t('errors.dashboard.failedToImport', target.space || DEFAULT_SPACE));
   }
 
   ctx.body = importResponse;
