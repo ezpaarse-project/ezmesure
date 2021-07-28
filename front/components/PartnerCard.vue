@@ -33,17 +33,15 @@
         <div v-for="contact in contacts" :key="contact.name">
           <v-tooltip right>
             <template v-slot:activator="{ on }">
-              <span v-on="on">{{ contact.name }}</span>
+              <v-chip class="mb-1" :color="contact.color" outlined v-on="on">
+                <v-icon small left>
+                  {{ contact.icon }}
+                </v-icon>
+                {{ contact.name }}
+              </v-chip>
             </template>
-            <span v-if="contact.type === 'tech'">
-              {{ $t('partners.technical') }}
-            </span>
-            <span v-else-if="contact.type === 'doc'">
-              {{ $t('partners.documentary') }}
-            </span>
-            <span v-else-if="contact.type === 'doc-tech'">
-              {{ $t('partners.technical') }} / {{ $t('partners.documentary') }}
-            </span>
+
+            <span>{{ contact.label }}</span>
           </v-tooltip>
         </div>
       </template>
@@ -116,14 +114,26 @@ export default {
     contacts() {
       const doc = this.partner?.docContactName;
       const tech = this.partner?.techContactName;
-
-      if (!doc && !tech) { return []; }
-      if (doc === tech) { return [{ name: doc, type: 'doc-tech' }]; }
-
       const contacts = [];
 
-      if (doc) { contacts.push({ name: doc, type: 'doc' }); }
-      if (tech) { contacts.push({ name: tech, type: 'tech' }); }
+      if (doc) {
+        contacts.push({
+          name: doc,
+          type: 'doc',
+          icon: 'mdi-book',
+          color: 'green',
+          label: this.$t('partners.documentary'),
+        });
+      }
+      if (tech) {
+        contacts.push({
+          name: tech,
+          type: 'tech',
+          icon: 'mdi-wrench',
+          color: 'blue',
+          label: this.$t('partners.technical'),
+        });
+      }
 
       return contacts;
     },
