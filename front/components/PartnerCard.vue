@@ -87,6 +87,7 @@
           v-for="link in links"
           :key="link.icon"
           :href="link.url"
+          :color="link.color"
           icon
         >
           <v-icon>{{ link.icon }}</v-icon>
@@ -149,19 +150,19 @@ export default {
       const links = [];
 
       if (this.partner?.website) {
-        links.push({ icon: 'mdi-open-in-new', url: this.partner?.website });
+        links.push({ icon: 'mdi-web', color: '#616161', url: this.partner?.website });
       }
       if (this.partner?.twitterUrl) {
-        links.push({ icon: 'mdi-twitter', url: this.partner?.twitterUrl });
+        links.push({ icon: 'mdi-twitter', color: '#1da1f2', url: this.partner?.twitterUrl });
       }
       if (this.partner?.linkedinUrl) {
-        links.push({ icon: 'mdi-linkedin', url: this.partner?.linkedinUrl });
+        links.push({ icon: 'mdi-linkedin', color: '#0077b5', url: this.partner?.linkedinUrl });
       }
       if (this.partner?.youtubeUrl) {
-        links.push({ icon: 'mdi-youtube', url: this.partner?.youtubeUrl });
+        links.push({ icon: 'mdi-youtube', color: '#ff0000', url: this.partner?.youtubeUrl });
       }
       if (this.partner?.facebookUrl) {
-        links.push({ icon: 'mdi-facebook', url: this.partner?.facebookUrl });
+        links.push({ icon: 'mdi-facebook', color: '#1877f2', url: this.partner?.facebookUrl });
       }
 
       return links;
