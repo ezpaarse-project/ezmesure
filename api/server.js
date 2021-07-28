@@ -14,6 +14,7 @@ const logger = require('./lib/services/logger');
 const notifications = require('./lib/services/notifications');
 const depositors = require('./lib/services/depositors');
 const opendata = require('./lib/services/opendata');
+const elastic = require('./lib/services/elastic');
 
 const appLogger = logger(config.get('logs.app'));
 const httpLogger = logger(config.get('logs.http'));
@@ -27,10 +28,6 @@ if (mailSender) {
 } else {
   appLogger.error('Missing sender address for mails, please configure <notifications.sender>');
 }
-
-notifications.start(appLogger);
-depositors.start(appLogger);
-opendata.startCron(appLogger);
 
 const controller = require('./lib/controllers');
 
@@ -125,18 +122,66 @@ app.on('error', (err, ctx = {}) => {
 
 app.use(mount('/', controller));
 
-const server = app.listen(config.port);
-server.setTimeout(1000 * 60 * 30);
+function start() {
+  notifications.start(appLogger);
+  depositors.start(appLogger);
+  opendata.startCron(appLogger);
 
-appLogger.info(`API server listening on port ${config.port}`);
-appLogger.info('Press CTRL+C to stop server');
+  const server = app.listen(config.port);
+  server.setTimeout(1000 * 60 * 30);
 
-function closeApp() {
-  appLogger.info('Got Signal, closing the server');
-  server.close(() => {
-    process.exit(0);
-  });
+  appLogger.info(`API server listening on port ${config.port}`);
+  appLogger.info('Press CTRL+C to stop server');
+
+  function closeApp() {
+    appLogger.info('Got Signal, closing the server');
+    server.close(() => {
+      process.exit(0);
+    });
+  }
+
+  process.on('SIGINT', closeApp);
+  process.on('SIGTERM', closeApp);
 }
 
-process.on('SIGINT', closeApp);
-process.on('SIGTERM', closeApp);
+async function waitForElasticsearch() {
+  appLogger.info('Waiting for Elasticsearch...');
+
+  for (let i = 0; i < 10; i += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const { body } = await elastic.cluster.health({ waitForStatus: 'yellow', timeout: '20s' });
+      const status = body && body.status;
+
+      if (status === 'yellow' || status === 'green') {
+        appLogger.info(`Elasticsearch is ready (status: ${status || 'unknown'})`);
+        return;
+      }
+
+      appLogger.info(`Elasticsearch not ready yet (status: ${status})`);
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } catch (e) {
+      const status = (e.meta && e.meta.body && e.meta.body.status);
+
+      if (typeof status === 'string') {
+        appLogger.info(`Elasticsearch not ready yet (status: ${status || 'unknown'})`);
+      } else {
+        appLogger.info(`Cannot connect to Elasticsearch yet : ${e.message}`);
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  }
+
+  throw new Error('Elasticsearch does not respond');
+}
+
+waitForElasticsearch()
+  .then(start)
+  .catch(() => {
+    appLogger.error('Elasticsearch does not respond or is in a bad state');
+    appLogger.error('Shutting down...');
+    process.exit(1);
+  });
