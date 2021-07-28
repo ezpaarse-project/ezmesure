@@ -29,6 +29,10 @@
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE"
   },
+  "admin": {
+    "username": "EZMESURE_ADMIN_USERNAME",
+    "password": "EZMESURE_ADMIN_PASSWORD"
+  },
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"
   },

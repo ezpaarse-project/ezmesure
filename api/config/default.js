@@ -47,6 +47,10 @@ module.exports = {
     secret: 'some-secret',
     cookie: 'eztoken',
   },
+  admin: {
+    username: 'ezmesure-admin',
+    password: 'changeme',
+  },
   storage: {
     path: path.resolve(__dirname, '../storage'),
   },

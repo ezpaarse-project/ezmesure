@@ -175,13 +175,36 @@ async function waitForElasticsearch() {
     }
   }
 
+  appLogger.error('Elasticsearch does not respond or is in a bad state');
   throw new Error('Elasticsearch does not respond');
 }
 
+async function createAdmin() {
+  const username = config.get('admin.username');
+  const password = config.get('admin.password');
+
+  if (!username || !password) { return; }
+
+  appLogger.info(`Creating or updating admin user [${username}]`);
+
+  try {
+    await elastic.security.putUser({
+      username,
+      refresh: true,
+      body: {
+        password,
+        roles: ['superuser'],
+      },
+    });
+  } catch (e) {
+    appLogger.error(`Failed to create admin : ${e.message}`);
+  }
+}
+
 waitForElasticsearch()
+  .then(createAdmin)
   .then(start)
   .catch(() => {
-    appLogger.error('Elasticsearch does not respond or is in a bad state');
-    appLogger.error('Shutting down...');
+    appLogger.error('Error during bootstrap, shutting down...');
     process.exit(1);
   });
