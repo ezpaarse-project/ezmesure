@@ -133,27 +133,6 @@ exports.updateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.deleteInstitutions = async (ctx) => {
-  const { body } = ctx.request;
-  const response = [];
-
-  if (Array.isArray(body.ids) && body.ids.length > 0) {
-    for (let i = 0; i < body.ids.length; i += 1) {
-      try {
-        // FIXME: use bulk query
-        await Institution.deleteOne(body.ids[i]);
-        response.push({ id: body.ids[i], status: 'deleted' });
-      } catch (error) {
-        response.push({ id: body.ids[i], status: 'failed' });
-        appLogger.error('Failed to delete institution', error);
-      }
-    }
-
-    ctx.status = 200;
-    ctx.body = response;
-  }
-};
-
 exports.deleteInstitution = async (ctx) => {
   ctx.action = 'institutions/delete';
   const { institutionId } = ctx.params;

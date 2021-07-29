@@ -219,18 +219,6 @@ router.route({
 });
 
 router.route({
-  method: 'POST',
-  path: '/delete',
-  handler: deleteInstitutions,
-  validate: {
-    type: 'json',
-    body: {
-      ids: Joi.array().items(Joi.string().trim()),
-    },
-  },
-});
-
-router.route({
   method: 'GET',
   path: '/:institutionId/state',
   handler: [
