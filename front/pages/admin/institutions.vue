@@ -35,6 +35,7 @@
       :items="institutions"
       :search="search"
       :loading="refreshing"
+      sort-by="name"
       item-key="id"
       show-select
     >
