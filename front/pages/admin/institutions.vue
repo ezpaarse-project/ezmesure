@@ -145,7 +145,7 @@
 
       <template v-slot:footer>
         <span v-if="selected.length">
-          <v-btn small color="error" class="ma-2" @click="deleteData">
+          <v-btn small color="error" class="ma-2" @click="deleteInstitutions">
             <v-icon left>mdi-delete</v-icon>
             {{ $t('delete') }} ({{ selected.length }})
           </v-btn>
@@ -226,32 +226,39 @@ export default {
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ saveCreator: false });
     },
-    async deleteData() {
+    async deleteInstitutions() {
       if (this.selected.length === 0) {
         return;
       }
 
-      const ids = this.selected.map(select => select.id);
-      let response;
-
-      try {
-        response = await this.$axios.$post('/institutions/delete', { ids });
-        if (!Array.isArray(response)) {
-          throw new Error('invalid response');
+      const requests = this.selected.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/institutions/${item.id}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
         }
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
-        return;
-      }
-
-      const failed = response.filter(item => item?.status !== 'deleted');
-      const deleted = response.filter(item => item?.status === 'deleted');
-
-      failed.forEach(({ id }) => {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
+        return { item, deleted };
       });
 
+      const results = await Promise.all(requests);
 
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
       if (deleted.length > 0) {
         this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
 
@@ -259,6 +266,8 @@ export default {
         this.institutions = this.institutions.filter(removeDeleted);
         this.selected = this.selected.filter(removeDeleted);
       }
+
+      await this.refreshInstitutions();
     },
     async copyInstitutionId(item) {
       if (!navigator.clipboard) {
