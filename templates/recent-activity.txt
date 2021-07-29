@@ -51,6 +51,6 @@ Rapports ({{ reportings.length }})
 {% if institutions.length -%}
 Mises à jour établissements ({{ institutions.length }})
   {% for action in institutions -%}
-    [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+    [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}{{ "-" if action.action == 'institutions/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
   {% endfor %}
 {% endif -%}

@@ -43,6 +43,7 @@ async function getEzMesureMetrics() {
                   'indices/insert',
                   'institutions/create',
                   'institutions/update',
+                  'institutions/delete',
                 ],
               },
             },

@@ -185,6 +185,8 @@
             <td>+</td>
           {% elif action.action == 'institutions/update' %}
             <td>*</td>
+          {% elif action.action == 'institutions/delete' %}
+            <td>-</td>
           {% endif %}
           <td>{{ action.user.name }}</td>
           <td>{{ action.metadata.institutionName or action.metadata.institutionId }}</td>
