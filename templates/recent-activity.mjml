@@ -54,6 +54,44 @@
 </mj-section>
 {% endif %}
 
+{% if institutions.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Mises à jour établissements ({{ institutions.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th></th>
+          <th>Utilisateur</th>
+          <th>Établissement</th>
+          <th style="width: 130px">Date</th>
+          <th style="width: 50px">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in institutions %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          {% if action.action == 'institutions/create' %}
+            <td>+</td>
+          {% elif action.action == 'institutions/update' %}
+            <td>*</td>
+          {% elif action.action == 'institutions/delete' %}
+            <td>-</td>
+          {% endif %}
+          <td>{{ action.user.name }}</td>
+          <td>{{ action.metadata.institutionName or action.metadata.institutionId }}</td>
+          <td>{{ action.datetime }}</td>
+          <td>{{ action.response.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
 {% if files.length %}
 <mj-section>
   <mj-column>
@@ -154,44 +192,6 @@
           <td>{{ action.metadata.space }}</td>
           <td>{{ action.metadata.dashboardName }}</td>
           <td>{{ action.datetime }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </mj-table>
-  </mj-column>
-</mj-section>
-{% endif %}
-
-{% if institutions.length %}
-<mj-section>
-  <mj-column>
-    <mj-text mj-class="subheading">
-      Mises à jour établissements ({{ institutions.length }})
-    </mj-text>
-    <mj-table cellpadding="5px">
-      <thead>
-        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
-          <th></th>
-          <th>Utilisateur</th>
-          <th>Établissement</th>
-          <th style="width: 130px">Date</th>
-          <th style="width: 50px">Statut</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for action in institutions %}
-        <tr style="border-bottom: 1px solid #d0d0d0">
-          {% if action.action == 'institutions/create' %}
-            <td>+</td>
-          {% elif action.action == 'institutions/update' %}
-            <td>*</td>
-          {% elif action.action == 'institutions/delete' %}
-            <td>-</td>
-          {% endif %}
-          <td>{{ action.user.name }}</td>
-          <td>{{ action.metadata.institutionName or action.metadata.institutionId }}</td>
-          <td>{{ action.datetime }}</td>
-          <td>{{ action.response.status }}</td>
         </tr>
         {% endfor %}
       </tbody>
