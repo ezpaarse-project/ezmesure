@@ -207,7 +207,10 @@ router.use(requireAnyRole(['admin', 'superuser']));
 router.route({
   method: 'DELETE',
   path: '/:institutionId',
-  handler: deleteInstitution,
+  handler: [
+    fetchInstitution,
+    deleteInstitution,
+  ],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),

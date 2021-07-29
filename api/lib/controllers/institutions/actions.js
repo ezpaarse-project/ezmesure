@@ -155,7 +155,14 @@ exports.deleteInstitutions = async (ctx) => {
 };
 
 exports.deleteInstitution = async (ctx) => {
+  ctx.action = 'institutions/delete';
   const { institutionId } = ctx.params;
+  const { institution } = ctx.state;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+  };
 
   ctx.status = 200;
   ctx.body = await Institution.deleteOne(institutionId);
