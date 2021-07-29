@@ -193,7 +193,11 @@ async function createAdmin() {
       refresh: true,
       body: {
         password,
+        full_name: 'ezMESURE Administrator',
         roles: ['superuser'],
+        metadata: {
+          acceptedTerms: true,
+        },
       },
     });
   } catch (e) {
