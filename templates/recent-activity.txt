@@ -4,6 +4,9 @@ Activité récente
 {% if users.length -%}
 - {{ users.length }} enregistrements
 {% endif -%}
+{% if institutions.length -%}
+- {{ institutions.length }} mises à jour d'établissements
+{% endif %}
 {% if files.length -%}
 - {{ files.length }} dépôts de fichiers
 {% endif -%}
@@ -13,9 +16,6 @@ Activité récente
 {% if reportings.length -%}
 - {{ reportings.length }} mises à jour de tâches de reporting
 {% endif -%}
-{% if institutions.length -%}
-- {{ institutions.length }} mises à jour d'établissements
-{% endif %}
 
 {% if users.length -%}
 Enregistrements ({{ users.length }})
