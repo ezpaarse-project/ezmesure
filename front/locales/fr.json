@@ -105,6 +105,7 @@
   "institutions": {
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
+    "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
     "newInstitution": "Nouvel établissement",
     "notMember": "Vous n'appartenez pas encore à un établissement.",
     "declareMyInstitution": "Déclarer mon établissement",

@@ -105,6 +105,7 @@
   "institutions": {
     "title": "Institution",
     "updateInstitution": "Update institution",
+    "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
     "newInstitution": "New institution",
     "notMember": "You don't belong to an institution yet.",
     "declareMyInstitution": "Declare my institution",

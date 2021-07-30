@@ -1,7 +1,28 @@
 <template>
   <section>
-    <ToolBar title="Établissements">
-      <slot>
+    <ToolBar
+      :title="toolbarTitle"
+      :dark="hasSelection"
+    >
+      <template v-if="hasSelection" v-slot:nav-icon>
+        <v-btn icon @click="clearSelection">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+
+      <template v-if="hasSelection" v-slot:default>
+        <v-spacer />
+
+        <v-btn text @click="deleteInstitutions">
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          {{ $t('delete') }}
+        </v-btn>
+      </template>
+
+
+      <template v-else v-slot:default>
         <v-spacer />
 
         <v-btn text @click="createInstitution">
@@ -26,7 +47,7 @@
           hide-details
           style="max-width: 200px"
         />
-      </slot>
+      </template>
     </ToolBar>
 
     <v-data-table
@@ -142,24 +163,17 @@
           </v-list>
         </v-menu>
       </template>
-
-      <template v-slot:footer>
-        <span v-if="selected.length">
-          <v-btn small color="error" class="ma-2" @click="deleteInstitutions">
-            <v-icon left>mdi-delete</v-icon>
-            {{ $t('delete') }} ({{ selected.length }})
-          </v-btn>
-        </span>
-      </template>
     </v-data-table>
 
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
+    <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import InstitutionForm from '~/components/InstitutionForm';
+import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog';
 
 export default {
   layout: 'space',
@@ -167,6 +181,7 @@ export default {
   components: {
     ToolBar,
     InstitutionForm,
+    InstitutionsDeleteDialog,
   },
   data() {
     return {
@@ -183,6 +198,15 @@ export default {
     return this.refreshInstitutions();
   },
   computed: {
+    hasSelection() {
+      return this.selected.length > 0;
+    },
+    toolbarTitle() {
+      if (this.hasSelection) {
+        return this.$t('nSelected', { count: this.selected.length });
+      }
+      return this.$t('menu.institutions');
+    },
     headers() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
@@ -195,7 +219,7 @@ export default {
           width: '150px',
         },
         {
-          text: 'Actions',
+          text: this.$t('actions'),
           value: 'actions',
           sortable: false,
           width: '170px',
@@ -226,48 +250,10 @@ export default {
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ saveCreator: false });
     },
-    async deleteInstitutions() {
-      if (this.selected.length === 0) {
-        return;
-      }
-
-      const requests = this.selected.map(async (item) => {
-        let deleted = false;
-        try {
-          await this.$axios.$delete(`/institutions/${item.id}`);
-          deleted = true;
-        } catch (e) {
-          deleted = false;
-        }
-        return { item, deleted };
-      });
-
-      const results = await Promise.all(requests);
-
-      const { deleted, failed } = results.reduce((acc, result) => {
-        const { item } = result;
-
-        if (result.deleted) {
-          acc.deleted.push(item);
-        } else {
-          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
-          acc.failed.push(item);
-        }
-        return acc;
-      }, { deleted: [], failed: [] });
-
-      if (failed.length > 0) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
-      }
-      if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
-
-        const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
-        this.institutions = this.institutions.filter(removeDeleted);
-        this.selected = this.selected.filter(removeDeleted);
-      }
-
-      await this.refreshInstitutions();
+    onInstitutionsRemove(removedIds) {
+      const removeDeleted = institution => !removedIds.some(id => institution.id === id);
+      this.institutions = this.institutions.filter(removeDeleted);
+      this.selected = this.selected.filter(removeDeleted);
     },
     async copyInstitutionId(item) {
       if (!navigator.clipboard) {
@@ -281,6 +267,12 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('idCopied'));
+    },
+    deleteInstitutions() {
+      this.$refs.deleteDialog.confirmDelete(this.selected);
+    },
+    clearSelection() {
+      this.selected = [];
     },
   },
 };
