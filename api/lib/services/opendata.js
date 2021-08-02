@@ -8,6 +8,22 @@ const indexTemplate = require('../utils/opendata-template');
 
 const { cron, index } = config.get('opendata');
 
+const datasets = [
+  'fr-esr-principaux-etablissements-enseignement-superieur',
+  'fr-esr-etablissements-publics-prives-impliques-recherche-developpement',
+];
+
+const fieldsTranslations = new Map([
+  ['libelle', 'uo_lib_officiel'],
+  ['code_uai', 'uai'],
+  ['categorie', 'type_d_etablissement'],
+  ['departement', 'dep_nom'],
+  ['site_web', 'url'],
+  ['code_commune', 'com_code'],
+  ['region', 'reg_nom'],
+  ['departement', 'dep_nom'],
+]);
+
 async function insertDocuments(docs = []) {
   const result = {
     failed: 0,
@@ -62,41 +78,63 @@ async function recreateIndex() {
 }
 
 async function update() {
-  const { data } = await axios({
-    method: 'get',
-    // url: 'https://www.data.gouv.fr/fr/datasets/r/5fb6d2e3-609c-481d-9104-350e9ca134fa',
-    url: 'https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-principaux-etablissements-enseignement-superieur/download',
-    params: {
-      format: 'json',
-      timezone: 'Europe/Berlin',
-      use_labels_for_header: false,
-    },
-    timeout: 30000,
-    headers: {
-      'Application-ID': 'ezMESURE',
-    },
-  });
-
-  if (!Array.isArray(data)) {
-    return Promise.reject(new Error('Got invalid response from the OpenData API'));
-  }
-
-  const docs = data
-    .filter((doc) => doc && doc.fields)
-    .map((doc) => {
-      const { fields, geometry } = doc;
-
-      // fields.coordonnees can be wrong, so we use geometry.coordinates instead
-      if (Array.isArray(geometry && geometry.coordinates)) {
-        const [lon, lat] = geometry.coordinates;
-        fields.coordonnees = { lat, lon };
-      }
-
-      return fields;
-    });
+  const results = [];
 
   await recreateIndex();
-  return insertDocuments(docs);
+
+  for (let i = 0; i < datasets.length; i += 1) {
+    const datasetId = datasets[i];
+
+    // eslint-disable-next-line no-await-in-loop
+    const { data } = await axios({
+      method: 'get',
+      url: `https://data.enseignementsup-recherche.gouv.fr/explore/dataset/${datasetId}/download`,
+      params: {
+        format: 'json',
+        timezone: 'Europe/Berlin',
+        use_labels_for_header: false,
+      },
+      timeout: 50000,
+      headers: {
+        'Application-ID': 'ezMESURE',
+      },
+    });
+
+    if (!Array.isArray(data)) {
+      return Promise.reject(new Error('Got invalid response from the OpenData API'));
+    }
+
+    const docs = data
+      .filter((doc) => doc && doc.fields)
+      .map((doc) => {
+        const { fields, geometry } = doc;
+
+        // fields.coordonnees can be wrong, so we use geometry.coordinates instead
+        if (Array.isArray(geometry && geometry.coordinates)) {
+          const [lon, lat] = geometry.coordinates;
+          fields.coordonnees = { lat, lon };
+        }
+
+        fieldsTranslations.forEach((targetField, sourceField) => {
+          fields[targetField] = fields[sourceField];
+          fields[sourceField] = undefined;
+        });
+
+        if (!fields.localisation && fields.dep_nom && fields.reg_nom) {
+          fields.localisation = `${fields.reg_nom}>${fields.dep_nom}`;
+        }
+
+        return fields;
+      });
+
+    results.push({
+      id: datasetId,
+      // eslint-disable-next-line no-await-in-loop
+      result: await insertDocuments(docs),
+    });
+  }
+
+  return results;
 }
 
 function search(queryString) {
@@ -150,31 +188,37 @@ async function startCron(appLogger) {
     cronTime: cron,
     runOnInit: !indexExists,
     onTick: async () => {
-      let result;
+      let results;
 
       appLogger.info('Refreshing OpenData');
 
       try {
-        result = await update();
+        results = await update();
       } catch (e) {
         appLogger.error(`Failed to update OpenData : ${e.message}`);
         return;
       }
 
-      const {
-        inserted = 0,
-        updated = 0,
-        failed = 0,
-        errors,
-      } = (result || {});
+      if (Array.isArray(results)) {
+        results.forEach((dataset) => {
+          const {
+            inserted = 0,
+            updated = 0,
+            failed = 0,
+            errors,
+          } = (dataset.result || {});
 
-      appLogger.info(`OpenData refreshed: ${inserted} inserted, ${updated} updated, ${failed} failed`);
+          appLogger.info(`[OpenData][${dataset.id}] ${inserted} inserted, ${updated} updated, ${failed} failed`);
 
-      if (Array.isArray(errors)) {
-        errors.forEach((error) => {
-          appLogger.error(`OpenData refresh: ${error}`);
+          if (Array.isArray(errors)) {
+            errors.forEach((error) => {
+              appLogger.error(`[OpenData][${dataset.id}] ${error}`);
+            });
+          }
         });
       }
+
+      appLogger.info('OpenData refreshed');
     },
   });
 
