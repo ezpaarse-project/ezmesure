@@ -37,7 +37,7 @@ exports.listIndexPatterns = async (ctx) => {
   }
 
   const { data } = await kibana.findObjects({
-    spaceId,
+    spaceId: spaceId === DEFAULT_SPACE ? null : spaceId,
     type: 'index-pattern',
     perPage: 1000,
   });
