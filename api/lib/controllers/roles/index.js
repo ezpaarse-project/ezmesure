@@ -60,6 +60,9 @@ router.route({
 
       elasticsearch: Joi.object({
         run_as: Joi.array().items(Joi.string()),
+        cluster: Joi.array(),
+        global: Joi.object().unknown(true),
+        applications: Joi.array(),
         indices: Joi.array().items(
           Joi.object({
             names: Joi.array().items(Joi.string()),
