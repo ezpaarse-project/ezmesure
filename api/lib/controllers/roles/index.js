@@ -64,6 +64,9 @@ router.route({
           Joi.object({
             names: Joi.array().items(Joi.string()),
             privileges: Joi.array().items(Joi.string()),
+            field_security: Joi.object().unknown(true),
+            query: Joi.string(),
+            allow_restricted_indices: Joi.boolean(),
           }),
         ),
       }),
