@@ -56,6 +56,8 @@ router.route({
       roleName: Joi.string().trim().required().regex(roleNamePattern),
     },
     body: {
+      name: Joi.any().strip(),
+      transient_metadata: Joi.any().strip(),
       metadata: Joi.object().unknown(true),
 
       elasticsearch: Joi.object({
