@@ -82,7 +82,7 @@ router.route({
             Joi.any(),
             Joi.array().length(1).items(Joi.string().valid('read', 'all')),
           ),
-        }).required().xor('base', 'feature'),
+        }).required(),
       ),
     },
   },
