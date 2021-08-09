@@ -78,7 +78,7 @@ router.route({
 
       kibana: Joi.array().items(
         Joi.object({
-          base: Joi.array().length(1).items(Joi.string().valid('read', 'all')),
+          base: Joi.array().items(Joi.string().valid('read', 'all')),
           spaces: Joi.array().items(Joi.string()).required(),
           feature: Joi.object().unknown(true).pattern(
             Joi.any(),
