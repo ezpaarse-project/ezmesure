@@ -4018,6 +4018,22 @@
             "in": "query",
             "name": "q",
             "description": "a query for searching"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "size",
+            "description": "a query to change users list limit size"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "source",
+            "description": "a query to retrieve more information, the fields are separated by a comma"
           }
         ],
         "tags": [
