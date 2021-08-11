@@ -19,7 +19,7 @@ exports.getUser = async (ctx) => {
 exports.list = async (ctx) => {
   const search = ctx.query.q;
 
-  const { size = 10, fields: source = 'full_name,username' } = ctx.query;
+  const { size = 10, source = 'full_name,username' } = ctx.query;
 
   const query = {
     bool: {
