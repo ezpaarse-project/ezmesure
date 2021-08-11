@@ -18,6 +18,9 @@ exports.getUser = async (ctx) => {
 
 exports.list = async (ctx) => {
   const search = ctx.query.q;
+
+  const { size = 10, fields: source = 'full_name,username' } = ctx.query;
+
   const query = {
     bool: {
       filter: {
@@ -36,7 +39,8 @@ exports.list = async (ctx) => {
 
   const { body = {} } = await elastic.search({
     index: '.security',
-    _source: ['full_name', 'username'],
+    _source: source,
+    size,
     body: { query },
   });
 
