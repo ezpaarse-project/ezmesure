@@ -3880,6 +3880,34 @@
             "bearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "summary": "Delete a space",
+        "operationId": "delete-space-spaceId",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
       }
     },
     "/spaces/{id}/index-patterns": {
