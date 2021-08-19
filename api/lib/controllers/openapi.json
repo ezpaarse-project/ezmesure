@@ -4173,6 +4173,34 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "operationId": "delete-user-username",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
       }
     }
   }

@@ -4,7 +4,12 @@ const { Joi } = require('koa-joi-router');
 const handleElasticErrors = require('../../utils/elastic-error-handler');
 
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
-const { list, getUser, updateUser } = require('./actions');
+const {
+  list,
+  getUser,
+  updateUser,
+  deleteUser,
+} = require('./actions');
 
 router.use(requireJwt, requireUser);
 
@@ -43,5 +48,17 @@ router.route({
     },
   },
 });
+
+router.route({
+  method: 'DELETE',
+  path: '/:username',
+  handler: deleteUser,
+  validate: {
+    params: {
+      username: Joi.string().trim().required(),
+    },
+  },
+});
+
 
 module.exports = router;
