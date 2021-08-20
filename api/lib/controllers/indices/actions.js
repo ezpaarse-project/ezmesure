@@ -35,6 +35,10 @@ exports.deleteIndex = async (ctx) => {
 
   const { body: exists } = await elastic.indices.exists({ index });
 
+  if (!exists) {
+    ctx.status = 404;
+  }
+
   if (exists) {
     const { body: result } = await elastic.indices.delete({
       index,
@@ -42,6 +46,4 @@ exports.deleteIndex = async (ctx) => {
     ctx.status = (result && result.acknowledged) ? 204 : 404;
     ctx.body = result;
   }
-
-  ctx.status = 404;
 };
