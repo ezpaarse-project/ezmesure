@@ -1687,7 +1687,7 @@
       },
       "delete": {
         "summary": "Delete an index",
-        "operationId": "delete-index",
+        "operationId": "delete-indices-id",
         "responses": {
           "204": {
             "description": "No Content"
