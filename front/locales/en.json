@@ -220,6 +220,17 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "authenticate": {
+    "restrictedAccess": "Restricted Access",
+    "kibanaAuth": "You are already registered? Log in with your Kibana credentials.",
+    "user": "User",
+    "fieldIsRequired": "This field is required",
+    "password": "Password",
+    "logIn": "Log in",
+    "logInWithProvider": "Log in via your identity provider.",
+    "loginFailed": "The information transmitted did not allow you to authenticate",
+    "failed": "An error occurred"
+  },
   "contact": {
     "contactUs": "Contact us",
     "email": "Email address",
