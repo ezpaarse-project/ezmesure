@@ -19,7 +19,7 @@
             flat
             dense
           >
-            <v-toolbar-title>Nous contacter</v-toolbar-title>
+            <v-toolbar-title v-text="$t('contact.contactUs')" />
             <v-spacer />
             <v-icon>mdi-email-edit</v-icon>
           </v-toolbar>
@@ -43,7 +43,7 @@
                 v-else
                 :value="user.email"
                 :rules="emailRules"
-                label="Email"
+                :label="$t('contact.email')"
                 name="email"
                 outlined
                 clearable
@@ -54,7 +54,7 @@
                 v-model="object"
                 :items="objects"
                 :rules="objectRules"
-                label="Objet"
+                :label="$t('contact.object')"
                 name="object"
                 outlined
                 required
@@ -63,7 +63,7 @@
               <v-textarea
                 v-model="message"
                 :rules="messageRules"
-                label="Message"
+                :label="$t('contact.content')"
                 name="message"
                 outlined
                 required
@@ -71,24 +71,21 @@
               <v-checkbox
                 v-if="object.value === 'bugs'"
                 v-model="sendBrowser"
-                label="Envoyer la version de mon navigateur"
+                :label="$t('contact.sendNavigatorVersion')"
               />
             </v-form>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer />
-            <v-btn color="error" @click="$router.go(-1)">
-              Annuler
-            </v-btn>
+            <v-btn color="error" @click="$router.go(-1)" v-text="$t('cancel')" />
             <v-btn
               :disabled="!valid"
               :loading="loading"
               color="primary"
               @click="validate"
-            >
-              Envoyer
-            </v-btn>
+              v-text="$t('send')"
+            />
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -100,30 +97,34 @@
 export default {
   data: () => ({
     email: '',
-    emailRules: [
-      v => !!v || 'L\'adresse email est requise',
-      v => /.+@.+\..+/.test(v) || 'L\'adresse email doit être valide',
-    ],
     message: '',
-    messageRules: [v => !!v || 'Un message est requis'],
     object: {},
-    objectRules: [v => !!v || 'L\'objet est requis'],
-    objects: [
-      {
-        value: 'informations',
-        text: 'Demande de renseignements',
-      },
-      {
-        value: 'bugs',
-        text: 'Rapport de bugs',
-      },
-    ],
     sendBrowser: true,
     valid: true,
     loading: false,
   }),
   computed: {
     user() { return this.$auth.user; },
+    objects() {
+      return [
+        {
+          value: 'informations',
+          text: this.$t('contact.requestInformation'),
+        },
+        {
+          value: 'bugs',
+          text: this.$t('contact.bugReport'),
+        },
+      ];
+    },
+    emailRules() {
+      return [
+        v => !!v || this.$t('contact.emailIsRequired'),
+        v => /.+@.+\..+/.test(v) || this.$t('contact.emailMustBeValid'),
+      ];
+    },
+    messageRules() { return [v => !!v || this.$t('contact.contentIsRequired')]; },
+    objectRules() { return [v => !!v || this.$t('contact.objectIsRequired')]; },
   },
   methods: {
     async validate() {
@@ -138,7 +139,7 @@ export default {
             message: this.message,
             browser: this.sendBrowser && this.object.value === 'bugs' ? navigator.userAgent : null,
           });
-          this.$store.dispatch('snacks/success', 'Votre demande de contact vient d\'être envoyé à l\'équipe.');
+          this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
 
           this.email = '';
           this.object = {};
@@ -147,7 +148,7 @@ export default {
           this.$refs.form.resetValidation();
           this.loading = false;
         } catch (e) {
-          this.$store.dispatch('snacks/error', 'L\'envoi du formulaire de contact à échoué.');
+          this.$store.dispatch('snacks/error', this.$t('contact.failed'));
           this.loading = false;
         }
       }
