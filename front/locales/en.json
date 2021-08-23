@@ -220,6 +220,21 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "contact": {
+    "contactUs": "Contact us",
+    "email": "Email address",
+    "subject": "Subject",
+    "content": "Message content",
+    "sendNavigatorVersion": "Send my browser version",
+    "emailSent": "Your contact request has just been sent to the team.",
+    "failed": "Sending the contact form failed.",
+    "requestInformation": "Information request",
+    "bugReport": "Bug report",
+    "emailIsRequired": "The email address is required",
+    "emailMustBeValid": "The email address must be valid",
+    "contentIsRequired": "A message is required",
+    "subjectIsRequired": "Subject is required"
+  },
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
   "idCopied": "ID copied in the clipboard",
@@ -252,5 +267,6 @@
   "create": "Create",
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
-  "areYouSure": "Are you sure ?"
+  "areYouSure": "Are you sure ?",
+  "send": "Send"
 }
