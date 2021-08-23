@@ -61,6 +61,14 @@ client.updateSpace = (opts) => {
   return axiosClient.put(`/api/spaces/space/${options.id}`, options);
 };
 
+client.deleteSpace = (spaceId) => {
+  if (!spaceId) {
+    throw new Error('Missing required parameter: spaceId');
+  }
+
+  return axiosClient.delete(`/api/spaces/space/${spaceId}`);
+};
+
 client.putRole = (opts) => {
   const options = opts || {};
 

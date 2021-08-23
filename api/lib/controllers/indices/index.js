@@ -5,6 +5,7 @@ const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth
 const {
   getIndex,
   createIndex,
+  deleteIndex,
 } = require('./actions');
 
 const indexNamePattern = /^[a-z0-9][a-z0-9_.-]*$/;
@@ -29,6 +30,17 @@ router.route({
   validate: {
     params: {
       index: Joi.string().trim().regex(indexNamePattern).required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:index',
+  handler: deleteIndex,
+  validate: {
+    params: {
+      index: Joi.string().trim().required(),
     },
   },
 });

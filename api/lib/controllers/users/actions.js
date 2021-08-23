@@ -63,3 +63,15 @@ exports.updateUser = async (ctx) => {
   ctx.status = (result && result.created) ? 201 : 200;
   ctx.body = result;
 };
+
+exports.deleteUser = async (ctx) => {
+  const { username } = ctx.request.params;
+
+  const { body: result } = await elastic.security.deleteUser({
+    username,
+    refresh: true,
+  });
+
+  ctx.status = (result && result.found) ? 204 : 404;
+  ctx.body = result;
+};
