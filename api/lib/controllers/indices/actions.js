@@ -36,14 +36,12 @@ exports.deleteIndex = async (ctx) => {
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
-    ctx.status = 404;
+    ctx.throw(404, ctx.$t('errors.index.notFound', index));
   }
 
-  if (exists) {
-    const { body: result } = await elastic.indices.delete({
-      index,
-    });
-    ctx.status = (result && result.acknowledged) ? 204 : 404;
-    ctx.body = result;
-  }
+  const { body: result } = await elastic.indices.delete({
+    index,
+  });
+  ctx.status = (result && result.acknowledged) ? 204 : 404;
+  ctx.body = result;
 };
