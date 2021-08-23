@@ -69,7 +69,7 @@
                 required
               />
               <v-checkbox
-                v-if="object.value === 'bugs'"
+                v-if="subject.value === 'bugs'"
                 v-model="sendBrowser"
                 :label="$t('contact.sendNavigatorVersion')"
               />
