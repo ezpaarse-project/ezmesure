@@ -220,6 +220,17 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
+  "authenticate": {
+    "restrictedAccess": "Accès restreint",
+    "kibanaAuth": "Vous êtes déjà enregistré ? Connectez-vous avec vos identifiants Kibana.",
+    "user": "Utilisateur",
+    "fieldIsRequired": "Ce champs est requis",
+    "password": "Mot de passe",
+    "logIn": "Se connecter",
+    "logInWithProvider": "Connectez-vous via votre fournisseur d'identité.",
+    "loginFailed": "Les informations transmises n'ont pas permis de vous authentifier",
+    "failed": "Une erreur est survenue"
+  },
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
   "idCopied": "ID copié dans le presse-papier",
