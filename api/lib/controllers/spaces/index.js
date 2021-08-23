@@ -9,6 +9,7 @@ const {
   updateSpace,
   createIndexPattern,
   getSpace,
+  deleteSpace,
 } = require('./actions');
 
 const spaceIdPattern = /^[a-z0-9][a-z0-9_.-]*$/i;
@@ -93,6 +94,17 @@ router.route({
     body: {
       title: Joi.string().trim().regex(indexPatternRegex).required(),
       timeFieldName: Joi.string().trim().default('datetime'),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:spaceId',
+  handler: deleteSpace,
+  validate: {
+    params: {
+      spaceId: Joi.string().trim().required(),
     },
   },
 });

@@ -133,3 +133,21 @@ exports.createIndexPattern = async (ctx) => {
   ctx.status = 201;
   ctx.body = createdIndexPattern;
 };
+
+exports.deleteSpace = async (ctx) => {
+  const { spaceId } = ctx.request.params;
+
+  try {
+    await kibana.deleteSpace(spaceId);
+  } catch (e) {
+    const status = e && e.response && e.response.status;
+
+    if (status === 404) {
+      ctx.throw(404, ctx.$t('errors.space.notFound', spaceId));
+    } else {
+      ctx.throw(e);
+    }
+  }
+
+  ctx.status = 204;
+};
