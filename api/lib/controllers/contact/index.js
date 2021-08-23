@@ -13,7 +13,7 @@ router.route({
     type: 'json',
     body: {
       email: Joi.string().trim().email().required(),
-      object: Joi.string().trim().required(),
+      subject: Joi.string().trim().required(),
       message: Joi.string().trim().required(),
       browser: Joi.empty(null),
     },

@@ -51,11 +51,11 @@
                 disabled
               />
               <v-select
-                v-model="object"
-                :items="objects"
-                :rules="objectRules"
-                :label="$t('contact.object')"
-                name="object"
+                v-model="subject"
+                :items="subjects"
+                :rules="subjectRules"
+                :label="$t('contact.subject')"
+                name="subject"
                 outlined
                 required
                 return-object
@@ -98,14 +98,14 @@ export default {
   data: () => ({
     email: '',
     message: '',
-    object: {},
+    subject: {},
     sendBrowser: true,
     valid: true,
     loading: false,
   }),
   computed: {
     user() { return this.$auth.user; },
-    objects() {
+    subjects() {
       return [
         {
           value: 'informations',
@@ -124,7 +124,7 @@ export default {
       ];
     },
     messageRules() { return [v => !!v || this.$t('contact.contentIsRequired')]; },
-    objectRules() { return [v => !!v || this.$t('contact.objectIsRequired')]; },
+    subjectRules() { return [v => !!v || this.$t('contact.subjectIsRequired')]; },
   },
   methods: {
     async validate() {
@@ -135,14 +135,14 @@ export default {
         try {
           await this.$axios.post('/contact', {
             email: this.user?.email || this.email,
-            object: this.object?.text,
+            subject: this.subject?.text,
             message: this.message,
-            browser: this.sendBrowser && this.object.value === 'bugs' ? navigator.userAgent : null,
+            browser: this.sendBrowser && this.subject.value === 'bugs' ? navigator.userAgent : null,
           });
           this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
 
           this.email = '';
-          this.object = {};
+          this.subject = {};
           this.message = '';
           this.sendBrowser = true;
           this.$refs.form.resetValidation();

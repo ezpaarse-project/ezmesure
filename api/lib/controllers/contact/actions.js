@@ -13,7 +13,7 @@ exports.contact = async (ctx) => {
     ctx.body = await sendMail({
       from: body.email,
       to: recipients,
-      subject: `Contact - ${body.object}`,
+      subject: `Contact - ${body.subject}`,
       ...generateMail('contact', { body, appName: config.get('appName') }),
     });
   } catch (err) {

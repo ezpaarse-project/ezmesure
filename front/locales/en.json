@@ -223,7 +223,7 @@
   "contact": {
     "contactUs": "Contact us",
     "email": "Email address",
-    "object": "Object",
+    "subject": "Subject",
     "content": "Message content",
     "sendNavigatorVersion": "Send my browser version",
     "emailSent": "Your contact request has just been sent to the team.",
@@ -233,7 +233,7 @@
     "emailIsRequired": "The email address is required",
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
-    "objectIsRequired": "Object is required"
+    "subjectIsRequired": "Subject is required"
   },
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",

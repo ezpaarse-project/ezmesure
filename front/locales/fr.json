@@ -223,7 +223,7 @@
   "contact": {
     "contactUs": "Nous contacter",
     "email": "Adresse électronique",
-    "object": "Objet",
+    "subject": "Objet",
     "content": "Contenu du message",
     "sendNavigatorVersion": "Envoyer la version de mon navigateur",
     "emailSent": "Votre demande de contact vient d'être envoyée à l'équipe.",
@@ -233,7 +233,7 @@
     "emailIsRequired": "L'adresse électronique est requise",
     "emailMustBeValid": "L'adresse électronique doit être valide",
     "contentIsRequired": "Un message est requis",
-    "objectIsRequired": "L'objet est requis"
+    "subjectIsRequired": "L'objet est requis"
   },
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
