@@ -22,11 +22,12 @@ const schema = {
   createdAt: Joi.date(),
 
   indexCount: Joi.number().default(0),
-  indexPrefix: Joi.string().allow(''),
+  indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]*$/).allow(''),
 
   creator: Joi.string().allow('').allow(null),
   role: Joi.string().allow('').allow(null),
   space: Joi.string().allow('').allow(null),
+  hidePartner: Joi.boolean().default(false),
 
   techContactName: Joi.string().allow('').allow(null),
   docContactName: Joi.string().allow('').allow(null),
@@ -38,6 +39,11 @@ const schema = {
   city: Joi.string().allow(''),
   uai: Joi.string().allow(''),
   logoId: Joi.string().empty('').allow(null),
+
+  twitterUrl: Joi.string().allow(''),
+  linkedinUrl: Joi.string().allow(''),
+  youtubeUrl: Joi.string().allow(''),
+  facebookUrl: Joi.string().allow(''),
 
   domains: Joi.array().default([]).items(Joi.string()),
   auto: Joi.object({
@@ -60,6 +66,7 @@ const createSchema = {
   role: Joi.any().strip(),
   creator: Joi.any().strip(),
   space: Joi.any().strip(),
+  hidePartner: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
@@ -68,16 +75,28 @@ const updateSchema = {
   ...createSchema,
 };
 
-async function createRole(role, settings = {}) {
+async function getRole(role) {
   const { body } = await elastic.security.getRole({ name: role }, { ignore: [404] });
-  const existingRole = body && body[role];
+  return body && body[role];
+}
 
-  if (existingRole) { return; }
+/**
+ * Create a role with given settings
+ * @param {String} role the role to create
+ * @param {Object} settings role settings
+ * @returns {Boolean} true if the role has been created, false if it already exists
+ */
+async function createRole(role, settings = {}) {
+  if (await getRole(role)) {
+    return { created: false };
+  }
 
   await kibana.putRole({
     name: role,
     body: settings,
   }, { ignore: [404] });
+
+  return { created: true };
 }
 
 /**
@@ -101,9 +120,13 @@ function addReadOnlySuffix(str) {
 }
 
 class Institution extends typedModel(type, schema, createSchema, updateSchema) {
+  static docRole() { return docRole; }
+
+  static techRole() { return techRole; }
+
   static findOneByCreatorOrRole(username, userRoles) {
     // Remove readonly suffix so that we search with the base role
-    const roles = userRoles.map(trimReadOnlySuffix);
+    const roles = Array.isArray(userRoles) ? userRoles.map(trimReadOnlySuffix) : [];
 
     return this.findOne({
       should: [
@@ -126,6 +149,9 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       filters: [
         { term: { [`${type}.validated`]: true } },
       ],
+      must_not: [
+        { term: { [`${type}.hidePartner`]: true } },
+      ],
     });
   }
 
@@ -146,65 +172,170 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
     this.data.creator = username;
   }
 
-  get(prop, defaultValue) {
-    const value = this.data[prop];
-    return (typeof value === 'undefined' ? defaultValue : value);
+  getRole(opts = {}) {
+    const role = this.get('role');
+
+    if (role) {
+      const readonly = opts && opts.readonly;
+      return readonly ? addReadOnlySuffix(role) : role;
+    }
+
+    return null;
   }
 
-  set(prop, value) {
-    this.data[prop] = value;
+  isCreator(user) {
+    if (!user || !user.username) { return false; }
+    const { creator } = this.data;
+
+    return (creator && creator === user.username);
   }
 
   isContact(user) {
-    const { creator, role } = this.data;
+    if (!this.isMember(user)) { return false; }
+    if (!Array.isArray(user && user.roles)) { return false; }
+
+    const roles = new Set(user.roles);
+    return (roles.has(techRole) || roles.has(docRole));
+  }
+
+  isMember(user) {
+    if (!user || !user.username) { return false; }
+
+    const { role } = this.data;
     const readOnlyRole = addReadOnlySuffix(role);
 
-    if (!user || !user.username) { return false; }
-    if (creator && creator === user.username) { return true; }
     if (!role || !Array.isArray(user && user.roles)) { return false; }
 
     const roles = new Set(user.roles);
-    const hasInstitutionRole = roles.has(role) || roles.has(readOnlyRole);
-    const hasContactRole = roles.has(techRole) || roles.has(docRole);
-    return hasInstitutionRole && hasContactRole;
+    return (roles.has(role) || roles.has(readOnlyRole));
   }
 
   async getMembers() {
-    const { role } = this.data;
+    const { role, creator } = this.data;
 
-    if (!role) { return []; }
+    if (!role && !creator) { return []; }
+
+    const should = [];
+
+    if (role) {
+      should.push({ terms: { roles: [role, addReadOnlySuffix(role)] } });
+    }
+    if (creator) {
+      should.push({ term: { username: creator } });
+    }
 
     const { body = {} } = await elastic.search({
       index: '.security',
-      _source: ['full_name', 'roles', 'email'],
+      _source: ['full_name', 'roles', 'username'],
       body: {
+        size: 1000,
         query: {
           bool: {
-            filter: [
-              { terms: { roles: [role, addReadOnlySuffix(role)] } },
-            ],
+            should,
+            minimum_should_match: 1,
           },
         },
       },
     });
 
-    const users = body.hits && body.hits.hits;
+    let members = body.hits && body.hits.hits;
 
-    return Array.isArray(users) ? users.map(({ _source: source }) => ({
-      ...source,
-      readonly: !(Array.isArray(source.roles) && source.roles.includes(role)),
-    })) : [];
+    if (!Array.isArray(members)) {
+      members = [];
+    }
+
+    return members.map(({ _source: source }) => {
+      const userRoles = new Set(Array.isArray(source.roles) ? source.roles : []);
+
+      return {
+        ...source,
+        readonly: !userRoles.has(role),
+        docContact: userRoles.has(Institution.docRole()),
+        techContact: userRoles.has(Institution.techRole()),
+        creator: creator && (source.username === creator),
+      };
+    });
+  }
+
+  /**
+   * Get the institution space
+   */
+  async getSpace(id) {
+    const { space } = this.data;
+
+    if (typeof space !== 'string' || space.length === 0) {
+      return null;
+    }
+
+    const { data = {}, status } = await kibana.getSpace(id || space);
+
+    return status === 200 ? data : null;
+  }
+
+  /**
+   * Get all institution spaces
+   */
+  async getSpaces() {
+    const { space } = this.data;
+
+    if (typeof space !== 'string' || space.length === 0) {
+      return [];
+    }
+
+    const { data = [], status } = await kibana.getSpaces();
+
+    if (status !== 200 || !Array.isArray(data)) { return []; }
+
+    return data.filter((s) => s && typeof s.id === 'string' && s.id.startsWith(space));
   }
 
   /**
    * Create the institution space if it doesn't exist yet
    */
-  async createSpace() {
-    const { space, name } = this.data;
-    const response = await kibana.getSpace(space);
-    if (response && response.status !== 404) { return; }
+  async createSpace(opts) {
+    const {
+      id,
+      name,
+      description,
+      initials,
+      color,
+    } = opts || {};
+    const { space, name: institutionName } = this.data;
 
-    await kibana.createSpace({ id: space, name });
+    const spaceId = id || space;
+
+    const { data: existingSpace, status } = await kibana.getSpace(spaceId);
+
+    if (status === 200 && existingSpace) {
+      return existingSpace;
+    }
+
+    const { data } = await kibana.createSpace({
+      id: spaceId,
+      name: name || spaceId,
+      description: description || institutionName,
+      initials,
+      color,
+    });
+    return data;
+  }
+
+  /**
+   * Check that the institution roles exist
+   */
+  async checkRoles() {
+    const { role } = this.data;
+
+    return {
+      base: {
+        name: role,
+        exists: !!role && !!await getRole(role),
+      },
+      readonly: {
+        name: role && addReadOnlySuffix(role),
+        exists: !!role && !!await getRole(addReadOnlySuffix(role)),
+      },
+    };
   }
 
   /**
@@ -223,55 +354,103 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
       throw new Error('institution has no space associated');
     }
 
-    await createRole(techRole);
-    await createRole(docRole);
-    await createRole(role, {
-      elasticsearch: {
-        indices: [{
-          names: [`${indexPrefix}*`],
-          privileges: ['all'],
-        }],
+    return [
+      {
+        name: techRole,
+        ...await createRole(techRole),
       },
-      kibana: [{
-        base: ['all'],
-        spaces: [space],
-      }],
+      {
+        name: docRole,
+        ...await createRole(docRole),
+      },
+      {
+        name: role,
+        ...await createRole(role, {
+          elasticsearch: {
+            indices: [{
+              names: [`${indexPrefix}*`],
+              privileges: ['all'],
+            }],
+          },
+          kibana: [{
+            base: ['all'],
+            spaces: [space],
+          }],
+        }),
+      },
+      {
+        name: addReadOnlySuffix(role),
+        ...await createRole(addReadOnlySuffix(role), {
+          elasticsearch: {
+            indices: [{
+              names: [`${indexPrefix}*`],
+              privileges: ['read'],
+            }],
+          },
+          kibana: [{
+            base: ['read'],
+            spaces: [space],
+          }],
+        }),
+      },
+    ];
+  }
+
+  /**
+   * Get the index patterns of the institution
+   */
+  async getIndexPatterns(opts) {
+    const { suffix } = opts || {};
+    const { space, indexPrefix } = this.data;
+
+    if (!space || (suffix && !indexPrefix)) {
+      return [];
+    }
+
+    const { data } = await kibana.findObjects({
+      spaceId: space,
+      type: 'index-pattern',
+      perPage: 1000,
     });
-    await createRole(addReadOnlySuffix(role), {
-      elasticsearch: {
-        indices: [{
-          names: [`${indexPrefix}*`],
-          privileges: ['read'],
-        }],
-      },
-      kibana: [{
-        base: ['read'],
-        spaces: [space],
-      }],
+    let patterns = data && data.saved_objects;
+
+    if (!Array.isArray(patterns)) {
+      patterns = [];
+    }
+
+    if (suffix) {
+      patterns = patterns.filter((obj) => {
+        const title = obj && obj.attributes && obj.attributes.title;
+        return title === `${indexPrefix}${suffix}`;
+      });
+    }
+
+    return patterns.map((obj) => {
+      const { id, updatedAt, attributes } = obj || {};
+      const { title, timeFieldName } = attributes || {};
+
+      return {
+        id,
+        updatedAt,
+        title,
+        timeFieldName,
+      };
     });
   }
 
   /**
-   * Create a base index pattern if there are no patterns yet in the space
+   * Get the indices of the institution
    */
-  async createIndexPattern() {
-    const { indexPrefix, space } = this.data;
+  async getIndices() {
+    const { indexPrefix } = this.data;
 
     if (!indexPrefix) {
-      throw new Error('institution has no index prefix associated');
-    }
-    if (!space) {
-      throw new Error('institution has no space associated');
+      return [];
     }
 
-    const { data } = await kibana.getIndexPatterns(space);
+    const { body } = await elastic.indices.get({ index: `${indexPrefix}*`, allowNoIndices: true });
 
-    if (data && data.total === 0) {
-      await kibana.createIndexPattern(space, {
-        title: `${indexPrefix}*`,
-        timeFieldName: 'datetime',
-      });
-    }
+    return Object.keys(body);
   }
 
   /**
@@ -292,30 +471,6 @@ class Institution extends typedModel(type, schema, createSchema, updateSchema) {
         body: indexTemplate,
       });
     }
-  }
-
-  async migrateCreator() {
-    const { creator, role } = this.data;
-    if (!creator || !role) { return; }
-
-    const { body = {} } = await elastic.security.getUser({ username: creator }, { ignore: [404] });
-    const user = body[creator];
-
-    if (!user) {
-      throw new Error('no user matching institution creator');
-    }
-
-    user.roles = Array.isArray(user.roles) ? user.roles : [];
-
-    const roles = [role, techRole, docRole];
-    const hasAllRoles = roles.every((r) => user.roles.includes(r));
-
-    if (!hasAllRoles) {
-      user.roles = Array.from(new Set(roles.concat(user.roles)));
-      await elastic.security.putUser({ username: creator, refresh: true, body: user });
-    }
-
-    this.data.creator = null;
   }
 
   /**

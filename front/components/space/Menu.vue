@@ -22,7 +22,7 @@
       </v-list-item>
 
       <v-list-group
-        v-if="isBetaTester || isAdmin"
+        v-if="institutionMenu"
         :value="$nuxt.$route.name.includes(institutionMenu.title.toLowerCase())"
       >
         <template v-slot:activator>
@@ -48,7 +48,7 @@
       </v-list-group>
 
       <v-list-group
-        v-if="administration.admin && isAdmin"
+        v-if="isAdmin"
         :value="$nuxt.$route.name.indexOf(administration.title.toLowerCase()) !== -1"
       >
         <template v-slot:activator>
@@ -109,7 +109,6 @@ export default {
       return {
         title: this.$t('menu.administration'),
         href: '/admin',
-        admin: true,
         children: [
           {
             title: this.$t('menu.institutions'),
@@ -119,22 +118,31 @@ export default {
       };
     },
     institutionMenu() {
+      if (!this.canAccessSushi && !this.canAccessInstitution) {
+        return null;
+      }
+
       const menuGroup = {
         title: this.$t('menu.myInstitution'),
         href: '/institutions',
-        children: [
-          {
-            title: this.$t('menu.profile'),
-            href: '/self',
-          },
-        ],
+        children: [],
       };
 
-      if (this.isInstitutionContact && this.institution?.validated) {
+      if (this.canAccessInstitution) {
+        menuGroup.children.push({
+          title: this.$t('menu.profile'),
+          href: '/self',
+        });
+      }
+
+      if (this.institution && this.canAccessMembers) {
         menuGroup.children.push({
           title: this.$t('menu.members'),
           href: '/self/members',
         });
+      }
+
+      if (this.institution && this.canAccessSushi) {
         menuGroup.children.push({
           title: this.$t('menu.sushi'),
           href: '/self/sushi',
@@ -157,11 +165,28 @@ export default {
     isContact() {
       return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
     },
-    isBetaTester() {
-      return this.userRoles.includes('sushi_form_tester');
+    canAccessInstitution() {
+      return this.isAdmin || this.institutionFeatureEnabled;
+    },
+    canAccessMembers() {
+      return this.canAccessInstitution && (this.isAdmin || this.isInstitutionContact);
+    },
+    canAccessSushi() {
+      if (this.isAdmin) { return true; }
+
+      if (!this.institution?.validated) { return false; }
+      if (!this.sushiFeatureEnabled) { return false; }
+      if (!this.isInstitutionContact) { return false; }
+
+      return true;
+    },
+    institutionFeatureEnabled() {
+      return this.userRoles.includes('institution_form');
+    },
+    sushiFeatureEnabled() {
+      return this.userRoles.includes('sushi_form');
     },
     isInstitutionContact() {
-      if (this.isAdmin) { return true; }
       if (!this.institution?.role) { return false; }
       if (!this.isContact) { return false; }
 
@@ -170,13 +195,13 @@ export default {
   },
 
   async mounted() {
-    if (!this.isAdmin && !this.isBetaTester) { return; }
+    if (!this.institutionFeatureEnabled && !this.sushiFeatureEnabled) { return; }
 
     try {
       this.institution = await this.$axios.$get('/institutions/self');
     } catch (e) {
       if (e.response?.status !== 404) {
-        this.$store.$dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
+        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }
     }
   },

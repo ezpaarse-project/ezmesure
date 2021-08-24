@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('config');
+const qs = require('qs');
 
 const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
@@ -17,9 +18,14 @@ const axiosClient = axios.create({
     // Kibana won't accept any request without this
     'kbn-xsrf': true,
   },
+  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 
-const client = {};
+const client = {
+  DEFAULT_SPACE: 'default',
+};
+
+client.getSpaces = () => axiosClient.get('/api/spaces/space');
 
 client.getSpace = (id) => {
   if (!id) {
@@ -55,6 +61,14 @@ client.updateSpace = (opts) => {
   return axiosClient.put(`/api/spaces/space/${options.id}`, options);
 };
 
+client.deleteSpace = (spaceId) => {
+  if (!spaceId) {
+    throw new Error('Missing required parameter: spaceId');
+  }
+
+  return axiosClient.delete(`/api/spaces/space/${spaceId}`);
+};
+
 client.putRole = (opts) => {
   const options = opts || {};
 
@@ -64,6 +78,24 @@ client.putRole = (opts) => {
 
   return axiosClient.put(`/api/security/role/${options.name}`, options.body || {});
 };
+
+client.deleteRole = (name) => {
+  if (!name) {
+    throw new Error('Missing required parameter: name');
+  }
+
+  return axiosClient.delete(`/api/security/role/${name}`);
+};
+
+client.getRole = (name) => {
+  if (!name) {
+    throw new Error('Missing required parameter: name');
+  }
+
+  return axiosClient.get(`/api/security/role/${name}`, { validateStatus: allowNotFound });
+};
+
+client.getRoles = () => axiosClient.get('/api/security/role');
 
 client.createIndexPattern = (spaceId, opts) => {
   const attributes = opts || {};
@@ -75,15 +107,93 @@ client.createIndexPattern = (spaceId, opts) => {
     throw new Error('Missing required parameter: timeFieldName');
   }
 
-  return axiosClient.post(`/s/${spaceId}/api/saved_objects/index-pattern`, { attributes }, {  });
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  return axiosClient.post(`${spacePrefix}/api/saved_objects/index-pattern`, { attributes });
 };
 
-client.getIndexPatterns = (spaceId) => {
+client.getIndexPatterns = async (opts) => {
   const options = {
-    params: { type: 'index-pattern' },
+    ...(opts || {}),
+    type: 'index-pattern',
   };
 
-  return axiosClient.get(`/s/${spaceId}/api/saved_objects/_find`, options);
+  const { data } = await client.findObjects(options);
+  let patterns = data && data.saved_objects;
+
+  if (!Array.isArray(patterns)) {
+    patterns = [];
+  }
+
+  return patterns.map((obj) => {
+    const { id, updatedAt, attributes } = obj || {};
+    const { title, timeFieldName } = attributes || {};
+
+    return {
+      spaceId: options.spaceId || null,
+      id,
+      updatedAt,
+      title,
+      timeFieldName,
+    };
+  });
+};
+
+client.getObject = (options) => {
+  const {
+    type,
+    id,
+    spaceId,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  return axiosClient.get(`${spacePrefix}/api/saved_objects/${type}/${id}`, { validateStatus: allowNotFound });
+};
+
+client.findObjects = (options) => {
+  const {
+    type,
+    spaceId,
+    page,
+    perPage,
+  } = options || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const params = {
+    type,
+    page: page || 1,
+    per_page: perPage || 50,
+  };
+
+  return axiosClient.get(`${spacePrefix}/api/saved_objects/_find`, { params });
+};
+
+client.exportDashboard = (opts) => {
+  const {
+    dashboardId, // Can be an array
+    spaceId,
+  } = opts || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const params = {
+    dashboard: dashboardId,
+  };
+
+  return axiosClient.get(`${spacePrefix}/api/kibana/dashboards/export`, { params });
+};
+
+client.importDashboard = (opts) => {
+  const {
+    data,
+    spaceId,
+    force,
+  } = opts || {};
+
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+  const params = {
+    force: !!force,
+  };
+
+  return axiosClient.post(`${spacePrefix}/api/kibana/dashboards/import`, data, { params });
 };
 
 module.exports = client;

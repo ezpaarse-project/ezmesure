@@ -16,6 +16,12 @@ const institutions = require('./institutions');
 const sushi = require('./sushi');
 const tasks = require('./tasks');
 const contact = require('./contact');
+const opendata = require('./opendata');
+const users = require('./users');
+const dashboards = require('./dashboards');
+const spaces = require('./spaces');
+const indices = require('./indices');
+const roles = require('./roles');
 
 const openapi = require('./openapi.json');
 
@@ -64,5 +70,11 @@ app.use(files.prefix('/files').middleware());
 app.use(institutions.prefix('/institutions').middleware());
 app.use(sushi.prefix('/sushi').middleware());
 app.use(tasks.prefix('/tasks').middleware());
+app.use(opendata.prefix('/opendata').middleware());
+app.use(users.prefix('/users').middleware());
+app.use(dashboards.prefix('/dashboards').middleware());
+app.use(spaces.prefix('/spaces').middleware());
+app.use(indices.prefix('/indices').middleware());
+app.use(roles.prefix('/roles').middleware());
 
 module.exports = app;

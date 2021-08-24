@@ -13,6 +13,7 @@ export default {
       url: '/api/openapi.json',
       dom_id: '#swagger',
       deepLinking: false,
+      docExpansion: 'none',
     });
   },
 };

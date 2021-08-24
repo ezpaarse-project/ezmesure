@@ -29,33 +29,37 @@
   ],
   "tags": [
     {
-      "name": "Indices",
-      "description": "Manage your indices"
+      "name": "Administration"
     },
     {
-      "name": "Authentication",
-      "description": "Everything related to your profile"
-    },
-    {
-      "name": "Files",
-      "description": "Manage your hosted files"
-    },
-    {
-      "name": "Metrics",
-      "description": "Get metrics from indices"
-    },
-    {
-      "name": "Institutions",
-      "description": "Manage institutions"
+      "name": "Authentication"
     },
     {
       "name": "Basics"
+    },
+    {
+      "name": "Files"
+    },
+    {
+      "name": "Indices"
+    },
+    {
+      "name": "Institutions"
+    },
+    {
+      "name": "Kibana"
+    },
+    {
+      "name": "Metrics"
     },
     {
       "name": "Sushi"
     },
     {
       "name": "Tasks"
+    },
+    {
+      "name": "Users"
     }
   ],
   "components": {
@@ -95,7 +99,15 @@
           "error": {
             "type": "string",
             "example": "Authentication Error",
-            "description": "The error message"
+            "description": "The error message",
+            "readOnly": true
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "exclusiveMaximum": true,
+            "maximum": 600,
+            "readOnly": true
           }
         }
       },
@@ -105,7 +117,8 @@
         "properties": {
           "username": {
             "type": "string",
-            "example": "john.doo"
+            "example": "john.doo",
+            "readOnly": true
           },
           "roles": {
             "type": "array",
@@ -192,7 +205,8 @@
             "type": "string",
             "description": "Institution identifier",
             "example": "496ccfa0-1f73-11eb-a8a0-4f0bd0a37c79",
-            "format": "uuid"
+            "format": "uuid",
+            "readOnly": true
           },
           "name": {
             "type": "string",
@@ -248,9 +262,9 @@
           },
           "creator": {
             "type": "string",
-            "nullable": true,
             "description": "Username of the user that declared the institution. Removed once the institution is validated.",
-            "example": "john.doe"
+            "example": "john.doe",
+            "nullable": true
           },
           "validated": {
             "type": "boolean",
@@ -263,9 +277,9 @@
           },
           "logoId": {
             "type": "string",
-            "nullable": true,
             "description": "Identifier of the institution logo image",
-            "example": "32a1c269738c43463312f09821b22323.png"
+            "example": "32a1c269738c43463312f09821b22323.png",
+            "nullable": true
           },
           "updatedAt": {
             "type": "string",
@@ -620,7 +634,8 @@
             "type": "string",
             "format": "uuid",
             "example": "645c4000-1f89-11eb-836f-a3005ccf2dc6",
-            "description": "ID of the sushi item"
+            "description": "ID of the sushi item",
+            "readOnly": true
           },
           "vendor": {
             "type": "string",
@@ -752,22 +767,361 @@
               "type": "string"
             }
           },
-          "email": {
-            "type": "string",
-            "minLength": 1,
-            "format": "email",
-            "description": "Member email"
-          },
           "readonly": {
             "type": "boolean",
             "description": "Whether the member has Kibana write permission"
+          },
+          "docContact": {
+            "type": "boolean",
+            "description": "Whether the member is the documentary contact"
+          },
+          "techContact": {
+            "type": "boolean",
+            "description": "Whether the member is the technical contact"
           }
         },
         "required": [
           "full_name",
           "roles",
-          "email",
-          "readonly"
+          "readonly",
+          "docContact",
+          "techContact"
+        ]
+      },
+      "Space": {
+        "description": "A kibana Space",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "id": "toulouse-publisher",
+            "name": "Espace Toulouse",
+            "description": "espace éditeur de Toulouse",
+            "initials": "TL",
+            "color": "#000000",
+            "disabledFeatures": []
+          }
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The space ID"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The display name of the space"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The description of the space"
+          },
+          "initials": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The initials shown in the space avatar",
+            "maxLength": 2
+          },
+          "color": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The hexadecimal color code used in the space avatar",
+            "pattern": "^#([a-f0-9]{6}|[a-f0-9]{3})$",
+            "example": "#6e557e"
+          },
+          "disabledFeatures": {
+            "type": "array",
+            "description": "The list of disabled features for the space",
+            "items": {
+              "type": "string"
+            }
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The data-URL encoded image to display in the space avatar"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "IndexPattern": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/KibanaSavedObject"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "$ref": "#/components/schemas/IndexPatternAttributes"
+              }
+            }
+          }
+        ],
+        "description": "A Kibana index pattern"
+      },
+      "IndexPatternAttributes": {
+        "title": "IndexPatternAttributes",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "timeFieldName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "KibanaSavedObject": {
+        "title": "KibanaSavedObject",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "error": {
+            "$ref": "#/components/schemas/KibanaSavedObjectError"
+          },
+          "attributes": {
+            "type": "object"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KibanaSavedObjectReference"
+            }
+          },
+          "migrationVersion": {
+            "type": "object"
+          },
+          "namespaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "originId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "references",
+          "migrationVersion"
+        ],
+        "description": ""
+      },
+      "KibanaSavedObjectReference": {
+        "title": "KibanaSavedObjectReference",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ]
+      },
+      "KibanaSavedObjectError": {
+        "title": "KibanaSavedObjectError",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "KibanaDashboardImportResponse": {
+        "title": "KibanaDashboardImportResponse",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KibanaSavedObject"
+            }
+          }
+        },
+        "required": [
+          "objects"
+        ]
+      },
+      "KibanaDashboardExportResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^[\\d.]+$"
+          },
+          "objects": {
+            "$ref": "#/components/schemas/KibanaSavedObject"
+          }
+        },
+        "required": [
+          "version",
+          "objects"
+        ]
+      },
+      "KibanaRole": {
+        "description": "",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "metadata": {
+              "version": 1
+            },
+            "elasticsearch": {
+              "cluster": [],
+              "indices": []
+            },
+            "kibana": [
+              {
+                "base": [],
+                "feature": {
+                  "discover": [
+                    "all"
+                  ],
+                  "visualize": [
+                    "all"
+                  ],
+                  "dashboard": [
+                    "all"
+                  ],
+                  "dev_tools": [
+                    "read"
+                  ],
+                  "advancedSettings": [
+                    "read"
+                  ],
+                  "indexPatterns": [
+                    "read"
+                  ]
+                },
+                "spaces": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        },
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "description": "Metadata to be associated to the role"
+          },
+          "elasticsearch": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "run_as": {
+                "type": "array",
+                "description": "A list of usernames the owners of this role can impersonate",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cluster": {
+                "type": "array",
+                "description": "A list of cluster privileges",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "indices": {
+                "type": "array",
+                "description": "A list of indices permissions entries",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "names": {
+                      "type": "array",
+                      "description": "A list of indices to which the permissions in this entry apply",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "privileges": {
+                      "type": "array",
+                      "description": "The index level privileges the owners of the role have",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "kibana": {
+            "type": "array",
+            "uniqueItems": false,
+            "description": "Objects that specify the Kibana privileges for the role",
+            "items": {
+              "type": "object",
+              "properties": {
+                "spaces": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "base": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "feature": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "kibana"
         ]
       },
       "Task": {
@@ -866,6 +1220,25 @@
           "updatedAt",
           "createdAt"
         ]
+      },
+      "ElasticsearchIndex": {
+        "title": "ElasticsearchIndex",
+        "type": "object",
+        "description": "",
+        "properties": {
+          "aliases": {
+            "type": "object",
+            "readOnly": true
+          },
+          "mappings": {
+            "type": "object",
+            "readOnly": true
+          },
+          "settings": {
+            "type": "object",
+            "readOnly": true
+          }
+        }
       }
     }
   },
@@ -898,13 +1271,291 @@
         ]
       }
     },
-    "/profile": {
+    "/dashboards": {
+      "get": {
+        "summary": "List dashboards",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KibanaSavedObject"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-dashboards",
+        "description": "List dashboards",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "Get dashboards with a specific space ID"
+          }
+        ]
+      }
+    },
+    "/dashboards/_copy": {
+      "post": {
+        "summary": "Copy a dashboard from one space to another",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "post-dashboards-_copy",
+        "description": "Copy a dashboard from one space to another",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "space": {
+                        "type": "string",
+                        "description": "ID of the source space"
+                      },
+                      "dashboard": {
+                        "type": "array",
+                        "description": "ID of one or more source dashboards",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "dashboard"
+                    ]
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "space": {
+                        "type": "string",
+                        "description": "ID of the space where the dashboard should be imported"
+                      },
+                      "indexPattern": {
+                        "type": "string",
+                        "description": "An index pattern to use instead of the one included in the imported objects"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "force",
+            "description": "Override existing objects"
+          }
+        ]
+      }
+    },
+    "/dashboards/_export": {
+      "get": {
+        "summary": "Export a dashboard",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardExportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "get-dashboards-_export",
+        "description": "Export a dashboard",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "ID of the space where the dashboard is located"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "dashboard",
+            "description": "ID of one or more dashboards to be exported",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboards/_import": {
+      "post": {
+        "summary": "Import a dashboard",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KibanaDashboardImportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "post-dashboards-_import",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Import a dashboard into a given space",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KibanaDashboardExportResponse"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "space",
+            "description": "The space where the dashboard should be imported"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "index-pattern",
+            "description": "Replace the index-pattern of imported objects"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "force",
+            "description": "Override existing objects"
+          }
+        ]
+      }
+    },
+    "/files": {
       "get": {
         "tags": [
-          "Authentication"
+          "Files"
         ],
-        "summary": "Fetch profile",
-        "description": "Get the profile associated with the JWT token.",
+        "summary": "List your hosted files",
+        "description": "List your hosted files.",
         "security": [
           {
             "bearerAuth": []
@@ -916,7 +1567,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/FileList"
                 }
               }
             }
@@ -925,16 +1576,337 @@
             "$ref": "#/components/responses/UnauthorizedError"
           }
         },
-        "operationId": "getProfile"
+        "operationId": "getFiles"
       }
     },
-    "/profile/token": {
-      "get": {
+    "/files/{filename}": {
+      "delete": {
         "tags": [
-          "Authentication"
+          "Files"
         ],
-        "summary": "Get an authorization token",
-        "description": "Actually requires a JWT token (typically stored in cookies). This route provides you with a token from the user space.",
+        "summary": "Remove one file from your hosted files",
+        "description": "Remove one file from your hosted files.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "schema": {
+              "type": "string",
+              "example": "univ-foobar_2017-08-17.csv"
+            },
+            "description": "The file to be removed.",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "File successfully removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "deleteFile"
+      }
+    },
+    "/files/delete_batch": {
+      "post": {
+        "tags": [
+          "Files"
+        ],
+        "summary": "Remove a list of files from your hosted files",
+        "description": "Remove a list of files from your hosted files.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "univ-foobar_2017-08-17.csv"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "List of files successfully removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "deleteMultipleFiles"
+      }
+    },
+    "/indices/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Create an index",
+        "operationId": "post-indices",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "acknowledged": {
+                      "type": "boolean"
+                    },
+                    "shards_acknowledged": {
+                      "type": "boolean"
+                    },
+                    "index": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "acknowledged",
+                    "shards_acknowledged",
+                    "index"
+                  ],
+                  "x-examples": {
+                    "example-1": {
+                      "acknowledged": true,
+                      "shards_acknowledged": true,
+                      "index": "toulouse-foobarfoo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Initialize an index with an access events oriented mapping",
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get an index",
+        "operationId": "get-indices-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ElasticsearchIndex"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "description": "Get information about an index",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an index",
+        "operationId": "delete-indices-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete an ElasticSearch index",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Indices"
+        ]
+      }
+    },
+    "/institutions": {
+      "get": {
+        "summary": "Get institutions",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Institution"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-institutions",
+        "description": "Get all institutions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create an institution",
+        "operationId": "post-institutions",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Create an institution",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Institution"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "creator",
+            "description": "if set to false, the authenticated user will not be registered as the institution creator (requires admin permissions)"
+          }
+        ]
+      }
+    },
+    "/institutions/_refresh": {
+      "post": {
+        "tags": [
+          "Institutions"
+        ],
+        "summary": "Refresh institutions",
+        "description": "Refresh dynamic institution fields (contacts, number of ECs).",
         "security": [
           {
             "bearerAuth": []
@@ -942,67 +1914,682 @@
         ],
         "responses": {
           "200": {
-            "description": "Token generated successfully",
+            "description": "200 response",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4uZG9lIiwiZW1haWwiOiJkb28uam9obkB1bml2ZXJzZS5vcmciLCJpYXQiOjE1MTYyMzkwMjJ9.QsXZLquqEZY4q0XhDEvbEm_LzYEuPToboyUZFZrQSbE"
+                  "$ref": "#/components/schemas/InstitutionsRefresh"
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
-        "operationId": "getAuthToken"
+        "operationId": "refreshInstitutions"
       }
     },
-    "/profile/terms/accept": {
-      "post": {
+    "/institutions/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an institution",
         "tags": [
-          "Authentication"
+          "Institutions"
         ],
-        "summary": "Accept terms of service",
-        "description": "Accept terms of service. You should read them first!",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id",
+        "description": "Get an institution by ID. Use 'self' to get the institution of the authenticated user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an institution",
+        "operationId": "delete-institutions-id",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an institution.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "tags": [
+          "Institutions"
+        ]
+      },
+      "put": {
+        "summary": "Update an institution",
+        "operationId": "put-institutions-id",
         "responses": {
-          "204": {
-            "description": "Terms accepted successfully"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           }
         },
-        "operationId": "acceptTerms"
+        "description": "Update an institution",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Institution"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
-    "/profile/password/reset": {
-      "post": {
+    "/institutions/{id}/creator": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "delete": {
+        "summary": "Delete institution creator",
+        "operationId": "delete-institutions-id-creator",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
         "tags": [
-          "Authentication"
+          "Institutions",
+          "Administration"
         ],
-        "summary": "Reset Kibana password",
-        "description": "Reset Kibana password of the authenticated user.",
+        "description": "Remove the institution creator",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/validated": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Change validation state of an institution",
+        "operationId": "put-institutions-id-validated",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Change validation state of an institution",
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ]
+      }
+    },
+    "/institutions/{id}/sushi": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get Sushi items of an institution",
+        "tags": [
+          "Institutions",
+          "Sushi"
+        ],
         "responses": {
-          "204": {
-            "description": "Password successfully reset"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sushi"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id-sushi",
+        "description": "Get Sushi items of an institution.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/_refresh": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Refresh an institution",
+        "operationId": "post-institutions-id-_refresh",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Institutions"
+        ],
+        "description": "Refresh dynamic fields (contacts, number of ECs) of a specific institution.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/members": {
+      "get": {
+        "summary": "Get institution members",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-institutions-:id-members",
+        "description": "Get the members of an institution. Must be either admin or institution contact."
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ]
+    },
+    "/institutions/{id}/members/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "Username of the member"
+        }
+      ],
+      "put": {
+        "summary": "Update a member",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "description": "Conflict"
           }
         },
-        "operationId": "resetPassword"
+        "operationId": "put-institutions-id-members-username",
+        "description": "Update the member of an institution",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "readonly": {
+                    "type": "boolean",
+                    "description": "Whether the member has readonly access to the dashboards",
+                    "default": true
+                  },
+                  "docContact": {
+                    "type": "boolean",
+                    "description": "Whether the member is the documentary contact"
+                  },
+                  "techContact": {
+                    "type": "boolean",
+                    "description": "Whether the member is the technical contact"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Remove a member",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "delete-institutions-id-members-username",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Remove a member from an institution"
+      }
+    },
+    "/institutions/{id}/state": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ],
+      "get": {
+        "summary": "Get institution state",
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "space": {
+                        "id": "toulouse",
+                        "name": "toulouse",
+                        "description": "Université Toulouse-II",
+                        "disabledFeatures": []
+                      },
+                      "indices": [
+                        "toulouse",
+                        "toulouse-foo",
+                        "toulouse-foobar"
+                      ],
+                      "indexPatterns": [
+                        {
+                          "id": "902cf200-b97c-11eb-aae3-e9a25566a440",
+                          "title": "toulouse*",
+                          "timeFieldName": "datetime"
+                        },
+                        {
+                          "id": "34a502d0-b391-11e9-8339-63cd4d0c5d94",
+                          "title": "univ-example",
+                          "timeFieldName": "datetime"
+                        }
+                      ],
+                      "roles": {
+                        "base": {
+                          "name": "toulouse",
+                          "exists": true
+                        },
+                        "readonly": {
+                          "name": "toulouse_read_only",
+                          "exists": true
+                        }
+                      }
+                    }
+                  },
+                  "properties": {
+                    "spaces": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Space"
+                      }
+                    },
+                    "indices": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "indexPatterns": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "timeFieldName": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "spaceId": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title"
+                        ]
+                      }
+                    },
+                    "roles": {
+                      "type": "object",
+                      "required": [
+                        "base",
+                        "readonly"
+                      ],
+                      "properties": {
+                        "base": {
+                          "type": "object",
+                          "required": [
+                            "exists"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        "readonly": {
+                          "type": "object",
+                          "required": [
+                            "exists"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "spaces",
+                    "indices",
+                    "indexPatterns",
+                    "roles"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-institutions-id-state",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Get the current state of an institution (list spaces, indices, index patterns and roles)",
+        "x-internal": false
       }
     },
     "/logs": {
@@ -1166,7 +2753,57 @@
           }
         },
         "operationId": "insertLogs"
-      }
+      },
+      "delete": {
+        "summary": "Delete an index",
+        "operationId": "delete-logs-index",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "acknowledge": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "acknowledge"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete an index",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Indices"
+        ]
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "index",
+          "in": "path",
+          "required": true,
+          "description": "name of the index"
+        }
+      ]
     },
     "/logs/{index}/events": {
       "delete": {
@@ -1595,112 +3232,6 @@
         "operationId": "counterizeLogs"
       }
     },
-    "/files": {
-      "get": {
-        "tags": [
-          "Files"
-        ],
-        "summary": "List your hosted files",
-        "description": "List your hosted files.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "200 response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileList"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "operationId": "getFiles"
-      }
-    },
-    "/files/{filename}": {
-      "delete": {
-        "tags": [
-          "Files"
-        ],
-        "summary": "Remove one file from your hosted files",
-        "description": "Remove one file from your hosted files.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "filename",
-            "schema": {
-              "type": "string",
-              "example": "univ-foobar_2017-08-17.csv"
-            },
-            "description": "The file to be removed.",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "File successfully removed"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "operationId": "deleteFile"
-      }
-    },
-    "/files/delete_batch": {
-      "post": {
-        "tags": [
-          "Files"
-        ],
-        "summary": "Remove a list of files from your hosted files",
-        "description": "Remove a list of files from your hosted files.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "entries": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "example": "univ-foobar_2017-08-17.csv"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "List of files successfully removed"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "operationId": "deleteMultipleFiles"
-      }
-    },
     "/metrics": {
       "get": {
         "tags": [
@@ -1751,13 +3282,13 @@
         "operationId": "getInstitutions"
       }
     },
-    "/institutions/_refresh": {
-      "post": {
+    "/profile": {
+      "get": {
         "tags": [
-          "Institutions"
+          "Authentication"
         ],
-        "summary": "Refresh institutions",
-        "description": "Refresh dynamic institution fields (contacts, number of ECs).",
+        "summary": "Fetch profile",
+        "description": "Get the profile associated with the JWT token.",
         "security": [
           {
             "bearerAuth": []
@@ -1769,139 +3300,101 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstitutionsRefresh"
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "description": "Forbidden"
           }
         },
-        "operationId": "refreshInstitutions"
+        "operationId": "getProfile"
       }
     },
-    "/institutions/{id}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
+    "/profile/token": {
       "get": {
-        "summary": "Get an institution",
         "tags": [
-          "Institutions"
+          "Authentication"
+        ],
+        "summary": "Get an authorization token",
+        "description": "Actually requires a JWT token (typically stored in cookies). This route provides you with a token from the user space.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Token generated successfully",
             "content": {
-              "application/json": {
+              "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Institution"
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4uZG9lIiwiZW1haWwiOiJkb28uam9obkB1bml2ZXJzZS5vcmciLCJpYXQiOjE1MTYyMzkwMjJ9.QsXZLquqEZY4q0XhDEvbEm_LzYEuPToboyUZFZrQSbE"
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
+            "$ref": "#/components/responses/UnauthorizedError"
           }
         },
-        "operationId": "get-institutions-id",
-        "description": "Get an institution by ID. Use 'self' to get the institution of the authenticated user.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete an institution",
-        "operationId": "delete-institutions-id",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "description": "Delete an institution.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Institutions"
-        ]
-      },
-      "put": {
-        "summary": "Update an institution",
-        "operationId": "put-institutions-id",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Institution"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "description": "Update an institution",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Institution"
-              }
-            }
-          }
-        },
-        "tags": [
-          "Institutions"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        "operationId": "getAuthToken"
       }
     },
-    "/institutions": {
-      "get": {
-        "summary": "Get institutions",
+    "/profile/terms/accept": {
+      "post": {
         "tags": [
-          "Institutions"
+          "Authentication"
+        ],
+        "summary": "Accept terms of service",
+        "description": "Accept terms of service. You should read them first!",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Terms accepted successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "acceptTerms"
+      }
+    },
+    "/profile/password/reset": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset Kibana password",
+        "description": "Reset Kibana password of the authenticated user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Password successfully reset"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "operationId": "resetPassword"
+      }
+    },
+    "/roles": {
+      "get": {
+        "summary": "Get Kibana roles",
+        "tags": [
+          "Administration",
+          "Kibana"
         ],
         "responses": {
           "200": {
@@ -1911,7 +3404,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Institution"
+                    "$ref": "#/components/schemas/KibanaRole"
                   }
                 }
               }
@@ -1919,29 +3412,47 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
-        "operationId": "get-institutions",
-        "description": "Get all institutions",
+        "operationId": "get-roles",
+        "description": "List all Kibana roles",
         "security": [
           {
             "bearerAuth": []
           }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "reserved",
+            "description": "include reserved roles"
+          }
         ]
-      },
-      "post": {
-        "summary": "Create an institution",
-        "operationId": "post-institutions",
+      }
+    },
+    "/roles/{roleName}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "roleName",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Create or update role",
+        "operationId": "put-roles-roleName",
         "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Institution"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request"
@@ -1949,113 +3460,40 @@
           "401": {
             "description": "Unauthorized"
           },
-          "409": {
-            "description": "Conflict"
-          }
-        },
-        "description": "Create an institution",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Institution"
-              }
-            }
-          }
-        },
-        "tags": [
-          "Institutions"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/institutions/{id}/validated": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "put": {
-        "summary": "Change validation state of an institution",
-        "operationId": "put-institutions-id-validated",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
           "403": {
             "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
           }
         },
-        "description": "Change validation state of an institution",
+        "description": "Create or update a Kibana role",
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "value": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "value"
-                ]
+                "$ref": "#/components/schemas/KibanaRole"
               }
             }
           }
-        },
-        "tags": [
-          "Institutions"
-        ]
-      }
-    },
-    "/institutions/{id}/sushi": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
         }
-      ],
+      },
       "get": {
-        "summary": "Get Sushi items of an institution",
-        "tags": [
-          "Institutions",
-          "Sushi"
-        ],
+        "summary": "Get a role",
+        "operationId": "get-roles-roleName",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Sushi"
-                  }
+                  "$ref": "#/components/schemas/KibanaRole"
                 }
               }
             }
@@ -2070,122 +3508,43 @@
             "description": "Not Found"
           }
         },
-        "operationId": "get-institutions-id-sushi",
-        "description": "Get Sushi items of an institution.",
+        "description": "Get a role by its name",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
         "security": [
           {
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/institutions/delete": {
-      "post": {
-        "summary": "Delete multiple institutions",
-        "operationId": "post-institutions-delete",
+      },
+      "delete": {
+        "summary": "Delete a role",
+        "operationId": "delete-roles-roleName",
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid"
-                      },
-                      "status": {
-                        "type": "string",
-                        "enum": [
-                          "deleted",
-                          "failed"
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized"
           },
           "403": {
             "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           }
         },
-        "description": "Delete multiple institutions at once.",
+        "description": "Delete a Kibana role",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         "tags": [
-          "Institutions"
-        ]
-      }
-    },
-    "/institutions/{id}/_refresh": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "Refresh an institution",
-        "operationId": "post-institutions-id-_refresh",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Institution"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "tags": [
-          "Institutions"
-        ],
-        "description": "Refresh dynamic fields (contacts, number of ECs) of a specific institution.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+          "Administration",
+          "Kibana"
         ]
       }
     },
@@ -2435,7 +3794,7 @@
         }
       },
       "get": {
-        "summary": "Get a Sushi item",
+        "summary": "",
         "operationId": "get-sushi-id",
         "responses": {
           "200": {
@@ -2466,11 +3825,12 @@
         ]
       }
     },
-    "/institutions/{id}/members": {
+    "/spaces": {
       "get": {
-        "summary": "Get institution members",
+        "summary": "List spaces",
         "tags": [
-          "Institutions"
+          "Administration",
+          "Kibana"
         ],
         "responses": {
           "200": {
@@ -2478,7 +3838,108 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Member"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Space"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-spaces",
+        "description": "List spaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a space",
+        "operationId": "post-spaces",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Create a Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Space"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get a space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
                 }
               }
             }
@@ -2490,20 +3951,94 @@
             "description": "Forbidden"
           },
           "404": {
-            "description": "Not Found",
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-spaces-id",
+        "description": "Get a specific space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update a space",
+        "operationId": "put-spaces-id",
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/Space"
                 }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Update a Kibana space",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Space"
               }
             }
           }
         },
-        "operationId": "get-institutions-:id-members",
-        "description": "Get the members of an institution. Must be either admin or institution contact."
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
+      "delete": {
+        "summary": "Delete a space",
+        "operationId": "delete-space-spaceId",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
+      }
+    },
+    "/spaces/{id}/index-patterns": {
       "parameters": [
         {
           "schema": {
@@ -2513,7 +4048,304 @@
           "in": "path",
           "required": true
         }
-      ]
+      ],
+      "get": {
+        "summary": "List index patterns in a space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KibanaSavedObject"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-spaces-id-index-patterns",
+        "description": "List index patterns in a space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create an index pattern",
+        "operationId": "post-spaces-id-index-patterns",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexPattern"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "description": "Create an index pattern in a given space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexPatternAttributes"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List users",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operationId": "get-users",
+        "description": "List users. Limited to 10.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "description": "a query for searching"
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "size",
+            "description": "a query to change users list limit size"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "source",
+            "description": "a query to retrieve more information, the fields are separated by a comma"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get a user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-users-username",
+        "description": "Get a user by his username",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "summary": "Update a user",
+        "operationId": "put-users-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Update a user",
+        "tags": [
+          "Users",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "operationId": "delete-user-username",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
+      }
     },
     "/sushi/{id}/report.json": {
       "parameters": [

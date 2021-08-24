@@ -72,12 +72,12 @@ exports.renaterLogin = async (ctx) => {
   };
 
   if (!props.metadata.idp) {
-    ctx.throw(400, 'IDP not found in Shibboleth headers');
+    ctx.throw(400, ctx.$t('errors.auth.IDPNotFound'));
     return;
   }
 
   if (!props.email) {
-    ctx.throw(400, 'email not found in Shibboleth headers');
+    ctx.throw(400, ctx.$t('errors.auth.noEmailInHeaders'));
     return;
   }
 
@@ -99,7 +99,7 @@ exports.renaterLogin = async (ctx) => {
     user = await elastic.security.findUser({ username });
 
     if (!user) {
-      ctx.throw(500, 'Failed to save user data');
+      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
       return;
     }
 
@@ -122,7 +122,7 @@ exports.renaterLogin = async (ctx) => {
       await elastic.security.putUser({ username, body: props });
       user = props;
     } catch (e) {
-      ctx.throw(500, 'Failed to update user data');
+      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
       return;
     }
   } else {
@@ -157,7 +157,7 @@ exports.elasticLogin = async (ctx) => {
   }
 
   if (user.metadata && user.metadata._reserved) {
-    ctx.throw(403, 'cannot login as reserved user');
+    ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
     return;
   }
 
@@ -170,7 +170,7 @@ exports.acceptTerms = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
@@ -184,7 +184,7 @@ exports.resetPassword = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
@@ -204,7 +204,7 @@ exports.getUser = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
-    ctx.throw(401, 'Unable to fetch user data, please log in again');
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 

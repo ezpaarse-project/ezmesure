@@ -40,7 +40,12 @@ const {
   getAvailableReports,
 } = require('./actions');
 
-router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
+router.use(
+  requireJwt,
+  requireUser,
+  requireTermsOfUse,
+  requireAnyRole(['sushi_form', 'admin', 'superuser']),
+);
 
 router.route({
   method: 'GET',

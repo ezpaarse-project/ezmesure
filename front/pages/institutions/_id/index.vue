@@ -66,9 +66,18 @@ export default {
     InstitutionForm,
     InstitutionCard,
   },
-  async asyncData({ $axios, params }) {
+  async asyncData({
+    $axios,
+    params,
+    $auth,
+    redirect,
+  }) {
     let institution = null;
     let failedToFetch = false;
+
+    if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
+      return redirect({ name: 'myspace' });
+    }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
@@ -108,8 +117,12 @@ export default {
     isContact() {
       return this.isMember && this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
     },
+    isCreator() {
+      const creator = this.institution?.creator;
+      return creator && (creator === this.$auth?.user?.username);
+    },
     canEdit() {
-      return this.isAdmin || this.isContact;
+      return this.isAdmin || this.isContact || this.isCreator;
     },
   },
   methods: {

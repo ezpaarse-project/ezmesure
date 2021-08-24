@@ -15,7 +15,7 @@
             flat
             dense
           >
-            <v-toolbar-title>Accès restreint</v-toolbar-title>
+            <v-toolbar-title v-text="$t('authenticate.restrictedAccess')" />
             <v-spacer />
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
@@ -32,10 +32,7 @@
                 </div>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <p>
-                  Vous êtes déjà enregistré ?
-                  Connectez-vous avec vos identifiants Kibana.
-                </p>
+                <p v-text="$t('authenticate.kibanaAuth')" />
 
                 <v-alert
                   v-model="showError"
@@ -50,17 +47,17 @@
                 <v-form v-model="loginFormValid" @submit.prevent="signin">
                   <v-text-field
                     v-model="username"
-                    label="Utilisateur"
-                    :rules="[() => !!username || ('Ce champ est requis')]"
+                    :label="$t('authenticate.user')"
+                    :rules="[() => !!username || ($t('authenticate.fieldIsRequired'))]"
                     prepend-inner-icon="mdi-account"
                     outlined
                     required
                   />
                   <v-text-field
                     v-model="password"
-                    label="Mot de passe"
+                    :label="$t('authenticate.password')"
                     :type="showPassword ? 'text' : 'password'"
-                    :rules="[() => !!password || ('Ce champ est requis')]"
+                    :rules="[() => !!password || ($t('authenticate.fieldIsRequired'))]"
                     prepend-inner-icon="mdi-lock"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     outlined
@@ -74,9 +71,8 @@
                       type="submit"
                       :loading="connecting"
                       :disabled="!loginFormValid"
-                    >
-                      Se connecter
-                    </v-btn>
+                      v-text="$t('authenticate.logIn')"
+                    />
                   </p>
                 </v-form>
               </v-expansion-panel-content>
@@ -93,17 +89,14 @@
                 </div>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <p>
-                  Connectez-vous via votre fournisseur d'identité.
-                </p>
+                <p v-text="$t('authenticate.logInWithProvider')" />
 
                 <p class="text-center">
                   <v-btn
                     color="primary"
                     :href="`/login?origin=${$auth.$state.redirect || '/myspace'}`"
-                  >
-                    Se connecter
-                  </v-btn>
+                    v-text="$t('authenticate.logIn')"
+                  />
                 </p>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -146,10 +139,10 @@ export default {
         const statusCode = (err.response && err.response.status) || 500;
 
         if (statusCode >= 400 && statusCode < 500) {
-          this.errorMessage = 'Les informations transmises n\'ont pas permis de vous authentifier';
+          this.errorMessage = this.$t('authenticate.loginFailed');
           this.showError = true;
         } else {
-          this.errorMessage = 'Une erreur est survenue';
+          this.errorMessage = this.$t('authenticate.failed');
           this.showError = true;
         }
       }

@@ -70,7 +70,7 @@ export default {
         this.$store.dispatch('snacks/error', this.$t('token.copyFailed'));
         return;
       }
-      this.$store.dispatch('snacks/info', this.$t('token.copyed'));
+      this.$store.dispatch('snacks/info', this.$t('token.clipped'));
     },
   },
 };

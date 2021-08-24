@@ -2,18 +2,41 @@ Activité récente
 ================
 
 {% if users.length -%}
+- {{ users.length }} enregistrements
+{% endif -%}
+{% if institutions.length -%}
+- {{ institutions.length }} mises à jour d'établissements
+{% endif %}
+{% if files.length -%}
+- {{ files.length }} dépôts de fichiers
+{% endif -%}
+{% if insertions.length -%}
+- {{ insertions.length }} chargements
+{% endif -%}
+{% if reportings.length -%}
+- {{ reportings.length }} mises à jour de tâches de reporting
+{% endif -%}
+
+{% if users.length -%}
 Enregistrements ({{ users.length }})
   {% for action in users -%}
     [{{ action.datetime }}][{{ action.response.status }}] {{ action.elasticUser.full_name }} ({{ action.elasticUser.email }}) [{{ action.datetime }}]
   {% endfor %}
 {% endif -%}
 
+{% if institutions.length -%}
+Mises à jour établissements ({{ institutions.length }})
+  {% for action in institutions -%}
+    [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}{{ "-" if action.action == 'institutions/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+  {% endfor %}
+{% endif -%}
+
 {% if files.length -%}
 Dépôts de fichiers ({{ files.length }})
   {% for action in files -%}
-    {% for path in action.path -%}
-      [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
-    {% endfor %}
+  {% for path in action.path -%}
+    [{{ "+" if action.action == 'file/upload' else "-" }}][{{ action.datetime }}][{{ action.response.status }}] {{ path }}
+  {% endfor %}
   {%- endfor %}
 {% endif -%}
 

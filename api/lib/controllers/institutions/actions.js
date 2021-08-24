@@ -1,6 +1,4 @@
-const axios = require('axios');
 const config = require('config');
-const { v4: uuidv4 } = require('uuid');
 const elastic = require('../../services/elastic');
 const depositors = require('../../services/depositors');
 const indexTemplate = require('../../utils/depositors-template');
@@ -10,14 +8,6 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 
 const depositorsIndex = config.depositors.index;
-
-const instance = axios.create({
-  baseURL: 'https://api.opendata.onisep.fr/downloads/57da952417293/57da952417293.json',
-  timeout: 30000,
-  headers: {
-    'Application-ID': 'ezMESURE',
-  },
-});
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -35,69 +25,6 @@ const ensureIndex = async () => {
   }
 };
 
-const getInstitutionDataByUAI = async (uai) => {
-  try {
-    const { data: res } = await instance.get('');
-
-    if (!res) { return {}; }
-
-    const data = Object.values(res).find((e) => e.code_uai === uai);
-
-    return {
-      acronym: data.sigle,
-      city: data.commune,
-      type: data.type_detablissement,
-      location: {
-        lon: data.longitude_x,
-        lat: data.latitude_y,
-      },
-    };
-  } catch (err) {
-    appLogger.error('Failed to get institution data', err);
-    return {};
-  }
-};
-
-const getInstitutionData = async (email, sourceFilter) => {
-  try {
-    const { body } = await elastic.search({
-      index: depositorsIndex,
-      body: {
-        query: {
-          nested: {
-            path: 'members',
-            query: {
-              bool: {
-                must: [
-                  {
-                    match: {
-                      'members.email': email,
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-        _source: sourceFilter,
-      },
-    });
-
-    if (!body || !body.hits || !body.hits.hits) {
-      return {};
-    }
-
-    const institution = body.hits.hits.shift();
-
-    if (!institution) { return null; }
-
-    const { _id: id, _source: source } = institution;
-    return { ...source, id };
-  } catch (error) {
-    return null;
-  }
-};
-
 exports.getInstitutions = async (ctx) => {
   await ensureIndex();
 
@@ -108,18 +35,9 @@ exports.getInstitutions = async (ctx) => {
 exports.getInstitution = async (ctx) => {
   await ensureIndex();
 
-  const { institutionId } = ctx.params;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = ctx.state.institution;
 };
 
 exports.getSelfInstitution = async (ctx) => {
@@ -129,7 +47,7 @@ exports.getSelfInstitution = async (ctx) => {
   const institution = await Institution.findOneByCreatorOrRole(username, roles);
 
   if (!institution) {
-    ctx.throw(404, 'No assigned institution');
+    ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
     return;
   }
 
@@ -139,6 +57,7 @@ exports.getSelfInstitution = async (ctx) => {
 };
 
 exports.createInstitution = async (ctx) => {
+  ctx.action = 'institutions/create';
   await ensureIndex();
 
   const { user } = ctx.state;
@@ -147,12 +66,15 @@ exports.createInstitution = async (ctx) => {
   const { logo } = body;
   const { username, roles } = ctx.state.user;
 
+  ctx.metadata = {
+    institutionName: body.name,
+  };
 
   if (!isAdmin(user)) {
     const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
 
     if (selfInstitution) {
-      ctx.throw(409, 'You can not attach another institution to your profile');
+      ctx.throw(409, ctx.$t('errors.institution.alreadyAssigned'));
       return;
     }
   }
@@ -171,44 +93,23 @@ exports.createInstitution = async (ctx) => {
 
   await institution.save();
 
+  ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
   ctx.body = institution;
-
-  // if (institution.uai) {
-  //   try {
-  //     const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
-
-  //     if (institutionUAIData) {
-  //       institution = {
-  //         ...institution,
-  //         ...institutionUAIData,
-  //       };
-  //     }
-  //   } catch (err) {
-  //     appLogger.error('Failed to get institution data', err);
-  //   }
-  // }
 };
 
 exports.updateInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
+  ctx.action = 'institutions/update';
+  const { user, institution } = ctx.state;
   const { body } = ctx.request;
 
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+  };
+
   if (!body) {
-    ctx.throw(400, 'body is empty');
-    return;
-  }
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not authorized to update this institution data');
+    ctx.throw(400, ctx.$t('errors.emptyBody'));
     return;
   }
 
@@ -222,21 +123,6 @@ exports.updateInstitution = async (ctx) => {
     await institution.removeLogo();
   }
 
-  // if (institution.uai) {
-  //   try {
-  //     const institutionUAIData = await getInstitutionDataByUAI(institution.uai);
-
-  //     if (institutionUAIData) {
-  //       institution = {
-  //         ...institution,
-  //         ...institutionUAIData,
-  //       };
-  //     }
-  //   } catch (err) {
-  //     appLogger.error('Failed to get institution data', err);
-  //   }
-  // }
-
   try {
     await institution.save();
   } catch (e) {
@@ -247,96 +133,22 @@ exports.updateInstitution = async (ctx) => {
   ctx.body = institution;
 };
 
-exports.validateInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
-  const { body = {} } = ctx.request;
-  const { value: validated } = body;
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to validate this institution');
-    return;
-  }
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  institution.setValidation(validated);
-
-  if (validated) {
-    await institution.createSpace();
-    await institution.createBaseIndex();
-    await institution.createIndexPattern();
-    await institution.createRoles();
-    await institution.migrateCreator();
-  }
-
-  await institution.save();
-
-  ctx.status = 200;
-};
-
-exports.deleteInstitutions = async (ctx) => {
-  const { body } = ctx.request;
-  const { user } = ctx.state;
-  const response = [];
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to delete institutions');
-    return;
-  }
-
-  if (Array.isArray(body.ids) && body.ids.length > 0) {
-    for (let i = 0; i < body.ids.length; i += 1) {
-      try {
-        // FIXME: use bulk query
-        await Institution.deleteOne(body.ids[i]);
-        response.push({ id: body.ids[i], status: 'deleted' });
-      } catch (error) {
-        response.push({ id: body.ids[i], status: 'failed' });
-        appLogger.error('Failed to delete institution', error);
-      }
-    }
-
-    ctx.status = 200;
-    ctx.body = response;
-  }
-};
-
 exports.deleteInstitution = async (ctx) => {
+  ctx.action = 'institutions/delete';
   const { institutionId } = ctx.params;
-  const { user } = ctx.state;
+  const { institution } = ctx.state;
 
-  if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to delete institutions');
-    return;
-  }
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+  };
 
   ctx.status = 200;
   ctx.body = await Institution.deleteOne(institutionId);
 };
 
 exports.getInstitutionMembers = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const { user } = ctx.state;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to access this institution');
-    return;
-  }
-
-  const members = await institution.getMembers();
+  const members = await ctx.state.institution.getMembers();
 
   ctx.type = 'json';
   ctx.status = 200;
@@ -344,42 +156,134 @@ exports.getInstitutionMembers = async (ctx) => {
   ctx.body = Array.isArray(members) ? members : [];
 };
 
-exports.updateMember = async (ctx) => {
-  const { institutionId } = ctx.params;
-  let { email } = ctx.params;
-  const { body } = ctx.request;
+exports.addInstitutionMember = async (ctx) => {
+  ctx.action = 'institutions/addMember';
 
-  if (email === 'self') {
-    email = ctx.state.user.email;
+  const { institution, userIsAdmin } = ctx.state;
+  const { username } = ctx.params;
+  const { body = {} } = ctx.request;
+  const {
+    readonly = true,
+    docContact,
+    techContact,
+  } = body;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+    username,
+  };
+
+  const role = institution.getRole();
+  const readonlyRole = institution.getRole({ readonly: true });
+
+  if (!role) {
+    ctx.throw(409, ctx.$t('errors.institution.noRole'));
+  }
+
+  const member = await elastic.security.findUser({ username });
+
+  if (!member) {
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
+  }
+
+  // Only admins can update institution contacts
+  if (institution.isContact(member) && !userIsAdmin) {
+    ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
+  }
+
+  // If the user is not already a member, check if it belongs to another institution
+  if (!institution.isMember(member) && !institution.isCreator(member)) {
+    const memberInstitution = await Institution.findOneByCreatorOrRole(
+      member.username,
+      member.roles,
+    );
+
+    if (memberInstitution) {
+      ctx.throw(409, ctx.$t('errors.members.alreadyMember'));
+      return;
+    }
+  }
+
+  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  userRoles.add(readonly ? readonlyRole : role);
+  userRoles.delete(readonly ? role : readonlyRole);
+
+  if (userIsAdmin) {
+    if (docContact === true) { userRoles.add(Institution.docRole()); }
+    if (docContact === false) { userRoles.delete(Institution.docRole()); }
+    if (techContact === true) { userRoles.add(Institution.techRole()); }
+    if (techContact === false) { userRoles.delete(Institution.techRole()); }
+  }
+
+  member.roles = Array.from(userRoles);
+
+  try {
+    await elastic.security.putUser({ username, refresh: true, body: member });
+  } catch (e) {
+    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
+  }
+
+  if (institution.isCreator(member)) {
+    institution.setCreator(null);
+    await institution.save();
   }
 
   ctx.status = 200;
+  ctx.body = { message: 'user updated' };
+};
 
-  if (!body.id) {
-    body.id = uuidv4();
+exports.removeInstitutionMember = async (ctx) => {
+  ctx.action = 'institutions/removeMember';
+
+  const { institution, userIsAdmin } = ctx.state;
+  const { username } = ctx.params;
+
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.get('name'),
+    username,
+  };
+
+  const role = institution.getRole();
+  const readonlyRole = institution.getRole({ readonly: true });
+
+  if (!role) {
+    ctx.throw(409, ctx.$t('errors.institution.noRole'));
   }
 
-  await elastic.update({
-    index: depositorsIndex,
-    id: institutionId,
-    refresh: true,
-    body: {
-      script: {
-        source: 'def targets = ctx._source.members.findAll(contact -> contact.email == params.email);'
-          + 'for(contact in targets) {'
-          + 'contact.id = params.id;'
-          + 'contact.type = params.type;'
-          + 'contact.email = params.email;'
-          + 'contact.confirmed = params.confirmed;'
-          + 'contact.fullName = params.fullName;'
-          + '}',
-        params: body,
-      },
-    },
-  }).catch((err) => {
-    ctx.status = 500;
-    appLogger.error('Failed to update data in index', err);
-  });
+  const member = await elastic.security.findUser({ username });
+
+  if (!member) {
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
+  }
+  if (institution.isContact(member) && !userIsAdmin) {
+    ctx.throw(409, ctx.$t('errors.members.cannotRemoveContact'));
+  }
+
+  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  if (!userRoles.has(role) && !userRoles.has(readonlyRole)) {
+    ctx.status = 200;
+    ctx.body = { message: ctx.$t('nothingToDo') };
+    return;
+  }
+
+  userRoles.delete(role);
+  userRoles.delete(readonlyRole);
+
+  member.roles = Array.from(userRoles);
+
+  try {
+    await elastic.security.putUser({ username: member.username, refresh: true, body: member });
+  } catch (e) {
+    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
+  }
+
+  ctx.status = 200;
+  ctx.body = { message: ctx.$t('userUpdated') };
 };
 
 exports.refreshInstitutions = async (ctx) => {
@@ -391,38 +295,15 @@ exports.refreshInstitutions = async (ctx) => {
 };
 
 exports.refreshInstitution = async (ctx) => {
-  const { institutionId } = ctx.params;
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  await institution.refreshIndexCount();
-  await institution.refreshContacts();
+  await ctx.state.institution.refreshIndexCount();
+  await ctx.state.institution.refreshContacts();
 
   ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = ctx.state.institution;
 };
 
 exports.getSushiData = async (ctx) => {
-  const { user } = ctx.state;
-  const { institutionId } = ctx.params;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, 'Institution not found');
-    return;
-  }
-
-  if (!institution.isContact(user) && !isAdmin(user)) {
-    ctx.throw(403, 'You are not allowed to access this institution');
-    return;
-  }
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findByInstitutionId(institutionId);
+  ctx.body = await Sushi.findByInstitutionId(ctx.state.institution.id);
 };

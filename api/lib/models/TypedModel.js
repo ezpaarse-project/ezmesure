@@ -43,6 +43,15 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     return this.data || {};
   }
 
+  get(prop, defaultValue) {
+    const value = this.data[prop];
+    return (typeof value === 'undefined' ? defaultValue : value);
+  }
+
+  set(prop, value) {
+    this.data[prop] = value;
+  }
+
   static trimIdPrefix(id) {
     return id.startsWith(`${type}:`) ? id.slice(type.length + 1) : id;
   }
@@ -200,6 +209,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
           bool: {
             minimum_should_match: opt.should ? 1 : 0,
             should: opt.should,
+            must_not: opt.must_not,
             filter,
           },
         },

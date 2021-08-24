@@ -1,0 +1,92 @@
+nothingToDo: Rien à faire
+userUpdated: Utilisateur mis à jour
+indexCreated: index créé
+indexPatternCreated: index pattern créé
+creatorMigrated: Créateur migré
+
+errors:
+  emptyBody: Le corps de la requête est vide
+  termsOfUse: Vous devez acceptez les conditions d'utilisation avant d'utiliser ce service
+  unauthorized: Vous n'êtes pas autorisés à utiliser cette route
+
+  auth:
+    reservedUser: vous ne pouvez pas vous connecter avec un utilisateur réservé
+    noEmailInHeaders: Email introuvable dans les headers Shibboleth
+    IDPNotFound: IDP introuvable dans les headers Shibboleth
+    noUsername: Nom d'utilisateur introuvable dans le token
+    unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
+
+  sushi:
+    unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
+    institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
+    notFound: Item SUSHI introuvable
+    emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
+
+  institution:
+    notFound: Établissement introuvable
+    unauthorized: Vous n'êtes pas autorisé à accéder à cet établissement
+    noRole: L'établissement n'a pas de rôle associé
+    notAssigned: Pas d'établissement associé
+    alreadyAttached: Vous ne pouvez associer un autre établissement à votre profil
+    noSpaceSet: L'établissement [%s] n'a pas d'espace associé
+    noPrefixSet: L'établissement [%s] n'a pas de préfixe d'index associé
+    noRoleSet: L'établissement [%s] n'a pas de rôle associé
+    noBaseIndex: L'index de base [%s] de l'établissement [%s] n'existe pas
+    noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
+    forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
+
+  members:
+    alreadyMember: L'utilisateur appartient à une autre institution
+    cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
+    cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
+
+  user:
+    notFound: Utilisateur introuvable
+    noEmail: L'email obligatoire est absent du profil utilisateur
+    failedToSave: Impossible de sauvegarder les données utilisateur
+    failedToUpdateRoles: Impossible de mettre à jour les rôles de l'utilisateur
+
+  users:
+    failedToQuery: Impossible de récupérer les utilisateurs
+
+  role:
+    notFound: Rôle [%s] introuvable
+
+  space:
+    notFound: Espace [%s] introuvable
+    alreadyExists: L'espace [%s] existe déjà
+
+  spaces:
+    failedToQuery: Impossible de récupérer les espaces
+
+  dashboard:
+    notFound: Tableau de bord [%s] introuvable
+    failedToExport: Impossible d'exporter les tableaux de bord [%s] depuis l'espace [%s]
+    failedToImport: Impossible d'importer les tableaux de bord dans l'espace [%s]
+
+  index:
+    notFound: Index [%s] introuvable
+    alreadyExists: L'index [%s] existe déjà
+
+  indexPattern:
+    notFound: Index pattern [%s] introuvable dans l'espace [%s]
+    alreadyExists: L'index pattern [%s] existe déjà dans l'espace [%s]
+    noIndexMatching: L'index pattern [%s] ne correspond à aucun index
+
+  files:
+    wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
+    missingEntries: "Champ requis manquant: entries"
+    unsupportedType: Type de fichier non supporté
+
+  perms:
+    feature: Vous n'êtes pas autorisé à utiliser cette fonctionnalité
+    readIndex: Vous n'avez pas l'autorisation de lire dans %s
+    writeInIndex: Vous n'avez pas l'autorisation d'écrire dans %s
+    deleteIndex: Vous n'avez pas l'autorisation de supprimer %s
+    deleteFromIndex: Vous n'avez pas l'autorisation de supprimer dans %s
+
+  aggregate:
+    invalidFilter: "Filtre invalide : '%s' devrait être une chaîne de caractère, ou une liste de chaînes de caractères"
+    missingFields: "Champ requis manquant : fields"
+    invalidFilterFormat: Le filtre présente un format rison invalide
+    invalidPeriod: Période invalide

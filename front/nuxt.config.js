@@ -82,6 +82,7 @@ module.exports = {
     }],
   ],
   auth: {
+    scopeKey: 'roles',
     redirect: {
       login: '/authenticate',
       logout: '/',

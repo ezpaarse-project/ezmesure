@@ -11,6 +11,6 @@ router.use(requireJwt, requireUser);
 router.get('/', getUser);
 router.get('/token', getToken);
 router.post('/terms/accept', acceptTerms);
-router.put('/password/reset', resetPassword);
+router.post('/password/reset', resetPassword);
 
 module.exports = router;

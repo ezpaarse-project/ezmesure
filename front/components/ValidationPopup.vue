@@ -20,15 +20,6 @@
     </template>
 
     <v-card>
-      <v-card-text v-if="!isValidatable">
-        <v-alert
-          dense
-          outlined
-          type="info"
-          v-text="$t('institutions.institution.notValidatable')"
-        />
-      </v-card-text>
-
       <v-card-actions>
         <v-btn
           :loading="validating"
@@ -45,7 +36,6 @@
           :loading="validating"
           color="success"
           text
-          :disabled="!isValidatable"
           @click="setValidation(true)"
         >
           <v-icon left>
@@ -72,14 +62,6 @@ export default {
       validating: false,
       institutionId: this.institution?.id,
     };
-  },
-  computed: {
-    isValidatable() {
-      if (!this.institution?.indexPrefix) { return false; }
-      if (!this.institution?.role) { return false; }
-      if (!this.institution?.space) { return false; }
-      return true;
-    },
   },
   methods: {
     async setValidation(validated) {

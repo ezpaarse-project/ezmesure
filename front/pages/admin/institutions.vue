@@ -1,7 +1,28 @@
 <template>
   <section>
-    <ToolBar title="Établissements">
-      <slot>
+    <ToolBar
+      :title="toolbarTitle"
+      :dark="hasSelection"
+    >
+      <template v-if="hasSelection" v-slot:nav-icon>
+        <v-btn icon @click="clearSelection">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+
+      <template v-if="hasSelection" v-slot:default>
+        <v-spacer />
+
+        <v-btn text @click="deleteInstitutions">
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          {{ $t('delete') }}
+        </v-btn>
+      </template>
+
+
+      <template v-else v-slot:default>
         <v-spacer />
 
         <v-btn text @click="createInstitution">
@@ -10,7 +31,7 @@
           </v-icon>
           {{ $t('add') }}
         </v-btn>
-        <v-btn text @click="refreshInstitutions">
+        <v-btn text :loading="refreshing" @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
           </v-icon>
@@ -26,7 +47,7 @@
           hide-details
           style="max-width: 200px"
         />
-      </slot>
+      </template>
     </ToolBar>
 
     <v-data-table
@@ -34,6 +55,8 @@
       :headers="headers"
       :items="institutions"
       :search="search"
+      :loading="refreshing"
+      sort-by="name"
       item-key="id"
       show-select
     >
@@ -86,69 +109,71 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-tooltip bottom :open-delay="500">
+        <v-menu>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              v-bind="attrs" small icon :href="`/institutions/${item.id}/sushi`" v-on="on"
+              small
+              color="primary"
+              v-bind="attrs"
+              v-on="on"
             >
-              <v-icon small>
-                mdi-key
+              {{ $t('actions') }}
+              <v-icon right>
+                mdi-menu-down
               </v-icon>
             </v-btn>
           </template>
-          <span v-text="$t('institutions.sushi.credentials')" />
-        </v-tooltip>
 
-        <v-tooltip bottom :open-delay="500">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs" small icon :href="`/institutions/${item.id}/members`" v-on="on"
-            >
-              <v-icon small>
-                mdi-account-multiple
-              </v-icon>
-            </v-btn>
-          </template>
-          <span v-text="$t('institutions.members.members')" />
-        </v-tooltip>
+          <v-list>
+            <v-list-item @click="editInstitution(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('modify')" />
+              </v-list-item-content>
+            </v-list-item>
 
-        <v-tooltip bottom :open-delay="500">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs" small icon @click="editInstitution(item)" v-on="on"
-            >
-              <v-icon small>
-                mdi-pencil
-              </v-icon>
-            </v-btn>
-          </template>
-          <span v-text="$t('modify')" />
-        </v-tooltip>
+            <v-list-item :href="`/institutions/${item.id}/sushi`">
+              <v-list-item-icon>
+                <v-icon>mdi-key</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('institutions.sushi.credentials')" />
+              </v-list-item-content>
+            </v-list-item>
 
-        <ValidationPopup
-          :institution="item"
-          @change="validated => item.validated = validated"
-        />
-      </template>
+            <v-list-item :href="`/institutions/${item.id}/members`">
+              <v-list-item-icon>
+                <v-icon>mdi-account-multiple</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('institutions.members.members')" />
+              </v-list-item-content>
+            </v-list-item>
 
-      <template v-slot:footer>
-        <span v-if="selected.length">
-          <v-btn small color="error" class="ma-2" @click="deleteData">
-            <v-icon left>mdi-delete</v-icon>
-            {{ $t('delete') }} ({{ selected.length }})
-          </v-btn>
-        </span>
+            <v-list-item @click="copyInstitutionId(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-identifier</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="$t('copyId')" />
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
     </v-data-table>
 
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
+    <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import InstitutionForm from '~/components/InstitutionForm';
-import ValidationPopup from '~/components/ValidationPopup';
+import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog';
 
 export default {
   layout: 'space',
@@ -156,12 +181,13 @@ export default {
   components: {
     ToolBar,
     InstitutionForm,
-    ValidationPopup,
+    InstitutionsDeleteDialog,
   },
   data() {
     return {
       selected: [],
       search: '',
+      refreshing: false,
       types: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
@@ -172,6 +198,15 @@ export default {
     return this.refreshInstitutions();
   },
   computed: {
+    hasSelection() {
+      return this.selected.length > 0;
+    },
+    toolbarTitle() {
+      if (this.hasSelection) {
+        return this.$t('nSelected', { count: this.selected.length });
+      }
+      return this.$t('menu.institutions');
+    },
     headers() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
@@ -184,7 +219,7 @@ export default {
           width: '150px',
         },
         {
-          text: 'Actions',
+          text: this.$t('actions'),
           value: 'actions',
           sortable: false,
           width: '170px',
@@ -195,6 +230,8 @@ export default {
   },
   methods: {
     async refreshInstitutions() {
+      this.refreshing = true;
+
       try {
         this.institutions = await this.$axios.$get('/institutions');
       } catch (e) {
@@ -204,6 +241,8 @@ export default {
       if (!Array.isArray(this.institutions)) {
         this.institutions = [];
       }
+
+      this.refreshing = false;
     },
     editInstitution(item) {
       this.$refs.institutionForm.editInstitution(item);
@@ -211,39 +250,29 @@ export default {
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ saveCreator: false });
     },
-    async deleteData() {
-      if (this.selected.length === 0) {
+    onInstitutionsRemove(removedIds) {
+      const removeDeleted = institution => !removedIds.some(id => institution.id === id);
+      this.institutions = this.institutions.filter(removeDeleted);
+      this.selected = this.selected.filter(removeDeleted);
+    },
+    async copyInstitutionId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
         return;
       }
-
-      const ids = this.selected.map(select => select.id);
-      let response;
-
       try {
-        response = await this.$axios.$post('/institutions/delete', { ids });
-        if (!Array.isArray(response)) {
-          throw new Error('invalid response');
-        }
+        await navigator.clipboard.writeText(item.id);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
         return;
       }
-
-      const failed = response.filter(item => item?.status !== 'deleted');
-      const deleted = response.filter(item => item?.status === 'deleted');
-
-      failed.forEach(({ id }) => {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
-      });
-
-
-      if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
-
-        const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
-        this.institutions = this.institutions.filter(removeDeleted);
-        this.selected = this.selected.filter(removeDeleted);
-      }
+      this.$store.dispatch('snacks/info', this.$t('idCopied'));
+    },
+    deleteInstitutions() {
+      this.$refs.deleteDialog.confirmDelete(this.selected);
+    },
+    clearSelection() {
+      this.selected = [];
     },
   },
 };

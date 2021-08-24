@@ -47,6 +47,10 @@ module.exports = {
     secret: 'some-secret',
     cookie: 'eztoken',
   },
+  admin: {
+    username: 'ezmesure-admin',
+    password: 'changeme',
+  },
   storage: {
     path: path.resolve(__dirname, '../storage'),
   },
@@ -56,6 +60,10 @@ module.exports = {
   },
   depositors: {
     index: 'depositors',
+    cron: '0 0 0 * * *',
+  },
+  opendata: {
+    index: 'opendata',
     cron: '0 0 0 * * *',
   },
   reportingActivityIndex: '.ezreporting-activity',

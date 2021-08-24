@@ -20,7 +20,7 @@ exports.getAll = async (ctx) => {
   const { user } = ctx.state;
 
   if (!isAdmin(user)) {
-    ctx.throw(403, 'You are not authorized to access this route');
+    ctx.throw(403, ctx.$t('errors.unauthorized'));
     return;
   }
 
@@ -34,7 +34,7 @@ exports.getOne = async (ctx) => {
   const sushiItem = await Sushi.findById(sushiId);
 
   if (!sushiItem) {
-    ctx.throw(404, 'Sushi item not found');
+    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
     return;
   }
 
@@ -42,7 +42,7 @@ exports.getOne = async (ctx) => {
     const institution = await sushiItem.getInstitution();
 
     if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
       return;
     }
   }
@@ -82,17 +82,17 @@ exports.addSushi = async (ctx) => {
   const institution = await Institution.findById(body.institutionId);
 
   if (!institution) {
-    ctx.throw(404, 'Institution not found');
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
     return;
   }
 
   if (!isAdmin(user)) {
     if (!institution.isContact(user)) {
-      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
       return;
     }
     if (!institution.isValidated()) {
-      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
       return;
     }
   }
@@ -112,7 +112,7 @@ exports.updateSushi = async (ctx) => {
   const sushiItem = await Sushi.findById(sushiId);
 
   if (!sushiItem) {
-    ctx.throw(404, 'Sushi item not found');
+    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
     return;
   }
 
@@ -120,11 +120,11 @@ exports.updateSushi = async (ctx) => {
     const institution = await sushiItem.getInstitution();
 
     if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, 'You are not authorized to manage the sushi credentials of this institution');
+      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
       return;
     }
     if (!institution.isValidated()) {
-      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
       return;
     }
   }
@@ -149,11 +149,11 @@ exports.deleteSushiData = async (ctx) => {
 
   if (!isAdmin(user)) {
     if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, 'You are not authorized to manage sushi credentials');
+      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
       return;
     }
     if (!institution.isValidated()) {
-      ctx.throw(400, 'Cannot manage sushi credentials : institution is not validated');
+      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
       return;
     }
   }
@@ -186,7 +186,7 @@ exports.getAvailableReports = async (ctx) => {
   const sushi = await Sushi.findById(sushiId);
 
   if (!sushi) {
-    ctx.throw(404, 'Sushi item not found');
+    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
     return;
   }
 

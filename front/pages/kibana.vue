@@ -111,7 +111,7 @@ export default {
       this.resettingPassword = true;
 
       try {
-        await this.$axios.$put('/profile/password/reset');
+        await this.$axios.$post('/profile/password/reset');
         this.resetSuccess = true;
       } catch (e) {
         this.resetError = true;

@@ -23,6 +23,7 @@
   "historyIndex": "REPORTING_HISTORY_INDEX",
   "activityIndex": "REPORTING_ACTIVITY_INDEX",
   "roleName": "REPORTING_ROLE",
+  "cron": "REPORTING_CRON",
   "frequencies": {
     "__name": "REPORTING_FREQUENCIES",
     "__format": "json"

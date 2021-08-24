@@ -90,10 +90,7 @@ export default {
     ToolBar,
   },
   asyncData({ env }) {
-    const currentLocation = encodeURIComponent(window.location.href);
-
     return {
-      refreshUrl: `/login?refresh=1&origin=${currentLocation}`,
       logoutUrl: env.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout',
       selectedFiles: [],
       token: '',
@@ -103,6 +100,10 @@ export default {
     drawer: {
       get() { return this.$store.state.drawer; },
       set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },
+    },
+    refreshUrl() {
+      const currentLocation = encodeURIComponent(window.location.href);
+      return `/login?refresh=1&origin=${currentLocation}`;
     },
     user() { return this.$auth.user; },
     metadata() { return (this.user && this.user.metadata) || {}; },

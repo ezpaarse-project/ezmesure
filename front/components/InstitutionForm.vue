@@ -1,80 +1,143 @@
 <template>
-  <v-dialog v-model="show" scrollable width="900">
+  <v-dialog
+    v-model="show"
+    scrollable
+    persistent
+    width="900"
+  >
     <v-card>
       <v-card-title class="headline">
         {{ $t(editMode ? 'institutions.updateInstitution' : 'institutions.newInstitution') }}
       </v-card-title>
 
       <v-card-text>
+        <v-row align="center">
+          <v-col class="grow">
+            <OpenDataSearch
+              v-model="openData"
+              @input="applyOpenData"
+            />
+          </v-col>
+        </v-row>
+
         <v-form id="institutionForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.name"
-                :label="$t('institutions.institution.title')"
-                hide-details
-                outlined
-              />
-            </v-col>
+          <v-card outlined>
+            <v-card-title>
+              {{ $t('institutions.institution.general') }}
+            </v-card-title>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.acronym"
-                :label="$t('institutions.institution.acronym')"
-                hide-details
-                outlined
-              />
-            </v-col>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.name"
+                    :label="$t('institutions.institution.title')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.website"
-                :label="$t('institutions.institution.homepage')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.acronym"
+                    :label="$t('institutions.institution.acronym')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.city"
-                :label="$t('institutions.institution.city')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.website"
+                    :label="$t('institutions.institution.homepage')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.type"
-                :label="$t('institutions.institution.type')"
-                hide-details
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.city"
+                    :label="$t('institutions.institution.city')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="institution.uai"
-                :label="$t('institutions.institution.uai')"
-                :hint="$t('institutions.institution.uaiDescription')"
-                persistent-hint
-                outlined
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.type"
+                    :label="$t('institutions.institution.type')"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="12">
-              <v-combobox
-                v-model="institution.domains"
-                :label="$t('institutions.institution.domains')"
-                outlined
-                multiple
-                small-chips
-                hide-details
-              />
-            </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.uai"
+                    :label="$t('institutions.institution.uai')"
+                    :hint="$t('institutions.institution.uaiDescription')"
+                    persistent-hint
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
 
-            <v-col cols="12">
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.socialNetworks') }}
+            </v-card-title>
+
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.twitterUrl"
+                    :label="$t('institutions.institution.twitterUrl')"
+                    append-icon="mdi-twitter"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.linkedinUrl"
+                    :label="$t('institutions.institution.linkedinUrl')"
+                    append-icon="mdi-linkedin"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.youtubeUrl"
+                    :label="$t('institutions.institution.youtubeUrl')"
+                    append-icon="mdi-youtube"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="institution.facebookUrl"
+                    :label="$t('institutions.institution.facebookUrl')"
+                    append-icon="mdi-facebook"
+                    hide-details
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.logo') }}
+            </v-card-title>
+            <v-card-text>
               <v-hover v-model="hoverLogo" class="mx-auto">
                 <template v-slot:default="{ hover }">
                   <v-card
@@ -122,110 +185,123 @@
                   </v-card>
                 </template>
               </v-hover>
-            </v-col>
-          </v-row>
+            </v-card-text>
+          </v-card>
 
-          <v-divider class="my-3" />
-
-          <v-row no-gutters>
-            <v-col cols="12">
-              <span class="subtitle-1">{{ $t('institutions.institution.automations') }} :</span>
-            </v-col>
-            <v-col cols="12">
+          <v-card outlined class="mt-4">
+            <v-card-title>
+              {{ $t('institutions.institution.automations') }}
+            </v-card-title>
+            <v-card-text>
               <v-checkbox
                 v-model="institution.auto.ezpaarse"
-                :label="$t('institutions.institution.auto.ezpaarse')"
+                :label="$t('partners.auto.ezpaarse')"
                 hide-details
               />
-            </v-col>
-            <v-col cols="12">
               <v-checkbox
                 v-model="institution.auto.ezmesure"
-                :label="$t('institutions.institution.auto.ezmesure')"
+                :label="$t('partners.auto.ezmesure')"
                 hide-details
               />
-            </v-col>
-            <v-col cols="12">
               <v-checkbox
                 v-model="institution.auto.report"
-                :label="$t('institutions.institution.auto.reporting')"
+                :label="$t('partners.auto.report')"
                 hide-details
               />
-            </v-col>
-            <v-col cols="12">
               <v-checkbox
                 v-model="institution.auto.sushi"
                 :label="$t('institutions.institution.auto.sushi')"
                 hide-details
               />
-            </v-col>
-          </v-row>
+            </v-card-text>
+          </v-card>
 
-          <v-divider class="my-3" />
+          <v-card v-if="isAdmin" outlined class="mt-4">
+            <v-card-title>
+              {{ $t('administration') }}
+            </v-card-title>
 
-          <v-row v-if="isAdmin">
-            <v-col cols="12">
-              <span class="subtitle-1">{{ $t('administration') }}</span>
-            </v-col>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12">
+                  <v-checkbox
+                    v-model="institution.validated"
+                    :label="$t('institutions.institution.valid')"
+                    hide-details
+                    class="mt-0"
+                  />
+                  <v-checkbox
+                    v-model="institution.hidePartner"
+                    :label="$t('institutions.institution.hidePartner')"
+                    hide-details
+                  />
+                </v-col>
 
-            <v-col cols="12">
-              <v-checkbox
-                v-model="identicalNames"
-                :label="$t('institutions.institution.identicalNames')"
-                hide-details
-                @change="duplicatePrefix"
-              />
-            </v-col>
+                <v-col cols="12">
+                  <v-checkbox
+                    v-model="identicalNames"
+                    :label="$t('institutions.institution.identicalNames')"
+                    hide-details
+                    @change="duplicatePrefix"
+                  />
+                </v-col>
 
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.indexPrefix"
-                :label="$t('institutions.institution.associatedIndex')"
-                outlined
-                @input="duplicatePrefix"
-              />
-            </v-col>
-
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.role"
-                :label="$t('institutions.institution.associatedRole')"
-                :disabled="identicalNames"
-                outlined
-              />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="institution.space"
-                :label="$t('institutions.institution.associatedSpace')"
-                :disabled="identicalNames"
-                outlined
-              />
-            </v-col>
-          </v-row>
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.indexPrefix"
+                    :label="$t('institutions.institution.associatedIndex')"
+                    :rules="indexPrefixRules"
+                    outlined
+                    @input="duplicatePrefix"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.role"
+                    :label="$t('institutions.institution.associatedRole')"
+                    :disabled="identicalNames"
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model="institution.space"
+                    :label="$t('institutions.institution.associatedSpace')"
+                    :disabled="identicalNames"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false" v-text="$t('close')" />
+        <v-btn text @click="show = false" v-text="$t('cancel')" />
 
         <v-btn
           type="submit"
           form="institutionForm"
           color="primary"
-          text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('create')"
-        />
+        >
+          <v-icon left>
+            mdi-content-save
+          </v-icon>
+          {{ editMode ? $t('update') : $t('create') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import OpenDataSearch from '~/components/OpenDataSearch';
+
 const defaultLogo = require('@/static/images/logo-etab.png');
 
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -236,12 +312,17 @@ const toBase64 = file => new Promise((resolve, reject) => {
 });
 
 export default {
+  components: {
+    OpenDataSearch,
+  },
   data() {
     return {
       show: false,
       saving: false,
       valid: false,
       saveCreator: false,
+
+      openData: null,
 
       hoverLogo: false,
       draggingFile: false,
@@ -252,6 +333,17 @@ export default {
       institution: {
         auto: {},
       },
+
+      indexPrefixRules: [
+        (value) => {
+          const pattern = /^[a-z0-9][a-z0-9_.-]*$/;
+
+          if (value === '' || pattern.test(value)) {
+            return true;
+          }
+          return this.$t('institutions.institution.mustMatch', { pattern: pattern.toString() });
+        },
+      ],
     };
   },
   computed: {
@@ -299,6 +391,7 @@ export default {
       this.identicalNames = (role === space && role === indexPrefix);
 
       this.logoPreview = null;
+      this.openData = null;
       this.show = true;
     },
 
@@ -337,6 +430,27 @@ export default {
       this.logoPreview = null;
       this.institution.logo = null;
       this.institution.logoId = null;
+    },
+
+    applyOpenData() {
+      if (!this.openData) { return; }
+
+      const fields = [
+        ['name', 'uo_lib_officiel'],
+        ['website', 'url'],
+        ['uai', 'uai'],
+        ['type', 'type_d_etablissement'],
+        ['city', 'com_nom'],
+        ['acronym', 'sigle'],
+        ['twitterUrl', 'compte_twitter'],
+        ['linkedinUrl', 'compte_linkedin'],
+        ['youtubeUrl', 'compte_youtube'],
+        ['facebookUrl', 'compte_facebook'],
+      ];
+
+      fields.forEach(([institutionKey, openDataKey]) => {
+        this.$set(this.institution, institutionKey, this.openData[openDataKey] || '');
+      });
     },
 
     async save() {
