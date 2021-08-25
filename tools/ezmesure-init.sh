@@ -31,6 +31,13 @@ if  [[ ! $VERSION =~ $regex ]] ; then
   exit 1
 fi
 
+cmdExists=$(npm list -g @ezpaarse-project/ezmesure-admin --parseable)
+
+if [[ -z "$cmdExists" ]]; then
+  printf "Please install ezmesure-admin command : npm install -g @ezpaarse-project/ezmesure-admin"
+  exit 1
+fi
+
 if [[ -z ${EZMESURE_ADMIN_USERNAME} ]]; then
   printf "Please set EZMESURE_ADMIN_USERNAME variable"
   exit 1
