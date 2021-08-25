@@ -31,7 +31,6 @@ router.route({
   path: '/:taskId',
   handler: getOne,
   validate: {
-    type: 'json',
     params: {
       taskId: Joi.string().trim().required(),
     },
