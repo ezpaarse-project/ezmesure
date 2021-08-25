@@ -1,13 +1,28 @@
 #!/bin/bash
 
-VERSION=1
+TEMPLATES=1
+EZMESURE_BASE_URL="http://localhost:3000"
+
+echo "Instantiation will be done on ${EZMESURE_BASE_URL}"
+read -p "Are you sure you want to continue [y/N]: " choice
+case "$choice" in 
+  n|N|*)
+    echo 'To change ezMESURE API entrypoint set --api parameter'
+    exit 0
+  ;;
+esac
 
 while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
-    -v|--version)
-      VERSION="$2"
+    -t|--templates)
+      TEMPLATES="$2"
+      shift
+      shift
+      ;;
+    -a|--api)
+      EZMESURE_BASE_URL="$2"
       shift
       shift
       ;;
@@ -15,7 +30,8 @@ while [[ $# -gt 0 ]]; do
       printf "Usage: ezmesure-init.sh [OPTIONS]\n\n"
       printf "Initialize an ezMESURE instance\n\n"
       printf "Options:\n"
-      printf "    -v, --version    Set the templates version to use\n"
+      printf "    -t, --templates  Set the templates version to use\n"
+      printf "    -a, --api   Set ezMESURE API entrypoint (default: http://localhost:3000)\n"
       exit 0
       ;;
     *)
@@ -26,29 +42,30 @@ while [[ $# -gt 0 ]]; do
 done
 
 regex='^[0-9]+$'
-if  [[ ! $VERSION =~ $regex ]] ; then
-  printf "error: Version is not a number"
+if  [[ ! $TEMPLATES =~ $regex ]] ; then
+  echo "error: Templates version is not a number"
   exit 1
 fi
 
-cmdExists=$(npm list -g @ezpaarse-project/ezmesure-admin --parseable)
-
-if [[ -z "$cmdExists" ]]; then
-  printf "Please install ezmesure-admin command : npm install -g @ezpaarse-project/ezmesure-admin"
+if [[ ! -x "$(command -v ezmesure-admin)" ]]; then
+  echo "Please install ezmesure-admin command : npm install -g @ezpaarse-project/ezmesure-admin"
   exit 1
 fi
 
 if [[ -z ${EZMESURE_ADMIN_USERNAME} ]]; then
-  printf "Please set EZMESURE_ADMIN_USERNAME variable"
+  echo "Please set EZMESURE_ADMIN_USERNAME variable"
   exit 1
 fi
 
 if [[ -z ${EZMESURE_ADMIN_PASSWORD} ]]; then
-  printf "Please set EZMESURE_ADMIN_PASSWORD variable"
+  echo "Please set EZMESURE_ADMIN_PASSWORD variable"
   exit 1
 fi
 
-printf "[Login user]\n"
+printf "[Init configuration]\n"
+ezmesure-admin config set ezmesure.baseUrl ${EZMESURE_BASE_URL}
+
+printf "\n[Login user]\n"
 ezmesure-admin login --username ${EZMESURE_ADMIN_USERNAME} --password ${EZMESURE_ADMIN_PASSWORD}
 
 printf "\n[Create Bienvenue space]\n"
@@ -82,7 +99,7 @@ printf "\n[Pulling ezmesure-templates]\n"
 git -C ./ezmesure-templates pull
 
 printf "\n[Import dashoards in bienvenue space]\n"
-ezmesure-admin dashboard import bienvenue --index-pattern univ-example --overwrite --files ./ezmesure-templates/welcome/v${VERSION}/*.json
+ezmesure-admin dashboard import bienvenue --index-pattern univ-example --overwrite --files ./ezmesure-templates/welcome/v${TEMPLATES}/*.json
 
 printf "\n[Import dashoards in org-template space]\n"
-ezmesure-admin dashboard import org-template --index-pattern univ-example --overwrite --files ./ezmesure-templates/org-template/v${VERSION}/*.json
+ezmesure-admin dashboard import org-template --index-pattern univ-example --overwrite --files ./ezmesure-templates/org-template/v${TEMPLATES}/*.json
