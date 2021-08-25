@@ -138,7 +138,6 @@ router.route({
   path: '/:sushiId/report.json',
   handler: downloadReport,
   validate: {
-    type: 'json',
     params: {
       sushiId: Joi.string().trim().required(),
     },
