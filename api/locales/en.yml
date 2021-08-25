@@ -21,6 +21,12 @@ errors:
     institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"
     notFound: Sushi item not found
     emptyEndpointResponse: Sushi endpoint returned an empty response
+    invalidResponse: The Sushi endpoint responded with invalid data
+
+  task:
+    notFound: Tâche introuvable
+    invalidFrequency: Fréquence invalide
+    unauthorized: You are not authorized to access this task
 
   institution:
     notFound: Institution not found

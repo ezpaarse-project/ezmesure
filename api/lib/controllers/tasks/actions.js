@@ -31,7 +31,7 @@ exports.getOne = async (ctx) => {
   const task = await Task.findById(taskId);
 
   if (!task) {
-    ctx.throw(404, 'Task not found');
+    ctx.throw(404, ctx.$t('errors.task.notFound'));
     return;
   }
 
@@ -39,7 +39,7 @@ exports.getOne = async (ctx) => {
     const institution = await task.getInstitution();
 
     if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, 'You are not authorized to view tasks related to this institution');
+      ctx.throw(403, ctx.$t('errors.task.unauthorized'));
       return;
     }
   }

@@ -21,6 +21,12 @@ errors:
     institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
     notFound: Item SUSHI introuvable
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
+    invalidResponse: Le point d'accès SUSHI a retourné des données invalides
+
+  task:
+    notFound: Tâche introuvable
+    invalidFrequency: Fréquence invalide
+    unauthorized: Vous n'êtes pas autorisé à accéder à cette tâche
 
   institution:
     notFound: Établissement introuvable
