@@ -15,16 +15,6 @@ const {
 
 router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form_tester', 'admin', 'superuser']));
 
-router.route({
-  method: 'GET',
-  path: '/',
-  handler: getAll,
-  validate: {
-    params: {
-      status: Joi.string().trim().min(1),
-    },
-  },
-});
 
 router.route({
   method: 'GET',
@@ -33,6 +23,19 @@ router.route({
   validate: {
     params: {
       taskId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.use(requireAnyRole(['admin', 'superuser']));
+
+router.route({
+  method: 'GET',
+  path: '/',
+  handler: getAll,
+  validate: {
+    params: {
+      status: Joi.string().trim().min(1),
     },
   },
 });
