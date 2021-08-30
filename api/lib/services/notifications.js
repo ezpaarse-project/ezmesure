@@ -6,7 +6,12 @@ const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 
-const { sender, recipients, cron } = config.get('notifications');
+const {
+  sender,
+  recipients,
+  cron,
+  sendEmptyActivity,
+} = config.get('notifications');
 
 /**
  * Change a timestamp into a locale date
@@ -178,7 +183,7 @@ function setBroadcasted(actions) {
 /**
  * Send a mail containing new files and users
  */
-async function sendNotifications() {
+async function sendNotifications(appLogger) {
   const {
     actions: ezMesureActions = [],
     files,
@@ -190,7 +195,8 @@ async function sendNotifications() {
 
   const actions = [...ezMesureActions, ...reportingActions];
 
-  if (actions.length === 0) {
+  if (actions.length === 0 && !sendEmptyActivity) {
+    appLogger.info('No recent activity to be broadcasted');
     return;
   }
 
@@ -199,6 +205,7 @@ async function sendNotifications() {
     to: recipients,
     subject: '[Admin] Activité ezMESURE',
     ...generateMail('recent-activity', {
+      noActions: actions.length === 0,
       files,
       users,
       insertions,
@@ -207,16 +214,21 @@ async function sendNotifications() {
     }),
   });
 
-  // eslint-disable-next-line consistent-return
-  return setBroadcasted(actions);
+  appLogger.info('Recent activity successfully broadcasted');
+
+  if (actions.length > 0) {
+    try {
+      await setBroadcasted(actions);
+    } catch (err) {
+      appLogger.error(`Failed to mark actions as broadcasted : ${err}`);
+    }
+  }
 }
 
 module.exports = {
   start(appLogger) {
     const job = new CronJob(cron, () => {
-      sendNotifications().then(() => {
-        appLogger.info('Recent activity successfully broadcasted');
-      }).catch((err) => {
+      sendNotifications(appLogger).catch((err) => {
         appLogger.error(`Failed to broadcast recent activity : ${err}`);
       });
     });

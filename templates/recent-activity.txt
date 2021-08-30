@@ -1,6 +1,10 @@
 Activité récente
 ================
 
+{% if noActions -%}
+  Aucune activité n'a été enregistrée dernièrement.
+{% endif -%}
+
 {% if users.length -%}
 - {{ users.length }} enregistrements
 {% endif -%}

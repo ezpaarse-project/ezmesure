@@ -57,6 +57,7 @@ module.exports = {
   notifications: {
     sender: 'ezMESURE',
     cron: '0 0 0 * * *',
+    sendEmptyActivity: true,
   },
   depositors: {
     index: 'depositors',
