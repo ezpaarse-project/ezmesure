@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { addHours, differenceInHours } = require('date-fns');
 const elastic = require('../../services/elastic');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../../server');
@@ -22,9 +23,9 @@ function decode(value) {
   return Buffer.from(value, 'binary').toString('utf8');
 }
 
-function randomString() {
+function randomString(size) {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(5, (err, buffer) => {
+    crypto.randomBytes(size || 5, (err, buffer) => {
       if (err) {
         reject(err);
       } else {
@@ -43,12 +44,12 @@ function sendWelcomeMail(user, password) {
   });
 }
 
-function sendNewPassword(user, password) {
+function sendPasswordRecovery(user, data) {
   return sendMail({
     from: sender,
     to: user.email,
-    subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, password }),
+    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
+    ...generateMail('new-password', { user, ...data }),
   });
 }
 
@@ -181,22 +182,44 @@ exports.acceptTerms = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const { body } = ctx.request;
+
+  const username = body.username || ctx.state.user.username;
+
+  const user = await elastic.security.findUser({ username });
 
   if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
     return;
   }
 
-  const newPassword = await randomString();
+  const token = await randomString(32);
 
-  await elastic.security.changePassword({
-    username: ctx.state.user.username,
-    body: {
-      password: newPassword,
-    },
+  const origin = ctx.get('origin');
+
+  const currentDate = new Date();
+  const expiresAt = addHours(currentDate, config.passwordResetValidity);
+  user.metadata.password = {
+    token,
+    createdAt: currentDate,
+    expiresAt,
+  };
+  await elastic.security.putUser({ username: user.username, body: user });
+
+  // await elastic.security.changePassword({
+  //   username,
+  //   body: {
+  //     password: newPassword,
+  //   },
+  // });
+
+  const diffInHours = differenceInHours(expiresAt, currentDate);
+  await sendPasswordRecovery(user, {
+    recoveryLink: `${origin}/new-password?token=${token}`,
+    resetLink: `${origin}/reset-password`,
+    validity: `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`,
   });
-  await sendNewPassword(ctx.state.user, newPassword);
+
   ctx.status = 204;
 };
 

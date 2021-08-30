@@ -72,4 +72,5 @@ module.exports = {
     secret: 'some-secret',
   },
   appName: 'ezMESURE',
+  passwordResetValidity: 3
 };
