@@ -1,4 +1,5 @@
 const opendata = require('../../services/opendata');
+const { appLogger } = require('../../../server');
 
 exports.getOpenData = async (ctx) => {
   const { q: query } = ctx.query;
@@ -19,9 +20,13 @@ exports.getOpenData = async (ctx) => {
 };
 
 exports.refreshOpenData = async (ctx) => {
-  const result = await opendata.update();
+  const datasets = await opendata.getDatasetsMetadata();
+  opendata.reloadIndex(datasets, appLogger)
+    .catch((e) => {
+      appLogger.error(`Failed to update Opendata datasets: ${e.message}`);
+    });
 
   ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = result;
+  ctx.status = 202;
+  ctx.body = { acknowledged: true };
 };

@@ -74,7 +74,7 @@ exports.createInstitution = async (ctx) => {
     const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
 
     if (selfInstitution) {
-      ctx.throw(409, ctx.$t('errors.institution.alreadyAssigned'));
+      ctx.throw(409, ctx.$t('errors.institution.alreadyAttached'));
       return;
     }
   }
