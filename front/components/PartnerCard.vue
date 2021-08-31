@@ -24,25 +24,6 @@
       </div>
     </v-card-text>
 
-    <v-divider v-if="hasAutomation" />
-
-    <v-card-text v-if="hasAutomation" class="text-center">
-      <div class="subtitle-1">
-        {{ $t('partners.automated') }}
-      </div>
-      <v-chip
-        v-for="auto in automations"
-        :key="auto.label"
-        :color="auto.color"
-        small
-        label
-        dark
-        class="mr-1 mb-1"
-      >
-        {{ $t(`partners.auto.${auto.label}`) }}
-      </v-chip>
-    </v-card-text>
-
     <v-divider />
 
     <v-card-text class="text-center">
