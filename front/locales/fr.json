@@ -231,6 +231,19 @@
     "loginFailed": "Les informations transmises n'ont pas permis de vous authentifier",
     "failed": "Une erreur est survenue"
   },
+  "password": {
+    "forgotPassword": "Mot de passe oublié ?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "backToLogin": "Retour à la connexion",
+    "user": "Utilisateur",
+    "password": "Mot de passe",
+    "repeatPassword": "Répéter le mot de passe",
+    "fieldIsRequired": "Ce champs est requis",
+    "enterUser": "Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.",
+    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.<br> S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
+    "notEqual": "Les mots de passes ne correspondent pas",
+    "updated": "Mot de passe mis à jour"
+  },
   "contact": {
     "contactUs": "Nous contacter",
     "email": "Adresse électronique",
@@ -245,6 +258,11 @@
     "emailMustBeValid": "L'adresse électronique doit être valide",
     "contentIsRequired": "Un message est requis",
     "subjectIsRequired": "L'objet est requis"
+  },
+  "errors": {
+    "404": "La page demandée n'a pas été trouvée",
+    "500": "Une erreur interne est survenue",
+    "generic": "Une erreur inattendue est survenue"
   },
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",

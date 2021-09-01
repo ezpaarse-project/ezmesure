@@ -91,3 +91,6 @@ errors:
     missingFields: "missing mandatory param: fields"
     invalidFilterFormat: filter has an invalid rison format
     invalidPeriod: Invalid period
+
+  password:
+    expires: Your password reset request has expired

@@ -231,6 +231,19 @@
     "loginFailed": "The information transmitted did not allow you to authenticate",
     "failed": "An error occurred"
   },
+  "password": {
+    "forgotPassword": "Forgout your password ?",
+    "email": "Email address *",
+    "resetPassword": "Reset password",
+    "user": "User",
+    "password": "Password",
+    "repeatPassword": "Repeat password",
+    "backToLogin": "Back to login",
+    "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
+    "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",
+    "notEqual": "Passwords don't match",
+    "updated": "Password updated"
+  },
   "contact": {
     "contactUs": "Contact us",
     "email": "Email address",
@@ -245,6 +258,11 @@
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
     "subjectIsRequired": "Subject is required"
+  },
+  "errors": {
+    "404": "La page demandée n'a pas été trouvée",
+    "500": "An internal error occurred",
+    "generic": "An unexpected error has occurred"
   },
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",

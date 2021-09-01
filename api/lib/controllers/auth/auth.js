@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { addHours, differenceInHours } = require('date-fns');
+const { addHours, differenceInHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../../server');
@@ -181,7 +181,7 @@ exports.acceptTerms = async (ctx) => {
   ctx.status = 204;
 };
 
-exports.resetPassword = async (ctx) => {
+exports.getResetToken = async (ctx) => {
   const { body } = ctx.request;
 
   const username = body.username || ctx.state.user.username;
@@ -193,35 +193,85 @@ exports.resetPassword = async (ctx) => {
     return;
   }
 
-  const token = await randomString(32);
-
   const origin = ctx.get('origin');
 
   const currentDate = new Date();
   const expiresAt = addHours(currentDate, config.passwordResetValidity);
-  user.metadata.password = {
-    token,
+  const token = jwt.sign({
+    username: user.username,
     createdAt: currentDate,
     expiresAt,
-  };
-  await elastic.security.putUser({ username: user.username, body: user });
-
-  // await elastic.security.changePassword({
-  //   username,
-  //   body: {
-  //     password: newPassword,
-  //   },
-  // });
+  }, secret);
 
   const diffInHours = differenceInHours(expiresAt, currentDate);
   await sendPasswordRecovery(user, {
-    recoveryLink: `${origin}/new-password?token=${token}`,
-    resetLink: `${origin}/reset-password`,
+    recoveryLink: `${origin}/password/new?token=${token}`,
+    resetLink: `${origin}/password/reset`,
     validity: `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`,
   });
 
   ctx.status = 204;
 };
+
+exports.resetPassword = async (ctx) => {
+  const { token, password } = ctx.request.body;
+
+  const { username, expiresAt, createdAt } = jwt.verify(token, secret);
+  
+  let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
+  if (!tokenIsValid) {
+    ctx.throw(400, ctx.$t('errors.password.expires'));
+    return;
+  }
+
+  const user = await elastic.security.findUser({ username });
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  if (user && user.metadata && user.metadata.passwordDate) {
+    tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+
+    if (!tokenIsValid) {
+      ctx.throw(404, ctx.$t('errors.password.expires'));
+      return;
+    }
+  }
+
+  user.metadata.passwordDate = new Date();
+  await elastic.security.putUser({ username: username, body: user });
+
+  await elastic.security.changePassword({
+    username,
+    body: {
+      password,
+    },
+  });
+
+  ctx.status = 204;
+}
+
+exports.changePassword = async (ctx) => {
+  const { body } = ctx.request;
+  const { password } = body;
+
+  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+
+  if (!user) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  await elastic.security.changePassword({
+    username: ctx.state.user.username,
+    body: {
+      password,
+    },
+  });
+
+  ctx.status = 204;
+}
 
 exports.getUser = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });

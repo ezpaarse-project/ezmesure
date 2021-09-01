@@ -91,3 +91,6 @@ errors:
     missingFields: "Champ requis manquant : fields"
     invalidFilterFormat: Le filtre présente un format rison invalide
     invalidPeriod: Période invalide
+
+  password:
+    expires: Votre demande de réinitialisation de mot de passe est expirée
