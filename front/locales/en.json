@@ -70,8 +70,8 @@
     "title": "Kibana identifiers",
     "passwordLost": "Password forgoten",
     "username": "Username",
-    "newPasswordSentByEmail": "A new password has been emailed to you.",
-    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a new one by email.",
+    "newPasswordSentByEmail": "An email has been sent to you to reset your password.",
+    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a reset email.",
     "whatDoesUsername": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your <a href=\"/kibana/app/kibana#/account\">Kibana account</a>."
   },
   "token": {
@@ -232,9 +232,10 @@
     "failed": "An error occurred"
   },
   "password": {
-    "forgotPassword": "Forgout your password ?",
+    "forgot": "Forgout your password ?",
     "email": "Email address *",
-    "resetPassword": "Reset password",
+    "reset": "Reset password",
+    "save": "Save password",
     "user": "User",
     "password": "Password",
     "repeatPassword": "Repeat password",

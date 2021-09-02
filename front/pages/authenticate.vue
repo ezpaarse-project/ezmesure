@@ -68,7 +68,7 @@
 
                   <v-row>
                     <a href="/password/reset" class="text-left ml-5 mt-2">
-                      {{ $t('password.forgotPassword') }}
+                      {{ $t('password.forgot') }}
                     </a>
 
                     <v-spacer />

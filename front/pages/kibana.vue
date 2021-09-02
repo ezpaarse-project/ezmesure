@@ -60,7 +60,7 @@
           />
 
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <p v-html="$t('kibana.resetPassword')" />
+          <p class="mt-2" v-html="$t('kibana.resetPassword')" />
         </v-card-text>
 
         <v-divider />
@@ -111,7 +111,7 @@ export default {
       this.resettingPassword = true;
 
       try {
-        await this.$axios.$post('/profile/password/reset');
+        await this.$axios.$post('/profile/password/_get_token', { username: this.user.username });
         this.resetSuccess = true;
       } catch (e) {
         this.resetError = true;

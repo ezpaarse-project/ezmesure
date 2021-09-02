@@ -15,7 +15,7 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('password.forgotPassword')" />
+            <v-toolbar-title v-text="$t('password.forgot')" />
             <v-spacer />
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
@@ -66,7 +66,7 @@
                 :loading="resettingPassword"
                 :disabled="!resetFormValid"
               >
-                {{ $t('password.resetPassword') }}
+                {{ $t('password.reset') }}
               </v-btn>
 
 

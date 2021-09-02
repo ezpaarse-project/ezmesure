@@ -70,8 +70,8 @@
     "title": "Identifiants kibana",
     "passwordLost": "Mot de passe oublié",
     "username": "Nom d'utilisateur",
-    "newPasswordSentByEmail": "Un nouveau mot de passe vous a été envoyé par mail.",
-    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour en recevoir un nouveau par mail.",
+    "newPasswordSentByEmail": "Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
+    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour en recevoir un courriel de réinitialisation.",
     "whatDoesUsername": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre <a href=\"/kibana/app/kibana#/account\">compte Kibana</a>."
   },
   "token": {
@@ -232,8 +232,9 @@
     "failed": "Une erreur est survenue"
   },
   "password": {
-    "forgotPassword": "Mot de passe oublié ?",
-    "resetPassword": "Sauvegarder le mot de passe",
+    "forogot": "Mot de passe oublié ?",
+    "reset": "Réinitialiser le mot de passe",
+    "save": "Sauvegarder le mot de passe",
     "backToLogin": "Retour à la connexion",
     "user": "Utilisateur",
     "password": "Mot de passe",

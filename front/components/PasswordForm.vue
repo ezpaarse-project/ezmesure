@@ -49,7 +49,7 @@
           :loading="passwordSaved"
           :disabled="!validForm"
         >
-          {{ $t('password.resetPassword') }}
+          {{ $t('password.save') }}
         </v-btn>
       </slot>
     </v-form>
