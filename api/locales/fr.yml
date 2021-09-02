@@ -94,3 +94,4 @@ errors:
 
   password:
     expires: Votre demande de réinitialisation de mot de passe est expirée
+    invalidToken: Le token est invalide

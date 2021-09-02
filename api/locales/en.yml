@@ -94,3 +94,4 @@ errors:
 
   password:
     expires: Your password reset request has expired
+    invalidToken: The token is invalid

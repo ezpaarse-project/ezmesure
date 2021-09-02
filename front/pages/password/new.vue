@@ -21,58 +21,7 @@
           </v-toolbar>
 
           <v-card-text>
-            <v-alert
-              class="mt-1"
-              :value="sendError"
-              dismissible
-              prominent
-              dense
-              type="error"
-            >
-              {{ sendErrorText }}
-            </v-alert>
-
-            <v-form
-              v-model="passwordFormValid"
-              @submit.prevent="sendPassword"
-            >
-              <v-text-field
-                v-model="password"
-                :label="$t('password.password')"
-                :type="showPassword ? 'text' : 'password'"
-                :rules="[() => !!password || ($t('password.fieldIsRequired'))]"
-                prepend-inner-icon="mdi-lock"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                outlined
-                required
-                @click:append="showPassword = !showPassword"
-              />
-
-              <v-text-field
-                v-model="passwordRepeat"
-                :label="$t('password.repeatPassword')"
-                :type="showPassword ? 'text' : 'password'"
-                :rules="[
-                  () => !!passwordRepeat || ($t('password.fieldIsRequired')),
-                  () => passwordRepeat === password || ($t('password.notEqual'))
-                ]"
-                prepend-inner-icon="mdi-lock"
-                outlined
-                required
-                @click:append="showPassword = !showPassword"
-              />
-
-              <v-btn
-                block
-                color="primary"
-                type="submit"
-                class="mb-2"
-                :loading="sendingPassword"
-                :disabled="!passwordFormValid"
-              >
-                {{ $t('password.resetPassword') }}
-              </v-btn>
-            </v-form>
+            <PasswordForm :recovery="true" @save="savePassword" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -81,6 +30,8 @@
 </template>
 
 <script>
+import PasswordForm from '~/components/PasswordForm';
+
 export default {
   middleware({ route, error }) {
     if (!route.query.token) {
@@ -88,42 +39,12 @@ export default {
     }
     return false;
   },
-  data() {
-    return {
-      password: '',
-      passwordRepeat: '',
-      passwordFormValid: true,
-      sendingPassword: false,
-      sendError: null,
-      sendErrorText: '',
-      showPassword: false,
-    };
+  components: {
+    PasswordForm,
   },
   methods: {
-    async sendPassword() {
-      this.sendingPassword = true;
-
-      try {
-        await this.$axios.$post('/profile/password/_reset', {
-          token: this.$route.query.token,
-          password: this.password,
-          passwordRepeat: this.passwordRepeat,
-        });
-
-        this.$store.dispatch('snacks/success', this.$t('password.updated'));
-        this.$router.push('/authenticate?provider=kibana');
-      } catch (e) {
-        this.sendError = true;
-        if (e.response.status >= 400 && e.response.status < 500) {
-          this.sendErrorText = e.response.data.error;
-        } else if (e.response.statusText) {
-          this.sendErrorText = e.response.statusText;
-        } else {
-          this.sendErrorText = e.message;
-        }
-      }
-
-      this.sendingPassword = false;
+    async savePassword() {
+      this.$router.push('/authenticate?provider=kibana');
     },
   },
 };

@@ -23,9 +23,9 @@ function decode(value) {
   return Buffer.from(value, 'binary').toString('utf8');
 }
 
-function randomString(size) {
+function randomString() {
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(size || 5, (err, buffer) => {
+    crypto.randomBytes(5, (err, buffer) => {
       if (err) {
         reject(err);
       } else {
@@ -35,12 +35,12 @@ function randomString(size) {
   });
 }
 
-function sendWelcomeMail(user, password) {
+function sendWelcomeMail(user) {
   return sendMail({
     from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user, password }),
+    ...generateMail('welcome', { user }),
   });
 }
 
@@ -105,7 +105,7 @@ exports.renaterLogin = async (ctx) => {
     }
 
     try {
-      await sendWelcomeMail(user, props.password);
+      await sendWelcomeMail(user);
     } catch (err) {
       appLogger.error('Failed to send mail', err);
     }
@@ -216,7 +216,16 @@ exports.getResetToken = async (ctx) => {
 exports.resetPassword = async (ctx) => {
   const { token, password } = ctx.request.body;
 
-  const { username, expiresAt, createdAt } = jwt.verify(token, secret);
+  let decoded;
+  try {
+    decoded = jwt.verify(token, secret);
+  } catch(err) {
+    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
+    return;
+  }
+
+  const { username, expiresAt, createdAt } = decoded;
+  
   
   let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
   if (!tokenIsValid) {

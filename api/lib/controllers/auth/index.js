@@ -51,6 +51,20 @@ router.use(requireJwt, requireUser);
 router.get('/', getUser);
 router.get('/token', getToken);
 router.post('/terms/accept', acceptTerms);
-router.put('/password', changePassword);
+router.route({
+  method: 'PUT',
+  path: '/password',
+  handler: [
+    bodyParser(),
+    changePassword,
+  ],
+  validate: {
+    type: 'json',
+    body: {
+      password: Joi.string().trim().required(),
+      passwordRepeat: Joi.string().trim().equal(Joi.ref('password')).required(),
+    },
+  },
+});
 
 module.exports = router;

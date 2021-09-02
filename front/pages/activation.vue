@@ -19,7 +19,7 @@
             flat
             dense
           >
-            <v-toolbar-title>Conditions d'utilisation</v-toolbar-title>
+            <v-toolbar-title>{{ $t('validation.title') }}</v-toolbar-title>
             <v-spacer />
             <v-icon>mdi-text</v-icon>
           </v-toolbar>
@@ -32,7 +32,7 @@
               dense
               type="error"
             >
-              Une erreur est survenue, veuillez réessayer.
+              {{ $t('errors.generic') }}
             </v-alert>
             <v-alert
               v-model="pleaseAccept"
@@ -41,30 +41,33 @@
               dense
               type="error"
             >
-              Veuillez accepter les conditions d'utilisation.
+              {{ $t('validation.acceptTerms') }}
             </v-alert>
 
-            <p>
-              Afin d'utiliser ce service, vous vous engagez à respecter le
-              <a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees" target="_blank">règlement général sur la protection des données</a>.
-            </p>
+            <PasswordForm :form-is-valid="formIsValid" @save="save">
+              <slot>
+                <!-- eslint-disable-next-line -->
+                <p v-html="$t('validation.description')" />
 
-            <v-checkbox
-              v-model="accepted"
-              label="J'ai lu et j'accepte les conditions d'utilisation"
-            />
+                <v-checkbox
+                  v-model="accepted"
+                  :rules="[() => !!accepted || ($t('validation.acceptTerms'))]"
+                  :label="$t('validation.readAndAccept')"
+                />
+
+                <v-btn
+                  block
+                  color="primary"
+                  type="submit"
+                  class="my-2"
+                  :disabled="!accepted"
+                  :loading="loading"
+                >
+                  {{ $t('validation.activate') }}
+                </v-btn>
+              </slot>
+            </PasswordForm>
           </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              :loading="loading"
-              @click="acceptedTerms"
-            >
-              Activer mon compte
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
@@ -72,18 +75,27 @@
 </template>
 
 <script>
+import PasswordForm from '~/components/PasswordForm';
+
 export default {
   middleware: ['auth'],
+  components: {
+    PasswordForm,
+  },
   data() {
     return {
       pleaseAccept: false,
       accepted: false,
       error: false,
       loading: false,
+      activated: false,
+      formIsValid: false,
     };
   },
   methods: {
-    async acceptedTerms() {
+    async save() {
+      this.loading = true;
+
       this.error = false;
       this.pleaseAccept = false;
 
@@ -91,8 +103,6 @@ export default {
         this.pleaseAccept = true;
         return;
       }
-
-      this.loading = true;
 
       try {
         await this.$axios.$post('/profile/terms/accept');

@@ -264,6 +264,13 @@
     "500": "An internal error occurred",
     "generic": "An unexpected error has occurred"
   },
+  "validation": {
+    "title": "Account activation",
+    "description": "In order to use this service, you agree to comply with the <a href=\"https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2\" target=\"_blank\">General Data Protection Regulation</a>.",
+    "acceptTerms": "Please accept the terms of use.",
+    "readAndAccept": "I have read and accept the terms of use",
+    "activate": "Activate my account"
+  },
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
   "idCopied": "ID copied in the clipboard",

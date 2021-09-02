@@ -233,7 +233,7 @@
   },
   "password": {
     "forgotPassword": "Mot de passe oublié ?",
-    "resetPassword": "Réinitialiser le mot de passe",
+    "resetPassword": "Sauvegarder le mot de passe",
     "backToLogin": "Retour à la connexion",
     "user": "Utilisateur",
     "password": "Mot de passe",
@@ -263,6 +263,13 @@
     "404": "La page demandée n'a pas été trouvée",
     "500": "Une erreur interne est survenue",
     "generic": "Une erreur inattendue est survenue"
+  },
+  "validation": {
+    "title": "Activation du compte",
+    "description": "Afin d'utiliser ce service, vous vous engagez à respecter le <a href=\"https://www.cnil.fr/fr/reglement-europeen-protection-donnees\" target=\"_blank\">règlement général sur la protection des données</a>.",
+    "acceptTerms": "Veuillez accepter les conditions d'utilisation.",
+    "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
+    "activate": "Activer mon compte"
   },
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
