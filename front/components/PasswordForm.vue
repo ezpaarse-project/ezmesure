@@ -16,13 +16,19 @@
     >
       <v-text-field
         v-model="password"
+        class="mb-2"
         :label="$t('password.password')"
         :type="showPassword ? 'text' : 'password'"
-        :rules="[() => !!password || ($t('password.fieldIsRequired'))]"
+        :rules="[
+          () => !!password || ($t('password.fieldIsRequired')),
+          () => !(password.length < 6) || ($t('password.length'))
+        ]"
         prepend-inner-icon="mdi-lock"
         :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         outlined
         required
+        :hint="$t('password.pattern')"
+        persistent-hint
         @click:append="showPassword = !showPassword"
       />
 
@@ -32,7 +38,8 @@
         :type="showPassword ? 'text' : 'password'"
         :rules="[
           () => !!passwordRepeat || ($t('password.fieldIsRequired')),
-          () => passwordRepeat === password || ($t('password.notEqual'))
+          () => passwordRepeat === password || ($t('password.notEqual')),
+          () => !(passwordRepeat.length < 6) || ($t('password.length'))
         ]"
         prepend-inner-icon="mdi-lock"
         outlined

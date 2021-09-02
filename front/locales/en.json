@@ -243,7 +243,9 @@
     "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
     "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",
     "notEqual": "Passwords don't match",
-    "updated": "Password updated"
+    "updated": "Password updated",
+    "pattern": "Minimum 6 characters",
+    "length": "The password must be at least 6 characters long"
   },
   "contact": {
     "contactUs": "Contact us",

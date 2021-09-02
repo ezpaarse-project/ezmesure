@@ -232,7 +232,7 @@
     "failed": "Une erreur est survenue"
   },
   "password": {
-    "forogot": "Mot de passe oublié ?",
+    "forgot": "Mot de passe oublié ?",
     "reset": "Réinitialiser le mot de passe",
     "save": "Sauvegarder le mot de passe",
     "backToLogin": "Retour à la connexion",
@@ -243,7 +243,9 @@
     "enterUser": "Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.",
     "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.<br> S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
     "notEqual": "Les mots de passes ne correspondent pas",
-    "updated": "Mot de passe mis à jour"
+    "updated": "Mot de passe mis à jour",
+    "pattern": "Minimum 6 caractères",
+    "length": "Le mot de passe doit être d'au moins 6 caratères"
   },
   "contact": {
     "contactUs": "Nous contacter",

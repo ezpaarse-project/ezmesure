@@ -14,6 +14,11 @@ const {
   changePassword,
 } = require('./auth');
 
+const schema = {
+  password: Joi.string().trim().min(6).required(),
+  passwordRepeat: Joi.string().trim().min(6).equal(Joi.ref('password')).required(),
+}
+
 router.route({
   method: 'POST',
   path: '/password/_get_token',
@@ -38,11 +43,10 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: {
+    body: Joi.object({
       token: Joi.string().trim().required(),
-      password: Joi.string().trim().required(),
-      passwordRepeat: Joi.string().trim().equal(Joi.ref('password')).required(),
-    },
+      ...schema,
+    }),
   },
 });
 
@@ -60,10 +64,7 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: {
-      password: Joi.string().trim().required(),
-      passwordRepeat: Joi.string().trim().equal(Joi.ref('password')).required(),
-    },
+    body: Joi.object(schema),
   },
 });
 
