@@ -53,14 +53,6 @@ const keywords = [
 module.exports = {
   settings: {
     number_of_shards: 1,
-    analysis: {
-      normalizer: {
-        lowercase_normalizer: {
-          type: 'custom',
-          filter: ['lowercase'],
-        },
-      },
-    },
   },
   mappings: {
     dynamic_templates: [
@@ -78,7 +70,7 @@ module.exports = {
         type: 'geo_point',
       },
       ...keywords.reduce((acc, keyword) => {
-        acc[keyword] = { type: 'keyword', normalizer: 'lowercase_normalizer' };
+        acc[keyword] = { type: 'keyword' };
         return acc;
       }, {}),
     },

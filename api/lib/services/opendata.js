@@ -189,31 +189,41 @@ async function updateDataset(dataset) {
   return result;
 }
 
+const searchFields = [
+  { name: 'uo_lib_officiel', boost: 3 },
+  { name: 'uo_lib', boost: 3 },
+  { name: 'aca_nom', boost: 2 },
+  { name: 'localisation', boost: 2 },
+  { name: 'siren' },
+  { name: 'dep_nom' },
+  { name: 'siret' },
+  { name: 'uucr_nom' },
+  { name: 'nom_court' },
+  { name: 'identifiant_ror' },
+  { name: 'reg_nom' },
+  { name: 'sigle' },
+  { name: 'uai' },
+];
+
 function search(queryString) {
-  const query = {};
+  let query = {
+    match_all: {},
+  };
 
   if (queryString) {
-    query.query_string = {
-      query: `*${queryString}*`,
-      default_operator: 'and',
-      fields: [
-        'uo_lib_officiel^3',
-        'uo_lib^3',
-        'aca_nom^2',
-        'localisation^2',
-        'siren',
-        'dep_nom',
-        'siret',
-        'uucr_nom',
-        'nom_court',
-        'identifiant_ror',
-        'reg_nom',
-        'sigle',
-        'uai',
-      ],
-    };
-  } else {
-    query.match_all = {};
+    const should = searchFields.map((field) => (
+      {
+        wildcard: {
+          [field.name]: {
+            value: `*${queryString}*`,
+            boost: field.boost,
+            case_insensitive: true,
+          },
+        },
+      }
+    ));
+
+    query = { bool: { should } };
   }
 
   return elastic.search({
