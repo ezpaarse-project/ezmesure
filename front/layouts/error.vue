@@ -42,7 +42,10 @@ export default {
   },
   computed: {
     errorMessage() {
-      return this.$te(`errors.${this.error.statusCode}`) || this.error.message;
+      if (this.$te(`errors.${this.error.statusCode}`)) {
+        return this.$t(`errors.${this.error.statusCode}`);
+      }
+      return this.error.message;
     },
   },
 };
