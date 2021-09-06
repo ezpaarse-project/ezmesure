@@ -134,6 +134,8 @@
       "localisation": "Localisation",
       "automations": "Automatisations",
       "dropImageHere": "Déposez votre image ici",
+      "invalidImageFile": "Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG",
+      "imageTooLarge": "L'image est trop volumineuse. Taille maximale autorisée : 2mb",
       "noDataFound": "Les informations de votre établissement n'ont pas pu être récupérées.",
       "dataSent": "Informations d'établissement transmises",
       "updated": "Établissement mis à jour",

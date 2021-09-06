@@ -1,6 +1,5 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const bodyParser = require('koa-bodyparser');
 
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const Institution = require('../../models/Institution');
@@ -8,7 +7,6 @@ const Institution = require('../../models/Institution');
 const {
   getInstitutions,
   createInstitution,
-  deleteInstitutions,
   deleteInstitution,
   getInstitution,
   getSelfInstitution,
@@ -157,14 +155,13 @@ router.route({
   },
 });
 
-router.use(bodyParser());
-
 router.route({
   method: 'POST',
   path: '/',
   handler: createInstitution,
   validate: {
     type: 'json',
+    maxBody: '3mb',
     query: {
       creator: Joi.boolean(),
     },
@@ -181,6 +178,7 @@ router.route({
   ],
   validate: {
     type: 'json',
+    maxBody: '3mb',
     params: {
       institutionId: Joi.string().trim().required(),
     },
