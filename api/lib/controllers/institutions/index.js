@@ -161,6 +161,7 @@ router.route({
   handler: createInstitution,
   validate: {
     type: 'json',
+    maxBody: '3mb',
     query: {
       creator: Joi.boolean(),
     },
@@ -177,6 +178,7 @@ router.route({
   ],
   validate: {
     type: 'json',
+    maxBody: '3mb',
     params: {
       institutionId: Joi.string().trim().required(),
     },
