@@ -8,7 +8,6 @@ const Institution = require('../../models/Institution');
 const {
   getInstitutions,
   createInstitution,
-  deleteInstitutions,
   deleteInstitution,
   getInstitution,
   getSelfInstitution,
