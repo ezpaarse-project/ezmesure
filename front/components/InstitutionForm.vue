@@ -475,7 +475,11 @@ export default {
         }
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.institution.unableToUpate'));
+        if (e?.response?.status === 413) {
+          this.$store.dispatch('snacks/error', this.$t('institutions.institution.imageTooLarge'));
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('institutions.institution.unableToUpate'));
+        }
         this.saving = false;
         return;
       }
