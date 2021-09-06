@@ -1,6 +1,5 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const bodyParser = require('koa-bodyparser');
 
 const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
 const Institution = require('../../models/Institution');
@@ -155,8 +154,6 @@ router.route({
     },
   },
 });
-
-router.use(bodyParser());
 
 router.route({
   method: 'POST',
