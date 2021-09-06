@@ -138,6 +138,10 @@
               {{ $t('institutions.institution.logo') }}
             </v-card-title>
             <v-card-text>
+              <v-alert v-model="logoHasError" type="error" dismissible>
+                {{ logoErrorMessage }}
+              </v-alert>
+
               <v-hover v-model="hoverLogo" class="mx-auto">
                 <template v-slot:default="{ hover }">
                   <v-card
@@ -160,7 +164,7 @@
                     <input
                       ref="logo"
                       type="file"
-                      accept="image/*"
+                      accept="image/png, image/jpeg, image/svg+xml"
                       class="d-none"
                       @change="onLogoChange"
                     >
@@ -324,6 +328,8 @@ export default {
       defaultLogo,
       logoPreview: null,
       identicalNames: true,
+      logoErrorMessage: null,
+      logoHasError: false,
 
       institution: {
         auto: {},
@@ -386,6 +392,7 @@ export default {
       this.identicalNames = (role === space && role === indexPrefix);
 
       this.logoPreview = null;
+      this.logoHasError = false;
       this.openData = null;
       this.show = true;
     },
@@ -415,7 +422,15 @@ export default {
       this.draggingFile = false;
     },
     async updateLogo(file) {
-      if (file.type.startsWith('image/')) {
+      const maxSize = 2 * 1024 * 1024; // 2mb
+
+      if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
+        this.logoErrorMessage = this.$t('institutions.institution.invalidImageFile');
+        this.logoHasError = true;
+      } else if (file.size > maxSize) {
+        this.logoErrorMessage = this.$t('institutions.institution.imageTooLarge');
+        this.logoHasError = true;
+      } else {
         const base64logo = await toBase64(file);
         this.institution.logo = base64logo;
         this.logoPreview = URL.createObjectURL(file);
