@@ -15,6 +15,7 @@ errors:
     IDPNotFound: IDP not found in Shibboleth headers
     noUsername: no username in the token
     unableToFetchUser: Unable to fetch user data, please log in again
+    noUserFound: No user found
 
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
@@ -96,3 +97,7 @@ errors:
     missingFields: "missing mandatory param: fields"
     invalidFilterFormat: filter has an invalid rison format
     invalidPeriod: Invalid period
+
+  password:
+    expires: Your password reset request has expired
+    invalidToken: The token is invalid

@@ -11,7 +11,7 @@ const formatDate = require('date-fns/format');
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 const storagePath = config.get('storage.path');
 const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)

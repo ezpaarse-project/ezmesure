@@ -20,7 +20,7 @@
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 
-          <v-expansion-panels accordion :value="shibbolethEnabled ? 1 : 0">
+          <v-expansion-panels accordion :value="provider">
             <v-expansion-panel>
               <v-expansion-panel-header>
                 <div>
@@ -53,6 +53,7 @@
                     outlined
                     required
                   />
+
                   <v-text-field
                     v-model="password"
                     :label="$t('authenticate.password')"
@@ -65,15 +66,22 @@
                     @click:append="showPassword = !showPassword"
                   />
 
-                  <p class="text-center">
+                  <v-row>
+                    <a href="/password/reset" class="text-left ml-5 mt-2">
+                      {{ $t('password.forgot') }}
+                    </a>
+
+                    <v-spacer />
+
                     <v-btn
+                      class="mr-5"
                       color="primary"
                       type="submit"
                       :loading="connecting"
                       :disabled="!loginFormValid"
                       v-text="$t('authenticate.logIn')"
                     />
-                  </p>
+                  </v-row>
                 </v-form>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -110,7 +118,12 @@
 <script>
 export default {
   middleware: ['auth'],
-  asyncData({ env }) {
+  asyncData({ env, query }) {
+    let provider = env.shibbolethEnabled ? 1 : 0;
+    if (query?.provider === 'kibana') {
+      provider = 0;
+    }
+
     return {
       username: '',
       password: '',
@@ -120,6 +133,7 @@ export default {
       connecting: false,
       showPassword: false,
       shibbolethEnabled: env.shibbolethEnabled,
+      provider,
     };
   },
   methods: {

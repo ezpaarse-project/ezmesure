@@ -1,11 +1,5 @@
 Bienvenue {{ user.full_name }},
-Vous êtes à présent enregistré sur ezMESURE. Les identifiants suivants vous seront demandés afin d'accéder aux tableaux de bord :
-
-Nom d'utilisateur: {{ user.username }}
-Mot de passe: {{ password }}
-
-Par souci de sécurité, nous vous invitons à changer rapidement votre mot de passe en accédant à votre compte via l'interface Kibana.
-Si ce n'est pas déjà fait, nous vous invitons également à vous rapprocher de l'équipe afin de déterminer vos droits d'accès, sans quoi vous ne pourrez visualiser vos données.
+Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ user.username }}</strong>
 
 Cordialement,
 L'équipe ezMESURE.

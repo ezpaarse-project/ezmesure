@@ -1,9 +1,10 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { addHours, differenceInHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
 const { sendMail, generateMail } = require('../../services/mail');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -34,21 +35,21 @@ function randomString() {
   });
 }
 
-function sendWelcomeMail(user, password) {
+function sendWelcomeMail(user) {
   return sendMail({
     from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user, password }),
+    ...generateMail('welcome', { user }),
   });
 }
 
-function sendNewPassword(user, password) {
+function sendPasswordRecovery(user, data) {
   return sendMail({
     from: sender,
     to: user.email,
-    subject: 'Votre nouveau mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, password }),
+    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
+    ...generateMail('new-password', { user, ...data }),
   });
 }
 
@@ -104,7 +105,7 @@ exports.renaterLogin = async (ctx) => {
     }
 
     try {
-      await sendWelcomeMail(user, props.password);
+      await sendWelcomeMail(user);
     } catch (err) {
       appLogger.error('Failed to send mail', err);
     }
@@ -180,7 +181,91 @@ exports.acceptTerms = async (ctx) => {
   ctx.status = 204;
 };
 
+exports.getResetToken = async (ctx) => {
+  const { body } = ctx.request;
+
+  const username = body.username || ctx.state.user.username;
+
+  const user = await elastic.security.findUser({ username });
+
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  const origin = ctx.get('origin');
+
+  const currentDate = new Date();
+  const expiresAt = addHours(currentDate, config.passwordResetValidity);
+  const token = jwt.sign({
+    username: user.username,
+    createdAt: currentDate,
+    expiresAt,
+  }, secret);
+
+  const diffInHours = config.get('passwordResetValidity');
+  await sendPasswordRecovery(user, {
+    recoveryLink: `${origin}/password/new?token=${token}`,
+    resetLink: `${origin}/password/reset`,
+    validity: `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`,
+  });
+
+  ctx.status = 204;
+};
+
 exports.resetPassword = async (ctx) => {
+  const { token, password } = ctx.request.body;
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, secret);
+  } catch(err) {
+    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
+    return;
+  }
+
+  const { username, expiresAt, createdAt } = decoded;
+  
+  
+  let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
+  if (!tokenIsValid) {
+    ctx.throw(400, ctx.$t('errors.password.expires'));
+    return;
+  }
+
+  const user = await elastic.security.findUser({ username });
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  if (user && user.metadata && user.metadata.passwordDate) {
+    tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+
+    if (!tokenIsValid) {
+      ctx.throw(404, ctx.$t('errors.password.expires'));
+      return;
+    }
+  }
+
+  await elastic.security.changePassword({
+    username,
+    body: {
+      password,
+    },
+  });
+
+  user.metadata.passwordDate = new Date();
+  user.password = password;
+  await elastic.security.putUser({ username: username, body: user });
+
+  ctx.status = 204;
+}
+
+exports.changePassword = async (ctx) => {
+  const { body } = ctx.request;
+  const { password } = body;
+
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
   if (!user) {
@@ -188,17 +273,15 @@ exports.resetPassword = async (ctx) => {
     return;
   }
 
-  const newPassword = await randomString();
-
   await elastic.security.changePassword({
     username: ctx.state.user.username,
     body: {
-      password: newPassword,
+      password,
     },
   });
-  await sendNewPassword(ctx.state.user, newPassword);
+
   ctx.status = 204;
-};
+}
 
 exports.getUser = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });

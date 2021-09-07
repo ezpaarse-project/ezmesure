@@ -1,4 +1,4 @@
-FROM node:10.15.3
+FROM node:14.17.1-alpine3.13
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
 RUN mkdir -p /usr/src/app
