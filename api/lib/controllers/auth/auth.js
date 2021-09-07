@@ -4,7 +4,7 @@ const config = require('config');
 const { addHours, differenceInHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
 const { sendMail, generateMail } = require('../../services/mail');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
