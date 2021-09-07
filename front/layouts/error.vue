@@ -17,7 +17,7 @@
           {{ errorMessage }}
         </h2>
         <h1
-          v-if="!error"
+          v-else
           class="display-1"
         >
           {{ $t('errors.generic') }}

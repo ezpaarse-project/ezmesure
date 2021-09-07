@@ -33,9 +33,9 @@
             </v-alert>
 
             <!-- eslint-disable-next-line -->
-            <v-alert type="success" :value="reseted" v-html="$t('password.checkYourEmail')"/>
+            <v-alert type="success" :value="reset" v-html="$t('password.checkYourEmail')"/>
             <v-btn
-              v-if="reseted"
+              v-if="reset"
               block
               color="primary"
               to="/authenticate"
@@ -43,7 +43,7 @@
             />
 
             <v-form
-              v-if="!reseted"
+              v-if="!reset"
               v-model="resetFormValid"
               @submit.prevent="resetPassword"
             >
@@ -90,7 +90,7 @@ export default {
       resettingPassword: false,
       resetError: null,
       resetErrorText: '',
-      reseted: false,
+      reset: false,
     };
   },
   methods: {
@@ -101,7 +101,7 @@ export default {
 
       try {
         await this.$axios.$post('/profile/password/_get_token', { username: this.username });
-        this.reseted = true;
+        this.reset = true;
       } catch (e) {
         this.resetError = true;
         if (e.response.status >= 400 && e.response.status < 500) {

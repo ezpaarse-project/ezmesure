@@ -71,7 +71,7 @@
     "passwordLost": "Mot de passe oublié",
     "username": "Nom d'utilisateur",
     "newPasswordSentByEmail": "Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
-    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour en recevoir un courriel de réinitialisation.",
+    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour recevoir un courriel de réinitialisation.",
     "whatDoesUsername": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre <a href=\"/kibana/app/kibana#/account\">compte Kibana</a>."
   },
   "token": {
@@ -245,7 +245,7 @@
     "notEqual": "Les mots de passes ne correspondent pas",
     "updated": "Mot de passe mis à jour",
     "pattern": "Minimum 6 caractères",
-    "length": "Le mot de passe doit être d'au moins 6 caratères"
+    "length": "Le mot de passe doit contenir au moins 6 caractères"
   },
   "contact": {
     "contactUs": "Nous contacter",

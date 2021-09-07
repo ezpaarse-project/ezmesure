@@ -44,7 +44,7 @@
               {{ $t('validation.acceptTerms') }}
             </v-alert>
 
-            <PasswordForm :form-is-valid="formIsValid" @save="save">
+            <PasswordForm @save="save">
               <slot>
                 <!-- eslint-disable-next-line -->
                 <p v-html="$t('validation.description')" />
@@ -89,7 +89,6 @@ export default {
       error: false,
       loading: false,
       activated: false,
-      formIsValid: false,
     };
   },
   methods: {

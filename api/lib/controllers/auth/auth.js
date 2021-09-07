@@ -203,7 +203,7 @@ exports.getResetToken = async (ctx) => {
     expiresAt,
   }, secret);
 
-  const diffInHours = differenceInHours(expiresAt, currentDate);
+  const diffInHours = config.get('passwordResetValidity');
   await sendPasswordRecovery(user, {
     recoveryLink: `${origin}/password/new?token=${token}`,
     resetLink: `${origin}/password/reset`,
@@ -248,15 +248,16 @@ exports.resetPassword = async (ctx) => {
     }
   }
 
-  user.metadata.passwordDate = new Date();
-  await elastic.security.putUser({ username: username, body: user });
-
   await elastic.security.changePassword({
     username,
     body: {
       password,
     },
   });
+
+  user.metadata.passwordDate = new Date();
+  user.password = password;
+  await elastic.security.putUser({ username: username, body: user });
 
   ctx.status = 204;
 }

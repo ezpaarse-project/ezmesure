@@ -120,7 +120,7 @@ export default {
   middleware: ['auth'],
   asyncData({ env, query }) {
     let provider = env.shibbolethEnabled ? 1 : 0;
-    if (query.provider && query.provider === 'kibana') {
+    if (query?.provider === 'kibana') {
       provider = 0;
     }
 

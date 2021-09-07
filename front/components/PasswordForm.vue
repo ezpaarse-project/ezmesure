@@ -70,10 +70,6 @@ export default {
       type: Boolean,
       default: () => false,
     },
-    formIsValid: {
-      type: Boolean,
-      default: () => false,
-    },
     recovery: {
       type: Boolean,
       default: () => false,
@@ -87,7 +83,7 @@ export default {
       showPassword: false,
       sendError: null,
       sendErrorText: '',
-      validForm: this.formIsValid,
+      validForm: false,
       saved: this.passwordSaved,
     };
   },
