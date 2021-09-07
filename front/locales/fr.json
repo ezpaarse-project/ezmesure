@@ -70,8 +70,8 @@
     "title": "Identifiants kibana",
     "passwordLost": "Mot de passe oublié",
     "username": "Nom d'utilisateur",
-    "newPasswordSentByEmail": "Un nouveau mot de passe vous a été envoyé par mail.",
-    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour en recevoir un nouveau par mail.",
+    "newPasswordSentByEmail": "Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
+    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour recevoir un courriel de réinitialisation.",
     "whatDoesUsername": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre <a href=\"/kibana/app/kibana#/account\">compte Kibana</a>."
   },
   "token": {
@@ -233,6 +233,22 @@
     "loginFailed": "Les informations transmises n'ont pas permis de vous authentifier",
     "failed": "Une erreur est survenue"
   },
+  "password": {
+    "forgot": "Mot de passe oublié ?",
+    "reset": "Réinitialiser le mot de passe",
+    "save": "Sauvegarder le mot de passe",
+    "backToLogin": "Retour à la connexion",
+    "user": "Utilisateur",
+    "password": "Mot de passe",
+    "repeatPassword": "Répéter le mot de passe",
+    "fieldIsRequired": "Ce champs est requis",
+    "enterUser": "Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.",
+    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.<br> S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
+    "notEqual": "Les mots de passes ne correspondent pas",
+    "updated": "Mot de passe mis à jour",
+    "pattern": "Minimum 6 caractères",
+    "length": "Le mot de passe doit contenir au moins 6 caractères"
+  },
   "contact": {
     "contactUs": "Nous contacter",
     "email": "Adresse électronique",
@@ -247,6 +263,18 @@
     "emailMustBeValid": "L'adresse électronique doit être valide",
     "contentIsRequired": "Un message est requis",
     "subjectIsRequired": "L'objet est requis"
+  },
+  "errors": {
+    "404": "La page demandée n'a pas été trouvée",
+    "500": "Une erreur interne est survenue",
+    "generic": "Une erreur inattendue est survenue"
+  },
+  "validation": {
+    "title": "Activation du compte",
+    "description": "Afin d'utiliser ce service, vous vous engagez à respecter le <a href=\"https://www.cnil.fr/fr/reglement-europeen-protection-donnees\" target=\"_blank\">règlement général sur la protection des données</a>.",
+    "acceptTerms": "Veuillez accepter les conditions d'utilisation.",
+    "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
+    "activate": "Activer mon compte"
   },
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
