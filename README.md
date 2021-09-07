@@ -57,11 +57,7 @@ Put the certificate (``server.crt``) and private key (``server.key``) used to de
 
 **NB**: the private key is critical and should not be shared.
 
-Then run the following command :
-
-```bash
-make config
-```
+Additionnaly, set the environment variables `SHIBBOLETH_SP_URL` and `SHIBBOLETH_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable Shibboleth authentication (see below).
 
 #### Disabling Shibboleth
 
