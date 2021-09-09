@@ -2,7 +2,7 @@
   "menu": {
     "homepage": "Page d'accueil ezMESURE",
     "home": "Accueil",
-    "dashboard": "Tableau de bord",
+    "dashboards": "Tableaux de bord",
     "myspace": "Mon compte",
     "partners": "Nos partenaires",
     "api": "API",
