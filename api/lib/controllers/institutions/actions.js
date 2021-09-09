@@ -2,7 +2,7 @@ const config = require('config');
 const elastic = require('../../services/elastic');
 const depositors = require('../../services/depositors');
 const indexTemplate = require('../../utils/depositors-template');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
@@ -74,7 +74,7 @@ exports.createInstitution = async (ctx) => {
     const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
 
     if (selfInstitution) {
-      ctx.throw(409, ctx.$t('errors.institution.alreadyAssigned'));
+      ctx.throw(409, ctx.$t('errors.institution.alreadyAttached'));
       return;
     }
   }

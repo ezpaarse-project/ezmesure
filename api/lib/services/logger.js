@@ -1,6 +1,7 @@
+const config = require('config');
 const winston = require('winston');
 
-module.exports = function logger(loggersConfig) {
+function logger(loggersConfig) {
   const transports = [];
 
   Object.entries(loggersConfig).forEach(([key, value]) => {
@@ -10,4 +11,9 @@ module.exports = function logger(loggersConfig) {
   });
 
   return winston.createLogger({ transports });
+}
+
+module.exports = {
+  appLogger: logger(config.get('logs.app')),
+  httpLogger: logger(config.get('logs.http')),
 };

@@ -7,7 +7,7 @@ const Papa = require('papaparse');
 const validator = require('../../services/validator');
 
 const storagePath = config.get('storage.path');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 exports.upload = async function (ctx) {
   let { fileName } = ctx.request.params;

@@ -15,6 +15,7 @@ errors:
     IDPNotFound: IDP introuvable dans les headers Shibboleth
     noUsername: Nom d'utilisateur introuvable dans le token
     unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
+    noUserFound: Utilisateur introuvable
 
   sushi:
     unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
@@ -90,3 +91,7 @@ errors:
     missingFields: "Champ requis manquant : fields"
     invalidFilterFormat: Le filtre présente un format rison invalide
     invalidPeriod: Période invalide
+
+  password:
+    expires: Votre demande de réinitialisation de mot de passe est expirée
+    invalidToken: Le token est invalide

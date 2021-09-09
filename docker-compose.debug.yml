@@ -34,7 +34,7 @@ services:
       service: rp
 
   api:
-    image: node:10.15.3
+    image: node:14.17.1
     ports:
       - 3000:3000
     volumes:
@@ -60,6 +60,7 @@ services:
       - EZMESURE_NOTIFICATIONS_SENDER
       - EZMESURE_NOTIFICATIONS_CRON
       - EZMESURE_NOTIFICATIONS_RECIPIENTS
+      - EZMESURE_SEND_EMPTY_ACTIVITY
       - EZMESURE_ENCRYPTION_SECRET
       - NODE_ENV
       - NODE_CONFIG
@@ -67,7 +68,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:10.15.3
+    image: node:14.17.1-alpine3.13
     ports:
       - 8080:8080
     volumes:

@@ -12,6 +12,16 @@
   </mj-column>
 </mj-section>
 
+{% if noActions %}
+<mj-section>
+  <mj-column>
+    <mj-text>
+      Aucune activité n'a été enregistrée dernièrement.
+    </mj-text>
+  </mj-column>
+</mj-section>
+{% endif %}
+
 <mj-section>
   <mj-column>
     <mj-text>

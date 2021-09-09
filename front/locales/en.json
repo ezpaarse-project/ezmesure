@@ -70,8 +70,8 @@
     "title": "Kibana identifiers",
     "passwordLost": "Password forgoten",
     "username": "Username",
-    "newPasswordSentByEmail": "A new password has been emailed to you.",
-    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a new one by email.",
+    "newPasswordSentByEmail": "An email has been sent to you to reset your password.",
+    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a reset email.",
     "whatDoesUsername": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your <a href=\"/kibana/app/kibana#/account\">Kibana account</a>."
   },
   "token": {
@@ -134,6 +134,8 @@
       "localisation": "Localisation",
       "automations": "Automations",
       "dropImageHere": "Drop your image here",
+      "invalidImageFile": "Invalid image file. Accepted file types: JPEG, PNG, SVG",
+      "imageTooLarge": "Image is too large. Maximum allowed size: 2mb",
       "noDataFound": "Your institution's information could not be retrieved.",
       "dataSent": "Institution informations transmitted",
       "updated": "Institution updated",
@@ -231,6 +233,22 @@
     "loginFailed": "The information transmitted did not allow you to authenticate",
     "failed": "An error occurred"
   },
+  "password": {
+    "forgot": "Forgout your password ?",
+    "email": "Email address *",
+    "reset": "Reset password",
+    "save": "Save password",
+    "user": "User",
+    "password": "Password",
+    "repeatPassword": "Repeat password",
+    "backToLogin": "Back to login",
+    "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
+    "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",
+    "notEqual": "Passwords don't match",
+    "updated": "Password updated",
+    "pattern": "Minimum 6 characters",
+    "length": "The password must be at least 6 characters long"
+  },
   "contact": {
     "contactUs": "Contact us",
     "email": "Email address",
@@ -245,6 +263,18 @@
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
     "subjectIsRequired": "Subject is required"
+  },
+  "errors": {
+    "404": "La page demandée n'a pas été trouvée",
+    "500": "An internal error occurred",
+    "generic": "An unexpected error has occurred"
+  },
+  "validation": {
+    "title": "Account activation",
+    "description": "In order to use this service, you agree to comply with the <a href=\"https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2\" target=\"_blank\">General Data Protection Regulation</a>.",
+    "acceptTerms": "Please accept the terms of use.",
+    "readAndAccept": "I have read and accept the terms of use",
+    "activate": "Activate my account"
   },
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",

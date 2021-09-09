@@ -28,9 +28,10 @@ export default {
         uai,
       } = (this.item || {});
 
-      let str = `${localisation}`;
-      if (uai) { str += ` - UAI ${uai}`; }
-      return str;
+      const infos = [];
+      if (localisation) { infos.push(localisation); }
+      if (uai) { infos.push(`UAI ${uai}`); }
+      return infos.join(' - ');
     },
   },
 };

@@ -23,7 +23,8 @@
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
     "sender": "EZMESURE_NOTIFICATIONS_SENDER",
-    "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS"
+    "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS",
+    "sendEmptyActivity": { "__name": "EZMESURE_SEND_EMPTY_ACTIVITY", "__format": "boolean" }
   },
   "auth": {
     "secret": "EZMESURE_AUTH_SECRET",
@@ -35,10 +36,6 @@
   },
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"
-  },
-  "googleAPI": {
-    "clientEmail": "EZMESURE_GOOGLE_EMAIL",
-    "privateKey": "EZMESURE_GOOGLE_PRIVATE_KEY"
   },
   "depositors": {
     "index": "EZMESURE_DEPOSITORS_INDEX",
