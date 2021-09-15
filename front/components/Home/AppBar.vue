@@ -73,11 +73,15 @@
       origin="top left"
     >
       <template v-slot:activator="{ on }">
-        <v-chip color="primary darken-4" v-on="on">
+        <v-chip
+          color="primary darken-4"
+          class="d-none d-md-flex d-lg-flex d-xl-flex font-weight-medium"
+          v-on="on"
+        >
           <v-icon left>
             mdi-account-circle
           </v-icon>
-          {{ user.username }}
+          {{ (user.full_name || user.username).toUpperCase() }}
         </v-chip>
       </template>
       <v-list flat>
@@ -91,6 +95,14 @@
             <v-icon>{{ link.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-subtitle v-text="link.title" />
+        </v-list-item>
+
+        <v-divider v-if="isAdmin" />
+        <v-list-item v-if="isAdmin" href="/cockpit">
+          <v-list-item-action>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-action>
+          <v-list-item-subtitle v-text="$t('administration')" />
         </v-list-item>
 
         <v-divider />
@@ -108,6 +120,7 @@
       <template v-slot:activator="{ on, value }">
         <v-btn
           text
+          class="d-none d-md-flex d-lg-flex d-xl-flex mx-1"
           v-on="on"
         >
           {{ currentLocal }}
@@ -160,6 +173,15 @@ export default {
         { title: this.$t('menu.kibanIdentifiers'), href: '/kibana', icon: 'mdi-card-account-details-outline' },
         { title: this.$t('menu.authentificationToken'), href: '/token', icon: 'mdi-key' },
       ];
+    },
+    hasRoles() {
+      return Array.isArray(this.$auth?.user?.roles) && this.$auth.user.roles.length > 0;
+    },
+    isAdmin() {
+      if (this.hasRoles) {
+        return this.$auth.user.roles.some(role => ['admin', 'superuser'].includes(role));
+      }
+      return false;
     },
   },
   methods: {
