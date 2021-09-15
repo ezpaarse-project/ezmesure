@@ -18,7 +18,9 @@
     "sushi": "Sushi",
     "users": "Users",
     "logout": "Logout",
-    "contact": "Contact"
+    "contact": "Contact",
+    "legalNotices": "Legal notices",
+    "privacy": "Privacy policy"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -264,6 +266,12 @@
     "contentIsRequired": "A message is required",
     "subjectIsRequired": "Subject is required"
   },
+  "legalNotices": {
+    "title": "Legal notices"
+  },
+  "privacy": {
+    "title": "Privacy policy"
+  },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",
     "500": "An internal error occurred",
@@ -309,5 +317,9 @@
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
   "areYouSure": "Are you sure ?",
-  "send": "Send"
+  "send": "Send",
+  "github": "GitHub",
+  "twitter": "Twitter",
+  "youtube": "Youtube",
+  "mailto": "Contact by email"
 }

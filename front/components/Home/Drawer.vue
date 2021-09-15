@@ -16,7 +16,7 @@
 
       <v-list-item exact link @click="drawer = !drawer; $vuetify.goTo('#supported-by')">
         <v-list-item-icon>
-          <v-icon>mdi-handshake-outline</v-icon>
+          <v-icon>mdi-charity</v-icon>
         </v-list-item-icon>
         <v-list-item-title v-text="$t('menu.partners')" />
       </v-list-item>
@@ -33,6 +33,20 @@
           <v-icon>mdi-account-outline</v-icon>
         </v-list-item-icon>
         <v-list-item-title v-text="$t('menu.myspace')" />
+      </v-list-item>
+
+      <v-list-item exact link to="/contact-us">
+        <v-list-item-icon>
+          <v-icon>mdi-email-edit-outline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title v-text="$t('menu.contact')" />
+      </v-list-item>
+
+      <v-list-item exact link to="/api-reference">
+        <v-list-item-icon>
+          <v-icon>mdi-api</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title v-text="$t('menu.api')" />
       </v-list-item>
     </v-list>
   </v-navigation-drawer>

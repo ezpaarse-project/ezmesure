@@ -3,12 +3,27 @@
     <AppBar />
     <Drawer />
 
-    <v-content>
+    <v-main>
       <nuxt />
-    </v-content>
+    </v-main>
+
+    <Footer />
+
+    <v-btn
+      v-show="fab"
+      v-scroll="onScroll"
+      fab
+      dark
+      fixed
+      bottom
+      right
+      style="margin: 0 0 60px 0"
+      @click="toTop"
+    >
+      <v-icon>mdi-chevron-up</v-icon>
+    </v-btn>
 
     <Snackbar />
-    <Footer />
   </v-app>
 </template>
 
@@ -24,6 +39,19 @@ export default {
     Drawer,
     Snackbar,
     Footer,
+  },
+  data: () => ({
+    fab: false,
+  }),
+  methods: {
+    onScroll(e) {
+      if (typeof window === 'undefined') return;
+      const top = window.pageYOffset || e.target.scrollTop || 0;
+      this.fab = top > 20;
+    },
+    toTop() {
+      this.$vuetify.goTo(0);
+    },
   },
 };
 </script>

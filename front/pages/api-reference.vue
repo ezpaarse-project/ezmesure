@@ -8,6 +8,7 @@
 import SwaggerUI from 'swagger-ui';
 
 export default {
+  layout: 'home',
   mounted() {
     SwaggerUI({
       url: '/api/openapi.json',

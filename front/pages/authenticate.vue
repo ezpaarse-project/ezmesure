@@ -1,129 +1,117 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
-    <v-row
-      align="center"
-      justify="center"
+  <v-container fluid fill-height>
+    <v-layout
+      id="authenticate"
+      row
+      wrap
+      align-center
+      align-content-start
+      justify-center
+      class="text-center"
     >
-      <v-col style="max-width: 600px">
-        <v-card class="elevation-12">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title v-text="$t('authenticate.restrictedAccess')" />
-            <v-spacer />
-            <v-icon>mdi-lock</v-icon>
-          </v-toolbar>
+      <v-flex xs12>
+        <v-icon size="100">
+          mdi-lock
+        </v-icon>
 
-          <v-expansion-panels accordion :value="provider">
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <div>
-                  <img
-                    src="/images/kibana-logo-color-horizontal.svg"
-                    alt="Kibana"
-                    height="35"
-                  >
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p v-text="$t('authenticate.kibanaAuth')" />
+        <h1
+          class="display-1 mb-2"
+          v-text="$t('authenticate.restrictedAccess')"
+        />
+      </v-flex>
 
-                <v-alert
-                  v-model="showError"
-                  dismissible
-                  prominent
-                  dense
-                  type="error"
-                >
-                  {{ errorMessage }}
-                </v-alert>
+      <v-flex xs12 sm12 md6 xl4 lg4 class="ma-2" align-self-start>
+        <v-card>
+          <v-card-text>
+            <img
+              src="/images/kibana-logo-color-horizontal.svg"
+              alt="Kibana"
+              height="48"
+            >
 
-                <v-form v-model="loginFormValid" @submit.prevent="signin">
-                  <v-text-field
-                    v-model="username"
-                    :label="$t('authenticate.user')"
-                    :rules="[() => !!username || ($t('authenticate.fieldIsRequired'))]"
-                    prepend-inner-icon="mdi-account"
-                    outlined
-                    required
-                  />
+            <p v-text="$t('authenticate.kibanaAuth')" />
 
-                  <v-text-field
-                    v-model="password"
-                    :label="$t('authenticate.password')"
-                    :type="showPassword ? 'text' : 'password'"
-                    :rules="[() => !!password || ($t('authenticate.fieldIsRequired'))]"
-                    prepend-inner-icon="mdi-lock"
-                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    outlined
-                    required
-                    @click:append="showPassword = !showPassword"
-                  />
+            <v-alert
+              v-model="showError"
+              dismissible
+              prominent
+              dense
+              type="error"
+            >
+              {{ errorMessage }}
+            </v-alert>
 
-                  <v-row>
-                    <a href="/password/reset" class="text-left ml-5 mt-2">
-                      {{ $t('password.forgot') }}
-                    </a>
+            <v-form v-model="loginFormValid" @submit.prevent="signin">
+              <v-text-field
+                v-model="username"
+                :label="$t('authenticate.user')"
+                :rules="[() => !!username || ($t('authenticate.fieldIsRequired'))]"
+                prepend-inner-icon="mdi-account"
+                outlined
+                required
+              />
 
-                    <v-spacer />
+              <v-text-field
+                v-model="password"
+                :label="$t('authenticate.password')"
+                :type="showPassword ? 'text' : 'password'"
+                :rules="[() => !!password || ($t('authenticate.fieldIsRequired'))]"
+                prepend-inner-icon="mdi-lock"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                outlined
+                required
+                @click:append="showPassword = !showPassword"
+              />
 
-                    <v-btn
-                      class="mr-5"
-                      color="primary"
-                      type="submit"
-                      :loading="connecting"
-                      :disabled="!loginFormValid"
-                      v-text="$t('authenticate.logIn')"
-                    />
-                  </v-row>
-                </v-form>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
+              <v-layout justify-space-between>
+                <a href="/password/reset" class="text-left ml-5 mt-2">
+                  {{ $t('password.forgot') }}
+                </a>
 
-            <v-expansion-panel v-if="shibbolethEnabled">
-              <v-expansion-panel-header>
-                <div>
-                  <img
-                    src="/images/shibboleth_logowordmark_color.png"
-                    alt="Shibboleth"
-                    height="40"
-                  >
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p v-text="$t('authenticate.logInWithProvider')" />
-
-                <p class="text-center">
-                  <v-btn
-                    color="primary"
-                    :href="`/login?origin=${$auth.$state.redirect || '/myspace'}`"
-                    v-text="$t('authenticate.logIn')"
-                  />
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
+                <v-btn
+                  class="mr-5"
+                  color="primary"
+                  type="submit"
+                  :loading="connecting"
+                  :disabled="!loginFormValid"
+                  v-text="$t('authenticate.logIn')"
+                />
+              </v-layout>
+            </v-form>
+          </v-card-text>
         </v-card>
-      </v-col>
-    </v-row>
+      </v-flex>
+
+      <v-flex v-if="shibbolethEnabled" xs12 sm12 md6 xl4 lg4 class="ma-2" align-self-start>
+        <v-card>
+          <v-card-text>
+            <img
+              src="/images/shibboleth_logowordmark_color.png"
+              alt="Shibboleth"
+              height="64"
+            >
+
+            <p v-text="$t('authenticate.logInWithProvider')" />
+
+            <p class="text-center">
+              <v-btn
+                color="primary"
+                :href="`/login?origin=${$auth.$state.redirect || '/myspace'}`"
+                v-text="$t('authenticate.logIn')"
+              />
+            </p>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
 <script>
 export default {
+  layout: 'home',
   middleware: ['auth'],
-  asyncData({ env, query }) {
-    let provider = env.shibbolethEnabled ? 1 : 0;
-    if (query?.provider === 'kibana') {
-      provider = 0;
-    }
-
+  asyncData({ env }) {
     return {
       username: '',
       password: '',
@@ -133,7 +121,6 @@ export default {
       connecting: false,
       showPassword: false,
       shibbolethEnabled: env.shibbolethEnabled,
-      provider,
     };
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <v-card width="350" height="100%" class="flexCard">
+  <v-card light width="350" height="100%" class="flexCard">
     <v-card-text class="text-center grow">
       <v-img
         v-if="partner.logoId"

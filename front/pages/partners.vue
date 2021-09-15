@@ -1,18 +1,26 @@
 <template>
-  <v-container fluid grid-list-lg>
-    <v-layout column>
-      <v-icon size="100" color="pink">
-        mdi-charity
-      </v-icon>
+  <v-container fluid>
+    <v-layout
+      id="partners"
+      row
+      wrap
+      align-center
+      align-content-start
+      justify-center
+      class="text-center"
+    >
+      <v-flex xs12>
+        <v-icon size="100" color="pink">
+          mdi-charity
+        </v-icon>
 
-      <h1
-        class="display-1 text-center mb-2"
-        v-text="$t('partners.count', { count: partners.length })"
-      />
-    </v-layout>
+        <h1
+          class="display-1 mb-2"
+          v-text="$t('partners.count', { count: partners.length })"
+        />
+      </v-flex>
 
-    <v-row align="center" justify="center">
-      <v-col cols="12" sm="6" md="5" lg="4">
+      <v-flex xs12 sm6 md5 lg4 class="ma-2">
         <v-text-field
           v-model="search"
           :label="$t('partners.search')"
@@ -21,8 +29,9 @@
           append-icon="mdi-magnify"
           hide-details
         />
-      </v-col>
-      <v-col cols="12" sm="6" md="5" lg="4">
+      </v-flex>
+
+      <v-flex xs12 sm6 md5 lg4 class="ma-2">
         <v-select
           v-model="selectedAutomations"
           :items="automations"
@@ -46,11 +55,22 @@
             </v-chip>
           </template>
         </v-select>
-      </v-col>
-    </v-row>
+      </v-flex>
+    </v-layout>
 
-    <v-layout row wrap justify-center>
-      <v-flex v-for="(partner, index) in filteredPartners" :key="index" shrink>
+    <v-layout
+      row
+      wrap
+      justify-center
+      class="mb-5"
+    >
+      <v-flex
+        v-for="(partner, index) in filteredPartners"
+        :key="index"
+        d-flex
+        shrink
+        class="ma-2"
+      >
         <PartnerCard :partner="partner" />
       </v-flex>
     </v-layout>
@@ -61,6 +81,7 @@
 import PartnerCard from '~/components/PartnerCard.vue';
 
 export default {
+  layout: 'home',
   components: {
     PartnerCard,
   },

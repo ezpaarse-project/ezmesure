@@ -1,93 +1,83 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
+  <v-container fluid fill-height>
     <v-layout
+      id="privacy"
+      row
+      wrap
       align-center
+      align-content-start
       justify-center
+      class="text-center"
     >
-      <v-flex
-        xs12
-        sm8
-        md4
-      >
-        <v-card class="elevation-12">
-          <v-toolbar
+      <v-flex xs12>
+        <v-icon size="100">
+          mdi-email-edit
+        </v-icon>
+        <h1
+          class="display-1 mb-2"
+          v-text="$t('contact.contactUs')"
+        />
+      </v-flex>
+
+      <v-flex xs12 sm6 md5 lg4 class="ma-2">
+        <v-form
+          ref="form"
+          v-model="valid"
+        >
+          <v-text-field
+            v-if="!user"
+            v-model="email"
+            :rules="emailRules"
+            label="Email"
+            name="email"
+            outlined
+            clearable
+            required
+          />
+          <v-text-field
+            v-else
+            :value="user.email"
+            :rules="emailRules"
+            :label="$t('contact.email')"
+            name="email"
+            outlined
+            clearable
+            required
+            disabled
+          />
+          <v-select
+            v-model="subject"
+            :items="subjects"
+            :rules="subjectRules"
+            :label="$t('contact.subject')"
+            name="subject"
+            outlined
+            required
+            return-object
+          />
+          <v-textarea
+            v-model="message"
+            :rules="messageRules"
+            :label="$t('contact.content')"
+            name="message"
+            outlined
+            required
+          />
+          <v-checkbox
+            v-if="subject.value === 'bugs'"
+            v-model="sendBrowser"
+            :label="$t('contact.sendNavigatorVersion')"
+          />
+          <v-btn
+            :disabled="!valid"
+            :loading="loading"
             color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title v-text="$t('contact.contactUs')" />
-            <v-spacer />
-            <v-icon>mdi-email-edit</v-icon>
-          </v-toolbar>
-
-          <v-card-text>
-            <v-form
-              ref="form"
-              v-model="valid"
-            >
-              <v-text-field
-                v-if="!user"
-                v-model="email"
-                :rules="emailRules"
-                label="Email"
-                name="email"
-                outlined
-                clearable
-                required
-              />
-              <v-text-field
-                v-else
-                :value="user.email"
-                :rules="emailRules"
-                :label="$t('contact.email')"
-                name="email"
-                outlined
-                clearable
-                required
-                disabled
-              />
-              <v-select
-                v-model="subject"
-                :items="subjects"
-                :rules="subjectRules"
-                :label="$t('contact.subject')"
-                name="subject"
-                outlined
-                required
-                return-object
-              />
-              <v-textarea
-                v-model="message"
-                :rules="messageRules"
-                :label="$t('contact.content')"
-                name="message"
-                outlined
-                required
-              />
-              <v-checkbox
-                v-if="subject.value === 'bugs'"
-                v-model="sendBrowser"
-                :label="$t('contact.sendNavigatorVersion')"
-              />
-            </v-form>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn color="error" @click="$router.go(-1)" v-text="$t('cancel')" />
-            <v-btn
-              :disabled="!valid"
-              :loading="loading"
-              color="primary"
-              @click="validate"
-              v-text="$t('send')"
-            />
-          </v-card-actions>
-        </v-card>
+            type="submit"
+            block
+            @click="validate"
+            v-text="$t('send')"
+          />
+        </v-form>
       </v-flex>
     </v-layout>
   </v-container>
@@ -95,6 +85,7 @@
 
 <script>
 export default {
+  layout: 'home',
   data: () => ({
     email: '',
     message: '',

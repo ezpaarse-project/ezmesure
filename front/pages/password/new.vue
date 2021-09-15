@@ -1,31 +1,29 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
-    <v-row
-      align="center"
-      justify="center"
+  <v-container fluid fill-height>
+    <v-layout
+      id="authenticate"
+      row
+      wrap
+      align-center
+      align-content-start
+      justify-center
+      class="text-center"
     >
-      <v-col style="max-width: 600px">
-        <v-card class="elevation-12">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title v-text="$t('password.forgot')" />
-            <v-spacer />
-            <v-icon>mdi-lock</v-icon>
-          </v-toolbar>
+      <v-flex xs12>
+        <v-icon size="100">
+          mdi-lock
+        </v-icon>
 
-          <v-card-text>
-            <PasswordForm :recovery="true" @save="savePassword" />
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+        <h1
+          class="display-1 mb-2"
+          v-text="$t('password.forgot')"
+        />
+      </v-flex>
+
+      <v-flex xs12 sm12 md6 xl4 lg4 class="ma-2">
+        <PasswordForm :recovery="true" @save="savePassword" />
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
@@ -44,7 +42,7 @@ export default {
   },
   methods: {
     async savePassword() {
-      this.$router.push('/authenticate?provider=kibana');
+      this.$router.push('/authenticate');
     },
   },
 };
