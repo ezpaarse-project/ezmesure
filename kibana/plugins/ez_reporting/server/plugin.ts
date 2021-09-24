@@ -78,47 +78,30 @@ export class EzreportingPlugin
     features.registerKibanaFeature({
       id: PLUGIN_ID,
       name: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}`,
-      icon: PLUGIN_ICON,
       category: featuresCategory,
-      app: [PLUGIN_ID],
+      app: [PLUGIN_ID, 'kibana'],
       catalogue: [PLUGIN_ID],
       privilegesTooltip: PLUGIN_DESCRIPTION,
-      management: {
-        insightsAndAlerting: ['triggersActions'],
-      },
-      alerting: Object.values(AlertType),
       privileges: {
         all: {
-          app: [PLUGIN_ID],
+          app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`, `${PLUGIN_ID}-all`],
           catalogue: [PLUGIN_ID],
           savedObject: {
             all: [],
             read: [],
           },
-          alerting: {
-            all: Object.values(AlertType),
-          },
-          management: {
-            insightsAndAlerting: ['triggersActions'],
-          },
           ui: ['create', 'edit', 'save', 'download', 'delete', 'show'],
         },
         read: {
-          app: [PLUGIN_ID],
+          app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`],
           catalogue: [PLUGIN_ID],
           savedObject: {
             all: [],
             read: [],
           },
-          alerting: {
-            all: Object.values(AlertType),
-          },
-          management: {
-            insightsAndAlerting: ['triggersActions'],
-          },
-          ui: [],
+          ui: ['view'],
         },
       },
     });

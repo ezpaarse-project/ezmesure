@@ -8,8 +8,10 @@ services:
   kibana:
     build:
       context: ./kibana
+      dockerfile: Dockerfile-dev
     ports:
       - 5601:5601
+      - 5603:5603
     environment:
       - ELASTICSEARCH_PASSWORD
       - ELASTICSEARCH_USERNAME
@@ -24,8 +26,10 @@ services:
       - APPLI_APACHE_SERVERNAME
       - REPORTING_URL=http://reporting:3000
       - EZMESURE_APPLICATION_NAME
+    working_dir: /home/kbn-dev/kibana
     volumes:
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana/config/kibana.dev.yml:/home/kbn-dev/kibana/config/kibana.dev.yml:ro
+      - ./kibana/plugins:/home/kbn-dev/kibana/plugins
     restart: unless-stopped
 
   rp:

@@ -1,6 +1,10 @@
 elasticsearch.hosts:
-    - http://localhost:9200/
-elasticsearch.username: steven
-elasticsearch.password: steven
+  - http://elastic:9200/
+server.host: "0.0.0.0"
+elasticsearch.username: ezmesure-admin
+elasticsearch.password: ezmesure-admin
 elasticsearch.ssl.verificationMode: none
 server.rewriteBasePath: false
+xpack.security.enabled: true
+xpack.reporting.capture.browser.chromium.disableSandbox: true
+xpack.reporting.roles.enabled: false

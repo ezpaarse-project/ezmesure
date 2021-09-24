@@ -42,6 +42,7 @@ import {
   EuiIcon,
   EuiHealth,
   EuiHighlight,
+  EuiPageHeader,
 } from '@elastic/eui';
 
 import { i18n } from '@kbn/i18n';
@@ -536,25 +537,26 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         <I18nProvider>
           <>
             <navigation.ui.TopNavMenu appName={PLUGIN_ID} showSearchBar={false} />
-            <EuiPage restrictWidth="1000px">
+            <EuiPage paddingSize="none">
               <EuiPageBody>
-                <EuiPageContent>
-                  <EuiPageContentHeader>
-                    <EuiPageContentHeaderSection>
-                      <EuiTitle>
-                        <h2>
-                          <FormattedMessage
-                            id="ezreporting.title"
-                            defaultMessage="{name}"
-                            values={{ name: `${PLUGIN_NAME} ${applicationName}` }}
-                          />
-                        </h2>
-                      </EuiTitle>
-                    </EuiPageContentHeaderSection>
+                <EuiPageContent borderRadius="none" hasShadow={false} paddingSize="l">
+                  <EuiPageContentBody restrictWidth>
+                    <EuiPageContentHeader>
+                      <EuiPageContentHeaderSection>
+                        <EuiTitle>
+                          <h2>
+                            <FormattedMessage
+                              id="ezreporting.title"
+                              defaultMessage="{name}"
+                              values={{ name: `${PLUGIN_NAME} ${applicationName}` }}
+                            />
+                          </h2>
+                        </EuiTitle>
+                      </EuiPageContentHeaderSection>
 
-                    <EuiPageContentHeaderSection>{createBtn}</EuiPageContentHeaderSection>
-                  </EuiPageContentHeader>
-                  <EuiPageContentBody>
+                      <EuiPageContentHeaderSection>{createBtn}</EuiPageContentHeaderSection>
+                    </EuiPageContentHeader>
+
                     <EuiSpacer size="s" />
 
                     <EuiFlexGroup>

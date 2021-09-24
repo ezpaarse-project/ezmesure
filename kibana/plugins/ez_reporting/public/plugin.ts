@@ -86,7 +86,6 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         const { chrome } = coreStart;
 
         chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
-        chrome.setBreadcrumbs([{ text: `${PLUGIN_NAME} ${applicationName}` }]);
 
         const admin = false;
 
@@ -155,15 +154,15 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
 
     // ezReporting app in home page
     if (home) {
-      // home.featureCatalogue.registerSolution({
-      //   id: PLUGIN_ID,
-      //   title: `${PLUGIN_NAME} ${applicationName}`,
-      //   subtitle: `${PLUGIN_NAME} ${applicationName}`,
-      //   description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-      //   icon: PLUGIN_ICON,
-      //   path: `/app/${PLUGIN_ID}`,
-      //   appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName)],
-      // });
+      home.featureCatalogue.registerSolution({
+        id: PLUGIN_ID,
+        title: `${PLUGIN_NAME} ${applicationName}`,
+        subtitle: `${PLUGIN_NAME} ${applicationName}`,
+        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+        icon: PLUGIN_ICON,
+        path: `/app/${PLUGIN_ID}`,
+        appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName)],
+      });
 
       home.featureCatalogue.register({
         id: PLUGIN_ID,
