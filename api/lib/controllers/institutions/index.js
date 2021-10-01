@@ -1,8 +1,13 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
-const Institution = require('../../models/Institution');
+const {
+  requireJwt,
+  requireUser,
+  requireAnyRole,
+  fetchInstitution,
+  requireContact,
+} = require('../../services/auth');
 
 const {
   getInstitutions,
@@ -25,43 +30,6 @@ const {
   deleteInstitutionCreator,
 } = require('./admin');
 
-/**
- * Middleware that fetches an institution and put it in ctx.state.institution
- * Assumes that the route param institutionId is present
- */
-async function fetchInstitution(ctx, next) {
-  const { institutionId } = ctx.params;
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    ctx.throw(404, ctx.$t('errors.institution.notFound'));
-    return;
-  }
-
-  ctx.state.institution = institution;
-  await next();
-}
-
-/**
- * Middleware that checks that user is either admin or institution contact
- * Assumes that ctx.state contains institution and user
- */
-function requireContact(opts = {}) {
-  const { allowCreator } = opts;
-
-  return (ctx, next) => {
-    const { user, institution, userIsAdmin } = ctx.state;
-
-    if (userIsAdmin) { return next(); }
-    if (user && institution && institution.isContact(user)) { return next(); }
-    if (allowCreator && user && institution && institution.isCreator(user)) { return next(); }
-
-    ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
-    return undefined;
-  };
-}
-
 router.use(requireJwt, requireUser);
 
 router.get('/', getInstitutions);
@@ -71,7 +39,7 @@ router.route({
   path: '/:institutionId/sushi',
   handler: [
     requireAnyRole(['sushi_form', 'admin', 'superuser']),
-    fetchInstitution,
+    fetchInstitution(),
     requireContact(),
     getSushiData,
   ],
@@ -97,7 +65,7 @@ router.route({
   method: 'GET',
   path: '/:institutionId',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     getInstitution,
   ],
 });
@@ -106,7 +74,7 @@ router.route({
   method: 'GET',
   path: '/:institutionId/members',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     requireContact(),
     getInstitutionMembers,
   ],
@@ -121,7 +89,7 @@ router.route({
   method: 'PUT',
   path: '/:institutionId/members/:username',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     requireContact(),
     addInstitutionMember,
   ],
@@ -143,7 +111,7 @@ router.route({
   method: 'DELETE',
   path: '/:institutionId/members/:username',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     requireContact(),
     removeInstitutionMember,
   ],
@@ -172,7 +140,7 @@ router.route({
   method: 'PUT',
   path: '/:institutionId',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     requireContact({ allowCreator: true }),
     updateInstitution,
   ],
@@ -189,7 +157,7 @@ router.route({
   method: 'DELETE',
   path: '/:institutionId/creator',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     requireContact(),
     deleteInstitutionCreator,
   ],
@@ -206,7 +174,7 @@ router.route({
   method: 'DELETE',
   path: '/:institutionId',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     deleteInstitution,
   ],
   validate: {
@@ -220,7 +188,7 @@ router.route({
   method: 'GET',
   path: '/:institutionId/state',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     getInstitutionState,
   ],
   validate: {
@@ -234,7 +202,7 @@ router.route({
   method: 'PUT',
   path: '/:institutionId/validated',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     validateInstitution,
   ],
   validate: {
@@ -252,7 +220,7 @@ router.route({
   method: 'POST',
   path: '/:institutionId/_refresh',
   handler: [
-    fetchInstitution,
+    fetchInstitution(),
     refreshInstitution,
   ],
   validate: {
