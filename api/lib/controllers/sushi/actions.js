@@ -406,12 +406,12 @@ exports.importSushiItems = async (ctx) => {
       const sushiItem = await Sushi.findById(sushiData.id);
 
       if (sushiItem && sushiItem.get('institutionId') !== institutionId) {
-        addResponseItem(sushiData, 'error', `sushi item [${sushiItem.getId()}] belongs to an other institution`);
+        addResponseItem(sushiData, 'error', ctx.$t('errors.sushi.import.belongsToAnother', sushiItem.getId()));
         return;
       }
 
       if (sushiItem && !overwrite) {
-        addResponseItem(sushiData, 'conflict', `sushi item [${sushiItem.getId()}] already exists`);
+        addResponseItem(sushiData, 'conflict', ctx.$t('errors.sushi.import.alreadyExists', sushiItem.getId()));
         return;
       }
     }

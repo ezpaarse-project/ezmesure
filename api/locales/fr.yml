@@ -24,6 +24,10 @@ errors:
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
     invalidResponse: Le point d'accès SUSHI a retourné des données invalides
 
+    import:
+      belongsToAnother: L'item SUSHI [%s] appartient à un autre établissement
+      alreadyExists: L'item SUSHI [%s] existe déjà
+
   task:
     notFound: Tâche introuvable
     invalidFrequency: Fréquence invalide

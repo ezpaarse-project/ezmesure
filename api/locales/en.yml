@@ -24,6 +24,10 @@ errors:
     emptyEndpointResponse: Sushi endpoint returned an empty response
     invalidResponse: The Sushi endpoint responded with invalid data
 
+    import:
+      belongsToAnother: SUSHI item [%s] belongs to an other institution
+      alreadyExists: SUSHI item [%s] already exists
+
   task:
     notFound: Tâche introuvable
     invalidFrequency: Fréquence invalide
