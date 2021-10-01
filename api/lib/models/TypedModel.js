@@ -39,6 +39,10 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     return this.id;
   }
 
+  setId(id) {
+    this.id = id;
+  }
+
   getData() {
     return this.data || {};
   }

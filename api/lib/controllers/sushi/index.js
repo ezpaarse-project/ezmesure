@@ -8,6 +8,8 @@ const {
   requireUser,
   requireTermsOfUse,
   requireAnyRole,
+  fetchInstitution,
+  requireContact,
 } = require('../../services/auth');
 
 function saveSushiConnectionState(ctx, next) {
@@ -35,6 +37,7 @@ const {
   updateSushi,
   addSushi,
   importSushi,
+  importSushiItems,
   downloadReport,
   getTasks,
   getAvailableReports,
@@ -82,6 +85,27 @@ router.route({
   validate: {
     type: 'json',
     body: Sushi.createSchema,
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: [
+    fetchInstitution({ query: 'institutionId' }),
+    requireContact(),
+    importSushiItems,
+  ],
+  validate: {
+    type: 'json',
+    query: {
+      institutionId: Joi.string().trim().required(),
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array().required().items({
+      ...Sushi.createSchema,
+      id: Sushi.schema.id,
+    }),
   },
 });
 

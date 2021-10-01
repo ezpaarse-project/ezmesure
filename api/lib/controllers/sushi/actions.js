@@ -375,3 +375,69 @@ exports.importSushi = async (ctx) => {
   ctx.type = 'json';
   ctx.body = task;
 };
+
+exports.importSushiItems = async (ctx) => {
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+  const { institution } = ctx.state;
+  const institutionId = institution.getId();
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  const importItem = async (sushiData = {}) => {
+    if (sushiData.id) {
+      const sushiItem = await Sushi.findById(sushiData.id);
+
+      if (sushiItem && sushiItem.get('institutionId') !== institutionId) {
+        addResponseItem(sushiData, 'error', `sushi item [${sushiItem.getId()}] belongs to an other institution`);
+        return;
+      }
+
+      if (sushiItem && !overwrite) {
+        addResponseItem(sushiData, 'conflict', `sushi item [${sushiItem.getId()}] already exists`);
+        return;
+      }
+    }
+
+    const sushiItem = new Sushi({
+      ...sushiData,
+      institutionId,
+    });
+
+    sushiItem.setId(sushiData.id);
+
+    await sushiItem.save();
+
+    addResponseItem(sushiItem, 'created');
+  };
+
+  for (let i = 0; i < body.length; i += 1) {
+    const sushiData = body[i] || {};
+
+    try {
+      await importItem(sushiData); // eslint-disable-line no-await-in-loop
+    } catch (e) {
+      addResponseItem(sushiData, 'error', e.message);
+    }
+  }
+
+  ctx.type = 'json';
+  ctx.body = response;
+};
