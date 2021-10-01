@@ -2,7 +2,6 @@ const config = require('config');
 const elastic = require('../../services/elastic');
 const depositors = require('../../services/depositors');
 const indexTemplate = require('../../utils/depositors-template');
-const { appLogger } = require('../../services/logger');
 
 const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
