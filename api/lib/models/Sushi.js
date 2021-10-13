@@ -21,9 +21,13 @@ const schema = {
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
 
-  connectionState: Joi.object({
+  importState: Joi.object({
     date: Joi.date(),
     success: Joi.boolean(),
+    steps: Joi.array().items(Joi.object({
+      label: Joi.string(),
+      status: Joi.string(),
+    })),
   }),
 
   params: Joi.array().items(Joi.object({
@@ -37,6 +41,7 @@ const createSchema = {
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
+  importState: Joi.any().strip(),
 };
 
 const updateSchema = {
@@ -75,14 +80,15 @@ class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
     });
   }
 
-  static setConnectionStateById(sushiId, value = {}) {
-    const { date, success } = value;
+  static setImportStateById(sushiId, value = {}) {
+    const { date, success, steps } = value;
 
     return this.updateById(sushiId, {
       [type]: {
-        connectionState: {
+        importState: {
           date: date || new Date(),
           success: !!success,
+          steps,
         },
       },
     });

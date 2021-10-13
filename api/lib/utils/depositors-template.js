@@ -60,10 +60,16 @@ module.exports = {
           customerId: { type: 'keyword' },
           apiKey: { type: 'keyword' },
           comment: { type: 'keyword' },
-          connectionState: {
+          importState: {
             properties: {
               date: { type: 'date' },
               success: { type: 'boolean' },
+              steps: {
+                properties: {
+                  label: { type: 'keyword' },
+                  status: { type: 'keyword' },
+                },
+              },
             },
           },
           params: {

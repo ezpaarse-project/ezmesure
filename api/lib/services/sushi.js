@@ -22,7 +22,7 @@ const addFormats = require('ajv-formats').default;
 const definitions = require('../utils/sushi-definitions.json');
 const { appLogger } = require('../../server');
 
-const elastic = require('../services/elastic');
+const elastic = require('./elastic');
 const Task = require('../models/Task');
 const publisherIndexTemplate = require('../utils/publisher-template');
 
@@ -34,6 +34,7 @@ addFormats(ajv);
 const validateReportSchema = ajv.getSchema('#/definitions/COUNTER_title_report');
 
 const downloads = new Map();
+const DEFAULT_REPORT_TYPE = 'tr';
 
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
@@ -101,6 +102,7 @@ async function getReport(sushi, opts = {}) {
   } = sushi.getData();
 
   const {
+    reportType = DEFAULT_REPORT_TYPE,
     beginDate,
     endDate,
     stream,
@@ -136,7 +138,7 @@ async function getReport(sushi, opts = {}) {
 
   return axios({
     method: 'get',
-    url: `${baseUrl}/reports/tr`,
+    url: `${baseUrl}/reports/${reportType}`,
     responseType: stream ? 'stream' : 'json',
     params,
     httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
@@ -146,12 +148,12 @@ async function getReport(sushi, opts = {}) {
 
 function getReportFilename(options) {
   const {
-    sushi,
+    reportType = DEFAULT_REPORT_TYPE,
     beginDate,
     endDate,
   } = options;
 
-  return `${sushi.getPackage()}_${beginDate}_${endDate}.json`;
+  return `${reportType}_${beginDate}_${endDate}.json`;
 }
 
 function getReportPath(options) {
@@ -274,7 +276,12 @@ async function importSushiReport(options = {}) {
     endDate,
   } = options;
 
-  const sushiData = { sushi, beginDate, endDate };
+  const sushiData = {
+    reportType: DEFAULT_REPORT_TYPE,
+    sushi,
+    beginDate,
+    endDate,
+  };
   const reportPath = getReportPath(sushiData);
   let report;
 
@@ -369,7 +376,7 @@ async function importSushiReport(options = {}) {
 
   task.log('info', `Importing report into '${index}'`);
   task.endStep('validation');
-  task.newStep('import');
+  task.newStep('insert');
   await saveTask();
 
   let indexExists;
@@ -490,7 +497,6 @@ async function importSushiReport(options = {}) {
         if (!instance) { return; }
         if (typeof instance.Metric_Type !== 'string') { return; }
 
-
         switch (instance.Metric_Type.toLowerCase()) {
           case 'unique_item_requests':
             itemPerf.uniqueItemRequests = instance.Count;
@@ -562,7 +568,7 @@ async function importSushiReport(options = {}) {
   task.log('info', `Inserted items: ${response.inserted}`);
   task.log('info', `Updated items: ${response.updated}`);
   task.log('info', `Failed insertions: ${response.failed}`);
-  task.endStep('import');
+  task.endStep('insert');
   task.setResult(response);
   task.done();
   await saveTask();

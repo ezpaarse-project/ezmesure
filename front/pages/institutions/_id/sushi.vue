@@ -82,12 +82,12 @@
       show-select
       item-key="id"
     >
-      <template v-slot:item.connectionState="{ item }">
-        <ConnectionStateLabel :state="item.connectionState" />
+      <template v-slot:item.importState="{ item }">
+        <SushiStateLabel :state="item.importState" />
       </template>
 
-      <template v-slot:item.connectionState.date="{ item }">
-        <LocalDate v-if="item.connectionState" :date="item.connectionState.date" />
+      <template v-slot:item.importState.date="{ item }">
+        <LocalDate v-if="item.importState" :date="item.importState.date" />
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -138,7 +138,7 @@ import ToolBar from '~/components/space/ToolBar';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
-import ConnectionStateLabel from '~/components/ConnectionStateLabel';
+import SushiStateLabel from '~/components/SushiStateLabel';
 import LocalDate from '~/components/LocalDate';
 
 export default {
@@ -149,7 +149,7 @@ export default {
     SushiForm,
     SushiHistory,
     ReportsDialog,
-    ConnectionStateLabel,
+    SushiStateLabel,
     LocalDate,
   },
   async asyncData({
@@ -206,8 +206,8 @@ export default {
           width: '200px',
         },
         {
-          text: this.$t('sushi.connection.state'),
-          value: 'connectionState',
+          text: this.$t('sushi.importState'),
+          value: 'importState',
           align: 'right',
           width: '200px',
           sort: (a, b) => {
@@ -218,8 +218,8 @@ export default {
           },
         },
         {
-          text: this.$t('sushi.connection.lastConnection'),
-          value: 'connectionState.date',
+          text: this.$t('sushi.latestImport'),
+          value: 'importState.date',
           align: 'right',
           width: '220px',
         },

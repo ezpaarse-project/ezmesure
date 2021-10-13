@@ -165,7 +165,6 @@ exports.deleteSushiData = async (ctx) => {
       return { id: sushiItem.id, status: 'failed' };
     }
 
-
     try {
       await sushiItem.delete();
       return { id: sushiItem.id, status: 'deleted' };
@@ -358,11 +357,13 @@ exports.importSushi = async (ctx) => {
   });
 
   task.on('finish', () => {
-    const validationStep = task.getStep('validation') || {};
-    const date = validationStep.startTime || new Date();
-    const success = validationStep.status === 'finished';
+    const steps = task.get('steps')?.map?.((step) => ({
+      label: step?.label,
+      status: step?.status,
+    }));
+    const success = steps.every((step) => step?.status === 'finished');
 
-    Sushi.setConnectionStateById(sushiId, { date, success })
+    Sushi.setImportStateById(sushiId, { date: new Date(), success, steps })
       .then(() => {
         appLogger.info(`Sushi ${sushiId}: connection state changed to ${success ? 'success' : 'failure'}`);
       })

@@ -4,7 +4,7 @@
     outlined
     label
   >
-    <v-icon small left>
+    <v-icon v-if="icon" small left>
       {{ icon }}
     </v-icon>
     {{ statusText }}
@@ -20,14 +20,24 @@ export default {
     },
   },
   computed: {
+    lastStep() {
+      if (!Array.isArray(this.state?.steps)) { return null; }
+      return this.state.steps[this.state.steps.length - 1];
+    },
     statusText() {
       switch (this.state?.success) {
         case true:
-          return this.$t('sushi.connection.operational');
+          return this.$t('sushi.states.finished');
         case false:
-          return this.$t('sushi.connection.failed');
+          if (this.lastStep?.status !== 'finished') {
+            const translateKey = `sushi.states.failedStep.${this.lastStep?.label}`;
+            if (this.$te(translateKey)) {
+              return this.$t(translateKey);
+            }
+          }
+          return this.$t('sushi.states.failed');
         default:
-          return this.$t('sushi.connection.untested');
+          return this.$t('sushi.states.untested');
       }
     },
     color() {
@@ -43,11 +53,11 @@ export default {
     icon() {
       switch (this.state?.success) {
         case true:
-          return 'mdi-check-network-outline';
+          return 'mdi-check';
         case false:
-          return 'mdi-close-network-outline';
+          return 'mdi-alert-circle-outline';
         default:
-          return 'mdi-help-network-outline';
+          return null;
       }
     },
   },

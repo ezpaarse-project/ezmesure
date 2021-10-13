@@ -248,7 +248,7 @@
       "labels": {
         "download": "Report download",
         "validation": "Report validation",
-        "import": "Import in Elasticsearch"
+        "insert": "Insert in Elasticsearch"
       }
     }
   },
@@ -256,12 +256,17 @@
     "copyId": "Copy ID",
     "unableToCopyId": "Unable to copy in the clipboard",
     "idCopied": "ID copied in the clipboard",
-    "connection": {
-      "state": "Connection state",
-      "lastConnection": "Last connection",
-      "operational": "Operational",
-      "failed": "Failed",
-      "untested": "Untested"
+    "importState": "Import state",
+    "latestImport": "Latest import",
+    "states": {
+      "untested": "Not imported yet",
+      "finished": "Finished",
+      "failed": "Failure",
+      "failedStep": {
+        "download": "Report download failed",
+        "validation": "Invalid report",
+        "insert": "Report insert failed"
+      }
     }
   },
   "reports": {
