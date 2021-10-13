@@ -29,6 +29,8 @@
         sort-by="createdAt"
         sort-desc
         :items-per-page="5"
+        :expanded="expandedRows"
+        @update:expanded="onExpandedChange"
       >
         <template v-slot:item.createdAt="{ item }">
           <LocalDate :date="item.createdAt" />
@@ -104,6 +106,7 @@ export default {
       institutionId: null,
       sushi: null,
       tasks: [],
+      expandedRows: [],
     };
   },
   computed: {
@@ -141,8 +144,13 @@ export default {
     showSushiItem(sushiData = {}) {
       this.sushi = sushiData;
       this.tasks = [];
+      this.expandedRows = [];
       this.show = true;
       this.refreshSushiTasks();
+    },
+
+    onExpandedChange(value) {
+      this.expandedRows = value;
     },
 
     async refreshSushiTasks() {
