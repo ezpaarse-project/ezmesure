@@ -3,6 +3,7 @@
     :color="color"
     outlined
     label
+    @click="$emit('click')"
   >
     <v-icon v-if="icon" small left>
       {{ icon }}

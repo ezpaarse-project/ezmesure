@@ -83,7 +83,10 @@
       item-key="id"
     >
       <template v-slot:item.importState="{ item }">
-        <SushiStateLabel :state="item.importState" />
+        <SushiStateLabel
+          :state="item.importState"
+          @click="showSushiItemHistory(item)"
+        />
       </template>
 
       <template v-slot:item.importState.date="{ item }">
