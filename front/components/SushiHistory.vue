@@ -25,6 +25,7 @@
         :loading="refreshing"
         item-key="id"
         show-expand
+        single-expand
         sort-by="createdAt"
         sort-desc
         :items-per-page="5"
