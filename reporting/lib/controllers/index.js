@@ -1,18 +1,25 @@
 const Koa = require('koa');
-const route = require('koa-route');
-const mount = require('koa-mount');
+const router = require('koa-joi-router')();
 const { name, version } = require('../../package.json');
 
-const reporting = require('./reporting');
+const tasks = require('./tasks');
+const dashboards = require('./dashboards');
+const frequencies = require('./frequencies');
+const spaces = require('./spaces');
 
 const app = new Koa();
 
-app.use(route.get('/', async (ctx) => {
+router.get('/', async (ctx) => {
   ctx.action = 'reporting/index';
   ctx.status = 200;
   ctx.body = { name, version };
-}));
+});
 
-app.use(mount('/reporting', reporting));
+app.use(router.middleware());
+
+app.use(tasks.prefix('/tasks').middleware());
+app.use(dashboards.prefix('/dashboards').middleware());
+app.use(frequencies.prefix('/frequencies').middleware());
+app.use(spaces.prefix('/spaces').middleware());
 
 module.exports = app;

@@ -1,3 +1,4 @@
+const get = require('lodash.get');
 const {
   index,
   historyIndex,
@@ -7,7 +8,6 @@ const logger = require('../../logger');
 const elastic = require('../../services/elastic');
 const { generateReport } = require('../../services/reporting');
 const Frequency = require('../../services/frequency');
-const client = require('../../services/elastic');
 
 async function getMetadata(taskId) {
   const { body: data } = await elastic.getSource({
@@ -34,238 +34,91 @@ async function getMetadata(taskId) {
   return null;
 }
 
-async function getSpaces(namespace) {
-  const bool = {
-    must: [{
-      match: {
-        type: 'space',
-      },
-    }],
-  };
+async function getTasks(spaceName) {
+  let query;
 
-  if (namespace) {
-    bool.must.push({
-      match: {
-        _id: `space:${namespace}`,
-      },
-    });
-  }
-
-  try {
-    const { body } = await client.search({
-      index: '.kibana',
-      timeout: '30s',
-      body: {
-        size: 10000,
-        query: {
-          bool
-        },
-      },
-    });
-    
-    if (body && body.hits && body.hits.hits) {
-      if (body.hits.hits.length) {
-        return body.hits.hits.map((space) => {
-          return {
-            id: space._id,
-            name: space._id.split(':').pop(),
-            color: space._source.space.color || '#00bfb3',
-          }
-        })
-      }
-      return [];
-    }
-  } catch (err) {
-    logger.error(err);
-    return [];
-  }
-
-  return [];
-}
-
-async function getDashboards(namespace) {
-  const bool = {
-    must: [{
-      match: {
-        type: 'dashboard',
-      },
-    }],
-  };
-
-  if (namespace !== 'default') {
-    bool.must.push({
-      match: {
-        namespace,
-      },
-    });
-  } else {
-    bool.must_not = {
-      exists: {
-        field: 'namespace',
+  if (spaceName) {
+    query = {
+      bool: {
+        must: [
+          {
+            match: {
+              space: spaceName,
+            },
+          },
+        ],
       },
     };
   }
 
-  try {
-    const { body: data } = await elastic.search({
-      index: '.kibana',
-      timeout: '30s',
-      body: {
-        size: 10000,
-        query: {
-          bool,
-        },
-      },
-    });
-
-    if (data && data.hits && data.hits.hits) {
-      return data.hits.hits;
-    }
-  } catch (err) {
-    logger.error(err);
-    return [];
-  }
-
-  return [];
-}
-
-async function getTasks (space, dashboards) {
-  const bool = {
-    must: [],
-  };
-
-  if (space !== 'default') {
-    bool.must.push({
-      match: {
-        space,
-      },
-    });
-  }
-
-  if (space === 'default') {
-    bool.must_not = {
-      exists: {
-        field: 'space',
-      },
-    };
-  }
-
+  let tasksList;
   try {
     const { body: data } = await elastic.search({
       index,
       timeout: '30s',
       body: {
         size: 10000,
-        query: {
-          bool,
-        },
+        query,
       },
     });
 
-    if (data && data.hits && data.hits.hits) {
-      return data.hits.hits;
-    }
+    tasksList = get(data, 'hits.hits');
   } catch (err) {
     logger.error(err);
     return [];
   }
 
-  return [];
-};
+  const tasks = [];
+  for (let i = 0; i < tasksList.length; i += 1) {
+    const id = get(tasksList[i], '_id');
+    const {
+      dashboardId,
+      frequency,
+      emails,
+      createdAt,
+      sentAt,
+      runAt,
+      print,
+      space,
+    } = get(tasksList[i], '_source');
 
-exports.list = async (ctx) => {
+    tasks.push({
+      id,
+      dashboardId,
+      exists: true,
+      space,
+      reporting: {
+        frequency,
+        emails,
+        createdAt,
+        sentAt,
+        runAt,
+        print,
+      },
+    });
+  }
+
+  return tasks;
+}
+
+exports.getBySpace = async (ctx) => {
   logger.info('reporting/list');
   ctx.action = 'reporting/list';
   ctx.type = 'json';
   ctx.status = 200;
 
   const { space } = ctx.request.params;
-  const { user, admin } = ctx.query;
 
-  ctx.space = space;
+  ctx.body = await getTasks(space);
+};
 
-  let isAdmin = false;
-  try {
-    const { body } = await client.security.getUser({
-      username: user,
-    });
-    if (body && body[user]) {
-      isAdmin = body[user].roles.includes('superuser') || body[user].roles.includes('admin');
-    }
-  } catch (e) {}
+exports.getAll = async (ctx) => {
+  logger.info('reporting/list');
+  ctx.action = 'reporting/list';
+  ctx.type = 'json';
+  ctx.status = 200;
 
-  let dashboards = [];
-  let tasks = [];
-
-  let spacesList = [space || 'default'];
-
-  if (isAdmin && admin) {
-    try {
-      spacesList = await getSpaces();
-    } catch (e) {}
-  }
-
-  if (spacesList) {
-    for await (let space of spacesList) {
-      let dashboardsData;
-      try {
-        dashboardsData = await getDashboards(space.name || space);
-      } catch (err) {}
-
-      dashboardsData.forEach(({ _id: dashId, _source: dashSource }) => {
-        const dashboardId = dashId.split(':').pop();
-        const dashboardTitle = dashSource && dashSource.dashboard && dashSource.dashboard.title;
-        const dashboardDescription = dashSource && dashSource.dashboard && dashSource.dashboard.description;
-
-        dashboards.push({
-          id: dashboardId,
-          name: dashboardTitle,
-          description: dashboardDescription,
-          namespace: space.name || space,
-        });
-      });
-
-      try {
-        const tasksData = await getTasks(space.name || space);
-
-        tasksData.forEach((task) => {
-          const { _source: hitSource, _id: hitId } = task;
-          const dashboard = dashboards.find(({ id, namespace }) => id === hitSource.dashboardId && namespace === space.name || space);
- 
-          tasks.push({
-            _id: hitId,
-            dashboardId: hitSource.dashboardId,
-            exists: !!dashboard,
-            reporting: {
-              frequency: hitSource.frequency,
-              emails: hitSource.emails,
-              print: hitSource.print,
-              createdAt: hitSource.createdAt,
-              sentAt: hitSource.sentAt,
-              runAt: hitSource.runAt,
-            },
-            namespace: space.name || space,
-          });
-        });
-
-
-      } catch (e) {
-        tasks = [];
-      }
-    }
-  }
-
-  const body = {
-    dashboards,
-    tasks,
-    frequencies,
-  };
-
-  if (isAdmin && admin) {
-    body.spaces = spacesList;
-  }
-
-  ctx.body = body;
+  ctx.body = await getTasks();
 };
 
 exports.store = async (ctx) => {
@@ -280,15 +133,12 @@ exports.store = async (ctx) => {
     return;
   }
 
-  if (body.space === 'default' || body.space === '') {
-    delete body.space;
-  }
-
   const now = new Date();
   body.createdAt = now;
   body.updatedAt = now;
   body.sentAt = null;
   body.runAt = frequency.startOfnextPeriod(now);
+  ctx.status = 200;
 
   try {
     const { body: data } = await elastic.index({
@@ -303,7 +153,7 @@ exports.store = async (ctx) => {
     ctx.metadata = await getMetadata(dataId);
 
     ctx.body = {
-      _id: dataId,
+      id: dataId,
       createdAt: body.createdAt,
       sentAt: body.sentAt,
       runAt: body.runAt,
@@ -312,8 +162,6 @@ exports.store = async (ctx) => {
     logger.error(err);
     ctx.status = 500;
   }
-
-  ctx.status = 200;
 };
 
 exports.update = async (ctx) => {
@@ -454,7 +302,7 @@ exports.history = async (ctx) => {
       },
     });
 
-    const hits = data && data.hits && data.hits.hits;
+    const hits = get(data, 'hits.hits');
 
     ctx.body = [];
 

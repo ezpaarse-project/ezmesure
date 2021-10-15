@@ -30,6 +30,7 @@
     "koa-joi-router": "^6.0.0",
     "koa-mount": "^4.0.0",
     "koa-route": "^3.2.0",
+    "lodash.get": "^4.4.2",
     "mjml": "^4.5.1",
     "nodemailer": "^6.3.0",
     "nunjucks": "^3.2.0",
