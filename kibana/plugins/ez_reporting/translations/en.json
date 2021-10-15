@@ -79,6 +79,7 @@
     "ezReporting.add": "Add",
     "ezReporting.title": "{REPORTING_NAME}",
     "ezReporting.createNewTask": "New reporting task",
+    "ezReporting.reloadTasks": "Reload reporting tasks",
     "ezReporting.save": "Save",
     "ezReporting.dashboard": "Dashboard",
     "ezReporting.dashboardName": "Dashboard name",
@@ -132,6 +133,7 @@
     "ezReporting.pending": "Pending",
     "ezReporting.ongoing": "Ongoing",
     "ezReporting.unknown": "Unknown",
-    "ezReporting.refresh": "Refresh"
+    "ezReporting.refresh": "Refresh",
+    "ezReporting.manageYourReportingTasks": "Manage your reporting tasks."
   }
 }

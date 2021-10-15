@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import React, { Component, Fragment } from 'react';
 import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -27,9 +8,6 @@ import {
   EuiPageBody,
   EuiPageContent,
   EuiPageContentBody,
-  EuiPageContentHeader,
-  EuiTitle,
-  EuiPageContentHeaderSection,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
@@ -58,6 +36,7 @@ import {
 import { EzReportingHistoryFlyout } from './flyout/history';
 
 import { httpClient, toasts, capabilities } from '../../lib/reporting';
+import { ISelectedSpace } from '../../common/models/edit';
 
 interface EzReportingAppDeps {
   basename: string;
@@ -72,19 +51,20 @@ interface EzReportingAppState {
   frequencies: any[];
   spaces: any[];
   selectedSpaces: [];
-  reportingName: string;
   accessDenied: boolean;
   selectedItems: any[];
   showDestroyModal: boolean;
   isPopoverOpen: boolean;
+  tasksInProgress: object;
+  delay: number;
   dashboardsBySpace: any[];
   currentSpaces: any[];
-  delay: number;
-  interval: any;
-  tasksInProgress: object;
 }
 
 export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingAppState> {
+  private state: EzReportingAppState;
+  private props: EzReportingAppDeps;
+
   constructor(props: EzReportingAppDeps) {
     super(props);
 
@@ -94,44 +74,36 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       frequencies: [],
       spaces: [],
       selectedSpaces: [],
-      reportingName: 'Reporting',
       accessDenied: false,
       selectedItems: [],
       showDestroyModal: false,
       isPopoverOpen: false,
+      tasksInProgress: {},
       dashboardsBySpace: [],
       currentSpaces: [],
       delay: 5000,
-      interval: null,
-      tasksInProgress: {}
     };
   }
 
   componentDidMount = () => {
     this.refreshData();
-    this.polling();
   };
 
-  componentWillUnmount = () => {
-    clearTimeout(this.state.interval);
-    this.setState({ interval: null });
-  };
-
-  polling = () => {
+  polling = async () => {
     const { tasks, tasksInProgress } = this.state;
 
     if (tasks.length) {
       const tmp = JSON.parse(JSON.stringify(tasksInProgress));
 
-      tasks.forEach(({ _id }) => {
-        httpClient.get(`/api/ezreporting/tasks/${_id}/history`).then((histories) => {
+      tasks.forEach(({ id }) => {
+        httpClient.get(`/api/ezreporting/tasks/${id}/history`).then((histories) => {
           if (histories.length) {
             const { status, logs, startTime, endTime } = histories.shift();
 
             if (status !== 'success') {
               if (new Date(endTime).toISOString() <= new Date().toISOString()) {
                 const log = logs.find(({ type }) => type === 'error');
-                tmp[_id] = {
+                tmp[id] = {
                   status,
                   log: log ? log.message : '',
                   startTime,
@@ -143,25 +115,27 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         });
 
         this.setState({ tasksInProgress: tmp });
+        this.forceUpdate();
       });
     }
 
-    this.setState({ interval: setTimeout(this.polling, this.state.delay) });
+    return new Promise(() => setTimeout(this.polling, this.state.delay));
   };
 
   refreshData = () => {
     const { admin } = this.props;
 
     httpClient
-      .get(`/api/ezreporting/tasks/${admin ? 'admin' : 'user'}`)
+      .get(`/api/ezreporting/tasks${admin ? '/management' : ''}`)
       .then((res) => {
         this.setState({
           tasks: res.tasks,
           dashboards: res.dashboards,
           frequencies: res.frequencies,
           spaces: this.props.admin ? res.spaces : [],
-          reportingName: res.reportingName,
         });
+
+        this.polling();
       })
       .catch((err) => {
         console.log(err);
@@ -187,11 +161,11 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         frequency: task.reporting.frequency,
         emails: task.reporting.emails,
         print: task.reporting.print,
-        space: task.namespace,
+        space: task.space,
       });
 
-      return httpClient.patch(`/api/ezreporting/tasks/${task._id}`, { body }).then(() => {
-        const index = this.state.tasks.findIndex(({ _id }) => _id === task._id);
+      return httpClient.patch(`/api/ezreporting/tasks/${task.id}`, { body }).then(() => {
+        const index = this.state.tasks.findIndex(({ id }) => id === task.id);
 
         this.refreshData();
 
@@ -225,7 +199,7 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         frequency: task.reporting.frequency,
         emails: task.reporting.emails,
         print: task.reporting.print,
-        space: task.namespace,
+        space: task.space,
       });
 
       return httpClient.post('/api/ezreporting/tasks', { body }).then((res) => {
@@ -252,9 +226,9 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
     const { selectedItems } = this.state;
 
     if (capabilities.download && selectedItems.length) {
-      selectedItems.forEach(({ _id }) => {
+      selectedItems.forEach(({ id }) => {
         httpClient
-          .get(`/api/ezreporting/tasks/${_id}/download`)
+          .get(`/api/ezreporting/tasks/${id}/download`)
           .then(() => {
             toasts.addSuccess({
               title: 'Success',
@@ -293,9 +267,9 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
     const { selectedItems } = this.state;
 
     if (capabilities.delete && selectedItems.length) {
-      selectedItems.forEach(({ _id }) => {
+      selectedItems.forEach(({ id }) => {
         httpClient
-          .delete(`/api/ezreporting/tasks/${_id}`)
+          .delete(`/api/ezreporting/tasks/${id}`)
           .then(() => {
             this.refreshData();
 
@@ -359,13 +333,13 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
     const {
       tasks,
       dashboards,
-      frequencies,
       spaces,
       selectedSpaces,
       accessDenied,
       selectedItems,
       showDestroyModal,
       isPopoverOpen,
+      frequencies,
       dashboardsBySpace,
       currentSpaces,
       tasksInProgress,
@@ -399,8 +373,8 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
     if (capabilities.create) {
       createBtn = (
         <EuiButton
-          fill
-          iconType="plusInCircle"
+          fill={true}
+          iconType="plusInCircleFilled"
           isDisabled={dashboards.length > 0 ? false : true}
           onClick={() => (dashboards.length > 0 ? openEditFlyOut(null, false) : null)}
         >
@@ -409,15 +383,31 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       );
     }
 
+    let reloadBtn;
+    if (capabilities.show) {
+      reloadBtn = (
+        <EuiButton
+          fill={true}
+          iconType="refresh"
+          onClick={() => this.refreshData()}
+        >
+          <FormattedMessage id="ezreporting.reloadTasks" defaultMessage="Reload tasks" />
+        </EuiButton>
+      );
+    }
+
     let tasksList = tasks;
 
     let searchBar;
+    let spacesList: Array<ISelectedSpace> = [];
     if (admin) {
-      const spacesList = spaces.map((space) => ({
-        value: space.id,
-        label: space.name,
-        color: space.color,
-      }));
+      if (spaces.length > 0) {
+        spacesList = spaces.map((space) => ({
+          value: space.id,
+          label: space.name,
+          color: space.color,
+        }));
+      }
 
       const renderOption = (option, searchValue, contentClassName) => {
         const { color, label, value } = option;
@@ -445,7 +435,9 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
 
       if (selectedSpaces.length) {
         const spacesNames = selectedSpaces.map(({ label }) => label);
-        tasksList = tasks.filter(({ namespace }) => spacesNames.includes(namespace));
+        if (tasks.length > 0) {
+          tasksList = tasks.filter(({ space }) => spacesNames.includes(space));
+        }
       }
     }
 
@@ -519,6 +511,29 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       );
     }
 
+    const restrictWidth = admin ? 'none' : true;
+    const paddingSize = admin ? 'none' : 'l';
+    const descriptionHeader = i18n.translate('ezReporting.manageYourReportingTasks', { defaultMessage: 'Manage your reporting tasks.' });
+
+    let pageHeader = (
+      <EuiPageHeader
+        restrictWidth={restrictWidth}
+        pageTitle={i18n.translate('ezReporting.title', {
+          defaultMessage: '{name}',
+          values: { name: `${PLUGIN_NAME} ${applicationName}` }
+        })}
+        rightSideItems={[reloadBtn, createBtn]}
+        description={admin ? descriptionHeader : null}
+        bottomBorder={admin}
+      />
+    );
+
+    let pageHeaderAdmin;
+    if (admin) {
+      pageHeaderAdmin = pageHeader;
+      pageHeader = '';
+    }
+
     return (
       <Router basename={basename}>
         <EzReportingTaskEditFlyout
@@ -537,27 +552,14 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
         <I18nProvider>
           <>
             <navigation.ui.TopNavMenu appName={PLUGIN_ID} showSearchBar={false} />
-            <EuiPage paddingSize="none">
+            <EuiPage paddingSize={paddingSize}>
               <EuiPageBody>
-                <EuiPageContent borderRadius="none" hasShadow={false} paddingSize="l">
-                  <EuiPageContentBody restrictWidth>
-                    <EuiPageContentHeader>
-                      <EuiPageContentHeaderSection>
-                        <EuiTitle>
-                          <h2>
-                            <FormattedMessage
-                              id="ezreporting.title"
-                              defaultMessage="{name}"
-                              values={{ name: `${PLUGIN_NAME} ${applicationName}` }}
-                            />
-                          </h2>
-                        </EuiTitle>
-                      </EuiPageContentHeaderSection>
+                {pageHeader}
+                <EuiPageContent restrictWidth={restrictWidth} borderRadius="none" hasShadow={false} paddingSize="none">
+                  <EuiPageContentBody restrictWidth={restrictWidth}>
+                    {pageHeaderAdmin}
 
-                      <EuiPageContentHeaderSection>{createBtn}</EuiPageContentHeaderSection>
-                    </EuiPageContentHeader>
-
-                    <EuiSpacer size="s" />
+                    <EuiSpacer size={admin ? 'l' : 's'} />
 
                     <EuiFlexGroup>
                       {popover}
@@ -565,6 +567,7 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
                     </EuiFlexGroup>
 
                     <EuiSpacer />
+
                     <EzReportingTable
                       tasks={tasksList}
                       tasksInProgress={tasksInProgress}

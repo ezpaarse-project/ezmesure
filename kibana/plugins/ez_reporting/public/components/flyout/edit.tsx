@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import React, { Component, Fragment } from 'react';
 import {
   EuiFlyout,
@@ -43,48 +24,46 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { i18n } from '@kbn/i18n';
 
 import { httpClient, toasts, defaultTask, capabilities } from '../../../lib/reporting';
-
-interface Props {
-  dashboards: any[];
-  frequencies: any[];
-  spaces: any[];
-  admin: boolean;
-  editTaskHandler(task: object): Promise<object>;
-  saveTaskHandler(task: object): Promise<object>;
-  onChangeSpaceHandler(spaces: any[]): void;
-  dashboardsBySpace: any[];
-  currentSpaces: any[];
-}
-
-interface State {
-  isFlyoutVisible: boolean;
-  edit: boolean;
-  currentTask: object;
-  email: string;
-  receivers: any[];
-  mailErrorMessages: any[];
-  dashboardErrorMessages: any[];
-  spaceErrorMessages: any[];
-}
+import { IEditProps, IEditState, ISelectedSpace } from '../../../common/models/edit';
+import { IDashboard } from '../../../common/models/dashboard';
+import { ITask } from '../../../common/models/task';
+import { IFrequency } from '../../../common/models/frequency';
+import { ISpace } from '../../../common/models/space';
 
 let openFlyOutHandler;
-export function openFlyOut(dashboard, edit) {
-  openFlyOutHandler(dashboard, edit);
+export function openFlyOut(task, edit): void {
+  openFlyOutHandler(task, edit);
 }
 
 let closeFlyOutHandler;
-export function closeFlyOut() {
+export function closeFlyOut(): void {
   closeFlyOutHandler();
 }
 
-export class EzReportingTaskEditFlyout extends Component<Props, State> {
-  constructor(props: Props) {
+export class EzReportingTaskEditFlyout extends Component<IEditProps, IEditState> {
+  private props: IEditProps;
+  private state: IEditState;
+
+  constructor(props: IEditProps) {
     super(props);
 
     this.state = {
       isFlyoutVisible: false,
       edit: false,
-      currentTask: {},
+      currentTask: {
+        id: '',
+        dashboardId: null,
+        exists: false,
+        reporting: {
+          frequency: '',
+          emails: [],
+          createdAt: '',
+          sentAt: '',
+          runAt: '',
+          print: false,
+        },
+        space: '',
+      },
       email: '',
       receivers: [],
       mailErrorMessages: [],
@@ -96,13 +75,13 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
     closeFlyOutHandler = this.close;
   }
 
-  open = (dashboard, edit) => {
-    const currentTask = JSON.parse(
+  open = (dashboard: IDashboard, edit: boolean) => {
+    const currentTask: ITask = JSON.parse(
       JSON.stringify(dashboard || defaultTask(this.props.dashboards[0].id))
     );
-    const currentFrequency = get(currentTask, 'reporting.frequency');
-    const frequency = this.props.frequencies.find((f) => f.value === currentFrequency);
-    let receivers = get(currentTask, 'reporting.emails', []);
+    const currentFrequency: string = get(currentTask, 'reporting.frequency');
+    const frequency: string = this.props.frequencies.find((f: IFrequency) => f.value === currentFrequency);
+    let receivers: Array<string> | string = get(currentTask, 'reporting.emails', []);
 
     if (typeof receivers === 'string') {
       receivers = receivers.split(',').map(e => e.trim());
@@ -124,26 +103,26 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
     });
   };
 
-  close = () => {
+  close = (): void => {
     this.setState({ isFlyoutVisible: false });
   };
 
-  onChangeSpace = (selectedSpaces) => {
-    const currentTask = { ...this.state.currentTask };
+  onChangeSpace = (selectedSpaces: Array<ISelectedSpace>): void => {
+    const currentTask: ITask = { ...this.state.currentTask };
 
     if (!selectedSpaces.length) {
-      currentTask.namespace = '';
+      currentTask.space = '';
       this.setState({ currentTask });
     }
 
-    currentTask.namespace = selectedSpaces[0].label;
+    currentTask.space = selectedSpaces[0].label;
     this.setState({ currentTask });
     this.props.onChangeSpaceHandler(selectedSpaces);
   };
 
-  onChangeDashboard = (selectedDashboards) => {
-    const dashboard = selectedDashboards[0];
-    const currentTask = { ...this.state.currentTask };
+  onChangeDashboard = (selectedDashboards: Array<IDashboard>): void => {
+    const dashboard: IDashboard = selectedDashboards[0];
+    const currentTask: ITask = { ...this.state.currentTask };
     currentTask.dashboardId = dashboard && dashboard.value;
     const dashboardErrorMessages = [];
 
@@ -161,18 +140,18 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
     });
   };
 
-  onChangeFrequency = (event) => {
-    const currentTask = { ...this.state.currentTask };
+  onChangeFrequency = (event: { target: { value: string; } }): void => {
+    const currentTask: ITask = { ...this.state.currentTask };
     currentTask.reporting.frequency = event.target.value;
     this.setState({ currentTask });
   };
 
-  onChangeEmail = (event) => {
+  onChangeEmail = (event: { target: { value: string; } }): void => {
     this.setState({ email: event.target.value });
   };
 
-  onChangeLayout = (event) => {
-    const currentTask = { ...this.state.currentTask };
+  onChangeLayout = (event: { target: { checked: boolean; } }): void => {
+    const currentTask: ITask = { ...this.state.currentTask };
     currentTask.reporting.print = event.target.checked;
     this.setState({ currentTask });
   };
@@ -220,13 +199,13 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
     }
   };
 
-  removeReceiver = (email) => {
+  removeReceiver = (email: string): void => {
     this.setState({
       receivers: this.state.receivers.filter((r) => r !== email),
     });
   };
 
-  saveOrUpdate = () => {
+  saveOrUpdate = (): Promise<any> => {
     if (capabilities.create) {
       const { edit, currentTask, receivers } = this.state;
 
@@ -248,7 +227,7 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
     }
   };
 
-  render() {
+  render(): string {
     const {
       isFlyoutVisible,
       currentTask,
@@ -266,12 +245,12 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       label: dashboard.name,
     }));
 
-    const invalidMail = mailErrorMessages.length > 0;
-    const invalidDashboard = dashboardErrorMessages.length > 0;
-    const invalidSpace = spaceErrorMessages.length > 0;
-    const invalidForm = invalidDashboard || receivers.length === 0;
+    const invalidMail: boolean = mailErrorMessages.length > 0;
+    const invalidDashboard: boolean = dashboardErrorMessages.length > 0;
+    const invalidSpace: boolean = spaceErrorMessages.length > 0;
+    const invalidForm: boolean = invalidDashboard || receivers.length === 0;
 
-    let saveBtn;
+    let saveBtn: string;
     if (capabilities.create) {
       saveBtn = (
         <EuiFormRow fullWidth={true}>
@@ -293,7 +272,7 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       return <Fragment />;
     }
 
-    let title;
+    let title: string;
 
     if (edit) {
       title = (
@@ -308,7 +287,7 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       );
     }
 
-    const receiverItems = receivers.map((email, index) => (
+    const receiverItems: Array<string> = receivers.map((email, index) => (
       <EuiListGroupItem
         key={index}
         label={email}
@@ -323,7 +302,7 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       />
     ));
 
-    let receiversList;
+    let receiversList: string;
     if (receiverItems.length > 0) {
       receiversList = (
         <EuiFormRow fullWidth={true}>
@@ -334,18 +313,21 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       );
     }
 
-    const selectedDashboards = dashboardList.filter((d) => d.value === currentTask.dashboardId);
+    const selectedDashboards: Array<IDashboard> = dashboardList.filter((d) => d.value === currentTask.dashboardId);
 
     let spaceSelector;
     if (admin) {
-      const spacesList = spaces.map((space) => ({
-        value: space.id,
-        label: space.name,
-        color: space.color,
-      }));
+      let spacesList: Array<ISelectedSpace> = [];
+      if (spaces.length > 0) {
+        spacesList = spaces.map((space: ISpace) => ({
+          value: space.id,
+          label: space.name,
+          color: space.color,
+        }));
+      }
 
-      const renderOption = (option, searchValue, contentClassName) => {
-        const { color, label, value } = option;
+      const renderOption = (option: { color: string, label: string }, searchValue: string, contentClassName: string): string => {
+        const { color, label } = option;
         return (
           <EuiHealth color={color}>
             <span className={contentClassName}>
@@ -380,7 +362,7 @@ export class EzReportingTaskEditFlyout extends Component<Props, State> {
       );
     }
 
-    const flyOutContent = (
+    const flyOutContent: string = (
       <EuiForm>
         {spaceSelector}
 

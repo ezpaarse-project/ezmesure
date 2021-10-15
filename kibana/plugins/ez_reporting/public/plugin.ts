@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import {
   AppMountParameters,
   CoreSetup,
@@ -47,21 +28,21 @@ interface ClientConfigType {
 }
 
 export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzReportingPluginStart> {
-  initializerContext: PluginInitializerContext<ClientConfigType>;
+  private initializerContext: PluginInitializerContext<ClientConfigType>;
 
   constructor(initializerContext: PluginInitializerContext<ClientConfigType>) {
     this.initializerContext = initializerContext;
   }
 
   public setup(core: CoreSetup, { home, management }: SetupDeps): EzReportingPluginSetup {
-    const config = this.initializerContext.config.get<ClientConfigType>();
-    const { applicationName } = config;
+    const config: ClientConfigType = this.initializerContext.config.get<ClientConfigType>();
+    const applicationName: string = config.applicationName;
 
     CATEGORY.label = applicationName;
     CATEGORY.euiIconType = logo;
 
-    const { protocol, hostname, port } = window.location;
-    const ezmesureLink = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
+    const { protocol, hostname, port }: Location = window.location;
+    const ezmesureLink: string = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
 
     // Back to PLUGIN_NAME link
     core.application.register({
@@ -87,7 +68,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
 
         chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
 
-        const admin = false;
+        const admin: boolean = false;
 
         const unmountAppCallback = await mountApp({
           coreStart,
@@ -106,7 +87,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     });
 
     // Menagement section
-    const managementSection = `${applicationName.toLowerCase()}`;
+    const managementSection: string = `${applicationName.toLowerCase()}`;
     const appManagementSection = management.sections.register({
       id: managementSection,
       title: applicationName,
@@ -134,7 +115,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
           { text: PLUGIN_NAME },
         ]);
 
-        const admin = true;
+        const admin: boolean = true;
 
         const unmountAppCallback = await mountApp({
           coreStart,

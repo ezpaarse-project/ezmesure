@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import React, { Fragment, Component } from 'react';
 import {
   EuiFlyout,
@@ -48,16 +29,18 @@ interface State {
 }
 
 let openFlyOutHandler;
-export function openFlyOut(dashboard, edit) {
+export function openFlyOut(dashboard, edit): void {
   openFlyOutHandler(dashboard, edit);
 }
 
 let closeFlyOutHandler;
-export function closeFlyOut() {
+export function closeFlyOut(): void {
   closeFlyOutHandler();
 }
 
 export class EzReportingHistoryFlyout extends Component<{}, State> {
+  private state: State;
+
   constructor(props) {
     super(props);
 
@@ -75,7 +58,7 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
     closeFlyOutHandler = this.close;
   }
 
-  showDetails = (historyItem) => {
+  showDetails = (historyItem): void => {
     const expandedRows = { ...this.state.expandedRows };
     const { logs = [] } = historyItem;
 
@@ -115,13 +98,13 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
     this.setState({ expandedRows });
   }
 
-  hideDetails = (historyId) => {
+  hideDetails = (historyId): void => {
     const expandedRows = { ...this.state.expandedRows };
     delete expandedRows[historyId];
     this.setState({ expandedRows });
   }
 
-  toggleDetails = (historyItem) => {
+  toggleDetails = (historyItem): void => {
     const rowsExpanded = { ...this.state.expandedRows };
 
     if (rowsExpanded[historyItem.id]) {
@@ -171,19 +154,19 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
     });
   };
 
-  open = async (taskId) => {
+  open = async (taskId): void | boolean => {
     if (!taskId || !capabilities.show) {
-      return;
+      return false;
     }
 
     this.setState({ taskId, historyItems: [], isFlyoutVisible: true }, this.refresh);
   };
 
-  close = () => {
+  close = (): void => {
     this.setState({ isFlyoutVisible: false });
   };
 
-  onTableChange = ({ page = {} }) => {
+  onTableChange = ({ page = {} }): void => {
     const { index: pageIndex, size: pageSize } = page;
 
     this.setState({
@@ -192,7 +175,7 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
     });
   };
 
-  render() {
+  render(): string {
     const {
       refreshing,
       isFlyoutVisible,
@@ -200,13 +183,13 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
       expandedRows,
       pageIndex,
       pageSize,
-    } = this.state;
+    }: State = this.state;
 
     if (!isFlyoutVisible) {
       return <Fragment />;
     }
 
-    const columns = [
+    const columns: Array<object> = [
       {
         field: 'startTime',
         name: i18n.translate('ezReporting.date', { defaultMessage: 'Date' }),
@@ -279,7 +262,13 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
       }
     ];
 
-    const pagination = {
+    const pagination: {
+      pageIndex: number;
+      pageSize: number;
+      totalItemCount: number;
+      pageSizeOptions: Array<number>;
+      hidePerPageOptions: boolean,
+    } = {
       pageIndex,
       pageSize,
       totalItemCount: historyItems.length,
@@ -287,8 +276,8 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
       hidePerPageOptions: false,
     };
 
-    const startIndex = pageIndex * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, historyItems.length);
+    const startIndex: number = pageIndex * pageSize;
+    const endIndex: number = Math.min(startIndex + pageSize, historyItems.length);
 
     return (
       <EuiFlyout onClose={this.close} size="m" aria-labelledby="flyoutSmallTitle">

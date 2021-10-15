@@ -1,37 +1,14 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import { schema } from '@kbn/config-schema';
 import Address from '@hapi/address';
-import { IRouter } from '../../../../src/core/server';
+import { HttpAuth, Logger, IRouter } from '../../../../src/core/server';
 import { PLUGIN_ID } from '../../common';
 import { requestApi } from '../lib/api';
 
-export function defineRoutes(router: IRouter, auth: object) {
+export function defineRoutes(router: IRouter, auth: HttpAuth, logger: Logger) {
   router.get(
     {
-      path: '/api/ezreporting/tasks/{place}',
-      validate: {
-        params: schema.object({
-          place: schema.string(),
-        }),
-      },
+      path: '/api/ezreporting/tasks',
+      validate: false,
       options: {
         authRequired: true,
         tags: [`access:${PLUGIN_ID}-read`],
@@ -39,23 +16,65 @@ export function defineRoutes(router: IRouter, auth: object) {
     },
     async function (context, req, res) {
       const { spaceId } = context.core?.savedObjects?.client;
-      const { username } = auth.get(req).state;
-      const { place } = req.params;
 
       try {
-        const result = await requestApi({
-          url: `/reporting/tasks/${spaceId === 'default' ? '' : spaceId}?user=${username}${
-            place === 'admin' ? '&admin=true' : ''
-          }`,
+        const tasks = await requestApi(auth.get(req), {
+          url: `/tasks/${spaceId}`,
+        });
+        const frequencies = await requestApi(auth.get(req), {
+          url: `/frequencies`,
+        });
+        const dashboards = await requestApi(auth.get(req), {
+          url: `/dashboards/${spaceId}`,
         });
 
         return res.ok({
-          body: JSON.parse(result.body),
+          body: {
+            tasks: JSON.parse(tasks.body),
+            frequencies: JSON.parse(frequencies.body),
+            dashboards: JSON.parse(dashboards.body),
+          },
         });
       } catch (error) {
-        return res.internalError({
-          body: error,
+        return res.customError({ statusCode: 500, body: error });
+      }
+    }
+  );
+
+  router.get(
+    {
+      path: '/api/ezreporting/tasks/management',
+      validate: false,
+      options: {
+        authRequired: true,
+        tags: [`access:${PLUGIN_ID}-read`],
+      },
+    },
+    async function (context, req, res) {
+      try {
+        const tasks = await requestApi(auth.get(req), {
+          url: `/tasks`,
         });
+        const frequencies = await requestApi(auth.get(req), {
+          url: `/frequencies`,
+        });
+        const dashboards = await requestApi(auth.get(req), {
+          url: `/dashboards`,
+        });
+        const spaces = await requestApi(auth.get(req), {
+          url: `/spaces`,
+        });
+
+        return res.ok({
+          body: {
+            tasks: JSON.parse(tasks.body),
+            frequencies: JSON.parse(frequencies.body),
+            dashboards: JSON.parse(dashboards.body),
+            spaces: JSON.parse(spaces.body),
+          },
+        });
+      } catch (error) {
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );
@@ -82,18 +101,16 @@ export function defineRoutes(router: IRouter, auth: object) {
     },
     async function (context, req, res) {
       const { spaceId } = context.core?.savedObjects?.client;
-      const { username } = auth.get(req).state;
-
       try {
         let { body } = req;
 
-        if (spaceId && spaceId !== 'default') {
-          body = { ...body, space: spaceId };
+        if (body.space.length === 0) {
+          body.space = spaceId;
         }
 
-        const result = await requestApi({
+        const result = await requestApi(auth.get(req), {
           method: 'POST',
-          url: `/reporting/tasks?user=${username}`,
+          url: `/tasks`,
           body,
         });
 
@@ -101,9 +118,8 @@ export function defineRoutes(router: IRouter, auth: object) {
           body: result.body,
         });
       } catch (error) {
-        return res.internalError({
-          body: error,
-        });
+        console.log(error);
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );
@@ -133,31 +149,22 @@ export function defineRoutes(router: IRouter, auth: object) {
     },
     async function (context, req, res) {
       const { spaceId } = context.core?.savedObjects?.client;
-      const { username } = auth.get(req).state;
       const { taskId } = req.params;
 
       try {
         let body = req.body;
 
-        if (body.space && body.space === 'default') {
-          delete body.space;
-        }
-
-        if (spaceId && spaceId !== 'default') {
-          body = { ...body, space: spaceId };
-        }
-
-        const result = await requestApi({
+        const result = await requestApi(auth.get(req), {
           method: 'PATCH',
-          url: `/reporting/tasks/${taskId}?user=${username}`,
-          body,
+          url: `/tasks/${taskId}`,
+          body: { ...body, space: spaceId },
         });
 
-        return res.ok();
-      } catch (error) {
-        return res.internalError({
-          body: error,
+        return res.ok({
+          body: result.body,
         });
+      } catch (error) {
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );
@@ -176,22 +183,19 @@ export function defineRoutes(router: IRouter, auth: object) {
       },
     },
     async function (context, req, res) {
-      const { username } = auth.get(req).state;
       const { taskId } = req.params;
 
       try {
-        const body = req.body;
-
-        const result = await requestApi({
+        const result = await requestApi(auth.get(req), {
           method: 'DELETE',
-          url: `/reporting/tasks/${taskId}?user=${username}`,
+          url: `/tasks/${taskId}`,
         });
 
-        return res.ok();
-      } catch (error) {
-        return res.internalError({
-          body: error,
+        return res.ok({
+          body: result.body,
         });
+      } catch (error) {
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );
@@ -210,21 +214,18 @@ export function defineRoutes(router: IRouter, auth: object) {
       },
     },
     async function (context, req, res) {
-      const { username } = auth.get(req).state;
       const { taskId } = req.params;
 
       try {
-        const body = req.body;
-
-        const result = await requestApi({
-          url: `/reporting/tasks/${taskId}/download?user=${username}`,
+        const result = await requestApi(auth.get(req), {
+          url: `/tasks/${taskId}/download`,
         });
 
-        return res.ok();
+        return res.ok({
+          body: result.body,
+        });
       } catch (error) {
-        return res.internalError({
-          body: error,
-        });
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );
@@ -243,21 +244,18 @@ export function defineRoutes(router: IRouter, auth: object) {
       },
     },
     async function (context, req, res) {
-      const { username } = auth.get(req).state;
       const { taskId } = req.params;
 
       try {
-        const result = await requestApi({
-          url: `/reporting/tasks/${taskId}/history?user=${username}`,
+        const result = await requestApi(auth.get(req), {
+          url: `/tasks/${taskId}/history`,
         });
 
         return res.ok({
-          body: JSON.parse(result.body),
+          body: result.body,
         });
       } catch (error) {
-        return res.internalError({
-          body: error,
-        });
+        return res.customError({ statusCode: 500, body: error });
       }
     }
   );

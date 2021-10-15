@@ -1,31 +1,17 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import { PLUGIN_ID } from '../common';
+import { IFrequency } from '../common/models/frequency';
+import { ITask } from '../common/models/task';
+import { HttpStart } from '../../../../../src/core/public/http';
+import { NotificationsSetup } from '../../../../../src/core/public/notifications';
+import { Capabilities } from '../../../../../src/core/public/application';
 
-export const convertFrequency = (frequencies, frequency) => {
-  const freq = frequencies.find(({ value }) => value === frequency);
+export const convertFrequency = (frequencies: Array<IFrequency>, frequency: string): string => {
+  const freq: IFrequency = frequencies.find((f: IFrequency) => f.value === frequency);
   return freq ? freq.text : 'Error';
 };
 
-export const defaultTask = (dashboardId) => ({
-  _id: '',
+export const defaultTask = (dashboardId): ITask => ({
+  id: '',
   dashboardId: dashboardId || null,
   exists: true,
   reporting: {
@@ -34,16 +20,16 @@ export const defaultTask = (dashboardId) => ({
     createdAt: '',
     print: false,
   },
-  namespace: '',
+  space: '',
 });
 
-export const ms2Str = (time) => {
-  let ms = time;
-  let s = Math.floor(ms / 1000);
+export const ms2Str = (time: number): string => {
+  let ms: number = time;
+  let s: number = Math.floor(ms / 1000);
   ms %= 1000;
-  let m = Math.floor(s / 60);
+  let m: number = Math.floor(s / 60);
   s %= 60;
-  const h = Math.floor(m / 60);
+  const h: number = Math.floor(m / 60);
   m %= 60;
 
   if (h) {
@@ -59,20 +45,20 @@ export const ms2Str = (time) => {
   return `${ms}ms`;
 };
 
-export let httpClient;
+export let httpClient: HttpStart;
 
-export function setHttpClient(http) {
+export function setHttpClient(http: HttpStart): void {
   httpClient = http;
 }
 
-export let toasts;
+export let toasts: NotificationsSetup;
 
-export function setToasts(notifications) {
+export function setToasts(notifications: NotificationsSetup): void {
   toasts = notifications;
 }
 
-export let capabilities;
+export let capabilities: Capabilities;
 
-export function setCapabilities(capa) {
+export function setCapabilities(capa: Capabilities): void {
   capabilities = capa[PLUGIN_ID] || {};
 }
