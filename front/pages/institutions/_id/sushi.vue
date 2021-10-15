@@ -80,6 +80,8 @@
       :search="search"
       :items-per-page="15"
       show-select
+      show-expand
+      single-expand
       item-key="id"
     >
       <template v-slot:top="{ originalItemsLength }">
@@ -88,6 +90,13 @@
             {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
           </v-toolbar-title>
         </v-toolbar>
+      </template>
+
+      <template v-slot:expanded-item="{ headers, item }">
+        <td />
+        <td :colspan="headers.length - 1" class="py-4">
+          <SushiDetails :item="item" />
+        </td>
       </template>
 
       <template v-slot:item.importState="{ item }">
@@ -146,6 +155,7 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar';
+import SushiDetails from '~/components/SushiDetails';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
@@ -157,6 +167,7 @@ export default {
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
+    SushiDetails,
     SushiForm,
     SushiHistory,
     ReportsDialog,
