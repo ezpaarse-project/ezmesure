@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.members.title', { institutionName })">
+    <ToolBar :title="institutionName">
       <v-spacer />
 
       <v-btn text :loading="refreshing" @click="refreshMembers">
@@ -24,6 +24,14 @@
       sort-by="full_name"
       item-key="username"
     >
+      <template v-slot:top="{ originalItemsLength }">
+        <v-toolbar flat>
+          <v-toolbar-title>
+            {{ $t('institutions.members.title', { total: originalItemsLength }) }}
+          </v-toolbar-title>
+        </v-toolbar>
+      </template>
+
       <template v-slot:item.correspondent="{ item }">
         <v-chip
           v-if="item.techContact"

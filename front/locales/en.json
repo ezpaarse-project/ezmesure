@@ -173,7 +173,7 @@
       "facebookUrl": "Facebook URL"
     },
     "members": {
-      "title": "Members - {institutionName}",
+      "title": "Members ({total})",
       "technical": "Technical",
       "documentary": "Documentary",
       "technicalCorrespondent": "Technical correspondent",
@@ -204,7 +204,7 @@
       "failedToUpdatePerms": "Failed to update user permissions"
     },
     "sushi": {
-      "title": "Sushi credentials - {institutionName}",
+      "title": "SUSHI credentials ({total})",
       "addCredentials": "Add credentials",
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",

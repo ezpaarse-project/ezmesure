@@ -82,6 +82,14 @@
       show-select
       item-key="id"
     >
+      <template v-slot:top="{ originalItemsLength }">
+        <v-toolbar flat>
+          <v-toolbar-title>
+            {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
+          </v-toolbar-title>
+        </v-toolbar>
+      </template>
+
       <template v-slot:item.importState="{ item }">
         <SushiStateLabel
           :state="item.importState"
@@ -249,7 +257,7 @@ export default {
         return this.$t('nSelected', { count: this.selected.length });
       }
 
-      return this.$t('institutions.sushi.title', { institutionName: this.institutionName });
+      return this.institutionName;
     },
     itemActions() {
       return [

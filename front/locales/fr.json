@@ -173,7 +173,7 @@
       "facebookUrl": "URL Facebook"
     },
     "members": {
-      "title": "Membres - {institutionName}",
+      "title": "Membres ({total})",
       "technical": "Technique",
       "documentary": "Documentaire",
       "technicalCorrespondent": "Correspondant technique",
@@ -204,7 +204,7 @@
       "failedToUpdatePerms": "La mise à jour des permissions a échoué"
     },
     "sushi": {
-      "title": "Identifiants Sushi - {institutionName}",
+      "title": "Identifiants SUSHI ({total})",
       "addCredentials": "Ajouter des identifiants",
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
