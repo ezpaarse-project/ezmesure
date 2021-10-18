@@ -84,7 +84,7 @@ router.route({
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array().required().items({
-      ...Sushi.createSchema,
+      ...Sushi.updateSchema,
       id: Sushi.schema.id,
     }),
   },
