@@ -240,6 +240,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
 
     if (this.id) {
       this.data.updatedAt = new Date();
+      this.data.createdAt = this.data.createdAt || new Date();
 
       await elastic.index({
         index,
