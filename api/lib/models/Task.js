@@ -10,7 +10,7 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  type: Joi.string().trim().required(),
+  type: Joi.string().trim(),
   status: Joi.string(),
   runningTime: Joi.number(),
 
