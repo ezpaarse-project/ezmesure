@@ -209,6 +209,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
       ignoreUnavailable: true,
       body: {
         sort,
+        collapse: opt.collapse,
         query: {
           bool: {
             minimum_should_match: opt.should ? 1 : 0,
