@@ -22,6 +22,7 @@ const schema = {
   comment: Joi.string().trim().allow(''),
 
 
+  latestImportTask: Joi.object(),
 
   params: Joi.array().items(Joi.object({
     name: Joi.string().trim().required(),
@@ -34,6 +35,7 @@ const createSchema = {
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
+  latestImportTask: Joi.any().strip(),
 };
 
 const updateSchema = {

@@ -47,6 +47,9 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
     },
+    query: {
+      latestImportTask: Joi.boolean().default(false),
+    },
   },
 });
 

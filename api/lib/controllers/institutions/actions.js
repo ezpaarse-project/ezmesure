@@ -5,6 +5,7 @@ const indexTemplate = require('../../utils/depositors-template');
 
 const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
+const Task = require('../../models/Task');
 
 const depositorsIndex = config.depositors.index;
 
@@ -239,7 +240,6 @@ exports.removeInstitutionMember = async (ctx) => {
   const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
 
-
   ctx.metadata = {
     institutionId: institution.id,
     institutionName: institution.get('name'),
@@ -304,5 +304,21 @@ exports.refreshInstitution = async (ctx) => {
 exports.getSushiData = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findByInstitutionId(ctx.state.institution.id);
+  const sushiItems = await Sushi.findByInstitutionId(ctx.state.institution.id);
+
+  if (ctx?.query?.latestImportTask) {
+    const sushiMap = new Map(sushiItems.map((item) => [item.getId(), item]));
+    const latestTasks = await Task.findOnePerSushiId(Array.from(sushiMap.keys()));
+
+    if (Array.isArray(latestTasks)) {
+      latestTasks.forEach((task) => {
+        const sushiItem = sushiMap.get(task?.get?.('sushiId'));
+        if (sushiItem) {
+          sushiItem.set('latestImportTask', task);
+        }
+      });
+    }
+  }
+
+  ctx.body = sushiItems;
 };
