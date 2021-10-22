@@ -356,23 +356,6 @@ exports.importSushi = async (ctx) => {
     endDate,
   });
 
-  task.on('finish', () => {
-    const steps = task.get('steps')?.map?.((step) => ({
-      label: step?.label,
-      status: step?.status,
-    }));
-    const success = steps.every((step) => step?.status === 'finished');
-
-    Sushi.setImportStateById(sushiId, { date: new Date(), success, steps })
-      .then(() => {
-        appLogger.info(`Sushi ${sushiId}: connection state changed to ${success ? 'success' : 'failure'}`);
-      })
-      .catch((e) => {
-        appLogger.error('Failed to save sushi connection status');
-        appLogger.error(e);
-      });
-  });
-
   ctx.type = 'json';
   ctx.body = task;
 };
