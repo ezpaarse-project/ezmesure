@@ -83,6 +83,7 @@
       show-expand
       single-expand
       item-key="id"
+      sort-by="vendor"
     >
       <template v-slot:top="{ originalItemsLength }">
         <v-toolbar flat>
