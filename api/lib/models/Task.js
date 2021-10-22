@@ -67,6 +67,17 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     });
   }
 
+  static async findOnePerSushiId(sushiIds) {
+    return this.findAll({
+      filters: [
+        { terms: { [`${type}.sushiId`]: sushiIds } },
+      ],
+      collapse: {
+        field: `${type}.sushiId`,
+      },
+    });
+  }
+
   static deleteByInstitutionId(institutionId) {
     return this.deleteByQuery({
       filters: [
