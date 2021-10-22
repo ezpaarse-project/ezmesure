@@ -4,11 +4,11 @@
 
     <AppBar />
 
-    <v-content>
+    <v-main>
       <v-card flat tile color="transparent">
         <nuxt />
       </v-card>
-    </v-content>
+    </v-main>
 
     <Snackbar />
   </v-app>

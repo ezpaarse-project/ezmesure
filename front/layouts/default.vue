@@ -2,9 +2,9 @@
   <v-app>
     <AppBar />
 
-    <v-content>
+    <v-main>
       <nuxt />
-    </v-content>
+    </v-main>
 
     <Snackbar />
   </v-app>
