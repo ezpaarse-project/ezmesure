@@ -100,15 +100,12 @@
         </td>
       </template>
 
-      <template v-slot:item.importState="{ item }">
-        <SushiStateLabel
-          :state="item.importState"
-          @click="showSushiItemHistory(item)"
-        />
+      <template v-slot:item.latestImportTask="{ item }">
+        <TaskLabel :task="item.latestImportTask" @click="showSushiItemHistory(item)" />
       </template>
 
-      <template v-slot:item.importState.date="{ item }">
-        <LocalDate v-if="item.importState" :date="item.importState.date" />
+      <template v-slot:item.latestImportTask.createdAt="{ item }">
+        <LocalDate v-if="item.latestImportTask" :date="item.latestImportTask.createdAt" />
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -160,8 +157,8 @@ import SushiDetails from '~/components/SushiDetails';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
-import SushiStateLabel from '~/components/SushiStateLabel';
 import LocalDate from '~/components/LocalDate';
+import TaskLabel from '~/components/TaskLabel';
 
 export default {
   layout: 'space',
@@ -172,8 +169,8 @@ export default {
     SushiForm,
     SushiHistory,
     ReportsDialog,
-    SushiStateLabel,
     LocalDate,
+    TaskLabel,
   },
   async asyncData({
     $axios,
@@ -230,19 +227,21 @@ export default {
         },
         {
           text: this.$t('sushi.importState'),
-          value: 'importState',
+          value: 'latestImportTask',
           align: 'right',
           width: '200px',
           sort: (a, b) => {
-            if (a?.success === b?.success) { return 0; }
-            if (a?.success === true) { return 1; }
-            if (b?.success === true) { return -1; }
-            return (a?.success === false) ? 1 : -1;
+            if (a?.status === b?.status) { return 0; }
+            if (a?.status === 'finished') { return 1; }
+            if (b?.status === 'finished') { return -1; }
+            if (typeof a?.status !== 'string') { return -1; }
+            if (typeof b?.status !== 'string') { return 1; }
+            return a?.status > b?.status ? 1 : -1;
           },
         },
         {
           text: this.$t('sushi.latestImport'),
-          value: 'importState.date',
+          value: 'latestImportTask.createdAt',
           align: 'right',
           width: '220px',
         },
@@ -341,7 +340,11 @@ export default {
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`);
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, {
+          params: {
+            latestImportTask: true,
+          },
+        });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }

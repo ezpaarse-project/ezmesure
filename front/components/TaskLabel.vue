@@ -4,8 +4,9 @@
     text-color="white"
     small
     label
+    v-on="$listeners"
   >
-    <v-icon small left>
+    <v-icon v-if="icon" small left>
       {{ icon }}
     </v-icon>
     {{ statusText }}
@@ -31,21 +32,40 @@ const icons = new Map([
 
 export default {
   props: {
-    status: {
-      type: String,
-      default: () => '',
+    task: {
+      type: Object,
+      default: () => null,
     },
   },
   computed: {
+    status() { return this.task?.status; },
+    color() { return colors.get(this.status) || 'grey'; },
+    icon() { return icons.get(this.status); },
+    lastStep() {
+      if (Array.isArray(this.task?.steps)) {
+        return this.task.steps[this.task.steps.length - 1];
+      }
+      return null;
+    },
     statusText() {
+      if (!this.task) {
+        return this.$t('tasks.status.notLaunchedYet');
+      }
+
+      if (this.status === 'error' && this.lastStep?.status !== 'finished') {
+        const translateKey = `tasks.failedStep.${this.lastStep?.label}`;
+
+        if (this.$te(translateKey)) {
+          return this.$t(translateKey);
+        }
+      }
+
       const key = `tasks.status.${this.status}`;
       if (this.$te(key)) {
         return this.$t(key);
       }
       return this.status;
     },
-    color() { return colors.get(this.status) || 'grey'; },
-    icon() { return icons.get(this.status) || 'mdi-progress-question'; },
   },
 };
 </script>

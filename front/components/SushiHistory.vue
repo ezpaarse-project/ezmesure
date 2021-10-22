@@ -41,7 +41,7 @@
         </template>
 
         <template v-slot:item.status="{ item }">
-          <TaskLabel :status="item.status" />
+          <TaskLabel :task="item" />
         </template>
 
         <template v-slot:expanded-item="{ headers, item }">

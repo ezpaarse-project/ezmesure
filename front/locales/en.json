@@ -236,10 +236,16 @@
     "logs": "Logs",
     "history": "Tasks history",
     "status": {
+      "notLaunchedYet": "Not launched yet",
       "pending": "Pending",
       "running": "Running",
       "finished": "Finished",
       "error": "Error"
+    },
+    "failedStep": {
+      "download": "Download failed",
+      "validation": "Invalid report",
+      "insert": "Report insert failed"
     },
     "steps": {
       "title": "Steps",
@@ -261,12 +267,7 @@
     "states": {
       "untested": "Not imported yet",
       "finished": "Finished",
-      "failed": "Failure",
-      "failedStep": {
-        "download": "Report download failed",
-        "validation": "Invalid report",
-        "insert": "Report insert failed"
-      }
+      "failed": "Failure"
     }
   },
   "reports": {
