@@ -88,6 +88,7 @@ module.exports = {
           updatedAt: { type: 'date' },
           sushiId: { type: 'keyword' },
           institutionId: { type: 'keyword' },
+          type: { type: 'keyword' },
           status: { type: 'keyword' },
           runningTime: { type: 'long' },
           logs: {

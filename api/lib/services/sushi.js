@@ -583,6 +583,7 @@ async function initSushiImport(opts = {}) {
   } = options;
 
   const task = new Task({
+    type: 'sushi-import',
     status: 'running',
     sushiId: sushi.getId(),
     institutionId: institution.getId(),
