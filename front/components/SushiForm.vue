@@ -31,8 +31,10 @@
             v-model="sushiForm.sushiUrl"
             :label="`${$t('institutions.sushi.sushiUrl')} *`"
             :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
+            :hint="$t('institutions.sushi.sushiUrlMustBeRoot')"
             outlined
             required
+            @change="onSushiUrlChange"
           />
 
           <v-alert
@@ -158,12 +160,19 @@
           v-text="editMode ? $t('update') : $t('add')"
         />
       </v-card-actions>
+
+      <ConfirmDialog ref="confirm" />
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import ConfirmDialog from '~/components/ConfirmDialog';
+
 export default {
+  components: {
+    ConfirmDialog,
+  },
   props: {
     platforms: {
       type: Array,
@@ -262,6 +271,22 @@ export default {
 
       // workaround to hide vendors list on change
       this.$refs.vendorsBox.isMenuActive = false;
+    },
+
+    async onSushiUrlChange() {
+      const sushiUrl = this.sushiForm?.sushiUrl;
+      const checkReg = /\/(status|members|reports).*/i;
+
+      if (checkReg.test(sushiUrl)) {
+        const fixUrl = await this.$refs.confirm.open({
+          title: this.$t('areYouSure'),
+          message: this.$t('institutions.sushi.sushiNotRootDetected'),
+        });
+
+        if (fixUrl) {
+          this.sushiForm.sushiUrl = sushiUrl.replace(checkReg, '');
+        }
+      }
     },
 
     addParam() {
