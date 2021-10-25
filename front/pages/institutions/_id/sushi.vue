@@ -62,6 +62,11 @@
       </template>
     </ToolBar>
 
+    <v-container>
+      <div>{{ $t('institutions.sushi.pageDescription') }}</div>
+      <div><strong>{{ $t('institutions.sushi.pageDescription2') }}</strong></div>
+    </v-container>
+
     <SushiForm
       ref="sushiForm"
       :platforms="platforms"
