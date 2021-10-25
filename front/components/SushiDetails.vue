@@ -29,8 +29,18 @@ export default {
     hasParams() {
       return Array.isArray(this.item?.params) && this.item.params.length > 0;
     },
+    updatedAt() {
+      const localDate = new Date(this.item?.updatedAt);
+
+      if (!this.$dateFunctions.isValid(localDate)) {
+        return this.$t('invalidDate');
+      }
+
+      return this.$dateFunctions.format(localDate, 'PPPpp');
+    },
     fields() {
       return [
+        { value: this.updatedAt, label: this.$t('institutions.sushi.updatedAt') },
         { value: this.item?.sushiUrl, label: this.$t('institutions.sushi.sushiUrl') },
         { value: this.item?.requestorId, label: this.$t('institutions.sushi.requestorId') },
         { value: this.item?.customerId, label: this.$t('institutions.sushi.customerId') },

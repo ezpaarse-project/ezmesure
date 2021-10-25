@@ -217,6 +217,7 @@
       "necessaryField": "This field may be necessary",
       "enterLabel": "Please enter a label.",
       "enterPackage": "Please enter a package",
+      "updatedAt": "Last updated",
       "sushiUrl": "Sushi URL",
       "enterUrl": "Please enter an URL",
       "enterRequestorId": "Please enter a Requestor Id.",
