@@ -244,9 +244,13 @@ export default {
 
     applyVendor() {
       const vendor = this.sushiForm.vendor?.toLowerCase();
-      this.platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor) || {};
+      const platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor);
 
-      this.sushiForm.sushiUrl = this.platform?.sushiUrl || '';
+      if (platform) {
+        this.sushiForm.sushiUrl = platform?.sushiUrl || '';
+      }
+
+      this.platform = platform || {};
     },
 
     onVendorChange() {
