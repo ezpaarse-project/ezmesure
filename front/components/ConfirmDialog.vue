@@ -21,7 +21,6 @@
         </v-btn>
         <v-btn
           color="primary"
-          text
           @click="agree"
         >
           {{ agreeText || $t('confirm') }}
