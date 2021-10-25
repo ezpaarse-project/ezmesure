@@ -281,6 +281,8 @@ export default {
         const fixUrl = await this.$refs.confirm.open({
           title: this.$t('areYouSure'),
           message: this.$t('institutions.sushi.sushiNotRootDetected'),
+          agreeText: this.$t('fixIt'),
+          disagreeText: this.$t('leaveIt'),
         });
 
         if (fixUrl) {
