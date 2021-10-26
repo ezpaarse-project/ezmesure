@@ -222,7 +222,7 @@
       "updatedAt": "Dernière mise à jour",
       "sushiUrl": "URL Sushi",
       "sushiUrlMustBeRoot": "Doit pointer vers la racine du service SUSHI",
-      "sushiNotRootDetected": "L'URL SUSHI ne semble pas pointer vers la racine du service.",
+      "sushiNotRootDetected": "L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.",
       "enterUrl": "Veuillez saisir une URL",
       "enterRequestorId": "Veuillez saisir un Requestor Id.",
       "enterCustomerId": "Veuillez saisir un Customer Id.",
