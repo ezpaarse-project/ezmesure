@@ -141,12 +141,19 @@ export default {
     },
   },
   methods: {
-    showSushiItem(sushiData = {}) {
+    showSushiItem(sushiData = {}, opts = {}) {
       this.sushi = sushiData;
       this.tasks = [];
       this.expandedRows = [];
       this.show = true;
-      this.refreshSushiTasks();
+
+      this.refreshSushiTasks().then(() => {
+        const idToExpand = opts?.openLatest && sushiData?.latestImportTask?.id;
+
+        if (idToExpand) {
+          this.expandedRows = this.tasks.filter(task => task.id === idToExpand);
+        }
+      });
     },
 
     onExpandedChange(value) {

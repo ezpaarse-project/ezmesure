@@ -106,7 +106,10 @@
       </template>
 
       <template v-slot:item.latestImportTask="{ item }">
-        <TaskLabel :task="item.latestImportTask" @click="showSushiItemHistory(item)" />
+        <TaskLabel
+          :task="item.latestImportTask"
+          @click="showSushiItemHistory(item, { openLatest: true })"
+        />
       </template>
 
       <template v-slot:item.latestImportTask.createdAt="{ item }">
@@ -336,8 +339,8 @@ export default {
     duplicateItem(item) {
       this.$refs.sushiForm.editSushiItem(this.institution, { ...item, id: undefined });
     },
-    showSushiItemHistory(item) {
-      this.$refs.sushiHistory.showSushiItem(item);
+    showSushiItemHistory(item, opts = {}) {
+      this.$refs.sushiHistory.showSushiItem(item, opts);
     },
     async refreshSushiItems() {
       if (!this.hasInstitution) { return; }
