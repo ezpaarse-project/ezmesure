@@ -24,7 +24,7 @@ import { FormattedMessage } from '@kbn/i18n/react';
 import { i18n } from '@kbn/i18n';
 
 import { httpClient, toasts, defaultTask, capabilities } from '../../../lib/reporting';
-import { IEditProps, IEditState, ISelectedSpace } from '../../../common/models/edit';
+import { IEditProps, IEditState, ISelectedDashboard, ISelectedSpace } from '../../../common/models/edit';
 import { IDashboard } from '../../../common/models/dashboard';
 import { ITask } from '../../../common/models/task';
 import { IFrequency } from '../../../common/models/frequency';
@@ -110,14 +110,15 @@ export class EzReportingTaskEditFlyout extends Component<IEditProps, IEditState>
   onChangeSpace = (selectedSpaces: Array<ISelectedSpace>): void => {
     const currentTask: ITask = { ...this.state.currentTask };
 
-    if (!selectedSpaces.length) {
+    if (selectedSpaces.length === 0) {
       currentTask.space = '';
       this.setState({ currentTask });
     }
 
-    currentTask.space = selectedSpaces[0].label;
-    this.setState({ currentTask });
-    this.props.onChangeSpaceHandler(selectedSpaces);
+    if (selectedSpaces.length > 0) {
+      currentTask.space = selectedSpaces[0].label;
+      this.setState({ currentTask });
+    }
   };
 
   onChangeDashboard = (selectedDashboards: Array<IDashboard>): void => {
@@ -237,13 +238,28 @@ export class EzReportingTaskEditFlyout extends Component<IEditProps, IEditState>
       spaceErrorMessages,
       receivers,
     } = this.state;
-    const { dashboards, frequencies, admin, spaces, dashboardsBySpace, currentSpaces } = this.props;
+    const { dashboards, frequencies, admin, spaces } = this.props;
 
-    let dashboardList = admin ? dashboardsBySpace : dashboards;
-    dashboardList = dashboardList.map((dashboard) => ({
+    let dashboardList: Array<ISelectedDashboard> = dashboards.map((dashboard) => ({
       value: dashboard.id,
       label: dashboard.name,
     }));
+
+    let currentSpaces: Array<ISelectedSpace> = [];
+    if (admin && currentTask.id.length > 0) {
+      currentSpaces =  spaces.filter((space: ISpace) => space.name === currentTask.space)
+        .map((space: ISpace) => ({
+          value: space.id,
+          label: space.name,
+          color: space.color,
+        }));
+
+      dashboardList = dashboards.filter((dashboard) => dashboard.namespace === currentTask.space)
+        .map((dashboard) => ({
+          value: dashboard.id,
+          label: dashboard.name,
+        }));
+    }
 
     const invalidMail: boolean = mailErrorMessages.length > 0;
     const invalidDashboard: boolean = dashboardErrorMessages.length > 0;
@@ -311,6 +327,22 @@ export class EzReportingTaskEditFlyout extends Component<IEditProps, IEditState>
           </EuiListGroup>
         </EuiFormRow>
       );
+    }
+    
+    if (!edit && admin && currentTask.id.length === 0) {
+      dashboardList = [];
+      currentSpaces =  spaces.filter((space: ISpace) => space.name === currentTask.space)
+        .map((space: ISpace) => ({
+          value: space.id,
+          label: space.name,
+          color: space.color,
+        }));
+
+      dashboardList = dashboards.filter((dashboard) => dashboard.namespace === currentTask.space)
+        .map((dashboard) => ({
+          value: dashboard.id,
+          label: dashboard.name,
+        }));
     }
 
     const selectedDashboards: Array<IDashboard> = dashboardList.filter((d) => d.value === currentTask.dashboardId);

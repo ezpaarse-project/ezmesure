@@ -10,8 +10,6 @@ export interface IEditProps {
   admin: boolean;
   editTaskHandler(task: object): Promise<object>;
   saveTaskHandler(task: object): Promise<object>;
-  dashboardsBySpace: any[];
-  currentSpaces: any[];
 }
 
 export interface IEditState {
@@ -29,4 +27,9 @@ export interface ISelectedSpace {
   value?: string;
   label: string;
   color: string;
+}
+
+export interface ISelectedDashboard {
+  value: string,
+  label: string,
 }

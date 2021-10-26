@@ -57,8 +57,6 @@ interface EzReportingAppState {
   isPopoverOpen: boolean;
   tasksInProgress: object;
   delay: number;
-  dashboardsBySpace: any[];
-  currentSpaces: any[];
 }
 
 export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingAppState> {
@@ -79,8 +77,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       showDestroyModal: false,
       isPopoverOpen: false,
       tasksInProgress: {},
-      dashboardsBySpace: [],
-      currentSpaces: [],
       delay: 5000,
     };
   }
@@ -186,7 +182,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
   };
 
   closeEditFlyOut = () => {
-    this.setState({ dashboardsBySpace: [], currentSpaces: [] });
     closeEditFlyOutHandler();
   };
 
@@ -204,7 +199,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
 
       return httpClient.post('/api/ezreporting/tasks', { body }).then((res) => {
         this.refreshData();
-        this.setState({ dashboardsBySpace: [], currentSpaces: [] });
 
         toasts.addSuccess({
           title: 'Success',
@@ -316,18 +310,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
     this.setState({ isPopoverOpen: true });
   };
 
-  onChangeSpaceHandler = (selectedSpaces) => {
-    const { dashboards } = this.state;
-
-    this.setState({ dashboardsBySpace: [], currentSpaces: [] });
-
-    if (selectedSpaces.length) {
-      const { label: space } = selectedSpaces[0];
-      const dashboardsBySpace = dashboards.filter((dashboard) => dashboard.namespace === space);
-      this.setState({ dashboardsBySpace, currentSpaces: selectedSpaces });
-    }
-  };
-
   render() {
     const { basename, navigation, admin, applicationName } = this.props;
     const {
@@ -340,8 +322,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       showDestroyModal,
       isPopoverOpen,
       frequencies,
-      dashboardsBySpace,
-      currentSpaces,
       tasksInProgress,
     } = this.state;
 
@@ -538,14 +518,11 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       <Router basename={basename}>
         <EzReportingTaskEditFlyout
           dashboards={dashboards}
-          dashboardsBySpace={dashboardsBySpace}
           frequencies={frequencies}
           spaces={spaces}
-          currentSpaces={currentSpaces}
           admin={admin}
           editTaskHandler={this.editTaskHandler}
           saveTaskHandler={this.saveTaskHandler}
-          onChangeSpaceHandler={this.onChangeSpaceHandler}
         />
         <EzReportingHistoryFlyout />
         {destroyModal}

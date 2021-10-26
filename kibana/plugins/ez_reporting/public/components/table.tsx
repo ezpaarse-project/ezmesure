@@ -35,7 +35,7 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       itemIdToExpandedRowMap: {},
       pageIndex: 0,
       pageSize: 10,
-      sortField: 'namespace',
+      sortField: 'space',
       sortDirection: 'asc',
       tasksInProgress: {},
     };
