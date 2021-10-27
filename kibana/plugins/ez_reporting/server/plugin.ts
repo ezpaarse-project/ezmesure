@@ -65,7 +65,7 @@ export class EzreportingPlugin
       catalogue: [PLUGIN_ID],
       privilegesTooltip: PLUGIN_DESCRIPTION,
       management: {
-        insightsAndAlerting: ['triggersActions'],
+        ezmesure: [`${PLUGIN_ID}_management`],
       },
       privileges: {
         all: {
@@ -73,7 +73,7 @@ export class EzreportingPlugin
           api: [`${PLUGIN_ID}-read`, `${PLUGIN_ID}-all`],
           catalogue: [PLUGIN_ID],
           management: {
-            insightsAndAlerting: ['triggersActions'],
+            ezmesure: [`${PLUGIN_ID}_management`],
           },
           savedObject: {
             all: [],
@@ -86,7 +86,7 @@ export class EzreportingPlugin
           api: [`${PLUGIN_ID}-read`],
           catalogue: [PLUGIN_ID],
           management: {
-            insightsAndAlerting: ['triggersActions'],
+            ezmesure: [`${PLUGIN_ID}_management`],
           },
           savedObject: {
             all: [],
