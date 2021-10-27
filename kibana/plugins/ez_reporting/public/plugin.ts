@@ -89,6 +89,7 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     // Menagement section
     if (management) {
       const managementSection: string = `${applicationName.toLowerCase()}`;
+      console.log(managementSection);
       const appManagementSection = management.sections.register({
         id: managementSection,
         title: applicationName,

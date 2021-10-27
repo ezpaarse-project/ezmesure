@@ -97,6 +97,7 @@ export class EzreportingPlugin
       },
     });
 
+    // Hide reporting in management if user have not superuser role
     features.registerElasticsearchFeature({
       id: `${PLUGIN_ID}_management`,
       catalogue: [`${PLUGIN_ID}_management`],
@@ -106,7 +107,7 @@ export class EzreportingPlugin
       privileges: [
         {
           requiredClusterPrivileges: [],
-          requiredRoles: ['superuser'],
+          requiredRoles: ['superuser', 'admin', `${PLUGIN_ID}_management`], // `${PLUGIN_ID}_management` can be create
           ui: [],
         },
       ],
