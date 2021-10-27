@@ -18,8 +18,7 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
   <dd>Execute this to create a distributable version of this plugin that can be installed in Kibana</dd>
 </dl>
 
-
 ## Build
 ```bash
-$ yarn build --kibana-version 7.10.1
+$ yarn build --kibana-version 7.14.1
 ```

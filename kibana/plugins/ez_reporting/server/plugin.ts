@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import {
   PluginInitializerContext,
   CoreSetup,
@@ -57,13 +38,14 @@ export class EzreportingPlugin
     this.initializerContext = initializerContext;
   }
 
-  public setup(core: CoreSetup, { features }: EzReportingDeps) {
+  public async setup(core: CoreSetup, { features }: EzReportingDeps) {
     this.logger.debug(`${PLUGIN_ID}: Setup`);
 
     const router = core.http.createRouter();
 
     // Register server side APIs
-    defineRoutes(router, core.http.auth);
+    const { auth } = core.http;
+    defineRoutes(router, auth, this.logger);
 
     const applicationName = process.env.EZMESURE_APPLICATION_NAME || PLUGIN_APP_NAME;
 
@@ -78,49 +60,57 @@ export class EzreportingPlugin
     features.registerKibanaFeature({
       id: PLUGIN_ID,
       name: `${PLUGIN_NAME} ${PLUGIN_APP_NAME}`,
-      icon: PLUGIN_ICON,
       category: featuresCategory,
-      app: [PLUGIN_ID],
+      app: [PLUGIN_ID, 'kibana'],
       catalogue: [PLUGIN_ID],
       privilegesTooltip: PLUGIN_DESCRIPTION,
       management: {
-        insightsAndAlerting: ['triggersActions'],
+        ezmesure: [`${PLUGIN_ID}_management`],
       },
-      alerting: Object.values(AlertType),
       privileges: {
         all: {
-          app: [PLUGIN_ID],
+          app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`, `${PLUGIN_ID}-all`],
           catalogue: [PLUGIN_ID],
+          management: {
+            ezmesure: [`${PLUGIN_ID}_management`],
+          },
           savedObject: {
             all: [],
             read: [],
-          },
-          alerting: {
-            all: Object.values(AlertType),
-          },
-          management: {
-            insightsAndAlerting: ['triggersActions'],
           },
           ui: ['create', 'edit', 'save', 'download', 'delete', 'show'],
         },
         read: {
-          app: [PLUGIN_ID],
+          app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`],
           catalogue: [PLUGIN_ID],
+          management: {
+            ezmesure: [`${PLUGIN_ID}_management`],
+          },
           savedObject: {
             all: [],
             read: [],
           },
-          alerting: {
-            all: Object.values(AlertType),
-          },
-          management: {
-            insightsAndAlerting: ['triggersActions'],
-          },
-          ui: [],
+          ui: ['view'],
         },
       },
+    });
+
+    // Hide reporting in management if user have not superuser role
+    features.registerElasticsearchFeature({
+      id: `${PLUGIN_ID}_management`,
+      catalogue: [`${PLUGIN_ID}_management`],
+      management: {
+        ezmesure: [`${PLUGIN_ID}_management`],
+      },
+      privileges: [
+        {
+          requiredClusterPrivileges: [],
+          requiredRoles: ['superuser', 'admin', `${PLUGIN_ID}_management`], // `${PLUGIN_ID}_management` can be create
+          ui: [],
+        },
+      ],
     });
 
     return {};

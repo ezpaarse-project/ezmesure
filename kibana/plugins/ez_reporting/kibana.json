@@ -1,6 +1,6 @@
 {
   "id": "ezReporting",
-  "version": "7.10.1",
+  "version": "2.0.0",
   "kibanaVersion": "kibana",
   "server": true,
   "ui": true,
@@ -8,12 +8,15 @@
     "navigation",
     "features",
     "home",
-    "management"
+    "management",
+    "triggersActionsUi",
+    "kibanaReact"
   ],
-  "optionalPlugins": [],
+  "optionalPlugins": ["security"],
   "configPath": [
     "xpack",
-    "ezReporting"
+    "ezreporting",
+    "ezreporting_management"
   ],
   "extraPublicDirs": [
     "common"

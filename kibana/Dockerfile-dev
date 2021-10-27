@@ -1,31 +1,19 @@
-FROM debian:latest
+FROM node:14.17.6
+LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
-ENV NVM_DIR /usr/local/nvm
+RUN useradd -rm -d /home/kbn-dev -s /bin/bash -u 8854 kbn-dev \
+  && chown -R kbn-dev /usr/local
 
-ENV NODE_ENV development
-ENV KIBANA_VERSION 7.9
+USER kbn-dev
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh \
-  && apt-get update \
-  && apt-get install -y curl git \
-  && apt-get -y autoclean \
-  && mkdir -p /kibana \
-  && cd /kibana \
-  && git clone https://github.com/elastic/kibana.git . --progress --verbose \
-  && export NODE_VERSION=$(cat .nvmrc) \
-  && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.2/install.sh | bash
-RUN source $NVM_DIR/nvm.sh \
-  && nvm install $NODE_VERSION \
-  && nvm alias default $NODE_VERSION \
-  && nvm use default \
-  && node -v \
-  && npm -v \
-  && npm i -G yarn \
+WORKDIR /home/kbn-dev
+
+RUN git clone --progress --verbose https://github.com/elastic/kibana \
+  && cd ./kibana \
+  && git checkout 7.14 \
   && yarn kbn bootstrap
-
-WORKDIR /app
 
 EXPOSE 5601
 EXPOSE 5603
 
-CMD ["yarn", "start"]
+CMD [ "yarn", "start" ]

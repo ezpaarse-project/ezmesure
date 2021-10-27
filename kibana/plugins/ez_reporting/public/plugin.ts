@@ -1,22 +1,3 @@
-/*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import {
   AppMountParameters,
   CoreSetup,
@@ -47,21 +28,21 @@ interface ClientConfigType {
 }
 
 export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzReportingPluginStart> {
-  initializerContext: PluginInitializerContext<ClientConfigType>;
+  private initializerContext: PluginInitializerContext<ClientConfigType>;
 
   constructor(initializerContext: PluginInitializerContext<ClientConfigType>) {
     this.initializerContext = initializerContext;
   }
 
   public setup(core: CoreSetup, { home, management }: SetupDeps): EzReportingPluginSetup {
-    const config = this.initializerContext.config.get<ClientConfigType>();
-    const { applicationName } = config;
+    const config: ClientConfigType = this.initializerContext.config.get<ClientConfigType>();
+    const applicationName: string = config.applicationName;
 
     CATEGORY.label = applicationName;
     CATEGORY.euiIconType = logo;
 
-    const { protocol, hostname, port } = window.location;
-    const ezmesureLink = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
+    const { protocol, hostname, port }: Location = window.location;
+    const ezmesureLink: string = `${protocol}//${hostname}${port ? `:${port}` : ''}/`;
 
     // Back to PLUGIN_NAME link
     core.application.register({
@@ -86,9 +67,8 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         const { chrome } = coreStart;
 
         chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
-        chrome.setBreadcrumbs([{ text: `${PLUGIN_NAME} ${applicationName}` }]);
 
-        const admin = false;
+        const admin: boolean = false;
 
         const unmountAppCallback = await mountApp({
           coreStart,
@@ -107,63 +87,81 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     });
 
     // Menagement section
-    const managementSection = `${applicationName.toLowerCase()}`;
-    const appManagementSection = management.sections.register({
-      id: managementSection,
-      title: applicationName,
-      tip: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-      order: 1000,
-    });
-    appManagementSection.registerApp({
-      id: PLUGIN_ID,
-      title: PLUGIN_NAME,
-      order: 99,
-      mount: async (params: AppMountParameters) => {
-        // Load application bundle
-        const { mountApp } = await import('./application');
-        // Get start services as specified in kibana.json
-        const [coreStart, depsStart] = await core.getStartServices();
-        const { chrome } = coreStart;
+    if (management) {
+      const managementSection: string = `${applicationName.toLowerCase()}`;
+      console.log(managementSection);
+      const appManagementSection = management.sections.register({
+        id: managementSection,
+        title: applicationName,
+        tip: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+        order: 1000,
+      });
+      appManagementSection.registerApp({
+        id: `${PLUGIN_ID}_management`,
+        title: PLUGIN_NAME,
+        order: 99,
+        mount: async (params: AppMountParameters) => {
+          // Load application bundle
+          const { mountApp } = await import('./application');
+          // Get start services as specified in kibana.json
+          const [coreStart, depsStart] = await core.getStartServices();
+          const { chrome } = coreStart;
 
-        chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
-        chrome.setBreadcrumbs([
-          {
-            text: 'Stack Management',
-            href: coreStart.http.basePath.prepend('/app/management'),
-          },
-          { text: PLUGIN_APP_NAME },
-          { text: PLUGIN_NAME },
-        ]);
+          chrome.docTitle.change(`Management - ${PLUGIN_NAME} ${applicationName}`);
+          chrome.setBreadcrumbs([
+            {
+              text: 'Stack Management',
+              href: coreStart.http.basePath.prepend('/app/management'),
+            },
+            { text: PLUGIN_APP_NAME },
+            { text: PLUGIN_NAME },
+          ]);
 
-        const admin = true;
+          const admin: boolean = true;
 
-        const unmountAppCallback = await mountApp({
-          coreStart,
-          depsStart,
-          params,
-          applicationName,
-          admin,
+          const unmountAppCallback = await mountApp({
+            coreStart,
+            depsStart,
+            params,
+            applicationName,
+            admin,
+          });
+
+          // Render the application
+          return () => {
+            chrome.docTitle.reset();
+            unmountAppCallback();
+          };
+        },
+      });
+
+      if (home) {
+        home.featureCatalogue.register({
+          id: `${PLUGIN_ID}_management`,
+          title: `Management - ${PLUGIN_NAME} ${applicationName}`,
+          subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
+          description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+          icon: PLUGIN_ICON,
+          path: `/app/management/${managementSection}/${PLUGIN_ID}`,
+          showOnHomePage: true,
+          category: FeatureCatalogueCategory.ADMIN,
+          solutionId: `${PLUGIN_NAME} ${applicationName}`,
+          order: 1,
         });
-
-        // Render the application
-        return () => {
-          chrome.docTitle.reset();
-          unmountAppCallback();
-        };
-      },
-    });
+      }
+    }
 
     // ezReporting app in home page
     if (home) {
-      // home.featureCatalogue.registerSolution({
-      //   id: PLUGIN_ID,
-      //   title: `${PLUGIN_NAME} ${applicationName}`,
-      //   subtitle: `${PLUGIN_NAME} ${applicationName}`,
-      //   description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-      //   icon: PLUGIN_ICON,
-      //   path: `/app/${PLUGIN_ID}`,
-      //   appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName)],
-      // });
+      home.featureCatalogue.registerSolution({
+        id: PLUGIN_ID,
+        title: `${PLUGIN_NAME} ${applicationName}`,
+        subtitle: `${PLUGIN_NAME} ${applicationName}`,
+        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+        icon: PLUGIN_ICON,
+        path: `/app/${PLUGIN_ID}`,
+        appDescriptions: [`${PLUGIN_NAME} ${applicationName}`, PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName)],
+      });
 
       home.featureCatalogue.register({
         id: PLUGIN_ID,
@@ -175,19 +173,6 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         showOnHomePage: true,
         category: FeatureCatalogueCategory.OTHER,
         solutionId: `${PLUGIN_NAME} ${applicationName}`,
-      });
-
-      home.featureCatalogue.register({
-        id: `${PLUGIN_ID}_management`,
-        title: `Management - ${PLUGIN_NAME} ${applicationName}`,
-        subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
-        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-        icon: PLUGIN_ICON,
-        path: `/app/management/${managementSection}/${PLUGIN_ID}`,
-        showOnHomePage: true,
-        category: FeatureCatalogueCategory.ADMIN,
-        solutionId: `${PLUGIN_NAME} ${applicationName}`,
-        order: 1,
       });
     }
 

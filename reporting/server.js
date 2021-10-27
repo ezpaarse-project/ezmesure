@@ -11,6 +11,7 @@ const activity = require('./lib/services/activity');
 const controller = require('./lib/controllers');
 const puppeteer = require('./lib/services/puppeteer');
 const { generatePendingReports } = require('./lib/services/reporting');
+const elastic = require('./lib/services/elastic');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -104,17 +105,62 @@ app.on('error', (err, ctx = {}) => {
 
 app.use(mount('/', controller));
 
-const server = app.listen(port || 3000);
+function start() {
+  const server = app.listen(port || 3000);
+  server.setTimeout(1000 * 60 * 30);
 
-logger.info(`API server listening on port ${port || 3000}`);
-logger.info('Press CTRL+C to stop server');
+  logger.info(`API server listening on port ${port || 3000}`);
+  logger.info('Press CTRL+C to stop server');
 
-const closeApp = () => {
-  logger.info('Got Signal, closing the server');
-  server.close(() => {
-    process.exit(0);
+  const closeApp = () => {
+    logger.info('Got Signal, closing the server');
+    server.close(() => {
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', closeApp);
+  process.on('SIGTERM', closeApp);
+}
+
+async function waitForElasticsearch() {
+  logger.info('Waiting for Elasticsearch...');
+
+  for (let i = 0; i < 10; i += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const { body } = await elastic.cluster.health({ waitForStatus: 'yellow', timeout: '20s' });
+      const status = body && body.status;
+
+      if (status === 'yellow' || status === 'green') {
+        logger.info(`Elasticsearch is ready (status: ${status || 'unknown'})`);
+        return;
+      }
+
+      logger.info(`Elasticsearch not ready yet (status: ${status})`);
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } catch (e) {
+      const status = (e.meta && e.meta.body && e.meta.body.status);
+
+      if (typeof status === 'string') {
+        logger.info(`Elasticsearch not ready yet (status: ${status || 'unknown'})`);
+      } else {
+        logger.info(`Cannot connect to Elasticsearch yet : ${e.message}`);
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  }
+
+  logger.error('Elasticsearch does not respond or is in a bad state');
+  throw new Error('Elasticsearch does not respond');
+}
+
+waitForElasticsearch()
+  .then(start)
+  .catch(() => {
+    logger.error('Error during bootstrap, shutting down...');
+    process.exit(1);
   });
-};
-
-process.on('SIGINT', closeApp);
-process.on('SIGTERM', closeApp);

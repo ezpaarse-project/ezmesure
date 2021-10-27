@@ -154,3 +154,33 @@ Now you can access the Kibana instance on https://localhost/kibana/ and start bu
 ## API
 
 The ezMESURE API is documented here : https://localhost/api-reference
+
+## Plugins
+
+### Dev mode
+
+To develop a Kibana plugin for ezMESURE, you need to launch Kibana in ``dev`` mode via the ``docker-compose.debug.yml`` file
+
+To do so, you have to source the file ``ezmesure.env.sh`` and then build the Kibana image with the command ``docker-compose -f docker-compose.debug.yml build kibana``(this command is only needed once).
+Then you have to launch Kibana with the command ``docker-compose -f docker-compose.debug.yml up -d kibana``(``-d`` to launch it in detached mode)
+
+### Create plugin
+To create a Kibana plugin, you need to run the following command ``docker-compose -f docker-compose.debug.yml exec kibana bash -c 'node scripts/generate_plugin'`` and it will launch the plugin creation script in interactive mode.
+
+Here are the parameters of the command if you do not want an interactive world:
+```
+Options:
+    --yes, -y          Answer yes to all prompts, requires passing --name
+    --name             Set the plugin name
+    --ui               Generate a UI plugin
+    --server           Generate a Server plugin
+    --verbose, -v      Log verbosely
+    --debug            Log debug messages (less than verbose)
+    --quiet            Only log errors
+    --silent           Don't log anything
+    --help             Show this message
+```
+
+### Build plugin
+
+To build a Kibana plugin you need to connect to the container as follows ``docker-compose -f docker-compose.debug.yml exec kibana bash -c 'cd plugins/<plugin_name>/; yarn build --kibana-version <kibana_version>'``
