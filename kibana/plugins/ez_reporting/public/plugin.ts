@@ -87,51 +87,68 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
     });
 
     // Menagement section
-    const managementSection: string = `${applicationName.toLowerCase()}`;
-    const appManagementSection = management.sections.register({
-      id: managementSection,
-      title: applicationName,
-      tip: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-      order: 1000,
-    });
-    appManagementSection.registerApp({
-      id: PLUGIN_ID,
-      title: PLUGIN_NAME,
-      order: 99,
-      mount: async (params: AppMountParameters) => {
-        // Load application bundle
-        const { mountApp } = await import('./application');
-        // Get start services as specified in kibana.json
-        const [coreStart, depsStart] = await core.getStartServices();
-        const { chrome } = coreStart;
+    if (management) {
+      const managementSection: string = `${applicationName.toLowerCase()}`;
+      const appManagementSection = management.sections.register({
+        id: managementSection,
+        title: applicationName,
+        tip: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+        order: 1000,
+      });
+      appManagementSection.registerApp({
+        id: `${PLUGIN_ID}_management`,
+        title: PLUGIN_NAME,
+        order: 99,
+        mount: async (params: AppMountParameters) => {
+          // Load application bundle
+          const { mountApp } = await import('./application');
+          // Get start services as specified in kibana.json
+          const [coreStart, depsStart] = await core.getStartServices();
+          const { chrome } = coreStart;
 
-        chrome.docTitle.change(`${PLUGIN_NAME} ${applicationName}`);
-        chrome.setBreadcrumbs([
-          {
-            text: 'Stack Management',
-            href: coreStart.http.basePath.prepend('/app/management'),
-          },
-          { text: PLUGIN_APP_NAME },
-          { text: PLUGIN_NAME },
-        ]);
+          chrome.docTitle.change(`Management - ${PLUGIN_NAME} ${applicationName}`);
+          chrome.setBreadcrumbs([
+            {
+              text: 'Stack Management',
+              href: coreStart.http.basePath.prepend('/app/management'),
+            },
+            { text: PLUGIN_APP_NAME },
+            { text: PLUGIN_NAME },
+          ]);
 
-        const admin: boolean = true;
+          const admin: boolean = true;
 
-        const unmountAppCallback = await mountApp({
-          coreStart,
-          depsStart,
-          params,
-          applicationName,
-          admin,
+          const unmountAppCallback = await mountApp({
+            coreStart,
+            depsStart,
+            params,
+            applicationName,
+            admin,
+          });
+
+          // Render the application
+          return () => {
+            chrome.docTitle.reset();
+            unmountAppCallback();
+          };
+        },
+      });
+
+      if (home) {
+        home.featureCatalogue.register({
+          id: `${PLUGIN_ID}_management`,
+          title: `Management - ${PLUGIN_NAME} ${applicationName}`,
+          subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
+          description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
+          icon: PLUGIN_ICON,
+          path: `/app/management/${managementSection}/${PLUGIN_ID}`,
+          showOnHomePage: true,
+          category: FeatureCatalogueCategory.ADMIN,
+          solutionId: `${PLUGIN_NAME} ${applicationName}`,
+          order: 1,
         });
-
-        // Render the application
-        return () => {
-          chrome.docTitle.reset();
-          unmountAppCallback();
-        };
-      },
-    });
+      }
+    }
 
     // ezReporting app in home page
     if (home) {
@@ -155,19 +172,6 @@ export class EzReportingPlugin implements Plugin<EzReportingPluginSetup, EzRepor
         showOnHomePage: true,
         category: FeatureCatalogueCategory.OTHER,
         solutionId: `${PLUGIN_NAME} ${applicationName}`,
-      });
-
-      home.featureCatalogue.register({
-        id: `${PLUGIN_ID}_management`,
-        title: `Management - ${PLUGIN_NAME} ${applicationName}`,
-        subtitle: `Management - ${PLUGIN_NAME} ${applicationName}`,
-        description: PLUGIN_DESCRIPTION.replace('%APP_NAME%', applicationName),
-        icon: PLUGIN_ICON,
-        path: `/app/management/${managementSection}/${PLUGIN_ID}`,
-        showOnHomePage: true,
-        category: FeatureCatalogueCategory.ADMIN,
-        solutionId: `${PLUGIN_NAME} ${applicationName}`,
-        order: 1,
       });
     }
 

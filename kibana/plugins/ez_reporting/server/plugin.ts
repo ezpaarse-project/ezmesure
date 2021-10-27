@@ -43,13 +43,6 @@ export class EzreportingPlugin
 
     const router = core.http.createRouter();
 
-    const cookieOptions = {
-      name: 'sid',
-      encryptionKey: 'something_at_least_32_characters',
-      validate: () => ({ isValid: true }),
-      isSecure: false,
-    };
-
     // Register server side APIs
     const { auth } = core.http;
     defineRoutes(router, auth, this.logger);
@@ -71,11 +64,17 @@ export class EzreportingPlugin
       app: [PLUGIN_ID, 'kibana'],
       catalogue: [PLUGIN_ID],
       privilegesTooltip: PLUGIN_DESCRIPTION,
+      management: {
+        insightsAndAlerting: ['triggersActions'],
+      },
       privileges: {
         all: {
           app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`, `${PLUGIN_ID}-all`],
           catalogue: [PLUGIN_ID],
+          management: {
+            insightsAndAlerting: ['triggersActions'],
+          },
           savedObject: {
             all: [],
             read: [],
@@ -86,6 +85,9 @@ export class EzreportingPlugin
           app: [PLUGIN_ID, 'kibana'],
           api: [`${PLUGIN_ID}-read`],
           catalogue: [PLUGIN_ID],
+          management: {
+            insightsAndAlerting: ['triggersActions'],
+          },
           savedObject: {
             all: [],
             read: [],
@@ -93,6 +95,21 @@ export class EzreportingPlugin
           ui: ['view'],
         },
       },
+    });
+
+    features.registerElasticsearchFeature({
+      id: `${PLUGIN_ID}_management`,
+      catalogue: [`${PLUGIN_ID}_management`],
+      management: {
+        ezmesure: [`${PLUGIN_ID}_management`],
+      },
+      privileges: [
+        {
+          requiredClusterPrivileges: [],
+          requiredRoles: ['superuser'],
+          ui: [],
+        },
+      ],
     });
 
     return {};

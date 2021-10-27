@@ -8,12 +8,15 @@
     "navigation",
     "features",
     "home",
-    "management"
+    "management",
+    "triggersActionsUi",
+    "kibanaReact"
   ],
-  "optionalPlugins": [],
+  "optionalPlugins": ["security"],
   "configPath": [
     "xpack",
-    "ezReporting"
+    "ezreporting",
+    "ezreporting_management"
   ],
   "extraPublicDirs": [
     "common"
