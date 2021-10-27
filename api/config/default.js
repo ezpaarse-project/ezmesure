@@ -15,6 +15,8 @@ module.exports = {
     password: 'changeme',
   },
   kibana: {
+    username: 'kibana_system',
+    password: 'changeme',
     port: 5601,
     host: 'localhost',
   },
@@ -73,5 +75,5 @@ module.exports = {
     secret: 'some-secret',
   },
   appName: 'ezMESURE',
-  passwordResetValidity: 3
+  passwordResetValidity: 3,
 };

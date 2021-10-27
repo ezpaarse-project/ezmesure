@@ -13,6 +13,8 @@
     "apiVersion": "EZMESURE_ELASTIC_VERSION"
   },
   "kibana": {
+    "username": "KIBANA_USERNAME",
+    "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
     "host": "EZMESURE_KIBANA_HOST"
   },

@@ -218,10 +218,31 @@ async function createAdmin() {
   }
 }
 
+async function setKibanaPassword() {
+  const username = config.get('kibana.username');
+  const password = config.get('kibana.password');
+
+  if (!username || !password) { return; }
+
+  appLogger.info(`Updating [${username}] password`);
+
+  try {
+    await elastic.security.changePassword({
+      username,
+      refresh: true,
+      body: { password },
+    });
+  } catch (e) {
+    appLogger.error(`Failed to update Kibana password : ${e.message}`);
+  }
+}
+
 waitForElasticsearch()
   .then(createAdmin)
+  .then(setKibanaPassword)
   .then(start)
-  .catch(() => {
+  .catch((e) => {
+    appLogger.error(e);
     appLogger.error('Error during bootstrap, shutting down...');
     process.exit(1);
   });

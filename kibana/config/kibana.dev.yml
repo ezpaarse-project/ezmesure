@@ -1,6 +1,4 @@
 elasticsearch.hosts:
   - http://elastic:9200/
 server.host: "0.0.0.0"
-elasticsearch.username: ${EZMESURE_ADMIN_USERNAME}
-elasticsearch.password: ${EZMESURE_ADMIN_PASSWORD}
 xpack.reporting.enabled: false
