@@ -6,6 +6,7 @@ services:
       service: elastic
 
   kibana:
+    image: ezmesure_kibana_dev
     build:
       context: ./kibana
       dockerfile: Dockerfile-dev
