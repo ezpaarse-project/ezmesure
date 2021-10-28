@@ -161,8 +161,8 @@ export default {
           text: app.i18n.t('actions'),
           value: 'actions',
           sortable: false,
-          width: '80px',
-          align: 'right',
+          width: '85px',
+          align: 'center',
         },
       ],
     };

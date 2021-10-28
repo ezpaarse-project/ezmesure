@@ -120,14 +120,12 @@
         <v-menu>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              small
-              color="primary"
+              icon
               v-bind="attrs"
               v-on="on"
             >
-              {{ $t('actions') }}
-              <v-icon right>
-                mdi-menu-down
+              <v-icon>
+                mdi-cog
               </v-icon>
             </v-btn>
           </template>
@@ -254,11 +252,11 @@ export default {
           width: '220px',
         },
         {
-          text: '',
+          text: this.$t('actions'),
           value: 'actions',
           sortable: false,
-          width: '150px',
-          align: 'right',
+          width: '85px',
+          align: 'center',
         },
       ];
     },

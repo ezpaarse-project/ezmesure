@@ -2,15 +2,13 @@
   <v-menu>
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        small
-        color="primary"
+        icon
         :disabled="isContact && !isAdmin"
         v-bind="attrs"
         v-on="on"
       >
-        {{ $t('actions') }}
-        <v-icon right>
-          mdi-menu-down
+        <v-icon>
+          mdi-cog
         </v-icon>
       </v-btn>
     </template>
