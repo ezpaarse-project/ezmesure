@@ -5,8 +5,10 @@ EZMESURE_BASE_URL="http://localhost:3000"
 
 echo "Instantiation will be done on ${EZMESURE_BASE_URL}"
 read -p "Are you sure you want to continue [y/N]: " choice
-case "$choice" in 
-  n|N|*)
+case "$choice" in
+  y|Y)
+    ;;
+  *)
     echo 'To change ezMESURE API entrypoint set --api parameter'
     exit 0
   ;;
