@@ -6,12 +6,11 @@ RUN useradd -rm -d /home/kbn-dev -s /bin/bash -u 8854 kbn-dev \
 
 USER kbn-dev
 
-WORKDIR /home/kbn-dev
+RUN mkdir /home/kbn-dev/kibana
+WORKDIR /home/kbn-dev/kibana
 
-RUN git clone --progress --verbose https://github.com/elastic/kibana \
-  && cd ./kibana \
-  && git checkout 7.14 \
-  && yarn kbn bootstrap
+RUN git clone --depth 1 --branch 7.14 --single-branch --progress --verbose https://github.com/elastic/kibana .
+RUN yarn kbn bootstrap
 
 EXPOSE 5601
 EXPOSE 5603
