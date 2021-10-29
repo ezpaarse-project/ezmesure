@@ -32,7 +32,16 @@ if [[ -z "$EZMESURE_DISABLE_SHIBBOLETH" ]]; then
       -e "s|{{SHIBBOLETH_DS_URL}}|${SHIBBOLETH_DS_URL}|" \
       /etc/shibboleth/shibboleth2.dist.xml > /etc/shibboleth/shibboleth2.xml
 
+  a2enmod shib
+  a2enconf shib
+  a2ensite default-ssl
+  a2dissite default-ssl-no-shib
   /etc/init.d/shibd start
+else
+  a2dismod shib
+  a2disconf shib
+  a2ensite default-ssl-no-shib
+  a2dissite default-ssl
 fi
 
 # Apache gets grumpy about pre-existing PID files
