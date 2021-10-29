@@ -104,7 +104,8 @@
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
-      :items-per-page="15"
+      :items-per-page="50"
+      :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
       show-select
       show-expand
       single-expand
