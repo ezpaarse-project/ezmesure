@@ -40,7 +40,7 @@
       </v-btn>
     </ToolBar>
 
-    <v-container>
+    <v-container fluid>
       <div>{{ $t('institutions.sushi.pageDescription') }}</div>
       <div><strong>{{ $t('institutions.sushi.pageDescription2') }}</strong></div>
     </v-container>
