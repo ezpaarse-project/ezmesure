@@ -17,11 +17,6 @@ fi
 # Allow shibboleth to write in a mounted volume
 chown -R _shibd:_shibd /var/cache/shibboleth
 
-# patch shibboleth2.xml config file with SP/DS URLs
-sed -e "s|{{SHIBBOLETH_SP_URL}}|${SHIBBOLETH_SP_URL:-http://www.example.com}|" \
-    -e "s|{{SHIBBOLETH_DS_URL}}|${SHIBBOLETH_DS_URL:-http://www.example.com}|" \
-    /etc/shibboleth/shibboleth2.dist.xml > /etc/shibboleth/shibboleth2.xml
-
 if [[ -z "$EZMESURE_DISABLE_SHIBBOLETH" ]]; then
   if [[ ! -v SHIBBOLETH_SP_URL ]]; then
     echo "Missing env: SHIBBOLETH_SP_URL"
@@ -31,6 +26,11 @@ if [[ -z "$EZMESURE_DISABLE_SHIBBOLETH" ]]; then
     echo "Missing env: SHIBBOLETH_DS_URL"
     exit 1
   fi
+
+  # patch shibboleth2.xml config file with SP/DS URLs
+  sed -e "s|{{SHIBBOLETH_SP_URL}}|${SHIBBOLETH_SP_URL}|" \
+      -e "s|{{SHIBBOLETH_DS_URL}}|${SHIBBOLETH_DS_URL}|" \
+      /etc/shibboleth/shibboleth2.dist.xml > /etc/shibboleth/shibboleth2.xml
 
   /etc/init.d/shibd start
 fi
