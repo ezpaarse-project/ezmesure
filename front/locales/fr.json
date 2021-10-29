@@ -229,6 +229,7 @@
       "enterAPIKey": "Veuillez saisir une Clé API.",
       "comment": "Commentaire",
       "credentials": "Identifiants Sushi",
+      "manageNcredentials": "Gérer les identifiants | Gérer {count} identifiants",
       "pleaseEnterParams": "Si les requêtes vers l'endpoint Sushi nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
       "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)"
     },
@@ -360,6 +361,7 @@
   "fixIt": "Corriger",
   "leaveIt": "Laisser tel quel",
   "nSelected": "{count} sélectionné(s)",
+  "deselect": "Désélectionner",
   "requiredFields": "* champs obligatoires",
   "formSendingFailed": "L'envoi du formulaire a échoué",
   "add": "Ajouter",

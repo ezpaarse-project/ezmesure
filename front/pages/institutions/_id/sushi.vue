@@ -1,65 +1,43 @@
 <template>
   <section>
-    <ToolBar
-      :title="toolbarTitle"
-      :dark="hasSelection"
-    >
-      <template v-if="hasSelection" v-slot:nav-icon>
-        <v-btn icon @click="clearSelection">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
+    <ToolBar :title="institutionName">
+      <v-spacer />
 
-      <template v-if="hasSelection" v-slot:default>
-        <v-spacer />
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        :label="$t('search')"
+        solo
+        dense
+        hide-details
+        autocomplete="off"
+        style="max-width: 200px"
+      />
 
-        <v-btn text @click="deleteData">
-          <v-icon left>
-            mdi-delete
-          </v-icon>
-          {{ $t('delete') }}
-        </v-btn>
-      </template>
+      <v-btn
+        v-if="hasInstitution"
+        color="primary"
+        text
+        :loading="refreshing"
+        @click.stop="refreshSushiItems"
+      >
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        {{ $t('refresh') }}
+      </v-btn>
 
-      <template v-else v-slot:default>
-        <v-spacer />
-
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          :label="$t('search')"
-          solo
-          dense
-          hide-details
-          autocomplete="off"
-          style="max-width: 200px"
-        />
-
-        <v-btn
-          v-if="hasInstitution"
-          color="primary"
-          text
-          :loading="refreshing"
-          @click.stop="refreshSushiItems"
-        >
-          <v-icon left>
-            mdi-refresh
-          </v-icon>
-          {{ $t('refresh') }}
-        </v-btn>
-
-        <v-btn
-          v-if="hasInstitution"
-          color="primary"
-          text
-          @click.stop="createSushiItem"
-        >
-          <v-icon left>
-            mdi-key-plus
-          </v-icon>
-          {{ $t('add') }}
-        </v-btn>
-      </template>
+      <v-btn
+        v-if="hasInstitution"
+        color="primary"
+        text
+        @click.stop="createSushiItem"
+      >
+        <v-icon left>
+          mdi-key-plus
+        </v-icon>
+        {{ $t('add') }}
+      </v-btn>
     </ToolBar>
 
     <v-container>
@@ -75,6 +53,49 @@
 
     <SushiHistory ref="sushiHistory" />
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
+
+    <v-menu nudge-width="100" style="z-index:100">
+      <template v-slot:activator="{ on, attrs }">
+        <v-slide-y-reverse-transition>
+          <v-btn
+            v-show="hasSelection"
+            fixed
+            bottom
+            right
+            large
+            color="primary"
+            style="z-index:50"
+            v-bind="attrs"
+            v-on="on"
+          >
+            {{ $tc('institutions.sushi.manageNcredentials', selected.length) }}
+            <v-icon right>
+              mdi-chevron-down
+            </v-icon>
+          </v-btn>
+        </v-slide-y-reverse-transition>
+      </template>
+
+      <v-list>
+        <v-list-item :loading="deleting" @click="deleteData">
+          <v-list-item-icon>
+            <v-icon>mdi-delete</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title v-text="$t('delete')" />
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click="clearSelection">
+          <v-list-item-icon>
+            <v-icon>mdi-close</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title v-text="$t('deselect')" />
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
     <v-data-table
       v-if="hasInstitution"
@@ -214,6 +235,7 @@ export default {
       sushiItems: [],
       selected: [],
       refreshing: false,
+      deleting: false,
       search: '',
       platforms,
     };
@@ -268,13 +290,6 @@ export default {
     },
     hasSelection() {
       return this.selected.length > 0;
-    },
-    toolbarTitle() {
-      if (this.hasSelection) {
-        return this.$t('nSelected', { count: this.selected.length });
-      }
-
-      return this.institutionName;
     },
     itemActions() {
       return [
@@ -367,6 +382,8 @@ export default {
         return;
       }
 
+      this.deleting = true;
+
       const ids = this.selected.map(select => select.id);
       let response;
 
@@ -377,8 +394,11 @@ export default {
         }
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
+        this.deleting = false;
         return;
       }
+
+      this.deleting = false;
 
       const failed = response.filter(item => item?.status !== 'deleted');
       const deleted = response.filter(item => item?.status === 'deleted');
@@ -386,7 +406,6 @@ export default {
       failed.forEach(({ id }) => {
         this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
       });
-
 
       if (deleted.length > 0) {
         this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
