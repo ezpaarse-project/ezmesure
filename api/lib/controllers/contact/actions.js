@@ -17,7 +17,7 @@ exports.contact = async (ctx) => {
       ...generateMail('contact', { body, appName: config.get('appName') }),
     });
   } catch (err) {
-    appLogger.error('Failed to send mail', err);
+    appLogger.error(`Failed to send mail: ${err}`);
     ctx.status = 500;
   }
 };
