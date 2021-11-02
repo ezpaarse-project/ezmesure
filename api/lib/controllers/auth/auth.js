@@ -107,7 +107,7 @@ exports.renaterLogin = async (ctx) => {
     try {
       await sendWelcomeMail(user);
     } catch (err) {
-      appLogger.error('Failed to send mail', err);
+      appLogger.error(`Failed to send mail: ${err}`);
     }
   } else if (query.refresh) {
     ctx.action = 'user/refresh';
@@ -225,8 +225,8 @@ exports.resetPassword = async (ctx) => {
   }
 
   const { username, expiresAt, createdAt } = decoded;
-  
-  
+
+
   let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
   if (!tokenIsValid) {
     ctx.throw(400, ctx.$t('errors.password.expires'));
