@@ -54,7 +54,7 @@ const requireAnyRole = (role) => async (ctx, next) => {
 
 /**
  * Middleware that fetches an institution and put it in ctx.state.institution
- * Assumes that the route param institutionId is present
+ * Looks for institutionId in the route params by default
  */
 function fetchInstitution(opts = {}) {
   const { query: queryField } = opts;
@@ -67,7 +67,10 @@ function fetchInstitution(opts = {}) {
   return async (ctx, next) => {
     let institutionId;
 
-    if (paramField) {
+    if (typeof opts === 'function') {
+      institutionId = opts(ctx);
+    }
+    if (paramField && !institutionId) {
       institutionId = ctx.params[paramField];
     }
     if (queryField && !institutionId) {
