@@ -2,13 +2,18 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
+const Institution = require('../../models/Institution');
+const { appLogger } = require('../../services/logger');
 const {
   requireJwt,
   requireUser,
+  requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
   fetchInstitution,
+  fetchSushi,
   requireContact,
+  requireValidatedInstitution,
 } = require('../../services/auth');
 
 const {
@@ -34,7 +39,10 @@ router.use(
 router.route({
   method: 'GET',
   path: '/',
-  handler: getAll,
+  handler: [
+    requireAdmin,
+    getAll,
+  ],
 });
 
 router.route({
@@ -50,7 +58,16 @@ router.route({
 router.route({
   method: 'POST',
   path: '/batch_delete',
-  handler: deleteSushiData,
+  handler: [
+    async (ctx, next) => {
+      const { user } = ctx.state;
+      ctx.state.institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
+      return next();
+    },
+    requireContact(),
+    requireValidatedInstitution(),
+    deleteSushiData,
+  ],
   validate: {
     type: 'json',
     body: {
@@ -62,7 +79,12 @@ router.route({
 router.route({
   method: 'POST',
   path: '/',
-  handler: addSushi,
+  handler: [
+    fetchInstitution((ctx) => ctx?.request?.body?.institutionId),
+    requireContact(),
+    requireValidatedInstitution(),
+    addSushi,
+  ],
   validate: {
     type: 'json',
     body: Sushi.createSchema,
@@ -90,10 +112,26 @@ router.route({
   },
 });
 
+/**
+ * Fetch the SUSHI item from the param sushiId
+ * Fetch the associated institution
+ * Check that the user is either admin or institution contact
+ * Check that the institution is validated
+ */
+const commonHandlers = [
+  fetchSushi(),
+  fetchInstitution((ctx) => ctx?.state?.sushi?.get?.('institutionId')),
+  requireContact(),
+  requireValidatedInstitution({ ignoreIfAdmin: true }),
+];
+
 router.route({
   method: 'GET',
   path: '/:sushiId',
-  handler: getOne,
+  handler: [
+    commonHandlers,
+    getOne,
+  ],
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
@@ -104,7 +142,10 @@ router.route({
 router.route({
   method: 'GET',
   path: '/:sushiId/tasks',
-  handler: getTasks,
+  handler: [
+    commonHandlers,
+    getTasks,
+  ],
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
@@ -115,7 +156,10 @@ router.route({
 router.route({
   method: 'GET',
   path: '/:sushiId/reports',
-  handler: getAvailableReports,
+  handler: [
+    commonHandlers,
+    getAvailableReports,
+  ],
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
@@ -126,7 +170,10 @@ router.route({
 router.route({
   method: 'PATCH',
   path: '/:sushiId',
-  handler: updateSushi,
+  handler: [
+    commonHandlers,
+    updateSushi,
+  ],
   validate: {
     type: 'json',
     params: {
@@ -141,7 +188,10 @@ requireAnyRole(['admin', 'superuser']);
 router.route({
   method: 'GET',
   path: '/:sushiId/report.json',
-  handler: downloadReport,
+  handler: [
+    commonHandlers,
+    downloadReport,
+  ],
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
@@ -156,7 +206,10 @@ router.route({
 router.route({
   method: 'POST',
   path: '/:sushiId/_import',
-  handler: importSushi,
+  handler: [
+    commonHandlers,
+    importSushi,
+  ],
   validate: {
     type: 'json',
     params: {

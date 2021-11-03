@@ -2,100 +2,34 @@ const fs = require('fs-extra');
 const format = require('date-fns/format');
 const subMonths = require('date-fns/subMonths');
 
-const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 
-const isAdmin = (user) => {
-  const roles = new Set((user && user.roles) || []);
-  return (roles.has('admin') || roles.has('superuser'));
-};
-
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
-  const { user } = ctx.state;
-
-  if (!isAdmin(user)) {
-    ctx.throw(403, ctx.$t('errors.unauthorized'));
-    return;
-  }
-
   ctx.body = await Sushi.findAll();
 };
 
 exports.getOne = async (ctx) => {
-  const { sushiId } = ctx.params;
-  const { user } = ctx.state;
-
-  const sushiItem = await Sushi.findById(sushiId);
-
-  if (!sushiItem) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-  if (!isAdmin(user)) {
-    const institution = await sushiItem.getInstitution();
-
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-  }
+  const { sushi } = ctx.state;
 
   ctx.status = 200;
-  ctx.body = sushiItem;
+  ctx.body = sushi;
 };
 
 exports.getTasks = async (ctx) => {
-  const { sushiId } = ctx.params;
-  const { user } = ctx.state;
-
-  const sushiItem = await Sushi.findById(sushiId);
-
-  if (!sushiItem) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-  if (!isAdmin(user)) {
-    const institution = await sushiItem.getInstitution();
-
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-  }
+  const { sushi } = ctx.state;
 
   ctx.status = 200;
-  ctx.body = await Task.findBySushiId(sushiId);
+  ctx.body = await Task.findBySushiId(sushi.getId());
 };
 
 exports.addSushi = async (ctx) => {
   const { body } = ctx.request;
-  const { user } = ctx.state;
-
-  const institution = await Institution.findById(body.institutionId);
-
-  if (!institution) {
-    ctx.throw(404, ctx.$t('errors.institution.notFound'));
-    return;
-  }
-
-  if (!isAdmin(user)) {
-    if (!institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
-  }
 
   const sushiItem = new Sushi(body);
   await sushiItem.save();
@@ -105,63 +39,29 @@ exports.addSushi = async (ctx) => {
 };
 
 exports.updateSushi = async (ctx) => {
-  const { sushiId } = ctx.params;
-  const { user } = ctx.state;
+  const { sushi } = ctx.state;
   const { body } = ctx.request;
 
-  const sushiItem = await Sushi.findById(sushiId);
-
-  if (!sushiItem) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-  if (!isAdmin(user)) {
-    const institution = await sushiItem.getInstitution();
-
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
-  }
-
-  sushiItem.update(body);
+  sushi.update(body);
 
   try {
-    await sushiItem.save();
+    await sushi.save();
   } catch (e) {
     throw new Error(e);
   }
 
   ctx.status = 200;
-  ctx.body = sushiItem;
+  ctx.body = sushi;
 };
 
 exports.deleteSushiData = async (ctx) => {
   const { body } = ctx.request;
-  const { user } = ctx.state;
-
-  const institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
-
-  if (!isAdmin(user)) {
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
-  }
+  const { userIsAdmin, institution } = ctx.state;
 
   const sushiItems = await Sushi.findManyById(body.ids);
 
   const response = await Promise.all(sushiItems.map(async (sushiItem) => {
-    if (!isAdmin(user) && (sushiItem.getInstitutionId() !== institution.id)) {
+    if (!userIsAdmin && (sushiItem.getInstitutionId() !== institution.id)) {
       return { id: sushiItem.id, status: 'failed' };
     }
 
@@ -169,7 +69,7 @@ exports.deleteSushiData = async (ctx) => {
       await sushiItem.delete();
       return { id: sushiItem.id, status: 'deleted' };
     } catch (error) {
-      appLogger.error('Failed to delete sushi data', error);
+      appLogger.error(`Failed to delete sushi data: ${error}`);
       return { id: sushiItem.id, status: 'failed' };
     }
   }));
@@ -179,29 +79,7 @@ exports.deleteSushiData = async (ctx) => {
 };
 
 exports.getAvailableReports = async (ctx) => {
-  const { sushiId } = ctx.params;
-  const { user } = ctx.state;
-
-  const sushi = await Sushi.findById(sushiId);
-
-  if (!sushi) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-
-  if (!isAdmin(user)) {
-    const institution = await sushi.getInstitution();
-
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
-  }
+  const { sushi } = ctx.state;
 
   let reports;
   let exceptions;
@@ -238,9 +116,8 @@ exports.getAvailableReports = async (ctx) => {
 };
 
 exports.downloadReport = async (ctx) => {
-  const { sushiId } = ctx.params;
   const { query = {} } = ctx.request;
-  const { user } = ctx.state;
+  const { sushi } = ctx.state;
   let { beginDate, endDate } = query;
 
   if (!beginDate && !endDate) {
@@ -251,26 +128,6 @@ exports.downloadReport = async (ctx) => {
     endDate = beginDate;
   } else {
     beginDate = endDate;
-  }
-
-  const sushi = await Sushi.findById(sushiId);
-
-  if (!sushi) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-  const institution = sushi.getInstitution();
-
-  if (!isAdmin(user)) {
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
   }
 
   const sushiData = { sushi, beginDate, endDate };
@@ -304,34 +161,13 @@ exports.downloadReport = async (ctx) => {
 };
 
 exports.importSushi = async (ctx) => {
-  const { sushiId } = ctx.params;
   const { body = {} } = ctx.request;
-  const { user } = ctx.state;
+  const { sushi, user, institution } = ctx.state;
   const {
     target: index,
     beginDate,
     endDate,
   } = body;
-
-  const sushi = await Sushi.findById(sushiId);
-
-  if (!sushi) {
-    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-    return;
-  }
-
-  const institution = await sushi.getInstitution();
-
-  if (!isAdmin(user)) {
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.sushi.unauthorized'));
-      return;
-    }
-    if (!institution.isValidated()) {
-      ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
-      return;
-    }
-  }
 
   const { body: perm } = await elastic.security.hasPrivileges({
     username: user.username,

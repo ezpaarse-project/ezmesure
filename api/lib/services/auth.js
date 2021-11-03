@@ -53,6 +53,14 @@ const requireAnyRole = (role) => async (ctx, next) => {
   await next();
 };
 
+const requireAdmin = (ctx, next) => {
+  if (!ctx.state?.userIsAdmin) {
+    ctx.throw(403, ctx.$t('errors.perms.feature'));
+  }
+
+  return next();
+};
+
 /**
  * Middleware that fetches an institution and put it in ctx.state.institution
  * Looks for institutionId in the route params by default
@@ -167,6 +175,7 @@ function requireValidatedInstitution(opts = {}) {
 module.exports = {
   requireJwt,
   requireUser,
+  requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
   fetchInstitution,
