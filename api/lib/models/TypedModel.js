@@ -225,7 +225,6 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
       throw new Error('invalid elastic response');
     }
 
-
     const items = body.hits.hits.map((hit) => {
       const { _source: source, _id: id } = hit;
       return (source && source[type]) && this.from({ id, ...source[type] });
