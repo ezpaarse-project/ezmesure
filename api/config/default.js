@@ -21,6 +21,8 @@ module.exports = {
   smtp: {
     host: 'localhost',
     port: 25,
+    secure: false,
+    ignoreTLS: false,
   },
   logs: {
     app: {
