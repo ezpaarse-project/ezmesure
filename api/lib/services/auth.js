@@ -1,7 +1,8 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
-const elastic = require('../services/elastic');
+const elastic = require('./elastic');
 const Institution = require('../models/Institution');
+const Sushi = require('../models/Sushi');
 
 const requireJwt = jwt({
   secret: auth.secret,
@@ -90,6 +91,43 @@ function fetchInstitution(opts = {}) {
 }
 
 /**
+ * Middleware that fetches a SUSHI item and put it in ctx.state.sushi
+ * Looks for sushiId in the route params by default
+ */
+function fetchSushi(opts = {}) {
+  const { query: queryField } = opts;
+  let { params: paramField } = opts;
+
+  if (!paramField && !queryField) {
+    paramField = 'sushiId';
+  }
+
+  return async (ctx, next) => {
+    let sushiId;
+
+    if (typeof opts === 'function') {
+      sushiId = opts(ctx);
+    }
+    if (paramField && !sushiId) {
+      sushiId = ctx.params[paramField];
+    }
+    if (queryField && !sushiId) {
+      sushiId = ctx.query[queryField];
+    }
+
+    const sushi = await Sushi.findById(sushiId);
+
+    if (!sushi) {
+      ctx.throw(404, ctx.$t('errors.sushi.notFound'));
+      return;
+    }
+
+    ctx.state.sushi = sushi;
+    await next();
+  };
+}
+
+/**
  * Middleware that checks that user is either admin or institution contact
  * Assumes that ctx.state contains institution and user
  */
@@ -114,5 +152,6 @@ module.exports = {
   requireTermsOfUse,
   requireAnyRole,
   fetchInstitution,
+  fetchSushi,
   requireContact,
 };
