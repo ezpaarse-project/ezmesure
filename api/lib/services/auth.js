@@ -146,6 +146,24 @@ function requireContact(opts = {}) {
   };
 }
 
+/**
+ * Middleware that checks that the institution is valid
+ * Assumes that ctx.state contains institution
+ */
+function requireValidatedInstitution(opts = {}) {
+  const { ignoreIfAdmin } = opts;
+
+  return (ctx, next) => {
+    const { institution, userIsAdmin } = ctx.state;
+
+    if (userIsAdmin && ignoreIfAdmin) { return next(); }
+    if (institution?.get?.('validated') === true) { return next(); }
+
+    ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
+    return undefined;
+  };
+}
+
 module.exports = {
   requireJwt,
   requireUser,
@@ -154,4 +172,5 @@ module.exports = {
   fetchInstitution,
   fetchSushi,
   requireContact,
+  requireValidatedInstitution,
 };
