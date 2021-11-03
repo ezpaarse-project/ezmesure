@@ -22,7 +22,10 @@
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT",
     "secure": { "__name": "EZMESURE_SMTP_SECURE", "__format": "boolean" },
-    "ignoreTLS": { "__name": "EZMESURE_SMTP_IGNORE_TLS", "__format": "boolean" }
+    "ignoreTLS": { "__name": "EZMESURE_SMTP_IGNORE_TLS", "__format": "boolean" },
+    "tls": {
+      "rejectUnauthorized": { "__name": "EZMESURE_SMTP_REJECT_UNAUTHORIZED", "__format": "boolean" }
+    }
   },
   "notifications": {
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
