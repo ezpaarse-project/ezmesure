@@ -233,7 +233,11 @@
       "pleaseEnterParams": "If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.",
       "soapWarning": "The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)",
       "checkConnection": "Check connection",
-      "cannotCheckConnection": "Failed to check connection to {name}"
+      "cannotCheckConnection": "Failed to check connection to {name}",
+      "connectionSuccessful": "Successful connection",
+      "connectionFailed": "Connection failed",
+      "connectionUntested": "Connection untested",
+      "testedOn": "Tested on {date}"
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
