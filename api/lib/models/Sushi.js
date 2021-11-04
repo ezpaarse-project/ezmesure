@@ -21,7 +21,11 @@ const schema = {
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
 
-
+  connection: Joi.object({
+    success: Joi.boolean(),
+    date: Joi.date(),
+    exceptions: Joi.array().items(Joi.string()),
+  }),
   latestImportTask: Joi.object(),
 
   params: Joi.array().items(Joi.object({

@@ -4,6 +4,7 @@ const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
 const Institution = require('../../models/Institution');
 const { appLogger } = require('../../services/logger');
+const { stringifyException } = require('../../services/sushi');
 const {
   requireJwt,
   requireUser,
@@ -145,6 +146,54 @@ router.route({
   handler: [
     commonHandlers,
     getTasks,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/connection',
+  handler: [
+    commonHandlers,
+    async (ctx) => {
+      let error;
+      try {
+        await getAvailableReports(ctx);
+      } catch (e) {
+        error = e;
+      }
+
+      const { sushi } = ctx.state;
+
+      const exceptions = Array.isArray(ctx.exceptions)
+        ? ctx.exceptions.map(stringifyException)
+        : [];
+
+      if (exceptions.length === 0 && error?.isAxiosError) {
+        const status = error?.response?.status;
+        const statusText = error?.response?.statusText;
+        exceptions.push(`Endpoint responded with ${status} ${statusText}`);
+      }
+
+      sushi.set('connection', {
+        success: !error && ctx.status === 200,
+        date: new Date(),
+        exceptions,
+      });
+
+      try {
+        await sushi.save();
+      } catch (e) {
+        throw new Error(e);
+      }
+
+      ctx.status = 200;
+      ctx.body = sushi.get('connection');
+    },
   ],
   validate: {
     params: {
