@@ -606,6 +606,21 @@ async function initSushiImport(opts = {}) {
   return task;
 }
 
+function stringifyException(exception) {
+  if (!exception?.Message) { return ''; }
+
+  const {
+    Code: code,
+    Severity: severity,
+    Message: msg,
+  } = exception;
+
+  let message = severity ? `[${severity}] ` : '';
+  message += code ? `[#${code}] ` : '';
+  message += msg;
+  return message;
+}
+
 module.exports = {
   getReport,
   validateReport,
@@ -618,4 +633,5 @@ module.exports = {
   initiateDownload,
   getExceptions,
   initSushiImport,
+  stringifyException,
 };
