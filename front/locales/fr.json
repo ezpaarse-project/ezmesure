@@ -231,7 +231,9 @@
       "credentials": "Identifiants Sushi",
       "manageNcredentials": "Gérer les identifiants | Gérer {count} identifiants",
       "pleaseEnterParams": "Si les requêtes vers l'endpoint Sushi nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
-      "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)"
+      "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)",
+      "checkConnection": "Vérifier la connexion",
+      "cannotCheckConnection": "Échec de la connexion à {name}"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",

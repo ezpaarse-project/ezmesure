@@ -77,6 +77,15 @@
       </template>
 
       <v-list>
+        <v-list-item :disabled="testingConnection" @click="checkConnection">
+          <v-list-item-icon>
+            <v-icon>mdi-connection</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title v-text="$t('institutions.sushi.checkConnection')" />
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item :loading="deleting" @click="deleteData">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
@@ -125,6 +134,13 @@
         <td :colspan="headers.length - 1" class="py-4">
           <SushiDetails :item="item" />
         </td>
+      </template>
+
+      <template v-slot:item.status="{ item }">
+        <SushiConnectionIcon
+          :connection="item.connection"
+          :loading="loadingItems[item.id]"
+        />
       </template>
 
       <template v-slot:item.latestImportTask="{ item }">
@@ -182,6 +198,7 @@
 <script>
 import ToolBar from '~/components/space/ToolBar';
 import SushiDetails from '~/components/SushiDetails';
+import SushiConnectionIcon from '~/components/SushiConnectionIcon';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
@@ -194,6 +211,7 @@ export default {
   components: {
     ToolBar,
     SushiDetails,
+    SushiConnectionIcon,
     SushiForm,
     SushiHistory,
     ReportsDialog,
@@ -239,11 +257,18 @@ export default {
       deleting: false,
       search: '',
       platforms,
+      loadingItems: {},
     };
   },
   computed: {
     headers() {
       return [
+        {
+          text: this.$t('status'),
+          value: 'status',
+          align: 'center',
+          width: '100px',
+        },
         {
           text: this.$t('institutions.sushi.platform'),
           value: 'vendor',
@@ -291,6 +316,9 @@ export default {
     },
     hasSelection() {
       return this.selected.length > 0;
+    },
+    testingConnection() {
+      return Object.keys(this.loadingItems).length > 0;
     },
     itemActions() {
       return [
@@ -376,6 +404,35 @@ export default {
 
     clearSelection() {
       this.selected = [];
+    },
+
+    async checkConnection() {
+      if (!this.hasSelection) { return; }
+
+      const loadingItems = {};
+      const selected = this.selected.slice();
+
+      selected.forEach((s) => {
+        loadingItems[s.id] = true;
+      });
+
+      this.$set(this, 'loadingItems', loadingItems);
+      this.clearSelection();
+
+      for (let i = 0; i < selected.length; i += 1) {
+        const sushiItem = selected[i];
+
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          sushiItem.connection = await this.$axios.$get(`/sushi/${sushiItem.id}/connection`);
+        } catch (e) {
+          this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
+        }
+
+        this.loadingItems[sushiItem.id] = false;
+      }
+
+      this.$set(this, 'loadingItems', {});
     },
 
     async deleteData() {
