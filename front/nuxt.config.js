@@ -20,8 +20,8 @@ module.exports = {
     'swagger-ui/dist/swagger-ui.css',
     '~/assets/css/custom.scss',
   ],
-  mode: 'spa',
-  env: {
+  ssr: false,
+  telemetry: false,
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
   },
   modules: [
