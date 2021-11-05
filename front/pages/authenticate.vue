@@ -44,7 +44,7 @@
                   {{ errorMessage }}
                 </v-alert>
 
-                <v-form v-model="loginFormValid" @submit.prevent="signin">
+                <v-form v-model="loginFormValid" class="mb-4" @submit.prevent="signin">
                   <v-text-field
                     v-model="username"
                     :label="$t('authenticate.user')"
