@@ -8,7 +8,6 @@ COPY package.json /usr/src/app/
 RUN npm install && npm cache clean --force
 COPY . /usr/src/app
 
-ARG EZMESURE_DISABLE_SHIBBOLETH
 RUN npm run build
 
 ENTRYPOINT ["npm", "start"]

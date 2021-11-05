@@ -22,6 +22,7 @@ module.exports = {
   ],
   ssr: false,
   telemetry: false,
+  publicRuntimeConfig: {
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
   },
   modules: [

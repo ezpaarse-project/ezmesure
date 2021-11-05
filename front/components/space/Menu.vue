@@ -80,7 +80,7 @@
           block
           color="red lighten-2"
           dark
-          href="/Shibboleth.sso/Logout?return=/logout"
+          :href="logoutUrl"
           v-text="$t('menu.logout')"
         />
       </div>
@@ -97,6 +97,9 @@ export default {
     };
   },
   computed: {
+    logoutUrl() {
+      return this.$config.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout';
+    },
     links() {
       return [
         { title: this.$t('menu.profile'), href: '/myspace' },
