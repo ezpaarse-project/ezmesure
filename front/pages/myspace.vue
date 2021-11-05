@@ -89,9 +89,8 @@ export default {
   components: {
     ToolBar,
   },
-  asyncData({ env }) {
+  data() {
     return {
-      logoutUrl: env.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout',
       selectedFiles: [],
       token: '',
     };
