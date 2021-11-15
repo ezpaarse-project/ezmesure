@@ -12,7 +12,12 @@
   },
   "smtp": {
     "host": "REPORTING_SMTP_HOST",
-    "port": "REPORTING_SMTP_PORT"
+    "port": "REPORTING_SMTP_PORT",
+    "secure": { "__name": "REPORTING_SMTP_SECURE", "__format": "boolean" },
+    "ignoreTLS": { "__name": "REPORTING_SMTP_IGNORE_TLS", "__format": "boolean" },
+    "tls": {
+      "rejectUnauthorized": { "__name": "REPORTING_SMTP_REJECT_UNAUTHORIZED", "__format": "boolean" }
+    }
   },
   "email": {
     "attempts": "REPORTING_EMAIL_ATTEMPTS",
