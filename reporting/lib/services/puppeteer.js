@@ -328,7 +328,7 @@ class Reporter {
 
     await insertStyles(page, styles);
     if (print) {
-      await positionElements(page, viewport);
+     // await positionElements(page, viewport);
     }
     await waitForCompleteRender(page);
 

@@ -1,15 +1,15 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const { roleName } = require('config');
 
-const { requireAnyRole } = require('../../services/auth');
+const hasPrivileges = require('../../services/hasPrivileges');
+const isSuperuser = require('../../services/isSuperuser');
 
 const {
   getAll,
   getBySpace,
 } = require('./actions');
 
-router.get('/', requireAnyRole(['admin', 'superuser']), getAll);
+router.get('/', isSuperuser, getAll);
 
 router.get('/:space', {
   validate: {
@@ -17,6 +17,6 @@ router.get('/:space', {
       space: Joi.string().trim(),
     },
   },
-}, requireAnyRole([roleName, `${roleName}_read_only`]), getBySpace);
+}, hasPrivileges(['read']), getBySpace);
 
 module.exports = router;

@@ -269,14 +269,13 @@ exports.history = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const { taskId: id } = ctx.request.params;
-  ctx.taskId = id;
+  const { space } = ctx.request.params;
+  ctx.space = space;
 
-  if (!id) {
+  if (!space) {
     ctx.status = 404;
     return;
   }
-
   try {
     const { body: data } = await elastic.search({
       index: historyIndex,
@@ -293,10 +292,58 @@ exports.history = async (ctx) => {
             must: [
               {
                 match: {
-                  taskId: id,
+                  space,
                 },
               },
             ],
+          },
+        },
+      },
+    });
+
+    const hits = get(data, 'hits.hits');
+
+    ctx.body = [];
+
+    if (hits) {
+      ctx.body = hits.map((historyItem) => {
+        const { _source: historySource, _id: historyId } = historyItem;
+
+        return {
+          id: historyId,
+          ...historySource,
+        };
+      });
+    }
+  } catch (err) {
+    logger.error(err);
+    ctx.status = 500;
+  }
+};
+
+exports.getHistory = async (ctx) => {
+  logger.info('reporting/history');
+  ctx.action = 'reporting/history';
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  const { space } = ctx.request.params;
+  ctx.space = space;
+
+  if (!space) {
+    ctx.status = 404;
+    return;
+  }
+  try {
+    const { body: data } = await elastic.search({
+      index: historyIndex,
+      timeout: '30s',
+      body: {
+        size: 10000,
+        sort: {
+          startTime: {
+            order: 'desc',
           },
         },
       },
