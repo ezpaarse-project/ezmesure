@@ -18,6 +18,10 @@ import { i18n } from '@kbn/i18n';
 
 import { httpClient, toasts, ms2Str, capabilities } from '../../../lib/reporting';
 
+interface Props {
+  admin: boolean;
+}
+
 interface State {
   refreshing: boolean;
   isFlyoutVisible: boolean;
@@ -38,8 +42,9 @@ export function closeFlyOut(): void {
   closeFlyOutHandler();
 }
 
-export class EzReportingHistoryFlyout extends Component<{}, State> {
+export class EzReportingHistoryFlyout extends Component<Props, State> {
   private state: State;
+  private props: Props;
 
   constructor(props) {
     super(props);
@@ -115,13 +120,14 @@ export class EzReportingHistoryFlyout extends Component<{}, State> {
   };
 
   refresh = async () => {
-    const { taskId, expandedRows } = this.state;
+    const { expandedRows } = this.state;
+    const { admin } = this.props;
 
     this.setState({ refreshing: true });
 
     let historyItems;
     try {
-      const resp = await httpClient.get(`/api/ezreporting/tasks/${taskId}/history`);
+      const resp = await httpClient.get(`/api/ezreporting/tasks/history${admin ? '/management' : ''}`);
       historyItems = resp;
     } catch (e) {
       toasts.addDanger({

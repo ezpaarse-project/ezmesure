@@ -1,7 +1,9 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const bodyParser = require('koa-bodyparser');
-const { index, frequencies } = require('config');
+const { frequencies } = require('config');
+const hasPrivileges = require('../../services/hasPrivileges');
+const isSuperuser = require('../../services/isSuperuser');
 
 const {
   getBySpace,
@@ -10,57 +12,9 @@ const {
   update,
   del,
   history,
+  getHistory,
   download,
 } = require('./actions');
-const elastic = require('../../services/elastic');
-
-function hasPrivileges(privileges) {
-  return async (ctx, next) => {
-    const { user } = ctx.query;
-
-    if (!user) {
-      ctx.status = 400;
-      ctx.type = 'json';
-      ctx.body = {
-        error: 'No user specified.',
-        code: 400,
-      };
-      return;
-    }
-
-    try {
-      const { body: perm } = await elastic.security.hasPrivileges({
-        user,
-        body: {
-          index: [{ names: [index], privileges }],
-        },
-      }, {
-        headers: { 'es-security-runas-user': user },
-      });
-
-      const perms = (perm && perm.index && perm.index[index]) || {};
-      const canMakeAction = privileges.every((privilege) => perms[privilege]);
-
-      if (canMakeAction) {
-        await next();
-      } else {
-        ctx.status = 403;
-        ctx.type = 'json';
-        ctx.body = {
-          error: 'You have no rights to access this page.',
-          code: 403,
-        };
-      }
-    } catch (e) {
-      ctx.status = 403;
-      ctx.type = 'json';
-      ctx.body = {
-        error: 'You are not authorize to access this page.',
-        code: 403,
-      };
-    }
-  };
-}
 
 const validate = {
   type: 'json',
@@ -94,7 +48,7 @@ router.route({
   method: 'GET',
   path: '/',
   handler: [
-    hasPrivileges(['create']),
+    isSuperuser,
     getAll,
   ],
 });
@@ -160,7 +114,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:taskId/history',
+  path: '/history/:space',
   handler: [
     hasPrivileges(['read']),
     history,
@@ -169,7 +123,23 @@ router.route({
     failure: 400,
     continueOnError: true,
     params: {
-      taskId: Joi.string().required(),
+      space: Joi.string().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/history',
+  handler: [
+    isSuperuser,
+    getHistory,
+  ],
+  validate: {
+    failure: 400,
+    continueOnError: true,
+    params: {
+      space: Joi.string().required(),
     },
   },
 });
