@@ -21,7 +21,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@koa/cors": "^3.0.0",
-    "config": "^3.2.3",
+    "config": "^3.3.6",
     "cron": "^1.7.2",
     "date-fns": "^2.9.0",
     "fs-extra": "^8.1.0",
