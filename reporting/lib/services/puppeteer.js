@@ -16,6 +16,15 @@ const Frequency = require('./frequency');
 const logger = require('../logger');
 const { sendMail, generateMail } = require('./mail');
 
+
+// Useful element classes:
+// https://github.com/elastic/kibana/blob/7.14/x-pack/plugins/reporting/server/lib/layouts/index.ts#L32-L37
+const selectors = {
+  container: '[data-shared-items-container]',
+  renderComplete: '[data-shared-item]',
+  itemCountsAttribute: 'data-shared-items-count',
+};
+
 const assetsDir = path.resolve(__dirname, '..', '..', 'assets');
 
 function loadStyles() {
@@ -49,25 +58,39 @@ function insertStyles(page, css) {
 }
 
 function positionElements(page, viewport) {
-  return page.evaluate((vp) => {
+  return page.evaluate((vp, select) => {
     // eslint-disable-next-line no-undef
-    const visualizations = document.querySelectorAll('.dshLayout--viewing .react-grid-item');
+    const visualizations = document.querySelectorAll(`${select.container} .react-grid-item`);
     const pageHeight = vp.height - vp.margin.top - vp.margin.bottom;
 
     if (visualizations && visualizations.length) {
-      const grid = document.querySelector('.dshLayout--viewing');
+      // eslint-disable-next-line no-undef
+      const grid = document.querySelector(select.container);
       grid.style.height = `${pageHeight * (visualizations.length - 1)}px`;
     }
 
     visualizations.forEach((visualization, index) => {
       visualization.style.setProperty('top', `${(pageHeight) * index}px`, 'important');
     });
-  }, viewport);
+  }, viewport, selectors);
 }
 
-function waitForCompleteRender(page) {
-  page.evaluate(() => {
-    const allVis = document.querySelectorAll('[data-shared-item]'); // eslint-disable-line no-undef
+async function waitForCompleteRender(page, visCount) {
+  // Wait for all visualizations to be in the DOM
+  await page.waitForFunction(
+    (selector, numberOfVis) => {
+      // eslint-disable-next-line no-undef
+      const { length } = document.querySelectorAll(selector);
+      return length >= numberOfVis;
+    },
+    {}, // options
+    selectors.renderComplete,
+    visCount,
+  );
+
+  await page.evaluate((select) => {
+    // eslint-disable-next-line no-undef
+    const allVis = document.querySelectorAll(select.renderComplete);
     const renderedTasks = [];
 
     function waitForRender(visualization) {
@@ -92,7 +115,7 @@ function waitForCompleteRender(page) {
     });
 
     return Promise.all(renderedTasks);
-  });
+  }, selectors);
 }
 
 class Reporter {
@@ -146,7 +169,7 @@ class Reporter {
     return page;
   }
 
-  async testPuppeteer () {
+  async testPuppeteer() {
     try {
       await this.launchBrowser();
       await this.closeBrowser();
@@ -154,15 +177,14 @@ class Reporter {
     } catch (error) {
       logger.error('Puppeteer : can\'t get started');
       logger.error(error);
-      console.error(error);
 
       await sendMail({
         from: sender,
         to: sender,
-        subject: `Reporting - erreur test puppeteer`,
+        subject: 'Reporting - erreur test puppeteer',
         ...generateMail('error', {
           message: 'Une erreur est survenue pendant le test de puppeteer.',
-          error: error,
+          error,
         }),
       });
     }
@@ -259,17 +281,17 @@ class Reporter {
     });
 
     // Wait for either login form or dashboard wrapper
-    await page.waitFor('.login-form, .dshLayout--viewing');
+    await page.waitFor(`.login-form, ${selectors.container}`);
 
     const loginForm = await page.$('.login-form');
     if (loginForm) {
       await page.type('input[name=username]', elasticsearch.username);
       await page.type('input[name=password]', elasticsearch.password);
       await page.keyboard.press('Enter');
-      await page.waitFor('.dshLayout--viewing');
+      await page.waitFor(selectors.container);
     }
 
-    const dashboardViewport = await page.$('.dshLayout--viewing');
+    const dashboardViewport = await page.$(selectors.container);
     const boundingBox = await dashboardViewport.boundingBox();
 
     // 792x1122 = A4 at 96PPI
@@ -311,26 +333,34 @@ class Reporter {
           min-width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
           width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
         }
-        dashboard-app .react-grid-item {
-          position: fixed !important;
+        ${selectors.container} .react-grid-item {
           left: 0 !important;
-          background-color: inherit !important;
           z-index: 1 !important;
           width: ${viewport.width - viewport.margin.right - viewport.margin.left}px !important;
           height: ${viewport.height - viewport.margin.top - viewport.margin.bottom}px !important;
           transform: none !important;
           -webkit-transform: none !important;
+        }
+        ${selectors.container} .euiPanel {
           box-shadow: none;
           -webkit-box-shadow: none;
+          background-color: inherit !important;
         }
       `;
     }
 
+    const visCount = await page.evaluate(
+      (el, attr) => el.getAttribute(attr),
+      dashboardViewport,
+      selectors.itemCountsAttribute,
+    );
+
     await insertStyles(page, styles);
+    await waitForCompleteRender(page, visCount);
+
     if (print) {
-     // await positionElements(page, viewport);
+      await positionElements(page, viewport);
     }
-    await waitForCompleteRender(page);
 
     dashboardViewport.dispose();
 

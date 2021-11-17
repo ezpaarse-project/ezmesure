@@ -5,7 +5,7 @@
  ******
  */
 
-/**
+ /**
  *  global
  */
 
@@ -27,6 +27,7 @@ filter-bar,
  *  Discover Tweaks
  */
 
+
 /* hide unusable controls */
 discover-app .dscTimechart,
 discover-app .dscSidebar__container,
@@ -35,10 +36,10 @@ discover-app .discover-table-footer {
   display: none;
 }
 
+
 /**
  * The global banner (e.g. "Help us improve Elastic...") should not print.
  */
-
 #globalBannerList {
   display: none;
 }
@@ -52,6 +53,7 @@ discover-app .discover-table-footer {
 .visEditor__content .visEditor--default > :not(.visEditor__visualization__wrapper) {
   display: none !important;
 }
+
 /** THIS IS FOR TSVB UNTIL REFACTOR **/
 .tvbEditorVisualization {
   position: static !important;
@@ -81,9 +83,9 @@ discover-app .discover-table-footer {
 
 /* hide unusable controls */
 .visualize .visLegend__toggle,
-.visualize .kbnAggTable__controls/* export raw, export formatted, etc. */,
-.visualize .leaflet-container .leaflet-top.leaflet-left/* tilemap controls */,
-.visualize paginate-controls {
+.visualize .kbnAggTable__controls/* export raw, export formatted, etc. */ ,
+.visualize .leaflet-container .leaflet-top.leaflet-left/* tilemap controls */ ,
+.visualize paginate-controls /* page numbers */ {
   display: none;
 }
 
