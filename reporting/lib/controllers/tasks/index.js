@@ -114,7 +114,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/history/:space',
+  path: '/history/:taskId',
   handler: [
     hasPrivileges(['read']),
     history,
@@ -123,23 +123,7 @@ router.route({
     failure: 400,
     continueOnError: true,
     params: {
-      space: Joi.string().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/history',
-  handler: [
-    isSuperuser,
-    getHistory,
-  ],
-  validate: {
-    failure: 400,
-    continueOnError: true,
-    params: {
-      space: Joi.string().required(),
+      taskId: Joi.string().required(),
     },
   },
 });

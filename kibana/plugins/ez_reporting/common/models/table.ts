@@ -5,7 +5,6 @@ import { IDashboard } from './dashboard';
 
 export interface ITableProps {
   tasks: Array<ITask>;
-  tasksInProgress: object;
   spaces: Array<ISpace>;
   frequencies: Array<IFrequency>;
   dashboards: Array<IDashboard>;
@@ -19,5 +18,4 @@ export interface ITableState {
   pageSize: number;
   sortField: string;
   sortDirection: string;
-  tasksInProgress: object;
 }

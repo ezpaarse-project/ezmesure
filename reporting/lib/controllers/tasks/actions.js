@@ -82,6 +82,42 @@ async function getTasks(spaceName) {
       space,
     } = get(tasksList[i], '_source');
 
+    let history;
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const { body: histories } = await elastic.search({
+        index: historyIndex,
+        timeout: '30s',
+        body: {
+          size: 1,
+          sort: {
+            startTime: {
+              order: 'desc',
+            },
+          },
+          query: {
+            bool: {
+              must: [
+                {
+                  match: {
+                    taskId: id,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      const hits = get(histories, 'hits.hits');
+      if (hits.length > 0) {
+        // eslint-disable-next-line no-underscore-dangle
+        history = hits[0]._source;
+      }
+    } catch (error) {
+      logger.error(error);
+    }
+
     tasks.push({
       id,
       dashboardId,
@@ -95,6 +131,7 @@ async function getTasks(spaceName) {
         runAt,
         print,
       },
+      history,
     });
   }
 
@@ -269,10 +306,10 @@ exports.history = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const { space } = ctx.request.params;
-  ctx.space = space;
+  const { taskId } = ctx.request.params;
+  ctx.taskId = taskId;
 
-  if (!space) {
+  if (!taskId) {
     ctx.status = 404;
     return;
   }
@@ -292,7 +329,7 @@ exports.history = async (ctx) => {
             must: [
               {
                 match: {
-                  space,
+                  taskId,
                 },
               },
             ],
