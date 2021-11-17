@@ -232,43 +232,23 @@ export function defineRoutes(router: IRouter, auth: HttpAuth, logger: Logger) {
 
   router.get(
     {
-      path: '/api/ezreporting/tasks/history',
-      validate: false,
+      path: '/api/ezreporting/tasks/history/{taskId}',
+      validate: {
+        params: schema.object({
+          taskId: schema.string(),
+        }),
+      },
       options: {
         authRequired: true,
         tags: [`access:${PLUGIN_ID}-all`],
       },
     },
     async function (context, req, res) {
-      const { spaceId } = context.core?.savedObjects?.client;
+      const { taskId } = req.params;
 
       try {
         const result = await requestApi(auth.get(req), {
-          url: `/tasks/history/${spaceId}`,
-        });
-
-        return res.ok({
-          body: result.body,
-        });
-      } catch (error) {
-        return res.customError({ statusCode: 500, body: error });
-      }
-    }
-  );
-
-  router.get(
-    {
-      path: '/api/ezreporting/tasks/history/management',
-      validate: false,
-      options: {
-        authRequired: true,
-        tags: [`access:${PLUGIN_ID}-all`],
-      },
-    },
-    async function (context, req, res) {
-      try {
-        const result = await requestApi(auth.get(req), {
-          url: '/tasks/history',
+          url: `/tasks/history/${taskId}`,
         });
 
         return res.ok({

@@ -10,8 +10,8 @@ import {
   EuiIcon,
   EuiImage,
   EuiToolTip,
-  EuiBadge,
   EuiLoadingSpinner,
+  EuiBadge,
 } from '@elastic/eui';
 import moment from 'moment';
 
@@ -21,8 +21,8 @@ import { convertFrequency, toasts, capabilities, httpClient } from '../../lib/re
 import printer from '../../public/images/printer.png';
 import { IAction } from '../../common/models/action';
 import { ITask } from '../../common/models/task';
-import { ISpace } from '../../common/models/space';
 import { ITableProps, ITableState } from '../../common/models/table';
+import { ISpace } from '../../common/models/space';
 
 export class EzReportingTable extends Component<ITableProps, ITableState> {
   private props: ITableProps;
@@ -37,7 +37,6 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       pageSize: 10,
       sortField: 'space',
       sortDirection: 'asc',
-      tasksInProgress: {},
     };
   }
 
@@ -107,7 +106,6 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
     const { pageIndex, pageSize, itemIdToExpandedRowMap, sortField, sortDirection, } = this.state;
     const {
       tasks,
-      tasksInProgress,
       spaces,
       dashboards,
       frequencies,
@@ -197,6 +195,60 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       render?(el: ITask | string | { id: string }, param?: any): string;
     }> = [
       {
+        field: 'status',
+        name: '',
+        width: '28px',
+        align: 'center',
+        render: (dashboardId: string, { id, history }): string => {
+          if (history) {
+            const { status, logs } = history;
+            
+            const error = logs.find(({ type }) => type.toLowerCase() === 'error');
+  
+            if (status) {
+              if (status === 'pending' || status === 'ongoing') {
+                return (<EuiLoadingSpinner size="m" />)
+              } else if (status === 'error') {
+                return (
+                  <EuiToolTip position="bottom" content={error.message}>
+                    <EuiIcon type="alert" />
+                  </EuiToolTip>
+                );
+              }
+            }
+          }
+        }
+      },
+      {
+        field: 'print',
+        name: '',
+        width: '28px',
+        align: 'center',
+        render: (dashboardId: string, { reporting }): string => {
+          if (reporting.print) {
+            return (
+              <Fragment>
+                {' '}
+                <EuiToolTip
+                  position="right"
+                  content={i18n.translate('ezReporting.optimizedForPrinting', {
+                    defaultMessage: 'Optimized for printing',
+                  })}
+                >
+                  <EuiImage
+                    alt={i18n.translate('ezReporting.optimizedForPrinting', {
+                      defaultMessage: 'Optimized for printing',
+                    })}
+                    size={14}
+                    url={printer}
+                  />
+                </EuiToolTip>
+              </Fragment>
+            );
+          }
+        }
+      },
+      {
         field: 'dashboardId',
         name: i18n.translate('ezReporting.dashboard', { defaultMessage: 'Dashboard' }),
         description: i18n.translate('ezReporting.dashboardName', {
@@ -236,6 +288,7 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       },
       {
         field: 'reporting.frequency',
+        width: '140px',
         name: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
         description: i18n.translate('ezReporting.frequency', { defaultMessage: 'Frequency' }),
         render: (frequency: string): string => convertFrequency(frequencies, frequency),
@@ -244,6 +297,7 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       },
       {
         field: 'reporting.sentAt',
+        width: '140px',
         name: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
         description: i18n.translate('ezReporting.sentAt', { defaultMessage: 'Last sent' }),
         align: 'center',
@@ -274,76 +328,10 @@ export class EzReportingTable extends Component<ITableProps, ITableState> {
       },
     ];
 
-    const hasTaskHistory: boolean = Object.keys(tasksInProgress).length > 0
-
-    if (hasTaskHistory) {
-      columns.splice(0, 0, {
-        field: 'status',
-        name: '',
-        width: '28px',
-        align: 'center',
-        render: (dashboardId: string, { id }): string => {
-          const taskStatus: { status: string, log: string } = tasksInProgress[id];
-
-          if (taskStatus) {
-            const { status, log } = taskStatus;
-
-            if (status) {
-              if (status === 'pending' || status === 'ongoing') {
-                return (<EuiLoadingSpinner size="m" />)
-              } else if (status === 'error') {
-                return (
-                  <EuiToolTip position="bottom" content={log}>
-                    <EuiIcon type="alert" />
-                  </EuiToolTip>
-                );
-              }
-            }
-          }
-        }
-      });
-    }
-
-    let taskOptimzedForPrinting = [];
-    if (tasks.length > 0) {
-      taskOptimzedForPrinting = tasks.filter(({ reporting }) => reporting.print)
-    }
-    
-    if (taskOptimzedForPrinting.length) {
-      columns.splice(hasTaskHistory ? 1 : 0, 0, {
-          field: 'print',
-          name: '',
-          width: '28px',
-          align: 'center',
-          render: (dashboardId: string, { reporting }): string => {
-            if (reporting.print) {
-              return (
-                <Fragment>
-                  {' '}
-                  <EuiToolTip
-                    position="right"
-                    content={i18n.translate('ezReporting.optimizedForPrinting', {
-                      defaultMessage: 'Optimized for printing',
-                    })}
-                  >
-                    <EuiImage
-                      alt={i18n.translate('ezReporting.optimizedForPrinting', {
-                        defaultMessage: 'Optimized for printing',
-                      })}
-                      size={14}
-                      url={printer}
-                    />
-                  </EuiToolTip>
-                </Fragment>
-              );
-            }
-          }
-        });
-    }
-
     if (this.props.admin) {
-      columns.splice(hasTaskHistory ? 2 : 1, 0, {
+      columns.splice(3, 0, {
         field: 'space',
+        width: '100px',
         name: i18n.translate('ezReporting.space', { defaultMessage: 'Space' }),
         description: i18n.translate('ezReporting.space', { defaultMessage: 'Space' }),
         render: (space): string => {

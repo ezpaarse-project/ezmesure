@@ -27,7 +27,6 @@ filter-bar,
  *  Discover Tweaks
  */
 
-
 /* hide unusable controls */
 discover-app .dscTimechart,
 discover-app .dscSidebar__container,
@@ -53,7 +52,6 @@ discover-app .discover-table-footer {
 .visEditor__content .visEditor--default > :not(.visEditor__visualization__wrapper) {
   display: none !important;
 }
-
 /** THIS IS FOR TSVB UNTIL REFACTOR **/
 .tvbEditorVisualization {
   position: static !important;

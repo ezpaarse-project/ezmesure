@@ -359,7 +359,7 @@ class Reporter {
     await waitForCompleteRender(page, visCount);
 
     if (print) {
-      await positionElements(page, viewport);
+     // await positionElements(page, viewport);
     }
 
     dashboardViewport.dispose();

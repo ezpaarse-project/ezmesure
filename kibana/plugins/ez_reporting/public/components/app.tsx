@@ -55,7 +55,6 @@ interface EzReportingAppState {
   selectedItems: any[];
   showDestroyModal: boolean;
   isPopoverOpen: boolean;
-  tasksInProgress: object;
   delay: number;
   timeoutId: number;
 }
@@ -77,7 +76,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       selectedItems: [],
       showDestroyModal: false,
       isPopoverOpen: false,
-      tasksInProgress: {},
       delay: 5000,
       timeoutId: 0,
     };
@@ -89,43 +87,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
 
   componentWillUnmount = () => {
     clearTimeout(this.state.timeoutId);
-  };
-
-  polling = async () => {
-    const { admin } = this.props;
-    const { tasks, tasksInProgress } = this.state;
-
-    if (tasks.length) {
-      const tmp = JSON.parse(JSON.stringify(tasksInProgress));
-
-      tasks.forEach(({ id }) => {
-        httpClient.get(`/api/ezreporting/tasks/history${admin ? '/management' : ''}`).then((histories) => {
-          if (histories.length) {
-            const { status, logs, startTime, endTime } = histories.shift();
-
-            if (status !== 'success') {
-              if (new Date(endTime).toISOString() <= new Date().toISOString()) {
-                const log = logs.find(({ type }) => type === 'error');
-                tmp[id] = {
-                  status,
-                  log: log ? log.message : '',
-                  startTime,
-                  endTime,
-                };
-              }
-            }
-          }
-        });
-
-        this.setState({ tasksInProgress: tmp });
-        this.forceUpdate();
-      });
-    }
-
-    return new Promise(() => {
-      const timeoutId = setTimeout(this.polling, this.state.delay);
-      this.setState({ timeoutId });
-    });
   };
 
   refreshData = () => {
@@ -141,7 +102,10 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
           spaces: this.props.admin ? res.spaces : [],
         });
 
-        this.polling();
+        return new Promise(() => {
+          const timeoutId = setTimeout(this.refreshData, this.state.delay);
+          this.setState({ timeoutId });
+        });
       })
       .catch((err) => {
         console.log(err);
@@ -332,7 +296,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
       showDestroyModal,
       isPopoverOpen,
       frequencies,
-      tasksInProgress,
     } = this.state;
 
     if (accessDenied) {
@@ -534,7 +497,7 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
           editTaskHandler={this.editTaskHandler}
           saveTaskHandler={this.saveTaskHandler}
         />
-        <EzReportingHistoryFlyout admin={admin} />
+        <EzReportingHistoryFlyout />
         {destroyModal}
         <I18nProvider>
           <>
@@ -557,7 +520,6 @@ export class EzReportingApp extends Component<EzReportingAppDeps, EzReportingApp
 
                     <EzReportingTable
                       tasks={tasksList}
-                      tasksInProgress={tasksInProgress}
                       spaces={spaces}
                       dashboards={dashboards}
                       frequencies={frequencies}
