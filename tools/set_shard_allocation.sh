@@ -52,7 +52,7 @@ SETTINGS="{
   }
 }"
 
-response=$(curl -X PUT -u $ES_USR:$ES_PWD -H 'Content-Type: application/json' 'http://localhost:9200/_cluster/settings' -fsSL -d "$SETTINGS")
+response=$(curl -X PUT -u $ES_USR:$ES_PWD -H 'Content-Type: application/json' 'https://localhost:9200/_cluster/settings' -fsSLk -d "$SETTINGS")
 
 if [ $? -ne 0 ]; then
   echo "Something went wrong"
