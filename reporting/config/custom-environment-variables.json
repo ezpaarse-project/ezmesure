@@ -5,6 +5,7 @@
     "external": "KIBANA_EXTERNAL_URL"
   },
   "elasticsearch": {
+    "scheme": "REPORTING_ELASTIC_SCHEME",
     "port": "REPORTING_ELASTIC_PORT",
     "host": "REPORTING_ELASTIC_HOST",
     "username": "REPORTING_ELASTIC_USER",

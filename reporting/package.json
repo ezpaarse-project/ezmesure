@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/ezpaarse-project/ezmesure#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.4.0",
+    "@elastic/elasticsearch": "^7.14.1",
     "@koa/cors": "^3.0.0",
     "config": "^3.3.6",
     "cron": "^1.7.2",

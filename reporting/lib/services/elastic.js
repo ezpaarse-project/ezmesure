@@ -7,11 +7,12 @@ const {
   password,
   host,
   port,
+  scheme,
 } = elasticsearch;
 
 const client = new Client({
   node: {
-    url: new URL(`http://${host}:${port}`),
+    url: new URL(`${scheme}://${host}:${port}`),
     auth: {
       username,
       password,

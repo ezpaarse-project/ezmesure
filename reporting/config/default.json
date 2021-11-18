@@ -5,6 +5,7 @@
     "external": "http://localhost:5601"
   },
   "elasticsearch": {
+    "scheme": "https",
     "port": 9200,
     "host": "localhost",
     "username": "elastic",
