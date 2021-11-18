@@ -9,6 +9,8 @@
 ##server.basePath: ${SERVER_BASEPATH}
 server.rewriteBasePath: false
 
+elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/x-pack/certificates/ca/ca.crt
+
 # The maximum payload size in bytes for incoming server requests.
 # server.maxPayloadBytes: 1048576
 

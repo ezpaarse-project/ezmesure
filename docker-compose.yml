@@ -59,6 +59,7 @@ services:
       - EZMESURE_APPLICATION_NAME
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - "./kibana/config/certificates:/usr/share/kibana/config/x-pack/certificates"
     restart: unless-stopped
 
   api:
@@ -95,7 +96,7 @@ services:
       - NODE_ENV
       - NODE_CONFIG
     volumes:
-      - "./data/api/storage:/usr/src/app/storage"
+      - "/data/results_ESR:/usr/src/app/storage"
       - "./data/api/uploads:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     restart: unless-stopped
