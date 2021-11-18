@@ -6,6 +6,7 @@
     "db": "EZMESURE_MONGO_DB"
   },
   "elasticsearch": {
+    "scheme": "EZMESURE_ELASTIC_SCHEME",
     "port": "EZMESURE_ELASTIC_PORT",
     "host": "EZMESURE_ELASTIC_HOST",
     "user": "EZMESURE_ELASTIC_USER",
