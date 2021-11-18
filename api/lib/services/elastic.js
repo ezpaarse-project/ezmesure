@@ -6,10 +6,11 @@ const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
 const host = config.get('elasticsearch.host');
 const port = config.get('elasticsearch.port');
+const scheme = config.get('elasticsearch.scheme');
 
 const client = new Client({
   node: {
-    url: new URL(`http://${host}:${port}`),
+    url: new URL(`${scheme}://${host}:${port}`),
     auth: {
       username,
       password,

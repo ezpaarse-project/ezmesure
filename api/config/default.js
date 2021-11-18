@@ -9,6 +9,7 @@ module.exports = {
     db: 'ezmesure',
   },
   elasticsearch: {
+    scheme: 'https',
     port: 9200,
     host: 'localhost',
     user: 'elastic',
