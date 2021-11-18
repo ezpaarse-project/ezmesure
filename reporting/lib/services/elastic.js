@@ -18,6 +18,9 @@ const client = new Client({
       password,
     },
   },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 module.exports = client;
