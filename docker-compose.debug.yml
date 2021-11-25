@@ -45,8 +45,8 @@ services:
       - 3000:3000
     volumes:
       - "./api:/usr/src/app"
-      - "./data/api/storage:/usr/src/app/storage"
-      - "./data/api/uploads:/usr/src/app/uploads"
+      - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
+      - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
     environment:

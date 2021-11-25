@@ -96,8 +96,8 @@ services:
       - NODE_ENV
       - NODE_CONFIG
     volumes:
-      - "/data/results_ESR:/usr/src/app/storage"
-      - "./data/api/uploads:/usr/src/app/uploads"
+      - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
+      - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
       - "./templates:/usr/src/app/templates"
     restart: unless-stopped
 
