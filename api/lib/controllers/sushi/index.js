@@ -3,7 +3,6 @@ const { Joi } = require('koa-joi-router');
 const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
 const Institution = require('../../models/Institution');
-const { appLogger } = require('../../services/logger');
 const { stringifyException } = require('../../services/sushi');
 const {
   requireJwt,
@@ -66,7 +65,7 @@ router.route({
       return next();
     },
     requireContact(),
-    requireValidatedInstitution(),
+    requireValidatedInstitution({ ignoreIfAdmin: true }),
     deleteSushiData,
   ],
   validate: {
@@ -83,7 +82,7 @@ router.route({
   handler: [
     fetchInstitution((ctx) => ctx?.request?.body?.institutionId),
     requireContact(),
-    requireValidatedInstitution(),
+    requireValidatedInstitution({ ignoreIfAdmin: true }),
     addSushi,
   ],
   validate: {
