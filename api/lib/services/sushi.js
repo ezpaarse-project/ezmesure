@@ -493,37 +493,15 @@ async function importSushiReport(options = {}) {
       const date = format(perfBeginDate, 'yyyy-MM');
       const id = [date, ...idFields.map((f) => (item[f] || ''))].join('|');
 
-      const itemPerf = { ...item, date };
-
-      performance.Instance.forEach((instance) => {
-        if (!instance) { return; }
-        if (typeof instance.Metric_Type !== 'string') { return; }
-
-        switch (instance.Metric_Type.toLowerCase()) {
-          case 'unique_item_requests':
-            itemPerf.uniqueItemRequests = instance.Count;
-            break;
-          case 'total_item_requests':
-            itemPerf.totalItemRequests = instance.Count;
-            break;
-          case 'unique_item_investigations':
-            itemPerf.uniqueItemInvestigations = instance.Count;
-            break;
-          case 'total_item_investigations':
-            itemPerf.totalItemInvestigations = instance.Count;
-            break;
-          case 'unique_title_investigations':
-            itemPerf.uniqueTitleInvestigations = instance.Count;
-            break;
-          case 'unique_title_requests':
-            itemPerf.uniqueTitleRequests = instance.Count;
-            break;
-          default:
-        }
-      });
+      const metrics = performance.Instance
+        .filter((instance) => typeof instance?.Metric_Type === 'string')
+        .map((instance) => ({
+          type: instance.Metric_Type.toLowerCase(),
+          value: instance.Count,
+        }));
 
       bulk.push({ index: { _index: index, _id: id } });
-      bulk.push(itemPerf);
+      bulk.push({ ...item, date, metrics });
     });
   });
 

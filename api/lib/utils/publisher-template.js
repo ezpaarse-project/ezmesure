@@ -28,13 +28,13 @@ module.exports = {
       section_type: { type: 'keyword' },
       access_type: { type: 'keyword' },
       access_method: { type: 'keyword' },
-      totalItemInvestigations: { type: 'integer' },
-      uniqueItemInvestigations: { type: 'integer' },
-      totalItemRequests: { type: 'integer' },
-      uniqueItemRequests: { type: 'integer' },
-      uniqueTitleInvestigations: { type: 'integer' },
-      uniqueTitleRequests: { type: 'integer' },
       date: { type: 'date', format: 'yyyy-MM' },
+      metrics: {
+        properties: {
+          type: { type: 'keyword' },
+          value: { type: 'integer' },
+        },
+      },
     },
   },
 };
