@@ -427,7 +427,7 @@ async function importSushiReport(options = {}) {
     const item = {
       platform: reportItem.Platform,
       publication_title: reportItem.Title,
-      publication_year: reportItem.YOP,
+      year_of_publication: reportItem.YOP,
       publisher: reportItem.Publisher,
       data_type: reportItem.Data_Type,
       section_type: reportItem.Section_Type,

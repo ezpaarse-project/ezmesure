@@ -18,7 +18,7 @@ module.exports = {
       print_identifier: { type: 'keyword' },
       online_identifier: { type: 'keyword' },
       publication_date: { type: 'keyword' },
-      publication_year: { type: 'keyword' },
+      year_of_publication: { type: 'keyword' },
       publication_title: { type: 'keyword' },
       platform: { type: 'keyword' },
       publisher: { type: 'keyword' },
