@@ -425,6 +425,8 @@ async function importSushiReport(options = {}) {
     }
 
     const item = {
+      report_type: sushiData.reportType,
+      package: sushi.get('package'),
       platform: reportItem.Platform,
       publication_title: reportItem.Title,
       year_of_publication: reportItem.YOP,

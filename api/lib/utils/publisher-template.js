@@ -16,6 +16,8 @@ module.exports = {
     properties: {
       doi: { type: 'keyword' },
       print_identifier: { type: 'keyword' },
+      report_type: { type: 'keyword' },
+      package: { type: 'keyword' },
       online_identifier: { type: 'keyword' },
       publication_date: { type: 'keyword' },
       year_of_publication: { type: 'keyword' },
