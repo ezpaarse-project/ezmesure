@@ -37,7 +37,7 @@ if [ -z "$ES_PWD" ]; then
   exit 1;
 fi
 
-response=$(curl -X POST -u $ES_USR:$ES_PWD 'http://localhost:9200/_flush' -fsSL)
+response=$(curl -X POST -u $ES_USR:$ES_PWD 'https://localhost:9200/_flush' -fsSLk)
 
 if [ $? -ne 0 ]; then
   echo "Something went wrong"
