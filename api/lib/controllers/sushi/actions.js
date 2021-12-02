@@ -29,20 +29,37 @@ exports.getTasks = async (ctx) => {
 };
 
 exports.addSushi = async (ctx) => {
+  ctx.action = 'sushi/create';
   const { body } = ctx.request;
+  const { institution } = ctx.state;
+
+  ctx.metadata = {
+    vendor: body.vendor,
+    institutionId: institution.getId(),
+    institutionName: institution.get('name'),
+  };
 
   const sushiItem = new Sushi(body);
   await sushiItem.save();
 
+  ctx.metadata.sushiId = sushiItem.getId();
   ctx.status = 201;
   ctx.body = sushiItem;
 };
 
 exports.updateSushi = async (ctx) => {
-  const { sushi } = ctx.state;
+  ctx.action = 'sushi/update';
+  const { sushi, institution } = ctx.state;
   const { body } = ctx.request;
 
   sushi.update(body);
+
+  ctx.metadata = {
+    sushiId: sushi.getId(),
+    vendor: sushi.get('vendor'),
+    institutionId: institution.getId(),
+    institutionName: institution.get('name'),
+  };
 
   try {
     await sushi.save();
@@ -55,6 +72,7 @@ exports.updateSushi = async (ctx) => {
 };
 
 exports.deleteSushiData = async (ctx) => {
+  ctx.action = 'sushi/delete-many';
   const { body } = ctx.request;
   const { userIsAdmin, institution } = ctx.state;
 
@@ -73,6 +91,10 @@ exports.deleteSushiData = async (ctx) => {
       return { id: sushiItem.id, status: 'failed' };
     }
   }));
+
+  ctx.metadata = {
+    sushiDeleteResult: response,
+  };
 
   ctx.status = 200;
   ctx.body = response;
@@ -116,9 +138,17 @@ exports.getAvailableReports = async (ctx) => {
 };
 
 exports.downloadReport = async (ctx) => {
+  ctx.action = 'sushi/download-report';
   const { query = {} } = ctx.request;
-  const { sushi } = ctx.state;
+  const { sushi, institution } = ctx.state;
   let { beginDate, endDate } = query;
+
+  ctx.metadata = {
+    sushiId: sushi.getId(),
+    vendor: sushi.get('vendor'),
+    institutionId: institution.getId(),
+    institutionName: institution.get('name'),
+  };
 
   if (!beginDate && !endDate) {
     const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
@@ -161,6 +191,7 @@ exports.downloadReport = async (ctx) => {
 };
 
 exports.importSushi = async (ctx) => {
+  ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
   const { sushi, user, institution } = ctx.state;
   const {
@@ -168,6 +199,13 @@ exports.importSushi = async (ctx) => {
     beginDate,
     endDate,
   } = body;
+
+  ctx.metadata = {
+    sushiId: sushi.getId(),
+    vendor: sushi.get('vendor'),
+    institutionId: institution.getId(),
+    institutionName: institution.get('name'),
+  };
 
   const { body: perm } = await elastic.security.hasPrivileges({
     username: user.username,
@@ -197,10 +235,16 @@ exports.importSushi = async (ctx) => {
 };
 
 exports.importSushiItems = async (ctx) => {
+  ctx.action = 'sushi/import';
   const { body = [] } = ctx.request;
   const { overwrite } = ctx.query;
   const { institution } = ctx.state;
   const institutionId = institution.getId();
+
+  ctx.metadata = {
+    institutionId: institution.getId(),
+    institutionName: institution.get('name'),
+  };
 
   const response = {
     errors: 0,

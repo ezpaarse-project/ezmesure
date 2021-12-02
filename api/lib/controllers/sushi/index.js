@@ -159,14 +159,22 @@ router.route({
   handler: [
     commonHandlers,
     async (ctx) => {
+      const { sushi, institution } = ctx.state;
+
+      ctx.action = 'sushi/check-connection';
+      ctx.metadata = {
+        sushiId: sushi.getId(),
+        vendor: sushi.get('vendor'),
+        institutionId: institution.getId(),
+        institutionName: institution.get('name'),
+      };
+
       let error;
       try {
         await getAvailableReports(ctx);
       } catch (e) {
         error = e;
       }
-
-      const { sushi } = ctx.state;
 
       const exceptions = Array.isArray(ctx.exceptions)
         ? ctx.exceptions.map(stringifyException)
