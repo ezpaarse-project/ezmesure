@@ -86,7 +86,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
 
-            <v-expansion-panel v-if="shibbolethEnabled">
+            <v-expansion-panel v-if="$config.shibbolethEnabled">
               <v-expansion-panel-header>
                 <div>
                   <img
@@ -118,8 +118,8 @@
 <script>
 export default {
   middleware: ['auth'],
-  asyncData({ env, query }) {
-    let provider = env.shibbolethEnabled ? 1 : 0;
+  asyncData({ query, $config }) {
+    let provider = $config.shibbolethEnabled ? 1 : 0;
     if (query?.provider === 'kibana') {
       provider = 0;
     }
@@ -132,7 +132,6 @@ export default {
       loginFormValid: true,
       connecting: false,
       showPassword: false,
-      shibbolethEnabled: env.shibbolethEnabled,
       provider,
     };
   },
