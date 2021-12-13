@@ -74,6 +74,7 @@ services:
       - http_proxy
       - https_proxy
       - no_proxy=localhost,kibana
+      - EZMESURE_ELASTIC_SCHEME=${EZMESURE_ELASTIC_SCHEME:-https}
       - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
       - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
       - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
