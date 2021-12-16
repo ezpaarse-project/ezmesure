@@ -5,6 +5,7 @@ const isFirstDayOfMonth = require('date-fns/isFirstDayOfMonth');
 const format = require('date-fns/format');
 
 const os = require('os');
+const crypto = require('crypto');
 const config = require('config');
 const axios = require('axios');
 const path = require('path');
@@ -418,6 +419,41 @@ async function importSushiReport(options = {}) {
     }
   };
 
+  /**
+   * Transform a list of attributes into an object
+   * @param {Array<Object>} list an array of { Type, Value } objects
+   * @returns an object representation of the list where each type becomes a property
+   *          if a type appears multiple times, the value of the resulting property is an array
+   */
+  const list2object = (list) => {
+    const obj = {};
+
+    if (!Array.isArray(list)) { return obj; }
+
+    list.forEach((el) => {
+      if (!el?.Type || !el?.Value) { return; }
+
+      const currentValue = obj[el.Type];
+
+      if (Array.isArray(currentValue)) {
+        obj[el.Type].push(el.Value);
+      } else if (currentValue) {
+        obj[el.Type] = [currentValue, el.Value];
+      } else {
+        obj[el.Type] = el.Value;
+      }
+    });
+
+    return obj;
+  };
+
+  /**
+   * Sanitize string for use in an Elasticsearch document ID
+   * @param {String} str
+   * @returns lowercased string with only underscores and alphanumeric characters
+   */
+  const sanitizeIdentifier = (str) => (str || '').replace(/[^a-z0-9_]+/gi, '_').toLowerCase();
+
   report.Report_Items.forEach((reportItem) => {
     if (!Array.isArray(reportItem.Item_ID)) {
       addError('Item has no Item_ID');
@@ -425,45 +461,40 @@ async function importSushiReport(options = {}) {
     }
 
     const item = {
-      report_type: sushiData.reportType,
-      package: sushi.get('package'),
-      platform: reportItem.Platform,
-      publication_title: reportItem.Title,
-      year_of_publication: reportItem.YOP,
-      publisher: reportItem.Publisher,
-      data_type: reportItem.Data_Type,
-      section_type: reportItem.Section_Type,
-      access_type: reportItem.Access_Type,
-      access_method: reportItem.Access_Method,
+      Report_Type: sushiData.reportType,
+      Package: sushi.get('package'),
+
+      Item_ID: list2object(reportItem.Item_ID),
+      Item_Dates: list2object(reportItem.Item_Dates),
+      Item_Attributes: list2object(reportItem.Item_Attributes),
+      Publisher_ID: list2object(reportItem.Publisher_ID),
+
+      Title: reportItem.Title,
+      Item: reportItem.Item,
+      Database: reportItem.Database,
+      Platform: reportItem.Platform,
+      Publisher: reportItem.Publisher,
+      Data_Type: reportItem.Data_Type,
+      YOP: reportItem.YOP,
+      Section_Type: reportItem.Section_Type,
+      Access_Type: reportItem.Access_Type,
+      Access_Method: reportItem.Access_Method,
+      Item_Contributors: reportItem.Item_Contributors,
     };
 
-    if (Array.isArray(reportItem.Item_Dates)) {
-      reportItem.Item_Dates.forEach((itemDate) => {
-        if (!itemDate) { return; }
-        if (typeof itemDate.Type !== 'string') { return; }
-        if (itemDate.Type.toLowerCase() === 'publication_date') {
-          item.publication_date = itemDate.Value;
-        }
-      });
+    const itemParent = reportItem.Item_Parent;
+
+    if (itemParent) {
+      item.Item_Parent = {
+        Item_ID: list2object(itemParent.Item_ID),
+        Item_Dates: list2object(itemParent.Item_Dates),
+        Item_Attributes: list2object(itemParent.Item_Attributes),
+
+        Item_Name: itemParent.Item_Name,
+        Data_Type: itemParent.Data_Type,
+        Item_Contributors: itemParent.Item_Contributors,
+      };
     }
-
-    reportItem.Item_ID.forEach((identifier) => {
-      if (!identifier) { return; }
-      if (typeof identifier.Type !== 'string') { return; }
-
-      switch (identifier.Type.toLowerCase()) {
-        case 'doi':
-          item.doi = identifier.Value;
-          break;
-        case 'print_issn':
-          item.print_identifier = identifier.Value;
-          break;
-        case 'online_issn':
-          item.online_identifier = identifier.Value;
-          break;
-        default:
-      }
-    });
 
     reportItem.Performance.forEach((performance) => {
       if (!Array.isArray(performance.Instance)) { return; }
@@ -481,27 +512,44 @@ async function importSushiReport(options = {}) {
         return;
       }
 
-      const idFields = [
-        'print_identifier',
-        'online_identifier',
-        'publication_date',
-        'publication_year',
-        'publication_title',
-        'platform',
-      ];
+      const identifiers = Object.entries(item.Item_ID)
+        .map(([key, value]) => `${key}:${value}`)
+        .sort();
 
       const date = format(perfBeginDate, 'yyyy-MM');
-      const id = [date, ...idFields.map((f) => (item[f] || ''))].join('|');
 
-      const metrics = performance.Instance
-        .filter((instance) => typeof instance?.Metric_Type === 'string')
-        .map((instance) => ({
-          type: instance.Metric_Type.toLowerCase(),
-          value: instance.Count,
-        }));
+      performance.Instance.forEach((instance) => {
+        if (typeof instance?.Metric_Type !== 'string') { return; }
 
-      bulk.push({ index: { _index: index, _id: id } });
-      bulk.push({ ...item, date, metrics });
+        const metricType = instance.Metric_Type;
+        const metricCount = instance.Count;
+
+        const id = [
+          date,
+          item.Report_Type,
+          metricType.toLowerCase(),
+          sanitizeIdentifier(item.Platform),
+          sanitizeIdentifier(item.Publisher),
+          crypto
+            .createHash('sha256')
+            .update([
+              item.Package,
+              item.YOP,
+              item.Access_Method,
+              item.Access_Type,
+              item.Section_Type,
+              ...identifiers].join('|'))
+            .digest('hex'),
+        ].join(':');
+
+        bulk.push({ index: { _index: index, _id: id } });
+        bulk.push({
+          ...item,
+          Date: date,
+          Metric_Type: metricType,
+          Count: metricCount,
+        });
+      });
     });
   });
 
