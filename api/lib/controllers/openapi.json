@@ -4255,7 +4255,7 @@
         }
       }
     },
-    "/sushi/{id}/_import": {
+    "/sushi/{id}/_harvest": {
       "parameters": [
         {
           "schema": {
@@ -4267,11 +4267,11 @@
         }
       ],
       "post": {
-        "summary": "Initiate a Sushi import",
-        "operationId": "post-sushi-id-_import",
+        "summary": "Initiate a Sushi harvest",
+        "operationId": "post-sushi-id-_harvest",
         "responses": {
           "200": {
-            "description": "Import initiated. Returns a task object that can be requested in order to follow the status of the process.",
+            "description": "Harvest initiated. Returns a task object that can be requested in order to follow the status of the process.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4290,7 +4290,7 @@
         "tags": [
           "Sushi"
         ],
-        "description": "Initiate a Sushi import. Downloads the latest COUNTER report, validate it, and import items into a given index.",
+        "description": "Initiate a Sushi harvest. Downloads the latest COUNTER report, validate it, and import items into a given index.",
         "security": [
           {
             "bearerAuth": []

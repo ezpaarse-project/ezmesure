@@ -190,7 +190,7 @@ exports.downloadReport = async (ctx) => {
   ctx.body = { message };
 };
 
-exports.importSushi = async (ctx) => {
+exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
   const { sushi, user, institution } = ctx.state;
@@ -221,7 +221,7 @@ exports.importSushi = async (ctx) => {
     ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
-  const task = await sushiService.initSushiImport({
+  const task = await sushiService.initSushiHarvest({
     sushi,
     institution,
     user,

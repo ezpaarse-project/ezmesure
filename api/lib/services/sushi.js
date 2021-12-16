@@ -603,7 +603,7 @@ async function importSushiReport(options = {}) {
   appLogger.info(`Sushi report ${sushi.getId()} imported`);
 }
 
-async function initSushiImport(opts = {}) {
+async function initSushiHarvest(opts = {}) {
   const options = opts || {};
   const {
     sushi,
@@ -660,6 +660,6 @@ module.exports = {
   getOngoingDownload,
   initiateDownload,
   getExceptions,
-  initSushiImport,
+  initSushiHarvest,
   stringifyException,
 };

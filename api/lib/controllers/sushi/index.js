@@ -22,7 +22,7 @@ const {
   deleteSushiData,
   updateSushi,
   addSushi,
-  importSushi,
+  harvestSushi,
   importSushiItems,
   downloadReport,
   getTasks,
@@ -261,10 +261,10 @@ router.route({
 
 router.route({
   method: 'POST',
-  path: '/:sushiId/_import',
+  path: '/:sushiId/_harvest',
   handler: [
     commonHandlers,
-    importSushi,
+    harvestSushi,
   ],
   validate: {
     type: 'json',
