@@ -1,13 +1,16 @@
 {
+  "info": {
+    "version": "5.0.2"
+  },
   "definitions" : {
     "SUSHI_error_model" : {
       "type" : "object",
-      "description" : "Generalized format for presenting errors and exceptions.",
-      "required" : [ "Code", "Message" ],
+      "description" : "Generalized format for presenting errors and warnings.",
+      "required" : [ "Code", "Severity", "Message" ],
       "properties" : {
         "Code" : {
           "type" : "integer",
-          "description" : "Exception Number. See Table F.1 in the Code of Practice, Appendix F",
+          "description" : "Exception Code. See Table F.1 in the Code of Practice, Appendix F.",
           "example" : 3031
         },
         "Severity" : {
@@ -18,7 +21,7 @@
         },
         "Message" : {
           "type" : "string",
-          "description" : "Exception Description. See Table F.1 in the Code of Practice, Appendix F",
+          "description" : "Exception Message. See Table F.1 in the Code of Practice, Appendix F.",
           "example" : "Usage Not Ready for Requested Dates"
         },
         "Help_URL" : {
@@ -28,7 +31,7 @@
         "Data" : {
           "type" : "string",
           "description" : "Additional data provided by the server to clarify the Exception.",
-          "example" : "request was for 2016-01-01 to 2016-12-31; however, usage is only available to 2016-08-31"
+          "example" : "Request was for 2016-01-01 to 2016-12-31; however, usage is only available to 2016-08-31."
         }
       }
     },
