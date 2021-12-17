@@ -94,6 +94,11 @@
             {{ $t('advancedSettings') }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
+            <v-checkbox
+              v-model="sushiForm.ignoreReportValidation"
+              :label="$t('institutions.sushi.ignoreReportValidation')"
+            />
+
             <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
 
             <v-btn

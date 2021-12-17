@@ -237,7 +237,8 @@
       "connectionSuccessful": "Connexion réussie",
       "connectionFailed": "Connexion échouée",
       "connectionUntested": "Connexion non testée",
-      "testedOn": "Testée le {date}"
+      "testedOn": "Testée le {date}",
+      "ignoreReportValidation": "Ignorer la validation du rapport"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",

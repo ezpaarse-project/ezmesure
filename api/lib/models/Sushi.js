@@ -21,6 +21,8 @@ const schema = {
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
 
+  ignoreReportValidation: Joi.boolean(),
+
   connection: Joi.object({
     success: Joi.boolean(),
     date: Joi.date(),

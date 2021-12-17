@@ -237,7 +237,8 @@
       "connectionSuccessful": "Successful connection",
       "connectionFailed": "Connection failed",
       "connectionUntested": "Connection untested",
-      "testedOn": "Tested on {date}"
+      "testedOn": "Tested on {date}",
+      "ignoreReportValidation": "Ignore report validation"
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",

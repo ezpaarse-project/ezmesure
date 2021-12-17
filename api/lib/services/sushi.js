@@ -396,10 +396,18 @@ async function importSushiReport(options = {}) {
   const { valid, errors } = validateReport(report);
 
   if (!valid) {
-    task.fail(['The report is not valid', ...errors]);
-    deleteReportFile();
-    saveTask();
-    return;
+    task.log('error', 'The report is not valid');
+
+    if (Array.isArray(errors)) {
+      errors.slice(0, 10).forEach((e) => task.log('error', e));
+    }
+
+    if (!sushi.get('ignoreReportValidation')) {
+      task.fail();
+      deleteReportFile();
+      saveTask();
+      return;
+    }
   }
 
   task.log('info', `Importing report into '${index}'`);
