@@ -361,7 +361,8 @@ async function importSushiReport(options = {}) {
     let hasError = false;
 
     exceptions.forEach((e) => {
-      const message = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
+      const prefix = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
+      const message = `${prefix} ${e?.Message}`;
 
       switch (e?.Severity?.toLowerCase?.()) {
         case 'fatal':
