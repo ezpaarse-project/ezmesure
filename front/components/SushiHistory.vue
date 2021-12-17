@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" width="800">
+  <v-dialog v-model="show" width="1000">
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
         <v-toolbar-title>
