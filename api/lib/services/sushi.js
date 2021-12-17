@@ -358,12 +358,38 @@ async function importSushiReport(options = {}) {
   const exceptions = getExceptions(report);
 
   if (exceptions.length > 0) {
-    const errorMessages = exceptions.map((e) => e.Message);
+    let hasError = false;
 
-    task.fail(['Sushi endpoint returned exceptions', ...errorMessages]);
-    deleteReportFile();
-    saveTask();
-    return;
+    exceptions.forEach((e) => {
+      const message = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
+
+      switch (e?.Severity?.toLowerCase?.()) {
+        case 'fatal':
+        case 'error':
+          hasError = true;
+          task.log('error', message);
+          break;
+        case 'debug':
+          task.log('verbose', message);
+          break;
+        case 'info':
+          task.log('info', message);
+          break;
+        case 'warning':
+        default:
+          task.log('warning', message);
+      }
+
+      if (e?.Data) { task.log('info', `[Add. data] ${e.Data}`); }
+      if (e?.Help_URL) { task.log('info', `[Help URL] ${e.Help_URL}`); }
+    });
+
+    if (hasError) {
+      task.fail(['Sushi endpoint returned exceptions']);
+      deleteReportFile();
+      saveTask();
+      return;
+    }
   }
 
   const { valid, errors } = validateReport(report);
