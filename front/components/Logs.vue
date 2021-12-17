@@ -6,7 +6,7 @@
         <span v-if="log.type" :class="log.color">
           {{ log.type }} :
         </span>
-        <span v-if="log.message" v-text="log.message" />
+        <span v-if="log.message" class="message" v-text="log.message" />
       </div>
     </v-card-text>
   </v-card>
@@ -49,5 +49,8 @@ export default {
 <style scoped>
   .scrolling {
     overflow-y: auto;
+  }
+  .message {
+    word-break: break-word;
   }
 </style>
