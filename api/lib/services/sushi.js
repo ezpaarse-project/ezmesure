@@ -201,7 +201,7 @@ async function downloadReport(options = {}) {
       .on('error', reject);
   });
 
-  await fs.move(tmpPath, reportPath);
+  await fs.move(tmpPath, reportPath, { overwrite: true });
 }
 
 function getOngoingDownload(options = {}) {
@@ -275,6 +275,7 @@ async function importSushiReport(options = {}) {
     user,
     beginDate,
     endDate,
+    forceDownload,
   } = options;
 
   const sushiData = {
@@ -312,7 +313,7 @@ async function importSushiReport(options = {}) {
     }
   }
 
-  if (report) {
+  if (report && !forceDownload) {
     task.log('info', 'Found a local COUNTER report file');
   } else {
     try {

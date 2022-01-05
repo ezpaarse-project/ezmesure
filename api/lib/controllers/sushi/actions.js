@@ -198,6 +198,7 @@ exports.harvestSushi = async (ctx) => {
     target: index,
     beginDate,
     endDate,
+    forceDownload,
   } = body;
 
   ctx.metadata = {
@@ -228,6 +229,7 @@ exports.harvestSushi = async (ctx) => {
     index,
     beginDate,
     endDate,
+    forceDownload,
   });
 
   ctx.type = 'json';
