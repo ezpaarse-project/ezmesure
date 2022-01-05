@@ -456,26 +456,32 @@ async function importSushiReport(options = {}) {
 
   /**
    * Transform a list of attributes into an object
-   * @param {Array<Object>} list an array of { Type, Value } objects
+   * @param {Array<Object>} list an array of { Type, Value } or { Name, Value } objects
    * @returns an object representation of the list where each type becomes a property
    *          if a type appears multiple times, the value of the resulting property is an array
    */
-  const list2object = (list) => {
+  const list2object = (list, opts) => {
     const obj = {};
+    const { splitValuesBy } = opts || {};
 
     if (!Array.isArray(list)) { return obj; }
 
     list.forEach((el) => {
-      if (!el?.Type || !el?.Value) { return; }
+      const elementKey = el?.Type || el?.Name;
+      let elementValue = el?.Value;
 
-      const currentValue = obj[el.Type];
+      if (!elementKey || !elementValue) { return; }
 
-      if (Array.isArray(currentValue)) {
-        obj[el.Type].push(el.Value);
-      } else if (currentValue) {
-        obj[el.Type] = [currentValue, el.Value];
+      const valuesSoFar = obj[elementKey];
+
+      if (splitValuesBy && typeof elementValue === 'string') {
+        elementValue = elementValue.split(splitValuesBy);
+      }
+
+      if (valuesSoFar) {
+        obj[elementKey] = [].concat(valuesSoFar).concat(elementValue);
       } else {
-        obj[el.Type] = el.Value;
+        obj[elementKey] = elementValue;
       }
     });
 
@@ -489,6 +495,20 @@ async function importSushiReport(options = {}) {
    */
   const sanitizeIdentifier = (str) => (str || '').replace(/[^a-z0-9_]+/gi, '_').toLowerCase();
 
+  const reportHeader = {
+    Created: report?.Report_Header?.Created,
+    Created_By: report?.Report_Header?.Created_By,
+    Customer_ID: report?.Report_Header?.Customer_ID,
+    Report_ID: report?.Report_Header?.Report_ID,
+    Release: report?.Report_Header?.Release,
+    Report_Name: report?.Report_Header?.Report_Name,
+    Institution_Name: report?.Report_Header?.Institution_Name,
+
+    Institution_ID: list2object(report?.Report_Header?.Institution_ID),
+    Report_Filters: list2object(report?.Report_Header?.Report_Filters),
+    Report_Attributes: list2object(report?.Report_Header?.Report_Attributes, { splitValuesBy: '|' }),
+  };
+
   report.Report_Items.forEach((reportItem) => {
     if (!Array.isArray(reportItem.Item_ID)) {
       addError('Item has no Item_ID');
@@ -496,8 +516,7 @@ async function importSushiReport(options = {}) {
     }
 
     const item = {
-      Report_Type: sushiData.reportType,
-      Package: sushi.get('package'),
+      Report_Header: reportHeader,
 
       Item_ID: list2object(reportItem.Item_ID),
       Item_Dates: list2object(reportItem.Item_Dates),

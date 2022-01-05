@@ -90,6 +90,38 @@ module.exports = {
           Item_Contributors: itemContributors,
         },
       },
+
+      Report_Header: {
+        properties: {
+          Created: { type: 'date' },
+          Created_By: { type: 'keyword' },
+          Customer_ID: { type: 'keyword' },
+          Report_ID: { type: 'keyword' },
+          Release: { type: 'keyword' },
+          Report_Name: { type: 'keyword' },
+          Institution_Name: { type: 'keyword' },
+
+          Institution_ID: {
+            properties: {
+              ISNI: { type: 'keyword' },
+              ISIL: { type: 'keyword' },
+              OCLC: { type: 'keyword' },
+              Proprietary: { type: 'keyword' },
+            },
+          },
+
+          Report_Filters: {
+            properties: {
+              Begin_Date: { type: 'keyword' },
+            },
+          },
+          Report_Attributes: {
+            properties: {
+              Attributes_To_Show: { type: 'keyword' },
+            },
+          },
+        },
+      },
     },
   },
 };
