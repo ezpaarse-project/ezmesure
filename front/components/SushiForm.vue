@@ -201,6 +201,7 @@ export default {
         comment: '',
         id: null,
         params: [],
+        ignoreReportValidation: false,
       },
     };
   },
@@ -244,6 +245,7 @@ export default {
       this.sushiForm.comment = sushiData.comment || '';
       this.sushiForm.params = sushiData.params;
       this.sushiForm.id = sushiData.id;
+      this.sushiForm.ignoreReportValidation = !!sushiData.ignoreReportValidation;
 
       if (!Array.isArray(this.sushiForm.params)) {
         this.sushiForm.params = [];
