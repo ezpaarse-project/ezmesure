@@ -577,10 +577,11 @@ async function importSushiReport(options = {}) {
 
         const metricType = instance.Metric_Type;
         const metricCount = instance.Count;
+        const reportId = reportHeader?.Report_ID || '';
 
         const id = [
           date,
-          item.Report_Type,
+          reportId.toLowerCase(),
           metricType.toLowerCase(),
           sanitizeIdentifier(item.Platform),
           sanitizeIdentifier(item.Publisher),
