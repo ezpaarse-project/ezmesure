@@ -603,6 +603,7 @@ async function importSushiReport(options = {}) {
           Date: date,
           Metric_Type: metricType,
           Count: metricCount,
+          Period: period,
         });
       });
     });

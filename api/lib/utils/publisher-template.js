@@ -80,6 +80,13 @@ module.exports = {
         },
       },
 
+      Period: {
+        properties: {
+          Begin_Date: { type: 'date', format: 'yyyy-MM-dd' },
+          End_Date: { type: 'date', format: 'yyyy-MM-dd' },
+        },
+      },
+
       Item_Parent: {
         properties: {
           Item_Name: { type: 'keyword' },
