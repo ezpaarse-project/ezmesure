@@ -50,9 +50,8 @@ module.exports = {
       },
     ],
     properties: {
-      Report_Type: { type: 'keyword' },
-      Package: { type: 'keyword' },
-      Date: { type: 'date', format: 'yyyy-MM' },
+      X_Package: { type: 'keyword' },
+      X_Date_Month: { type: 'date', format: 'yyyy-MM' },
 
       Metric_Type: { type: 'keyword' },
       Count: { type: 'integer' },

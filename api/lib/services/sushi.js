@@ -516,6 +516,8 @@ async function importSushiReport(options = {}) {
     }
 
     const item = {
+      X_Package: sushi.get('package'),
+
       Report_Header: reportHeader,
 
       Item_ID: list2object(reportItem.Item_ID),
@@ -600,7 +602,7 @@ async function importSushiReport(options = {}) {
         bulk.push({ index: { _index: index, _id: id } });
         bulk.push({
           ...item,
-          Date: date,
+          X_Date_Month: date,
           Metric_Type: metricType,
           Count: metricCount,
           Period: period,
