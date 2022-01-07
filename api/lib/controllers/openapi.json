@@ -1202,6 +1202,12 @@
               "failed": {
                 "type": "number"
               },
+              "coveredPeriods": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
               "errors": {
                 "type": "array",
                 "items": {

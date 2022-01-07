@@ -448,6 +448,8 @@ async function importSushiReport(options = {}) {
     errors: [],
   };
 
+  const coveredPeriods = new Set();
+
   const addError = (message) => {
     response.failed += 1;
     if (response.errors.length < 9) {
@@ -575,6 +577,11 @@ async function importSushiReport(options = {}) {
 
       const date = format(perfBeginDate, 'yyyy-MM');
 
+      if (!coveredPeriods.has(date)) {
+        coveredPeriods.add(date);
+        response.coveredPeriods = Array.from(coveredPeriods).sort();
+      }
+
       performance.Instance.forEach((instance) => {
         if (typeof instance?.Metric_Type !== 'string') { return; }
 
@@ -652,9 +659,11 @@ async function importSushiReport(options = {}) {
   }
 
   task.log('info', 'Sushi harvesting terminated');
+  task.log('info', `Covered periods: ${response.coveredPeriods.join(', ')}`);
   task.log('info', `Inserted items: ${response.inserted}`);
   task.log('info', `Updated items: ${response.updated}`);
   task.log('info', `Failed insertions: ${response.failed}`);
+
   task.endStep('insert');
   task.setResult(response);
   task.done();
@@ -677,7 +686,7 @@ async function initSushiHarvest(opts = {}) {
   });
 
   task.log('info', 'Sushi import task initiated');
-  task.log('info', `Period: from ${options.beginDate} to ${options.endDate}`);
+  task.log('info', `Requested period: from ${options.beginDate} to ${options.endDate}`);
   await task.save();
 
   importSushiReport({ ...options, task })
