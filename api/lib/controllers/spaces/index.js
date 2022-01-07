@@ -53,10 +53,10 @@ router.route({
     type: 'json',
     body: {
       id: Joi.string().trim().required().regex(spaceIdPattern),
-      name: Joi.string().trim(),
-      description: Joi.string().trim(),
-      initials: Joi.string().trim().min(1).max(2),
-      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
+      name: Joi.string().trim().empty(''),
+      description: Joi.string().trim().empty(''),
+      initials: Joi.string().trim().min(1).max(2).empty(''), // eslint-disable-line newline-per-chained-call
+      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i).empty(''),
       disabledFeatures: Joi.array().items(Joi.string()),
     },
   },
@@ -74,9 +74,9 @@ router.route({
     body: {
       id: Joi.string().trim().required().regex(spaceIdPattern),
       name: Joi.string().trim().required(),
-      description: Joi.string().trim(),
-      initials: Joi.string().trim().min(1).max(2),
-      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i),
+      description: Joi.string().trim().allow(''),
+      initials: Joi.string().trim().min(1).max(2).empty(''), // eslint-disable-line newline-per-chained-call
+      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i).empty(''),
       disabledFeatures: Joi.array().items(Joi.string()),
     },
   },
