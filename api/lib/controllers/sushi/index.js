@@ -176,8 +176,8 @@ router.route({
         error = e;
       }
 
-      const exceptions = Array.isArray(ctx.exceptions)
-        ? ctx.exceptions.map(stringifyException)
+      const exceptions = Array.isArray(ctx?.body?.exceptions)
+        ? ctx.body.exceptions.map(stringifyException)
         : [];
 
       if (exceptions.length === 0 && error?.isAxiosError) {
