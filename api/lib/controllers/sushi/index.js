@@ -43,6 +43,11 @@ router.route({
     requireAdmin,
     getAll,
   ],
+  validate: {
+    query: {
+      connection: Joi.string().valid('working', 'faulty', 'untested'),
+    },
+  },
 });
 
 router.route({

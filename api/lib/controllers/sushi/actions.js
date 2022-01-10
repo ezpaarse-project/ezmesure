@@ -9,9 +9,22 @@ const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 
 exports.getAll = async (ctx) => {
+  const options = {};
+  const connection = ctx.query?.connection;
+
+  if (connection === 'untested') {
+    options.must_not = [{
+      exists: { field: `${Sushi.type}.connection.success` },
+    }];
+  } else if (connection) {
+    options.filters = [{
+      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
+    }];
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findAll();
+  ctx.body = await Sushi.findAll(options);
 };
 
 exports.getOne = async (ctx) => {

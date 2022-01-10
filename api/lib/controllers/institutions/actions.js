@@ -302,9 +302,20 @@ exports.refreshInstitution = async (ctx) => {
 };
 
 exports.getSushiData = async (ctx) => {
-  ctx.type = 'json';
-  ctx.status = 200;
-  const sushiItems = await Sushi.findByInstitutionId(ctx.state.institution.id);
+  const options = {};
+  const connection = ctx.query?.connection;
+
+  if (connection === 'untested') {
+    options.must_not = [{
+      exists: { field: `${Sushi.type}.connection.success` },
+    }];
+  } else if (connection) {
+    options.filters = [{
+      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
+    }];
+  }
+
+  const sushiItems = await Sushi.findByInstitutionId(ctx.state.institution.id, options);
 
   if (ctx?.query?.latestImportTask) {
     const sushiMap = new Map(sushiItems.map((item) => [item.getId(), item]));
@@ -320,5 +331,7 @@ exports.getSushiData = async (ctx) => {
     }
   }
 
+  ctx.type = 'json';
+  ctx.status = 200;
   ctx.body = sushiItems;
 };

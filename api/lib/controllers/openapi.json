@@ -2202,6 +2202,21 @@
           {
             "bearerAuth": []
           }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "working",
+                "faulty",
+                "untested"
+              ]
+            },
+            "in": "query",
+            "name": "connection",
+            "description": "filter items depending on connection state"
+          }
         ]
       }
     },
@@ -3677,6 +3692,21 @@
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "working",
+                "faulty",
+                "untested"
+              ]
+            },
+            "in": "query",
+            "name": "connection",
+            "description": "filter items depending on connection state"
           }
         ]
       },
