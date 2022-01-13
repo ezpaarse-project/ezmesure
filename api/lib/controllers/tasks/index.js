@@ -33,8 +33,11 @@ router.route({
   path: '/',
   handler: getAll,
   validate: {
-    params: {
+    query: {
       status: Joi.string().trim().min(1),
+      type: Joi.string().trim().min(1),
+      sushiId: Joi.string().trim().min(1),
+      institutionId: Joi.string().trim().min(1),
     },
   },
 });
