@@ -679,7 +679,7 @@ async function initSushiHarvest(opts = {}) {
   } = options;
 
   const task = new Task({
-    type: 'sushi-import',
+    type: 'sushi-harvest',
     status: 'running',
     sushiId: sushi.getId(),
     institutionId: institution.getId(),
