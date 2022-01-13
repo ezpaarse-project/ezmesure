@@ -233,6 +233,12 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     return items.filter((i) => i);
   }
 
+  static filterBy(prop, value) {
+    return {
+      [Array.isArray(value) ? 'terms' : 'term']: { [`${type}.${prop}`]: value },
+    };
+  }
+
   async save() {
     const now = new Date();
 
