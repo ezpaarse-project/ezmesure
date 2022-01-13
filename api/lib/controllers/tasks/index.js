@@ -13,6 +13,11 @@ const {
   getOne,
 } = require('./actions');
 
+const stringOrArray = Joi.alternatives().try(
+  Joi.string().trim().min(1),
+  Joi.array().items(Joi.string().trim().min(1)).min(1),
+);
+
 router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form', 'admin', 'superuser']));
 
 router.route({
@@ -34,10 +39,10 @@ router.route({
   handler: getAll,
   validate: {
     query: {
-      status: Joi.string().trim().min(1),
-      type: Joi.string().trim().min(1),
-      sushiId: Joi.string().trim().min(1),
-      institutionId: Joi.string().trim().min(1),
+      status: stringOrArray,
+      type: stringOrArray,
+      sushiId: stringOrArray,
+      institutionId: stringOrArray,
     },
   },
 });
