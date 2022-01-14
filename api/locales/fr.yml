@@ -9,6 +9,9 @@ errors:
   termsOfUse: Vous devez acceptez les conditions d'utilisation avant d'utiliser ce service
   unauthorized: Vous n'êtes pas autorisés à utiliser cette route
 
+  harvest:
+    noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
+
   auth:
     reservedUser: vous ne pouvez pas vous connecter avec un utilisateur réservé
     noEmailInHeaders: Email introuvable dans les headers Shibboleth

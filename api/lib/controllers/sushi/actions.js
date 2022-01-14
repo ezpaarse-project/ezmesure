@@ -208,11 +208,23 @@ exports.harvestSushi = async (ctx) => {
   const { body = {} } = ctx.request;
   const { sushi, user, institution } = ctx.state;
   const {
-    target: index,
+    target,
     beginDate,
     endDate,
     forceDownload,
   } = body;
+
+  let index = target;
+
+  if (!index) {
+    const prefix = institution.get('indexPrefix');
+
+    if (!prefix) {
+      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.getId()));
+    }
+
+    index = `${prefix}-publisher`;
+  }
 
   ctx.metadata = {
     sushiId: sushi.getId(),

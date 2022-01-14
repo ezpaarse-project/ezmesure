@@ -277,7 +277,7 @@ router.route({
       sushiId: Joi.string().trim().required(),
     },
     body: {
-      target: Joi.string().trim().required(),
+      target: Joi.string().trim(),
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
