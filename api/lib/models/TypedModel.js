@@ -239,6 +239,20 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     };
   }
 
+  static filterById(id) {
+    let value;
+
+    if (Array.isArray(id)) {
+      value = id.map((i) => TypedModel.generateId(i));
+    } else {
+      value = TypedModel.generateId(id);
+    }
+
+    return {
+      [Array.isArray(value) ? 'terms' : 'term']: { _id: value },
+    };
+  }
+
   async save() {
     const now = new Date();
 

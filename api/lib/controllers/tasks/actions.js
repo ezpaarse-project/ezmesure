@@ -10,6 +10,7 @@ exports.getAll = async (ctx) => {
   ctx.status = 200;
   const { query = {} } = ctx.request;
   const {
+    id: taskIds,
     status,
     type,
     institutionId,
@@ -18,6 +19,9 @@ exports.getAll = async (ctx) => {
 
   const filters = [];
 
+  if (taskIds) {
+    filters.push(Task.filterById(Array.isArray(taskIds) ? taskIds : taskIds.split(',').map((s) => s.trim())));
+  }
   if (status) {
     filters.push(Task.filterBy('status', Array.isArray(status) ? status : status.split(',').map((s) => s.trim())));
   }

@@ -39,6 +39,7 @@ router.route({
   handler: getAll,
   validate: {
     query: {
+      id: stringOrArray,
       status: stringOrArray,
       type: stringOrArray,
       sushiId: stringOrArray,
