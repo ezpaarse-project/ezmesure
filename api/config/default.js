@@ -63,6 +63,7 @@ module.exports = {
     sender: 'ezMESURE',
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
+    recipients: ['exemple@exemple.fr'],
   },
   depositors: {
     index: 'depositors',
