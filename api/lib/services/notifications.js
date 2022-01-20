@@ -49,6 +49,9 @@ async function getEzMesureMetrics() {
                   'institutions/create',
                   'institutions/update',
                   'institutions/delete',
+                  'sushi/create',
+                  'sushi/update',
+                  'sushi/delete-many',
                 ],
               },
             },
@@ -102,12 +105,20 @@ async function getEzMesureMetrics() {
       datetime: toLocaleDate(_source.datetime),
     }));
 
+  const sushi = actions
+    .filter((a) => a._source.action.startsWith('sushi/'))
+    .map(({ _source }) => ({
+      ..._source,
+      datetime: toLocaleDate(_source.datetime),
+    }));
+
   return {
     actions,
     files,
     users,
     insertions,
     institutions,
+    sushi,
   };
 }
 
@@ -190,6 +201,7 @@ async function sendNotifications(appLogger) {
     users,
     insertions,
     institutions,
+    sushi,
   } = await getEzMesureMetrics();
   const { actions: reportingActions = [], reportings } = await getReportingActivity();
 
@@ -211,6 +223,7 @@ async function sendNotifications(appLogger) {
       insertions,
       reportings,
       institutions,
+      sushi,
     }),
   });
 

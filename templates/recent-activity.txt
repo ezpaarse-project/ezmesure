@@ -3,14 +3,16 @@ Activité récente
 
 {% if noActions -%}
   Aucune activité n'a été enregistrée dernièrement.
-{% endif -%}
-
+{% else %}
 {% if users.length -%}
 - {{ users.length }} enregistrements
 {% endif -%}
 {% if institutions.length -%}
 - {{ institutions.length }} mises à jour d'établissements
-{% endif %}
+{% endif -%}
+{% if sushi.length -%}
+- {{ sushi.length }} mises à jour d'identifiants SUSHI
+{% endif -%}
 {% if files.length -%}
 - {{ files.length }} dépôts de fichiers
 {% endif -%}
@@ -20,6 +22,7 @@ Activité récente
 {% if reportings.length -%}
 - {{ reportings.length }} mises à jour de tâches de reporting
 {% endif -%}
+{% endif %}
 
 {% if users.length -%}
 Enregistrements ({{ users.length }})
@@ -32,6 +35,19 @@ Enregistrements ({{ users.length }})
 Mises à jour établissements ({{ institutions.length }})
   {% for action in institutions -%}
     [{{ "+" if action.action == 'institutions/create' }}{{ "*" if action.action == 'institutions/update' }}{{ "-" if action.action == 'institutions/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+  {% endfor %}
+{% endif -%}
+
+{% if sushi.length -%}
+Mises à jour d'identifiants SUSHI ({{ sushi.length }})
+  {% for action in sushi -%}
+  {% if action.action == 'sushi/delete-many' -%}
+  {% for result in action.metadata.sushiDeleteResult -%}
+    [-][{{ action.datetime }}][{{ result.status }}] {{ action.user.name }} / {{ result.vendor or result.id }}
+  {% endfor %}
+  {%- else -%}
+    [{{ "+" if action.action == 'sushi/create' }}{{ "*" if action.action == 'sushi/update' }}{{ "-" if action.action == 'sushi/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
+  {% endif -%}
   {% endfor %}
 {% endif -%}
 
