@@ -44,6 +44,9 @@ export EZMESURE_ES_NODE_SEARCH_REMOTE="true"
 export ES_JAVA_OPTS="-Xms2g -Xmx2g"
 export EZMESURE_ES_MEM_LIMIT="4g"
 
+
+export EZMESURE_DISABLE_SHIBBOLETH="true"
+
 if [[ -f $LOCAL_ENV_FILE ]] ; then
   source "$LOCAL_ENV_FILE"
 fi
