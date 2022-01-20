@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon -w server.js -w config/ -w lib/ server.js",
     "start": "node server.js",
-    "lint": "eslint --ext .js ."
+    "lint": "eslint --ext .js .",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -62,6 +63,8 @@
     "eslint": "^8.0.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.25.1",
+    "eslint-plugin-jest": "^25.3.4",
+    "jest": "^27.4.7",
     "nodemon": "^1.19.1"
   }
 }
