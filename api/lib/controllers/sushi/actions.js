@@ -92,16 +92,21 @@ exports.deleteSushiData = async (ctx) => {
   const sushiItems = await Sushi.findManyById(body.ids);
 
   const response = await Promise.all(sushiItems.map(async (sushiItem) => {
+    const result = {
+      id: sushiItem.getId(),
+      vendor: sushiItem.get('vendor'),
+    };
+
     if (!userIsAdmin && (sushiItem.getInstitutionId() !== institution.id)) {
-      return { id: sushiItem.id, status: 'failed' };
+      return { ...result, status: 'failed' };
     }
 
     try {
       await sushiItem.delete();
-      return { id: sushiItem.id, status: 'deleted' };
+      return { ...result, status: 'deleted' };
     } catch (error) {
       appLogger.error(`Failed to delete sushi data: ${error}`);
-      return { id: sushiItem.id, status: 'failed' };
+      return { ...result, status: 'failed' };
     }
   }));
 
