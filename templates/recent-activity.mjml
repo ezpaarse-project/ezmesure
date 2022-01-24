@@ -27,6 +27,7 @@
     <mj-text>
       {% if users.length %}<div><strong>{{ users.length }}</strong> enregistrements</div>{% endif %}
       {% if institutions.length %}<div><strong>{{ institutions.length }}</strong> mises à jour d'établissements</div>{% endif %}
+      {% if sushi.length %}<div><strong>{{ sushi.length }}</strong> mises à jour d'identifiants SUSHI </div>{% endif %}
       {% if files.length %}<div><strong>{{ files.length }}</strong> dépôts de fichiers</div>{% endif %}
       {% if insertions.length %}<div><strong>{{ insertions.length }}</strong> chargements</div>{% endif %}
       {% if reportings.length %}<div><strong>{{ reportings.length }}</strong> mises à jour de tâches de reporting</div>{% endif %}
@@ -95,6 +96,54 @@
           <td>{{ action.datetime }}</td>
           <td>{{ action.response.status }}</td>
         </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
+{% if sushi.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Mises à jour d'identifiants SUSHI ({{ sushi.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th></th>
+          <th>Utilisateur</th>
+          <th>Vendor</th>
+          <th style="width: 130px">Date</th>
+          <th style="width: 50px">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in sushi %}
+          {% if action.action == 'sushi/delete-many' %}
+            {% for result in action.metadata.sushiDeleteResult %}
+              <tr style="border-bottom: 1px solid #d0d0d0">
+                <td>-</td>
+                <td>{{ action.user.name }}</td>
+                <td>{{ result.vendor or result.id }}</td>
+                <td>{{ action.datetime }}</td>
+                <td>{{ result.status }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+          <tr style="border-bottom: 1px solid #d0d0d0">
+            {% if action.action == 'sushi/create' %}
+              <td>+</td>
+            {% elif action.action == 'sushi/update' %}
+              <td>*</td>
+            {% endif %}
+            <td>{{ action.user.name }}</td>
+            <td>{{ action.metadata.vendor or action.metadata.sushiId }}</td>
+            <td>{{ action.datetime }}</td>
+            <td>{{ action.response.status }}</td>
+          </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </mj-table>

@@ -49,6 +49,7 @@ router.route({
     },
     query: {
       latestImportTask: Joi.boolean().default(false),
+      connection: Joi.string().valid('working', 'faulty', 'untested'),
     },
   },
 });

@@ -50,12 +50,13 @@ const updateSchema = {
 };
 
 class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
-  static async findByInstitutionId(institutionId) {
-    return this.findAll({
-      filters: [
-        { term: { [`${type}.institutionId`]: institutionId } },
-      ],
-    });
+  static async findByInstitutionId(institutionId, opts) {
+    const options = opts || {};
+
+    options.filters = Array.isArray(opts?.filters) ? opts.filters : [];
+    options.filters.push({ term: { [`${type}.institutionId`]: institutionId } });
+
+    return this.findAll(options);
   }
 
   static from(data = {}) {

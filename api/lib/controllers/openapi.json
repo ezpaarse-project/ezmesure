@@ -2202,6 +2202,21 @@
           {
             "bearerAuth": []
           }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "working",
+                "faulty",
+                "untested"
+              ]
+            },
+            "in": "query",
+            "name": "connection",
+            "description": "filter items depending on connection state"
+          }
         ]
       }
     },
@@ -3678,6 +3693,21 @@
           {
             "bearerAuth": []
           }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "working",
+                "faulty",
+                "untested"
+              ]
+            },
+            "in": "query",
+            "name": "connection",
+            "description": "filter items depending on connection state"
+          }
         ]
       },
       "post": {
@@ -4517,6 +4547,38 @@
             "in": "query",
             "name": "status",
             "description": "filter tasks by status"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "id",
+            "description": "filter tasks by ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "filter tasks by type"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "institutionId",
+            "description": "filter tasks by institution ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "sushiId",
+            "description": "filter tasks by SUSHI ID"
           }
         ]
       }

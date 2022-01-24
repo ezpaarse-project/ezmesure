@@ -9,9 +9,22 @@ const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 
 exports.getAll = async (ctx) => {
+  const options = {};
+  const connection = ctx.query?.connection;
+
+  if (connection === 'untested') {
+    options.must_not = [{
+      exists: { field: `${Sushi.type}.connection.success` },
+    }];
+  } else if (connection) {
+    options.filters = [{
+      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
+    }];
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findAll();
+  ctx.body = await Sushi.findAll(options);
 };
 
 exports.getOne = async (ctx) => {
@@ -79,16 +92,21 @@ exports.deleteSushiData = async (ctx) => {
   const sushiItems = await Sushi.findManyById(body.ids);
 
   const response = await Promise.all(sushiItems.map(async (sushiItem) => {
+    const result = {
+      id: sushiItem.getId(),
+      vendor: sushiItem.get('vendor'),
+    };
+
     if (!userIsAdmin && (sushiItem.getInstitutionId() !== institution.id)) {
-      return { id: sushiItem.id, status: 'failed' };
+      return { ...result, status: 'failed' };
     }
 
     try {
       await sushiItem.delete();
-      return { id: sushiItem.id, status: 'deleted' };
+      return { ...result, status: 'deleted' };
     } catch (error) {
       appLogger.error(`Failed to delete sushi data: ${error}`);
-      return { id: sushiItem.id, status: 'failed' };
+      return { ...result, status: 'failed' };
     }
   }));
 
@@ -195,11 +213,23 @@ exports.harvestSushi = async (ctx) => {
   const { body = {} } = ctx.request;
   const { sushi, user, institution } = ctx.state;
   const {
-    target: index,
+    target,
     beginDate,
     endDate,
     forceDownload,
   } = body;
+
+  let index = target;
+
+  if (!index) {
+    const prefix = institution.get('indexPrefix');
+
+    if (!prefix) {
+      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.getId()));
+    }
+
+    index = `${prefix}-publisher`;
+  }
 
   ctx.metadata = {
     sushiId: sushi.getId(),

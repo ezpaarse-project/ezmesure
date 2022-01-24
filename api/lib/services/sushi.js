@@ -676,17 +676,23 @@ async function initSushiHarvest(opts = {}) {
   const {
     sushi,
     institution,
+    beginDate,
+    endDate,
   } = options;
 
   const task = new Task({
-    type: 'sushi-import',
+    type: 'sushi-harvest',
     status: 'running',
     sushiId: sushi.getId(),
     institutionId: institution.getId(),
   });
 
   task.log('info', 'Sushi import task initiated');
-  task.log('info', `Requested period: from ${options.beginDate} to ${options.endDate}`);
+  if (beginDate || endDate) {
+    task.log('info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
+  } else {
+    task.log('info', 'No period requested, defaulting to last month');
+  }
   await task.save();
 
   importSushiReport({ ...options, task })

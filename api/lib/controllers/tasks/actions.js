@@ -9,13 +9,33 @@ exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
   const { query = {} } = ctx.request;
-  const { status } = query;
+  const {
+    id: taskIds,
+    status,
+    type,
+    institutionId,
+    sushiId,
+  } = query;
 
-  if (typeof status === 'string') {
-    ctx.body = await Task.findByStatus(status.split(',').map((s) => s.trim()));
-  } else {
-    ctx.body = await Task.findAll();
+  const filters = [];
+
+  if (taskIds) {
+    filters.push(Task.filterById(Array.isArray(taskIds) ? taskIds : taskIds.split(',').map((s) => s.trim())));
   }
+  if (status) {
+    filters.push(Task.filterBy('status', Array.isArray(status) ? status : status.split(',').map((s) => s.trim())));
+  }
+  if (type) {
+    filters.push(Task.filterBy('type', Array.isArray(type) ? type : type.split(',').map((s) => s.trim())));
+  }
+  if (institutionId) {
+    filters.push(Task.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+  }
+  if (sushiId) {
+    filters.push(Task.filterBy('sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+  }
+
+  ctx.body = await Task.findAll({ filters });
 };
 
 exports.getOne = async (ctx) => {

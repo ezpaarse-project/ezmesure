@@ -26,7 +26,7 @@ router.route({
   validate: {
     params: {
       index: Joi.string().trim().min(1),
-      extension: Joi.string().valid(['csv', 'ndjson']),
+      extension: Joi.string().valid('csv', 'ndjson'),
     },
     query: {
       fields: Joi.string().required().trim().min(1),
