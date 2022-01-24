@@ -302,7 +302,7 @@ describe('DELETE /users/:username', () => {
         res = err?.response;
       }
 
-      expect(res).toHaveProperty('status', 204);
+      expect(res).toHaveProperty('status', 200);
     });
   });
 
