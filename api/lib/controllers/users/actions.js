@@ -85,8 +85,8 @@ exports.deleteUser = async (ctx) => {
   const { body: result } = await elastic.security.deleteUser({
     username,
     refresh: true,
-  });
+  }, { ignore: [404] });
 
-  ctx.status = (result && result.found) ? 204 : 404;
+  ctx.status = 200;
   ctx.body = result;
 };

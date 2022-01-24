@@ -27,7 +27,6 @@ while [ "$go_on" != "n" ]; do
   if [ $first_instance == true ]; then
     default_name="$EZMESURE_ES_NODE_NAME"
     default_ip="$EZMESURE_ES_PUBLISH"
-    first_instance=false
   fi
 
   read -e -p "  Name: " -i "$default_name" instance_name
@@ -40,6 +39,12 @@ while [ "$go_on" != "n" ]; do
   echo "    dns:" >> $INSTANCES_FILE
   echo "      - \"$instance_hostname\"" >> $INSTANCES_FILE
   echo "      - \"localhost\"" >> $INSTANCES_FILE
+
+  if [ $first_instance == true ]; then
+    echo "      - \"elastic\"" >> $INSTANCES_FILE
+  fi
+
+  first_instance=false
 
   echo "Instance added to $INSTANCES_FILE"
   read -e -n 1 -p "Add another instance (Y/n) ? " go_on

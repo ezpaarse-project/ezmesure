@@ -1,7 +1,9 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { addHours, differenceInHours, isBefore, parseISO } = require('date-fns');
+const {
+  addHours, differenceInHours, isBefore, parseISO,
+} = require('date-fns');
 const elastic = require('../../services/elastic');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
@@ -219,13 +221,12 @@ exports.resetPassword = async (ctx) => {
   let decoded;
   try {
     decoded = jwt.verify(token, secret);
-  } catch(err) {
+  } catch (err) {
     ctx.throw(400, ctx.$t('errors.password.invalidToken'));
     return;
   }
 
   const { username, expiresAt, createdAt } = decoded;
-
 
   let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
   if (!tokenIsValid) {
@@ -257,10 +258,10 @@ exports.resetPassword = async (ctx) => {
 
   user.metadata.passwordDate = new Date();
   user.password = password;
-  await elastic.security.putUser({ username: username, body: user });
+  await elastic.security.putUser({ username, body: user });
 
   ctx.status = 204;
-}
+};
 
 exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
@@ -281,7 +282,7 @@ exports.changePassword = async (ctx) => {
   });
 
   ctx.status = 204;
-}
+};
 
 exports.getUser = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
@@ -299,7 +300,6 @@ exports.getToken = async (ctx) => {
   ctx.status = 200;
   ctx.body = generateToken(ctx.state.user);
 };
-
 
 exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, null, { httpOnly: true });
