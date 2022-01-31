@@ -4,7 +4,8 @@ Platform aggregating electronic ressources usage statistics for the French resea
 https://ezmesure.couperin.org
 
 ## Prerequisites
-[Docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/)
+* [docker](https://www.docker.com/)
+* [docker-compose](https://docs.docker.com/compose/)
 
 ## Installation
 
@@ -79,15 +80,8 @@ For each node in the cluster, add certificates in `elasticsearch/config/certific
     - `unzip bundle.zip -d ../elasticsearch/config/certificates/`
     - `unzip bundle.zip -d ../kibana/config/certificates/`
 
-### 5. Setup local DNS (for dev only)
 
-The Shibboleth authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts` :
-
-```
-127.0.0.1 ezmesure-preprod.couperin.org
-```
-
-### 6. Adjust system configuration for Elasticsearch
+### 5. Adjust system configuration for Elasticsearch
 
 Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
 
@@ -155,32 +149,88 @@ Now you can access the Kibana instance on https://localhost/kibana/ and start bu
 
 The ezMESURE API is documented here : https://localhost/api-reference
 
-## Plugins
+## Dev mode
 
-### Dev mode
+### Prerequisites
 
-To develop a Kibana plugin for ezMESURE, you need to launch Kibana in ``dev`` mode via the ``docker-compose.debug.yml`` file
+* [Docker](https://www.docker.com/) 
+* [docker-compose](https://docs.docker.com/compose/)
+* [npm](https://docs.npmjs.com/about-npm)
+* [node 14](https://nodejs.org/en/)
 
-To do so, you have to source the file ``ezmesure.env.sh`` and then build the Kibana image with the command ``docker-compose -f docker-compose.debug.yml build kibana``(this command is only needed once).
-Then you have to launch Kibana with the command ``docker-compose -f docker-compose.debug.yml up -d kibana``(``-d`` to launch it in detached mode)
+### 1. Install local dependencies
 
-### Create plugin
-To create a Kibana plugin, you need to run the following command ``docker-compose -f docker-compose.debug.yml exec kibana bash -c 'node scripts/generate_plugin'`` and it will launch the plugin creation script in interactive mode.
+You should install local dependencies with npm in ``api`` and ``front`` directory;
 
-Here are the parameters of the command if you do not want an interactive world:
+```bash
+ezmesure/api npm i
+
+ezmesure/front npm i
 ```
-Options:
-    --yes, -y          Answer yes to all prompts, requires passing --name
-    --name             Set the plugin name
-    --ui               Generate a UI plugin
-    --server           Generate a Server plugin
-    --verbose, -v      Log verbosely
-    --debug            Log debug messages (less than verbose)
-    --quiet            Only log errors
-    --silent           Don't log anything
-    --help             Show this message
+### 2. Source environnement variable
+
+You should source ``ezmesure.env.sh`` for the following and before each start.
+
+```bash
+souce ezmesure.env.sh
+```
+### 3. Setup https for kibana and elastic
+
+ezmesure request to elastic in https, to do that, you need to create certificate.
+
+Before that, you need to create ``instances.yml`` file, you need to use a script that will help you to create that in ``init_es_instance.sh``. This script will pre-fill the necessary fields.
+
+```bash
+ezmesure/tools/init_es_instances.sh
+
+Adding new instance
+  Name: <Name>
+  IP: <IP>
+  Hostname: <Hostname>
+Instance added to ./tools/../certs/instances.yml
+Add another instance (Y/n) ? n
 ```
 
-### Build plugin
+Once the file is created, you can generate the certificates.
 
-To build a Kibana plugin you need to connect to the container as follows ``docker-compose -f docker-compose.debug.yml exec kibana bash -c 'cd plugins/<plugin_name>/; yarn build --kibana-version <kibana_version>'``
+```bash
+ezmesure/certs docker-compose -f create-certs.yml run --rm create_certs
+```
+
+Once the certificates are generated, they must be unzipped and placed in the right folders.
+
+```bash
+ezmesure/certs sudo unzip bundle.zip -d ../elasticsearch/config/certificates/
+ezmesure/certs sudo unzip bundle.zip -d ../kibana/config/certificates/
+```
+
+### 4. Setup local DNS (for dev with Shibboleth)
+
+The Shibboleth authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
+
+```
+127.0.0.1 ezmesure-preprod.couperin.org
+```
+
+On top of that, you have to override the environment variable ``EZMESURE_DISABLE_SHIBBOLETH`` on ezmesure.local.env.sh
+
+```
+export EZMESURE_DISABLE_SHIBBOLETH=""
+```
+
+Don't forget to restore the environment variables after the modification.
+
+### 5. Prepare start
+
+Before launching ezmesure, you must create the elastic container, for that you must use this command.
+
+```bash
+docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+
+sudo chmod 777 ./data/elastic/data
+```
+### 6. Start
+
+```bash
+docker-compose -f docker-compose.debug.yml up -d
+```
