@@ -2,7 +2,7 @@ const config = require('config');
 
 const recipients = config.get('notifications.recipients');
 const { sendMail, generateMail } = require('../../services/mail');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 exports.contact = async (ctx) => {
   const { body } = ctx.request;

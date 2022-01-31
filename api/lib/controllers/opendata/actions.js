@@ -1,5 +1,5 @@
 const opendata = require('../../services/opendata');
-const { appLogger } = require('../../../server');
+const { appLogger } = require('../../services/logger');
 
 exports.getOpenData = async (ctx) => {
   const { q: query } = ctx.query;
