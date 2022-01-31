@@ -19,6 +19,11 @@
     "port": "EZMESURE_KIBANA_PORT",
     "host": "EZMESURE_KIBANA_HOST"
   },
+  "redis": {
+    "host": "EZMESURE_REDIS_HOST",
+    "port": "EZMESURE_REDIS_PORT",
+    "password": "EZMESURE_REDIS_PASSWORD"
+  },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT",

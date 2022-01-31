@@ -21,6 +21,11 @@ module.exports = {
     port: 5601,
     host: 'localhost',
   },
+  redis: {
+    host: 'localhost',
+    port: 6379,
+    password: 'changeme',
+  },
   smtp: {
     host: 'localhost',
     port: 25,

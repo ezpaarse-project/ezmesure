@@ -250,7 +250,7 @@
     "history": "Historique des tâches",
     "status": {
       "notLaunchedYet": "Pas encore lancé",
-      "pending": "En attente",
+      "waiting": "En attente",
       "running": "En cours",
       "finished": "Terminé",
       "error": "Erreur"

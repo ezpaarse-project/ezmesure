@@ -15,7 +15,7 @@
 
 <script>
 const colors = new Map([
-  ['pending', 'grey'],
+  ['waiting', 'grey'],
   ['running', 'blue'],
   ['finished', 'green'],
   ['error', 'red'],
@@ -23,7 +23,7 @@ const colors = new Map([
 ]);
 
 const icons = new Map([
-  ['pending', 'mdi-clock-outline'],
+  ['waiting', 'mdi-clock-outline'],
   ['running', 'mdi-play'],
   ['finished', 'mdi-check'],
   ['error', 'mdi-alert-circle-outline'],

@@ -323,7 +323,7 @@ exports.getSushiData = async (ctx) => {
 
     if (Array.isArray(latestTasks)) {
       latestTasks.forEach((task) => {
-        const sushiItem = sushiMap.get(task?.get?.('sushiId'));
+        const sushiItem = sushiMap.get(task?.getParam?.('sushiId'));
         if (sushiItem) {
           sushiItem.set('latestImportTask', task);
         }

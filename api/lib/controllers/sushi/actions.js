@@ -7,6 +7,7 @@ const Task = require('../../models/Task');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
+const { harvestQueue } = require('../../services/jobs');
 
 exports.getAll = async (ctx) => {
   const options = {};
@@ -252,15 +253,22 @@ exports.harvestSushi = async (ctx) => {
     ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
-  const task = await sushiService.initSushiHarvest({
-    sushi,
-    institution,
-    user,
-    index,
-    beginDate,
-    endDate,
-    forceDownload,
+  const task = new Task({
+    type: 'sushi-harvest',
+    status: 'waiting',
+    params: {
+      sushiId: sushi.getId(),
+      institutionId: institution.getId(),
+      username: user.username,
+      index,
+      beginDate,
+      endDate,
+      forceDownload,
+    },
   });
+
+  await task.save();
+  await harvestQueue.add({ taskId: task.getId() });
 
   ctx.type = 'json';
   ctx.body = task;

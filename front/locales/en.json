@@ -250,7 +250,7 @@
     "history": "Tasks history",
     "status": {
       "notLaunchedYet": "Not launched yet",
-      "pending": "Pending",
+      "waiting": "Waiting",
       "running": "Running",
       "finished": "Finished",
       "error": "Error"

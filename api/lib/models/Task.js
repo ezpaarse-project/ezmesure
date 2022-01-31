@@ -5,10 +5,11 @@ const type = 'task';
 
 const schema = {
   id: Joi.string().trim().required(),
-  sushiId: Joi.string().trim().required(),
-  institutionId: Joi.string().trim().required(),
   updatedAt: Joi.date(),
+  startedAt: Joi.date(),
   createdAt: Joi.date(),
+
+  params: Joi.object(),
 
   type: Joi.string().trim(),
   status: Joi.string(),
@@ -35,6 +36,7 @@ const createSchema = {
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
+  startedAt: Joi.any().strip(),
 };
 
 const updateSchema = {
@@ -47,7 +49,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static async findByInstitutionId(institutionId) {
     return this.findAll({
       filters: [
-        { term: { [`${type}.institutionId`]: institutionId } },
+        { term: { [`${type}.params.institutionId`]: institutionId } },
       ],
     });
   }
@@ -63,7 +65,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static async findBySushiId(sushiId) {
     return this.findAll({
       filters: [
-        { term: { [`${type}.sushiId`]: sushiId } },
+        { term: { [`${type}.params.sushiId`]: sushiId } },
       ],
     });
   }
@@ -71,10 +73,10 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static async findOnePerSushiId(sushiIds) {
     return this.findAll({
       filters: [
-        { terms: { [`${type}.sushiId`]: sushiIds } },
+        { terms: { [`${type}.params.sushiId`]: sushiIds } },
       ],
       collapse: {
-        field: `${type}.sushiId`,
+        field: `${type}.params.sushiId`,
       },
     });
   }
@@ -82,7 +84,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static deleteByInstitutionId(institutionId) {
     return this.deleteByQuery({
       filters: [
-        { term: { [`${type}.institutionId`]: institutionId } },
+        { term: { [`${type}.params.institutionId`]: institutionId } },
       ],
     });
   }
@@ -90,7 +92,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static deleteBySushiId(sushiId) {
     return this.deleteByQuery({
       filters: [
-        { term: { [`${type}.sushiId`]: sushiId } },
+        { term: { [`${type}.params.sushiId`]: sushiId } },
       ],
     });
   }
@@ -115,13 +117,17 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   getSushi() {
-    if (!this.data.sushiId) { return null; }
-    return getModel('sushi').findById(this.data.sushiId);
+    if (!this.getParam('sushiId')) { return null; }
+    return getModel('sushi').findById(this.getParam('sushiId'));
   }
 
   getInstitution() {
-    if (!this.data.institutionId) { return null; }
-    return getModel('institution').findById(this.data.institutionId);
+    if (!this.getParam('institutionId')) { return null; }
+    return getModel('institution').findById(this.getParam('institutionId'));
+  }
+
+  getParam(prop) {
+    return this.data?.params?.[prop];
   }
 
   setStatus(status) {
@@ -174,6 +180,13 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     return !!(step && step.status === 'finished');
   }
 
+  start() {
+    this.set('status', 'running');
+    this.set('startedAt', new Date());
+    this.updateRunningTime();
+    this.emit('running');
+  }
+
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();
@@ -181,8 +194,8 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   updateRunningTime() {
-    if (this.data && this.data.createdAt) {
-      this.data.runningTime = Date.now() - this.data.createdAt.getTime();
+    if (this.data?.startedAt) {
+      this.data.runningTime = Date.now() - this.data.startedAt.getTime();
     }
   }
 

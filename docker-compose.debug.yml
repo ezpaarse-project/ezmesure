@@ -15,6 +15,12 @@ services:
       file: docker-compose.yml
       service: rp
 
+  redis:
+    image: redis:6.2.6-alpine3.15
+    command: --requirepass "${EZMESURE_REDIS_PASSWORD:-changeme}"
+    ports:
+      - 6379:6379
+
   api:
     image: node:14.17.1
     ports:
@@ -33,6 +39,8 @@ services:
       - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
       - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
       - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
+      - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
+      - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
       - ELASTICSEARCH_PASSWORD
       - KIBANA_PASSWORD
       - EZMESURE_ADMIN_USERNAME
