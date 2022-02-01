@@ -183,7 +183,6 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   start() {
     this.set('status', 'running');
     this.set('startedAt', new Date());
-    this.updateRunningTime();
     this.emit('running');
   }
 
