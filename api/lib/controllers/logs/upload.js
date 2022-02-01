@@ -46,6 +46,7 @@ module.exports = async function upload(ctx) {
   }, {
     headers: { 'es-security-runas-user': username },
   });
+
   const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
   const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
