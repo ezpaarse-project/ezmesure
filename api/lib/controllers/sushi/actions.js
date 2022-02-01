@@ -173,10 +173,10 @@ exports.downloadReport = async (ctx) => {
     const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
     beginDate = prevMonth;
     endDate = prevMonth;
-  } else if (beginDate) {
-    endDate = beginDate;
-  } else {
+  } else if (!beginDate) {
     beginDate = endDate;
+  } else if (!endDate) {
+    endDate = beginDate;
   }
 
   const sushiData = { sushi, beginDate, endDate };
@@ -253,10 +253,10 @@ exports.harvestSushi = async (ctx) => {
     const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
     beginDate = prevMonth;
     endDate = prevMonth;
-  } else if (beginDate) {
-    endDate = beginDate;
-  } else {
+  } else if (!beginDate) {
     beginDate = endDate;
+  } else if (!endDate) {
+    endDate = beginDate;
   }
 
   const task = new Task({
