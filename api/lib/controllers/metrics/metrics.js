@@ -1,11 +1,8 @@
 const elastic = require('../../services/elastic');
 
-/**
- * Return global aggregated metrics
- */
-exports.overall = async (ctx) => {
-  ctx.type = 'json';
+let metrics = {};
 
+exports.getMetric = async () => {
   const { body: result } = await elastic.search({
     body: {
       size: 0,
@@ -40,7 +37,7 @@ exports.overall = async (ctx) => {
     days = Math.ceil((maxDate.value - minDate.value) / (24 * 60 * 60 * 1000));
   }
 
-  ctx.body = {
+  metrics = {
     took,
     docs: hits.total && hits.total.value,
     dateCoverage: {
@@ -54,4 +51,12 @@ exports.overall = async (ctx) => {
       indices: indices.value,
     },
   };
+};
+
+/**
+ * Return global aggregated metrics
+ */
+exports.overall = (ctx) => {
+  ctx.type = 'json';
+  ctx.body = metrics;
 };
