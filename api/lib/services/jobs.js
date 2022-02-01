@@ -2,13 +2,14 @@ const config = require('config');
 const path = require('path');
 const Queue = require('bull');
 
-const redisConfig = config.get('redis');
-
 const { appLogger } = require('./logger');
+
+const harvestConcurrency = Number.parseInt(config.get('jobs.harvest.concurrency'), 10);
+const redisConfig = config.get('redis');
 const logPrefix = '[Harvest Queue]';
 
 const harvestQueue = new Queue('sushi-harvest', { redis: redisConfig });
-harvestQueue.process(path.resolve(__dirname, 'processors', 'harvest.js'));
+harvestQueue.process(harvestConcurrency, path.resolve(__dirname, 'processors', 'harvest.js'));
 
 harvestQueue
   .on('waiting', (jobId) => { appLogger.verbose(`${logPrefix} Job [${jobId}] is pending`); })

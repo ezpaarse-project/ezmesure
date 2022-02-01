@@ -50,6 +50,11 @@
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"
   },
+  "jobs": {
+    "harvest": {
+      "concurrency": "EZMESURE_HARVEST_CONCURRENCY"
+    }
+  },
   "depositors": {
     "index": "EZMESURE_DEPOSITORS_INDEX",
     "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",

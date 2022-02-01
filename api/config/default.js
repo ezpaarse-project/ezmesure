@@ -64,6 +64,11 @@ module.exports = {
   storage: {
     path: path.resolve(__dirname, '../storage'),
   },
+  jobs: {
+    harvest: {
+      concurrency: 3,
+    },
+  },
   notifications: {
     sender: 'ezMESURE',
     cron: '0 0 0 * * *',
