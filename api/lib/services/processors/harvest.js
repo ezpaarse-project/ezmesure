@@ -43,7 +43,7 @@ async function importSushiReport(options = {}) {
   }
 
   function deleteReportFile() {
-    return fs.unlink(reportPath).catch((err) => {
+    return fs.remove(reportPath).catch((err) => {
       appLogger.error(`Failed to delete report file ${reportPath}`);
       appLogger.error(err.message);
     });
