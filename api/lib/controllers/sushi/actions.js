@@ -213,12 +213,8 @@ exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
   const { sushi, user, institution } = ctx.state;
-  const {
-    target,
-    beginDate,
-    endDate,
-    forceDownload,
-  } = body;
+  const { target, forceDownload } = body;
+  let { beginDate, endDate } = body;
 
   let index = target;
 
@@ -251,6 +247,16 @@ exports.harvestSushi = async (ctx) => {
 
   if (!canWrite) {
     ctx.throw(403, `you don't have permission to write in ${index}`);
+  }
+
+  if (!beginDate && !endDate) {
+    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    beginDate = prevMonth;
+    endDate = prevMonth;
+  } else if (beginDate) {
+    endDate = beginDate;
+  } else {
+    beginDate = endDate;
   }
 
   const task = new Task({
