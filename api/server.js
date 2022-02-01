@@ -126,7 +126,6 @@ function start() {
   notifications.start(appLogger);
   depositors.start(appLogger);
   opendata.startCron(appLogger);
-  getMetric();
   cronMetrics.start();
 
   // Change the status of tasks that was running when the server went down
