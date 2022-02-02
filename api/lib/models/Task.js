@@ -26,6 +26,7 @@ const schema = {
     status: Joi.string().trim(),
     startTime: Joi.date(),
     took: Joi.number(),
+    data: Joi.object(),
   })),
 
   result: Joi.object(),
@@ -143,17 +144,21 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     return this.data.steps.find((s) => s.label === label);
   }
 
-  newStep(label) {
+  newStep(label, data) {
     if (!Array.isArray(this.data.steps)) {
       this.data.steps = [];
     }
 
-    this.data.steps.push({
+    const step = {
       label,
       startTime: new Date(),
       status: 'running',
       took: 0,
-    });
+      data: data || {},
+    };
+
+    this.data.steps.push(step);
+    return step;
   }
 
   endStep(label, opts = {}) {
