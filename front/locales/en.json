@@ -264,6 +264,8 @@
       "title": "Steps",
       "startedOn": "Started on {date}",
       "terminatedIn": "Terminated in {duration}",
+      "processedItems": "{n} processed items",
+      "progress": "Progress: {progress}%",
       "labels": {
         "download": "Report download",
         "validation": "Report validation",

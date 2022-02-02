@@ -264,6 +264,8 @@
       "title": "Étapes",
       "startedOn": "Démarrée le {date}",
       "terminatedIn": "Terminée en {duration}",
+      "processedItems": "{n} entrées traitées",
+      "progress": "Progression : {progress}%",
       "labels": {
         "download": "Téléchargement du rapport",
         "validation": "Validation du rapport",

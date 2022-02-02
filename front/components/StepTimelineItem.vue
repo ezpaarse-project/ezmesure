@@ -13,6 +13,12 @@
     <div v-if="duration" class="caption">
       {{ $t('tasks.steps.terminatedIn', { duration }) }}
     </div>
+    <div v-if="data.processedReportItems" class="caption">
+      {{ $t('tasks.steps.processedItems', { n: data.processedReportItems }) }}
+    </div>
+    <div v-if="data.progress && data.progress < 100" class="caption">
+      {{ $t('tasks.steps.progress', { progress: data.progress }) }}
+    </div>
   </v-timeline-item>
 </template>
 
@@ -54,6 +60,9 @@ export default {
       }
 
       return null;
+    },
+    data() {
+      return this.step?.data || {};
     },
     color() {
       return statusColors.get(this.step?.status) || 'grey';
