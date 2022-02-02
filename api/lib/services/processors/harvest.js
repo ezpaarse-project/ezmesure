@@ -187,7 +187,7 @@ async function importSushiReport(options = {}) {
     }
   }
 
-  const bulk = [];
+  const bulkItems = [];
   const bulkSize = 2000;
   const response = {
     inserted: 0,
@@ -203,6 +203,29 @@ async function importSushiReport(options = {}) {
     if (response.errors.length < 9) {
       response.errors.push(message);
     }
+  };
+
+  const insertItems = async (bulkOps) => {
+    const { body: bulkResult } = await elastic.bulk(
+      { body: bulkOps },
+      { headers: { 'es-security-runas-user': username } },
+    );
+
+    if (!Array.isArray(bulkResult?.items)) { return; }
+
+    bulkResult?.items.forEach((i) => {
+      if (i?.index?.result === 'created') {
+        response.inserted += 1;
+      } else if (i?.index?.result === 'updated') {
+        response.updated += 1;
+      } else {
+        response.failed += 1;
+
+        if (i?.index?.error && response.errors.length < 10) {
+          response.errors.push(i.index.error);
+        }
+      }
+    });
   };
 
   /**
@@ -260,7 +283,9 @@ async function importSushiReport(options = {}) {
     Report_Attributes: list2object(report?.Report_Header?.Report_Attributes, { splitValuesBy: '|' }),
   };
 
-  report.Report_Items.forEach((reportItem) => {
+  for (let i = 0; i < report.Report_Items.length; i += 1) {
+    const reportItem = report.Report_Items[i];
+
     if (!Array.isArray(reportItem.Item_ID)) {
       addError('Item has no Item_ID');
       return;
@@ -303,7 +328,9 @@ async function importSushiReport(options = {}) {
       };
     }
 
-    reportItem.Performance.forEach((performance) => {
+    for (let p = 0; p < reportItem.Performance.length; p += 1) {
+      const performance = reportItem.Performance[p];
+
       if (!Array.isArray(performance.Instance)) { return; }
 
       const period = performance.Period;
@@ -355,8 +382,8 @@ async function importSushiReport(options = {}) {
             .digest('hex'),
         ].join(':');
 
-        bulk.push({ index: { _index: index, _id: id } });
-        bulk.push({
+        bulkItems.push({ index: { _index: index, _id: id } });
+        bulkItems.push({
           ...item,
           X_Date_Month: date,
           Metric_Type: metricType,
@@ -364,47 +391,17 @@ async function importSushiReport(options = {}) {
           Period: period,
         });
       });
-    });
-  });
-
-  for (let offset = 0; offset <= bulk.length; offset += bulkSize) {
-    let bulkResult;
-
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const result = await elastic.bulk(
-        { body: bulk.slice(offset, offset + bulkSize) },
-        { headers: { 'es-security-runas-user': username } },
-      );
-      bulkResult = result.body;
-    } catch (e) {
-      task.fail(['Failed to import performance items', e.message]).catch((err) => {
-        appLogger.error('Failed to save sushi task');
-        appLogger.error(err);
-      });
-      saveTask();
-      return;
     }
 
-    const resultItems = (bulkResult && bulkResult.items) || [];
-
-    resultItems.forEach((i) => {
-      if (!i.index) {
-        response.failed += 1;
-      } else if (i.index.result === 'created') {
-        response.inserted += 1;
-      } else if (i.index.result === 'updated') {
-        response.updated += 1;
-      } else {
-        if (response.errors.length < 10) {
-          response.errors.push(i.index.error);
-        }
-        response.failed += 1;
-      }
-    });
-
-    task.setResult(response);
+    if (bulkItems.length >= bulkSize) {
+      // eslint-disable-next-line no-await-in-loop
+      await insertItems(bulkItems.splice(0, bulkSize));
+    }
   }
+
+  await insertItems(bulkItems);
+
+  task.setResult(response);
 
   task.log('info', 'Sushi harvesting terminated');
   task.log('info', `Covered periods: ${response.coveredPeriods.join(', ')}`);
@@ -464,7 +461,8 @@ async function processJob(job) {
   try {
     await importSushiReport({ ...taskParams, sushi, task });
   } catch (err) {
-    appLogger.info(`Failed to import sushi report ${sushi.getId()}: ${err.message}`);
+    appLogger.error(`Failed to import sushi report [${sushi.getId()}]`);
+    appLogger.error(err.message);
     task.fail(['Failed to import sushi report', err.message]);
     task.save().catch((e) => {
       appLogger.error('Failed to save sushi task');
