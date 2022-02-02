@@ -161,7 +161,7 @@ async function importSushiReport(options = {}) {
 
   task.log('info', `Importing report into '${index}'`);
   task.endStep('validation');
-  task.newStep('insert');
+  const insertStep = task.newStep('insert');
   await saveTask();
 
   let indexExists;
@@ -283,6 +283,14 @@ async function importSushiReport(options = {}) {
     Report_Attributes: list2object(report?.Report_Header?.Report_Attributes, { splitValuesBy: '|' }),
   };
 
+  const reportItems = Array.isArray(report?.Report_Items) ? report.Report_Items : [];
+  const totalItems = reportItems.length;
+
+  insertStep.data.totalReportItems = totalItems;
+  insertStep.data.processedReportItems = 0;
+  insertStep.data.progress = 0;
+  let lastSaveDate = Date.now();
+
   for (let i = 0; i < report.Report_Items.length; i += 1) {
     const reportItem = report.Report_Items[i];
 
@@ -396,10 +404,21 @@ async function importSushiReport(options = {}) {
     if (bulkItems.length >= bulkSize) {
       // eslint-disable-next-line no-await-in-loop
       await insertItems(bulkItems.splice(0, bulkSize));
+      insertStep.data.processedReportItems = i + 1;
+      insertStep.data.progress = Math.floor(((i + 1) / totalItems) * 100);
+
+      if ((Date.now() - lastSaveDate) > 5000) {
+        // eslint-disable-next-line no-await-in-loop
+        await saveTask();
+        lastSaveDate = Date.now();
+      }
     }
   }
 
   await insertItems(bulkItems);
+
+  insertStep.data.processedReportItems = totalItems;
+  insertStep.data.progress = 100;
 
   task.setResult(response);
 
