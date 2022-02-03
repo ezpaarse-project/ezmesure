@@ -12,6 +12,9 @@ errors:
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
 
+  queue:
+    notFound: Queue not found
+
   auth:
     reservedUser: cannot login as reserved user
     noEmailInHeaders: email not found in Shibboleth headers

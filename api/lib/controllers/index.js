@@ -21,6 +21,7 @@ const dashboards = require('./dashboards');
 const spaces = require('./spaces');
 const indices = require('./indices');
 const roles = require('./roles');
+const queues = require('./queues');
 
 const openapi = require('./openapi.json');
 
@@ -75,5 +76,6 @@ app.use(dashboards.prefix('/dashboards').middleware());
 app.use(spaces.prefix('/spaces').middleware());
 app.use(indices.prefix('/indices').middleware());
 app.use(roles.prefix('/roles').middleware());
+app.use(queues.prefix('/queues').middleware());
 
 module.exports = app;

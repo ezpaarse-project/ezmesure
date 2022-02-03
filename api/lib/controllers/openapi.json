@@ -1245,6 +1245,77 @@
             "readOnly": true
           }
         }
+      },
+      "Queue": {
+        "description": "Status of a job queue",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "id": "sushi",
+            "jobCounts": 123,
+            "completedCount": 123,
+            "failedCount": 123,
+            "delayedCount": 123,
+            "activeCount": 123,
+            "waitingCount": 123,
+            "pausedCount": 123
+          }
+        },
+        "title": "Queue",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the queue",
+            "example": "harvest"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "Whether the queue is currently paused"
+          },
+          "jobCounts": {
+            "type": "object",
+            "required": [
+              "waiting",
+              "active",
+              "completed",
+              "failed",
+              "delayed",
+              "paused"
+            ],
+            "properties": {
+              "waiting": {
+                "type": "number",
+                "description": "Number of waiting jobs"
+              },
+              "active": {
+                "type": "number",
+                "description": "Number of active jobs"
+              },
+              "completed": {
+                "type": "number",
+                "description": "Number of completed jobs"
+              },
+              "failed": {
+                "type": "number",
+                "description": "Number of failed jobs"
+              },
+              "delayed": {
+                "type": "number",
+                "description": "Number of delayed jobs"
+              },
+              "paused": {
+                "type": "number",
+                "description": "Number of paused jobs"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "paused",
+          "jobCounts"
+        ]
       }
     }
   },
@@ -3408,6 +3479,199 @@
           }
         },
         "operationId": "resetPassword"
+      }
+    },
+    "/queues": {
+      "get": {
+        "summary": "Get status of all job queues",
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "get-jobs",
+        "description": "Get queue status for all job types",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobQueue"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/queues/{type}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "get": {
+        "summary": "Get status of a job queue",
+        "tags": [
+          "Jobs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobQueue"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type",
+        "description": "Get the status of a specific job queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queues/{type}/_pause": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "post": {
+        "summary": "Pause a job queue",
+        "tags": [
+          "Jobs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paused": {
+                      "type": "boolean",
+                      "description": "Whether the queue is paused or not"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type-_pause",
+        "description": "Pause a job queue (does not affect jobs that are already running)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queues/{type}/_resume": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "post": {
+        "summary": "Resume a job queue",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paused": {
+                      "type": "boolean",
+                      "description": "Whether the queue is paused or not"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type-_resume",
+        "description": "Resume a job queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Jobs"
+        ]
       }
     },
     "/roles": {

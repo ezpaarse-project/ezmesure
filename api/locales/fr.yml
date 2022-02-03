@@ -12,6 +12,9 @@ errors:
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
 
+  queue:
+    notFound: File d'attente introuvable
+
   auth:
     reservedUser: vous ne pouvez pas vous connecter avec un utilisateur réservé
     noEmailInHeaders: Email introuvable dans les headers Shibboleth
