@@ -1,4 +1,3 @@
-
 const env = process.env.NODE_ENV || 'development';
 
 const Koa = require('koa');
@@ -16,6 +15,7 @@ const Task = require('./lib/models/Task');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
 
+const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
 
 module.exports = { appLogger };
@@ -125,6 +125,7 @@ function start() {
   notifications.start(appLogger);
   depositors.start(appLogger);
   opendata.startCron(appLogger);
+  cronMetrics.start();
 
   // Change the status of tasks that was running when the server went down
   Task.interruptRunningTasks()
