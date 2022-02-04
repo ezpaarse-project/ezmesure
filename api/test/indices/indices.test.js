@@ -1,8 +1,8 @@
-const ezmesure = require('../utils/ezmesure');
+const ezmesure = require('../setup/ezmesure');
 
-const login = require('../utils/login');
-const { createUser, deleteUser } = require('../utils/users');
-const { createIndex, deleteIndex } = require('../utils/indices');
+const login = require('../setup/login');
+const { createUser, deleteUser } = require('../setup/users');
+const { createIndex, deleteIndex } = require('../setup/indices');
 
 describe('GET /indices', () => {
   describe('GET /indices/index-test - get indice "index-test" with ezmesure-token', () => {

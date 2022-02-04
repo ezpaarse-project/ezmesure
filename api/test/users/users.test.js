@@ -1,7 +1,7 @@
-const ezmesure = require('../utils/ezmesure');
+const ezmesure = require('../setup/ezmesure');
 
-const { createUser, deleteUser } = require('../utils/users');
-const login = require('../utils/login');
+const { createUser, deleteUser } = require('../setup/users');
+const login = require('../setup/login');
 
 describe('GET /users', () => {
   describe('GET /users - get all users with ezmesure-admin token', () => {
@@ -52,7 +52,7 @@ describe('GET /users', () => {
       expect(user).toHaveProperty('username', 'ezmesure-admin');
       expect(user).toHaveProperty('roles', ['superuser']);
       expect(user).toHaveProperty('full_name', 'ezMESURE Administrator');
-      expect(user).toHaveProperty('email', null);
+      expect(user).toHaveProperty('email', 'admin@admin.com');
       expect(user).toHaveProperty('metadata', { acceptedTerms: true });
       expect(user).toHaveProperty('enabled', true);
     });

@@ -1,8 +1,8 @@
-const ezmesure = require('../utils/ezmesure');
+const ezmesure = require('../setup/ezmesure');
 
-const login = require('../utils/login');
-const { createUser, deleteUser } = require('../utils/users');
-const { createRole, deleteRole } = require('../utils/roles');
+const login = require('../setup/login');
+const { createUser, deleteUser } = require('../setup/users');
+const { createRole, deleteRole } = require('../setup/roles');
 
 describe('GET /roles', () => {
   describe('GET /roles - get all roles with ezmesure-admin token', () => {
