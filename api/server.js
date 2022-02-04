@@ -16,7 +16,6 @@ const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
 
 const cronMetrics = require('./lib/controllers/metrics/cron');
-const { getMetric } = require('./lib/controllers/metrics/metrics');
 const { appLogger, httpLogger } = require('./lib/services/logger');
 
 module.exports = { appLogger };
