@@ -1,6 +1,6 @@
 const { CronJob } = require('cron');
 const { getMetric } = require('./metrics');
-const logger = require('../../services/logger');
+const { appLogger } = require('../../services/logger');
 
 const job = new CronJob({
   cronTime: '0 0 0 * * *',
@@ -9,6 +9,6 @@ const job = new CronJob({
 });
 
 exports.start = () => {
-  logger.info('Cache is running (metrics)');
+  appLogger.info('Cache is running (metrics)');
   job.start();
 };
