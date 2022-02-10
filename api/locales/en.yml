@@ -23,6 +23,9 @@ errors:
     unableToFetchUser: Unable to fetch user data, please log in again
     noUserFound: No user found
 
+  endpoint:
+    notFound: Endpoint not found
+
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
     institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"

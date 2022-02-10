@@ -23,6 +23,9 @@ errors:
     unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
     noUserFound: Utilisateur introuvable
 
+  endpoint:
+    notFound: Point d'accès introuvable
+
   sushi:
     unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
     institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
