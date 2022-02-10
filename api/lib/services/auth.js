@@ -3,6 +3,7 @@ const jwt = require('koa-jwt');
 const elastic = require('./elastic');
 const Institution = require('../models/Institution');
 const Sushi = require('../models/Sushi');
+const SushiEndpoint = require('../models/SushiEndpoint');
 
 const requireJwt = jwt({
   secret: auth.secret,
@@ -140,6 +141,43 @@ function fetchSushi(opts = {}) {
 }
 
 /**
+ * Middleware that fetches a SUSHI endpoint and put it in ctx.state.endpoint
+ * Looks for endpointId in the route params by default
+ */
+function fetchSushiEndpoint(opts = {}) {
+  const { query: queryField } = opts;
+  let { params: paramField } = opts;
+
+  if (!paramField && !queryField) {
+    paramField = 'endpointId';
+  }
+
+  return async (ctx, next) => {
+    let endpointId;
+
+    if (typeof opts === 'function') {
+      endpointId = opts(ctx);
+    }
+    if (paramField && !endpointId) {
+      endpointId = ctx.params[paramField];
+    }
+    if (queryField && !endpointId) {
+      endpointId = ctx.query[queryField];
+    }
+
+    const endpoint = await SushiEndpoint.findById(endpointId);
+
+    if (!endpoint) {
+      ctx.throw(404, ctx.$t('errors.endpoint.notFound'));
+      return;
+    }
+
+    ctx.state.endpoint = endpoint;
+    await next();
+  };
+}
+
+/**
  * Middleware that checks that user is either admin or institution contact
  * Assumes that ctx.state contains institution and user
  */
@@ -184,6 +222,7 @@ module.exports = {
   requireAnyRole,
   fetchInstitution,
   fetchSushi,
+  fetchSushiEndpoint,
   requireContact,
   requireValidatedInstitution,
 };
