@@ -243,7 +243,8 @@ waitForElasticsearch()
   .then(setKibanaPassword)
   .then(start)
   .catch((e) => {
-    appLogger.error(e);
+    appLogger.error(e.message);
+    appLogger.error(e.stack);
     appLogger.error('Error during bootstrap, shutting down...');
     process.exit(1);
   });
