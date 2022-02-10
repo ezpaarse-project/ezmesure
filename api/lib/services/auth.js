@@ -66,7 +66,11 @@ const requireAdmin = (ctx, next) => {
  * Looks for institutionId in the route params by default
  */
 function fetchInstitution(opts = {}) {
-  const { query: queryField } = opts;
+  const {
+    query: queryField,
+    getId,
+    ignoreNotFound,
+  } = opts;
   let { params: paramField } = opts;
 
   if (!paramField && !queryField) {
@@ -76,8 +80,8 @@ function fetchInstitution(opts = {}) {
   return async (ctx, next) => {
     let institutionId;
 
-    if (typeof opts === 'function') {
-      institutionId = opts(ctx);
+    if (typeof getId === 'function') {
+      institutionId = getId(ctx);
     }
     if (paramField && !institutionId) {
       institutionId = ctx.params[paramField];
@@ -86,9 +90,9 @@ function fetchInstitution(opts = {}) {
       institutionId = ctx.query[queryField];
     }
 
-    const institution = await Institution.findById(institutionId);
+    const institution = institutionId && await Institution.findById(institutionId);
 
-    if (!institution) {
+    if (!institution && !ignoreNotFound) {
       ctx.throw(404, ctx.$t('errors.institution.notFound'));
       return;
     }
