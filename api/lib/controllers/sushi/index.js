@@ -85,7 +85,7 @@ router.route({
   method: 'POST',
   path: '/',
   handler: [
-    fetchInstitution((ctx) => ctx?.request?.body?.institutionId),
+    fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),
     requireContact(),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
     addSushi,
@@ -125,7 +125,7 @@ router.route({
  */
 const commonHandlers = [
   fetchSushi(),
-  fetchInstitution((ctx) => ctx?.state?.sushi?.get?.('institutionId')),
+  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.get?.('institutionId') }),
   requireContact(),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
 ];
