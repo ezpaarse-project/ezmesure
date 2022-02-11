@@ -7,6 +7,7 @@ exports.getAll = async (ctx) => {
     requireRequestorId,
     requireApiKey,
     isSushiCompliant,
+    tags,
   } = ctx.query;
 
   if (typeof requireCustomerId === 'boolean') {
@@ -20,6 +21,9 @@ exports.getAll = async (ctx) => {
   }
   if (typeof isSushiCompliant === 'boolean') {
     filters.push(SushiEndpoint.filterBy('isSushiCompliant', isSushiCompliant));
+  }
+  if (tags) {
+    filters.push(SushiEndpoint.filterBy('tags.name', Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim())));
   }
 
   ctx.type = 'json';

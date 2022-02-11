@@ -2,6 +2,11 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 const SushiEndpoint = require('../../models/SushiEndpoint');
 
+const stringOrArray = Joi.alternatives().try(
+  Joi.string().trim().min(1),
+  Joi.array().items(Joi.string().trim().min(1)).min(1),
+);
+
 const {
   requireJwt,
   requireUser,
@@ -43,6 +48,7 @@ router.route({
       requireRequestorId: Joi.boolean(),
       requireApiKey: Joi.boolean(),
       isSushiCompliant: Joi.boolean(),
+      tags: stringOrArray,
     },
   },
 });
