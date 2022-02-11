@@ -744,6 +744,10 @@
             "type": "string",
             "description": "Description of the SUSHI endpoint"
           },
+          "companies": {
+            "type": "string",
+            "description": "Companies behind the SUSHI endpoint"
+          },
           "requireRequestorId": {
             "type": "boolean",
             "description": "Whether the endpoint requires a requestor ID"
