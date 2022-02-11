@@ -40,6 +40,8 @@ const createSchema = {
 const updateSchema = {
   ...createSchema,
   institutionId: Joi.any().strip(),
+  vendor: schema.vendor.optional(),
+  sushiUrl: schema.sushiUrl.optional(),
 };
 
 class SushiEndpoint extends typedModel(type, schema, createSchema, updateSchema) {

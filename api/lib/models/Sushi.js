@@ -47,6 +47,8 @@ const createSchema = {
 const updateSchema = {
   ...createSchema,
   institutionId: Joi.any().strip(),
+  package: schema.package.optional(),
+  sushiUrl: schema.package.optional(),
 };
 
 class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
