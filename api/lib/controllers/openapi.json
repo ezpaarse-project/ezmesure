@@ -761,7 +761,14 @@
             "description": "Whether the endpoint requires an API key"
           },
           "isSushiCompliant": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the endpoint is SUSHI compliant"
+          },
+          "counterVersion": {
+            "type": "string",
+            "example": "5.0.1",
+            "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?$",
+            "description": "The COUNTER version supported by the endpoint"
           },
           "params": {
             "type": "array",

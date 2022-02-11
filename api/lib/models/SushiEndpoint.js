@@ -13,6 +13,7 @@ const schema = {
   sushiUrl: Joi.string().trim().required(),
   description: Joi.string().trim().allow(''),
   companies: Joi.string().trim().allow(''),
+  counterVersion: Joi.string().trim().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/).empty(''),
 
   requireCustomerId: Joi.boolean().default(false),
   requireRequestorId: Joi.boolean().default(false),
