@@ -42,8 +42,6 @@ const createSchema = {
 
 const updateSchema = {
   ...createSchema,
-  sushiId: Joi.any().strip(),
-  institutionId: Joi.any().strip(),
 };
 
 class Task extends typedModel(type, schema, createSchema, updateSchema) {
