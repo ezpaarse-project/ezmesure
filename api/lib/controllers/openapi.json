@@ -776,6 +776,28 @@
                 "name"
               ]
             }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags associated with the endpoint",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Tag name"
+                },
+                "color": {
+                  "type": "string",
+                  "description": "Tag color",
+                  "example": "#0a79e7",
+                  "pattern": "^#([a-f0-9]{6}|[a-f0-9]{3})$"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
           }
         },
         "required": [
