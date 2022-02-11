@@ -131,8 +131,7 @@ router.route({
     params: {
       endpointId: Joi.string().trim().required(),
     },
-    body: Joi.object(SushiEndpoint.updateSchema)
-      .fork(Object.keys(SushiEndpoint.updateSchema), (schema) => schema.optional()),
+    body: SushiEndpoint.updateSchema,
   },
 });
 
