@@ -23,7 +23,7 @@ errors:
     unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
     noUserFound: Utilisateur introuvable
 
-  endpoint:
+  sushi-endpoint:
     notFound: Point d'accès introuvable
 
   sushi:

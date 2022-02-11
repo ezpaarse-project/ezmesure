@@ -23,7 +23,7 @@ errors:
     unableToFetchUser: Unable to fetch user data, please log in again
     noUserFound: No user found
 
-  endpoint:
+  sushi-endpoint:
     notFound: Endpoint not found
 
   sushi:
