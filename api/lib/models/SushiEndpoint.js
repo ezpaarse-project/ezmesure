@@ -10,6 +10,7 @@ const schemas = {
     updatedAt: Joi.date(),
     createdAt: Joi.date(),
 
+    validated: Joi.boolean().default(false),
 
     vendor: Joi.string().trim(),
     sushiUrl: Joi.string().trim(),
@@ -51,13 +52,13 @@ schemas.adminUpdate = {
 
 schemas.create = {
   ...schemas.adminCreate,
+  validated: Joi.any().strip(),
 };
 
 schemas.update = {
   ...schemas.adminUpdate,
   institutionId: Joi.any().strip(),
-  vendor: schema.vendor.optional(),
-  sushiUrl: schema.sushiUrl.optional(),
+  validated: Joi.any().strip(),
 };
 
 class SushiEndpoint extends typedModel({ type, schemas }) {

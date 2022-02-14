@@ -748,6 +748,10 @@
             "type": "string",
             "description": "Companies behind the SUSHI endpoint"
           },
+          "validated": {
+            "type": "boolean",
+            "description": "Whether the endpoint has been validated or not"
+          },
           "requireRequestorId": {
             "type": "boolean",
             "description": "Whether the endpoint requires a requestor ID"
