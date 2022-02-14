@@ -10,7 +10,6 @@ const stringOrArray = Joi.alternatives().try(
 const {
   requireJwt,
   requireUser,
-  requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
   fetchInstitution,
@@ -39,7 +38,6 @@ router.route({
   method: 'GET',
   path: '/',
   handler: [
-    requireAdmin,
     getAll,
   ],
   validate: {
