@@ -81,6 +81,11 @@ app.use(async (ctx, next) => {
   } catch (error) {
     ctx.status = error.status || 500;
 
+    if (error?.name === 'ValidationError') {
+      ctx.status = 400;
+      error.expose = true;
+    }
+
     if (ctx.status >= 500) {
       ctx.app.emit('error', error, ctx, false);
     }
