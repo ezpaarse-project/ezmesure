@@ -65,7 +65,6 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: SushiEndpoint.getSchema('create'),
   },
 });
 
@@ -135,7 +134,6 @@ router.route({
     params: {
       endpointId: Joi.string().trim().required(),
     },
-    body: SushiEndpoint.getSchema('update'),
   },
 });
 

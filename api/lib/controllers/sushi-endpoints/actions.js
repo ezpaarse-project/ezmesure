@@ -49,7 +49,9 @@ exports.addEndpoint = async (ctx) => {
     institutionName: institution?.get('name'),
   };
 
-  const endpoint = new SushiEndpoint(body);
+  const endpoint = new SushiEndpoint(body, {
+    schema: ctx.state?.userIsAdmin ? 'adminCreate' : 'create',
+  });
   await endpoint.save();
 
   ctx.metadata.endpointId = endpoint.getId();
@@ -62,7 +64,9 @@ exports.updateEndpoint = async (ctx) => {
   const { endpoint, institution } = ctx.state;
   const { body } = ctx.request;
 
-  endpoint.update(body);
+  endpoint.update(body, {
+    schema: ctx.state?.userIsAdmin ? 'adminUpdate' : 'update',
+  });
 
   ctx.metadata = {
     endpointId: endpoint.getId(),
