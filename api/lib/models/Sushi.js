@@ -6,52 +6,66 @@ const { appLogger } = require('../services/logger');
 const type = 'sushi';
 const cryptedFields = ['requestorId', 'consortialId', 'customerId', 'apiKey'];
 
-const schema = {
-  id: Joi.string().trim().required(),
-  institutionId: Joi.string().trim().required(),
-  updatedAt: Joi.date(),
-  createdAt: Joi.date(),
+const schemas = {
+  base: {
+    id: Joi.string().trim(),
+    institutionId: Joi.string().trim(),
+    updatedAt: Joi.date(),
+    createdAt: Joi.date(),
 
-  vendor: Joi.string().trim().required(),
-  package: Joi.string().trim().required(),
-  sushiUrl: Joi.string().trim().required(),
-  requestorId: Joi.string().trim().allow(''),
-  consortialId: Joi.string().trim().allow(''),
-  customerId: Joi.string().trim().allow(''),
-  apiKey: Joi.string().trim().allow(''),
-  comment: Joi.string().trim().allow(''),
+    vendor: Joi.string().trim().allow(''),
+    package: Joi.string().trim(),
+    sushiUrl: Joi.string().trim(),
+    requestorId: Joi.string().trim().allow(''),
+    consortialId: Joi.string().trim().allow(''),
+    customerId: Joi.string().trim().allow(''),
+    apiKey: Joi.string().trim().allow(''),
+    comment: Joi.string().trim().allow(''),
 
-  ignoreReportValidation: Joi.boolean(),
+    ignoreReportValidation: Joi.boolean(),
 
-  connection: Joi.object({
-    success: Joi.boolean(),
-    date: Joi.date(),
-    exceptions: Joi.array().items(Joi.string()),
-  }),
-  latestImportTask: Joi.object(),
+    connection: Joi.object({
+      success: Joi.boolean(),
+      date: Joi.date(),
+      exceptions: Joi.array().items(Joi.string()),
+    }),
+    latestImportTask: Joi.object(),
 
-  params: Joi.array().items(Joi.object({
-    name: Joi.string().trim().required(),
-    value: Joi.string().trim().allow(''),
-  })),
+    params: Joi.array().items(Joi.object({
+      name: Joi.string().trim().required(),
+      value: Joi.string().trim().allow(''),
+    })),
+  },
 };
 
-const createSchema = {
-  ...schema,
+schemas.adminCreate = {
+  ...schemas.base,
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
   latestImportTask: Joi.any().strip(),
+
+  institutionId: schemas.base.institutionId.required(),
+  package: schemas.base.package.required(),
 };
 
-const updateSchema = {
-  ...createSchema,
+schemas.adminUpdate = {
+  ...schemas.adminCreate,
+  institutionId: schemas.base.institutionId.optional(),
+  package: schemas.base.package.optional(),
+};
+
+schemas.create = {
+  ...schemas.adminCreate,
+};
+
+schemas.update = {
+  ...schemas.create,
   institutionId: Joi.any().strip(),
-  package: schema.package.optional(),
-  sushiUrl: schema.package.optional(),
+  package: schemas.base.package.optional(),
 };
 
-class Sushi extends typedModel(type, schema, createSchema, updateSchema) {
+class Sushi extends typedModel({ type, schemas }) {
   static async findByInstitutionId(institutionId, opts) {
     const options = opts || {};
 

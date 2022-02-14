@@ -3,48 +3,50 @@ const { typedModel, registerModel, getModel } = require('./TypedModel');
 
 const type = 'task';
 
-const schema = {
-  id: Joi.string().trim().required(),
-  updatedAt: Joi.date(),
-  startedAt: Joi.date(),
-  createdAt: Joi.date(),
+const schemas = {
+  base: {
+    id: Joi.string().trim().required(),
+    updatedAt: Joi.date(),
+    startedAt: Joi.date(),
+    createdAt: Joi.date(),
 
-  params: Joi.object(),
+    params: Joi.object(),
 
-  type: Joi.string().trim(),
-  status: Joi.string(),
-  runningTime: Joi.number(),
-
-  logs: Joi.array().items(Joi.object({
-    date: Joi.date().required(),
     type: Joi.string().trim(),
-    message: Joi.string().trim(),
-  })),
+    status: Joi.string(),
+    runningTime: Joi.number(),
 
-  steps: Joi.array().items(Joi.object({
-    label: Joi.string().trim(),
-    status: Joi.string().trim(),
-    startTime: Joi.date(),
-    took: Joi.number(),
-    data: Joi.object(),
-  })),
+    logs: Joi.array().items(Joi.object({
+      date: Joi.date().required(),
+      type: Joi.string().trim(),
+      message: Joi.string().trim(),
+    })),
 
-  result: Joi.object(),
+    steps: Joi.array().items(Joi.object({
+      label: Joi.string().trim(),
+      status: Joi.string().trim(),
+      startTime: Joi.date(),
+      took: Joi.number(),
+      data: Joi.object(),
+    })),
+
+    result: Joi.object(),
+  },
 };
 
-const createSchema = {
-  ...schema,
+schemas.create = {
+  ...schemas.base,
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
   startedAt: Joi.any().strip(),
 };
 
-const updateSchema = {
-  ...createSchema,
+schemas.update = {
+  ...schemas.create,
 };
 
-class Task extends typedModel(type, schema, createSchema, updateSchema) {
+class Task extends typedModel({ type, schemas }) {
   static async findByInstitutionId(institutionId) {
     return this.findAll({
       filters: [

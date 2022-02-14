@@ -80,7 +80,7 @@ exports.createInstitution = async (ctx) => {
   }
 
   const institution = new Institution(body, {
-    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+    schema: isAdmin(user) ? 'adminCreate' : 'create',
   });
 
   if (!isAdmin(user) || creator !== false) {
@@ -114,7 +114,7 @@ exports.updateInstitution = async (ctx) => {
   }
 
   institution.update(body, {
-    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+    schema: isAdmin(user) ? 'adminUpdate' : 'update',
   });
 
   if (body.logo) {

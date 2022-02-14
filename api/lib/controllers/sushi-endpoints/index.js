@@ -65,7 +65,7 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: SushiEndpoint.createSchema,
+    body: SushiEndpoint.getSchema('create'),
   },
 });
 
@@ -87,8 +87,8 @@ router.route({
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array().required().items({
-      ...SushiEndpoint.updateSchema,
-      id: SushiEndpoint.schema.id.optional(),
+      ...SushiEndpoint.getSchema('update'),
+      id: SushiEndpoint.getSchema('base')?.id,
     }),
   },
 });
@@ -135,7 +135,7 @@ router.route({
     params: {
       endpointId: Joi.string().trim().required(),
     },
-    body: SushiEndpoint.updateSchema,
+    body: SushiEndpoint.getSchema('update'),
   },
 });
 

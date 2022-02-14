@@ -15,64 +15,82 @@ const readOnlySuffix = '_read_only';
 
 const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 
-const schema = {
-  id: Joi.string(),
-  validated: Joi.boolean().default(false),
-  updatedAt: Joi.date(),
-  createdAt: Joi.date(),
+const schemas = {
+  base: {
+    id: Joi.string(),
+    validated: Joi.boolean().default(false),
+    updatedAt: Joi.date(),
+    createdAt: Joi.date(),
 
-  indexCount: Joi.number().default(0),
-  indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]*$/).allow(''),
+    indexCount: Joi.number().default(0),
+    indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]*$/).allow(''),
 
-  creator: Joi.string().allow('').allow(null),
-  role: Joi.string().allow('').allow(null),
-  space: Joi.string().allow('').allow(null),
-  hidePartner: Joi.boolean().default(false),
+    creator: Joi.string().allow('').allow(null),
+    role: Joi.string().allow('').allow(null),
+    space: Joi.string().allow('').allow(null),
+    hidePartner: Joi.boolean().default(false),
 
-  techContactName: Joi.string().allow('').allow(null),
-  docContactName: Joi.string().allow('').allow(null),
+    techContactName: Joi.string().allow('').allow(null),
+    docContactName: Joi.string().allow('').allow(null),
 
-  type: Joi.string().allow(''),
-  name: Joi.string().allow(''),
-  acronym: Joi.string().allow(''),
-  website: Joi.string().allow(''),
-  city: Joi.string().allow(''),
-  uai: Joi.string().allow(''),
-  logoId: Joi.string().empty('').allow(null),
+    type: Joi.string().allow(''),
+    name: Joi.string().allow(''),
+    acronym: Joi.string().allow(''),
+    website: Joi.string().allow(''),
+    city: Joi.string().allow(''),
+    uai: Joi.string().allow(''),
+    logoId: Joi.string().empty('').allow(null),
 
-  twitterUrl: Joi.string().allow(''),
-  linkedinUrl: Joi.string().allow(''),
-  youtubeUrl: Joi.string().allow(''),
-  facebookUrl: Joi.string().allow(''),
+    twitterUrl: Joi.string().allow(''),
+    linkedinUrl: Joi.string().allow(''),
+    youtubeUrl: Joi.string().allow(''),
+    facebookUrl: Joi.string().allow(''),
 
-  domains: Joi.array().default([]).items(Joi.string()),
-  auto: Joi.object({
-    ezmesure: Joi.boolean().default(false),
-    ezpaarse: Joi.boolean().default(false),
-    report: Joi.boolean().default(false),
-    sushi: Joi.boolean().default(false),
-  }).default(),
+    domains: Joi.array().default([]).items(Joi.string()),
+    auto: Joi.object({
+      ezmesure: Joi.boolean().default(false),
+      ezpaarse: Joi.boolean().default(false),
+      report: Joi.boolean().default(false),
+      sushi: Joi.boolean().default(false),
+    }).default(),
+  },
 };
 
-const createSchema = {
-  ...schema,
+schemas.adminCreate = {
+  ...schemas.base,
   id: Joi.any().strip(),
-  indexCount: Joi.any().strip(),
-  indexPrefix: Joi.any().strip(),
-  techContactName: Joi.any().strip(),
-  docContactName: Joi.any().strip(),
-  validated: Joi.any().strip(),
-  logoId: Joi.any().strip(),
-  role: Joi.any().strip(),
-  creator: Joi.any().strip(),
-  space: Joi.any().strip(),
-  hidePartner: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
 
-const updateSchema = {
-  ...createSchema,
+schemas.adminUpdate = {
+  ...schemas.adminCreate,
+};
+
+schemas.create = {
+  ...schemas.base,
+
+  id: Joi.any().strip(),
+  validated: Joi.any().strip(),
+  updatedAt: Joi.any().strip(),
+  createdAt: Joi.any().strip(),
+
+  indexCount: Joi.any().strip(),
+  indexPrefix: Joi.any().strip(),
+
+  creator: Joi.any().strip(),
+  role: Joi.any().strip(),
+  space: Joi.any().strip(),
+  hidePartner: Joi.any().strip(),
+
+  techContactName: Joi.any().strip(),
+  docContactName: Joi.any().strip(),
+
+  logoId: Joi.any().strip(),
+};
+
+schemas.update = {
+  ...schemas.create,
 };
 
 async function getRole(role) {
@@ -119,7 +137,7 @@ function addReadOnlySuffix(str) {
   return `${str || ''}${readOnlySuffix}`;
 }
 
-class Institution extends typedModel(type, schema, createSchema, updateSchema) {
+class Institution extends typedModel({ type, schemas }) {
   static docRole() { return docRole; }
 
   static techRole() { return techRole; }

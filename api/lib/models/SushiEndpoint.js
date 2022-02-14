@@ -3,49 +3,64 @@ const { typedModel, registerModel, getModel } = require('./TypedModel');
 
 const type = 'sushi-endpoint';
 
-const schema = {
-  id: Joi.string().trim().required(),
-  institutionId: Joi.string().trim(),
-  updatedAt: Joi.date(),
-  createdAt: Joi.date(),
+const schemas = {
+  base: {
+    id: Joi.string().trim(),
+    institutionId: Joi.string().trim(),
+    updatedAt: Joi.date(),
+    createdAt: Joi.date(),
 
-  vendor: Joi.string().trim().required(),
-  sushiUrl: Joi.string().trim().required(),
-  description: Joi.string().trim().allow(''),
-  companies: Joi.string().trim().allow(''),
-  counterVersion: Joi.string().trim().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/).empty(''),
 
-  requireCustomerId: Joi.boolean().default(false),
-  requireRequestorId: Joi.boolean().default(false),
-  requireApiKey: Joi.boolean().default(false),
-  isSushiCompliant: Joi.boolean().default(false),
+    vendor: Joi.string().trim(),
+    sushiUrl: Joi.string().trim(),
+    description: Joi.string().trim().allow(''),
+    companies: Joi.string().trim().allow(''),
+    counterVersion: Joi.string().trim().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/).empty(''),
 
-  tags: Joi.array().items(Joi.object({
-    name: Joi.string().trim().required(),
-    color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i).empty(''),
-  })),
+    requireCustomerId: Joi.boolean().default(false),
+    requireRequestorId: Joi.boolean().default(false),
+    requireApiKey: Joi.boolean().default(false),
+    isSushiCompliant: Joi.boolean().default(false),
 
-  params: Joi.array().items(Joi.object({
-    name: Joi.string().trim().required(),
-    value: Joi.string().trim().allow(''),
-  })),
+    tags: Joi.array().items(Joi.object({
+      name: Joi.string().trim().required(),
+      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i).empty(''),
+    })),
+
+    params: Joi.array().items(Joi.object({
+      name: Joi.string().trim().required(),
+      value: Joi.string().trim().allow(''),
+    })),
+  },
 };
 
-const createSchema = {
-  ...schema,
+schemas.adminCreate = {
+  ...schemas.base,
   id: Joi.any().strip(),
+  vendor: schemas.base.vendor.required(),
+  sushiUrl: schemas.base.sushiUrl.required(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
 
-const updateSchema = {
-  ...createSchema,
+schemas.adminUpdate = {
+  ...schemas.adminCreate,
+  vendor: schemas.base.vendor.optional(),
+  sushiUrl: schemas.base.sushiUrl.optional(),
+};
+
+schemas.create = {
+  ...schemas.adminCreate,
+};
+
+schemas.update = {
+  ...schemas.adminUpdate,
   institutionId: Joi.any().strip(),
   vendor: schema.vendor.optional(),
   sushiUrl: schema.sushiUrl.optional(),
 };
 
-class SushiEndpoint extends typedModel(type, schema, createSchema, updateSchema) {
+class SushiEndpoint extends typedModel({ type, schemas }) {
   static async findByInstitutionId(institutionId, opts) {
     const options = opts || {};
 
