@@ -10,6 +10,7 @@ const { appLogger } = require('../logger');
 const sushiService = require('../sushi');
 const elastic = require('../elastic');
 
+const SushiEndpoint = require('../../models/SushiEndpoint');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
@@ -17,6 +18,7 @@ const publisherIndexTemplate = require('../../utils/publisher-template');
 
 async function importSushiReport(options = {}) {
   const {
+    endpoint,
     sushi,
     task,
     index,
@@ -29,6 +31,7 @@ async function importSushiReport(options = {}) {
   const sushiData = {
     reportType: sushiService.DEFAULT_REPORT_TYPE,
     sushi,
+    endpoint,
     beginDate,
     endDate,
   };
@@ -443,6 +446,8 @@ async function processJob(job) {
     return job.remove();
   }
 
+  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
+
   const task = await Task.findById(taskId);
 
   if (!task) {
@@ -457,10 +462,24 @@ async function processJob(job) {
     endDate,
   } = taskParams;
 
+  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching SUSHI credentials [${sushiId}]`);
+
   const sushi = await Sushi.findById(sushiId);
 
   if (!sushi) {
     const message = `SUSHI item [${sushiId}] not found`;
+    task.fail([message]);
+    await task.save();
+    throw new Error(message);
+  }
+
+  const endpointId = sushi.get('endpointId');
+  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching endpoint [${endpointId}]`);
+
+  const endpoint = await SushiEndpoint.findById(endpointId);
+
+  if (!endpoint) {
+    const message = `SUSHI Endpoint [${endpointId}] not found`;
     task.fail([message]);
     await task.save();
     throw new Error(message);
@@ -478,10 +497,16 @@ async function processJob(job) {
   await task.save();
 
   try {
-    await importSushiReport({ ...taskParams, sushi, task });
+    await importSushiReport({
+      ...taskParams,
+      sushi,
+      endpoint,
+      task,
+    });
   } catch (err) {
     appLogger.error(`Failed to import sushi report [${sushi.getId()}]`);
     appLogger.error(err.message);
+    appLogger.error(err.stack);
     task.fail(['Failed to import sushi report', err.message]);
     task.save().catch((e) => {
       appLogger.error('Failed to save sushi task');

@@ -83,11 +83,15 @@ async function getAvailableReports(sushi) {
   return response;
 }
 
-async function getReport(sushi, opts = {}) {
+async function getReport(endpoint, sushi, opts = {}) {
   const options = opts || {};
 
   const {
     sushiUrl,
+    params: endpointParams,
+  } = endpoint.getData();
+
+  const {
     requestorId,
     customerId,
     apiKey,
@@ -102,19 +106,22 @@ async function getReport(sushi, opts = {}) {
   } = options;
 
   if (!sushiUrl) {
-    throw new Error('sushiUrl not set');
+    throw new Error('endpoint is missing [sushiUrl]');
   }
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const params = {};
 
-  if (Array.isArray(sushiParams)) {
-    sushiParams.forEach((param) => {
-      if (param) {
-        params[param.name] = param.value;
-      }
-    });
-  }
+  endpointParams?.forEach?.((param) => {
+    if (param?.name) {
+      params[param.name] = param.value;
+    }
+  });
+  sushiParams?.forEach?.((param) => {
+    if (param?.name) {
+      params[param.name] = param.value;
+    }
+  });
 
   if (requestorId) { params.requestor_id = requestorId; }
   if (customerId) { params.customer_id = customerId; }
@@ -166,14 +173,14 @@ function getReportTmpPath(options) {
  *                         endDate
  */
 async function downloadReport(options = {}) {
-  const { sushi } = options;
+  const { endpoint, sushi } = options;
   const reportPath = getReportPath(options);
   const tmpPath = getReportTmpPath(options);
 
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
 
-  const response = await getReport(sushi, { ...options, stream: true });
+  const response = await getReport(endpoint, sushi, { ...options, stream: true });
 
   // TODO: handle "try again later" and timeouts
 

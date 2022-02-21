@@ -9,13 +9,13 @@ const cryptedFields = ['requestorId', 'consortialId', 'customerId', 'apiKey'];
 const schemas = {
   base: {
     id: Joi.string().trim(),
+    endpointId: Joi.string().trim(),
     institutionId: Joi.string().trim(),
     updatedAt: Joi.date(),
     createdAt: Joi.date(),
 
     vendor: Joi.string().trim().allow(''),
     package: Joi.string().trim(),
-    sushiUrl: Joi.string().trim(),
     requestorId: Joi.string().trim().allow(''),
     consortialId: Joi.string().trim().allow(''),
     customerId: Joi.string().trim().allow(''),
