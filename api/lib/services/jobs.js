@@ -17,8 +17,9 @@ harvestQueue
   .on('completed', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] completed`); })
   .on('stalled', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] stalled`); })
   .on('failed', (job, err) => {
-    appLogger.verbose(`${logPrefix} Job [${job?.id}] failed`);
-    appLogger.verbose(err);
+    appLogger.error(`${logPrefix} Job [${job?.id}] failed`);
+    appLogger.error(err.message);
+    appLogger.error(err.stack);
   })
   .on('lock-extension-failed', (job, err) => {
     // A job failed to extend lock. This will be useful to debug redis
@@ -29,7 +30,8 @@ harvestQueue
   })
   .on('error', (error) => {
     appLogger.error(`${logPrefix} An error occurred in the job queue`);
-    appLogger.error(error);
+    appLogger.error(error.message);
+    appLogger.error(error.stack);
   })
   .on('paused', () => { appLogger.verbose(`${logPrefix} Queue has been paused`); })
   .on('resumed', () => { appLogger.verbose(`${logPrefix} Queue has been resumed`); })
