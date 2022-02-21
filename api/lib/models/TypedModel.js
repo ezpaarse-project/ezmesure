@@ -7,7 +7,10 @@ const { appLogger } = require('../services/logger');
 const index = config.get('depositors.index');
 const models = new Map();
 
-const registerModel = (model) => models.set(model.type, model);
+const registerModel = (model) => {
+  appLogger.verbose(`Registering model ${model?.type}`);
+  models.set(model.type, model);
+};
 const getModel = (type) => models.get(type);
 
 const typedModel = ({ type, schemas }) => class TypedModel {
