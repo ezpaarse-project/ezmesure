@@ -1,0 +1,5 @@
+{{ data }} vient de créer son compte sur ezMESURE
+Vous pouvez dès à présent l'intégrer à votre établissement depuis l'interface de gestion des membres
+
+Cordialement,
+L'équipe ezMESURE.

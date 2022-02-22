@@ -18,7 +18,7 @@ const client = new Client({
   },
   ssl: {
     rejectUnauthorized: false,
-  }
+  },
 });
 
 client.extend('security.findUser', ({ makeRequest, ConfigurationError }) => (params, opts) => {
