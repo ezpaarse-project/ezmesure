@@ -116,11 +116,16 @@ module.exports = {
         properties: {
           createdAt: { type: 'date' },
           updatedAt: { type: 'date' },
-          sushiId: { type: 'keyword' },
-          institutionId: { type: 'keyword' },
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           runningTime: { type: 'long' },
+          params: {
+            properties: {
+              sushiId: { type: 'keyword' },
+              beginDate: { type: 'keyword' },
+              endDate: { type: 'keyword' },
+            },
+          },
           logs: {
             properties: {
               date: { type: 'date' },
