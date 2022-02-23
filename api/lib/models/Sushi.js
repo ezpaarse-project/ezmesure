@@ -45,12 +45,14 @@ schemas.adminCreate = {
   createdAt: Joi.any().strip(),
   latestImportTask: Joi.any().strip(),
 
+  endpointId: schemas.base.endpointId.required(),
   institutionId: schemas.base.institutionId.required(),
   package: schemas.base.package.required(),
 };
 
 schemas.adminUpdate = {
   ...schemas.adminCreate,
+  endpointId: schemas.base.endpointId.optional(),
   institutionId: schemas.base.institutionId.optional(),
   package: schemas.base.package.optional(),
 };
