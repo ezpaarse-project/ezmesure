@@ -117,6 +117,10 @@ export default {
             title: this.$t('menu.institutions'),
             href: '/institutions',
           },
+          {
+            title: this.$t('menu.sushiEndpoints'),
+            href: '/endpoints',
+          },
         ],
       };
     },
