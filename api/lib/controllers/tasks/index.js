@@ -44,6 +44,7 @@ router.route({
       type: stringOrArray,
       sushiId: stringOrArray,
       institutionId: stringOrArray,
+      collapse: Joi.string().trim(),
     },
   },
 });

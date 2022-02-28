@@ -15,6 +15,7 @@ exports.getAll = async (ctx) => {
     type,
     institutionId,
     sushiId,
+    collapse,
   } = query;
 
   const filters = [];
@@ -35,7 +36,13 @@ exports.getAll = async (ctx) => {
     filters.push(Task.filterBy('sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
   }
 
-  ctx.body = await Task.findAll({ filters });
+  const options = { filters };
+
+  if (typeof collapse === 'string') {
+    options.collapse = { field: `${Task.type}.${collapse}` };
+  }
+
+  ctx.body = await Task.findAll(options);
 };
 
 exports.getOne = async (ctx) => {
