@@ -23,7 +23,7 @@ exports.getAll = async (ctx) => {
     filters.push(SushiEndpoint.filterBy('isSushiCompliant', isSushiCompliant));
   }
   if (tags) {
-    filters.push(SushiEndpoint.filterBy('tags.name', Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim())));
+    filters.push(SushiEndpoint.filterBy('tags', Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim())));
   }
 
   ctx.type = 'json';

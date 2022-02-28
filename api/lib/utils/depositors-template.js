@@ -96,12 +96,7 @@ module.exports = {
           requireRequestorId: { type: 'boolean' },
           requireApiKey: { type: 'boolean' },
           isSushiCompliant: { type: 'boolean' },
-          tags: {
-            properties: {
-              name: { type: 'keyword' },
-              color: { type: 'boolean' },
-            },
-          },
+          tags: { type: 'keyword' },
           params: {
             properties: {
               name: { type: 'keyword' },

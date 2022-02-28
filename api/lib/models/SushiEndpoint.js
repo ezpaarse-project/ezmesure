@@ -23,10 +23,7 @@ const schemas = {
     requireApiKey: Joi.boolean().default(false),
     isSushiCompliant: Joi.boolean().default(false),
 
-    tags: Joi.array().items(Joi.object({
-      name: Joi.string().trim().required(),
-      color: Joi.string().trim().regex(/^#([a-f0-9]{6}|[a-f0-9]{3})$/i).empty(''),
-    })),
+    tags: Joi.array().items(Joi.string().trim()),
 
     params: Joi.array().items(Joi.object({
       name: Joi.string().trim().required(),
