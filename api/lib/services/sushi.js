@@ -37,14 +37,18 @@ const DEFAULT_REPORT_TYPE = 'tr';
  *                         beginDate
  *                         endDate
  */
-async function getAvailableReports(sushi) {
+async function getAvailableReports(endpoint, sushi) {
   const {
     sushiUrl,
+    params: endpointParams,
+  } = endpoint?.getData?.();
+
+  const {
     requestorId,
     customerId,
     apiKey,
     params: sushiParams,
-  } = sushi.getData();
+  } = sushi?.getData?.();
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const params = {};
@@ -53,13 +57,16 @@ async function getAvailableReports(sushi) {
   if (customerId) { params.customer_id = customerId; }
   if (apiKey) { params.api_key = apiKey; }
 
-  if (Array.isArray(sushiParams)) {
-    sushiParams.forEach((param) => {
-      if (param.name) {
-        params[param.name] = param.value;
-      }
-    });
-  }
+  endpointParams?.forEach?.((param) => {
+    if (param?.name) {
+      params[param.name] = param.value;
+    }
+  });
+  sushiParams?.forEach?.((param) => {
+    if (param?.name) {
+      params[param.name] = param.value;
+    }
+  });
 
   const response = await axios({
     method: 'get',

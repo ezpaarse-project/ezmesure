@@ -12,6 +12,7 @@ const {
   requireAnyRole,
   fetchInstitution,
   fetchSushi,
+  fetchSushiEndpoint,
   requireContact,
   requireValidatedInstitution,
 } = require('../../services/auth');
@@ -163,6 +164,7 @@ router.route({
   path: '/:sushiId/connection',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     async (ctx) => {
       const { sushi, institution } = ctx.state;
 
@@ -219,6 +221,7 @@ router.route({
   path: '/:sushiId/reports',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     getAvailableReports,
   ],
   validate: {
@@ -251,6 +254,7 @@ router.route({
   path: '/:sushiId/report.json',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     downloadReport,
   ],
   validate: {

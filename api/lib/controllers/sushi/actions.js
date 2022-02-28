@@ -120,13 +120,13 @@ exports.deleteSushiData = async (ctx) => {
 };
 
 exports.getAvailableReports = async (ctx) => {
-  const { sushi } = ctx.state;
+  const { sushi, endpoint } = ctx.state;
 
   let reports;
   let exceptions;
 
   try {
-    const { data } = await sushiService.getAvailableReports(sushi);
+    const { data } = await sushiService.getAvailableReports(endpoint, sushi);
     reports = data;
   } catch (e) {
     exceptions = sushiService.getExceptions(e && e.response && e.response.data);
@@ -159,7 +159,7 @@ exports.getAvailableReports = async (ctx) => {
 exports.downloadReport = async (ctx) => {
   ctx.action = 'sushi/download-report';
   const { query = {} } = ctx.request;
-  const { sushi, institution } = ctx.state;
+  const { sushi, institution, endpoint } = ctx.state;
   let { beginDate, endDate } = query;
 
   ctx.metadata = {
@@ -179,7 +179,12 @@ exports.downloadReport = async (ctx) => {
     endDate = beginDate;
   }
 
-  const sushiData = { sushi, beginDate, endDate };
+  const sushiData = {
+    endpoint,
+    sushi,
+    beginDate,
+    endDate,
+  };
   const reportPath = sushiService.getReportPath(sushiData);
 
   if (await fs.pathExists(reportPath)) {
