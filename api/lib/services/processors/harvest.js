@@ -299,7 +299,7 @@ async function importSushiReport(options = {}) {
 
     if (!Array.isArray(reportItem.Item_ID)) {
       addError('Item has no Item_ID');
-      return;
+      continue; // eslint-disable-line no-continue
     }
 
     const item = {
@@ -339,10 +339,8 @@ async function importSushiReport(options = {}) {
       };
     }
 
-    for (let p = 0; p < reportItem.Performance.length; p += 1) {
-      const performance = reportItem.Performance[p];
-
-      if (!Array.isArray(performance.Instance)) { return; }
+    reportItem.Performance.forEach((performance) => {
+      if (!Array.isArray(performance?.Instance)) { return; }
 
       const period = performance.Period;
       const perfBeginDate = new Date(period.Begin_Date);
@@ -402,7 +400,7 @@ async function importSushiReport(options = {}) {
           Period: period,
         });
       });
-    }
+    });
 
     if (bulkItems.length >= bulkSize) {
       // eslint-disable-next-line no-await-in-loop
