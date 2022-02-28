@@ -47,7 +47,7 @@
 
     <SushiForm
       ref="sushiForm"
-      :platforms="platforms"
+      :endpoints="endpoints"
       @update="refreshSushiItems"
     />
 
@@ -242,9 +242,9 @@ export default {
       }
     }
 
-    let platforms = [];
+    let endpoints = [];
     try {
-      platforms = await $axios.$get('/sushi/platforms.json');
+      endpoints = await $axios.$get('/sushi-endpoints');
     } catch (e) {
       store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetrivePlatforms'));
     }
@@ -256,7 +256,7 @@ export default {
       refreshing: false,
       deleting: false,
       search: '',
-      platforms,
+      endpoints,
       loadingItems: {},
     };
   },
@@ -270,7 +270,7 @@ export default {
           width: '100px',
         },
         {
-          text: this.$t('institutions.sushi.platform'),
+          text: this.$t('institutions.sushi.label'),
           value: 'vendor',
         },
         {
