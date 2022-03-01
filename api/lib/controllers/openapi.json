@@ -47,6 +47,9 @@
       "name": "Institutions"
     },
     {
+      "name": "Jobs"
+    },
+    {
       "name": "Kibana"
     },
     {
@@ -1250,22 +1253,38 @@
             "description": "ID of the task",
             "format": "uuid"
           },
+          "createdAt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Creation date of the task",
+            "format": "date"
+          },
+          "updatedAt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last date of modification",
+            "format": "date"
+          },
+          "startedAt": {
+            "type": "string",
+            "minLength": 1,
+            "format": "date",
+            "description": "Start date of the task"
+          },
           "status": {
             "type": "string",
             "minLength": 1,
             "description": "Status of the task"
           },
-          "sushiId": {
+          "type": {
             "type": "string",
             "minLength": 1,
-            "description": "ID of the sushi item related to the task",
-            "format": "uuid"
+            "description": "Type of the task",
+            "example": "sushi-harvest"
           },
-          "institutionId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID of the institution related to the task",
-            "format": "uuid"
+          "runningTime": {
+            "type": "number",
+            "description": "How many milliseconds the task has been running"
           },
           "logs": {
             "type": "array",
@@ -1294,53 +1313,107 @@
               }
             }
           },
-          "updatedAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Last date of modification",
-            "format": "date"
+          "params": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Parameters associated to the task",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sushiId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the sushi item related to the task",
+                  "format": "uuid"
+                },
+                "institutionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "format": "uuid"
+                }
+              }
+            }
           },
-          "createdAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Creation date of the task",
-            "format": "date"
+          "steps": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Task steps",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Label of the step",
+                  "example": "download"
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "enum": [
+                    "running",
+                    "finished",
+                    "failed"
+                  ]
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Start time of the step"
+                },
+                "took": {
+                  "type": "number",
+                  "description": "How many milliseconds the step has been running"
+                },
+                "data": {
+                  "type": "object",
+                  "description": "Arbitrary data associated to the step"
+                }
+              }
+            },
+            "readOnly": true
           },
           "result": {
             "type": "object",
             "properties": {
               "inserted": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of inserted documents"
               },
               "updated": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of updated documents"
               },
               "failed": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of documents that failed to be inserted"
               },
               "coveredPeriods": {
                 "type": "array",
+                "description": "Performance periods found in the report",
                 "items": {
                   "type": "string"
                 }
               },
               "errors": {
                 "type": "array",
+                "description": "A list of errors, if any",
                 "items": {
                   "type": "string"
                 }
               }
-            }
-          },
-          "runningTime": {
-            "type": "number",
-            "description": "How many milliseconds the task has been running"
+            },
+            "readOnly": true
           }
         },
         "required": [
           "id",
-          "updatedAt",
-          "createdAt"
+          "createdAt",
+          "updatedAt"
         ]
       },
       "ElasticsearchIndex": {
@@ -3618,7 +3691,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/JobQueue"
+                    "$ref": "#/components/schemas/Queue"
                   }
                 }
               }
@@ -3658,7 +3731,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobQueue"
+                  "$ref": "#/components/schemas/Queue"
                 }
               }
             }
