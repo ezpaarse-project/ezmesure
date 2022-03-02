@@ -30,10 +30,10 @@ exports.getAll = async (ctx) => {
     filters.push(Task.filterBy('type', Array.isArray(type) ? type : type.split(',').map((s) => s.trim())));
   }
   if (institutionId) {
-    filters.push(Task.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+    filters.push(Task.filterBy('params.institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
   }
   if (sushiId) {
-    filters.push(Task.filterBy('sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+    filters.push(Task.filterBy('params.sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
   }
 
   const options = { filters };
