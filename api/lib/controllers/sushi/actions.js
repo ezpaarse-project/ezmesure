@@ -220,6 +220,12 @@ exports.harvestSushi = async (ctx) => {
   const { sushi, user, institution } = ctx.state;
   const { target, forceDownload } = body;
   let { beginDate, endDate } = body;
+  const {
+    endpoint,
+    sushi,
+    user,
+    institution,
+  } = ctx.state;
 
   let index = target;
 
@@ -275,6 +281,8 @@ exports.harvestSushi = async (ctx) => {
       beginDate,
       endDate,
       forceDownload,
+      endpointVendor: endpoint.get('vendor'),
+      sushiLabel: sushi.get('vendor'),
     },
   });
 

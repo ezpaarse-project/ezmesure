@@ -273,6 +273,7 @@ router.route({
   path: '/:sushiId/_harvest',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     harvestSushi,
   ],
   validate: {
