@@ -217,8 +217,7 @@ exports.downloadReport = async (ctx) => {
 exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
-  const { sushi, user, institution } = ctx.state;
-  const { target, forceDownload } = body;
+  const { target, forceDownload, reportType } = body;
   let { beginDate, endDate } = body;
   const {
     endpoint,
@@ -244,6 +243,7 @@ exports.harvestSushi = async (ctx) => {
     vendor: sushi.get('vendor'),
     institutionId: institution.getId(),
     institutionName: institution.get('name'),
+    reportType,
   };
 
   const { body: perm } = await elastic.security.hasPrivileges({
@@ -277,6 +277,7 @@ exports.harvestSushi = async (ctx) => {
       sushiId: sushi.getId(),
       institutionId: institution.getId(),
       username: user.username,
+      reportType,
       index,
       beginDate,
       endDate,

@@ -286,6 +286,7 @@ router.route({
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
+      reportType: Joi.string().trim().lowercase().default('tr'),
     },
   },
 });

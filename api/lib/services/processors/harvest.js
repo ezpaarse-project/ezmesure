@@ -26,10 +26,11 @@ async function importSushiReport(options = {}) {
     beginDate,
     endDate,
     forceDownload,
+    reportType = sushiService.DEFAULT_REPORT_TYPE,
   } = options;
 
   const sushiData = {
-    reportType: sushiService.DEFAULT_REPORT_TYPE,
+    reportType,
     sushi,
     endpoint,
     beginDate,
