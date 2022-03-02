@@ -1332,6 +1332,36 @@
                   "minLength": 1,
                   "description": "ID of the institution related to the task",
                   "format": "uuid"
+                },
+                "username": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "format": "uuid"
+                },
+                "reportType": {
+                  "type": "string",
+                  "example": "tr",
+                  "description": "Type of COUNTER report"
+                },
+                "index": {
+                  "type": "string",
+                  "description": "Target index"
+                },
+                "beginDate": {
+                  "type": "string"
+                },
+                "endDate": {
+                  "type": "string"
+                },
+                "forceDownload": {
+                  "type": "string"
+                },
+                "endpointVendor": {
+                  "type": "string"
+                },
+                "sushiLabel": {
+                  "type": "string"
                 }
               }
             }
