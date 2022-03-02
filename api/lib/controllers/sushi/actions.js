@@ -283,6 +283,7 @@ exports.harvestSushi = async (ctx) => {
       forceDownload,
       endpointVendor: endpoint.get('vendor'),
       sushiLabel: sushi.get('vendor'),
+      institutionName: institution.get('name'),
     },
   });
 
