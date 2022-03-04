@@ -29,14 +29,11 @@
                       v-for="(tag, index) in item.tags"
                       :key="index"
                       label
-                      small
+                      x-small
                       color="accent"
                       outlined
                       class="mr-1"
                     >
-                      <v-icon left>
-                        mdi-tag
-                      </v-icon>
                       {{ tag }}
                     </v-chip>
                   </template>
