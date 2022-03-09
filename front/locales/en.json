@@ -245,7 +245,7 @@
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "API key",
-      "necessaryField": "This field may be necessary",
+      "necessaryField": "This field is required for this platform",
       "pleaseSelectEndpoint": "Please select an endpoint",
       "enterLabel": "Please enter a label.",
       "enterPackage": "Please enter a package",
