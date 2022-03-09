@@ -41,12 +41,9 @@ exports.getOne = async (ctx) => {
 exports.addEndpoint = async (ctx) => {
   ctx.action = 'endpoint/create';
   const { body } = ctx.request;
-  const { institution } = ctx.state;
 
   ctx.metadata = {
     vendor: body.vendor,
-    institutionId: institution?.getId(),
-    institutionName: institution?.get('name'),
   };
 
   const endpoint = new SushiEndpoint(body, {
@@ -61,7 +58,7 @@ exports.addEndpoint = async (ctx) => {
 
 exports.updateEndpoint = async (ctx) => {
   ctx.action = 'endpoint/update';
-  const { endpoint, institution } = ctx.state;
+  const { endpoint } = ctx.state;
   const { body } = ctx.request;
 
   endpoint.update(body, {
@@ -71,8 +68,6 @@ exports.updateEndpoint = async (ctx) => {
   ctx.metadata = {
     endpointId: endpoint.getId(),
     vendor: endpoint.get('vendor'),
-    institutionId: institution?.getId(),
-    institutionName: institution?.get('name'),
   };
 
   try {
@@ -104,13 +99,6 @@ exports.importEndpoints = async (ctx) => {
   ctx.action = 'endpoint/import';
   const { body = [] } = ctx.request;
   const { overwrite } = ctx.query;
-  const { institution } = ctx.state;
-  const institutionId = institution?.getId();
-
-  ctx.metadata = {
-    institutionId,
-    institutionName: institution?.get('name'),
-  };
 
   const response = {
     errors: 0,
@@ -135,21 +123,13 @@ exports.importEndpoints = async (ctx) => {
     if (endpointData.id) {
       const endpoint = await SushiEndpoint.findById(endpointData.id);
 
-      if (endpoint && endpoint.get('institutionId') !== institutionId) {
-        addResponseItem(endpointData, 'error', ctx.$t('errors.endpoint.import.belongsToAnother', endpoint.getId()));
-        return;
-      }
-
       if (endpoint && !overwrite) {
         addResponseItem(endpointData, 'conflict', ctx.$t('errors.endpoint.import.alreadyExists', endpoint.getId()));
         return;
       }
     }
 
-    const endpoint = new SushiEndpoint({
-      ...endpointData,
-      institutionId,
-    });
+    const endpoint = new SushiEndpoint(endpointData);
 
     endpoint.setId(endpointData.id);
 

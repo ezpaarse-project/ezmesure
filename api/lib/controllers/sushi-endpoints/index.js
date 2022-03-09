@@ -12,10 +12,8 @@ const {
   requireUser,
   requireTermsOfUse,
   requireAnyRole,
-  fetchInstitution,
   fetchSushiEndpoint,
-  requireContact,
-  requireValidatedInstitution,
+  requireAdmin,
 } = require('../../services/auth');
 
 const {
@@ -52,15 +50,25 @@ router.route({
 });
 
 router.route({
+  method: 'GET',
+  path: '/:endpointId',
+  handler: [
+    fetchSushiEndpoint(),
+    getOne,
+  ],
+  validate: {
+    params: {
+      endpointId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.use(requireAdmin);
+
+router.route({
   method: 'POST',
   path: '/',
   handler: [
-    fetchInstitution({
-      getId: (ctx) => ctx?.request?.body?.institutionId,
-      ignoreNotFound: true,
-    }),
-    requireContact(),
-    requireValidatedInstitution({ ignoreIfAdmin: true }),
     addEndpoint,
   ],
   validate: {
@@ -72,17 +80,11 @@ router.route({
   method: 'POST',
   path: '/_import',
   handler: [
-    fetchInstitution({
-      query: 'institutionId',
-      ignoreNotFound: true,
-    }),
-    requireContact(),
     importEndpoints,
   ],
   validate: {
     type: 'json',
     query: {
-      institutionId: Joi.string().trim(),
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array().required().items({
@@ -92,41 +94,11 @@ router.route({
   },
 });
 
-/**
- * Fetch the SUSHI endpoint from the param endpointId
- * Fetch the associated institution
- * Check that the user is either admin or institution contact
- * Check that the institution is validated
- */
-const commonHandlers = [
-  fetchSushiEndpoint(),
-  fetchInstitution({
-    getId: (ctx) => ctx?.state?.endpoint?.get?.('institutionId'),
-    ignoreNotFound: true,
-  }),
-  requireContact(),
-  requireValidatedInstitution({ ignoreIfAdmin: true }),
-];
-
-router.route({
-  method: 'GET',
-  path: '/:endpointId',
-  handler: [
-    commonHandlers,
-    getOne,
-  ],
-  validate: {
-    params: {
-      endpointId: Joi.string().trim().required(),
-    },
-  },
-});
-
 router.route({
   method: 'PATCH',
   path: '/:endpointId',
   handler: [
-    commonHandlers,
+    fetchSushiEndpoint(),
     updateEndpoint,
   ],
   validate: {
@@ -141,7 +113,7 @@ router.route({
   method: 'DELETE',
   path: '/:endpointId',
   handler: [
-    commonHandlers,
+    fetchSushiEndpoint(),
     deleteOne,
   ],
   validate: {

@@ -711,12 +711,6 @@
             "description": "ID of the sushi item",
             "readOnly": true
           },
-          "institutionId": {
-            "type": "string",
-            "example": "f438c3f0-152b-11eb-8113-ff14fcf1fe5b",
-            "format": "uuid",
-            "description": "ID of the institution that owns the sushi item"
-          },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
@@ -806,7 +800,6 @@
         },
         "required": [
           "id",
-          "institutionId",
           "updatedAt",
           "createdAt",
           "vendor",
@@ -5199,14 +5192,6 @@
           }
         ],
         "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "institutionId",
-            "description": "ID of the institution that owns the endpoints"
-          },
           {
             "schema": {
               "type": "boolean"
