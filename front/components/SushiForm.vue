@@ -39,21 +39,7 @@
                   </template>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action v-if="item.validated">
-                <v-chip
-                  color="success"
-                  label
-                  small
-                  outlined
-                >
-                  <v-icon left>
-                    mdi-check
-                  </v-icon>
-                  {{ $t('endpoints.validated') }}
-                </v-chip>
-              </v-list-item-action>
             </template>
-
           </v-autocomplete>
 
           <v-text-field
