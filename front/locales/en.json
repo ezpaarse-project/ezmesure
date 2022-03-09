@@ -118,7 +118,7 @@
     "url": "URL",
     "vendor": "Vendor",
     "tags": "Tags",
-    "companies": "Companies",
+    "technicalProvider": "Technical provider",
     "counterVersion": "COUNTER version",
     "requireCustomerId": "Customer ID is required",
     "requireRequestorId": "Requestor ID is required",

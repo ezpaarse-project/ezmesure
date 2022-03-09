@@ -48,8 +48,8 @@
           />
 
           <v-text-field
-            v-model="endpointForm.companies"
-            :label="$t('endpoints.companies')"
+            v-model="endpointForm.technicalProvider"
+            :label="$t('endpoints.technicalProvider')"
             outlined
             required
           />
@@ -195,7 +195,7 @@ export default {
         vendor: '',
         sushiUrl: '',
         description: '',
-        companies: '',
+        technicalProvider: '',
         counterVersion: '',
         validated: false,
         requireCustomerId: false,
@@ -236,7 +236,7 @@ export default {
       this.endpointForm.vendor = data.vendor || '';
       this.endpointForm.sushiUrl = data.sushiUrl || '';
       this.endpointForm.description = data.description || '';
-      this.endpointForm.companies = data.companies || '';
+      this.endpointForm.technicalProvider = data.technicalProvider || '';
       this.endpointForm.counterVersion = data.counterVersion || '';
 
       this.endpointForm.validated = !!data.validated;

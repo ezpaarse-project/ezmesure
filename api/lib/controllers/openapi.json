@@ -747,9 +747,9 @@
             "type": "string",
             "description": "Description of the SUSHI endpoint"
           },
-          "companies": {
+          "technicalProvider": {
             "type": "string",
-            "description": "Companies behind the SUSHI endpoint"
+            "description": "The technical provider that operates the SUSHI endpoint"
           },
           "validated": {
             "type": "boolean",
@@ -846,7 +846,7 @@
           "isNonSushi": {
             "type": "boolean"
           },
-          "companies": {
+          "technicalProvider": {
             "type": "string"
           }
         },
@@ -866,7 +866,7 @@
             "apiKey": true,
             "description": "This is a fictive sushi endpoint",
             "isNonSushi": false,
-            "companies": "Atypon"
+            "technicalProvider": "Atypon"
           }
         }
       },

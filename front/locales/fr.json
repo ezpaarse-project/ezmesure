@@ -118,7 +118,7 @@
     "url": "URL",
     "vendor": "Fournisseur",
     "tags": "Étiquettes",
-    "companies": "Compagnies",
+    "technicalProvider": "Prestataire technique",
     "counterVersion": "Version de COUNTER",
     "requireCustomerId": "un customer ID est nécessaire",
     "requireRequestorId": "un requestor ID est nécessaire",

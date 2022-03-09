@@ -90,7 +90,7 @@ module.exports = {
           vendor: { type: 'keyword' },
           sushiUrl: { type: 'keyword' },
           description: { type: 'keyword' },
-          companies: { type: 'keyword' },
+          technicalProvider: { type: 'keyword' },
           validated: { type: 'boolean' },
           requireCustomerId: { type: 'boolean' },
           requireRequestorId: { type: 'boolean' },

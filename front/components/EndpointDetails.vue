@@ -55,7 +55,7 @@ export default {
         { value: this.item?.vendor, label: this.$t('endpoints.vendor') },
         { value: this.item?.sushiUrl, label: this.$t('endpoints.url') },
         { value: this.item?.description, label: this.$t('endpoints.description') },
-        { value: this.item?.companies, label: this.$t('endpoints.companies') },
+        { value: this.item?.technicalProvider, label: this.$t('endpoints.technicalProvider') },
         { value: this.item?.counterVersion, label: this.$t('endpoints.counterVersion') },
 
         { value: this.item?.requireCustomerId ? this.$t('yes') : this.$t('no'), label: this.$t('endpoints.requireCustomerId') },
