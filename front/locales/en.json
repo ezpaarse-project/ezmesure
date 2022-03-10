@@ -356,10 +356,15 @@
     "failed": "Sending the contact form failed.",
     "requestInformation": "Information request",
     "bugReport": "Bug report",
+    "declareSushiEndpoint": "Declare a SUSHI endpoint",
     "emailIsRequired": "The email address is required",
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
-    "subjectIsRequired": "Subject is required"
+    "subjectIsRequired": "Subject is required",
+    "endpointVendor": "Vendor name",
+    "endpointUrl": "URL of the SUSHI endpoint",
+    "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
+    "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below."
   },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",

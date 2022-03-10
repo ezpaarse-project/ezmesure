@@ -60,6 +60,27 @@
                 required
                 return-object
               />
+
+              <template v-if="endpointSubject">
+                <v-text-field
+                  v-model="endpointVendor"
+                  :label="$t('contact.endpointVendor')"
+                  :hint="$t('contact.pleaseEnterFullVendorName')"
+                  :rules="[v => !!v || $t('fieldIsRequired')]"
+                  requried
+                  outlined
+                />
+                <v-text-field
+                  v-model="endpointUrl"
+                  :label="$t('contact.endpointUrl')"
+                  :rules="[v => !!v || $t('fieldIsRequired')]"
+                  requried
+                  outlined
+                />
+
+                <p>{{ $t('contact.endpointDetails') }}</p>
+              </template>
+
               <v-textarea
                 v-model="message"
                 :rules="messageRules"
@@ -98,6 +119,8 @@ export default {
   data: () => ({
     email: '',
     message: '',
+    endpointVendor: '',
+    endpointUrl: '',
     subject: {},
     sendBrowser: true,
     valid: true,
@@ -105,6 +128,7 @@ export default {
   }),
   computed: {
     user() { return this.$auth.user; },
+    endpointSubject() { return this.subject?.value === 'sushi-endpoint'; },
     subjects() {
       return [
         {
@@ -114,6 +138,10 @@ export default {
         {
           value: 'bugs',
           text: this.$t('contact.bugReport'),
+        },
+        {
+          value: 'sushi-endpoint',
+          text: this.$t('contact.declareSushiEndpoint'),
         },
       ];
     },
@@ -132,11 +160,26 @@ export default {
 
       if (this.valid) {
         this.loading = true;
+
+        let { message } = this;
+
+        if (this.endpointSubject) {
+          message = [
+            this.$t('contact.endpointVendor'),
+            this.endpointVendor,
+            '',
+            this.$t('contact.endpointUrl'),
+            this.endpointUrl,
+            '',
+            message,
+          ].join('\n');
+        }
+
         try {
           await this.$axios.post('/contact', {
             email: this.user?.email || this.email,
             subject: this.subject?.text,
-            message: this.message,
+            message,
             browser: this.sendBrowser && this.subject.value === 'bugs' ? navigator.userAgent : null,
           });
           this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
@@ -144,6 +187,8 @@ export default {
           this.email = '';
           this.subject = {};
           this.message = '';
+          this.endpointVendor = '';
+          this.endpointUrl = '';
           this.sendBrowser = true;
           this.$refs.form.resetValidation();
           this.loading = false;

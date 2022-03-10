@@ -351,10 +351,15 @@
     "failed": "L'envoi du formulaire de contact a échoué.",
     "requestInformation": "Demande d'information",
     "bugReport": "Rapporter un bug",
+    "declareSushiEndpoint": "Déclarer un point d'accès SUSHI",
     "emailIsRequired": "L'adresse électronique est requise",
     "emailMustBeValid": "L'adresse électronique doit être valide",
     "contentIsRequired": "Un message est requis",
-    "subjectIsRequired": "L'objet est requis"
+    "subjectIsRequired": "L'objet est requis",
+    "endpointVendor": "Nom du fournisseur",
+    "endpointUrl": "URL du point d'accès SUSHI",
+    "pleaseEnterFullVendorName": "Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)",
+    "endpointDetails": "Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous."
   },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",
