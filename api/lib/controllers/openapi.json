@@ -646,12 +646,6 @@
             "example": "Akademiai Kiado",
             "description": "Vendor name"
           },
-          "sushiUrl": {
-            "type": "string",
-            "format": "uri",
-            "example": "https://journals.com/rest/COUNTER/v5/reports",
-            "description": "URL of the Sushi endpoint"
-          },
           "requestorId": {
             "type": "string"
           },
