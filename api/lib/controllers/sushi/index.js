@@ -1,6 +1,5 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
 const Institution = require('../../models/Institution');
 const { stringifyException } = require('../../services/sushi');
