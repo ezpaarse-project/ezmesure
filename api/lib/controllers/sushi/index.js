@@ -52,16 +52,6 @@ router.route({
 });
 
 router.route({
-  method: 'GET',
-  path: '/platforms.json',
-  handler: (ctx) => {
-    ctx.type = 'json';
-    ctx.status = 200;
-    ctx.body = sushiPlatforms;
-  },
-});
-
-router.route({
   method: 'POST',
   path: '/batch_delete',
   handler: [
