@@ -422,5 +422,6 @@
   "yes": "Oui",
   "no": "Non",
   "validate": "Valider",
-  "invalidate": "Invalider"
+  "invalidate": "Invalider",
+  "reason": "Raison : {reason}"
 }

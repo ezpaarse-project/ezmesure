@@ -427,5 +427,6 @@
   "yes": "Yes",
   "no": "No",
   "validate": "Validate",
-  "invalidate": "Invalidate"
+  "invalidate": "Invalidate",
+  "reason": "Reason: {reason}"
 }

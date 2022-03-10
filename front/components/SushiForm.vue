@@ -329,7 +329,14 @@ export default {
         }
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
+        const message = [e?.response?.data?.error || this.$t('formSendingFailed')];
+        const detail = e?.response?.data?.detail;
+
+        if (detail) {
+          message.push(this.$t('reason', { reason: detail }));
+        }
+
+        this.$store.dispatch('snacks/error', message);
         this.saving = false;
         return;
       }
