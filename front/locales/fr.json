@@ -129,7 +129,7 @@
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
     "deleteNbEndpoints": "Vous allez supprimer {number} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
-    "clickToCreateOne": "Cliquez ici pour en créer un"
+    "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
     "title": "Établissement",

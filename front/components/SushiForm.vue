@@ -40,6 +40,24 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
             </template>
+
+            <template v-slot:no-data>
+              <v-list-item to="/contact-us">
+                <v-list-item-avatar>
+                  <v-icon>
+                    mdi-plus-circle-outline
+                  </v-icon>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ $t('endpoints.noEndpointFound') }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ $t('endpoints.clickToDeclareOne') }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
           </v-autocomplete>
 
           <v-text-field

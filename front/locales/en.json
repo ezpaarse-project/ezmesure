@@ -129,7 +129,7 @@
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
     "deleteNbEndpoints": "You are about to delete {number} endpoints.",
     "noEndpointFound": "No endpoint found",
-    "clickToCreateOne": "Click here to create one"
+    "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
     "title": "Institution",
