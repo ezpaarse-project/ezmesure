@@ -48,6 +48,17 @@ router.use(
 );
 
 router.route({
+  method: 'GET',
+  path: '/_lock',
+  handler: function getLock(ctx) {
+    ctx.body = {
+      locked: sushiLocked,
+      reason: lockReason,
+    };
+  },
+});
+
+router.route({
   method: 'PUT',
   path: '/_lock',
   handler: [

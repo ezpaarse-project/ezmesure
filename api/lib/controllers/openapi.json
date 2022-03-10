@@ -4646,6 +4646,50 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get SUSHI management lock status",
+        "operationId": "get-sushi-_lock",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locked": {
+                      "type": "boolean",
+                      "description": "Wether SUSHI management is locked or not"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "The reason of the lock"
+                    }
+                  },
+                  "required": [
+                    "locked"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Get the current lock status of SUSHI management.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/sushi/{id}": {
