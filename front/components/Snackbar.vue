@@ -6,13 +6,17 @@
     :color="currentMessage.color"
     :timeout="currentMessage.timeout"
   >
-    {{ currentMessage.text }}
-    <v-btn
-      dark
-      text
-      @click.native="visible = false"
-      v-text="$t('close')"
-    />
+    <div v-for="(text, i) in lines" :key="i" v-text="text" />
+
+    <template v-slot:action="{ attrs }">
+      <v-btn
+        dark
+        text
+        v-bind="attrs"
+        @click.native="visible = false"
+        v-text="$t('close')"
+      />
+    </template>
   </v-snackbar>
 </template>
 
@@ -48,6 +52,11 @@ export default {
     ...mapState('snacks', ['messages']),
     currentMessage() {
       return this.messages[0];
+    },
+    lines() {
+      const text = this.currentMessage?.text;
+      const lines = Array.isArray(text) ? text : [text];
+      return lines.map(x => x);
     },
   },
   methods: {
