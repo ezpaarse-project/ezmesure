@@ -800,63 +800,6 @@
           "sushiUrl"
         ]
       },
-      "SushiPlatform": {
-        "description": "",
-        "type": "object",
-        "properties": {
-          "vendor": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Vendor name"
-          },
-          "sushiUrl": {
-            "type": "string",
-            "minLength": 1,
-            "description": "URL of the sushi endpoint"
-          },
-          "customerId": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs a customer ID"
-          },
-          "requestorId": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs a requestor ID"
-          },
-          "apiKey": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs an API key"
-          },
-          "description": {
-            "type": "string",
-            "description": "Vendor description"
-          },
-          "isNonSushi": {
-            "type": "boolean"
-          },
-          "technicalProvider": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "vendor",
-          "sushiUrl",
-          "customerId",
-          "requestorId",
-          "apiKey"
-        ],
-        "x-examples": {
-          "example-1": {
-            "vendor": "Fictive Journals",
-            "sushiUrl": "https://journals.fictive.com/sushi/reports",
-            "customerId": true,
-            "requestorId": false,
-            "apiKey": true,
-            "description": "This is a fictive sushi endpoint",
-            "isNonSushi": false,
-            "technicalProvider": "Atypon"
-          }
-        }
-      },
       "Member": {
         "description": "",
         "type": "object",
@@ -4130,6 +4073,128 @@
         }
       }
     },
+    "/spaces/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get a space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-spaces-id",
+        "description": "Get a specific space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update a space",
+        "operationId": "put-spaces-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Update a Kibana space",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Space"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete a space",
+        "operationId": "delete-space-spaceId",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
+      }
+    },
     "/spaces/{id}/index-patterns": {
       "parameters": [
         {
@@ -4514,6 +4579,75 @@
         }
       }
     },
+    "/sushi/_lock": {
+      "put": {
+        "summary": "Lock SUSHI identifiers management",
+        "operationId": "put-sushi-_lock",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locked": {
+                      "type": "boolean",
+                      "description": "Whether the management is locked or not"
+                    }
+                  },
+                  "required": [
+                    "locked"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi",
+          "Administration"
+        ],
+        "description": "Lock SUSHI identifiers management",
+        "x-internal": false,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locked": {
+                    "type": "boolean",
+                    "description": "Wether the management should be locked or not"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "The reason of the lock"
+                  }
+                },
+                "required": [
+                  "locked"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/sushi/{id}": {
       "parameters": [
         {
@@ -4600,128 +4734,6 @@
         ],
         "tags": [
           "Sushi"
-        ]
-      }
-    },
-    "/spaces/{id}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "Get a space",
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Space"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "operationId": "get-spaces-id",
-        "description": "Get a specific space",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "put": {
-        "summary": "Update a space",
-        "operationId": "put-spaces-id",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Space"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "tags": [
-          "Administration",
-          "Kibana"
-        ],
-        "description": "Update a Kibana space",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Space"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Delete a space",
-        "operationId": "delete-space-spaceId",
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "description": "Delete a Kibana space",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Administration",
-          "Kibana"
         ]
       }
     },

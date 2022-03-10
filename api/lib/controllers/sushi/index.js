@@ -29,12 +29,46 @@ const {
   getAvailableReports,
 } = require('./actions');
 
+let sushiLocked = false;
+let lockReason;
+
+const blockIfLocked = (ctx, next) => {
+  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.userIsAdmin) {
+    ctx.throw(403, ctx.$t('errors.sushi.managementLocked'), { detail: lockReason });
+  }
+  return next();
+};
+
 router.use(
   requireJwt,
   requireUser,
   requireTermsOfUse,
   requireAnyRole(['sushi_form', 'admin', 'superuser']),
+  blockIfLocked,
 );
+
+router.route({
+  method: 'PUT',
+  path: '/_lock',
+  handler: [
+    requireAdmin,
+    function setLock(ctx) {
+      sushiLocked = !!ctx.request?.body?.locked;
+      lockReason = sushiLocked ? ctx?.request?.body?.reason : undefined;
+
+      ctx.body = {
+        locked: sushiLocked,
+      };
+    },
+  ],
+  validate: {
+    type: 'json',
+    body: {
+      locked: Joi.boolean().required(),
+      reason: Joi.string().trim().empty(''),
+    },
+  },
+});
 
 router.route({
   method: 'GET',

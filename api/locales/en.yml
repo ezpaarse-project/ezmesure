@@ -32,6 +32,7 @@ errors:
     notFound: Sushi item not found
     emptyEndpointResponse: Sushi endpoint returned an empty response
     invalidResponse: The Sushi endpoint responded with invalid data
+    managementLocked: SUSHI identifiers management is currently locked
 
     import:
       belongsToAnother: SUSHI item [%s] belongs to an other institution
