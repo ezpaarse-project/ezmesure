@@ -102,6 +102,7 @@ app.use(async (ctx, next) => {
       ctx.body = {
         status: ctx.status,
         error: message,
+        detail: error.detail,
       };
       return;
     }
@@ -111,6 +112,7 @@ app.use(async (ctx, next) => {
     ctx.body = {
       status: ctx.status,
       error: error.message,
+      detail: error.detail,
       stack: error.stack,
       code: error.code,
     };
