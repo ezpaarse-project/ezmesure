@@ -43,6 +43,20 @@
     <v-container fluid>
       <div>{{ $t('institutions.sushi.pageDescription') }}</div>
       <div><strong>{{ $t('institutions.sushi.pageDescription2') }}</strong></div>
+
+      <v-row v-if="locked" justify="center" class="mt-2">
+        <v-col style="max-width: 900px">
+          <v-alert
+            outlined
+            type="info"
+            prominent
+            icon="mdi-lock"
+          >
+            <div class="text-h6" v-text="$t('sushi.managementIsLocked')" />
+            <div v-if="lockReason" v-text="$t('reason', { reason: lockReason })" />
+          </v-alert>
+        </v-col>
+      </v-row>
     </v-container>
 
     <SushiForm
@@ -227,6 +241,7 @@ export default {
     redirect,
   }) {
     let institution = null;
+    let lockStatus;
 
     if (!$auth.hasScope('superuser') && !$auth.hasScope('sushi_form')) {
       return redirect({ name: 'myspace' });
@@ -240,6 +255,12 @@ export default {
       } else {
         store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetriveInformations'));
       }
+    }
+
+    try {
+      lockStatus = await $axios.$get('/sushi/_lock');
+    } catch (e) {
+      store.dispatch('snacks/error', app.i18n.t('sushi.unableToGetLockStatus'));
     }
 
     let endpoints = [];
@@ -258,6 +279,8 @@ export default {
       search: '',
       endpoints,
       loadingItems: {},
+      locked: lockStatus?.locked,
+      lockReason: lockStatus?.reason,
     };
   },
   computed: {

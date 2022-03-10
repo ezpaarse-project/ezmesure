@@ -306,11 +306,8 @@
     "idCopied": "ID copied in the clipboard",
     "importState": "Import state",
     "latestImport": "Latest import",
-    "states": {
-      "untested": "Not imported yet",
-      "finished": "Finished",
-      "failed": "Failure"
-    }
+    "unableToGetLockStatus": "Failed to retrieve credentials lock status",
+    "managementIsLocked": "SUSHI credentials management is currently locked."
   },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",

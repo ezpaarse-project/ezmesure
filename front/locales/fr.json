@@ -305,7 +305,9 @@
     "unableToCopyId": "Impossible de copier dans le presse-papier",
     "idCopied": "ID copié dans le presse-papier",
     "importState": "État de l'import",
-    "latestImport": "Dernier import"
+    "latestImport": "Dernier import",
+    "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
+    "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verouillée."
   },
   "reports": {
     "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
