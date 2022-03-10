@@ -3,15 +3,11 @@
     fluid
     fill-height
   >
-    <v-layout
-      align-center
-      justify-center
+    <v-row
+      align="center"
+      justify="center"
     >
-      <v-flex
-        xs12
-        sm8
-        md4
-      >
+      <v-col style="max-width: 800px">
         <v-card class="elevation-12">
           <v-toolbar
             color="primary"
@@ -109,8 +105,8 @@
             />
           </v-card-actions>
         </v-card>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
