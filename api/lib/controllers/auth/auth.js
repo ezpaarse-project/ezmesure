@@ -55,6 +55,15 @@ function sendPasswordRecovery(user, data) {
   });
 }
 
+function sendToNewAccount(receivers, data) {
+  return sendMail({
+    from: sender,
+    to: receivers,
+    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
+    ...generateMail('new-account', { data }),
+  });
+}
+
 exports.renaterLogin = async (ctx) => {
   const { query } = ctx.request;
   const headers = ctx.request.header;
@@ -172,6 +181,8 @@ exports.elasticLogin = async (ctx) => {
 exports.acceptTerms = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
+  const origin = ctx.get('origin');
+
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
@@ -179,6 +190,43 @@ exports.acceptTerms = async (ctx) => {
 
   user.metadata.acceptedTerms = true;
   await elastic.security.putUser({ username: user.username, body: user });
+
+  const { email } = user;
+  const [, domain] = email.split('@');
+
+  let res;
+  try {
+    res = await elastic.search({
+      index: '.security',
+      body: {
+        query: {
+          bool: {
+            filter: [
+              { term: { type: 'user' } },
+              { terms: { roles: ['doc_contact', 'tech_contact'] } },
+              { wildcard: { email: { value: `*@${domain}` } } },
+            ],
+          },
+        },
+      },
+    });
+  } catch (err) {
+    appLogger.error(`Failed to get collaborators of new user: ${err}`);
+  }
+
+  const correspondents = res?.body?.hits?.hits;
+  if (Array.isArray(correspondents) && correspondents.length > 0) {
+    const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
+
+    try {
+      await sendToNewAccount(emails, {
+        manageMemberLink: `${origin}/institutions/self/members`,
+        newUser: user.username,
+      });
+    } catch (err) {
+      appLogger.error(`Failed to send mail: ${err}`);
+    }
+  }
 
   ctx.status = 204;
 };
