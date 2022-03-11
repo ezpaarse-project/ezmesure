@@ -361,7 +361,8 @@
     "endpointVendor": "Vendor name",
     "endpointUrl": "URL of the SUSHI endpoint",
     "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
-    "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below."
+    "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.",
+    "additionalInformation": "Additional information"
   },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",

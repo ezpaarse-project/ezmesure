@@ -63,9 +63,17 @@
                 />
 
                 <p>{{ $t('contact.endpointDetails') }}</p>
+
+                <v-textarea
+                  v-model="message"
+                  :label="$t('contact.additionalInformation')"
+                  name="message"
+                  outlined
+                />
               </template>
 
               <v-textarea
+                v-else
                 v-model="message"
                 :rules="messageRules"
                 :label="$t('contact.content')"
