@@ -174,7 +174,13 @@ You should source ``ezmesure.env.sh`` for the following and before each start.
 ```bash
 souce ezmesure.env.sh
 ```
-### 3. Setup https for kibana and elastic
+### 3. Install SSL certificates
+
+use [mkcert](https://github.com/FiloSottile/mkcert) for local development
+
+ezMESURE uses an Apache reverse proxy which communicates with HTTPS only. Put the SSL certificate (``server.pem``) and private key (``server.key``) in ``rp/apache2/ssl``.
+
+### 4. Setup https for kibana and elastic
 
 ezmesure request to elastic in https, to do that, you need to create certificate.
 
@@ -204,7 +210,7 @@ ezmesure/certs sudo unzip bundle.zip -d ../elasticsearch/config/certificates/
 ezmesure/certs sudo unzip bundle.zip -d ../kibana/config/certificates/
 ```
 
-### 4. Setup local DNS (for dev with Shibboleth)
+### 5. Setup local DNS (for dev with Shibboleth)
 
 The Shibboleth authentication process requires the user to be located at `ezmesure-preprod.couperin.org`. If working on localhost, add the following line into `/etc/hosts`:
 
@@ -220,7 +226,7 @@ export EZMESURE_DISABLE_SHIBBOLETH=""
 
 Don't forget to restore the environment variables after the modification.
 
-### 5. Prepare start
+### 6. Prepare start
 
 Before launching ezmesure, you must create the elastic container, for that you must use this command.
 
@@ -229,7 +235,7 @@ docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsear
 
 sudo chmod 777 ./data/elastic/data
 ```
-### 6. Start
+### 7. Start
 
 ```bash
 docker-compose -f docker-compose.debug.yml up -d
