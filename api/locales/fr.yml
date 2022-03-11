@@ -32,7 +32,7 @@ errors:
     notFound: Item SUSHI introuvable
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
     invalidResponse: Le point d'accès SUSHI a retourné des données invalides
-    managementLocked: La gestion des identifiants SUSHI est actuellement verouillée
+    managementLocked: La gestion des identifiants SUSHI est actuellement verrouillée
 
     import:
       belongsToAnother: L'item SUSHI [%s] appartient à un autre établissement
