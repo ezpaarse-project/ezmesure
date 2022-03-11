@@ -8,14 +8,14 @@
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">{{ data }} vient de créer son compte sur ezMESURE</mj-text>
+    <mj-text mj-class="headline">{{ data.newUser }} vient de créer son compte sur ezMESURE</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      Vous pouvez dès à présent l'intégrer à votre établissement depuis l'interface de gestion des membres
+      Vous pouvez dès à présent l'intégrer à votre établissement depuis <a target="_blank" href="{{ data.manageMemberLink }}">l'interface de gestion des membres</a>
     </mj-text>
 
     <mj-text>

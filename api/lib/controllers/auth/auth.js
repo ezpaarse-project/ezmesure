@@ -55,11 +55,11 @@ function sendPasswordRecovery(user, data) {
   });
 }
 
-function sendToNewAccount(users, data) {
+function sendToNewAccount(receivers, data) {
   return sendMail({
     from: sender,
-    to: users,
-    subject: `${data} s'est inscrit sur ezMESURE`,
+    to: receivers,
+    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
     ...generateMail('new-account', { data }),
   });
 }
@@ -181,6 +181,8 @@ exports.elasticLogin = async (ctx) => {
 exports.acceptTerms = async (ctx) => {
   const user = await elastic.security.findUser({ username: ctx.state.user.username });
 
+  const origin = ctx.get('origin');
+
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
@@ -214,10 +216,13 @@ exports.acceptTerms = async (ctx) => {
 
   const correspondents = res?.body?.hits?.hits;
   if (Array.isArray(correspondents) && correspondents.length > 0) {
-    const emails = correspondents.map((c) => c?.['_source']?.email)).filter((x) => x);
+    const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
 
     try {
-      await sendToNewAccount(emails, user.username);
+      await sendToNewAccount(emails, {
+        manageMemberLink: `${origin}/institutions/self/members`,
+        newUser: user.username,
+      });
     } catch (err) {
       appLogger.error(`Failed to send mail: ${err}`);
     }
