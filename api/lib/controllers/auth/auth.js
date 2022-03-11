@@ -213,7 +213,7 @@ exports.acceptTerms = async (ctx) => {
   }
 
   const correspondents = res?.body?.hits?.hits;
-  if (correspondents.length !== 0) {
+  if (Array.isArray(correspondents) && correspondents.length > 0) {
     const emails = [];
     correspondents.forEach((correspondent) => {
       emails.push(correspondent['_source']?.email);
