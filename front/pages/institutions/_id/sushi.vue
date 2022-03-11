@@ -186,6 +186,7 @@
             <v-list-item
               v-for="action in itemActions"
               :key="action.icon"
+              :disabled="action.disabled"
               @click="action.callback(item)"
             >
               <v-list-item-icon>
@@ -349,11 +350,13 @@ export default {
           icon: 'mdi-pencil',
           label: this.$t('modify'),
           callback: this.editSushiItem,
+          disabled: this.locked,
         },
         {
           icon: 'mdi-content-copy',
           label: this.$t('duplicate'),
           callback: this.duplicateItem,
+          disabled: this.locked,
         },
         {
           icon: 'mdi-file-search',
