@@ -189,7 +189,6 @@ exports.acceptTerms = async (ctx) => {
   user.metadata.acceptedTerms = true;
   await elastic.security.putUser({ username: user.username, body: user });
 
-  // TODO
   const { email } = user;
   const [, domain] = email.split('@');
 
