@@ -26,26 +26,14 @@
               v-model="valid"
             >
               <v-text-field
-                v-if="!user"
                 v-model="email"
-                :rules="emailRules"
-                label="Email"
-                name="email"
-                outlined
-                clearable
-                required
-              />
-              <v-text-field
-                v-else
-                :value="user.email"
                 :rules="emailRules"
                 :label="$t('contact.email')"
                 name="email"
                 outlined
-                clearable
                 required
-                disabled
               />
+
               <v-select
                 v-model="subject"
                 :items="subjects"
@@ -112,16 +100,18 @@
 
 <script>
 export default {
-  data: () => ({
-    email: '',
-    message: '',
-    endpointVendor: '',
-    endpointUrl: '',
-    subject: {},
-    sendBrowser: true,
-    valid: true,
-    loading: false,
-  }),
+  asyncData({ $auth }) {
+    return {
+      email: $auth?.user?.email || '',
+      message: '',
+      endpointVendor: '',
+      endpointUrl: '',
+      subject: {},
+      sendBrowser: true,
+      valid: true,
+      loading: false,
+    };
+  },
   computed: {
     user() { return this.$auth.user; },
     endpointSubject() { return this.subject?.value === 'sushi-endpoint'; },
