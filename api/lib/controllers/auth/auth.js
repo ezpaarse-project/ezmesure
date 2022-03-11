@@ -214,10 +214,7 @@ exports.acceptTerms = async (ctx) => {
 
   const correspondents = res?.body?.hits?.hits;
   if (Array.isArray(correspondents) && correspondents.length > 0) {
-    const emails = [];
-    correspondents.forEach((correspondent) => {
-      emails.push(correspondent['_source']?.email);
-    });
+    const emails = correspondents.map((c) => c?.['_source']?.email)).filter((x) => x);
 
     try {
       await sendToNewAccount(emails, user.username);
