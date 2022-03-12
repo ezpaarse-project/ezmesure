@@ -455,6 +455,11 @@ async function processJob(job) {
     return job.remove();
   }
 
+  if (job.attemptsMade > 0) {
+    appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade + 1})`);
+    task.log('info', `New attempt (total: ${job.attemptsMade + 1})`);
+  }
+
   const { params: taskParams = {} } = task.getData();
   const {
     sushiId,
