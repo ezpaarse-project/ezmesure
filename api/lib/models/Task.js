@@ -197,6 +197,10 @@ class Task extends typedModel({ type, schemas }) {
     this.emit('finish');
   }
 
+  isDone() {
+    return ['finished', 'error'].includes(this.get('status'));
+  }
+
   updateRunningTime() {
     if (this.data?.startedAt) {
       this.data.runningTime = Date.now() - this.data.startedAt.getTime();
