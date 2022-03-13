@@ -289,7 +289,7 @@ exports.harvestSushi = async (ctx) => {
   });
 
   await task.save();
-  await harvestQueue.add({ taskId: task.getId() });
+  await harvestQueue.add({ taskId: task.getId() }, { jobId: task.getId() });
 
   ctx.type = 'json';
   ctx.body = task;
