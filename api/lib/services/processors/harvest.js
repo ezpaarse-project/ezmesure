@@ -299,7 +299,7 @@ async function importSushiReport(options = {}) {
     const reportItem = report.Report_Items[i];
 
     if (!Array.isArray(reportItem.Item_ID)) {
-      addError('Item has no Item_ID');
+      addError(`Item #${i} has no Item_ID [Title: ${reportItem.Title}]`);
       continue; // eslint-disable-line no-continue
     }
 
@@ -341,6 +341,10 @@ async function importSushiReport(options = {}) {
       };
     }
 
+    const identifiers = Object.entries(item.Item_ID)
+      .map(([key, value]) => `${key}:${value}`)
+      .sort();
+
     reportItem.Performance.forEach((performance) => {
       if (!Array.isArray(performance?.Instance)) { return; }
 
@@ -349,17 +353,23 @@ async function importSushiReport(options = {}) {
       const perfEndDate = new Date(period.End_Date);
 
       if (!isSameMonth(perfBeginDate, perfEndDate)) {
-        addError(`Item performance cover more than a month: ${perfBeginDate} -> ${perfEndDate}`);
+        addError(
+          `Item #${i} performance cover more than a month`
+          + ` [${perfBeginDate} -> ${perfEndDate}]`
+          + ` [ID: ${identifiers.join(', ')}]`
+          + ` [Title: ${item.Title}]`,
+        );
         return;
       }
       if (!isFirstDayOfMonth(perfBeginDate) || !isLastDayOfMonth(perfEndDate)) {
-        addError(`Item performance does not cover the entire month: ${perfBeginDate} -> ${perfEndDate}`);
+        addError(
+          `Item #${i} performance does not cover the entire month`
+          + ` [${perfBeginDate} -> ${perfEndDate}]`
+          + ` [ID: ${identifiers.join(', ')}]`
+          + ` [Title: ${item.Title}]`,
+        );
         return;
       }
-
-      const identifiers = Object.entries(item.Item_ID)
-        .map(([key, value]) => `${key}:${value}`)
-        .sort();
 
       const date = format(perfBeginDate, 'yyyy-MM');
 
