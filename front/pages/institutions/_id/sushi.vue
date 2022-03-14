@@ -283,7 +283,7 @@ export default {
       search: '',
       endpoints,
       loadingItems: {},
-      locked: lockStatus?.locked,
+      locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
     };
   },
