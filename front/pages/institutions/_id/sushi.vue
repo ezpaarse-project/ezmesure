@@ -92,7 +92,7 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="testingConnection || locked" @click="checkConnection">
+        <v-list-item :disabled="testingConnection || locked" @click="checkMultipleConnection">
           <v-list-item-icon>
             <v-icon>mdi-connection</v-icon>
           </v-list-item-icon>
@@ -155,6 +155,8 @@
         <SushiConnectionIcon
           :connection="item.connection"
           :loading="loadingItems[item.id]"
+          :locked="locked"
+          @checkConnection="checkSingleConnection(item)"
         />
       </template>
 
@@ -435,7 +437,19 @@ export default {
       this.selected = [];
     },
 
-    async checkConnection() {
+    async checkSingleConnection(sushiItem) {
+      this.$set(this, 'loadingItems', { [sushiItem.id]: true });
+
+      try {
+        sushiItem.connection = await this.$axios.$get(`/sushi/${sushiItem.id}/connection`);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
+      }
+
+      this.$set(this, 'loadingItems', {});
+    },
+
+    async checkMultipleConnection() {
       if (!this.hasSelection) { return; }
 
       const loadingItems = {};
