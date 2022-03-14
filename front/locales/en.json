@@ -315,7 +315,8 @@
     "checkCredentials": "Check credentials",
     "availableReports": "Available reports",
     "availableReportsOnPlatform": "Available reports on the publisher platform",
-    "failedToFetchReports": "Failed to fetch the list of available reports"
+    "failedToFetchReports": "Failed to fetch the list of available reports",
+    "showAllReports": "Show all reports"
   },
   "identifier": "Identifier",
   "authenticate": {

@@ -315,7 +315,8 @@
     "checkCredentials": "Vérifier les identifiants",
     "availableReports": "Rapports disponibles",
     "availableReportsOnPlatform": "Rapports disponibles sur la plateforme éditeur",
-    "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles"
+    "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles",
+    "showAllReports": "Afficher tous les rapports"
   },
   "identifier": "Identifiant",
   "authenticate": {

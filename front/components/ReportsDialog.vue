@@ -47,16 +47,38 @@
         </v-alert>
       </v-card-text>
 
-      <v-data-table
-        :headers="headers"
-        :items="reports"
-        :loading="refreshing"
-        item-key="Report_ID"
-      />
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">
+                {{ $t('name') }}
+              </th>
+              <th class="text-left">
+                {{ $t('identifier') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="report in filteredReports"
+              :key="report.Report_ID"
+            >
+              <td>{{ report.Report_Name }}</td>
+              <td>{{ report.Report_ID }}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
 
       <v-divider />
 
       <v-card-actions>
+        <v-checkbox
+          v-model="showAllReports"
+          :label="$t('reports.showAllReports')"
+        />
+
         <v-spacer />
 
         <v-btn text @click="show = false">
@@ -74,6 +96,7 @@ export default {
       show: false,
       exceptions: [],
       refreshing: false,
+      showAllReports: false,
       sushi: null,
       reports: [],
     };
@@ -108,6 +131,14 @@ export default {
         message += code ? `[#${code}] ` : '';
         message += msg;
         return message;
+      });
+    },
+    filteredReports() {
+      if (this.showAllReports) { return this.reports; }
+
+      return this.reports.filter((report) => {
+        if (typeof report?.['Report_ID'] !== 'string') { return false; }
+        return !report.Report_ID.includes('_');
       });
     },
   },
