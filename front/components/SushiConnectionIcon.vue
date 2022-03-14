@@ -12,6 +12,7 @@
         :loading="loading"
         v-bind="attrs"
         v-on="on"
+        @click="$emit('checkConnection')"
       >
         <v-icon :color="color" small>
           {{ icon }}
