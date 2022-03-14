@@ -92,7 +92,7 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="testingConnection" @click="checkConnection">
+        <v-list-item :disabled="testingConnection || locked" @click="checkConnection">
           <v-list-item-icon>
             <v-icon>mdi-connection</v-icon>
           </v-list-item-icon>
@@ -101,7 +101,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :disabled="deleting" @click="deleteData">
+        <v-list-item :disabled="deleting || locked" @click="deleteData">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
