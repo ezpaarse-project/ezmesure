@@ -314,6 +314,7 @@
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
     "checkCredentials": "Check credentials",
     "availableReports": "Available reports",
+    "availableReportsOnPlatform": "Available reports on the publisher platform",
     "failedToFetchReports": "Failed to fetch the list of available reports"
   },
   "identifier": "Identifier",

@@ -3,7 +3,7 @@
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
         <v-toolbar-title>
-          {{ $t('reports.availableReports') }}
+          {{ $t('reports.availableReportsOnPlatform') }}
           <div class="caption">
             {{ sushiVendor }} - {{ sushiPackage }}
           </div>

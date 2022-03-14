@@ -314,6 +314,7 @@
     "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
     "checkCredentials": "Vérifier les identifiants",
     "availableReports": "Rapports disponibles",
+    "availableReportsOnPlatform": "Rapports disponibles sur la plateforme éditeur",
     "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles"
   },
   "identifier": "Identifiant",
