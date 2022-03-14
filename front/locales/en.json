@@ -307,7 +307,8 @@
     "importState": "Import state",
     "latestImport": "Latest import",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
-    "managementIsLocked": "SUSHI credentials management is currently locked."
+    "managementIsLocked": "SUSHI credentials management is currently locked.",
+    "deleteNbCredentials": "You are about to delete {number} SUSHI credentials."
   },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",

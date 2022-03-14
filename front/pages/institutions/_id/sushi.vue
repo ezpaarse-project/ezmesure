@@ -67,6 +67,7 @@
 
     <SushiHistory ref="sushiHistory" />
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
+    <ConfirmDialog ref="confirm" />
 
     <v-menu nudge-width="100" style="z-index:100">
       <template v-slot:activator="{ on, attrs }">
@@ -217,6 +218,7 @@ import SushiConnectionIcon from '~/components/SushiConnectionIcon';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
+import ConfirmDialog from '~/components/ConfirmDialog';
 import LocalDate from '~/components/LocalDate';
 import TaskLabel from '~/components/TaskLabel';
 
@@ -232,6 +234,7 @@ export default {
     ReportsDialog,
     LocalDate,
     TaskLabel,
+    ConfirmDialog,
   },
   async asyncData({
     $axios,
@@ -463,6 +466,17 @@ export default {
 
     async deleteData() {
       if (!this.hasSelection) {
+        return;
+      }
+
+      const deleteData = await this.$refs.confirm.open({
+        title: this.$t('areYouSure'),
+        message: this.$t('sushi.deleteNbCredentials', { number: this.selected.length }),
+        agreeText: this.$t('delete'),
+        disagreeText: this.$t('cancel'),
+      });
+
+      if (!deleteData) {
         return;
       }
 
