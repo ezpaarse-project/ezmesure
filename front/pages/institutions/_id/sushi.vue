@@ -101,7 +101,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :loading="deleting" @click="deleteData">
+        <v-list-item :disabled="deleting" @click="deleteData">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
