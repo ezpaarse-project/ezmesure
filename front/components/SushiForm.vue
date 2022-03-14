@@ -201,19 +201,12 @@
           v-text="editMode ? $t('update') : $t('add')"
         />
       </v-card-actions>
-
-      <ConfirmDialog ref="confirm" />
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import ConfirmDialog from '~/components/ConfirmDialog';
-
 export default {
-  components: {
-    ConfirmDialog,
-  },
   props: {
     endpoints: {
       type: Array,
