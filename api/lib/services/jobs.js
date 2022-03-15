@@ -29,29 +29,42 @@ async function checkTask(taskId, jobId) {
   }
 }
 
+/**
+ * Make sure that the associated task is marked as finished
+ * and remove the job from the queue
+ * @param {Object} job the job that has finished
+ */
+async function handleFinishedJob(job) {
+  try {
+    checkTask(job?.data?.taskId, job?.id);
+  } catch (e) {
+    appLogger.error(`${logPrefix} Failed to check state of task [${job?.data?.taskId}]`);
+    appLogger.error(e.message);
+    appLogger.error(e.stack);
+  }
+
+  try {
+    job.remove();
+  } catch (e) {
+    appLogger.error(`${logPrefix} Failed to remove job [${job?.id}]`);
+    appLogger.error(e.message);
+    appLogger.error(e.stack);
+  }
+}
+
 harvestQueue
   .on('waiting', (jobId) => { appLogger.verbose(`${logPrefix} Job [${jobId}] is pending`); })
   .on('active', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] has started`); })
   .on('stalled', (job) => { appLogger.error(`${logPrefix} Job [${job?.id}] stalled`); })
   .on('completed', (job) => {
     appLogger.verbose(`${logPrefix} Job [${job?.id}] completed`);
-
-    checkTask(job?.data?.taskId, job?.id).catch((e) => {
-      appLogger.error(`${logPrefix} Failed to check state of task [${job?.data?.taskId}]`);
-      appLogger.error(e.message);
-      appLogger.error(e.stack);
-    });
+    handleFinishedJob(job);
   })
   .on('failed', (job, err) => {
     appLogger.error(`${logPrefix} Job [${job?.id}] failed`);
     appLogger.error(err.message);
     appLogger.error(err.stack);
-
-    checkTask(job?.data?.taskId, job?.id).catch((e) => {
-      appLogger.error(`${logPrefix} Failed to check state of task [${job?.data?.taskId}]`);
-      appLogger.error(e.message);
-      appLogger.error(e.stack);
-    });
+    handleFinishedJob(job);
   })
   .on('lock-extension-failed', (job, err) => {
     // A job failed to extend lock. This will be useful to debug redis
