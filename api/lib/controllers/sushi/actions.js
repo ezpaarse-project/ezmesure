@@ -287,6 +287,7 @@ exports.harvestSushi = async (ctx) => {
     status: 'waiting',
     params: {
       sushiId: sushi.getId(),
+      endpointId: sushi.get('endpointId'),
       institutionId: institution.getId(),
       username: user.username,
       reportType,
