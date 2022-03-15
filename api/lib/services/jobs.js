@@ -36,7 +36,7 @@ async function checkTask(taskId, jobId) {
  */
 async function handleFinishedJob(job) {
   try {
-    checkTask(job?.data?.taskId, job?.id);
+    await checkTask(job?.data?.taskId, job?.id);
   } catch (e) {
     appLogger.error(`${logPrefix} Failed to check state of task [${job?.data?.taskId}]`);
     appLogger.error(e.message);
@@ -44,7 +44,7 @@ async function handleFinishedJob(job) {
   }
 
   try {
-    job.remove();
+    await job.remove();
   } catch (e) {
     appLogger.error(`${logPrefix} Failed to remove job [${job?.id}]`);
     appLogger.error(e.message);
