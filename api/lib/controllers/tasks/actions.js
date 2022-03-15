@@ -15,6 +15,7 @@ exports.getAll = async (ctx) => {
     type,
     institutionId,
     sushiId,
+    endpointId,
     collapse,
   } = query;
 
@@ -34,6 +35,9 @@ exports.getAll = async (ctx) => {
   }
   if (sushiId) {
     filters.push(Task.filterBy('params.sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+  }
+  if (endpointId) {
+    filters.push(Task.filterBy('params.endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
   }
 
   const options = { filters };
