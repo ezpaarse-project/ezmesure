@@ -3,12 +3,29 @@
     <ToolBar :title="$t('institutions.institution.title')">
       <v-spacer />
 
-      <v-btn v-if="institution && canEdit" color="primary" @click="editInstitution">
-        <v-icon left>
-          mdi-pencil
-        </v-icon>
-        {{ $t('modify') }}
-      </v-btn>
+      <template v-if="institution && canEdit">
+        <template v-if="isAdmin">
+          <v-btn color="primary" text :to="`/institutions/${institutionId}/sushi`">
+            <v-icon left>
+              mdi-key
+            </v-icon>
+            {{ $t('institutions.sushi.credentials') }}
+          </v-btn>
+          <v-btn color="primary" text :to="`/institutions/${institutionId}/members`">
+            <v-icon left>
+              mdi-account-multiple
+            </v-icon>
+            {{ $t('institutions.members.members') }}
+          </v-btn>
+        </template>
+
+        <v-btn color="primary" text @click="editInstitution">
+          <v-icon left>
+            mdi-pencil
+          </v-icon>
+          {{ $t('modify') }}
+        </v-btn>
+      </template>
     </ToolBar>
 
     <v-card-text v-if="institution">
