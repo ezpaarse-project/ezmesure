@@ -11,6 +11,7 @@ errors:
 
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
+    jobExists: "SUSHI item [%s] already have an associated job (status: [%s])"
 
   queue:
     notFound: Queue not found

@@ -246,6 +246,18 @@ exports.harvestSushi = async (ctx) => {
     reportType,
   };
 
+  const currentJob = await harvestQueue.getJob(sushi.getId());
+
+  if (currentJob) {
+    const jobState = await currentJob.getState();
+
+    if (jobState === 'completed' || jobState === 'failed') {
+      await currentJob.remove();
+    } else {
+      ctx.throw(409, ctx.$t('errors.harvest.jobExists', sushi.getId(), jobState));
+    }
+  }
+
   const { body: perm } = await elastic.security.hasPrivileges({
     username: user.username,
     body: {
