@@ -32,11 +32,13 @@
             v-model="docContact"
             :label="$t('institutions.members.documentaryCorrespondent')"
             hide-details
+            @change="handleContactChange"
           />
           <v-checkbox
             v-model="techContact"
             :label="$t('institutions.members.technicalCorrespondent')"
             hide-details
+            @change="handleContactChange"
           />
         </template>
 
@@ -100,6 +102,12 @@ export default {
       this.docContact = memberData?.docContact === true;
       this.techContact = memberData?.techContact === true;
       this.show = true;
+    },
+
+    handleContactChange(newValue) {
+      if (newValue === true) {
+        this.readonly = false;
+      }
     },
 
     async save() {

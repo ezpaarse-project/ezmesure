@@ -64,11 +64,13 @@
               v-model="docContact"
               :label="$t('institutions.members.documentaryCorrespondent')"
               hide-details
+              @change="handleContactChange"
             />
             <v-checkbox
               v-model="techContact"
               :label="$t('institutions.members.technicalCorrespondent')"
               hide-details
+              @change="handleContactChange"
             />
           </template>
 
@@ -176,6 +178,13 @@ export default {
     isConnectedUser(item) {
       return item?.username === this.$auth?.user?.username;
     },
+
+    handleContactChange(newValue) {
+      if (newValue === true) {
+        this.selectedPermission = 'write';
+      }
+    },
+
 
     doSearch: debounce(async function doSearch() {
       if (!this.search) {
