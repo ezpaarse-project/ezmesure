@@ -26,7 +26,7 @@
             :items="users"
             :loading="loading"
             :search-input.sync="search"
-            :item-disabled="isConnectedUser && !isAdmin"
+            :item-disabled="(item) => !isAdmin && isConnectedUser(item)"
             item-text="full_name"
             :label="$t('search')"
             prepend-inner-icon="mdi-account-search"
