@@ -21,45 +21,6 @@ exports.getUser = async (ctx) => {
   ctx.body = user;
 };
 
-exports.getInstitutionOfUser = async (ctx) => {
-  const { username } = ctx.params;
-
-  const { body: user, statusCode } = await elastic.security.getUser(
-    { username },
-    { ignore: [404] },
-  );
-
-  const { roles } = user;
-
-  let res;
-
-  try {
-    res = await elastic.search({
-      index: 'institutions',
-      body: {
-        query: {
-          bool: {
-            filter: [
-              {
-                terms: { role: roles },
-              },
-            ],
-          },
-        },
-      },
-    });
-  } catch (err) {
-    //
-  }
-
-  if (statusCode === 404) {
-    ctx.throw(404, ctx.$t('errors.user.notFound'));
-  }
-
-  ctx.status = 200;
-  ctx.body = user;
-};
-
 exports.list = async (ctx) => {
   const search = ctx.query.q;
 
