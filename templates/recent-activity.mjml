@@ -31,6 +31,7 @@
       {% if files.length %}<div><strong>{{ files.length }}</strong> dépôts de fichiers</div>{% endif %}
       {% if insertions.length %}<div><strong>{{ insertions.length }}</strong> chargements</div>{% endif %}
       {% if reportings.length %}<div><strong>{{ reportings.length }}</strong> mises à jour de tâches de reporting</div>{% endif %}
+      {% if reportingsSend.length %}<div><strong>{{ reportingsSend.length }}</strong> de tâches de reporting ont été envoyées</div>{% endif %}
     </mj-text>
   </mj-column>
 </mj-section>
@@ -251,6 +252,34 @@
           <td>{{ action.metadata.space }}</td>
           <td>{{ action.metadata.dashboardName }}</td>
           <td>{{ action.datetime }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </mj-table>
+  </mj-column>
+</mj-section>
+{% endif %}
+
+{% if reportingsSend.length %}
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="subheading">
+      Rapports envoyé(s) ({{ reportingsSend.length }})
+    </mj-text>
+    <mj-table cellpadding="5px">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid #d0d0d0">
+          <th>Espace</th>
+          <th>Tableau de bord</th>
+          <th style="width: 130px">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reportingsSend %}
+        <tr style="border-bottom: 1px solid #d0d0d0">
+          <td>{{ report.space }}</td>
+          <td>{{ report.dashboardName }}</td>
+          <td>{{ report.sentAt }}</td>
         </tr>
         {% endfor %}
       </tbody>
