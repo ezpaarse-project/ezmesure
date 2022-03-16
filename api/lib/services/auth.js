@@ -1,8 +1,7 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
 const elastic = require('./elastic');
-const Institution = require('../models/Institution');
-const Sushi = require('../models/Sushi');
+const { getModel } = require('../models/TypedModel');
 
 const requireJwt = jwt({
   secret: auth.secret,
@@ -62,75 +61,39 @@ const requireAdmin = (ctx, next) => {
 };
 
 /**
- * Middleware that fetches an institution and put it in ctx.state.institution
- * Looks for institutionId in the route params by default
+ * Middleware that fetches an item from a model and put it in ctx.state
+ * Looks for {modelName}Id in the route params by default
  */
-function fetchInstitution(opts = {}) {
-  const { query: queryField } = opts;
-  let { params: paramField } = opts;
-
-  if (!paramField && !queryField) {
-    paramField = 'institutionId';
-  }
+function fetchModel(modelName, opts = {}) {
+  const {
+    query: queryField,
+    params: paramField = `${modelName}Id`,
+    state: stateField = modelName,
+    getId,
+    ignoreNotFound,
+  } = opts;
 
   return async (ctx, next) => {
-    let institutionId;
+    let modelId;
 
-    if (typeof opts === 'function') {
-      institutionId = opts(ctx);
+    if (typeof getId === 'function') {
+      modelId = getId(ctx);
     }
-    if (paramField && !institutionId) {
-      institutionId = ctx.params[paramField];
+    if (paramField && !modelId) {
+      modelId = ctx.params[paramField];
     }
-    if (queryField && !institutionId) {
-      institutionId = ctx.query[queryField];
+    if (queryField && !modelId) {
+      modelId = ctx.query[queryField];
     }
 
-    const institution = await Institution.findById(institutionId);
+    const item = modelId && await getModel(modelName).findById(modelId);
 
-    if (!institution) {
-      ctx.throw(404, ctx.$t('errors.institution.notFound'));
+    if (!item && !ignoreNotFound) {
+      ctx.throw(404, ctx.$t(`errors.${modelName}.notFound`));
       return;
     }
 
-    ctx.state.institution = institution;
-    await next();
-  };
-}
-
-/**
- * Middleware that fetches a SUSHI item and put it in ctx.state.sushi
- * Looks for sushiId in the route params by default
- */
-function fetchSushi(opts = {}) {
-  const { query: queryField } = opts;
-  let { params: paramField } = opts;
-
-  if (!paramField && !queryField) {
-    paramField = 'sushiId';
-  }
-
-  return async (ctx, next) => {
-    let sushiId;
-
-    if (typeof opts === 'function') {
-      sushiId = opts(ctx);
-    }
-    if (paramField && !sushiId) {
-      sushiId = ctx.params[paramField];
-    }
-    if (queryField && !sushiId) {
-      sushiId = ctx.query[queryField];
-    }
-
-    const sushi = await Sushi.findById(sushiId);
-
-    if (!sushi) {
-      ctx.throw(404, ctx.$t('errors.sushi.notFound'));
-      return;
-    }
-
-    ctx.state.sushi = sushi;
+    ctx.state[stateField] = item;
     await next();
   };
 }
@@ -178,8 +141,10 @@ module.exports = {
   requireAdmin,
   requireTermsOfUse,
   requireAnyRole,
-  fetchInstitution,
-  fetchSushi,
   requireContact,
   requireValidatedInstitution,
+  fetchModel,
+  fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
+  fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
+  fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
 };

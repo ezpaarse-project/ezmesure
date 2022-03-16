@@ -11,6 +11,10 @@ errors:
 
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
+    jobExists: "SUSHI item [%s] already have an associated job (status: [%s])"
+
+  queue:
+    notFound: Queue not found
 
   auth:
     reservedUser: cannot login as reserved user
@@ -20,12 +24,16 @@ errors:
     unableToFetchUser: Unable to fetch user data, please log in again
     noUserFound: No user found
 
+  sushi-endpoint:
+    notFound: Endpoint not found
+
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
     institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"
     notFound: Sushi item not found
     emptyEndpointResponse: Sushi endpoint returned an empty response
     invalidResponse: The Sushi endpoint responded with invalid data
+    managementLocked: SUSHI credentials management is currently locked
 
     import:
       belongsToAnother: SUSHI item [%s] belongs to an other institution

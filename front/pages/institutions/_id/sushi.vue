@@ -43,16 +43,31 @@
     <v-container fluid>
       <div>{{ $t('institutions.sushi.pageDescription') }}</div>
       <div><strong>{{ $t('institutions.sushi.pageDescription2') }}</strong></div>
+
+      <v-row v-if="locked" justify="center" class="mt-2">
+        <v-col style="max-width: 900px">
+          <v-alert
+            outlined
+            type="info"
+            prominent
+            icon="mdi-lock"
+          >
+            <div class="text-h6" v-text="$t('sushi.managementIsLocked')" />
+            <div v-if="lockReason" v-text="$t('reason', { reason: lockReason })" />
+          </v-alert>
+        </v-col>
+      </v-row>
     </v-container>
 
     <SushiForm
       ref="sushiForm"
-      :platforms="platforms"
+      :endpoints="endpoints"
       @update="refreshSushiItems"
     />
 
     <SushiHistory ref="sushiHistory" />
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
+    <ConfirmDialog ref="confirm" />
 
     <v-menu nudge-width="100" style="z-index:100">
       <template v-slot:activator="{ on, attrs }">
@@ -77,7 +92,7 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="testingConnection" @click="checkConnection">
+        <v-list-item :disabled="testingConnection || locked" @click="checkMultipleConnection">
           <v-list-item-icon>
             <v-icon>mdi-connection</v-icon>
           </v-list-item-icon>
@@ -86,7 +101,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :loading="deleting" @click="deleteData">
+        <v-list-item :disabled="deleting || locked" @click="deleteData">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
@@ -140,6 +155,8 @@
         <SushiConnectionIcon
           :connection="item.connection"
           :loading="loadingItems[item.id]"
+          :locked="locked"
+          @checkConnection="checkSingleConnection(item)"
         />
       </template>
 
@@ -172,6 +189,7 @@
             <v-list-item
               v-for="action in itemActions"
               :key="action.icon"
+              :disabled="action.disabled"
               @click="action.callback(item)"
             >
               <v-list-item-icon>
@@ -202,6 +220,7 @@ import SushiConnectionIcon from '~/components/SushiConnectionIcon';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
 import ReportsDialog from '~/components/ReportsDialog';
+import ConfirmDialog from '~/components/ConfirmDialog';
 import LocalDate from '~/components/LocalDate';
 import TaskLabel from '~/components/TaskLabel';
 
@@ -217,6 +236,7 @@ export default {
     ReportsDialog,
     LocalDate,
     TaskLabel,
+    ConfirmDialog,
   },
   async asyncData({
     $axios,
@@ -227,6 +247,7 @@ export default {
     redirect,
   }) {
     let institution = null;
+    let lockStatus;
 
     if (!$auth.hasScope('superuser') && !$auth.hasScope('sushi_form')) {
       return redirect({ name: 'myspace' });
@@ -242,9 +263,15 @@ export default {
       }
     }
 
-    let platforms = [];
     try {
-      platforms = await $axios.$get('/sushi/platforms.json');
+      lockStatus = await $axios.$get('/sushi/_lock');
+    } catch (e) {
+      store.dispatch('snacks/error', app.i18n.t('sushi.unableToGetLockStatus'));
+    }
+
+    let endpoints = [];
+    try {
+      endpoints = await $axios.$get('/sushi-endpoints');
     } catch (e) {
       store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetrivePlatforms'));
     }
@@ -256,8 +283,10 @@ export default {
       refreshing: false,
       deleting: false,
       search: '',
-      platforms,
+      endpoints,
       loadingItems: {},
+      locked: lockStatus?.locked && !$auth.hasScope('superuser'),
+      lockReason: lockStatus?.reason,
     };
   },
   computed: {
@@ -270,7 +299,7 @@ export default {
           width: '100px',
         },
         {
-          text: this.$t('institutions.sushi.platform'),
+          text: this.$t('institutions.sushi.label'),
           value: 'vendor',
         },
         {
@@ -326,11 +355,13 @@ export default {
           icon: 'mdi-pencil',
           label: this.$t('modify'),
           callback: this.editSushiItem,
+          disabled: this.locked,
         },
         {
           icon: 'mdi-content-copy',
           label: this.$t('duplicate'),
           callback: this.duplicateItem,
+          disabled: this.locked,
         },
         {
           icon: 'mdi-file-search',
@@ -406,7 +437,19 @@ export default {
       this.selected = [];
     },
 
-    async checkConnection() {
+    async checkSingleConnection(sushiItem) {
+      this.$set(this, 'loadingItems', { [sushiItem.id]: true });
+
+      try {
+        sushiItem.connection = await this.$axios.$get(`/sushi/${sushiItem.id}/connection`);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
+      }
+
+      this.$set(this, 'loadingItems', {});
+    },
+
+    async checkMultipleConnection() {
       if (!this.hasSelection) { return; }
 
       const loadingItems = {};
@@ -437,6 +480,17 @@ export default {
 
     async deleteData() {
       if (!this.hasSelection) {
+        return;
+      }
+
+      const deleteData = await this.$refs.confirm.open({
+        title: this.$t('areYouSure'),
+        message: this.$t('sushi.deleteNbCredentials', { number: this.selected.length }),
+        agreeText: this.$t('delete'),
+        disagreeText: this.$t('cancel'),
+      });
+
+      if (!deleteData) {
         return;
       }
 

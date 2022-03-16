@@ -47,6 +47,9 @@
       "name": "Institutions"
     },
     {
+      "name": "Jobs"
+    },
+    {
       "name": "Kibana"
     },
     {
@@ -643,12 +646,6 @@
             "example": "Akademiai Kiado",
             "description": "Vendor name"
           },
-          "sushiUrl": {
-            "type": "string",
-            "format": "uri",
-            "example": "https://journals.com/rest/COUNTER/v5/reports",
-            "description": "URL of the Sushi endpoint"
-          },
           "requestorId": {
             "type": "string"
           },
@@ -675,13 +672,15 @@
             "type": "string",
             "format": "date-time",
             "example": "2020-11-05T17:07:31.967Z",
-            "description": "Last modification of the sushi item"
+            "description": "Last modification of the sushi item",
+            "readOnly": true
           },
           "createdAt": {
             "type": "string",
             "format": "date-time",
             "example": "2020-11-05T17:07:31.967Z",
-            "description": "Creation date of the sushi item"
+            "description": "Creation date of the sushi item",
+            "readOnly": true
           }
         },
         "required": [
@@ -694,62 +693,112 @@
           "createdAt"
         ]
       },
-      "SushiPlatform": {
+      "SushiEndpoint": {
         "description": "",
         "type": "object",
+        "title": "SushiEndpoint",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "645c4000-1f89-11eb-836f-a3005ccf2dc6",
+            "description": "ID of the sushi item",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Last modification of the sushi item",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Creation date of the sushi item",
+            "readOnly": true
+          },
           "vendor": {
             "type": "string",
             "minLength": 1,
+            "example": "Akademiai Kiado",
             "description": "Vendor name"
           },
           "sushiUrl": {
             "type": "string",
-            "minLength": 1,
-            "description": "URL of the sushi endpoint"
-          },
-          "customerId": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs a customer ID"
-          },
-          "requestorId": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs a requestor ID"
-          },
-          "apiKey": {
-            "type": "boolean",
-            "description": "Whether the sushi endpoint needs an API key"
+            "format": "uri",
+            "example": "https://journals.com/rest/COUNTER/v5/reports",
+            "description": "URL of the Sushi endpoint"
           },
           "description": {
             "type": "string",
-            "description": "Vendor description"
+            "description": "Description of the SUSHI endpoint"
           },
-          "isNonSushi": {
-            "type": "boolean"
+          "technicalProvider": {
+            "type": "string",
+            "description": "The technical provider that operates the SUSHI endpoint"
           },
-          "companies": {
-            "type": "string"
+          "validated": {
+            "type": "boolean",
+            "description": "Whether the endpoint has been validated or not"
+          },
+          "requireRequestorId": {
+            "type": "boolean",
+            "description": "Whether the endpoint requires a requestor ID"
+          },
+          "requireCustomerId": {
+            "type": "boolean",
+            "description": "Whether the endpoint requires a customer ID"
+          },
+          "requireApiKey": {
+            "type": "boolean",
+            "description": "Whether the endpoint requires an API key"
+          },
+          "isSushiCompliant": {
+            "type": "boolean",
+            "description": "Whether the endpoint is SUSHI compliant"
+          },
+          "counterVersion": {
+            "type": "string",
+            "example": "5.0.1",
+            "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?$",
+            "description": "The COUNTER version supported by the endpoint"
+          },
+          "params": {
+            "type": "array",
+            "description": "Default query params to add when requesting the endpoint",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags associated with the endpoint",
+            "items": {
+              "type": "string",
+              "description": "Tag name"
+            }
           }
         },
         "required": [
+          "id",
+          "updatedAt",
+          "createdAt",
           "vendor",
-          "sushiUrl",
-          "customerId",
-          "requestorId",
-          "apiKey"
-        ],
-        "x-examples": {
-          "example-1": {
-            "vendor": "Fictive Journals",
-            "sushiUrl": "https://journals.fictive.com/sushi/reports",
-            "customerId": true,
-            "requestorId": false,
-            "apiKey": true,
-            "description": "This is a fictive sushi endpoint",
-            "isNonSushi": false,
-            "companies": "Atypon"
-          }
-        }
+          "sushiUrl"
+        ]
       },
       "Member": {
         "description": "",
@@ -1134,22 +1183,38 @@
             "description": "ID of the task",
             "format": "uuid"
           },
+          "createdAt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Creation date of the task",
+            "format": "date"
+          },
+          "updatedAt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last date of modification",
+            "format": "date"
+          },
+          "startedAt": {
+            "type": "string",
+            "minLength": 1,
+            "format": "date",
+            "description": "Start date of the task"
+          },
           "status": {
             "type": "string",
             "minLength": 1,
             "description": "Status of the task"
           },
-          "sushiId": {
+          "type": {
             "type": "string",
             "minLength": 1,
-            "description": "ID of the sushi item related to the task",
-            "format": "uuid"
+            "description": "Type of the task",
+            "example": "sushi-harvest"
           },
-          "institutionId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID of the institution related to the task",
-            "format": "uuid"
+          "runningTime": {
+            "type": "number",
+            "description": "How many milliseconds the task has been running"
           },
           "logs": {
             "type": "array",
@@ -1178,53 +1243,137 @@
               }
             }
           },
-          "updatedAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Last date of modification",
-            "format": "date"
+          "params": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Parameters associated to the task",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sushiId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the sushi item related to the task",
+                  "format": "uuid"
+                },
+                "institutionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "format": "uuid"
+                },
+                "username": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "format": "uuid"
+                },
+                "reportType": {
+                  "type": "string",
+                  "example": "tr",
+                  "description": "Type of COUNTER report"
+                },
+                "index": {
+                  "type": "string",
+                  "description": "Target index"
+                },
+                "beginDate": {
+                  "type": "string"
+                },
+                "endDate": {
+                  "type": "string"
+                },
+                "forceDownload": {
+                  "type": "string"
+                },
+                "endpointVendor": {
+                  "type": "string"
+                },
+                "sushiLabel": {
+                  "type": "string"
+                }
+              }
+            }
           },
-          "createdAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Creation date of the task",
-            "format": "date"
+          "steps": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Task steps",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Label of the step",
+                  "example": "download"
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "ID of the institution related to the task",
+                  "enum": [
+                    "running",
+                    "finished",
+                    "failed"
+                  ]
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Start time of the step"
+                },
+                "took": {
+                  "type": "number",
+                  "description": "How many milliseconds the step has been running"
+                },
+                "data": {
+                  "type": "object",
+                  "description": "Arbitrary data associated to the step"
+                }
+              }
+            },
+            "readOnly": true
           },
           "result": {
             "type": "object",
             "properties": {
               "inserted": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of inserted documents"
               },
               "updated": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of updated documents"
               },
               "failed": {
-                "type": "number"
+                "type": "number",
+                "description": "Number of documents that failed to be inserted"
               },
               "coveredPeriods": {
                 "type": "array",
+                "description": "Performance periods found in the report",
                 "items": {
                   "type": "string"
                 }
               },
               "errors": {
                 "type": "array",
+                "description": "A list of errors, if any",
                 "items": {
                   "type": "string"
                 }
               }
-            }
-          },
-          "runningTime": {
-            "type": "number",
-            "description": "How many milliseconds the task has been running"
+            },
+            "readOnly": true
           }
         },
         "required": [
           "id",
-          "updatedAt",
-          "createdAt"
+          "createdAt",
+          "updatedAt"
         ]
       },
       "ElasticsearchIndex": {
@@ -1245,6 +1394,77 @@
             "readOnly": true
           }
         }
+      },
+      "Queue": {
+        "description": "Status of a job queue",
+        "type": "object",
+        "x-examples": {
+          "example-1": {
+            "id": "sushi",
+            "jobCounts": 123,
+            "completedCount": 123,
+            "failedCount": 123,
+            "delayedCount": 123,
+            "activeCount": 123,
+            "waitingCount": 123,
+            "pausedCount": 123
+          }
+        },
+        "title": "Queue",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the queue",
+            "example": "harvest"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "Whether the queue is currently paused"
+          },
+          "jobCounts": {
+            "type": "object",
+            "required": [
+              "waiting",
+              "active",
+              "completed",
+              "failed",
+              "delayed",
+              "paused"
+            ],
+            "properties": {
+              "waiting": {
+                "type": "number",
+                "description": "Number of waiting jobs"
+              },
+              "active": {
+                "type": "number",
+                "description": "Number of active jobs"
+              },
+              "completed": {
+                "type": "number",
+                "description": "Number of completed jobs"
+              },
+              "failed": {
+                "type": "number",
+                "description": "Number of failed jobs"
+              },
+              "delayed": {
+                "type": "number",
+                "description": "Number of delayed jobs"
+              },
+              "paused": {
+                "type": "number",
+                "description": "Number of paused jobs"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "paused",
+          "jobCounts"
+        ]
       }
     }
   },
@@ -3410,6 +3630,199 @@
         "operationId": "resetPassword"
       }
     },
+    "/queues": {
+      "get": {
+        "summary": "Get status of all job queues",
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "get-jobs",
+        "description": "Get queue status for all job types",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Queue"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/queues/{type}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "get": {
+        "summary": "Get status of a job queue",
+        "tags": [
+          "Jobs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Queue"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type",
+        "description": "Get the status of a specific job queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queues/{type}/_pause": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "post": {
+        "summary": "Pause a job queue",
+        "tags": [
+          "Jobs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paused": {
+                      "type": "boolean",
+                      "description": "Whether the queue is paused or not"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type-_pause",
+        "description": "Pause a job queue (does not affect jobs that are already running)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queues/{type}/_resume": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "example": "harvest"
+          },
+          "name": "type",
+          "in": "path",
+          "required": true,
+          "description": "job type"
+        }
+      ],
+      "post": {
+        "summary": "Resume a job queue",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paused": {
+                      "type": "boolean",
+                      "description": "Whether the queue is paused or not"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-jobs-type-_resume",
+        "description": "Resume a job queue",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Jobs"
+        ]
+      }
+    },
     "/roles": {
       "get": {
         "summary": "Get Kibana roles",
@@ -3660,415 +4073,6 @@
         }
       }
     },
-    "/sushi": {
-      "get": {
-        "summary": "Get all Sushi items",
-        "tags": [
-          "Sushi"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Sushi"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "operationId": "get-sushi",
-        "description": "Get all Sushi items",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "enum": [
-                "working",
-                "faulty",
-                "untested"
-              ]
-            },
-            "in": "query",
-            "name": "connection",
-            "description": "filter items depending on connection state"
-          }
-        ]
-      },
-      "post": {
-        "summary": "Create a Sushi item",
-        "operationId": "post-sushi",
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Sushi"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "description": "Add a new Sushi item",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Sushi"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sushi"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sushi/platforms.json": {
-      "get": {
-        "summary": "Get known Sushi endpoints",
-        "tags": [
-          "Sushi"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SushiPlatform"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "operationId": "get-sushi-platforms.json",
-        "description": "Get the list of known platforms that have sushi endpoints",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/sushi/batch_delete": {
-      "post": {
-        "summary": "Delete multiple Sushi items",
-        "operationId": "post-sushi-batch_delete",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid"
-                      },
-                      "status": {
-                        "type": "string",
-                        "enum": [
-                          "failed",
-                          "deleted"
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Sushi"
-        ],
-        "description": "Delete multiple Sushi items at once",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sushi/_import": {
-      "post": {
-        "summary": "Import SUSHI items",
-        "operationId": "post-sushi-_import",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errors": {
-                      "type": "integer",
-                      "description": "number of items that failed to be imported"
-                    },
-                    "conflicts": {
-                      "type": "integer",
-                      "description": "number of items that already exists"
-                    },
-                    "created": {
-                      "type": "number",
-                      "description": "number if items that were successfuly imported"
-                    },
-                    "items": {
-                      "type": "array",
-                      "description": "operation details for each item",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "description": "import status of the item",
-                            "enum": [
-                              "error",
-                              "conflict",
-                              "created"
-                            ]
-                          },
-                          "message": {
-                            "type": "string",
-                            "description": "error or conflict message"
-                          },
-                          "data": {
-                            "$ref": "#/components/schemas/Sushi"
-                          }
-                        },
-                        "required": [
-                          "status",
-                          "data"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "errors",
-                    "conflicts",
-                    "created",
-                    "items"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "tags": [
-          "Sushi"
-        ],
-        "description": "Import a list of Sushi items",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "institutionId",
-            "required": true,
-            "description": "ID of the institution that owns the SUSHI items"
-          },
-          {
-            "schema": {
-              "type": "boolean"
-            },
-            "in": "query",
-            "name": "overwrite",
-            "description": "overwrite item if one with the same ID already exists"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Sushi"
-                }
-              }
-            }
-          },
-          "description": ""
-        }
-      }
-    },
-    "/sushi/{id}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "patch": {
-        "summary": "Update a Sushi item",
-        "operationId": "patch-sushi-id",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Sushi"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "tags": [
-          "Sushi"
-        ],
-        "description": "Update a Sushi item",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sushi"
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "",
-        "operationId": "get-sushi-id",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Sushi"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "description": "Get a Sushi item",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Sushi"
-        ]
-      }
-    },
     "/spaces/{id}": {
       "parameters": [
         {
@@ -4291,6 +4295,492 @@
         }
       }
     },
+    "/sushi": {
+      "get": {
+        "summary": "Get all Sushi items",
+        "tags": [
+          "Sushi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Sushi"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-sushi",
+        "description": "Get all Sushi items",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "working",
+                "faulty",
+                "untested"
+              ]
+            },
+            "in": "query",
+            "name": "connection",
+            "description": "filter items depending on connection state"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a Sushi item",
+        "operationId": "post-sushi",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Add a new Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sushi"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sushi/batch_delete": {
+      "post": {
+        "summary": "Delete multiple Sushi items",
+        "operationId": "post-sushi-batch_delete",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "failed",
+                          "deleted"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Delete multiple Sushi items at once",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sushi/_import": {
+      "post": {
+        "summary": "Import SUSHI items",
+        "operationId": "post-sushi-_import",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/Sushi"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Import a list of Sushi items",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "institutionId",
+            "required": true,
+            "description": "ID of the institution that owns the SUSHI items"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      }
+    },
+    "/sushi/_lock": {
+      "put": {
+        "summary": "Lock SUSHI identifiers management",
+        "operationId": "put-sushi-_lock",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locked": {
+                      "type": "boolean",
+                      "description": "Whether the management is locked or not"
+                    }
+                  },
+                  "required": [
+                    "locked"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi",
+          "Administration"
+        ],
+        "description": "Lock SUSHI identifiers management",
+        "x-internal": false,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locked": {
+                    "type": "boolean",
+                    "description": "Wether the management should be locked or not"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "The reason of the lock"
+                  }
+                },
+                "required": [
+                  "locked"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get SUSHI management lock status",
+        "operationId": "get-sushi-_lock",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locked": {
+                      "type": "boolean",
+                      "description": "Wether SUSHI management is locked or not"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "The reason of the lock"
+                    }
+                  },
+                  "required": [
+                    "locked"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Get the current lock status of SUSHI management.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "patch": {
+        "summary": "Update a Sushi item",
+        "operationId": "patch-sushi-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Update a Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sushi"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "",
+        "operationId": "get-sushi-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sushi"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Get a Sushi item",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ]
+      }
+    },
     "/sushi/{id}/_harvest": {
       "parameters": [
         {
@@ -4341,6 +4831,12 @@
                   "target": {
                     "type": "string",
                     "description": "The index where the report should be imported"
+                  },
+                  "reportType": {
+                    "type": "string",
+                    "description": "The report type that should be harvested",
+                    "example": "tr",
+                    "default": "tr"
                   },
                   "beginDate": {
                     "type": "string",
@@ -4472,7 +4968,9 @@
       ],
       "get": {
         "summary": "Get tasks of a Sushi item",
-        "tags": [],
+        "tags": [
+          "Tasks"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4500,6 +4998,353 @@
           {
             "bearerAuth": []
           }
+        ]
+      }
+    },
+    "/sushi-endpoints": {
+      "get": {
+        "summary": "Get all SUSHI endpoints",
+        "tags": [
+          "Sushi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SushiEndpoint"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-sushi-endpoints",
+        "description": "Get all SUSHI endpoints",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "requireCustomerId",
+            "description": "Filter endpoints by requireCustomerId"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "requireRequestorId",
+            "description": "Filter endpoints by requireRequestorId"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "requireApiKey",
+            "description": "Filter endpoints by requireApiKey"
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "isSushiCompliant",
+            "description": "Filter endpoints by isSushiCompliant"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "tags",
+            "description": "Filter endpoints by tags (comma-separated)"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a SUSHI endpoint",
+        "operationId": "post-sushi-endpoints",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Add a new SUSHI endpoint",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SushiEndpoint"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Sushi"
+        ]
+      }
+    },
+    "/sushi-endpoints/_import": {
+      "post": {
+        "summary": "Import SUSHI endpoints",
+        "operationId": "post-sushi-endpoint-_import",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/SushiEndpoint"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Import a list of SUSHI endpoints",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SushiEndpoint"
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": []
+    },
+    "/sushi-endpoints/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the endpoint"
+        }
+      ],
+      "patch": {
+        "summary": "Update a SUSHI endpoint",
+        "operationId": "patch-sushi-endpoint-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Sushi"
+        ],
+        "description": "Update a SUSHI endpoint",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SushiEndpoint"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a SUSHI endpoint",
+        "operationId": "get-sushi-endpoint-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiEndpoint"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Get a SUSHI endpoint",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a SUSHI endpoint",
+        "operationId": "delete-sushi-endpoints-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a SUSHI endpoint",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Sushi"
         ]
       }
     },
@@ -4579,6 +5424,14 @@
             "in": "query",
             "name": "sushiId",
             "description": "filter tasks by SUSHI ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "endpointId",
+            "description": "filter tasks by endpoint ID"
           }
         ]
       }

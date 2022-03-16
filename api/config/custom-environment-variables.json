@@ -19,6 +19,11 @@
     "port": "EZMESURE_KIBANA_PORT",
     "host": "EZMESURE_KIBANA_HOST"
   },
+  "redis": {
+    "host": "EZMESURE_REDIS_HOST",
+    "port": "EZMESURE_REDIS_PORT",
+    "password": "EZMESURE_REDIS_PASSWORD"
+  },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT",
@@ -44,6 +49,11 @@
   },
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"
+  },
+  "jobs": {
+    "harvest": {
+      "concurrency": "EZMESURE_HARVEST_CONCURRENCY"
+    }
   },
   "depositors": {
     "index": "EZMESURE_DEPOSITORS_INDEX",

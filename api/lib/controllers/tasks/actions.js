@@ -15,6 +15,8 @@ exports.getAll = async (ctx) => {
     type,
     institutionId,
     sushiId,
+    endpointId,
+    collapse,
   } = query;
 
   const filters = [];
@@ -29,13 +31,22 @@ exports.getAll = async (ctx) => {
     filters.push(Task.filterBy('type', Array.isArray(type) ? type : type.split(',').map((s) => s.trim())));
   }
   if (institutionId) {
-    filters.push(Task.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+    filters.push(Task.filterBy('params.institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
   }
   if (sushiId) {
-    filters.push(Task.filterBy('sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+    filters.push(Task.filterBy('params.sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+  }
+  if (endpointId) {
+    filters.push(Task.filterBy('params.endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
   }
 
-  ctx.body = await Task.findAll({ filters });
+  const options = { filters };
+
+  if (typeof collapse === 'string') {
+    options.collapse = { field: `${Task.type}.${collapse}` };
+  }
+
+  ctx.body = await Task.findAll(options);
 };
 
 exports.getOne = async (ctx) => {

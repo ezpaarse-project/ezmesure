@@ -7,19 +7,18 @@ const { appLogger } = require('../services/logger');
 const index = config.get('depositors.index');
 const models = new Map();
 
-const registerModel = (model) => models.set(model.type, model);
+const registerModel = (model) => {
+  appLogger.verbose(`Registering model ${model?.type}`);
+  models.set(model.type, model);
+};
 const getModel = (type) => models.get(type);
 
-const typedModel = (type, schema, createSchema, updateSchema) => class TypedModel {
+const typedModel = ({ type, schemas }) => class TypedModel {
   static get index() { return index; }
 
   static get type() { return type; }
 
-  static get schema() { return schema; }
-
-  static get createSchema() { return createSchema; }
-
-  static get updateSchema() { return updateSchema; }
+  static get schemas() { return schemas; }
 
   static get logger() { return appLogger; }
 
@@ -27,7 +26,7 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     this.data = {};
 
     if (data) {
-      this.update(data, { schema: createSchema, ...opt });
+      this.update(data, { schema: 'create', ...opt });
     }
   }
 
@@ -56,6 +55,10 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
     this.data[prop] = value;
   }
 
+  static getSchema(name) {
+    return schemas[name];
+  }
+
   static trimIdPrefix(id) {
     return id.startsWith(`${type}:`) ? id.slice(type.length + 1) : id;
   }
@@ -65,11 +68,11 @@ const typedModel = (type, schema, createSchema, updateSchema) => class TypedMode
   }
 
   static from(data) {
-    return new this(data, { schema });
+    return new this(data, { schema: 'base' });
   }
 
   update(data = {}, opt = {}) {
-    const validator = Joi.object(opt.schema || updateSchema);
+    const validator = Joi.object(schemas[opt.schema] || schemas.update);
     const { value, error } = validator.validate(data, { stripUnknown: true });
     if (error) { throw error; }
 

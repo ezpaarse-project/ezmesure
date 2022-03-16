@@ -13,6 +13,7 @@
     "administration": "Administration",
     "myInstitution": "My institution",
     "institutions": "Institutions",
+    "sushiEndpoints": "SUSHI endpoints",
     "profile": "Profile",
     "members": "Members",
     "sushi": "Sushi",
@@ -101,6 +102,34 @@
       "report": "Reporting",
       "sushi": "SUSHI"
     }
+  },
+  "endpoints": {
+    "title": "SUSHI endpoints ({total})",
+    "pageDescription": "Here you can manage the list of the available SUSHI endpoints.",
+    "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
+    "manageNendpoints": "Manage endpoint | Manage {count} endpoints",
+    "unableToRetriveEndpoints": "Unable to retrieve SUSHI endpoints",
+    "soapWarning": "The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)",
+    "sushiNotRootDetected": "It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.",
+    "validated": "Validated",
+    "addEndpoint": "Add an endpoint",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "url": "URL",
+    "vendor": "Vendor",
+    "tags": "Tags",
+    "technicalProvider": "Technical provider",
+    "counterVersion": "COUNTER version",
+    "requireCustomerId": "Customer ID is required",
+    "requireRequestorId": "Requestor ID is required",
+    "requireApiKey": "An API key is required",
+    "isSushiCompliant": "The endpoint is SUSHI compliant",
+    "description": "Description",
+    "queryParameters": "Query parameters",
+    "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
+    "deleteNbEndpoints": "You are about to delete {number} endpoints.",
+    "noEndpointFound": "No endpoint found",
+    "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
     "title": "Institution",
@@ -211,18 +240,17 @@
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
       "unableToRetriveSushiData": "Unable to retrieve sushi information",
-      "platform": "Platform",
+      "endpoint": "Endpoint",
       "package": "Package",
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "API key",
-      "necessaryField": "This field may be necessary",
+      "necessaryField": "This field is required for this platform",
+      "pleaseSelectEndpoint": "Please select an endpoint",
       "enterLabel": "Please enter a label.",
       "enterPackage": "Please enter a package",
       "updatedAt": "Last updated",
       "sushiUrl": "Sushi URL",
-      "sushiUrlMustBeRoot": "Must point to the root of the SUSHI service",
-      "sushiNotRootDetected": "It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.",
       "enterUrl": "Please enter an URL",
       "enterRequestorId": "Please enter a Requestor Id.",
       "enterCustomerId": "Please enter a Customer Id.",
@@ -231,7 +259,6 @@
       "credentials": "Sushi credentials",
       "manageNcredentials": "Manage credentials | Manage {count} credentials",
       "pleaseEnterParams": "If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.",
-      "soapWarning": "The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)",
       "checkConnection": "Check connection",
       "cannotCheckConnection": "Failed to check connection to {name}",
       "connectionSuccessful": "Successful connection",
@@ -250,7 +277,7 @@
     "history": "Tasks history",
     "status": {
       "notLaunchedYet": "Not launched yet",
-      "pending": "Pending",
+      "waiting": "Waiting",
       "running": "Running",
       "finished": "Finished",
       "error": "Error"
@@ -264,6 +291,8 @@
       "title": "Steps",
       "startedOn": "Started on {date}",
       "terminatedIn": "Terminated in {duration}",
+      "processedItems": "{n} processed items",
+      "progress": "Progress: {progress}%",
       "labels": {
         "download": "Report download",
         "validation": "Report validation",
@@ -277,17 +306,17 @@
     "idCopied": "ID copied in the clipboard",
     "importState": "Import state",
     "latestImport": "Latest import",
-    "states": {
-      "untested": "Not imported yet",
-      "finished": "Finished",
-      "failed": "Failure"
-    }
+    "unableToGetLockStatus": "Failed to retrieve credentials lock status",
+    "managementIsLocked": "SUSHI credentials management is currently locked.",
+    "deleteNbCredentials": "You are about to delete {number} SUSHI credentials."
   },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
     "checkCredentials": "Check credentials",
     "availableReports": "Available reports",
-    "failedToFetchReports": "Failed to fetch the list of available reports"
+    "availableReportsOnPlatform": "Available reports on the publisher platform",
+    "failedToFetchReports": "Failed to fetch the list of available reports",
+    "showAllReports": "Show all reports"
   },
   "identifier": "Identifier",
   "authenticate": {
@@ -327,10 +356,16 @@
     "failed": "Sending the contact form failed.",
     "requestInformation": "Information request",
     "bugReport": "Bug report",
+    "declareSushiEndpoint": "Declare a SUSHI endpoint",
     "emailIsRequired": "The email address is required",
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
-    "subjectIsRequired": "Subject is required"
+    "subjectIsRequired": "Subject is required",
+    "endpointVendor": "Vendor name",
+    "endpointUrl": "URL of the SUSHI endpoint",
+    "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
+    "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.",
+    "additionalInformation": "Additional information"
   },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",
@@ -379,6 +414,7 @@
   "add": "Add",
   "cannotDeleteItems": "Cannot delete {count} item(s)",
   "cannotDeleteItem": "Cannot remove the element {id}",
+  "cannotUpdateItem": "Cannot update the element {id}",
   "itemsDeleted": "{count} element(s) deleted",
   "update": "Update",
   "create": "Create",
@@ -386,5 +422,12 @@
   "informationSubmitted": "Information submitted",
   "invalidDate": "Invalid date",
   "areYouSure": "Are you sure ?",
-  "send": "Send"
+  "fieldIsRequired": "This field is required",
+  "fieldMustMatch": "This field must match : {pattern}",
+  "send": "Send",
+  "yes": "Yes",
+  "no": "No",
+  "validate": "Validate",
+  "invalidate": "Invalidate",
+  "reason": "Reason: {reason}"
 }

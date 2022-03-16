@@ -80,7 +80,7 @@ exports.createInstitution = async (ctx) => {
   }
 
   const institution = new Institution(body, {
-    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+    schema: isAdmin(user) ? 'adminCreate' : 'create',
   });
 
   if (!isAdmin(user) || creator !== false) {
@@ -114,7 +114,7 @@ exports.updateInstitution = async (ctx) => {
   }
 
   institution.update(body, {
-    schema: isAdmin(user) ? Institution.schema : Institution.updateSchema,
+    schema: isAdmin(user) ? 'adminUpdate' : 'update',
   });
 
   if (body.logo) {
@@ -323,7 +323,7 @@ exports.getSushiData = async (ctx) => {
 
     if (Array.isArray(latestTasks)) {
       latestTasks.forEach((task) => {
-        const sushiItem = sushiMap.get(task?.get?.('sushiId'));
+        const sushiItem = sushiMap.get(task?.getParam?.('sushiId'));
         if (sushiItem) {
           sushiItem.set('latestImportTask', task);
         }

@@ -1,22 +1,79 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title v-if="sushiForm.id" class="headline" v-text="sushiForm.vendor" />
+      <v-card-title v-if="sushiForm.id" class="headline" v-text="formTitle" />
       <v-card-title v-else class="headline" v-text="$t('institutions.sushi.addCredentials')" />
 
       <v-card-text>
         <v-form id="sushiForm" ref="form" v-model="valid" @submit.prevent="save">
-          <v-combobox
-            ref="vendorsBox"
-            v-model="sushiForm.vendor"
-            :items="vendors"
-            :label="`${$t('institutions.sushi.platform')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
+          <v-autocomplete
+            ref="endpointsBox"
+            v-model="endpoint"
+            :items="endpoints"
+            :label="`${$t('institutions.sushi.endpoint')} *`"
+            :rules="[v => !!v || $t('institutions.sushi.pleaseSelectEndpoint')]"
             item-text="vendor"
+            clearable
             outlined
             required
             autofocus
-            @change="onVendorChange"
+            return-object
+            @change="onEndpointChange"
+          >
+            <template v-slot:item="{ item }">
+              <v-list-item-content>
+                <v-list-item-title v-text="item.vendor" />
+                <v-list-item-subtitle>
+                  <template v-if="Array.isArray(item.tags)">
+                    <v-chip
+                      v-for="(tag, index) in item.tags"
+                      :key="index"
+                      label
+                      x-small
+                      color="accent"
+                      outlined
+                      class="mr-1"
+                    >
+                      {{ tag }}
+                    </v-chip>
+                  </template>
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </template>
+
+            <template v-slot:no-data>
+              <v-list-item to="/contact-us">
+                <v-list-item-avatar>
+                  <v-icon>
+                    mdi-plus-circle-outline
+                  </v-icon>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ $t('endpoints.noEndpointFound') }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ $t('endpoints.clickToDeclareOne') }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+
+          <v-text-field
+            :value="sushiUrl"
+            :label="$t('institutions.sushi.sushiUrl')"
+            outlined
+            readonly
+            disabled
+          />
+
+          <v-text-field
+            v-model="sushiForm.vendor"
+            :label="`${$t('institutions.sushi.label')} *`"
+            :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
+            outlined
+            required
           />
 
           <v-text-field
@@ -27,34 +84,13 @@
             required
           />
 
-          <v-text-field
-            v-model="sushiForm.sushiUrl"
-            :label="`${$t('institutions.sushi.sushiUrl')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterUrl')]"
-            :hint="$t('institutions.sushi.sushiUrlMustBeRoot')"
-            outlined
-            required
-            @change="onSushiUrlChange"
-          />
-
-          <v-alert
-            :value="looksLikeSoapUrl"
-            dense
-            outlined
-            type="warning"
-            icon="mdi-alert-outline"
-            transition="scale-transition"
-          >
-            {{ $t('institutions.sushi.soapWarning') }}
-          </v-alert>
-
           <v-row>
             <v-col cols="6">
               <v-text-field
                 v-model="sushiForm.requestorId"
                 :label="$t('institutions.sushi.requestorId')"
-                :hint="platform.requestorId ? $t('institutions.sushi.necessaryField') : null"
-                :persistent-hint="platform.requestorId && !sushiForm.requestorId"
+                :hint="requireRequestorId ? $t('institutions.sushi.necessaryField') : null"
+                :persistent-hint="requireRequestorId && !sushiForm.requestorId"
                 outlined
               />
             </v-col>
@@ -63,8 +99,8 @@
               <v-text-field
                 v-model="sushiForm.customerId"
                 :label="$t('institutions.sushi.customerId')"
-                :hint="platform.customerId ? $t('institutions.sushi.necessaryField') : null"
-                :persistent-hint="platform.customerId && !sushiForm.customerId"
+                :hint="requireCustomerId ? $t('institutions.sushi.necessaryField') : null"
+                :persistent-hint="requireCustomerId && !sushiForm.customerId"
                 outlined
               />
             </v-col>
@@ -73,8 +109,8 @@
           <v-text-field
             v-model="sushiForm.apiKey"
             :label="$t('institutions.sushi.apiKey')"
-            :hint="platform.apiKey ? $t('institutions.sushi.necessaryField') : null"
-            :persistent-hint="platform.apiKey && !sushiForm.apiKey"
+            :hint="requireApiKey ? $t('institutions.sushi.necessaryField') : null"
+            :persistent-hint="requireApiKey && !sushiForm.apiKey"
             outlined
           />
 
@@ -165,21 +201,14 @@
           v-text="editMode ? $t('update') : $t('add')"
         />
       </v-card-actions>
-
-      <ConfirmDialog ref="confirm" />
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import ConfirmDialog from '~/components/ConfirmDialog';
-
 export default {
-  components: {
-    ConfirmDialog,
-  },
   props: {
-    platforms: {
+    endpoints: {
       type: Array,
       default: () => ([]),
     },
@@ -190,11 +219,11 @@ export default {
       saving: false,
       institutionId: null,
       valid: false,
-      platform: {},
+      endpoint: null,
+      formTitle: '',
 
       sushiForm: {
         vendor: '',
-        sushiUrl: '',
         requestorId: '',
         customerId: '',
         apiKey: '',
@@ -206,24 +235,19 @@ export default {
     };
   },
   computed: {
-    editMode() {
-      return !!this.sushiForm.id;
-    },
-    vendors() {
-      return this.platforms.map(p => p.vendor);
-    },
+    editMode() { return !!this.sushiForm.id; },
+    sushiUrl() { return this.endpoint?.sushiUrl; },
+    requireCustomerId() { return this.endpoint?.requireCustomerId; },
+    requireRequestorId() { return this.endpoint?.requireRequestorId; },
+    requireApiKey() { return this.endpoint?.requireApiKey; },
     requestorIdLabel() {
-      return `${this.$t('institutions.sushi.requestorId')} ${this.platform?.requestorId ? '*' : ''}`;
+      return `${this.$t('institutions.sushi.requestorId')} ${this.requireRequestorId ? '*' : ''}`;
     },
     customerIdLabel() {
-      return `${this.$t('institutions.sushi.customerId')} ${this.platform?.customerId ? '*' : ''}`;
+      return `${this.$t('institutions.sushi.customerId')} ${this.requireCustomerId ? '*' : ''}`;
     },
     apiKeyLabel() {
-      return `${this.$t('institutions.sushi.apiKey')} ${this.platform?.apiKey ? '*' : ''}`;
-    },
-    looksLikeSoapUrl() {
-      if (typeof this.sushiForm?.sushiUrl !== 'string') { return false; }
-      return this.sushiForm?.sushiUrl.toLowerCase().includes('soap');
+      return `${this.$t('institutions.sushi.apiKey')} ${this.requireApiKey ? '*' : ''}`;
     },
   },
   methods: {
@@ -234,11 +258,7 @@ export default {
 
       this.institutionId = institution?.id;
       this.sushiForm.vendor = sushiData.vendor || '';
-
-      this.applyVendor();
-
       this.sushiForm.package = sushiData.package || institution?.indexPrefix || '';
-      this.sushiForm.sushiUrl = sushiData.sushiUrl || '';
       this.sushiForm.requestorId = sushiData.requestorId || '';
       this.sushiForm.customerId = sushiData.customerId || '';
       this.sushiForm.apiKey = sushiData.apiKey || '';
@@ -251,6 +271,8 @@ export default {
         this.sushiForm.params = [];
       }
 
+      this.endpoint = this.endpoints.find(endpoint => endpoint?.id === sushiData?.endpointId);
+      this.formTitle = this.sushiForm.vendor;
       this.show = true;
     },
 
@@ -258,44 +280,17 @@ export default {
       this.editSushiItem(institution);
     },
 
-    applyVendor() {
-      const vendor = this.sushiForm.vendor?.toLowerCase();
-      const platform = this.platforms.find(p => p.vendor.toLowerCase() === vendor);
-
-      if (platform) {
-        this.sushiForm.sushiUrl = platform?.sushiUrl || '';
-      }
-
-      this.platform = platform || {};
-    },
-
-    onVendorChange() {
+    onEndpointChange() {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
 
-      this.applyVendor();
+      if (this.endpoint?.vendor) {
+        this.sushiForm.vendor = this.endpoint.vendor;
+      }
 
       // workaround to hide vendors list on change
-      this.$refs.vendorsBox.isMenuActive = false;
-    },
-
-    async onSushiUrlChange() {
-      const sushiUrl = this.sushiForm?.sushiUrl;
-      const checkReg = /\/(status|members|reports).*/i;
-
-      if (checkReg.test(sushiUrl)) {
-        const fixUrl = await this.$refs.confirm.open({
-          title: this.$t('areYouSure'),
-          message: this.$t('institutions.sushi.sushiNotRootDetected'),
-          agreeText: this.$t('fixIt'),
-          disagreeText: this.$t('leaveIt'),
-        });
-
-        if (fixUrl) {
-          this.sushiForm.sushiUrl = sushiUrl.replace(checkReg, '');
-        }
-      }
+      this.$refs.endpointsBox.isMenuActive = false;
     },
 
     addParam() {
@@ -313,14 +308,28 @@ export default {
 
       try {
         if (this.sushiForm.id) {
-          await this.$axios.$patch(`/sushi/${this.sushiForm.id}`, this.sushiForm);
+          await this.$axios.$patch(`/sushi/${this.sushiForm.id}`, {
+            ...this.sushiForm,
+            endpointId: this.endpoint?.id,
+          });
         } else {
-          await this.$axios.$post('/sushi', { ...this.sushiForm, institutionId: this.institutionId });
+          await this.$axios.$post('/sushi', {
+            ...this.sushiForm,
+            institutionId: this.institutionId,
+            endpointId: this.endpoint?.id,
+          });
           this.show = false;
         }
         this.$emit('update');
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('formSendingFailed'));
+        const message = [e?.response?.data?.error || this.$t('formSendingFailed')];
+        const detail = e?.response?.data?.detail;
+
+        if (detail) {
+          message.push(this.$t('reason', { reason: detail }));
+        }
+
+        this.$store.dispatch('snacks/error', message);
         this.saving = false;
         return;
       }

@@ -13,6 +13,7 @@ const partners = require('./partners');
 const metrics = require('./metrics');
 const institutions = require('./institutions');
 const sushi = require('./sushi');
+const sushiEndpoints = require('./sushi-endpoints');
 const tasks = require('./tasks');
 const contact = require('./contact');
 const opendata = require('./opendata');
@@ -21,6 +22,7 @@ const dashboards = require('./dashboards');
 const spaces = require('./spaces');
 const indices = require('./indices');
 const roles = require('./roles');
+const queues = require('./queues');
 
 const openapi = require('./openapi.json');
 
@@ -68,6 +70,7 @@ app.use(logs.prefix('/logs').middleware());
 app.use(files.prefix('/files').middleware());
 app.use(institutions.prefix('/institutions').middleware());
 app.use(sushi.prefix('/sushi').middleware());
+app.use(sushiEndpoints.prefix('/sushi-endpoints').middleware());
 app.use(tasks.prefix('/tasks').middleware());
 app.use(opendata.prefix('/opendata').middleware());
 app.use(users.prefix('/users').middleware());
@@ -75,5 +78,6 @@ app.use(dashboards.prefix('/dashboards').middleware());
 app.use(spaces.prefix('/spaces').middleware());
 app.use(indices.prefix('/indices').middleware());
 app.use(roles.prefix('/roles').middleware());
+app.use(queues.prefix('/queues').middleware());
 
 module.exports = app;

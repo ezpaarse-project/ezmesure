@@ -43,7 +43,9 @@ router.route({
       status: stringOrArray,
       type: stringOrArray,
       sushiId: stringOrArray,
+      endpointId: stringOrArray,
       institutionId: stringOrArray,
+      collapse: Joi.string().trim(),
     },
   },
 });

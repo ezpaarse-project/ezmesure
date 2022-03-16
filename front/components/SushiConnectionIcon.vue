@@ -1,22 +1,18 @@
 <template>
-  <v-progress-circular
-    v-if="loading"
-    size="15"
-    width="2"
-    indeterminate
-    color="primary"
-  />
   <v-menu
-    v-else
     v-model="showPopover"
     open-on-hover
     offset-x
+    :close-on-content-click="false"
+    nudge-width="300"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         icon
+        :loading="loading"
         v-bind="attrs"
         v-on="on"
+        @click="$emit('checkConnection')"
       >
         <v-icon :color="color" small>
           {{ icon }}
@@ -53,15 +49,32 @@
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-
-        <v-divider v-if="hasExceptions" />
-
-        <v-card-text v-if="hasExceptions">
-          <ul>
-            <li v-for="(exception, index) in exceptions" :key="index" v-text="exception" />
-          </ul>
-        </v-card-text>
       </v-list>
+
+      <v-divider v-if="hasExceptions" />
+
+      <v-card-text v-if="hasExceptions">
+        <ul>
+          <li v-for="(exception, index) in exceptions" :key="index" v-text="exception" />
+        </ul>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          small
+          color="primary"
+          text
+          :disabled="locked"
+          :loading="loading"
+          @click="$emit('checkConnection')"
+        >
+          <v-icon left>
+            mdi-connection
+          </v-icon>
+          {{ $t('institutions.sushi.checkConnection') }}
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-menu>
 </template>
@@ -74,6 +87,10 @@ export default {
       default: () => ({}),
     },
     loading: {
+      type: Boolean,
+      default: () => false,
+    },
+    locked: {
       type: Boolean,
       default: () => false,
     },

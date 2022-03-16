@@ -3,15 +3,11 @@
     fluid
     fill-height
   >
-    <v-layout
-      align-center
-      justify-center
+    <v-row
+      align="center"
+      justify="center"
     >
-      <v-flex
-        xs12
-        sm8
-        md4
-      >
+      <v-col style="max-width: 800px">
         <v-card class="elevation-12">
           <v-toolbar
             color="primary"
@@ -30,26 +26,14 @@
               v-model="valid"
             >
               <v-text-field
-                v-if="!user"
                 v-model="email"
-                :rules="emailRules"
-                label="Email"
-                name="email"
-                outlined
-                clearable
-                required
-              />
-              <v-text-field
-                v-else
-                :value="user.email"
                 :rules="emailRules"
                 :label="$t('contact.email')"
                 name="email"
                 outlined
-                clearable
                 required
-                disabled
               />
+
               <v-select
                 v-model="subject"
                 :items="subjects"
@@ -60,7 +44,36 @@
                 required
                 return-object
               />
+
+              <template v-if="endpointSubject">
+                <v-text-field
+                  v-model="endpointVendor"
+                  :label="$t('contact.endpointVendor')"
+                  :hint="$t('contact.pleaseEnterFullVendorName')"
+                  :rules="[v => !!v || $t('fieldIsRequired')]"
+                  requried
+                  outlined
+                />
+                <v-text-field
+                  v-model="endpointUrl"
+                  :label="$t('contact.endpointUrl')"
+                  :rules="[v => !!v || $t('fieldIsRequired')]"
+                  requried
+                  outlined
+                />
+
+                <p>{{ $t('contact.endpointDetails') }}</p>
+
+                <v-textarea
+                  v-model="message"
+                  :label="$t('contact.additionalInformation')"
+                  name="message"
+                  outlined
+                />
+              </template>
+
               <v-textarea
+                v-else
                 v-model="message"
                 :rules="messageRules"
                 :label="$t('contact.content')"
@@ -88,23 +101,28 @@
             />
           </v-card-actions>
         </v-card>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    email: '',
-    message: '',
-    subject: {},
-    sendBrowser: true,
-    valid: true,
-    loading: false,
-  }),
+  asyncData({ $auth }) {
+    return {
+      email: $auth?.user?.email || '',
+      message: '',
+      endpointVendor: '',
+      endpointUrl: '',
+      subject: {},
+      sendBrowser: true,
+      valid: true,
+      loading: false,
+    };
+  },
   computed: {
     user() { return this.$auth.user; },
+    endpointSubject() { return this.subject?.value === 'sushi-endpoint'; },
     subjects() {
       return [
         {
@@ -114,6 +132,10 @@ export default {
         {
           value: 'bugs',
           text: this.$t('contact.bugReport'),
+        },
+        {
+          value: 'sushi-endpoint',
+          text: this.$t('contact.declareSushiEndpoint'),
         },
       ];
     },
@@ -132,11 +154,26 @@ export default {
 
       if (this.valid) {
         this.loading = true;
+
+        let { message } = this;
+
+        if (this.endpointSubject) {
+          message = [
+            this.$t('contact.endpointVendor'),
+            this.endpointVendor,
+            '',
+            this.$t('contact.endpointUrl'),
+            this.endpointUrl,
+            '',
+            message,
+          ].join('\n');
+        }
+
         try {
           await this.$axios.post('/contact', {
             email: this.user?.email || this.email,
             subject: this.subject?.text,
-            message: this.message,
+            message,
             browser: this.sendBrowser && this.subject.value === 'bugs' ? navigator.userAgent : null,
           });
           this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
@@ -144,6 +181,8 @@ export default {
           this.email = '';
           this.subject = {};
           this.message = '';
+          this.endpointVendor = '';
+          this.endpointUrl = '';
           this.sendBrowser = true;
           this.$refs.form.resetValidation();
           this.loading = false;

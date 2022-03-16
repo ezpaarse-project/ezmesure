@@ -13,6 +13,7 @@
     "administration": "Administration",
     "myInstitution": "Mon établissement",
     "institutions": "Établissements",
+    "sushiEndpoints": "Points d'accès SUSHI",
     "profile": "Profil",
     "members": "Membres",
     "sushi": "Sushi",
@@ -101,6 +102,34 @@
       "report": "Reporting",
       "sushi": "SUSHI"
     }
+  },
+  "endpoints": {
+    "title": "Points d'accès SUSHI ({total})",
+    "pageDescription": "Gérez ici la liste des points d'accès SUSHI disponibles.",
+    "pageDescription2": "Seule la version 5 du protocole SUSHI est supportée.",
+    "manageNendpoints": "Gérer le point d'accès | Gérer {count} points d'accès",
+    "unableToRetriveEndpoints": "Impossible de récupérer les points d'accès",
+    "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)",
+    "sushiNotRootDetected": "L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.",
+    "validated": "Validé",
+    "addEndpoint": "Ajouter un point d'accès",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
+    "url": "URL",
+    "vendor": "Fournisseur",
+    "tags": "Étiquettes",
+    "technicalProvider": "Prestataire technique",
+    "counterVersion": "Version de COUNTER",
+    "requireCustomerId": "un customer ID est nécessaire",
+    "requireRequestorId": "un requestor ID est nécessaire",
+    "requireApiKey": "Une clé d'API est nécessaire",
+    "isSushiCompliant": "Le point d'accès est conforme SUSHI",
+    "description": "Description",
+    "queryParameters": "Paramètres de la query",
+    "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
+    "deleteNbEndpoints": "Vous allez supprimer {number} points d'accès.",
+    "noEndpointFound": "Aucun point d'accès trouvé",
+    "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
     "title": "Établissement",
@@ -211,18 +240,17 @@
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
       "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
-      "platform": "Plateforme",
+      "endpoint": "Point d'accès",
       "package": "Package",
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "Clé d'API",
-      "necessaryField": "Ce champ pourrait être nécessaire",
+      "necessaryField": "Ce champ est requis pour cette plateforme",
+      "pleaseSelectEndpoint": "Veuillez sélectionner un point d'accès",
       "enterLabel": "Veuillez saisir un libellé.",
       "enterPackage": "Veuillez saisir un package",
       "updatedAt": "Dernière mise à jour",
       "sushiUrl": "URL Sushi",
-      "sushiUrlMustBeRoot": "Doit pointer vers la racine du service SUSHI",
-      "sushiNotRootDetected": "L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.",
       "enterUrl": "Veuillez saisir une URL",
       "enterRequestorId": "Veuillez saisir un Requestor Id.",
       "enterCustomerId": "Veuillez saisir un Customer Id.",
@@ -230,8 +258,7 @@
       "comment": "Commentaire",
       "credentials": "Identifiants Sushi",
       "manageNcredentials": "Gérer les identifiants | Gérer {count} identifiants",
-      "pleaseEnterParams": "Si les requêtes vers l'endpoint Sushi nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
-      "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)",
+      "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
       "checkConnection": "Vérifier la connexion",
       "cannotCheckConnection": "Échec de la connexion à {name}",
       "connectionSuccessful": "Connexion réussie",
@@ -250,7 +277,7 @@
     "history": "Historique des tâches",
     "status": {
       "notLaunchedYet": "Pas encore lancé",
-      "pending": "En attente",
+      "waiting": "En attente",
       "running": "En cours",
       "finished": "Terminé",
       "error": "Erreur"
@@ -264,6 +291,8 @@
       "title": "Étapes",
       "startedOn": "Démarrée le {date}",
       "terminatedIn": "Terminée en {duration}",
+      "processedItems": "{n} entrées traitées",
+      "progress": "Progression : {progress}%",
       "labels": {
         "download": "Téléchargement du rapport",
         "validation": "Validation du rapport",
@@ -276,13 +305,18 @@
     "unableToCopyId": "Impossible de copier dans le presse-papier",
     "idCopied": "ID copié dans le presse-papier",
     "importState": "État de l'import",
-    "latestImport": "Dernier import"
+    "latestImport": "Dernier import",
+    "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
+    "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verrouillée.",
+    "deleteNbCredentials": "Vous allez supprimer {number} identifiants SUSHI."
   },
   "reports": {
     "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
     "checkCredentials": "Vérifier les identifiants",
     "availableReports": "Rapports disponibles",
-    "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles"
+    "availableReportsOnPlatform": "Rapports disponibles sur la plateforme éditeur",
+    "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles",
+    "showAllReports": "Afficher tous les rapports"
   },
   "identifier": "Identifiant",
   "authenticate": {
@@ -322,10 +356,16 @@
     "failed": "L'envoi du formulaire de contact a échoué.",
     "requestInformation": "Demande d'information",
     "bugReport": "Rapporter un bug",
+    "declareSushiEndpoint": "Déclarer un point d'accès SUSHI",
     "emailIsRequired": "L'adresse électronique est requise",
     "emailMustBeValid": "L'adresse électronique doit être valide",
     "contentIsRequired": "Un message est requis",
-    "subjectIsRequired": "L'objet est requis"
+    "subjectIsRequired": "L'objet est requis",
+    "endpointVendor": "Nom du fournisseur",
+    "endpointUrl": "URL du point d'accès SUSHI",
+    "pleaseEnterFullVendorName": "Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)",
+    "endpointDetails": "Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.",
+    "additionalInformation": "Informations complémentaires"
   },
   "errors": {
     "404": "La page demandée n'a pas été trouvée",
@@ -374,6 +414,7 @@
   "add": "Ajouter",
   "cannotDeleteItems": "Impossible de supprimer {count} élément(s)",
   "cannotDeleteItem": "Impossible de supprimer l'élément {id}",
+  "cannotUpdateItem": "Impossible de mettre à jour l'élément {id}",
   "itemsDeleted": "{count} élement(s) supprimé(s)",
   "update": "Mettre à jour",
   "create": "Créer",
@@ -381,5 +422,12 @@
   "informationSubmitted": "Informations transmises",
   "invalidDate": "Date invalide",
   "areYouSure": "Êtes-vous sûr ?",
-  "send": "Envoyer"
+  "fieldIsRequired": "Ce champ est requis",
+  "fieldMustMatch": "Ce champ doit correspondre à : {pattern}",
+  "send": "Envoyer",
+  "yes": "Oui",
+  "no": "Non",
+  "validate": "Valider",
+  "invalidate": "Invalider",
+  "reason": "Raison : {reason}"
 }

@@ -1,6 +1,5 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const sushiPlatforms = require('../../utils/sushi.json');
 const Sushi = require('../../models/Sushi');
 const Institution = require('../../models/Institution');
 const { stringifyException } = require('../../services/sushi');
@@ -12,6 +11,7 @@ const {
   requireAnyRole,
   fetchInstitution,
   fetchSushi,
+  fetchSushiEndpoint,
   requireContact,
   requireValidatedInstitution,
 } = require('../../services/auth');
@@ -29,12 +29,57 @@ const {
   getAvailableReports,
 } = require('./actions');
 
+let sushiLocked = false;
+let lockReason;
+
+const blockIfLocked = (ctx, next) => {
+  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.userIsAdmin) {
+    ctx.throw(403, ctx.$t('errors.sushi.managementLocked'), { detail: lockReason });
+  }
+  return next();
+};
+
 router.use(
   requireJwt,
   requireUser,
   requireTermsOfUse,
   requireAnyRole(['sushi_form', 'admin', 'superuser']),
+  blockIfLocked,
 );
+
+router.route({
+  method: 'GET',
+  path: '/_lock',
+  handler: function getLock(ctx) {
+    ctx.body = {
+      locked: sushiLocked,
+      reason: lockReason,
+    };
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/_lock',
+  handler: [
+    requireAdmin,
+    function setLock(ctx) {
+      sushiLocked = !!ctx.request?.body?.locked;
+      lockReason = sushiLocked ? ctx?.request?.body?.reason : undefined;
+
+      ctx.body = {
+        locked: sushiLocked,
+      };
+    },
+  ],
+  validate: {
+    type: 'json',
+    body: {
+      locked: Joi.boolean().required(),
+      reason: Joi.string().trim().empty(''),
+    },
+  },
+});
 
 router.route({
   method: 'GET',
@@ -47,16 +92,6 @@ router.route({
     query: {
       connection: Joi.string().valid('working', 'faulty', 'untested'),
     },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/platforms.json',
-  handler: (ctx) => {
-    ctx.type = 'json';
-    ctx.status = 200;
-    ctx.body = sushiPlatforms;
   },
 });
 
@@ -85,14 +120,14 @@ router.route({
   method: 'POST',
   path: '/',
   handler: [
-    fetchInstitution((ctx) => ctx?.request?.body?.institutionId),
+    fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),
     requireContact(),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
     addSushi,
   ],
   validate: {
     type: 'json',
-    body: Sushi.createSchema,
+    body: Sushi.getSchema('create'),
   },
 });
 
@@ -111,8 +146,8 @@ router.route({
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array().required().items({
-      ...Sushi.updateSchema,
-      id: Sushi.schema.id,
+      ...Sushi.getSchema('update'),
+      id: Sushi.getSchema('base')?.id,
     }),
   },
 });
@@ -125,7 +160,7 @@ router.route({
  */
 const commonHandlers = [
   fetchSushi(),
-  fetchInstitution((ctx) => ctx?.state?.sushi?.get?.('institutionId')),
+  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.get?.('institutionId') }),
   requireContact(),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
 ];
@@ -163,6 +198,7 @@ router.route({
   path: '/:sushiId/connection',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     async (ctx) => {
       const { sushi, institution } = ctx.state;
 
@@ -219,6 +255,7 @@ router.route({
   path: '/:sushiId/reports',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     getAvailableReports,
   ],
   validate: {
@@ -240,7 +277,7 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
-    body: Sushi.updateSchema,
+    body: Sushi.getSchema('update'),
   },
 });
 
@@ -251,6 +288,7 @@ router.route({
   path: '/:sushiId/report.json',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     downloadReport,
   ],
   validate: {
@@ -269,6 +307,7 @@ router.route({
   path: '/:sushiId/_harvest',
   handler: [
     commonHandlers,
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
     harvestSushi,
   ],
   validate: {
@@ -281,6 +320,7 @@ router.route({
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
+      reportType: Joi.string().trim().lowercase().default('tr'),
     },
   },
 });

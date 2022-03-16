@@ -132,7 +132,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :href="`/institutions/${item.id}/sushi`">
+            <v-list-item :to="`/institutions/${item.id}/sushi`">
               <v-list-item-icon>
                 <v-icon>mdi-key</v-icon>
               </v-list-item-icon>
@@ -141,7 +141,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :href="`/institutions/${item.id}/members`">
+            <v-list-item :to="`/institutions/${item.id}/members`">
               <v-list-item-icon>
                 <v-icon>mdi-account-multiple</v-icon>
               </v-list-item-icon>

@@ -3,51 +3,54 @@ const { typedModel, registerModel, getModel } = require('./TypedModel');
 
 const type = 'task';
 
-const schema = {
-  id: Joi.string().trim().required(),
-  sushiId: Joi.string().trim().required(),
-  institutionId: Joi.string().trim().required(),
-  updatedAt: Joi.date(),
-  createdAt: Joi.date(),
+const schemas = {
+  base: {
+    id: Joi.string().trim().required(),
+    updatedAt: Joi.date(),
+    startedAt: Joi.date(),
+    createdAt: Joi.date(),
 
-  type: Joi.string().trim(),
-  status: Joi.string(),
-  runningTime: Joi.number(),
+    params: Joi.object(),
 
-  logs: Joi.array().items(Joi.object({
-    date: Joi.date().required(),
     type: Joi.string().trim(),
-    message: Joi.string().trim(),
-  })),
+    status: Joi.string(),
+    runningTime: Joi.number(),
 
-  steps: Joi.array().items(Joi.object({
-    label: Joi.string().trim(),
-    status: Joi.string().trim(),
-    startTime: Joi.date(),
-    took: Joi.number(),
-  })),
+    logs: Joi.array().items(Joi.object({
+      date: Joi.date().required(),
+      type: Joi.string().trim(),
+      message: Joi.string().trim(),
+    })),
 
-  result: Joi.object(),
+    steps: Joi.array().items(Joi.object({
+      label: Joi.string().trim(),
+      status: Joi.string().trim(),
+      startTime: Joi.date(),
+      took: Joi.number(),
+      data: Joi.object(),
+    })),
+
+    result: Joi.object(),
+  },
 };
 
-const createSchema = {
-  ...schema,
+schemas.create = {
+  ...schemas.base,
   id: Joi.any().strip(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
+  startedAt: Joi.any().strip(),
 };
 
-const updateSchema = {
-  ...createSchema,
-  sushiId: Joi.any().strip(),
-  institutionId: Joi.any().strip(),
+schemas.update = {
+  ...schemas.create,
 };
 
-class Task extends typedModel(type, schema, createSchema, updateSchema) {
+class Task extends typedModel({ type, schemas }) {
   static async findByInstitutionId(institutionId) {
     return this.findAll({
       filters: [
-        { term: { [`${type}.institutionId`]: institutionId } },
+        { term: { [`${type}.params.institutionId`]: institutionId } },
       ],
     });
   }
@@ -63,7 +66,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static async findBySushiId(sushiId) {
     return this.findAll({
       filters: [
-        { term: { [`${type}.sushiId`]: sushiId } },
+        { term: { [`${type}.params.sushiId`]: sushiId } },
       ],
     });
   }
@@ -71,10 +74,10 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static async findOnePerSushiId(sushiIds) {
     return this.findAll({
       filters: [
-        { terms: { [`${type}.sushiId`]: sushiIds } },
+        { terms: { [`${type}.params.sushiId`]: sushiIds } },
       ],
       collapse: {
-        field: `${type}.sushiId`,
+        field: `${type}.params.sushiId`,
       },
     });
   }
@@ -82,7 +85,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static deleteByInstitutionId(institutionId) {
     return this.deleteByQuery({
       filters: [
-        { term: { [`${type}.institutionId`]: institutionId } },
+        { term: { [`${type}.params.institutionId`]: institutionId } },
       ],
     });
   }
@@ -90,7 +93,7 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   static deleteBySushiId(sushiId) {
     return this.deleteByQuery({
       filters: [
-        { term: { [`${type}.sushiId`]: sushiId } },
+        { term: { [`${type}.params.sushiId`]: sushiId } },
       ],
     });
   }
@@ -115,13 +118,17 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
   }
 
   getSushi() {
-    if (!this.data.sushiId) { return null; }
-    return getModel('sushi').findById(this.data.sushiId);
+    if (!this.getParam('sushiId')) { return null; }
+    return getModel('sushi').findById(this.getParam('sushiId'));
   }
 
   getInstitution() {
-    if (!this.data.institutionId) { return null; }
-    return getModel('institution').findById(this.data.institutionId);
+    if (!this.getParam('institutionId')) { return null; }
+    return getModel('institution').findById(this.getParam('institutionId'));
+  }
+
+  getParam(prop) {
+    return this.data?.params?.[prop];
   }
 
   setStatus(status) {
@@ -137,17 +144,21 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     return this.data.steps.find((s) => s.label === label);
   }
 
-  newStep(label) {
+  newStep(label, data) {
     if (!Array.isArray(this.data.steps)) {
       this.data.steps = [];
     }
 
-    this.data.steps.push({
+    const step = {
       label,
       startTime: new Date(),
       status: 'running',
       took: 0,
-    });
+      data: data || {},
+    };
+
+    this.data.steps.push(step);
+    return step;
   }
 
   endStep(label, opts = {}) {
@@ -174,15 +185,25 @@ class Task extends typedModel(type, schema, createSchema, updateSchema) {
     return !!(step && step.status === 'finished');
   }
 
+  start() {
+    this.set('status', 'running');
+    this.set('startedAt', new Date());
+    this.emit('running');
+  }
+
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();
     this.emit('finish');
   }
 
+  isDone() {
+    return ['finished', 'error'].includes(this.get('status'));
+  }
+
   updateRunningTime() {
-    if (this.data && this.data.createdAt) {
-      this.data.runningTime = Date.now() - this.data.createdAt.getTime();
+    if (this.data?.startedAt) {
+      this.data.runningTime = Date.now() - this.data.startedAt.getTime();
     }
   }
 

@@ -7,6 +7,7 @@ const Task = require('../../models/Task');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
+const { harvestQueue } = require('../../services/jobs');
 
 exports.getAll = async (ctx) => {
   const options = {};
@@ -119,13 +120,13 @@ exports.deleteSushiData = async (ctx) => {
 };
 
 exports.getAvailableReports = async (ctx) => {
-  const { sushi } = ctx.state;
+  const { sushi, endpoint } = ctx.state;
 
   let reports;
   let exceptions;
 
   try {
-    const { data } = await sushiService.getAvailableReports(sushi);
+    const { data } = await sushiService.getAvailableReports(endpoint, sushi);
     reports = data;
   } catch (e) {
     exceptions = sushiService.getExceptions(e && e.response && e.response.data);
@@ -158,7 +159,7 @@ exports.getAvailableReports = async (ctx) => {
 exports.downloadReport = async (ctx) => {
   ctx.action = 'sushi/download-report';
   const { query = {} } = ctx.request;
-  const { sushi, institution } = ctx.state;
+  const { sushi, institution, endpoint } = ctx.state;
   let { beginDate, endDate } = query;
 
   ctx.metadata = {
@@ -172,13 +173,18 @@ exports.downloadReport = async (ctx) => {
     const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
     beginDate = prevMonth;
     endDate = prevMonth;
-  } else if (beginDate) {
-    endDate = beginDate;
-  } else {
+  } else if (!beginDate) {
     beginDate = endDate;
+  } else if (!endDate) {
+    endDate = beginDate;
   }
 
-  const sushiData = { sushi, beginDate, endDate };
+  const sushiData = {
+    endpoint,
+    sushi,
+    beginDate,
+    endDate,
+  };
   const reportPath = sushiService.getReportPath(sushiData);
 
   if (await fs.pathExists(reportPath)) {
@@ -211,13 +217,14 @@ exports.downloadReport = async (ctx) => {
 exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
-  const { sushi, user, institution } = ctx.state;
+  const { target, forceDownload, reportType } = body;
+  let { beginDate, endDate } = body;
   const {
-    target,
-    beginDate,
-    endDate,
-    forceDownload,
-  } = body;
+    endpoint,
+    sushi,
+    user,
+    institution,
+  } = ctx.state;
 
   let index = target;
 
@@ -236,7 +243,20 @@ exports.harvestSushi = async (ctx) => {
     vendor: sushi.get('vendor'),
     institutionId: institution.getId(),
     institutionName: institution.get('name'),
+    reportType,
   };
+
+  const currentJob = await harvestQueue.getJob(sushi.getId());
+
+  if (currentJob) {
+    const jobState = await currentJob.getState();
+
+    if (jobState === 'completed' || jobState === 'failed') {
+      await currentJob.remove();
+    } else {
+      ctx.throw(409, ctx.$t('errors.harvest.jobExists', sushi.getId(), jobState));
+    }
+  }
 
   const { body: perm } = await elastic.security.hasPrivileges({
     username: user.username,
@@ -252,15 +272,40 @@ exports.harvestSushi = async (ctx) => {
     ctx.throw(403, `you don't have permission to write in ${index}`);
   }
 
-  const task = await sushiService.initSushiHarvest({
-    sushi,
-    institution,
-    user,
-    index,
-    beginDate,
-    endDate,
-    forceDownload,
+  if (!beginDate && !endDate) {
+    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    beginDate = prevMonth;
+    endDate = prevMonth;
+  } else if (!beginDate) {
+    beginDate = endDate;
+  } else if (!endDate) {
+    endDate = beginDate;
+  }
+
+  const task = new Task({
+    type: 'sushi-harvest',
+    status: 'waiting',
+    params: {
+      sushiId: sushi.getId(),
+      endpointId: sushi.get('endpointId'),
+      institutionId: institution.getId(),
+      username: user.username,
+      reportType,
+      index,
+      beginDate,
+      endDate,
+      forceDownload,
+      endpointVendor: endpoint.get('vendor'),
+      sushiLabel: sushi.get('vendor'),
+      institutionName: institution.get('name'),
+    },
   });
+
+  await task.save();
+  await harvestQueue.add(
+    { taskId: task.getId() },
+    { jobId: sushi.getId() },
+  );
 
   ctx.type = 'json';
   ctx.body = task;

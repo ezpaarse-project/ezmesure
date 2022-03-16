@@ -15,11 +15,11 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      <p>Email : <strong>{{ body.email }}</strong></p>
-      <p>Objet : <strong>{{ body.subject }}</strong></p>
-      {% if body.browser %}<p>Navigateur : <strong>{{ body.browser }}</strong></p>{% endif %}
-      <p>Message :</p>
-      <p>{{ body.message }}</p>
+      <div><strong>Email :</strong> {{ body.email }}</div>
+      <div><strong>Objet :</strong> {{ body.subject }}</div>
+      {% if body.browser %}<div><strong>Navigateur : </strong>{{ body.browser }}</div>{% endif %}
+      <p><strong>Message :</strong></p>
+      <p>{{ body.message | escape | nl2br }}</p>
     </mj-text>
   </mj-column>
 </mj-section>

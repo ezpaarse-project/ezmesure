@@ -81,6 +81,11 @@ app.use(async (ctx, next) => {
   } catch (error) {
     ctx.status = error.status || 500;
 
+    if (error?.name === 'ValidationError') {
+      ctx.status = 400;
+      error.expose = true;
+    }
+
     if (ctx.status >= 500) {
       ctx.app.emit('error', error, ctx, false);
     }
@@ -97,6 +102,7 @@ app.use(async (ctx, next) => {
       ctx.body = {
         status: ctx.status,
         error: message,
+        detail: error.detail,
       };
       return;
     }
@@ -106,6 +112,7 @@ app.use(async (ctx, next) => {
     ctx.body = {
       status: ctx.status,
       error: error.message,
+      detail: error.detail,
       stack: error.stack,
       code: error.code,
     };
@@ -243,7 +250,8 @@ waitForElasticsearch()
   .then(setKibanaPassword)
   .then(start)
   .catch((e) => {
-    appLogger.error(e);
+    appLogger.error(e.message);
+    appLogger.error(e.stack);
     appLogger.error('Error during bootstrap, shutting down...');
     process.exit(1);
   });

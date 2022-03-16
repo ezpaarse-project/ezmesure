@@ -11,6 +11,10 @@ errors:
 
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
+    jobExists: "L'item SUSHI [%s] a déjà un job associé (statut: [%s])"
+
+  queue:
+    notFound: File d'attente introuvable
 
   auth:
     reservedUser: vous ne pouvez pas vous connecter avec un utilisateur réservé
@@ -20,12 +24,16 @@ errors:
     unableToFetchUser: Impossible de récupérer les données utilisateur, veuillez vous reconnecter
     noUserFound: Utilisateur introuvable
 
+  sushi-endpoint:
+    notFound: Point d'accès introuvable
+
   sushi:
     unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
     institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
     notFound: Item SUSHI introuvable
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
     invalidResponse: Le point d'accès SUSHI a retourné des données invalides
+    managementLocked: La gestion des identifiants SUSHI est actuellement verrouillée
 
     import:
       belongsToAnother: L'item SUSHI [%s] appartient à un autre établissement

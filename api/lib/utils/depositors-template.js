@@ -81,16 +81,46 @@ module.exports = {
         },
       },
 
+      // Sushi items
+      'sushi-endpoint': {
+        properties: {
+          createdAt: { type: 'date' },
+          updatedAt: { type: 'date' },
+          institutionId: { type: 'keyword' },
+          vendor: { type: 'keyword' },
+          sushiUrl: { type: 'keyword' },
+          description: { type: 'keyword' },
+          technicalProvider: { type: 'keyword' },
+          validated: { type: 'boolean' },
+          requireCustomerId: { type: 'boolean' },
+          requireRequestorId: { type: 'boolean' },
+          requireApiKey: { type: 'boolean' },
+          isSushiCompliant: { type: 'boolean' },
+          tags: { type: 'keyword' },
+          params: {
+            properties: {
+              name: { type: 'keyword' },
+              value: { type: 'keyword' },
+            },
+          },
+        },
+      },
+
       // Task items
       task: {
         properties: {
           createdAt: { type: 'date' },
           updatedAt: { type: 'date' },
-          sushiId: { type: 'keyword' },
-          institutionId: { type: 'keyword' },
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           runningTime: { type: 'long' },
+          params: {
+            properties: {
+              sushiId: { type: 'keyword' },
+              beginDate: { type: 'keyword' },
+              endDate: { type: 'keyword' },
+            },
+          },
           logs: {
             properties: {
               date: { type: 'date' },
