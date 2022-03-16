@@ -5,6 +5,8 @@ const { format, isValid } = require('date-fns');
 const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
+const kibana = require('./kibana');
+const logger = require('./logger');
 
 const {
   sender,
@@ -175,6 +177,57 @@ async function getReportingActivity() {
   return { actions, reportings };
 }
 
+async function getReportingSend() {
+  const index = config.reportingIndex || '.ezreporting';
+  const { body: exists } = await elastic.indices.exists({ index });
+
+  if (!exists) {
+    return {};
+  }
+
+  const { body: result } = await elastic.search({
+    index,
+    size: 10000,
+    body: {
+      query: {
+        bool: {
+          filter: [
+            {
+              range: {
+                sentAt: { gte: 'now-1w' },
+              },
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const reportings = result?.hits?.hits || [];
+
+  for (let i = 0; i < reportings.length; i += 1) {
+    let dashboard;
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const { data: res } = await kibana.getObject({
+        type: 'dashboard',
+        id: reportings[i]._source.dashboardId,
+        spaceId: reportings[i]._source.space,
+      });
+      dashboard = res;
+    } catch (err) {
+      logger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
+      logger.error(err);
+    }
+
+    reportings[i]._source.dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
+
+    reportings[i]._source.sentAt = toLocaleDate(reportings[i]._source.sentAt);
+  }
+
+  return reportings.map((reporting) => reporting._source);
+}
+
 /**
  * Set metadata.broacasted to the current date for a list of action documents
  * @param {Array<Object>} actions a set of action documents from the metrics index
@@ -205,6 +258,8 @@ async function sendNotifications(appLogger) {
   } = await getEzMesureMetrics();
   const { actions: reportingActions = [], reportings } = await getReportingActivity();
 
+  const reportingsSend = await getReportingSend();
+
   const actions = [...ezMesureActions, ...reportingActions];
 
   if (actions.length === 0 && !sendEmptyActivity) {
@@ -224,6 +279,7 @@ async function sendNotifications(appLogger) {
       reportings,
       institutions,
       sushi,
+      reportingsSend,
     }),
   });
 
