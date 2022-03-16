@@ -220,7 +220,8 @@ async function getSentReports() {
       logger.error(err);
     }
 
-    reportings[i]._source.dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
+    const dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
+    reportings[i]._source.dashboardName = dashboardName;
     reportings[i]._source.sentAt = toLocaleDate(reportings[i]._source.sentAt);
   }
 
