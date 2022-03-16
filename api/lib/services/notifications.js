@@ -177,7 +177,7 @@ async function getReportingActivity() {
   return { actions, reportings };
 }
 
-async function getReportingSend() {
+async function getSentReports() {
   const index = config.reportingIndex || '.ezreporting';
   const { body: exists } = await elastic.indices.exists({ index });
 
@@ -257,7 +257,7 @@ async function sendNotifications(appLogger) {
   } = await getEzMesureMetrics();
   const { actions: reportingActions = [], reportings } = await getReportingActivity();
 
-  const reportingsSend = await getReportingSend();
+  const reportingsSend = await getSentReports();
 
   const actions = [...ezMesureActions, ...reportingActions];
 
