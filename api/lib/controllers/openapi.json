@@ -5424,6 +5424,14 @@
             "in": "query",
             "name": "sushiId",
             "description": "filter tasks by SUSHI ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "endpointId",
+            "description": "filter tasks by endpoint ID"
           }
         ]
       }
