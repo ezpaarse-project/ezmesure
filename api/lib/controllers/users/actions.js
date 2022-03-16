@@ -1,8 +1,25 @@
+const config = require('config');
 const elastic = require('../../services/elastic');
+const indexTemplate = require('../../utils/depositors-template');
+
+const Institution = require('../../models/Institution');
+
+const depositorsIndex = config.depositors.index;
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
   return (roles.has('admin') || roles.has('superuser'));
+};
+
+const ensureIndex = async () => {
+  const { body: exists } = await elastic.indices.exists({ index: depositorsIndex });
+
+  if (!exists) {
+    await elastic.indices.create({
+      index: depositorsIndex,
+      body: indexTemplate,
+    });
+  }
 };
 
 exports.getUser = async (ctx) => {
@@ -19,6 +36,22 @@ exports.getUser = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = user;
+};
+
+exports.getUserOfInstitution = async (ctx) => {
+  await ensureIndex();
+
+  const { username } = ctx.request.params;
+  const institution = await Institution.findOneByCreatorOrRole(username);
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = institution;
 };
 
 exports.list = async (ctx) => {
