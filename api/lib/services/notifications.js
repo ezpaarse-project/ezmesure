@@ -129,7 +129,7 @@ async function getReportingActivity() {
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
-    return {};
+    return [];
   }
 
   const { body: result } = await elastic.search({
@@ -182,7 +182,7 @@ async function getReportingSend() {
   const { body: exists } = await elastic.indices.exists({ index });
 
   if (!exists) {
-    return {};
+    return [];
   }
 
   const { body: result } = await elastic.search({
@@ -221,7 +221,6 @@ async function getReportingSend() {
     }
 
     reportings[i]._source.dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
-
     reportings[i]._source.sentAt = toLocaleDate(reportings[i]._source.sentAt);
   }
 
