@@ -292,11 +292,6 @@ async function importSushiReport(options = {}) {
   for (let i = 0; i < report.Report_Items.length; i += 1) {
     const reportItem = report.Report_Items[i];
 
-    if (!Array.isArray(reportItem.Item_ID)) {
-      addError(`Item #${i} has no Item_ID [Title: ${reportItem.Title}]`);
-      continue; // eslint-disable-line no-continue
-    }
-
     const item = {
       X_Package: sushi.get('package'),
       X_Endpoint_Tags: endpoint.get('tags'),
