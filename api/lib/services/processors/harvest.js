@@ -388,6 +388,8 @@ async function importSushiReport(options = {}) {
               item.Access_Method,
               item.Access_Type,
               item.Section_Type,
+              item.Title,
+              item.Database,
               ...identifiers].join('|'))
             .digest('hex'),
         ].join(':');
