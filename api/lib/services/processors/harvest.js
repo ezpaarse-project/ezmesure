@@ -16,6 +16,13 @@ const Task = require('../../models/Task');
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
 
+class HarvestError extends Error {
+  constructor(message, cause) {
+    super(message);
+    this.cause = cause;
+  }
+}
+
 async function importSushiReport(options = {}) {
   const {
     endpoint,
@@ -59,9 +66,7 @@ async function importSushiReport(options = {}) {
     report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
   } catch (e) {
     if (e.code !== 'ENOENT') {
-      task.fail([`Fail to read report file ${reportPath}`, e.message]);
-      saveTask();
-      return;
+      throw new HarvestError(`Fail to read report file ${reportPath}`, e);
     }
   }
 
@@ -69,37 +74,36 @@ async function importSushiReport(options = {}) {
     task.log('info', 'Found a local COUNTER report file');
   } else {
     try {
-      await new Promise((resolve, reject) => {
-        let download = sushiService.getOngoingDownload(sushiData);
+      let download = sushiService.getOngoingDownload(sushiData);
 
-        if (download) {
-          task.log('info', 'Report is already being downloaded, waiting for completion');
-        } else {
-          task.log('info', 'Report download initiated, waiting for completion');
-          download = sushiService.initiateDownload(sushiData);
-        }
+      if (download) {
+        task.log('info', 'Report is already being downloaded, waiting for completion');
+      } else {
+        task.log('info', 'Report download initiated, waiting for completion');
+        download = sushiService.initiateDownload(sushiData);
+      }
 
-        saveTask();
-        download.on('finish', () => {
-          task.log('info', 'Report downloaded');
-          resolve();
-        });
-        download.on('error', reject);
-      });
+      await Promise.all([
+        saveTask(),
+
+        new Promise((resolve, reject) => {
+          download.on('error', reject);
+          download.on('finish', () => {
+            task.log('info', 'Report downloaded');
+            resolve();
+          });
+        }),
+      ]);
     } catch (e) {
-      task.fail(['Failed to download the COUNTER report', e.message]);
-      saveTask();
-      deleteReportFile();
-      return;
+      await deleteReportFile();
+      throw new HarvestError('Failed to download the COUNTER report', e);
     }
 
     try {
       report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
     } catch (e) {
-      task.fail(['Fail to read downloaded report file', e.message]);
-      saveTask();
-      deleteReportFile();
-      return;
+      await deleteReportFile();
+      throw new HarvestError('Fail to read downloaded report file', e);
     }
   }
 
@@ -139,27 +143,21 @@ async function importSushiReport(options = {}) {
     });
 
     if (hasError) {
-      task.fail(['Sushi endpoint returned exceptions']);
-      deleteReportFile();
-      saveTask();
-      return;
+      await deleteReportFile();
+      throw new HarvestError('Sushi endpoint returned exceptions');
     }
   }
 
   const { valid, errors } = sushiService.validateReport(report);
 
   if (!valid) {
-    task.log('error', 'The report is not valid');
-
     if (Array.isArray(errors)) {
       errors.slice(0, 10).forEach((e) => task.log('error', e));
     }
 
     if (!sushi.get('ignoreReportValidation')) {
-      task.fail();
-      deleteReportFile();
-      saveTask();
-      return;
+      await deleteReportFile();
+      throw new HarvestError('The report is not valid');
     }
   }
 
@@ -173,9 +171,7 @@ async function importSushiReport(options = {}) {
     const { body: response } = await elastic.indices.exists({ index });
     indexExists = response;
   } catch (e) {
-    task.fail([`Failed to check that index '${index}' exists`, e.message]);
-    saveTask();
-    return;
+    throw new HarvestError(`Failed to check that index [${index}] exists`, e);
   }
 
   if (!indexExists) {
@@ -185,9 +181,7 @@ async function importSushiReport(options = {}) {
         body: publisherIndexTemplate,
       });
     } catch (e) {
-      task.fail([`Failed to create index '${index}'`, e.message]);
-      saveTask();
-      return;
+      throw new HarvestError(`Failed to create index [${index}]`, e);
     }
   }
 
@@ -482,10 +476,7 @@ async function processJob(job) {
   const sushi = await Sushi.findById(sushiId);
 
   if (!sushi) {
-    const message = `SUSHI item [${sushiId}] not found`;
-    task.fail([message]);
-    await task.save();
-    throw new Error(message);
+    throw new HarvestError(`SUSHI item [${sushiId}] not found`);
   }
 
   const endpointId = sushi.get('endpointId');
@@ -494,10 +485,7 @@ async function processJob(job) {
   const endpoint = await SushiEndpoint.findById(endpointId);
 
   if (!endpoint) {
-    const message = `SUSHI Endpoint [${endpointId}] not found`;
-    task.fail([message]);
-    await task.save();
-    throw new Error(message);
+    throw HarvestError(`SUSHI Endpoint [${endpointId}] not found`);
   }
 
   task.start();
@@ -520,13 +508,27 @@ async function processJob(job) {
     });
   } catch (err) {
     appLogger.error(`Failed to import sushi report [${sushi.getId()}]`);
-    appLogger.error(err.message);
-    appLogger.error(err.stack);
-    task.fail(['Failed to import sushi report', err.message]);
-    task.save().catch((e) => {
-      appLogger.error('Failed to save sushi task');
-      appLogger.error(e);
-    });
+    task.log('error', err.message);
+
+    if (err instanceof HarvestError) {
+      if (err.cause instanceof Error) {
+        task.log('error', err.cause.message);
+        appLogger.error(err.cause.message);
+        appLogger.error(err.cause.stack);
+      }
+    } else {
+      appLogger.error(err.message);
+      appLogger.error(err.stack);
+    }
+
+    try {
+      task.fail();
+      await task.save();
+    } catch (e) {
+      appLogger.error(`Failed to save sushi task ${task.getId()}`);
+      appLogger.error(e.message);
+    }
+
     throw err;
   }
 
