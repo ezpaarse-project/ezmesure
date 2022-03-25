@@ -16,7 +16,7 @@ const httpsAgent = process.env.https_proxy && new HttpsProxyAgent(process.env.ht
 
 const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats').default;
-const definitions = require('../utils/sushi-definitions.json');
+const definitions = require('../utils/sushi-definitions-patched');
 const { appLogger } = require('./logger');
 
 const storageDir = path.resolve(config.get('storage.path'), 'sushi');
