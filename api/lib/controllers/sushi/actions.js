@@ -13,11 +13,15 @@ exports.getAll = async (ctx) => {
   const options = { filters: [] };
   const { query = {} } = ctx.request;
   const {
+    id: sushiIds,
     institutionId,
     endpointId,
     connection,
   } = query;
 
+  if (sushiIds) {
+    options.filters.push(Sushi.filterById(Array.isArray(sushiIds) ? sushiIds : sushiIds.split(',').map((s) => s.trim())));
+  }
   if (institutionId) {
     options.filters.push(Sushi.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
   }

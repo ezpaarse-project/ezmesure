@@ -95,6 +95,7 @@ router.route({
   ],
   validate: {
     query: {
+      id: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       connection: Joi.string().valid('working', 'faulty', 'untested'),

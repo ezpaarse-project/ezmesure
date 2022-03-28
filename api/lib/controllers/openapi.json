@@ -4358,6 +4358,14 @@
             "in": "query",
             "name": "institutionId",
             "description": "filter items by institution ID"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "id",
+            "description": "filter items by ID"
           }
         ]
       },
