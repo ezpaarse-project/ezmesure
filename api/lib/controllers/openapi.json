@@ -4342,6 +4342,22 @@
             "in": "query",
             "name": "connection",
             "description": "filter items depending on connection state"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "filter items by endpoint ID",
+            "name": "endpointId"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "institutionId",
+            "description": "filter items by institution ID"
           }
         ]
       },

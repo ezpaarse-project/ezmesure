@@ -29,6 +29,11 @@ const {
   getAvailableReports,
 } = require('./actions');
 
+const stringOrArray = Joi.alternatives().try(
+  Joi.string().trim().min(1),
+  Joi.array().items(Joi.string().trim().min(1)).min(1),
+);
+
 let sushiLocked = false;
 let lockReason;
 
@@ -90,6 +95,8 @@ router.route({
   ],
   validate: {
     query: {
+      endpointId: stringOrArray,
+      institutionId: stringOrArray,
       connection: Joi.string().valid('working', 'faulty', 'untested'),
     },
   },

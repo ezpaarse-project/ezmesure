@@ -10,17 +10,29 @@ const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
 exports.getAll = async (ctx) => {
-  const options = {};
-  const connection = ctx.query?.connection;
+  const options = { filters: [] };
+  const { query = {} } = ctx.request;
+  const {
+    institutionId,
+    endpointId,
+    connection,
+  } = query;
+
+  if (institutionId) {
+    options.filters.push(Sushi.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+  }
+  if (endpointId) {
+    options.filters.push(Sushi.filterBy('endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
+  }
 
   if (connection === 'untested') {
     options.must_not = [{
       exists: { field: `${Sushi.type}.connection.success` },
     }];
   } else if (connection) {
-    options.filters = [{
+    options.filters.push({
       term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
-    }];
+    });
   }
 
   ctx.type = 'json';
