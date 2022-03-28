@@ -7,7 +7,7 @@ const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth
 const {
   list,
   getUser,
-  getUserOfInstitution,
+  getUserInstitution,
   updateUser,
   deleteUser,
 } = require('./actions');
@@ -30,7 +30,7 @@ router.route({
 router.route({
   method: 'GET',
   path: '/:username/institution',
-  handler: [handleElasticErrors, getUserOfInstitution],
+  handler: [handleElasticErrors, getUserInstitution],
   validate: {
     params: {
       username: Joi.string().trim().required(),

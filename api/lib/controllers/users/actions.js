@@ -38,7 +38,7 @@ exports.getUser = async (ctx) => {
   ctx.body = user;
 };
 
-exports.getUserOfInstitution = async (ctx) => {
+exports.getUserInstitution = async (ctx) => {
   await ensureIndex();
 
   const { username } = ctx.request.params;
