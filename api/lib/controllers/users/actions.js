@@ -42,7 +42,14 @@ exports.getUserOfInstitution = async (ctx) => {
   await ensureIndex();
 
   const { username } = ctx.request.params;
-  const institution = await Institution.findOneByCreatorOrRole(username);
+
+  const user = await elastic.security.findUser({ username });
+
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
+  }
+
+  const institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
 
   if (!institution) {
     ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
