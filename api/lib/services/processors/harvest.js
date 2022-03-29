@@ -293,6 +293,9 @@ async function importSushiReport(options = {}) {
     const reportItem = report.Report_Items[i];
 
     const item = {
+      X_Sushi_ID: sushi.getId(),
+      X_Institution_ID: sushi.get('institutionId'),
+      X_Endpoint_ID: endpoint.getId(),
       X_Package: sushi.get('package'),
       X_Endpoint_Tags: endpoint.get('tags'),
 
