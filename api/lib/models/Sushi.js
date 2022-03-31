@@ -99,20 +99,6 @@ class Sushi extends typedModel({ type, schemas }) {
     });
   }
 
-  static setImportStateById(sushiId, value = {}) {
-    const { date, success, steps } = value;
-
-    return this.updateById(sushiId, {
-      [type]: {
-        importState: {
-          date: date || new Date(),
-          success: !!success,
-          steps,
-        },
-      },
-    });
-  }
-
   getInstitutionId() {
     return this.data && this.data.institutionId;
   }
