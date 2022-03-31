@@ -208,7 +208,7 @@ const typedModel = ({ type, schemas }) => class TypedModel {
     // FIXME: prefer scrolling
     const { body } = await elastic.search({
       index: this.index,
-      size: opt.size || 1000,
+      size: opt.size || 10000,
       ignoreUnavailable: true,
       body: {
         sort,
