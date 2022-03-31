@@ -188,7 +188,7 @@
         "ezpaarse": "Traitements des logs avec ezPAARSE",
         "ezmesure": "Reversements dans ezMESURE",
         "reporting": "Rapports d'usage périodiques",
-        "sushi": "Moissonage SUSHI"
+        "sushi": "Moissonnage SUSHI"
       },
       "mustMatch": "Doit correspondre à : {pattern}",
       "searchOpenData": "Chercher parmi les établissements connus",
