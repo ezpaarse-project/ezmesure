@@ -24,9 +24,15 @@ instanceSchema.items.properties.Metric_Type = {
 // Remove enum for all first-level properties
 Object.values(defSchema.definitions).forEach((value) => {
   const schema = value;
-  if (Array.isArray(schema?.properties?.enum)) {
-    schema.properties.enum = undefined;
-  }
+  if (typeof schema?.properties !== 'object') { return; }
+
+  Object.values(schema?.properties).forEach((propValue) => {
+    const propertySchema = propValue;
+
+    if (Array.isArray(propertySchema?.enum)) {
+      propertySchema.enum = undefined;
+    }
+  });
 });
 
 module.exports = defSchema;
