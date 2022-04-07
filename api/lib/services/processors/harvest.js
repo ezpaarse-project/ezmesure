@@ -33,6 +33,7 @@ async function importSushiReport(options = {}) {
     beginDate,
     endDate,
     forceDownload,
+    harvestId,
     reportType = sushiService.DEFAULT_REPORT_TYPE,
   } = options;
 
@@ -312,6 +313,7 @@ async function importSushiReport(options = {}) {
       X_Endpoint_ID: endpoint.getId(),
       X_Package: sushi.get('package'),
       X_Endpoint_Tags: endpoint.get('tags'),
+      X_Harvest_ID: harvestId,
 
       Report_Header: reportHeader,
 

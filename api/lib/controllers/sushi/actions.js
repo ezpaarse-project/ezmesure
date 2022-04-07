@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const format = require('date-fns/format');
 const subMonths = require('date-fns/subMonths');
+const { v4: uuidv4 } = require('uuid');
 
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
@@ -233,7 +234,12 @@ exports.downloadReport = async (ctx) => {
 exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
-  const { target, forceDownload, reportType } = body;
+  const {
+    target,
+    forceDownload,
+    reportType,
+    harvestId,
+  } = body;
   let { beginDate, endDate } = body;
   const {
     endpoint,
@@ -305,6 +311,7 @@ exports.harvestSushi = async (ctx) => {
       sushiId: sushi.getId(),
       endpointId: sushi.get('endpointId'),
       institutionId: institution.getId(),
+      harvestId: harvestId || uuidv4(),
       username: user.username,
       reportType,
       index,

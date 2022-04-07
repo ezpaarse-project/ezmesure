@@ -4874,6 +4874,10 @@
                     "example": "2020-12",
                     "description": "End of the report period"
                   },
+                  "harvestId": {
+                    "type": "string",
+                    "description": "An identifier used to group tasks from a same harvest batch"
+                  },
                   "forceDownload": {
                     "type": "boolean",
                     "default": false,
