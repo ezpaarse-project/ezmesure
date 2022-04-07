@@ -148,9 +148,23 @@ async function importSushiReport(options = {}) {
     }
   }
 
-  const { valid, errors } = sushiService.validateReport(report);
+  const {
+    valid,
+    errors,
+    reportId: foundReportId,
+    unsupported,
+  } = sushiService.validateReport(report);
+
+  if (foundReportId) {
+    task.log('info', `Report_ID is [${foundReportId}]`);
+  } else {
+    task.log('error', 'Report_ID is missing from the report header');
+  }
 
   if (!valid) {
+    if (unsupported) {
+      task.log('error', 'Unsupported report type');
+    }
     if (Array.isArray(errors)) {
       errors.slice(0, 10).forEach((e) => task.log('error', e));
     }

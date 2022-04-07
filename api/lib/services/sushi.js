@@ -24,7 +24,13 @@ const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
 const ajv = new Ajv({ schemas: [definitions], strict: false });
 addFormats(ajv);
-const validateReportSchema = ajv.getSchema('#/definitions/COUNTER_title_report');
+
+const reportValidators = new Map([
+  ['pr', ajv.getSchema('#/definitions/COUNTER_platform_report')],
+  ['dr', ajv.getSchema('#/definitions/COUNTER_database_report')],
+  ['tr', ajv.getSchema('#/definitions/COUNTER_title_report')],
+  ['ir', ajv.getSchema('#/definitions/COUNTER_item_report')],
+]);
 
 const downloads = new Map();
 const DEFAULT_REPORT_TYPE = 'tr';
@@ -243,10 +249,23 @@ function initiateDownload(options = {}) {
 }
 
 function validateReport(report) {
-  const valid = validateReportSchema(report);
-  const { errors } = validateReportSchema;
+  const reportId = report?.Report_Header?.Report_ID;
 
-  return { valid, errors };
+  if (typeof reportId !== 'string') {
+    return { valid: false };
+  }
+
+  const masterReportId = reportId.toLowerCase().split('_')[0];
+  const validate = reportValidators.get(masterReportId);
+
+  if (typeof validate !== 'function') {
+    return { valid: false, reportId, unsupported: true };
+  }
+
+  const valid = validate(report);
+  const { errors } = validate;
+
+  return { valid, errors, reportId };
 }
 
 function getExceptions(sushiResponse) {
