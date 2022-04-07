@@ -42,6 +42,7 @@ router.route({
       id: stringOrArray,
       status: stringOrArray,
       type: stringOrArray,
+      harvestId: stringOrArray,
       sushiId: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,

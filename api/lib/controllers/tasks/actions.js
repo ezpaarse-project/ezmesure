@@ -13,9 +13,10 @@ exports.getAll = async (ctx) => {
     id: taskIds,
     status,
     type,
-    institutionId,
+    harvestId,
     sushiId,
     endpointId,
+    institutionId,
     collapse,
   } = query;
 
@@ -38,6 +39,9 @@ exports.getAll = async (ctx) => {
   }
   if (endpointId) {
     filters.push(Task.filterBy('params.endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
+  }
+  if (harvestId) {
+    filters.push(Task.filterBy('params.harvestId', Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim())));
   }
 
   const options = { filters };

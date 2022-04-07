@@ -5460,6 +5460,14 @@
             "in": "query",
             "name": "endpointId",
             "description": "filter tasks by endpoint ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "harvestId",
+            "description": "filter tasks by harvest ID"
           }
         ]
       }
