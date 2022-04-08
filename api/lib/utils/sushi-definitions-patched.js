@@ -5,6 +5,9 @@ const {
   COUNTER_item_performance: itemPerfSchema,
 } = defSchema.definitions;
 
+// Remove Severity from required fields
+errorSchema.required = errorSchema.required.filter((field) => field !== 'Severity');
+
 // Allow Severity to be an integer
 const severity = errorSchema.properties.Severity;
 
