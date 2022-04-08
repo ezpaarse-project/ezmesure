@@ -44,6 +44,13 @@ async function importSushiReport(options = {}) {
     beginDate,
     endDate,
   };
+
+  let ignoreReportValidation = sushi.get('ignoreReportValidation');
+
+  if (typeof options.ignoreValidation === 'boolean') {
+    ignoreReportValidation = options.ignoreValidation;
+  }
+
   const reportPath = sushiService.getReportPath(sushiData);
   let report;
 
@@ -170,9 +177,11 @@ async function importSushiReport(options = {}) {
       errors.slice(0, 10).forEach((e) => task.log('error', e));
     }
 
-    if (!sushi.get('ignoreReportValidation')) {
+    if (!ignoreReportValidation) {
       await deleteReportFile();
       throw new HarvestError('The report is not valid');
+    } else {
+      task.log('info', 'Ignoring report validation');
     }
   }
 

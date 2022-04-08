@@ -238,6 +238,7 @@ exports.harvestSushi = async (ctx) => {
     target,
     forceDownload,
     reportType,
+    ignoreValidation,
     harvestId,
   } = body;
   let { beginDate, endDate } = body;
@@ -318,6 +319,7 @@ exports.harvestSushi = async (ctx) => {
       beginDate,
       endDate,
       forceDownload,
+      ignoreValidation,
       endpointVendor: endpoint.get('vendor'),
       sushiLabel: sushi.get('vendor'),
       sushiPackage: sushi.get('package'),
