@@ -129,7 +129,9 @@ async function importSushiReport(options = {}) {
       const prefix = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
       const message = `${prefix} ${e?.Message}`;
 
-      switch (e?.Severity?.toLowerCase?.()) {
+      const severity = sushiService.getExceptionSeverity(e);
+
+      switch (severity) {
         case 'fatal':
         case 'error':
           hasError = true;

@@ -268,6 +268,31 @@ function validateReport(report) {
   return { valid, errors, reportId };
 }
 
+/**
+ * Change an exception code into a severity string
+ * @param {Integer} code the code of the exception
+ * @returns a string representing the error severity (info, warning or error)
+ */
+function getExceptionSeverity(exception) {
+  const severity = exception?.Severity?.toLowerCase?.();
+  const code = exception?.Code;
+
+  if (typeof severity === 'string') {
+    return severity;
+  }
+
+  const errorCodes = new Set([
+    1000, 1010, 1020, 1030,
+    2000, 2010, 2020, 2030,
+    3000, 3010, 3020, 3030,
+  ]);
+
+  if (code === 0) { return 'info'; }
+  if (errorCodes.has(code)) { return 'error'; }
+
+  return 'warning';
+}
+
 function getExceptions(sushiResponse) {
   if (!sushiResponse) { return []; }
 
@@ -318,6 +343,7 @@ module.exports = {
   getOngoingDownload,
   initiateDownload,
   getExceptions,
+  getExceptionSeverity,
   stringifyException,
   DEFAULT_REPORT_TYPE,
 };
