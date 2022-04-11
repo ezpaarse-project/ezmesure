@@ -34,6 +34,8 @@ errors:
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
     invalidResponse: Le point d'accès SUSHI a retourné des données invalides
     notJsonResponse: "La réponse du point d'accès n'est pas au format JSON (type: %s)"
+    badStatus: Le point d'accès a répondu avec un code %s %s
+    requestFailed: La requête a échoué pour une raison indéterminée
     managementLocked: La gestion des identifiants SUSHI est actuellement verrouillée
 
     import:

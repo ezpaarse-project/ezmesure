@@ -229,10 +229,16 @@ router.route({
         ? ctx.body.exceptions.map(stringifyException)
         : [];
 
-      if (exceptions.length === 0 && error?.isAxiosError) {
-        const status = error?.response?.status;
-        const statusText = error?.response?.statusText;
-        exceptions.push(`Endpoint responded with ${status} ${statusText}`);
+      if (exceptions.length === 0 && error) {
+        if (error?.expose && error?.message) {
+          exceptions.push(error?.message);
+        } else if (error?.response) {
+          const status = error?.response?.status;
+          const statusText = error?.response?.statusText;
+          exceptions.push(ctx.$t('errors.sushi.badStatus', status, statusText));
+        } else {
+          exceptions.push(ctx.$t('errors.sushi.requestFailed'));
+        }
       }
 
       sushi.set('connection', {

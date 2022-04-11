@@ -34,6 +34,8 @@ errors:
     emptyEndpointResponse: SUSHI endpoint returned an empty response
     invalidResponse: The SUSHI endpoint responded with invalid data
     notJsonResponse: "The endpoint response is not in JSON format (type: %s)"
+    badStatus: The endpoint responded with %s %s
+    requestFailed: Request failed for an unknown reason
     managementLocked: SUSHI credentials management is currently locked
 
     import:
