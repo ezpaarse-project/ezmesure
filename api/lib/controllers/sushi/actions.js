@@ -139,14 +139,14 @@ exports.deleteSushiData = async (ctx) => {
 exports.getAvailableReports = async (ctx) => {
   const { sushi, endpoint } = ctx.state;
 
-  let reports;
+  let data;
+  let headers;
   let exceptions;
 
   try {
-    const { data } = await sushiService.getAvailableReports(endpoint, sushi);
-    reports = data;
+    ({ data, headers } = await sushiService.getAvailableReports(endpoint, sushi));
   } catch (e) {
-    exceptions = sushiService.getExceptions(e && e.response && e.response.data);
+    exceptions = sushiService.getExceptions(e?.response?.data);
 
     if (!Array.isArray(exceptions) || exceptions.length === 0) {
       ctx.throw(502, e);
@@ -154,7 +154,7 @@ exports.getAvailableReports = async (ctx) => {
   }
 
   if (!Array.isArray(exceptions) || exceptions.length === 0) {
-    exceptions = sushiService.getExceptions(reports);
+    exceptions = sushiService.getExceptions(data);
   }
 
   if (exceptions.length > 0) {
@@ -165,12 +165,18 @@ exports.getAvailableReports = async (ctx) => {
 
   const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
-  if (!Array.isArray(reports) || !reports.every(isValidReport)) {
-    ctx.throw(502, ctx.$t('errors.sushi.invalidResponse'));
+  if (!Array.isArray(data) || !data.every(isValidReport)) {
+    const contentType = /^\s*([^;\s]*)/.exec(headers['content-type'])?.[1];
+
+    if (contentType === 'application/json') {
+      ctx.throw(502, ctx.$t('errors.sushi.invalidResponse'), { expose: true });
+    } else {
+      ctx.throw(502, ctx.$t('errors.sushi.notJsonResponse', contentType), { expose: true });
+    }
   }
 
   ctx.status = 200;
-  ctx.body = reports;
+  ctx.body = data;
 };
 
 exports.downloadReport = async (ctx) => {

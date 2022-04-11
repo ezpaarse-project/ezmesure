@@ -33,6 +33,7 @@ errors:
     notFound: Item SUSHI introuvable
     emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
     invalidResponse: Le point d'accès SUSHI a retourné des données invalides
+    notJsonResponse: "La réponse du point d'accès n'est pas au format JSON (type: %s)"
     managementLocked: La gestion des identifiants SUSHI est actuellement verrouillée
 
     import:
