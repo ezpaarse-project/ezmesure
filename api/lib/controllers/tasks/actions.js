@@ -1,10 +1,5 @@
 const Task = require('../../models/Task');
 
-const isAdmin = (user) => {
-  const roles = new Set((user && user.roles) || []);
-  return (roles.has('admin') || roles.has('superuser'));
-};
-
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
@@ -55,7 +50,7 @@ exports.getAll = async (ctx) => {
 
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
-  const { user } = ctx.state;
+  const { user, userIsAdmin } = ctx.state;
 
   const task = await Task.findById(taskId);
 
@@ -64,7 +59,7 @@ exports.getOne = async (ctx) => {
     return;
   }
 
-  if (!isAdmin(user)) {
+  if (!userIsAdmin) {
     const institution = await task.getInstitution();
 
     if (!institution || !institution.isContact(user)) {
