@@ -115,11 +115,6 @@ async function importSushiReport(options = {}) {
     }
   }
 
-  task.endStep('download');
-  task.newStep('validation');
-  task.log('info', 'Validating COUNTER report');
-  await saveTask();
-
   const exceptions = sushiService.getExceptions(report);
 
   if (exceptions.length > 0) {
@@ -157,6 +152,11 @@ async function importSushiReport(options = {}) {
       throw new HarvestError('Sushi endpoint returned exceptions');
     }
   }
+
+  task.endStep('download');
+  task.newStep('validation');
+  task.log('info', 'Validating COUNTER report');
+  await saveTask();
 
   const {
     valid,
