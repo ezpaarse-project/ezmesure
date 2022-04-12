@@ -5513,6 +5513,30 @@
             "bearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "summary": "Delete a task",
+        "operationId": "delete-tasks-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Delete a task, and the associated job if any. This is not possible if the associated job is active.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Tasks"
+        ]
       }
     },
     "/users": {

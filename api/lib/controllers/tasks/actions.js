@@ -103,3 +103,20 @@ exports.cancelOne = async (ctx) => {
   ctx.body = task;
 };
 
+exports.deleteOne = async (ctx) => {
+  const { taskId } = ctx.params;
+
+  const job = await harvestQueue.getJob(taskId);
+
+  if (job) {
+    if (await job.isActive()) {
+      ctx.throw(409, ctx.$t('errors.tasks.cannnotDeleteActiveTask'));
+    }
+
+    await job.remove();
+  }
+
+  await Task.deleteOne(taskId);
+
+  ctx.status = 204;
+};

@@ -11,6 +11,7 @@ const {
 const {
   getAll,
   getOne,
+  deleteOne,
   cancelOne,
 } = require('./actions');
 
@@ -56,6 +57,17 @@ router.route({
   method: 'POST',
   path: '/:taskId/_cancel',
   handler: cancelOne,
+  validate: {
+    params: {
+      taskId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:taskId',
+  handler: deleteOne,
   validate: {
     params: {
       taskId: Joi.string().trim().required(),
