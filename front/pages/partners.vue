@@ -88,6 +88,7 @@ export default {
       return this.partners.filter((partner) => {
         const {
           name: orgName,
+          acronym,
           techContactName,
           docContactName,
           auto = {},
@@ -95,6 +96,7 @@ export default {
 
         if (search) {
           if (orgName && orgName.toLowerCase().includes(search)) { return true; }
+          if (acronym && acronym.toLowerCase().includes(search)) { return true; }
           if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
           if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
           return false;
