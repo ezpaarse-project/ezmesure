@@ -84,6 +84,7 @@ exports.updateSushi = async (ctx) => {
   const { body } = ctx.request;
 
   sushi.update(body);
+  sushi.set('connection', undefined);
 
   ctx.metadata = {
     sushiId: sushi.getId(),
