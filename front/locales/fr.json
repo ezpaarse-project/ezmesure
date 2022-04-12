@@ -309,6 +309,7 @@
     "latestImport": "Dernier import",
     "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
     "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verrouillée.",
+    "youHaveUntestedCredentials": "Vous avez 1 identifiant non testé | Vous avez {count} identifiants non testés",
     "deleteNbCredentials": "Vous allez supprimer {number} identifiants SUSHI."
   },
   "reports": {

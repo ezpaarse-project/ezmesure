@@ -309,6 +309,7 @@
     "latestImport": "Latest import",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
+    "youHaveUntestedCredentials": "You have untested credentials | You have {count} untested credentials",
     "deleteNbCredentials": "You are about to delete {number} SUSHI credentials."
   },
   "reports": {

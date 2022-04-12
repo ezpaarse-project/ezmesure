@@ -57,6 +57,36 @@
           </v-alert>
         </v-col>
       </v-row>
+
+      <v-row v-if="hasUntestedItems" justify="center" class="mt-2">
+        <v-col style="max-width: 1000px">
+          <v-alert
+            outlined
+            type="info"
+            prominent
+            icon="mdi-bell-alert"
+          >
+            <div v-if="lockReason" v-text="$t('reason', { reason: lockReason })" />
+            <v-row align="center">
+              <v-col class="grow">
+                <div
+                  class="text-h6"
+                  v-text="$tc('sushi.youHaveUntestedCredentials', untestedItems.length)"
+                />
+              </v-col>
+              <v-col class="shrink">
+                <v-btn
+                  color="info"
+                  :loading="testingConnection"
+                  @click="checkUntestedItems"
+                >
+                  {{ $t('institutions.sushi.checkConnection') }}
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-alert>
+        </v-col>
+      </v-row>
     </v-container>
 
     <SushiForm
@@ -346,6 +376,12 @@ export default {
     hasSelection() {
       return this.selected.length > 0;
     },
+    hasUntestedItems() {
+      return this.untestedItems.length > 0;
+    },
+    untestedItems() {
+      return this.sushiItems.filter(item => (typeof item?.connection?.success !== 'boolean'));
+    },
     testingConnection() {
       return Object.keys(this.loadingItems).length > 0;
     },
@@ -437,6 +473,13 @@ export default {
       this.selected = [];
     },
 
+    checkUntestedItems() {
+      if (this.hasUntestedItems) {
+        this.selected = this.untestedItems.slice();
+        this.checkMultipleConnection();
+      }
+    },
+
     async checkSingleConnection(sushiItem) {
       this.$set(this, 'loadingItems', { [sushiItem.id]: true });
 
@@ -467,7 +510,7 @@ export default {
 
         try {
           // eslint-disable-next-line no-await-in-loop
-          sushiItem.connection = await this.$axios.$get(`/sushi/${sushiItem.id}/connection`);
+          this.$set(sushiItem, 'connection', await this.$axios.$get(`/sushi/${sushiItem.id}/connection`));
         } catch (e) {
           this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
         }
