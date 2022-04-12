@@ -275,16 +275,15 @@ exports.harvestSushi = async (ctx) => {
     reportType,
   };
 
-  const currentJob = await harvestQueue.getJob(sushi.getId());
+  const currentTask = await Task.findOne({
+    filters: [
+      Task.filterBy('params.sushiId', sushi.getId()),
+      Task.filterBy('status', ['waiting', 'running', 'delayed']),
+    ],
+  });
 
-  if (currentJob) {
-    const jobState = await currentJob.getState();
-
-    if (jobState === 'completed' || jobState === 'failed') {
-      await currentJob.remove();
-    } else {
-      ctx.throw(409, ctx.$t('errors.harvest.jobExists', sushi.getId(), jobState));
-    }
+  if (currentTask) {
+    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.getId(), currentTask.get('status')));
   }
 
   const { body: perm } = await elastic.security.hasPrivileges({
@@ -336,7 +335,7 @@ exports.harvestSushi = async (ctx) => {
   await task.save();
   await harvestQueue.add(
     { taskId: task.getId() },
-    { jobId: sushi.getId() },
+    { jobId: task.getId() },
   );
 
   ctx.type = 'json';

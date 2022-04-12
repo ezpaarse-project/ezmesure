@@ -11,7 +11,7 @@ errors:
 
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
-    jobExists: "L'item SUSHI [%s] a déjà un job associé (statut: [%s])"
+    taskExists: "L'item SUSHI [%s] a déjà une tâche associée (statut: [%s])"
 
   queue:
     notFound: File d'attente introuvable
