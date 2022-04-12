@@ -46,6 +46,8 @@ errors:
     notFound: Tâche introuvable
     invalidFrequency: Fréquence invalide
     unauthorized: You are not authorized to access this task
+    cannnotCancelActiveTask: Cannot cancel an active task
+    cannnotCancelCompletedTask: Cannot cancel a completed task
 
   institution:
     notFound: Institution not found

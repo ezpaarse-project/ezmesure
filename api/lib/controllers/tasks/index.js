@@ -11,6 +11,7 @@ const {
 const {
   getAll,
   getOne,
+  cancelOne,
 } = require('./actions');
 
 const stringOrArray = Joi.alternatives().try(
@@ -47,6 +48,17 @@ router.route({
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       collapse: Joi.string().trim(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:taskId/_cancel',
+  handler: cancelOne,
+  validate: {
+    params: {
+      taskId: Joi.string().trim().required(),
     },
   },
 });

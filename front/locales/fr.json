@@ -280,7 +280,8 @@
       "waiting": "En attente",
       "running": "En cours",
       "finished": "Terminé",
-      "error": "Erreur"
+      "error": "Erreur",
+      "cancelled": "Annulé"
     },
     "failedStep": {
       "download": "Échec du téléchargement",

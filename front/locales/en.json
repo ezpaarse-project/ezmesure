@@ -280,7 +280,8 @@
       "waiting": "Waiting",
       "running": "Running",
       "finished": "Finished",
-      "error": "Error"
+      "error": "Error",
+      "cancelled": "Cancelled"
     },
     "failedStep": {
       "download": "Download failed",

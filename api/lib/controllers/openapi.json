@@ -5779,6 +5779,47 @@
           }
         ]
       }
+    },
+    "/tasks/{id}/_cancel": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Cancel a task",
+        "operationId": "post-tasks-id-_cancel",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        },
+        "description": "Cancel a task. A task cannot be cancelled if its associated job is active or completed.",
+        "tags": [
+          "Tasks"
+        ]
+      }
     }
   }
 }

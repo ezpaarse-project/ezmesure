@@ -191,6 +191,10 @@ class Task extends typedModel({ type, schemas }) {
     this.emit('running');
   }
 
+  cancel() {
+    this.set('status', 'cancelled');
+  }
+
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();

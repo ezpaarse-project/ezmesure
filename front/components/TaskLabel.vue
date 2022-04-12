@@ -20,6 +20,7 @@ const colors = new Map([
   ['finished', 'green'],
   ['error', 'red'],
   ['interrupted', 'red'],
+  ['cancelled', 'red'],
 ]);
 
 const icons = new Map([
@@ -28,6 +29,7 @@ const icons = new Map([
   ['finished', 'mdi-check'],
   ['error', 'mdi-alert-circle-outline'],
   ['interrupted', 'mdi-progress-close'],
+  ['cancelled', 'mdi-cancel'],
 ]);
 
 export default {

@@ -1,4 +1,5 @@
 const Task = require('../../models/Task');
+const { harvestQueue } = require('../../services/jobs');
 
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
@@ -71,3 +72,34 @@ exports.getOne = async (ctx) => {
   ctx.status = 200;
   ctx.body = task;
 };
+
+exports.cancelOne = async (ctx) => {
+  const { taskId } = ctx.params;
+
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    ctx.throw(404, ctx.$t('errors.task.notFound'));
+    return;
+  }
+
+  const job = await harvestQueue.getJob(taskId);
+
+  if (job) {
+    if (await job.isActive()) {
+      ctx.throw(409, ctx.$t('errors.tasks.cannnotCancelActiveTask'));
+    }
+    if (await job.isCompleted() || await job.isFailed()) {
+      ctx.throw(409, ctx.$t('errors.tasks.cannnotCancelCompletedTask'));
+    }
+
+    await job.remove();
+  }
+
+  task.cancel();
+  await task.save();
+
+  ctx.status = 200;
+  ctx.body = task;
+};
+
