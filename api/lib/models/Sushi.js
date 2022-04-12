@@ -17,7 +17,6 @@ const schemas = {
     vendor: Joi.string().trim().allow(''),
     package: Joi.string().trim(),
     requestorId: Joi.string().trim().allow(''),
-    consortialId: Joi.string().trim().allow(''),
     customerId: Joi.string().trim().allow(''),
     apiKey: Joi.string().trim().allow(''),
     comment: Joi.string().trim().allow(''),

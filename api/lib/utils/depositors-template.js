@@ -56,7 +56,6 @@ module.exports = {
           package: { type: 'keyword' },
           sushiUrl: { type: 'keyword' },
           requestorId: { type: 'keyword' },
-          consortialId: { type: 'keyword' },
           customerId: { type: 'keyword' },
           apiKey: { type: 'keyword' },
           comment: { type: 'keyword' },
