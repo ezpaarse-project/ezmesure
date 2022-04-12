@@ -17,7 +17,7 @@
       />
 
       <div class="title">
-        {{ partner.name }}
+        {{ partnerName }}
       </div>
       <div class="body-2">
         {{ indexCount }} <abbr :title="$t('partners.ecs')">ECs</abbr> {{ $t('partners.ecsLoaded') }}
@@ -108,6 +108,12 @@ export default {
     },
   },
   computed: {
+    partnerName() {
+      if (this.partner?.acronym) {
+        return `${this.partner.name} (${this.partner.acronym})`;
+      }
+      return this.partner.name;
+    },
     hasContacts() {
       return this.contacts.length > 0;
     },
