@@ -208,6 +208,7 @@ export default {
     headers() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
+        { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
         { text: 'Index', value: 'index.prefix' },
         { text: 'ECs', value: 'index.count' },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
