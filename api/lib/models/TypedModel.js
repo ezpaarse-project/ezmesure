@@ -92,6 +92,8 @@ const typedModel = ({ type, schemas }) => class TypedModel {
       id: TypedModel.generateId(rawId),
       index,
       refresh: true,
+    }, {
+      ignore: [404],
     });
   }
 
@@ -100,6 +102,8 @@ const typedModel = ({ type, schemas }) => class TypedModel {
       id: TypedModel.generateId(this.id),
       index,
       refresh: true,
+    }, {
+      ignore: [404],
     }).catch((e) => Promise.reject(new Error(e)));
   }
 
