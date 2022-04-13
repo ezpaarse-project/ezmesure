@@ -22,6 +22,8 @@ itemUsage.properties.Publisher = { anyOf: [itemUsage.properties.Publisher, { typ
 errorSchema.required = errorSchema.required.filter((field) => field !== 'Severity');
 // Allow Severity to be an integer
 errorSchema.properties.Severity = { anyOf: [errorSchema.properties.Severity, { type: 'integer' }] };
+// Allow Code as string
+errorSchema.properties.Code = { anyOf: [errorSchema.properties.Code, { type: 'string', pattern: '^[0-9]+$' }] };
 
 // Remove enum for metric type
 const instanceSchema = itemPerfSchema.properties.Instance;

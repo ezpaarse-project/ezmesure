@@ -275,7 +275,7 @@ function validateReport(report) {
  */
 function getExceptionSeverity(exception) {
   const severity = exception?.Severity?.toLowerCase?.();
-  const code = exception?.Code;
+  const code = Number.parseInt(exception?.Code, 10);
 
   if (typeof severity === 'string') {
     return severity;
