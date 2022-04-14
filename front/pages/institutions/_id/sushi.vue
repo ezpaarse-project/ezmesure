@@ -484,7 +484,7 @@ export default {
       this.$set(this, 'loadingItems', { [sushiItem.id]: true });
 
       try {
-        sushiItem.connection = await this.$axios.$get(`/sushi/${sushiItem.id}/connection`);
+        this.$set(sushiItem, 'connection', await this.$axios.$get(`/sushi/${sushiItem.id}/connection`));
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
       }
