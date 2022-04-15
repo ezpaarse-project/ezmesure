@@ -87,7 +87,7 @@ exports.cancelOne = async (ctx) => {
 
   if (job) {
     if (await job.isActive()) {
-      ctx.throw(409, ctx.$t('errors.tasks.cannnotCancelActiveTask'));
+      ctx.throw(409, ctx.$t('errors.task.cannnotCancelActiveTask'));
     }
 
     await job.remove();
