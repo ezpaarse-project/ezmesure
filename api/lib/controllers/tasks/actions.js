@@ -93,8 +93,10 @@ exports.cancelOne = async (ctx) => {
     await job.remove();
   }
 
-  task.cancel();
-  await task.save();
+  if (!task.isDone()) {
+    task.cancel();
+    await task.save();
+  }
 
   ctx.status = 200;
   ctx.body = task;

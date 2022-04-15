@@ -201,8 +201,12 @@ class Task extends typedModel({ type, schemas }) {
     this.emit('finish');
   }
 
+  isRunning() {
+    return this.get('status') === 'running';
+  }
+
   isDone() {
-    return ['finished', 'error'].includes(this.get('status'));
+    return ['finished', 'error', 'cancelled'].includes(this.get('status'));
   }
 
   updateRunningTime() {
