@@ -6,6 +6,7 @@ exports.getAll = async (ctx) => {
   ctx.status = 200;
   const { query = {} } = ctx.request;
   const {
+    size,
     id: taskIds,
     status,
     type,
@@ -40,7 +41,7 @@ exports.getAll = async (ctx) => {
     filters.push(Task.filterBy('params.harvestId', Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim())));
   }
 
-  const options = { filters };
+  const options = { filters, size };
 
   if (typeof collapse === 'string') {
     options.collapse = { field: `${Task.type}.${collapse}` };

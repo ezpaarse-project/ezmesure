@@ -41,6 +41,7 @@ router.route({
   handler: getAll,
   validate: {
     query: {
+      size: Joi.number().min(1),
       id: stringOrArray,
       status: stringOrArray,
       type: stringOrArray,
