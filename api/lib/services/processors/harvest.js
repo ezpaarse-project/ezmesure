@@ -413,7 +413,7 @@ async function importSushiReport(options = {}) {
           crypto
             .createHash('sha256')
             .update([
-              item.Package,
+              item.X_Package,
               item.YOP,
               item.Access_Method,
               item.Access_Type,
