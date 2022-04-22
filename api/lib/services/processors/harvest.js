@@ -449,7 +449,9 @@ async function importSushiReport(options = {}) {
     }
   }
 
-  await insertItems(bulkItems);
+  if (bulkItems.length > 0) {
+    await insertItems(bulkItems);
+  }
 
   insertStep.data.processedReportItems = totalItems;
   insertStep.data.progress = 100;
