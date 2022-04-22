@@ -53,6 +53,7 @@ async function importSushiReport(options = {}) {
 
   const reportPath = sushiService.getReportPath(sushiData);
   let report;
+  let reportContent;
 
   function saveTask() {
     return task.save().catch((err) => {
@@ -61,26 +62,44 @@ async function importSushiReport(options = {}) {
     });
   }
 
-  function deleteReportFile() {
-    return fs.remove(reportPath).catch((err) => {
-      appLogger.error(`Failed to delete report file ${reportPath}`);
-      appLogger.error(err.message);
-    });
-  }
-
   task.newStep('download');
 
   try {
-    report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+    reportContent = await fs.readFile(reportPath, 'utf8');
   } catch (e) {
     if (e.code !== 'ENOENT') {
-      throw new HarvestError(`Fail to read report file ${reportPath}`, e);
+      throw new HarvestError('Failed to read report file', e);
     }
   }
 
-  if (report && !forceDownload) {
-    task.log('info', 'Found a local COUNTER report file');
-  } else {
+  if (reportContent) {
+    task.log('info', 'A local copy of the COUNTER report is already present');
+
+    try {
+      report = JSON.parse(reportContent);
+    } catch (e) {
+      task.log('warning', 'The report is not a valid JSON, it will be re-downloaded');
+    }
+
+    const exceptions = sushiService.getExceptions(report);
+    const hasFatalException = exceptions.some((e) => {
+      const severity = sushiService.getExceptionSeverity(e);
+      return ['error', 'fatal'].includes(severity);
+    });
+
+    if (hasFatalException) {
+      task.log('warning', 'The report contains fatal exceptions, it will be re-downloaded');
+      report = null;
+    }
+  }
+
+  if (!report || forceDownload) {
+    try {
+      await fs.remove(reportPath);
+    } catch (e) {
+      throw new HarvestError('Failed to delete the local copy of the report', e);
+    }
+
     try {
       let download = sushiService.getOngoingDownload(sushiData);
 
@@ -112,15 +131,17 @@ async function importSushiReport(options = {}) {
         }),
       ]);
     } catch (e) {
-      await deleteReportFile();
       throw new HarvestError('Failed to download the COUNTER report', e);
     }
 
     try {
       report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
     } catch (e) {
-      await deleteReportFile();
-      throw new HarvestError('Fail to read downloaded report file', e);
+      if (e instanceof SyntaxError) {
+        throw new HarvestError('The report is not a valid JSON');
+      } else {
+        throw new HarvestError('Fail to read downloaded report file', e);
+      }
     }
   }
 
@@ -157,8 +178,7 @@ async function importSushiReport(options = {}) {
     });
 
     if (hasError) {
-      await deleteReportFile();
-      throw new HarvestError('Sushi endpoint returned exceptions');
+      throw new HarvestError('The report contains exceptions');
     }
   }
 
@@ -189,14 +209,13 @@ async function importSushiReport(options = {}) {
     }
 
     if (!ignoreReportValidation) {
-      await deleteReportFile();
       throw new HarvestError('The report is not valid');
     } else {
       task.log('info', 'Ignoring report validation');
     }
   }
 
-  task.log('info', `Importing report into '${index}'`);
+  task.log('info', `Importing report into [${index}]`);
   task.endStep('validation');
   const insertStep = task.newStep('insert');
   await saveTask();
