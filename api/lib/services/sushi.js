@@ -153,6 +153,7 @@ async function getReport(endpoint, sushi, opts = {}) {
     method: 'get',
     url: `${baseUrl}/reports/${reportType}`,
     responseType: stream ? 'stream' : 'json',
+    validateStatus: false,
     params,
     httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
     proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
@@ -194,14 +195,10 @@ async function downloadReport(options = {}) {
   await fs.ensureFile(tmpPath);
 
   const response = await getReport(endpoint, sushi, { ...options, stream: true });
-
   // TODO: handle "try again later" and timeouts
 
   if (!response) {
     throw new Error('sushi endpoint didn\'t respond');
-  }
-  if (response.status !== 200) {
-    throw new Error(`sushi endpoint responded with status ${response.status}`);
   }
   if (!response.data) {
     throw new Error('sushi endpoint didn\'t return any data');
@@ -214,6 +211,8 @@ async function downloadReport(options = {}) {
   });
 
   await fs.move(tmpPath, reportPath, { overwrite: true });
+
+  return response;
 }
 
 function getOngoingDownload(options = {}) {
