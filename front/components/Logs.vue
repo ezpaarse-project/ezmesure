@@ -17,6 +17,7 @@ const logColors = new Map([
   ['info', 'green--text'],
   ['verbose', 'green--text'],
   ['warn', 'orange--text'],
+  ['warning', 'orange--text'],
   ['error', 'red--text'],
 ]);
 
