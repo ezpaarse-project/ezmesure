@@ -225,7 +225,7 @@ exports.downloadReport = async (ctx) => {
     message = 'download initiated, please retry this link later';
 
     sushiService.initiateDownload(sushiData)
-      .on('finish', (filePath) => {
+      .on('finish', (response, filePath) => {
         appLogger.info(`Report downloaded at ${filePath}`);
       })
       .on('error', (err) => {

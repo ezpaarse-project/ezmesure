@@ -223,17 +223,16 @@ function initiateDownload(options = {}) {
   const reportPath = getReportPath(options);
   const tmpPath = getReportTmpPath(options);
 
-  let emitter = downloads.get(reportPath);
-  if (emitter) {
-    return emitter;
+  if (downloads.has(reportPath)) {
+    return downloads.get(reportPath);
   }
 
-  emitter = new EventEmitter();
+  const emitter = new EventEmitter();
   downloads.set(reportPath, emitter);
 
   downloadReport(options)
-    .then(() => {
-      emitter.emit('finish', reportPath);
+    .then((response) => {
+      emitter.emit('finish', response, reportPath);
       downloads.delete(reportPath);
     })
     .catch((err) => {
