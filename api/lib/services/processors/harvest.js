@@ -96,8 +96,17 @@ async function importSushiReport(options = {}) {
 
         new Promise((resolve, reject) => {
           download.on('error', reject);
-          download.on('finish', () => {
-            task.log('info', 'Report downloaded');
+          download.on('finish', (response) => {
+            task.log('info', 'Download complete');
+
+            const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
+
+            if (response?.status !== 200) {
+              task.log('error', `Endpoint responded with status [${response?.status}]`);
+            }
+            if (contentType !== 'application/json') {
+              task.log('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
+            }
             resolve();
           });
         }),
