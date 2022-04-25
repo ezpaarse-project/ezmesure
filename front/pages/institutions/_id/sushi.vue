@@ -353,6 +353,13 @@ export default {
           },
         },
         {
+          text: this.$t('type'),
+          value: 'latestImportTask.params.reportType',
+          align: 'right',
+          width: '80px',
+          cellClass: 'text-uppercase',
+        },
+        {
           text: this.$t('sushi.latestImport'),
           value: 'latestImportTask.createdAt',
           align: 'right',

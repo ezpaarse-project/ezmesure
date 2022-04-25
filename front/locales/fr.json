@@ -388,6 +388,7 @@
     "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
     "activate": "Activer mon compte"
   },
+  "type": "Type",
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
   "idCopied": "ID copié dans le presse-papier",

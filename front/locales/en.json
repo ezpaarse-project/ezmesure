@@ -388,6 +388,7 @@
     "readAndAccept": "I have read and accept the terms of use",
     "activate": "Activate my account"
   },
+  "type": "Type",
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
   "idCopied": "ID copied in the clipboard",
