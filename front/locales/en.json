@@ -275,6 +275,7 @@
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
     "history": "Tasks history",
+    "parameters": "Parameters",
     "status": {
       "notLaunchedYet": "Not launched yet",
       "waiting": "Waiting",
@@ -299,6 +300,12 @@
         "validation": "Report validation",
         "insert": "Insert in Elasticsearch"
       }
+    },
+    "params": {
+      "reportType": "Report type:",
+      "harvestId": "Harvest identifier:",
+      "period": "Period:",
+      "index": "Indice:"
     }
   },
   "sushi": {

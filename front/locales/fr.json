@@ -275,6 +275,7 @@
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
     "history": "Historique des tâches",
+    "parameters": "Paramètres",
     "status": {
       "notLaunchedYet": "Pas encore lancé",
       "waiting": "En attente",
@@ -299,6 +300,12 @@
         "validation": "Validation du rapport",
         "insert": "Insertion dans Elasticsearch"
       }
+    },
+    "params": {
+      "reportType": "Type de rapport :",
+      "harvestId": "Identifiant de moissonnage :",
+      "period": "Période :",
+      "index": "Index :"
     }
   },
   "sushi": {

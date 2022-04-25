@@ -49,6 +49,12 @@
             <v-timeline align-top dense>
               <template v-if="item.steps">
                 <v-timeline-item hide-dot>
+                  <div class="subtitle-1" v-text="$t('tasks.parameters')" />
+                </v-timeline-item>
+
+                <TaskParams :params="item.params" />
+
+                <v-timeline-item hide-dot>
                   <div class="subtitle-1" v-text="$t('tasks.steps.title')" />
                 </v-timeline-item>
 
@@ -90,6 +96,7 @@ import TaskLabel from '~/components/TaskLabel';
 import LocalDate from '~/components/LocalDate';
 import LocalDuration from '~/components/LocalDuration';
 import StepTimelineItem from '~/components/StepTimelineItem';
+import TaskParams from '~/components/TaskParams';
 
 export default {
   components: {
@@ -98,6 +105,7 @@ export default {
     LocalDate,
     StepTimelineItem,
     LocalDuration,
+    TaskParams,
   },
   data() {
     return {
