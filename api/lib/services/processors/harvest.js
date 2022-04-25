@@ -436,16 +436,16 @@ async function importSushiReport(options = {}) {
           date,
           reportId.toLowerCase(),
           metricType.toLowerCase(),
-          sanitizeIdentifier(item.Platform),
-          sanitizeIdentifier(item.Publisher),
+          item.X_Sushi_ID,
           crypto
             .createHash('sha256')
             .update([
-              item.X_Package,
               item.YOP,
               item.Access_Method,
               item.Access_Type,
               item.Section_Type,
+              item.Platform,
+              item.Publisher,
               item.Title,
               item.Database,
               ...identifiers].join('|'))
