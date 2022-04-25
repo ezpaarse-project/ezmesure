@@ -526,6 +526,7 @@ async function processJob(job) {
     sushiId,
     beginDate,
     endDate,
+    reportType,
   } = taskParams;
 
   appLogger.verbose(`[Harvest Job #${job?.id}] Fetching SUSHI credentials [${sushiId}]`);
@@ -547,6 +548,7 @@ async function processJob(job) {
 
   task.start();
   task.log('info', 'Sushi import task initiated');
+  task.log('info', `Requested report type: ${reportType?.toUpperCase?.()}`);
 
   if (beginDate || endDate) {
     task.log('info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
