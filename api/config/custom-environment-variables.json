@@ -37,6 +37,7 @@
     "cron": "EZMESURE_NOTIFICATIONS_CRON",
     "sender": "EZMESURE_NOTIFICATIONS_SENDER",
     "recipients": "EZMESURE_NOTIFICATIONS_RECIPIENTS",
+    "supports": "EZMESURE_NOTIFICATIONS_SUPPORTS",
     "sendEmptyActivity": { "__name": "EZMESURE_SEND_EMPTY_ACTIVITY", "__format": "boolean" }
   },
   "auth": {

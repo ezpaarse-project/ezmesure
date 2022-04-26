@@ -74,6 +74,7 @@ module.exports = {
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
     recipients: ['exemple@exemple.fr'],
+    supports: ['supports@exemple.fr'],
   },
   depositors: {
     index: 'depositors',
