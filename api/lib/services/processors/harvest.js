@@ -62,7 +62,7 @@ async function importSushiReport(options = {}) {
     });
   }
 
-  task.newStep('download');
+  const downloadStep = task.newStep('download');
 
   try {
     reportContent = await fs.readFile(reportPath, 'utf8');
@@ -160,6 +160,7 @@ async function importSushiReport(options = {}) {
         case 'fatal':
         case 'error':
           hasError = true;
+          downloadStep.data.sushiErrorCode = Number.parseInt(e?.Code, 10);
           task.log('error', message);
           break;
         case 'debug':
