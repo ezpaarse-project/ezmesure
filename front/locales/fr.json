@@ -282,7 +282,21 @@
       "running": "En cours",
       "finished": "Terminé",
       "error": "Erreur",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "exceptions": {
+        "1000": "Service indisponible",
+        "1010": "Service surchargé",
+        "1020": "Trop de requêtes",
+        "1030": "Informations insufisantes",
+        "2000": "Demandeur non autorisé",
+        "2010": "Demandeur non autorisé",
+        "2020": "Clé d'API invalide",
+        "2030": "Adresse IP non autorisée",
+        "3000": "Rapport non supporté",
+        "3010": "Version non supportée",
+        "3020": "Dates invalides",
+        "3030": "Période indisponible"
+      }
     },
     "failedStep": {
       "download": "Échec du téléchargement",

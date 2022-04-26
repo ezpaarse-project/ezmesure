@@ -55,6 +55,15 @@ export default {
       }
 
       if (this.status === 'error' && this.lastStep?.status !== 'finished') {
+        const sushiCode = this.lastStep?.data?.sushiErrorCode;
+
+        if (sushiCode) {
+          const key = `tasks.status.exceptions.${sushiCode}`;
+          if (this.$te(key)) {
+            return this.$t(key);
+          }
+        }
+
         const translateKey = `tasks.failedStep.${this.lastStep?.label}`;
 
         if (this.$te(translateKey)) {

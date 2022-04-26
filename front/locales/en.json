@@ -282,7 +282,21 @@
       "running": "Running",
       "finished": "Finished",
       "error": "Error",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "exceptions": {
+        "1000": "Service not available",
+        "1010": "Service busy",
+        "1020": "Too many requests",
+        "1030": "Insufficient Information",
+        "2000": "Unauthorized requestor",
+        "2010": "Unauthorized requestor",
+        "2020": "Invalid API key",
+        "2030": "Unauthorized IP address",
+        "3000": "Unsupported report",
+        "3010": "Unsupported report version",
+        "3020": "Invalide dates",
+        "3030": "Unavailable period"
+      }
     },
     "failedStep": {
       "download": "Download failed",
