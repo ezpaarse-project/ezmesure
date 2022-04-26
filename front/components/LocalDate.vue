@@ -9,6 +9,10 @@ export default {
       type: String,
       default: () => '',
     },
+    format: {
+      type: String,
+      default: () => '',
+    },
   },
   computed: {
     localDate() {
@@ -18,7 +22,7 @@ export default {
         return this.$t('invalidDate');
       }
 
-      return this.$dateFunctions.format(localDate, 'PPPpp');
+      return this.$dateFunctions.format(localDate, this.format || 'PPPpp');
     },
   },
 };
