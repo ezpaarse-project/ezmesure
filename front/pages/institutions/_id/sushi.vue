@@ -198,7 +198,11 @@
       </template>
 
       <template v-slot:item.latestImportTask.createdAt="{ item }">
-        <LocalDate v-if="item.latestImportTask" :date="item.latestImportTask.createdAt" />
+        <LocalDate
+          v-if="item.latestImportTask"
+          :date="item.latestImportTask.createdAt"
+          format="Pp"
+        />
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -342,7 +346,7 @@ export default {
           text: this.$t('sushi.latestImport'),
           value: 'latestImportTask.createdAt',
           align: 'right',
-          width: '220px',
+          width: '160px',
         },
         {
           text: this.$t('type'),
