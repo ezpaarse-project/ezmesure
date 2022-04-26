@@ -339,6 +339,19 @@ export default {
           width: '200px',
         },
         {
+          text: this.$t('sushi.latestImport'),
+          value: 'latestImportTask.createdAt',
+          align: 'right',
+          width: '220px',
+        },
+        {
+          text: this.$t('type'),
+          value: 'latestImportTask.params.reportType',
+          align: 'right',
+          width: '80px',
+          cellClass: 'text-uppercase',
+        },
+        {
           text: this.$t('sushi.importState'),
           value: 'latestImportTask',
           align: 'right',
@@ -351,19 +364,6 @@ export default {
             if (typeof b?.status !== 'string') { return 1; }
             return a?.status > b?.status ? 1 : -1;
           },
-        },
-        {
-          text: this.$t('type'),
-          value: 'latestImportTask.params.reportType',
-          align: 'right',
-          width: '80px',
-          cellClass: 'text-uppercase',
-        },
-        {
-          text: this.$t('sushi.latestImport'),
-          value: 'latestImportTask.createdAt',
-          align: 'right',
-          width: '220px',
         },
         {
           text: this.$t('actions'),
