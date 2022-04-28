@@ -63,7 +63,7 @@ errors:
     forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
 
   members:
-    alreadyMember: The user belongs to another institution
+    alreadyMember: "The user belongs to another institution: %s"
     cannotRemoveContact: You can't remove an institution contact
     cannotUpdateContact: You can't update an institution contact
 

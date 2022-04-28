@@ -63,7 +63,7 @@ errors:
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
   members:
-    alreadyMember: L'utilisateur appartient à une autre institution
+    alreadyMember: "L'utilisateur appartient à un autre établissement : %s"
     cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
     cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
 

@@ -200,7 +200,7 @@ exports.addInstitutionMember = async (ctx) => {
     );
 
     if (memberInstitution) {
-      ctx.throw(409, ctx.$t('errors.members.alreadyMember'));
+      ctx.throw(409, ctx.$t('errors.members.alreadyMember', memberInstitution.get('name')));
       return;
     }
   }
