@@ -1,0 +1,22 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Votre établissement a été validé</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      Vous pouvez à présent <a target="_blank" href="{{ manageMembersLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir les identifiants sushis</a>
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

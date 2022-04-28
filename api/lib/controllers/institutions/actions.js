@@ -7,7 +7,21 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
+const { sendMail, generateMail } = require('../../services/mail');
+const { appLogger } = require('../../services/logger');
+
+const sender = config.get('notifications.sender');
+
 const depositorsIndex = config.depositors.index;
+
+function sendValidateInstitution(receivers, data) {
+  return sendMail({
+    from: sender,
+    to: receivers,
+    subject: 'Votre établissement a été validé',
+    ...generateMail('validate-institution', data),
+  });
+}
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -103,6 +117,8 @@ exports.updateInstitution = async (ctx) => {
   const { user, institution } = ctx.state;
   const { body } = ctx.request;
 
+  const origin = ctx.get('origin');
+
   ctx.metadata = {
     institutionId: institution.id,
     institutionName: institution.get('name'),
@@ -111,6 +127,22 @@ exports.updateInstitution = async (ctx) => {
   if (!body) {
     ctx.throw(400, ctx.$t('errors.emptyBody'));
     return;
+  }
+
+  let correspondents = await institution.getCorrespondents();
+  correspondents = correspondents.map((e) => e.email);
+
+  if (correspondents.length > 0) {
+    if (!institution.get('validated') && body.validated === true) {
+      try {
+        await sendValidateInstitution(correspondents, {
+          manageMembersLink: `${origin}/institutions/self/members`,
+          manageSushiLink: `${origin}/institutions/self/sushi`,
+        });
+      } catch (err) {
+        appLogger.error(`Failed to send validate institution mail: ${err}`);
+      }
+    }
   }
 
   institution.update(body, {
@@ -149,6 +181,15 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const members = await ctx.state.institution.getMembers();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = Array.isArray(members) ? members : [];
+};
+
+exports.getInstitutionCorrespondents = async (ctx) => {
+  const members = await ctx.state.institution.getCorrespondents();
 
   ctx.type = 'json';
   ctx.status = 200;

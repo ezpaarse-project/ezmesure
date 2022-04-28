@@ -22,6 +22,7 @@ const {
   getSushiData,
   refreshInstitutions,
   refreshInstitution,
+  getInstitutionCorrespondents,
 } = require('./actions');
 
 const {
@@ -81,6 +82,21 @@ router.route({
     fetchInstitution(),
     requireContact(),
     getInstitutionMembers,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/correspondents',
+  handler: [
+    fetchInstitution(),
+    requireContact(),
+    getInstitutionCorrespondents,
   ],
   validate: {
     params: {

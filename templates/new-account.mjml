@@ -15,7 +15,7 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      Vous pouvez dès à présent l'intégrer à votre établissement depuis <a target="_blank" href="{{ data.manageMemberLink }}">l'interface de gestion des membres</a>
+      Vous pouvez dès à présent l'intégrer à votre établissement depuis <a target="_blank" href="{{ data.manageMembersLink }}">l'interface de gestion des membres</a>
     </mj-text>
 
     <mj-text>
