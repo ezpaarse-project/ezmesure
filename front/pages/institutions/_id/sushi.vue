@@ -99,7 +99,7 @@
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
     <ConfirmDialog ref="confirm" />
 
-    <v-menu nudge-width="100" style="z-index:100">
+    <v-menu nudge-width="100" style="z-index:100" top offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-slide-y-reverse-transition>
           <v-btn
@@ -109,7 +109,8 @@
             right
             large
             color="primary"
-            style="z-index:50"
+            style="z-index:50; transition: bottom .3s ease"
+            :style="hasSnackMessages && 'bottom:70px'"
             v-bind="attrs"
             v-on="on"
           >
@@ -324,6 +325,10 @@ export default {
     };
   },
   computed: {
+    hasSnackMessages() {
+      const messages = this.$store?.state?.snacks?.messages;
+      return Array.isArray(messages) && messages.length >= 1;
+    },
     headers() {
       return [
         {
