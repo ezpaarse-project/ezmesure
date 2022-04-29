@@ -11,7 +11,7 @@ const { appLogger } = require('../../services/logger');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supports');
+const supports = config.get('notifications.supportRecipients');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -59,7 +59,8 @@ function sendPasswordRecovery(user, data) {
 function sendToNewAccount(receivers, data) {
   return sendMail({
     from: sender,
-    to: receivers.concat(supports),
+    to: receivers,
+    cc: supports,
     subject: `${data.newUser} s'est inscrit sur ezMESURE`,
     ...generateMail('new-account', { data }),
   });
