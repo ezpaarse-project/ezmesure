@@ -129,21 +129,7 @@ exports.updateInstitution = async (ctx) => {
     return;
   }
 
-  let correspondents = await institution.getCorrespondents();
-  correspondents = correspondents.map((e) => e.email);
-
-  if (correspondents.length > 0) {
-    if (!institution.get('validated') && body.validated === true) {
-      try {
-        await sendValidateInstitution(correspondents, {
-          manageMembersLink: `${origin}/institutions/self/members`,
-          manageSushiLink: `${origin}/institutions/self/sushi`,
-        });
-      } catch (err) {
-        appLogger.error(`Failed to send validate institution mail: ${err}`);
-      }
-    }
-  }
+  const wasValidated = institution.get('validated');
 
   institution.update(body, {
     schema: isAdmin(user) ? 'adminUpdate' : 'update',
@@ -159,6 +145,22 @@ exports.updateInstitution = async (ctx) => {
     await institution.save();
   } catch (e) {
     throw new Error(e);
+  }
+
+  let correspondents = await institution.getCorrespondents();
+  correspondents = correspondents.map((e) => e.email);
+
+  if (correspondents.length > 0) {
+    if (!wasValidated && body.validated === true) {
+      try {
+        await sendValidateInstitution(correspondents, {
+          manageMembersLink: `${origin}/institutions/self/members`,
+          manageSushiLink: `${origin}/institutions/self/sushi`,
+        });
+      } catch (err) {
+        appLogger.error(`Failed to send validate institution mail: ${err}`);
+      }
+    }
   }
 
   ctx.status = 200;

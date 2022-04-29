@@ -8,8 +8,14 @@
 
 <mj-section>
   <mj-column>
+
     <mj-text>
-      Vous pouvez à présent <a target="_blank" href="{{ manageMembersLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir les identifiants sushis</a>
+      Votre établissement a été validé
+    </mj-text>
+
+
+    <mj-text>
+      Vous pouvez à présent <a target="_blank" href="{{ manageMembersLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir les identifiants SUSHI</a>
     </mj-text>
 
     <mj-text>

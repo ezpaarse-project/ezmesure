@@ -1,5 +1,6 @@
 Votre établissement a été validé
-Vous pouvez à présent gérer les membres de votre établissement et saisir les identifiants sushis
+Votre établissement a été validé
+Vous pouvez à présent gérer les membres de votre établissement et saisir les identifiants SUSHI
 
 Cordialement,
 L'équipe ezMESURE.
