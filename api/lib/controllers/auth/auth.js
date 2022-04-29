@@ -11,6 +11,7 @@ const { appLogger } = require('../../services/logger');
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 const sender = config.get('notifications.sender');
+const supports = config.get('notifications.supportRecipients');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -55,10 +56,11 @@ function sendPasswordRecovery(user, data) {
   });
 }
 
-function sendToNewAccount(receivers, data) {
+function sendNewUserToContacts(receivers, data) {
   return sendMail({
     from: sender,
     to: receivers,
+    cc: supports,
     subject: `${data.newUser} s'est inscrit sur ezMESURE`,
     ...generateMail('new-account', { data }),
   });
@@ -219,7 +221,7 @@ exports.acceptTerms = async (ctx) => {
     const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
 
     try {
-      await sendToNewAccount(emails, {
+      await sendNewUserToContacts(emails, {
         manageMembersLink: `${origin}/institutions/self/members`,
         newUser: user.username,
       });

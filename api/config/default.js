@@ -31,6 +31,7 @@ module.exports = {
     port: 25,
     secure: false,
     ignoreTLS: false,
+    supportRecipients: ['ezcounter-support@exemple.fr'],
   },
   logs: {
     app: {
