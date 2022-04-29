@@ -92,7 +92,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:institutionId/correspondents',
+  path: '/:institutionId/contacts',
   handler: [
     fetchInstitution(),
     requireContact(),

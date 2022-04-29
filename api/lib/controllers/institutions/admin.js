@@ -42,7 +42,7 @@ exports.validateInstitution = async (ctx) => {
   const { value: validated } = body;
   const { institution } = ctx.state;
 
-  let correspondents = await institution.getCorrespondents();
+  let correspondents = await institution.getContacts();
   correspondents = correspondents.map((e) => e.email);
 
   if (correspondents.length > 0) {

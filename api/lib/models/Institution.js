@@ -275,7 +275,7 @@ class Institution extends typedModel({ type, schemas }) {
     });
   }
 
-  async getCorrespondents() {
+  async getContacts() {
     const role = await this.getRole();
     if (!role) return [];
 

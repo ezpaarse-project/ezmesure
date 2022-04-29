@@ -147,7 +147,7 @@ exports.updateInstitution = async (ctx) => {
     throw new Error(e);
   }
 
-  let correspondents = await institution.getCorrespondents();
+  let correspondents = await institution.getContacts();
   correspondents = correspondents.map((e) => e.email);
 
   if (correspondents.length > 0) {
@@ -191,7 +191,7 @@ exports.getInstitutionMembers = async (ctx) => {
 };
 
 exports.getInstitutionCorrespondents = async (ctx) => {
-  const members = await ctx.state.institution.getCorrespondents();
+  const members = await ctx.state.institution.getContacts();
 
   ctx.type = 'json';
   ctx.status = 200;
