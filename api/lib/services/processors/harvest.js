@@ -123,18 +123,32 @@ async function importSushiReport(options = {}) {
 
             const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
 
+            downloadStep.data.statusCode = response?.status;
+
+            if (response?.status === 202) {
+              task.log('warning', `Endpoint responded with status [${response?.status}]`);
+              task.delay();
+              resolve();
+              return;
+            }
             if (response?.status !== 200) {
               task.log('error', `Endpoint responded with status [${response?.status}]`);
             }
             if (contentType !== 'application/json') {
               task.log('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
             }
+
             resolve();
           });
         }),
       ]);
     } catch (e) {
       throw new HarvestError('Failed to download the COUNTER report', e);
+    }
+
+    if (task.isDelayed()) {
+      await saveTask();
+      return;
     }
 
     try {
@@ -152,12 +166,16 @@ async function importSushiReport(options = {}) {
 
   if (exceptions.length > 0) {
     let hasError = false;
+    let isDelayed = false;
 
     exceptions.forEach((e) => {
       const prefix = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
       const message = `${prefix} ${e?.Message}`;
-
       const severity = sushiService.getExceptionSeverity(e);
+
+      if (Number.parseInt(e?.Code, 10) === 1011) {
+        isDelayed = true;
+      }
 
       switch (severity) {
         case 'fatal':
@@ -181,6 +199,12 @@ async function importSushiReport(options = {}) {
       if (e?.Help_URL) { task.log('info', `[Help URL] ${e.Help_URL}`); }
     });
 
+    if (isDelayed) {
+      task.log('warning', 'Endpoint has queued report for processing');
+      task.delay();
+      await saveTask();
+      return;
+    }
     if (hasError) {
       throw new HarvestError('The report contains exceptions');
     }
