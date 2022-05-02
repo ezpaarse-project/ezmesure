@@ -280,7 +280,7 @@ exports.harvestSushi = async (ctx) => {
   const currentTask = await Task.findOne({
     filters: [
       Task.filterBy('params.sushiId', sushi.getId()),
-      Task.filterBy('status', ['waiting', 'running', 'delayed']),
+      Task.filterBy('status', ['waiting', 'running']),
     ],
   });
 
