@@ -151,7 +151,7 @@ exports.updateInstitution = async (ctx) => {
     let correspondents = await institution.getContacts();
     correspondents = correspondents?.map?.((e) => e.email);
 
-    if (correspondents.length > 0) {
+    if (Array.isArray(correspondents) && correspondents.length > 0) {
       try {
         await sendValidateInstitution(correspondents, {
           manageMemberLink: `${origin}/institutions/self/members`,
