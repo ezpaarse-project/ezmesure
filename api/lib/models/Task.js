@@ -210,7 +210,7 @@ class Task extends typedModel({ type, schemas }) {
   }
 
   isDone() {
-    return ['finished', 'error', 'cancelled'].includes(this.get('status'));
+    return ['finished', 'error', 'cancelled', 'delayed'].includes(this.get('status'));
   }
 
   isDelayed() {
