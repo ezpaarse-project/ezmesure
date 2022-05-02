@@ -4,6 +4,7 @@ const kibana = require('../../services/kibana');
 const { sendMail, generateMail } = require('../../services/mail');
 
 const sender = config.get('notifications.sender');
+const supportRecipients = config.get('notifications.supportRecipients');
 
 const { appLogger } = require('../../services/logger');
 
@@ -11,6 +12,7 @@ function sendValidateInstitution(receivers) {
   return sendMail({
     from: sender,
     to: receivers,
+    cc: supportRecipients,
     subject: 'Votre établissement a été validé',
     ...generateMail('validated-institution'),
   });

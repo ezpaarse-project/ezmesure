@@ -11,6 +11,7 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 
 const sender = config.get('notifications.sender');
+const supportRecipients = config.get('notifications.supportRecipients');
 
 const depositorsIndex = config.depositors.index;
 
@@ -18,6 +19,7 @@ function sendValidateInstitution(receivers, data) {
   return sendMail({
     from: sender,
     to: receivers,
+    cc: supportRecipients,
     subject: 'Votre établissement a été validé',
     ...generateMail('validate-institution', data),
   });
