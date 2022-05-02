@@ -41,6 +41,20 @@ const ensureIndex = async () => {
   }
 };
 
+function sendNewContact(receiver) {
+  const data = {
+    contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
+  };
+
+  return sendMail({
+    from: sender,
+    to: receiver,
+    cc: supportRecipients,
+    subject: 'Vous êtes correspondant de votre établissement',
+    ...generateMail('new-contact', { data }),
+  });
+}
+
 exports.getInstitutions = async (ctx) => {
   await ensureIndex();
 
@@ -237,6 +251,8 @@ exports.addInstitutionMember = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
   }
 
+  const wasContact = institution.isContact(member);
+
   // If the user is not already a member, check if it belongs to another institution
   if (!institution.isMember(member) && !institution.isCreator(member)) {
     const memberInstitution = await Institution.findOneByCreatorOrRole(
@@ -273,6 +289,14 @@ exports.addInstitutionMember = async (ctx) => {
   if (institution.isCreator(member)) {
     institution.setCreator(null);
     await institution.save();
+  }
+
+  if (!wasContact && institution.isContact(member)) {
+    try {
+      await sendNewContact(member.email);
+    } catch (err) {
+      appLogger.error(`Failed to send new contact mail: ${err}`);
+    }
   }
 
   ctx.status = 200;
