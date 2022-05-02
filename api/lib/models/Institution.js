@@ -294,13 +294,13 @@ class Institution extends typedModel({ type, schemas }) {
       },
     });
 
-    let correspondents = body.hits && body.hits.hits;
+    let contacts = body.hits && body.hits.hits;
 
-    if (!Array.isArray(correspondents)) {
-      correspondents = [];
+    if (!Array.isArray(contacts)) {
+      contacts = [];
     }
 
-    return correspondents.map(({ _source: source }) => ({
+    return contacts.map(({ _source: source }) => ({
       ...source,
     }));
   }
