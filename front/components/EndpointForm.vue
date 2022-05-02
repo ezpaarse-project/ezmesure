@@ -88,6 +88,10 @@
             :label="$t('endpoints.isSushiCompliant')"
             hide-details
           />
+          <v-checkbox
+            v-model="endpointForm.ignoreReportValidation"
+            :label="$t('endpoints.ignoreReportValidation')"
+          />
         </v-form>
       </v-card-text>
 
@@ -202,6 +206,7 @@ export default {
         requireRequestorId: false,
         requireApiKey: false,
         isSushiCompliant: false,
+        ignoreReportValidation: false,
       },
 
       counterVersionRules: [
@@ -244,6 +249,7 @@ export default {
       this.endpointForm.requireRequestorId = !!data.requireRequestorId;
       this.endpointForm.requireApiKey = !!data.requireApiKey;
       this.endpointForm.isSushiCompliant = !!data.isSushiCompliant;
+      this.endpointForm.ignoreReportValidation = !!data.ignoreReportValidation;
 
       this.formTitle = this.endpointForm.vendor;
       this.show = true;

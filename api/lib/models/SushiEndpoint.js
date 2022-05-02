@@ -18,6 +18,8 @@ const schemas = {
     technicalProvider: Joi.string().trim().allow(''),
     counterVersion: Joi.string().trim().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/).empty(''),
 
+    ignoreReportValidation: Joi.boolean(),
+
     requireCustomerId: Joi.boolean().default(false),
     requireRequestorId: Joi.boolean().default(false),
     requireApiKey: Joi.boolean().default(false),

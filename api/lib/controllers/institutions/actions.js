@@ -7,13 +7,23 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
-const { appLogger } = require('../../services/logger');
 const { sendMail, generateMail } = require('../../services/mail');
+const { appLogger } = require('../../services/logger');
 
 const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supportRecipients');
+const supportRecipients = config.get('notifications.supportRecipients');
 
 const depositorsIndex = config.depositors.index;
+
+function sendValidateInstitution(receivers, data) {
+  return sendMail({
+    from: sender,
+    to: receivers,
+    cc: supportRecipients,
+    subject: 'Votre établissement a été validé',
+    ...generateMail('validate-institution', data),
+  });
+}
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -31,15 +41,15 @@ const ensureIndex = async () => {
   }
 };
 
-function sendNewContact(reciver) {
+function sendNewContact(receiver) {
   const data = {
     contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
   };
 
   return sendMail({
     from: sender,
-    to: reciver,
-    cc: supports,
+    to: receiver,
+    cc: supportRecipients,
     subject: 'Vous êtes correspondant de votre établissement',
     ...generateMail('new-contact', { data }),
   });
@@ -123,6 +133,8 @@ exports.updateInstitution = async (ctx) => {
   const { user, institution } = ctx.state;
   const { body } = ctx.request;
 
+  const origin = ctx.get('origin');
+
   ctx.metadata = {
     institutionId: institution.id,
     institutionName: institution.get('name'),
@@ -132,6 +144,8 @@ exports.updateInstitution = async (ctx) => {
     ctx.throw(400, ctx.$t('errors.emptyBody'));
     return;
   }
+
+  const wasValidated = institution.get('validated');
 
   institution.update(body, {
     schema: isAdmin(user) ? 'adminUpdate' : 'update',
@@ -147,6 +161,22 @@ exports.updateInstitution = async (ctx) => {
     await institution.save();
   } catch (e) {
     throw new Error(e);
+  }
+
+  if (!wasValidated && body.validated === true) {
+    let contacts = await institution.getContacts();
+    contacts = contacts?.map?.((e) => e.email);
+
+    if (Array.isArray(contacts) && contacts.length > 0) {
+      try {
+        await sendValidateInstitution(contacts, {
+          manageMemberLink: `${origin}/institutions/self/members`,
+          manageSushiLink: `${origin}/institutions/self/sushi`,
+        });
+      } catch (err) {
+        appLogger.error(`Failed to send validate institution mail: ${err}`);
+      }
+    }
   }
 
   ctx.status = 200;
@@ -169,6 +199,15 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const members = await ctx.state.institution.getMembers();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = Array.isArray(members) ? members : [];
+};
+
+exports.getInstitutionContacts = async (ctx) => {
+  const members = await ctx.state.institution.getContacts();
 
   ctx.type = 'json';
   ctx.status = 200;
@@ -203,18 +242,6 @@ exports.addInstitutionMember = async (ctx) => {
 
   const member = await elastic.security.findUser({ username });
 
-  const { roles } = member;
-
-  if (!roles.includes('doc_contact') && !roles.includes('tech_contact')) {
-    if (docContact && techContact) {
-      try {
-        sendNewContact(member.email, '');
-      } catch (err) {
-        appLogger.error(`Failed to send mail: ${err}`);
-      }
-    }
-  }
-
   if (!member) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
@@ -223,6 +250,8 @@ exports.addInstitutionMember = async (ctx) => {
   if (institution.isContact(member) && !userIsAdmin) {
     ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
   }
+
+  const wasContact = institution.isContact(member);
 
   // If the user is not already a member, check if it belongs to another institution
   if (!institution.isMember(member) && !institution.isCreator(member)) {
@@ -260,6 +289,14 @@ exports.addInstitutionMember = async (ctx) => {
   if (institution.isCreator(member)) {
     institution.setCreator(null);
     await institution.save();
+  }
+
+  if (!wasContact && institution.isContact(member)) {
+    try {
+      await sendNewContact(member.email);
+    } catch (err) {
+      appLogger.error(`Failed to send new contact mail: ${err}`);
+    }
   }
 
   ctx.status = 200;

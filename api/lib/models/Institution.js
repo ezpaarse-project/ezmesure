@@ -275,6 +275,36 @@ class Institution extends typedModel({ type, schemas }) {
     });
   }
 
+  async getContacts() {
+    const role = await this.getRole();
+    if (!role) return [];
+
+    const { body = {} } = await elastic.search({
+      index: '.security',
+      body: {
+        query: {
+          bool: {
+            filter: [
+              { term: { type: 'user' } },
+              { terms: { roles: [role, addReadOnlySuffix(role)] } },
+              { terms: { roles: ['doc_contact', 'tech_contact'] } },
+            ],
+          },
+        },
+      },
+    });
+
+    let contacts = body.hits && body.hits.hits;
+
+    if (!Array.isArray(contacts)) {
+      contacts = [];
+    }
+
+    return contacts.map(({ _source: source }) => ({
+      ...source,
+    }));
+  }
+
   /**
    * Get the institution space
    */
@@ -511,7 +541,6 @@ class Institution extends typedModel({ type, schemas }) {
 
     return false;
   }
-
 
   /**
    * Refresh contact names by looking for members with either of doc or tech role

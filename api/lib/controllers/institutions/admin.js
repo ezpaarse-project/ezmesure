@@ -1,4 +1,22 @@
+const config = require('config');
 const kibana = require('../../services/kibana');
+
+const { sendMail, generateMail } = require('../../services/mail');
+
+const sender = config.get('notifications.sender');
+const supportRecipients = config.get('notifications.supportRecipients');
+
+const { appLogger } = require('../../services/logger');
+
+function sendValidateInstitution(receivers) {
+  return sendMail({
+    from: sender,
+    to: receivers,
+    cc: supportRecipients,
+    subject: 'Votre établissement a été validé',
+    ...generateMail('validated-institution'),
+  });
+}
 
 exports.getInstitutionState = async (ctx) => {
   const { institution } = ctx.state;
@@ -26,8 +44,23 @@ exports.validateInstitution = async (ctx) => {
   const { value: validated } = body;
   const { institution } = ctx.state;
 
+  const wasValidated = institution.get('validated');
+
   institution.setValidation(validated);
   await institution.save();
+
+  if (!wasValidated && validated === true) {
+    let contacts = await institution.getContacts();
+    contacts = contacts?.map?.((e) => e.email);
+
+    if (Array.isArray(contacts) && contacts.length > 0) {
+      try {
+        await sendValidateInstitution(contacts);
+      } catch (err) {
+        appLogger.error(`Failed to send validate institution mail: ${err}`);
+      }
+    }
+  }
 
   ctx.status = 200;
   ctx.body = institution;

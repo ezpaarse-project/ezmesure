@@ -17,7 +17,7 @@ const {
 const schema = {
   password: Joi.string().trim().min(6).required(),
   passwordRepeat: Joi.string().trim().min(6).equal(Joi.ref('password')).required(),
-}
+};
 
 router.route({
   method: 'POST',

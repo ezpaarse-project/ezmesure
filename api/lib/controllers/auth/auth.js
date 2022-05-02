@@ -56,7 +56,7 @@ function sendPasswordRecovery(user, data) {
   });
 }
 
-function sendToNewAccount(receivers, data) {
+function sendNewUserToContacts(receivers, data) {
   return sendMail({
     from: sender,
     to: receivers,
@@ -221,7 +221,7 @@ exports.acceptTerms = async (ctx) => {
     const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
 
     try {
-      await sendToNewAccount(emails, {
+      await sendNewUserToContacts(emails, {
         manageMemberLink: `${origin}/institutions/self/members`,
         newUser: user.username,
       });

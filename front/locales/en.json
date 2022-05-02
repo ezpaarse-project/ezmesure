@@ -124,6 +124,7 @@
     "requireRequestorId": "Requestor ID is required",
     "requireApiKey": "An API key is required",
     "isSushiCompliant": "The endpoint is SUSHI compliant",
+    "ignoreReportValidation": "Ignore report validation",
     "description": "Description",
     "queryParameters": "Query parameters",
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
@@ -264,8 +265,7 @@
       "connectionSuccessful": "Successful connection",
       "connectionFailed": "Connection failed",
       "connectionUntested": "Connection untested",
-      "testedOn": "Tested on {date}",
-      "ignoreReportValidation": "Ignore report validation"
+      "testedOn": "Tested on {date}"
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",

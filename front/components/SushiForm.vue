@@ -130,10 +130,7 @@
             {{ $t('advancedSettings') }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-checkbox
-              v-model="sushiForm.ignoreReportValidation"
-              :label="$t('institutions.sushi.ignoreReportValidation')"
-            />
+
 
             <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
 
@@ -230,7 +227,6 @@ export default {
         comment: '',
         id: null,
         params: [],
-        ignoreReportValidation: false,
       },
     };
   },
@@ -265,7 +261,6 @@ export default {
       this.sushiForm.comment = sushiData.comment || '';
       this.sushiForm.params = sushiData.params;
       this.sushiForm.id = sushiData.id;
-      this.sushiForm.ignoreReportValidation = !!sushiData.ignoreReportValidation;
 
       if (!Array.isArray(this.sushiForm.params)) {
         this.sushiForm.params = [];
