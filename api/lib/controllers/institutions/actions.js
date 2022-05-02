@@ -7,7 +7,21 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
+const { sendMail, generateMail } = require('../../services/mail');
+const { appLogger } = require('../../services/logger');
+
+const sender = config.get('notifications.sender');
+
 const depositorsIndex = config.depositors.index;
+
+function sendValidateInstitution(receivers, data) {
+  return sendMail({
+    from: sender,
+    to: receivers,
+    subject: 'Votre établissement a été validé',
+    ...generateMail('validate-institution', data),
+  });
+}
 
 const isAdmin = (user) => {
   const roles = new Set((user && user.roles) || []);
@@ -103,6 +117,8 @@ exports.updateInstitution = async (ctx) => {
   const { user, institution } = ctx.state;
   const { body } = ctx.request;
 
+  const origin = ctx.get('origin');
+
   ctx.metadata = {
     institutionId: institution.id,
     institutionName: institution.get('name'),
@@ -112,6 +128,8 @@ exports.updateInstitution = async (ctx) => {
     ctx.throw(400, ctx.$t('errors.emptyBody'));
     return;
   }
+
+  const wasValidated = institution.get('validated');
 
   institution.update(body, {
     schema: isAdmin(user) ? 'adminUpdate' : 'update',
@@ -127,6 +145,22 @@ exports.updateInstitution = async (ctx) => {
     await institution.save();
   } catch (e) {
     throw new Error(e);
+  }
+
+  if (!wasValidated && body.validated === true) {
+    let contacts = await institution.getContacts();
+    contacts = contacts?.map?.((e) => e.email);
+
+    if (Array.isArray(contacts) && contacts.length > 0) {
+      try {
+        await sendValidateInstitution(contacts, {
+          manageMemberLink: `${origin}/institutions/self/members`,
+          manageSushiLink: `${origin}/institutions/self/sushi`,
+        });
+      } catch (err) {
+        appLogger.error(`Failed to send validate institution mail: ${err}`);
+      }
+    }
   }
 
   ctx.status = 200;
@@ -149,6 +183,15 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const members = await ctx.state.institution.getMembers();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = Array.isArray(members) ? members : [];
+};
+
+exports.getInstitutionContacts = async (ctx) => {
+  const members = await ctx.state.institution.getContacts();
 
   ctx.type = 'json';
   ctx.status = 200;
