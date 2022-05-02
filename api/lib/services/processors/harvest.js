@@ -247,6 +247,7 @@ async function importSushiReport(options = {}) {
     updated: 0,
     failed: 0,
     errors: [],
+    coveredPeriods: [],
   };
 
   const coveredPeriods = new Set();
