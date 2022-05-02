@@ -7,6 +7,12 @@ const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
+const { appLogger } = require('../../services/logger');
+const { sendMail, generateMail } = require('../../services/mail');
+
+const sender = config.get('notifications.sender');
+const supports = config.get('notifications.supportRecipients');
+
 const depositorsIndex = config.depositors.index;
 
 const isAdmin = (user) => {
@@ -24,6 +30,20 @@ const ensureIndex = async () => {
     });
   }
 };
+
+function sendNewContact(reciver) {
+  const data = {
+    contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
+  };
+
+  return sendMail({
+    from: sender,
+    to: reciver,
+    cc: supports,
+    subject: 'Vous êtes correspondant de votre établissement',
+    ...generateMail('new-contact', { data }),
+  });
+}
 
 exports.getInstitutions = async (ctx) => {
   await ensureIndex();
@@ -182,6 +202,18 @@ exports.addInstitutionMember = async (ctx) => {
   }
 
   const member = await elastic.security.findUser({ username });
+
+  const { roles } = member;
+
+  if (!roles.includes('doc_contact') && !roles.includes('tech_contact')) {
+    if (docContact && techContact) {
+      try {
+        sendNewContact(member.email, '');
+      } catch (err) {
+        appLogger.error(`Failed to send mail: ${err}`);
+      }
+    }
+  }
 
   if (!member) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
