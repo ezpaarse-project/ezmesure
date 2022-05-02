@@ -22,7 +22,7 @@ const {
   getSushiData,
   refreshInstitutions,
   refreshInstitution,
-  getInstitutionCorrespondents,
+  getInstitutionContacts,
 } = require('./actions');
 
 const {
@@ -96,7 +96,7 @@ router.route({
   handler: [
     fetchInstitution(),
     requireContact(),
-    getInstitutionCorrespondents,
+    getInstitutionContacts,
   ],
   validate: {
     params: {

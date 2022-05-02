@@ -190,7 +190,7 @@ exports.getInstitutionMembers = async (ctx) => {
   ctx.body = Array.isArray(members) ? members : [];
 };
 
-exports.getInstitutionCorrespondents = async (ctx) => {
+exports.getInstitutionContacts = async (ctx) => {
   const members = await ctx.state.institution.getContacts();
 
   ctx.type = 'json';
