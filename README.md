@@ -36,7 +36,7 @@ Create an environment file named `ezmesure.local.env.sh` and export the followin
 | EZMESURE_SMTP_HOST | host of the SMTP server |
 | EZMESURE_NOTIFICATIONS_SENDER | the sender for emails issued by ezMESURE |
 | EZMESURE_NOTIFICATIONS_RECIPIENTS | recipients of the recent activity email |
-| EZMESURE_NOTIFICATIONS_SUPPORTS | recipients of the recent activity email |
+| EZMESURE_NOTIFICATIONS_SUPPORT_RECIPIENTS | recipients of the recent activity email |
 | EZMESURE_NOTIFICATIONS_CRON | cron for recent activity (defaults to daily midnight) |
 | REPORTING_SENDER | the sender for reporting emails |
 
