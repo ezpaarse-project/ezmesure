@@ -45,7 +45,7 @@ async function importSushiReport(options = {}) {
     endDate,
   };
 
-  let ignoreReportValidation = sushi.get('ignoreReportValidation');
+  let ignoreReportValidation = endpoint.get('ignoreReportValidation');
 
   if (typeof options.ignoreValidation === 'boolean') {
     ignoreReportValidation = options.ignoreValidation;

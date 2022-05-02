@@ -124,6 +124,7 @@
     "requireRequestorId": "un requestor ID est nécessaire",
     "requireApiKey": "Une clé d'API est nécessaire",
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
+    "ignoreReportValidation": "Ignorer la validation du rapport",
     "description": "Description",
     "queryParameters": "Paramètres de la query",
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
@@ -264,8 +265,7 @@
       "connectionSuccessful": "Connexion réussie",
       "connectionFailed": "Connexion échouée",
       "connectionUntested": "Connexion non testée",
-      "testedOn": "Testée le {date}",
-      "ignoreReportValidation": "Ignorer la validation du rapport"
+      "testedOn": "Testée le {date}"
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
