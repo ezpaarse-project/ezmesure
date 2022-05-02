@@ -31,7 +31,6 @@ module.exports = {
     port: 25,
     secure: false,
     ignoreTLS: false,
-    supportRecipients: ['ezcounter-support@exemple.fr'],
   },
   logs: {
     app: {
@@ -75,6 +74,7 @@ module.exports = {
     cron: '0 0 0 * * *',
     sendEmptyActivity: true,
     recipients: ['exemple@exemple.fr'],
+    supportRecipients: ['ezcounter-support@exemple.fr'],
   },
   depositors: {
     index: 'depositors',
