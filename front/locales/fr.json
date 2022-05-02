@@ -283,6 +283,7 @@
       "finished": "Terminé",
       "error": "Erreur",
       "cancelled": "Annulé",
+      "delayed": "Reporté",
       "exceptions": {
         "1000": "Service indisponible",
         "1010": "Service surchargé",

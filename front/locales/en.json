@@ -283,6 +283,7 @@
       "finished": "Finished",
       "error": "Error",
       "cancelled": "Cancelled",
+      "delayed": "Delayed",
       "exceptions": {
         "1000": "Service not available",
         "1010": "Service busy",
