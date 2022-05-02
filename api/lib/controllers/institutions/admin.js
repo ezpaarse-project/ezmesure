@@ -42,21 +42,23 @@ exports.validateInstitution = async (ctx) => {
   const { value: validated } = body;
   const { institution } = ctx.state;
 
-  let correspondents = await institution.getContacts();
-  correspondents = correspondents.map((e) => e.email);
+  const wasValidated = institution.get('validated');
 
-  if (correspondents.length > 0) {
-    if (!institution.get('validated') && validated === true) {
+  institution.setValidation(validated);
+  await institution.save();
+
+  if (!wasValidated && validated === true) {
+    let contacts = await institution.getContacts();
+    contacts = contacts?.map?.((e) => e.email);
+
+    if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(correspondents);
+        await sendValidateInstitution(contacts);
       } catch (err) {
         appLogger.error(`Failed to send validate institution mail: ${err}`);
       }
     }
   }
-
-  institution.setValidation(validated);
-  await institution.save();
 
   ctx.status = 200;
   ctx.body = institution;
