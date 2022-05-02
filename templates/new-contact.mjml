@@ -1,0 +1,28 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Vous êtes désormais correspondant·e de votre établissement</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Vous êtes désormais correspondant·e de votre établissement</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      Vous trouverez toutes les informations sur ce rôle dans le billet <a target="_blank" href="{{ contactBlogLink }}"> {{ data.contactBlogLink }} </a>
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}
