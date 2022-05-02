@@ -195,6 +195,10 @@ class Task extends typedModel({ type, schemas }) {
     this.set('status', 'cancelled');
   }
 
+  delay() {
+    this.set('status', 'delayed');
+  }
+
   done() {
     this.data.status = 'finished';
     this.updateRunningTime();
@@ -207,6 +211,10 @@ class Task extends typedModel({ type, schemas }) {
 
   isDone() {
     return ['finished', 'error', 'cancelled'].includes(this.get('status'));
+  }
+
+  isDelayed() {
+    return this.get('status') === 'delayed';
   }
 
   updateRunningTime() {
