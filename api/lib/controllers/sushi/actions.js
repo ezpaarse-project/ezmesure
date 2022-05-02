@@ -206,6 +206,7 @@ exports.downloadReport = async (ctx) => {
   const sushiData = {
     endpoint,
     sushi,
+    institution,
     beginDate,
     endDate,
   };

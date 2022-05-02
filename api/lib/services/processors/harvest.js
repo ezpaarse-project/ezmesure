@@ -12,6 +12,7 @@ const elastic = require('../elastic');
 
 const SushiEndpoint = require('../../models/SushiEndpoint');
 const Sushi = require('../../models/Sushi');
+const Institution = require('../../models/Institution');
 const Task = require('../../models/Task');
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
@@ -25,6 +26,7 @@ class HarvestError extends Error {
 
 async function importSushiReport(options = {}) {
   const {
+    institution,
     endpoint,
     sushi,
     task,
@@ -41,6 +43,7 @@ async function importSushiReport(options = {}) {
     reportType,
     sushi,
     endpoint,
+    institution,
     beginDate,
     endDate,
   };
@@ -539,6 +542,18 @@ async function processJob(job) {
     throw new HarvestError(`SUSHI item [${sushiId}] not found`);
   }
 
+  const institutionId = sushi.get('institutionId');
+
+  if (!institutionId) {
+    throw new HarvestError(`SUSHI item [${sushiId}] has no institution ID`);
+  }
+
+  const institution = await Institution.findById(institutionId);
+
+  if (!institution) {
+    throw new HarvestError(`Institution [${institutionId}] not found`);
+  }
+
   const endpointId = sushi.get('endpointId');
   appLogger.verbose(`[Harvest Job #${job?.id}] Fetching endpoint [${endpointId}]`);
 
@@ -565,6 +580,7 @@ async function processJob(job) {
       ...taskParams,
       sushi,
       endpoint,
+      institution,
       task,
     });
   } catch (err) {
