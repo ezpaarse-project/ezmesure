@@ -148,12 +148,12 @@ exports.updateInstitution = async (ctx) => {
   }
 
   if (!wasValidated && body.validated === true) {
-    let correspondents = await institution.getContacts();
-    correspondents = correspondents?.map?.((e) => e.email);
+    let contacts = await institution.getContacts();
+    contacts = contacts?.map?.((e) => e.email);
 
-    if (Array.isArray(correspondents) && correspondents.length > 0) {
+    if (Array.isArray(contacts) && contacts.length > 0) {
       try {
-        await sendValidateInstitution(correspondents, {
+        await sendValidateInstitution(contacts, {
           manageMemberLink: `${origin}/institutions/self/members`,
           manageSushiLink: `${origin}/institutions/self/sushi`,
         });
