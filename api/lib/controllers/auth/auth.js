@@ -222,7 +222,7 @@ exports.acceptTerms = async (ctx) => {
 
     try {
       await sendNewUserToContacts(emails, {
-        manageMembersLink: `${origin}/institutions/self/members`,
+        manageMemberLink: `${origin}/institutions/self/members`,
         newUser: user.username,
       });
     } catch (err) {

@@ -15,7 +15,7 @@
 
 
     <mj-text>
-      Vous pouvez à présent <a target="_blank" href="{{ manageMembersLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir les identifiants SUSHI</a>
+      Vous pouvez à présent <a target="_blank" href="{{ manageMemberLink }}">gérer les membres</a> de votre établissement et <a target="_blank" href="{{ manageSushiLink }}">saisir les identifiants SUSHI</a>
     </mj-text>
 
     <mj-text>

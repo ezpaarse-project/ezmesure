@@ -154,7 +154,7 @@ exports.updateInstitution = async (ctx) => {
     if (!wasValidated && body.validated === true) {
       try {
         await sendValidateInstitution(correspondents, {
-          manageMembersLink: `${origin}/institutions/self/members`,
+          manageMemberLink: `${origin}/institutions/self/members`,
           manageSushiLink: `${origin}/institutions/self/sushi`,
         });
       } catch (err) {
