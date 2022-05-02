@@ -1,6 +1,8 @@
-Votre établissement a été validé
-Votre établissement a été validé
-Vous pouvez à présent gérer les membres de votre établissement et saisir les identifiants SUSHI
+Bonjour,
+
+Nous vous informons que l'établissement auquel vous êtes rattachés a été validé.
+
+En tant que correspondant, vous pouvez à présent gérer les membres de votre établissement et saisir vos identifiants SUSHI.
 
 Cordialement,
 L'équipe ezMESURE.
