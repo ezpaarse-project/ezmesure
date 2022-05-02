@@ -147,11 +147,11 @@ exports.updateInstitution = async (ctx) => {
     throw new Error(e);
   }
 
-  let correspondents = await institution.getContacts();
-  correspondents = correspondents.map((e) => e.email);
+  if (!wasValidated && body.validated === true) {
+    let correspondents = await institution.getContacts();
+    correspondents = correspondents?.map?.((e) => e.email);
 
-  if (correspondents.length > 0) {
-    if (!wasValidated && body.validated === true) {
+    if (correspondents.length > 0) {
       try {
         await sendValidateInstitution(correspondents, {
           manageMemberLink: `${origin}/institutions/self/members`,
