@@ -286,7 +286,7 @@ class Institution extends typedModel({ type, schemas }) {
           bool: {
             filter: [
               { term: { type: 'user' } },
-              { term: { roles: role } },
+              { terms: { roles: [role, addReadOnlySuffix(role)] } },
               { terms: { roles: ['doc_contact', 'tech_contact'] } },
             ],
           },
