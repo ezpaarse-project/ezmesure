@@ -2159,6 +2159,109 @@
         "operationId": "refreshInstitutions"
       }
     },
+    "/institutions/{id}/creator": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "delete": {
+        "summary": "Delete institution creator",
+        "operationId": "delete-institutions-id-creator",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Institutions",
+          "Administration"
+        ],
+        "description": "Remove the institution creator",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/institutions/{id}/validated": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Change validation state of an institution",
+        "operationId": "put-institutions-id-validated",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Change validation state of an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ]
+      }
+    },
     "/institutions/{id}": {
       "parameters": [
         {
@@ -2269,109 +2372,6 @@
           {
             "bearerAuth": []
           }
-        ]
-      }
-    },
-    "/institutions/{id}/creator": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "delete": {
-        "summary": "Delete institution creator",
-        "operationId": "delete-institutions-id-creator",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Institution"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "tags": [
-          "Institutions",
-          "Administration"
-        ],
-        "description": "Remove the institution creator",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/institutions/{id}/validated": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "put": {
-        "summary": "Change validation state of an institution",
-        "operationId": "put-institutions-id-validated",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "description": "Change validation state of an institution",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "value": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "value"
-                ]
-              }
-            }
-          }
-        },
-        "tags": [
-          "Institutions"
         ]
       }
     },
@@ -2535,6 +2535,57 @@
           "description": "ID of the institution"
         }
       ]
+    },
+    "/institutions/${id}/contacts": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [
+          "Administration"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-institutions-$-id-contacts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Get contact of institutions"
+      }
     },
     "/institutions/{id}/members/{username}": {
       "parameters": [
