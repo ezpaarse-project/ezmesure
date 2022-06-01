@@ -131,6 +131,7 @@ router.route({
     fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),
     requireContact(),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.request?.body?.endpointId }),
     addSushi,
   ],
   validate: {
