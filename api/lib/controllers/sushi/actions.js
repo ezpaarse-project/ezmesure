@@ -62,15 +62,20 @@ exports.getTasks = async (ctx) => {
 exports.addSushi = async (ctx) => {
   ctx.action = 'sushi/create';
   const { body } = ctx.request;
-  const { institution } = ctx.state;
+  const { institution, endpoint } = ctx.state;
+
+  const sushiData = {
+    ...body,
+    vendor: body.vendor || endpoint.get('vendor'),
+  };
 
   ctx.metadata = {
-    vendor: body.vendor,
+    vendor: sushiData.vendor,
     institutionId: institution.getId(),
     institutionName: institution.get('name'),
   };
 
-  const sushiItem = new Sushi(body);
+  const sushiItem = new Sushi(sushiData);
   await sushiItem.save();
 
   ctx.metadata.sushiId = sushiItem.getId();
