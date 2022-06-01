@@ -647,16 +647,20 @@
             "description": "Vendor name"
           },
           "requestorId": {
-            "type": "string"
+            "type": "string",
+            "description": "Requestor ID"
           },
           "customerId": {
-            "type": "string"
+            "type": "string",
+            "description": "Customer ID"
           },
           "apiKey": {
-            "type": "string"
+            "type": "string",
+            "description": "API key"
           },
           "comment": {
-            "type": "string"
+            "type": "string",
+            "description": "Arbitrary comment"
           },
           "package": {
             "type": "string",
@@ -667,6 +671,12 @@
             "example": "f438c3f0-152b-11eb-8113-ff14fcf1fe5b",
             "format": "uuid",
             "description": "ID of the institution that owns the sushi item"
+          },
+          "endpointId": {
+            "type": "string",
+            "example": "f438c3f0-152b-11eb-8113-ff14fcf1fe5b",
+            "format": "uuid",
+            "description": "ID of the associated SUSHI endpoint"
           },
           "updatedAt": {
             "type": "string",
@@ -681,14 +691,52 @@
             "example": "2020-11-05T17:07:31.967Z",
             "description": "Creation date of the sushi item",
             "readOnly": true
+          },
+          "connection": {
+            "type": "object",
+            "description": "State of the latest connection test",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "description": "Whether the latest connection test succeeded"
+              },
+              "date": {
+                "type": "string",
+                "format": "date",
+                "description": "Date of the latest connection test"
+              },
+              "exceptions": {
+                "type": "array",
+                "description": "Exceptions that was thrown by the latest connection test",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "params": {
+            "type": "object",
+            "description": "Parameters that should be added in the query string",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the query parameter"
+              },
+              "value": {
+                "type": "string",
+                "description": "Value of the query parameter"
+              }
+            },
+            "required": [
+              "name"
+            ]
           }
         },
         "required": [
           "id",
-          "vendor",
-          "sushiUrl",
           "package",
           "institutionId",
+          "endpointId",
           "updatedAt",
           "createdAt"
         ]

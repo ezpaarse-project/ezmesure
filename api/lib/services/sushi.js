@@ -171,8 +171,22 @@ function getReportFilename(options) {
 }
 
 function getReportPath(options) {
-  const { sushi } = options;
-  return path.resolve(storageDir, sushi.getId(), getReportFilename(options));
+  const {
+    sushi,
+    endpoint,
+    institution,
+    reportType = DEFAULT_REPORT_TYPE,
+  } = options;
+  const indexPrefix = institution.get('indexPrefix');
+
+  return path.resolve(
+    storageDir,
+    indexPrefix || 'no_prefix',
+    endpoint.getId(),
+    sushi.getId(),
+    reportType,
+    getReportFilename(options),
+  );
 }
 
 function getReportTmpPath(options) {
