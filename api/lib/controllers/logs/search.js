@@ -1,7 +1,6 @@
-
 const elastic = require('../../services/elastic');
 
-module.exports = async function (ctx) {
+module.exports = async (ctx) => {
   const { index } = ctx.request.params;
   ctx.action = 'indices/search';
   ctx.type = 'json';

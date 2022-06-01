@@ -1,29 +1,7 @@
 const ezmesure = require('./ezmesure');
+const login = require('./login');
 
-const login = async (username, password) => {
-  let res;
-
-  try {
-    res = await ezmesure({
-      method: 'POST',
-      url: '/login/local',
-      data: {
-        username,
-        password,
-      },
-    });
-  } catch (err) {
-    console.error(err?.response?.data);
-    return;
-  }
-
-  let token = res?.headers['set-cookie'][0];
-  const match = /^eztoken=([a-zA-Z0-9_.-]+);/i.exec(token);
-  [, token] = match;
-  return token;
-};
-
-const createUser = async (username, password) => {
+const createUser = async (username, password, roles) => {
   let res;
 
   const token = await login('ezmesure-admin', 'changeme');
@@ -40,9 +18,9 @@ const createUser = async (username, password) => {
         enabled: true,
         email: 'user@test.fr',
         full_name: 'User test',
-        metadata: {},
+        metadata: { acceptedTerms: true },
         password,
-        roles: [],
+        roles,
       },
     });
   } catch (err) {

@@ -46,7 +46,8 @@
   },
   "admin": {
     "username": "EZMESURE_ADMIN_USERNAME",
-    "password": "EZMESURE_ADMIN_PASSWORD"
+    "password": "EZMESURE_ADMIN_PASSWORD",
+    "email": "EZMESURE_ADMIN_EMAIL"
   },
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"

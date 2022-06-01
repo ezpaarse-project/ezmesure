@@ -89,7 +89,7 @@ exports.deleteEvents = async function (ctx) {
 /**
  * Return aggregated metrics for a given index pattern
  */
-exports.tops = async function (ctx) {
+exports.tops = async (ctx) => {
   const { index } = ctx.request.params;
   ctx.action = 'indices/tops';
   ctx.type = 'json';

@@ -173,7 +173,7 @@ ezmesure/front npm i
 You should source ``ezmesure.env.sh`` for the following and before each start.
 
 ```bash
-souce ezmesure.env.sh
+source ezmesure.env.sh
 ```
 ### 3. Install SSL certificates
 
@@ -197,6 +197,8 @@ Adding new instance
 Instance added to ./tools/../certs/instances.yml
 Add another instance (Y/n) ? n
 ```
+
+// TODO Add elastic in dns
 
 Once the file is created, you can generate the certificates.
 
@@ -233,8 +235,6 @@ Before launching ezmesure, you must create the elastic container, for that you m
 
 ```bash
 docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
-
-sudo chmod 777 ./data/elastic/data
 ```
 ### 7. Start
 
