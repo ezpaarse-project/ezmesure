@@ -136,6 +136,13 @@ export default {
           value: 'runningTime',
         },
         {
+          text: this.$t('type'),
+          value: 'params.reportType',
+          align: 'right',
+          width: '80px',
+          cellClass: 'text-uppercase',
+        },
+        {
           align: 'left',
           text: this.$t('status'),
           value: 'status',
