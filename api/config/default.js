@@ -60,6 +60,7 @@ module.exports = {
   admin: {
     username: 'ezmesure-admin',
     password: 'changeme',
+    email: 'admin@admin.com',
   },
   storage: {
     path: path.resolve(__dirname, '../storage'),

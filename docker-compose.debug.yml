@@ -46,6 +46,7 @@ services:
       - KIBANA_PASSWORD
       - EZMESURE_ADMIN_USERNAME
       - EZMESURE_ADMIN_PASSWORD
+      - EZMESURE_ADMIN_EMAIL
       - EZMESURE_AUTH_SECRET
       - EZMESURE_SMTP_HOST=maildev
       - EZMESURE_SMTP_PORT=25
@@ -78,43 +79,43 @@ services:
     command: npm run dev
     restart: "no"
 
-  reporting:
-    build:
-      context: ./reporting
-      args:
-        - http_proxy
-        - https_proxy
-    ports:
-      - 4000:3000
-    volumes:
-      - "./reporting/logs:/usr/src/app/logs"
-      - "./reporting/tmp:/usr/src/app/tmp"
-      - "./reporting:/usr/src/app"
-      - "./templates:/usr/src/app/templates"
-    working_dir: /usr/src/app
-    environment:
-      - NODE_ENV=development
-      - http_proxy
-      - https_proxy
-      - no_proxy=localhost,rp
-      - REPORTING_PORT=3000
-      - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
-      - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
-      - REPORTING_SMTP_HOST=maildev
-      - REPORTING_SMTP_PORT=25
-      - REPORTING_SMTP_SECURE=false
-      - REPORTING_SMTP_IGNORE_TLS=true
-      - REPORTING_SMTP_REJECT_UNAUTHORIZED
-      - REPORTING_SENDER
-      - REPORTING_INDEX=.ezreporting
-      - REPORTING_FREQUENCIES
-      - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
-      - KIBANA_EXTERNAL_URL
-      - NODE_CONFIG
-      - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
-      - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-    restart: "no"
-    command: npm run dev
+  # reporting:
+  #   build:
+  #     context: ./reporting
+  #     args:
+  #       - http_proxy
+  #       - https_proxy
+  #   ports:
+  #     - 4000:3000
+  #   volumes:
+  #     - "./reporting/logs:/usr/src/app/logs"
+  #     - "./reporting/tmp:/usr/src/app/tmp"
+  #     - "./reporting:/usr/src/app"
+  #     - "./templates:/usr/src/app/templates"
+  #   working_dir: /usr/src/app
+  #   environment:
+  #     - NODE_ENV=development
+  #     - http_proxy
+  #     - https_proxy
+  #     - no_proxy=localhost,rp
+  #     - REPORTING_PORT=3000
+  #     - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+  #     - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
+  #     - REPORTING_SMTP_HOST=maildev
+  #     - REPORTING_SMTP_PORT=25
+  #     - REPORTING_SMTP_SECURE=false
+  #     - REPORTING_SMTP_IGNORE_TLS=true
+  #     - REPORTING_SMTP_REJECT_UNAUTHORIZED
+  #     - REPORTING_SENDER
+  #     - REPORTING_INDEX=.ezreporting
+  #     - REPORTING_FREQUENCIES
+  #     - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
+  #     - KIBANA_EXTERNAL_URL
+  #     - NODE_CONFIG
+  #     - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
+  #     - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+  #   restart: "no"
+  #   command: npm run dev
 
   maildev:
     image: djfarrelly/maildev

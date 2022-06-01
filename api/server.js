@@ -203,6 +203,7 @@ async function waitForElasticsearch() {
 async function createAdmin() {
   const username = config.get('admin.username');
   const password = config.get('admin.password');
+  const email = config.get('admin.email');
 
   if (!username || !password) { return; }
 
@@ -214,6 +215,7 @@ async function createAdmin() {
       refresh: true,
       body: {
         password,
+        email,
         full_name: 'ezMESURE Administrator',
         roles: ['superuser'],
         metadata: {
