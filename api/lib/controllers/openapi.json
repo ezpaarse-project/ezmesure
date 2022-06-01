@@ -695,6 +695,7 @@
           "connection": {
             "type": "object",
             "description": "State of the latest connection test",
+            "readOnly": true,
             "properties": {
               "success": {
                 "type": "boolean",
