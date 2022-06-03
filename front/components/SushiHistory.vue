@@ -28,7 +28,7 @@
         single-expand
         sort-by="createdAt"
         sort-desc
-        :items-per-page="5"
+        :items-per-page="10"
         :expanded="expandedRows"
         @update:expanded="onExpandedChange"
       >
