@@ -1,4 +1,4 @@
-FROM node:14.17.1-alpine3.13
+FROM node:16.15.0-alpine3.14
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
 
 # Installs latest Chromium (89) package.
