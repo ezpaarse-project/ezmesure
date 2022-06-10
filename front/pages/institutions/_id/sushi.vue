@@ -172,6 +172,89 @@
           <v-toolbar-title>
             {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
           </v-toolbar-title>
+
+          <v-spacer />
+
+          <v-menu
+            v-model="showSushiReadyPopup"
+            :close-on-content-click="false"
+            bottom
+            left
+            transition="scale-transition"
+            origin="top right"
+          >
+            <template v-slot:activator="{ on }">
+              <v-chip
+                outlined
+                label
+                :color="sushiReady ? 'success' : 'secondary'"
+                v-on="on"
+              >
+                <v-progress-circular
+                  v-if="loadingSushiReady"
+                  indeterminate
+                  size="16"
+                  width="2"
+                />
+                <template v-else>
+                  <v-icon v-if="sushiReady" left>
+                    mdi-checkbox-marked-circle-outline
+                  </v-icon>
+                  {{
+                    sushiReady
+                      ? $t('institutions.sushi.entryCompletedOn', { date: sushiReadySince })
+                      : $t('institutions.sushi.entryInProgress')
+                  }}
+                  <v-icon right>
+                    mdi-chevron-down
+                  </v-icon>
+                </template>
+              </v-chip>
+            </template>
+
+            <v-card width="500">
+              <v-card-title>
+                {{
+                  sushiReady
+                    ? $t('institutions.sushi.entryCompleted')
+                    : $t('institutions.sushi.entryInProgress')
+                }}
+              </v-card-title>
+
+              <v-card-text class="text-justify">
+                {{
+                  sushiReady
+                    ? $t('institutions.sushi.readyPopup.completed', { date: sushiReadySince })
+                    : $t('institutions.sushi.readyPopup.inProgress')
+                }}
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer />
+
+                <v-btn
+                  text
+                  @click="showSushiReadyPopup = false"
+                >
+                  {{ $t('close') }}
+                </v-btn>
+
+                <v-btn
+                  outlined
+                  color="primary"
+                  :loading="loadingSushiReady"
+                  @click="toggleSushiReady"
+                >
+                  <v-icon left>
+                    {{ sushiReady ? 'mdi-text-box-edit-outline' : 'mdi-text-box-check-outline' }}
+                  </v-icon>
+                  {{
+                    $t(`institutions.sushi.${sushiReady ? 'iResumeMyEntry' : 'iCompletedMyEntry'}`)
+                  }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-menu>
         </v-toolbar>
       </template>
 
@@ -319,6 +402,8 @@ export default {
       deleting: false,
       search: '',
       endpoints,
+      showSushiReadyPopup: false,
+      loadingSushiReady: false,
       loadingItems: {},
       locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
@@ -328,6 +413,20 @@ export default {
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
       return Array.isArray(messages) && messages.length >= 1;
+    },
+    sushiReady() {
+      return !!this.sushiReadySince;
+    },
+    sushiReadySince() {
+      if (!this.institution?.sushiReadySince) { return null; }
+
+      const localDate = new Date(this.institution?.sushiReadySince);
+
+      if (!this.$dateFunctions.isValid(localDate)) {
+        return null;
+      }
+
+      return this.$dateFunctions.format(localDate, 'P');
     },
     headers() {
       return [
@@ -483,6 +582,22 @@ export default {
       }
 
       this.refreshing = false;
+    },
+
+    async toggleSushiReady() {
+      this.loadingSushiReady = true;
+      this.showSushiReadyPopup = false;
+
+      const sushiReadySince = this.institution?.sushiReadySince ? null : new Date();
+
+      try {
+        const data = await this.$axios.$put(`/institutions/${this.institution.id}`, { sushiReadySince });
+        this.institution.sushiReadySince = data?.sushiReadySince;
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('errors.generic'));
+      }
+
+      this.loadingSushiReady = false;
     },
 
     clearSelection() {

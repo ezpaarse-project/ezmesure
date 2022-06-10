@@ -296,6 +296,12 @@
             "format": "date-time",
             "description": "Datetime of the institution creation"
           },
+          "sushiReadySince": {
+            "type": "string",
+            "format": "date",
+            "description": "Date since which SUSHI credentials are ready",
+            "nullable": true
+          },
           "auto": {
             "type": "object",
             "properties": {

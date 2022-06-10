@@ -46,6 +46,8 @@ const schemas = {
     youtubeUrl: Joi.string().allow(''),
     facebookUrl: Joi.string().allow(''),
 
+    sushiReadySince: Joi.date().allow(null),
+
     domains: Joi.array().default([]).items(Joi.string()),
     auto: Joi.object({
       ezmesure: Joi.boolean().default(false),

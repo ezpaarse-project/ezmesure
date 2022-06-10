@@ -265,7 +265,16 @@
       "connectionSuccessful": "Successful connection",
       "connectionFailed": "Connection failed",
       "connectionUntested": "Connection untested",
-      "testedOn": "Tested on {date}"
+      "testedOn": "Tested on {date}",
+      "entryCompleted": "Entry completed",
+      "entryCompletedOn": "Entry completed on {date}",
+      "entryInProgress": "Entry in progress",
+      "iResumeMyEntry": "I resume my entry",
+      "iCompletedMyEntry": "I completed my entry",
+      "readyPopup": {
+        "inProgress": "Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.",
+        "completed": "You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below."
+      }
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",

@@ -35,6 +35,7 @@ module.exports = {
           docContactName: { type: 'keyword' },
           indexPrefix: { type: 'keyword' },
           indexCount: { type: 'long' },
+          sushiReadySince: { type: 'date' },
           auto: {
             properties: {
               ezmesure: { type: 'boolean' },
