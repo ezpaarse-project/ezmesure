@@ -609,7 +609,7 @@ export default {
 
       try {
         const data = await this.$axios.$put(`/institutions/${this.institution.id}`, { sushiReadySince });
-        this.institution.sushiReadySince = data?.sushiReadySince;
+        this.$set(this.institution, 'sushiReadySince', data?.sushiReadySince);
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('errors.generic'));
       }
