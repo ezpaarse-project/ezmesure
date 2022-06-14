@@ -271,6 +271,8 @@
       "entryInProgress": "Saisie en cours",
       "iResumeMyEntry": "Je reprends ma saisie",
       "iCompletedMyEntry": "J'ai terminé ma saisie",
+      "resumeEntryQuestion": "Reprendre votre saisie ?",
+      "resumeEntryDesc": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Souhaitez-vous la reprendre ?",
       "readyPopup": {
         "inProgress": "Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.",
         "completed": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous."

@@ -92,7 +92,7 @@
     <SushiForm
       ref="sushiForm"
       :endpoints="endpoints"
-      @update="refreshSushiItems"
+      @update="onSushiUpdate"
     />
 
     <SushiHistory ref="sushiHistory" />
@@ -582,6 +582,23 @@ export default {
       }
 
       this.refreshing = false;
+    },
+
+    async onSushiUpdate() {
+      this.refreshSushiItems();
+
+      if (this.sushiReady) {
+        const resumeEntry = await this.$refs.confirm.open({
+          title: this.$t('institutions.sushi.resumeEntryQuestion'),
+          message: this.$t('institutions.sushi.resumeEntryDesc', { date: this.sushiReadySince }),
+          agreeText: this.$t('yes'),
+          disagreeText: this.$t('no'),
+        });
+
+        if (resumeEntry) {
+          this.toggleSushiReady();
+        }
+      }
     },
 
     async toggleSushiReady() {
