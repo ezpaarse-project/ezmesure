@@ -1,0 +1,12 @@
+Bonjour,
+
+{% if sushiReadySince %}
+L'établissement "{{ institutionName }}" a terminé la saisie de ses identifiants SUSHI.
+{% else %}
+L'établissement "{{ institutionName }}" a repris la saisie de ses identifiants SUSHI.
+{% endif %}
+
+Vous pouvez visualiser ses identifiants à cette adresse : {{ institutionSushiLink }}.
+
+Cordialement,
+L'équipe ezMESURE.

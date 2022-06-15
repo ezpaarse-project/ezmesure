@@ -146,6 +146,7 @@ exports.updateInstitution = async (ctx) => {
   }
 
   const wasValidated = institution.get('validated');
+  const wasSushiReady = institution.get('sushiReadySince');
 
   institution.update(body, {
     schema: isAdmin(user) ? 'adminUpdate' : 'update',
@@ -177,6 +178,25 @@ exports.updateInstitution = async (ctx) => {
         appLogger.error(`Failed to send validate institution mail: ${err}`);
       }
     }
+  }
+
+  const sushiReadySince = institution.get('sushiReadySince');
+  const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
+                         || (!wasSushiReady && sushiReadySince);
+
+  if (sushiReadyChanged) {
+    sendMail({
+      from: sender,
+      to: supportRecipients,
+      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      ...generateMail('sushi-ready-change', {
+        institutionName: institution.get('name'),
+        institutionSushiLink: `${origin}/institutions/${institution.getId()}/sushi`,
+        sushiReadySince,
+      }),
+    }).catch((err) => {
+      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    });
   }
 
   ctx.status = 200;

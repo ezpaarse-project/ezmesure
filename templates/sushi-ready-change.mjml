@@ -1,0 +1,34 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Statut de saisie SUSHI modifié</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Bonjour,</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+
+    <mj-text>
+      {% if sushiReadySince %}
+      <p>L'établissement <strong>{{ institutionName }}</strong> a terminé la saisie de ses identifiants SUSHI.</p>
+      {% else %}
+      <p>L'établissement <strong>{{ institutionName }}</strong> a repris la saisie de ses identifiants SUSHI.</p>
+      {% endif %}
+      <p>Vous pouvez visualiser ses identifiants à <a target="_blank" href="{{ institutionSushiLink }}">cette adresse</a>.</p>
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}
