@@ -10,7 +10,7 @@ const schemas = {
     updatedAt: Joi.date(),
     createdAt: Joi.date(),
 
-    validated: Joi.boolean().default(false),
+    validated: Joi.boolean(),
 
     vendor: Joi.string().trim(),
     sushiUrl: Joi.string().trim(),
@@ -20,10 +20,10 @@ const schemas = {
 
     ignoreReportValidation: Joi.boolean(),
 
-    requireCustomerId: Joi.boolean().default(false),
-    requireRequestorId: Joi.boolean().default(false),
-    requireApiKey: Joi.boolean().default(false),
-    isSushiCompliant: Joi.boolean().default(false),
+    requireCustomerId: Joi.boolean(),
+    requireRequestorId: Joi.boolean(),
+    requireApiKey: Joi.boolean(),
+    isSushiCompliant: Joi.boolean(),
 
     tags: Joi.array().items(Joi.string().trim()),
 
@@ -34,19 +34,29 @@ const schemas = {
   },
 };
 
-schemas.adminCreate = {
-  ...schemas.base,
+const immutableFields = {
   id: Joi.any().strip(),
-  vendor: schemas.base.vendor.required(),
-  sushiUrl: schemas.base.sushiUrl.required(),
   updatedAt: Joi.any().strip(),
   createdAt: Joi.any().strip(),
 };
 
+schemas.adminCreate = {
+  ...schemas.base,
+  ...immutableFields,
+
+  validated: schemas.base.validated.default(false),
+  requireCustomerId: schemas.base.requireCustomerId.default(false),
+  requireRequestorId: schemas.base.requireRequestorId.default(false),
+  requireApiKey: schemas.base.requireApiKey.default(false),
+  isSushiCompliant: schemas.base.isSushiCompliant.default(false),
+
+  vendor: schemas.base.vendor.required(),
+  sushiUrl: schemas.base.sushiUrl.required(),
+};
+
 schemas.adminUpdate = {
-  ...schemas.adminCreate,
-  vendor: schemas.base.vendor.optional(),
-  sushiUrl: schemas.base.sushiUrl.optional(),
+  ...schemas.base,
+  ...immutableFields,
 };
 
 schemas.create = {

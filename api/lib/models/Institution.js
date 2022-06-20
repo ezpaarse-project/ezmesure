@@ -18,17 +18,17 @@ const logosDir = path.resolve(__dirname, '..', '..', 'uploads', 'logos');
 const schemas = {
   base: {
     id: Joi.string(),
-    validated: Joi.boolean().default(false),
+    validated: Joi.boolean(),
     updatedAt: Joi.date(),
     createdAt: Joi.date(),
 
-    indexCount: Joi.number().default(0),
+    indexCount: Joi.number(),
     indexPrefix: Joi.string().regex(/^[a-z0-9][a-z0-9_.-]*$/).allow(''),
 
     creator: Joi.string().allow('').allow(null),
     role: Joi.string().allow('').allow(null),
     space: Joi.string().allow('').allow(null),
-    hidePartner: Joi.boolean().default(false),
+    hidePartner: Joi.boolean(),
 
     techContactName: Joi.string().allow('').allow(null),
     docContactName: Joi.string().allow('').allow(null),
@@ -48,34 +48,48 @@ const schemas = {
 
     sushiReadySince: Joi.date().allow(null),
 
-    domains: Joi.array().default([]).items(Joi.string()),
+    domains: Joi.array().items(Joi.string()),
     auto: Joi.object({
-      ezmesure: Joi.boolean().default(false),
-      ezpaarse: Joi.boolean().default(false),
-      report: Joi.boolean().default(false),
-      sushi: Joi.boolean().default(false),
-    }).default(),
+      ezmesure: Joi.boolean(),
+      ezpaarse: Joi.boolean(),
+      report: Joi.boolean(),
+      sushi: Joi.boolean(),
+    }),
   },
+};
+
+const immutableFields = {
+  id: Joi.any().strip(),
+  updatedAt: Joi.any().strip(),
+  createdAt: Joi.any().strip(),
 };
 
 schemas.adminCreate = {
   ...schemas.base,
-  id: Joi.any().strip(),
-  updatedAt: Joi.any().strip(),
-  createdAt: Joi.any().strip(),
+  ...immutableFields,
+
+  validated: schemas.base.validated.default(false),
+  indexCount: schemas.base.indexCount.default(0),
+  hidePartner: schemas.base.hidePartner.default(false),
+
+  auto: Joi.object({
+    ezmesure: Joi.boolean().default(false),
+    ezpaarse: Joi.boolean().default(false),
+    report: Joi.boolean().default(false),
+    sushi: Joi.boolean().default(false),
+  }).default(),
 };
 
 schemas.adminUpdate = {
-  ...schemas.adminCreate,
+  ...schemas.base,
+  ...immutableFields,
 };
 
 schemas.create = {
   ...schemas.base,
+  ...immutableFields,
 
-  id: Joi.any().strip(),
   validated: Joi.any().strip(),
-  updatedAt: Joi.any().strip(),
-  createdAt: Joi.any().strip(),
 
   indexCount: Joi.any().strip(),
   indexPrefix: Joi.any().strip(),
