@@ -361,6 +361,7 @@
     "fieldIsRequired": "This field is required",
     "password": "Password",
     "logIn": "Log in",
+    "logInWithIAM": "Log in via Indigo IAM.",
     "logInWithProvider": "Log in via your identity provider.",
     "loginFailed": "The information transmitted did not allow you to authenticate",
     "failed": "An error occurred"

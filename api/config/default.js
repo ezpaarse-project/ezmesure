@@ -57,6 +57,9 @@ module.exports = {
     secret: 'some-secret',
     cookie: 'eztoken',
   },
+  iam: {
+    oauth: 2,
+  },
   admin: {
     username: 'ezmesure-admin',
     password: 'changeme',

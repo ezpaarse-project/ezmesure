@@ -67,14 +67,22 @@ function sendNewUserToContacts(receivers, data) {
 }
 
 exports.renaterLogin = async (ctx) => {
-  const { query } = ctx.request;
-  const headers = ctx.request.header;
+  const { query, header: headers } = ctx.request;
+
+  const grant = ctx?.session?.grant;
+
+  let oauthData;
+
+  if (grant?.response?.id_token) {
+    oauthData = jwt.decode(grant?.response?.id_token);
+  }
+
   const props = {
-    full_name: decode(headers.displayname || headers.cn || headers.givenname),
-    email: decode(headers.mail),
+    full_name: oauthData?.name || decode(headers.displayname || headers.cn || headers.givenname),
+    email: oauthData?.email || decode(headers.mail),
     roles: ['new_user'],
     metadata: {
-      idp: headers['shib-identity-provider'],
+      idp: oauthData ? 'indigo-iam' : headers['shib-identity-provider'],
       uid: headers.uid,
       org: decode(headers.o),
       unit: decode(headers.ou),
@@ -145,7 +153,7 @@ exports.renaterLogin = async (ctx) => {
   }
 
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
-  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
+  ctx.redirect(decodeURIComponent(grant?.dynamic?.origin || ctx.query.origin || '/'));
 };
 
 exports.elasticLogin = async (ctx) => {

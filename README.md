@@ -70,6 +70,18 @@ docker-compose up -d --force-recreate front
 docker-compose restart rp
 ```
 
+### 3.2 Enable Indigo IAM
+
+To let users login with Indigo IAM, set the following environment variables:
+
+| name | description |
+|------|-------------|
+| EZMESURE_IAM_ENABLE        | Set to anything but `false` to show the IAM section in the authentication page |
+| EZMESURE_IAM_AUTHORIZE_URL | Oauth authorize URL, typically `https://iamserver.example/authorize` |
+| EZMESURE_IAM_ACCESS_URL    | Oauth token URL, typically `https://iamserver.example/token` |
+| EZMESURE_IAM_KEY           | Oauth client ID |
+| EZMESURE_IAM_SECRET        | Oauth client secret |
+
 ### 4. Setup Elastic certificates
 
 For each node in the cluster, add certificates in `elasticsearch/config/certificates/`. Kibana should also have certificates in `kibana/config/certificates`. If you don't have them yet, you can generate them by following these steps :

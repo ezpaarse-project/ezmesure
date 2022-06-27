@@ -44,6 +44,14 @@
     "secret": "EZMESURE_AUTH_SECRET",
     "cookie": "EZMESURE_AUTH_COOKIE"
   },
+  "iam": {
+    "authorize_url": "EZMESURE_IAM_AUTHORIZE_URL",
+    "access_url": "EZMESURE_IAM_ACCESS_URL",
+    "scope_delimiter": "EZMESURE_IAM_SCOPE_DELIMITER",
+    "oauth": "EZMESURE_IAM_OAUTH_VERSION",
+    "key": "EZMESURE_IAM_KEY",
+    "secret": "EZMESURE_IAM_SECRET"
+  },
   "admin": {
     "username": "EZMESURE_ADMIN_USERNAME",
     "password": "EZMESURE_ADMIN_PASSWORD",

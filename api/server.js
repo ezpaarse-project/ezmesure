@@ -2,6 +2,9 @@ const env = process.env.NODE_ENV || 'development';
 
 const Koa = require('koa');
 const mount = require('koa-mount');
+const session = require('koa-session');
+const grant = require('grant').koa();
+
 const cors = require('koa-cors');
 const config = require('config');
 const path = require('path');
@@ -127,6 +130,22 @@ app.on('error', (err, ctx = {}) => {
 });
 
 app.use(mount('/', controller));
+
+if (config.has('iam.key') && config.has('iam.secret')) {
+  app.keys = ['grant'];
+  app.use(session(app));
+  app.use(grant({
+    defaults: {
+      transport: 'session',
+      response: ['tokens'],
+      state: true,
+    },
+    iam: {
+      ...config.get('iam'),
+      callback: '/api/login',
+    },
+  }));
+}
 
 function start() {
   notifications.start(appLogger);

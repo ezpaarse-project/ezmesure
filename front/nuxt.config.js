@@ -26,6 +26,7 @@ module.exports = {
   telemetry: false,
   publicRuntimeConfig: {
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
+    iamEnabled: process.env.EZMESURE_IAM_ENABLE && process.env.EZMESURE_IAM_ENABLE !== 'false',
   },
   modules: [
     ['@nuxtjs/proxy', {

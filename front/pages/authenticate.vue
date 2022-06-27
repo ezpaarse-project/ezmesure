@@ -108,6 +108,31 @@
                 </p>
               </v-expansion-panel-content>
             </v-expansion-panel>
+
+            <v-expansion-panel v-if="$config.iamEnabled">
+              <v-expansion-panel-header>
+                <div class="d-flex align-center">
+                  <img
+                    src="/images/indigo-logo.png"
+                    alt="Indigo IAM"
+                    height="40"
+                    class="mr-2"
+                  >
+                  INDIGO - IAM
+                </div>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <p v-text="$t('authenticate.logInWithIAM')" />
+
+                <p class="text-center">
+                  <v-btn
+                    color="primary"
+                    :href="`/api/connect/iam?origin=${$auth.$state.redirect || '/myspace'}`"
+                    v-text="$t('authenticate.logIn')"
+                  />
+                </p>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
           </v-expansion-panels>
         </v-card>
       </v-col>
