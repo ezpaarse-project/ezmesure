@@ -136,6 +136,18 @@ async function getReport(endpoint, sushi, opts = {}) {
     }
   });
 
+  const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
+
+  if (!paramNames.has('attributes_to_show')) {
+    params.Attributes_To_Show = 'Access_Type|Access_Method|Section_Type|Data_Type|YOP';
+  }
+  if (!paramNames.has('access_type')) {
+    params.Access_Type = 'Controlled|OA_Gold';
+  }
+  if (!paramNames.has('section_type')) {
+    params.Section_Type = 'Article|Book|Chapter|Other|Section';
+  }
+
   if (requestorId) { params.requestor_id = requestorId; }
   if (customerId) { params.customer_id = customerId; }
   if (apiKey) { params.api_key = apiKey; }
@@ -144,10 +156,6 @@ async function getReport(endpoint, sushi, opts = {}) {
 
   params.begin_date = beginDate || endDate || prevMonth;
   params.end_date = endDate || beginDate || prevMonth;
-
-  params.Attributes_To_Show = 'Access_Type|Access_Method|Section_Type|Data_Type|YOP';
-  params.Access_Type = 'Controlled|OA_Gold';
-  params.Section_Type = 'Article|Book|Chapter|Other|Section';
 
   return axios({
     method: 'get',
