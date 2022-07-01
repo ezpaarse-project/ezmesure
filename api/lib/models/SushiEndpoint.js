@@ -27,6 +27,8 @@ const schemas = {
 
     tags: Joi.array().items(Joi.string().trim()),
 
+    paramSeparator: Joi.string().trim().allow(''),
+
     params: Joi.array().items(Joi.object({
       name: Joi.string().trim().required(),
       value: Joi.string().trim().allow(''),

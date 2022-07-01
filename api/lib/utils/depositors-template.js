@@ -91,6 +91,7 @@ module.exports = {
           sushiUrl: { type: 'keyword' },
           description: { type: 'keyword' },
           technicalProvider: { type: 'keyword' },
+          paramSeparator: { type: 'keyword' },
           validated: { type: 'boolean' },
           requireCustomerId: { type: 'boolean' },
           requireRequestorId: { type: 'boolean' },

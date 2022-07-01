@@ -102,6 +102,16 @@
       </v-card-title>
 
       <v-card-text>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <p class="text-justify" v-html="$t('endpoints.paramSeparatorDesc')" />
+        <v-text-field
+          v-model="endpointForm.paramSeparator"
+          :label="$t('endpoints.paramSeparator')"
+          dense
+          outlined
+          required
+        />
+
         <p v-text="$t('endpoints.pleaseEnterParams')" />
 
         <v-btn
@@ -201,6 +211,7 @@ export default {
         description: '',
         technicalProvider: '',
         counterVersion: '',
+        paramSeparator: '',
         validated: false,
         requireCustomerId: false,
         requireRequestorId: false,
@@ -243,6 +254,7 @@ export default {
       this.endpointForm.description = data.description || '';
       this.endpointForm.technicalProvider = data.technicalProvider || '';
       this.endpointForm.counterVersion = data.counterVersion || '';
+      this.endpointForm.paramSeparator = data.paramSeparator || '';
 
       this.endpointForm.validated = !!data.validated;
       this.endpointForm.requireCustomerId = !!data.requireCustomerId;

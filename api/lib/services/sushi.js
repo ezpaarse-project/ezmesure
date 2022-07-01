@@ -32,6 +32,63 @@ const reportValidators = new Map([
   ['ir', ajv.getSchema('#/definitions/COUNTER_item_report')],
 ]);
 
+const optionalAttributes = new Map([
+  [
+    'pr', [
+      'Data_Type',
+      'Access_Method',
+    ],
+  ],
+  [
+    'dr', [
+      'Data_Type',
+      'Access_Method',
+    ],
+  ],
+  [
+    'tr', [
+      'Data_Type',
+      'Section_Type',
+      'YOP',
+      'Access_Type',
+      'Access_Method',
+    ],
+  ],
+  [
+    'ir', [
+      'Authors',
+      'Publication_Date',
+      'Article_Version',
+      'Parent_Title',
+      'Parent_Authors',
+      'Parent_Publication_Date',
+      'Parent_Article_Version',
+      'Parent_Data_Type',
+      'Parent_DOI',
+      'Parent_Proprietary_ID',
+      'Parent_ISBN',
+      'Parent_Print_ISSN',
+      'Parent_Online_ISSN',
+      'Parent_URI',
+      'Component_Title',
+      'Component_Authors',
+      'Component_Publication_Date',
+      'Component_Data_Type',
+      'Component_DOI',
+      'Component_Proprietary_ID',
+      'Component_ISBN',
+      'Component_Print_ISSN',
+      'Component_Online_ISSN',
+      'Component_URI',
+      'Data_Type',
+      'YOP',
+      'Access_Type',
+      'Access_Method',
+
+    ],
+  ],
+]);
+
 const downloads = new Map();
 const DEFAULT_REPORT_TYPE = 'tr';
 
@@ -104,6 +161,8 @@ async function getReport(endpoint, sushi, opts = {}) {
     params: endpointParams,
   } = endpoint.getData();
 
+  const paramSeparator = endpoint.get('paramSeparator') || '|';
+
   const {
     requestorId,
     customerId,
@@ -139,13 +198,13 @@ async function getReport(endpoint, sushi, opts = {}) {
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
 
   if (!paramNames.has('attributes_to_show')) {
-    params.Attributes_To_Show = 'Access_Type|Access_Method|Section_Type|Data_Type|YOP';
+    params.Attributes_To_Show = optionalAttributes.get(reportType)?.join?.(paramSeparator);
   }
   if (!paramNames.has('access_type')) {
-    params.Access_Type = 'Controlled|OA_Gold';
+    params.Access_Type = ['Controlled', 'OA_Gold'].join(paramSeparator);
   }
   if (!paramNames.has('section_type')) {
-    params.Section_Type = 'Article|Book|Chapter|Other|Section';
+    params.Section_Type = ['Article', 'Book', 'Chapter', 'Other', 'Section'].join(paramSeparator);
   }
 
   if (requestorId) { params.requestor_id = requestorId; }

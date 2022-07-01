@@ -126,6 +126,8 @@
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
     "ignoreReportValidation": "Ignorer la validation du rapport",
     "description": "Description",
+    "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres <code>Attributes_To_Show</code>, <code>Access_Type</code> et <code>Section_Type</code> lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard <code>|</code> pour ces champs multivalués, renseignez le séparateur ici.",
+    "paramSeparator": "Séparateur",
     "queryParameters": "Paramètres de la query",
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
     "deleteNbEndpoints": "Vous allez supprimer {number} points d'accès.",
