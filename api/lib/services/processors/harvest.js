@@ -372,8 +372,8 @@ async function importSushiReport(options = {}) {
   insertStep.data.progress = 0;
   let lastSaveDate = Date.now();
 
-  for (let i = 0; i < report.Report_Items.length; i += 1) {
-    const reportItem = report.Report_Items[i];
+  for (let i = 0; i < reportItems.length; i += 1) {
+    const reportItem = reportItems[i];
 
     const item = {
       X_Sushi_ID: sushi.getId(),
