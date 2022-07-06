@@ -2591,7 +2591,7 @@
         }
       ]
     },
-    "/institutions/${id}/contacts": {
+    "/institutions/{id}/contacts": {
       "parameters": [
         {
           "schema": {
@@ -2603,7 +2603,7 @@
         }
       ],
       "get": {
-        "summary": "Your GET endpoint",
+        "summary": "Get the contacts of an institution",
         "tags": [
           "Administration"
         ],
