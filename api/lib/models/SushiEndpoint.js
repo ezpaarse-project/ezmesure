@@ -32,6 +32,15 @@ const schemas = {
     params: Joi.array().items(Joi.object({
       name: Joi.string().trim().required(),
       value: Joi.string().trim().allow(''),
+      scope: Joi.string().trim().valid(
+        'all',
+        'report_list',
+        'report_download',
+        'report_download_tr',
+        'report_download_pr',
+        'report_download_dr',
+        'report_download_ir',
+      ),
     })),
   },
 };

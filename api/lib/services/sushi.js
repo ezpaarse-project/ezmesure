@@ -116,20 +116,26 @@ async function getAvailableReports(endpoint, sushi) {
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const params = {};
 
-  if (requestorId) { params.requestor_id = requestorId; }
-  if (customerId) { params.customer_id = customerId; }
-  if (apiKey) { params.api_key = apiKey; }
+  const allowedScopes = new Set([
+    undefined,
+    'all',
+    'report_list',
+  ]);
 
   endpointParams?.forEach?.((param) => {
-    if (param?.name) {
+    if (param?.name && allowedScopes.has(param.scope)) {
       params[param.name] = param.value;
     }
   });
   sushiParams?.forEach?.((param) => {
-    if (param?.name) {
+    if (param?.name && allowedScopes.has(param.scope)) {
       params[param.name] = param.value;
     }
   });
+
+  if (requestorId) { params.requestor_id = requestorId; }
+  if (customerId) { params.customer_id = customerId; }
+  if (apiKey) { params.api_key = apiKey; }
 
   const response = await axios({
     method: 'get',
@@ -184,13 +190,20 @@ async function getReport(endpoint, sushi, opts = {}) {
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const params = {};
 
+  const allowedScopes = new Set([
+    undefined,
+    'all',
+    'report_download',
+    `report_download_${reportType}`,
+  ]);
+
   endpointParams?.forEach?.((param) => {
-    if (param?.name) {
+    if (param?.name && allowedScopes.has(param.scope)) {
       params[param.name] = param.value;
     }
   });
   sushiParams?.forEach?.((param) => {
-    if (param?.name) {
+    if (param?.name && allowedScopes.has(param.scope)) {
       params[param.name] = param.value;
     }
   });

@@ -130,8 +130,6 @@
             {{ $t('advancedSettings') }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-
-
             <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
 
             <v-btn
@@ -148,35 +146,22 @@
               {{ $t('add') }}
             </v-btn>
 
-            <template v-for="(param, index) in sushiForm.params">
-              <v-row :key="index">
-                <v-col>
-                  <v-text-field
-                    v-model="param.name"
-                    :label="$t('name')"
-                    hide-details
-                    outlined
-                    dense
-                  />
-                </v-col>
+            <SushiParam
+              v-for="(param, index) in sushiForm.params"
+              :key="`s-param-${index}`"
+              v-model="sushiForm.params[index]"
+              class="my-2"
+              @remove="removeParam(index)"
+            />
 
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="param.value"
-                    :label="$t('value')"
-                    hide-details
-                    outlined
-                    dense
-                  />
-                </v-col>
-
-                <v-col class="shrink">
-                  <v-btn icon @click="removeParam(index)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </template>
+            <SushiParam
+              v-for="(param, index) in endpointParams"
+              :key="`e-param-${index}`"
+              v-model="endpointParams[index]"
+              :top-text="$t('sushi.unchangeableParam')"
+              class="my-2"
+              readonly
+            />
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -203,7 +188,12 @@
 </template>
 
 <script>
+import SushiParam from '~/components/SushiParam';
+
 export default {
+  components: {
+    SushiParam,
+  },
   props: {
     endpoints: {
       type: Array,
@@ -233,6 +223,7 @@ export default {
   computed: {
     editMode() { return !!this.sushiForm.id; },
     sushiUrl() { return this.endpoint?.sushiUrl; },
+    endpointParams() { return Array.isArray(this.endpoint?.params) ? this.endpoint?.params : []; },
     requireCustomerId() { return this.endpoint?.requireCustomerId; },
     requireRequestorId() { return this.endpoint?.requireRequestorId; },
     requireApiKey() { return this.endpoint?.requireApiKey; },
@@ -289,7 +280,7 @@ export default {
     },
 
     addParam() {
-      this.sushiForm.params.unshift({ name: '', value: '' });
+      this.sushiForm.params.unshift({ name: '', value: '', scope: 'all' });
     },
 
     removeParam(index) {

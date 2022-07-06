@@ -117,7 +117,6 @@
         <v-btn
           type="submit"
           color="primary"
-          class="mb-2"
           small
           outlined
           @click="addParam"
@@ -128,35 +127,13 @@
           {{ $t('add') }}
         </v-btn>
 
-        <template v-for="(param, index) in endpointForm.params">
-          <v-row :key="index">
-            <v-col>
-              <v-text-field
-                v-model="param.name"
-                :label="$t('name')"
-                hide-details
-                outlined
-                dense
-              />
-            </v-col>
-
-            <v-col cols="6">
-              <v-text-field
-                v-model="param.value"
-                :label="$t('value')"
-                hide-details
-                outlined
-                dense
-              />
-            </v-col>
-
-            <v-col class="shrink">
-              <v-btn icon @click="removeParam(index)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </template>
+        <SushiParam
+          v-for="(param, index) in endpointForm.params"
+          :key="index"
+          v-model="endpointForm.params[index]"
+          class="my-2"
+          @remove="removeParam(index)"
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -184,10 +161,12 @@
 
 <script>
 import ConfirmDialog from '~/components/ConfirmDialog';
+import SushiParam from '~/components/SushiParam';
 
 export default {
   components: {
     ConfirmDialog,
+    SushiParam,
   },
   props: {
     availableTags: {
@@ -290,7 +269,7 @@ export default {
     },
 
     addParam() {
-      this.endpointForm.params.unshift({ name: '', value: '' });
+      this.endpointForm.params.unshift({ name: '', value: '', scope: 'all' });
     },
 
     removeParam(index) {

@@ -345,7 +345,18 @@
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
     "youHaveUntestedCredentials": "You have untested credentials | You have {count} untested credentials",
-    "deleteNbCredentials": "You are about to delete {number} SUSHI credentials."
+    "deleteNbCredentials": "You are about to delete {number} SUSHI credentials.",
+    "scope": "Scope",
+    "unchangeableParam": "Unchangeable parameter defined at the access point level.",
+    "paramScopes": {
+      "all": "All requests to the endpoint",
+      "report_list": "Report list",
+      "report_download": "Report download",
+      "report_download_tr": "TR report download",
+      "report_download_pr": "PR report download",
+      "report_download_dr": "DR report download",
+      "report_download_ir": "IR report download"
+    }
   },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
