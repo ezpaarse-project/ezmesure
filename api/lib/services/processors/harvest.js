@@ -473,6 +473,7 @@ async function importSushiReport(options = {}) {
               item.Access_Method,
               item.Access_Type,
               item.Section_Type,
+              item.Data_Type,
               item.Platform,
               item.Publisher,
               item.Title,
