@@ -159,7 +159,7 @@ async function getAvailableReports(endpoint, sushi) {
   return response;
 }
 
-async function getReport(endpoint, sushi, opts = {}) {
+function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   const options = opts || {};
 
   const {
@@ -229,7 +229,7 @@ async function getReport(endpoint, sushi, opts = {}) {
   params.begin_date = beginDate || endDate || prevMonth;
   params.end_date = endDate || beginDate || prevMonth;
 
-  return axios({
+  return {
     method: 'get',
     url: `${baseUrl}/reports/${reportType}`,
     responseType: stream ? 'stream' : 'json',
@@ -237,7 +237,7 @@ async function getReport(endpoint, sushi, opts = {}) {
     params,
     httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
     proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
-  });
+  };
 }
 
 function getReportFilename(options) {
@@ -281,14 +281,15 @@ function getReportTmpPath(options) {
  *                         endDate
  */
 async function downloadReport(options = {}) {
-  const { endpoint, sushi } = options;
-  const reportPath = getReportPath(options);
-  const tmpPath = getReportTmpPath(options);
+  const {
+    requestConfig,
+    reportPath,
+    tmpPath,
+  } = options;
 
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
-
-  const response = await getReport(endpoint, sushi, { ...options, stream: true });
+  const response = await axios(requestConfig);
   // TODO: handle "try again later" and timeouts
 
   if (!response) {
@@ -313,7 +314,29 @@ function getOngoingDownload(options = {}) {
   return downloads.get(getReportPath(options));
 }
 
+class DownloadEmitter extends EventEmitter {
+  constructor(requestConfig) {
+    super();
+    this.config = requestConfig || {};
+  }
+
+  getUri(opts) {
+    const obfuscate = !!opts?.obfuscate;
+    const params = { ...this.config?.params };
+
+    if (obfuscate && params?.requestor_id) { params.requestor_id = 'obfuscated'; }
+    if (obfuscate && params?.customer_id) { params.customer_id = 'obfuscated'; }
+    if (obfuscate && params?.api_key) { params.api_key = 'obfuscated'; }
+
+    return this.config?.url && axios.getUri({
+      ...this.config,
+      params,
+    });
+  }
+}
+
 function initiateDownload(options = {}) {
+  const { endpoint, sushi } = options;
   const reportPath = getReportPath(options);
   const tmpPath = getReportTmpPath(options);
 
@@ -321,10 +344,11 @@ function initiateDownload(options = {}) {
     return downloads.get(reportPath);
   }
 
-  const emitter = new EventEmitter();
+  const requestConfig = getReportDownloadConfig(endpoint, sushi, { ...options, stream: true });
+  const emitter = new DownloadEmitter(requestConfig);
   downloads.set(reportPath, emitter);
 
-  downloadReport(options)
+  downloadReport({ requestConfig, reportPath, tmpPath })
     .then((response) => {
       emitter.emit('finish', response, reportPath);
       downloads.delete(reportPath);
@@ -425,7 +449,7 @@ function stringifyException(exception) {
 }
 
 module.exports = {
-  getReport,
+  getReportDownloadConfig,
   validateReport,
   getReportFilename,
   getReportPath,
