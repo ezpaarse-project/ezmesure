@@ -19,6 +19,22 @@
     <div v-if="data.progress && data.progress < 100" class="caption">
       {{ $t('tasks.steps.progress', { progress: data.progress }) }}
     </div>
+    <v-sheet
+      v-if="data.url"
+      class="mt-2 pa-2"
+      style="word-break: break-all;"
+      rounded
+      elevation="1"
+    >
+      <div><strong>{{ $t('url') }}</strong></div>
+      {{ data.url }}
+      <v-btn x-small outlined color="primary" @click="copyToClipboard(data.url)">
+        <v-icon small class="mr-1">
+          mdi-clipboard-text
+        </v-icon>
+        {{ $t('clipboard.copy') }}
+      </v-btn>
+    </v-sheet>
   </v-timeline-item>
 </template>
 
@@ -76,6 +92,23 @@ export default {
         return this.$t(key);
       }
       return this.step?.label;
+    },
+  },
+  methods: {
+    async copyToClipboard(str) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('clipboard.unableToCopy'));
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(str);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('clipboard.unableToCopy'));
+        return;
+      }
+
+      this.$store.dispatch('snacks/info', this.$t('clipboard.textCopied'));
     },
   },
 };

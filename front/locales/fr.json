@@ -427,6 +427,12 @@
     "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
     "activate": "Activer mon compte"
   },
+  "clipboard": {
+    "copy": "Copier",
+    "unableToCopy": "Impossible de copier dans le presse-papier",
+    "textCopied": "Texte copié dans le presse-papier"
+  },
+  "url": "URL",
   "type": "Type",
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",

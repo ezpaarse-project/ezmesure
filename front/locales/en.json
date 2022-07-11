@@ -427,6 +427,12 @@
     "readAndAccept": "I have read and accept the terms of use",
     "activate": "Activate my account"
   },
+  "clipboard": {
+    "copy": "Copy",
+    "unableToCopy": "Unable to copy in the clipboard",
+    "textCopied": "Text copied in the clipboard"
+  },
+  "url": "URL",
   "type": "Type",
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
