@@ -135,6 +135,21 @@ module.exports = {
               status: { type: 'keyword' },
               startTime: { type: 'date' },
               took: { type: 'long' },
+              data: {
+                properties: {
+                  url: { type: 'keyword' },
+                  params: { properties: {} },
+                  processedReportItems: { type: 'long' },
+                  progress: { type: 'long' },
+                  reportId: { type: 'keyword' },
+                  reportIsValid: { type: 'boolean' },
+                  reportValidationIgnored: { type: 'boolean' },
+                  statusCode: { type: 'long' },
+                  sushiErrorCode: { type: 'long' },
+                  sushiExceptionCode: { type: 'long' },
+                  totalReportItems: { type: 'long' },
+                },
+              },
             },
           },
           result: {
