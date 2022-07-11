@@ -113,6 +113,8 @@ async function importSushiReport(options = {}) {
         download = sushiService.initiateDownload(sushiData);
       }
 
+      downloadStep.data.url = download?.getUri?.({ obfuscate: true });
+
       await Promise.all([
         saveTask(),
 
