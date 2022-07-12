@@ -20,7 +20,7 @@
       {{ $t('tasks.steps.progress', { progress: data.progress }) }}
     </div>
     <v-sheet
-      v-if="data.url"
+      v-if="data.url && isAdmin"
       class="mt-2 pa-2"
       style="word-break: break-all;"
       rounded
@@ -61,6 +61,9 @@ export default {
     },
   },
   computed: {
+    isAdmin() {
+      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+    },
     duration() {
       if (!Number.isInteger(this.step?.took)) { return null; }
 
