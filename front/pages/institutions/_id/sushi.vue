@@ -96,6 +96,7 @@
     />
 
     <SushiHistory ref="sushiHistory" />
+    <SushiFiles v-if="isAdmin" ref="sushiFiles" />
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
     <ConfirmDialog ref="confirm" />
 
@@ -337,6 +338,7 @@ import SushiDetails from '~/components/SushiDetails';
 import SushiConnectionIcon from '~/components/SushiConnectionIcon';
 import SushiForm from '~/components/SushiForm';
 import SushiHistory from '~/components/SushiHistory';
+import SushiFiles from '~/components/SushiFiles';
 import ReportsDialog from '~/components/ReportsDialog';
 import ConfirmDialog from '~/components/ConfirmDialog';
 import LocalDate from '~/components/LocalDate';
@@ -351,6 +353,7 @@ export default {
     SushiConnectionIcon,
     SushiForm,
     SushiHistory,
+    SushiFiles,
     ReportsDialog,
     LocalDate,
     TaskLabel,
@@ -410,6 +413,9 @@ export default {
     };
   },
   computed: {
+    isAdmin() {
+      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+    },
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
       return Array.isArray(messages) && messages.length >= 1;
@@ -501,7 +507,7 @@ export default {
       return Object.keys(this.loadingItems).length > 0;
     },
     itemActions() {
-      return [
+      const actions = [
         {
           icon: 'mdi-pencil',
           label: this.$t('modify'),
@@ -520,6 +526,12 @@ export default {
           callback: this.showAvailableReports,
         },
         {
+          icon: 'mdi-file-tree',
+          label: this.$t('sushi.showFiles'),
+          callback: this.showSushiItemFiles,
+          onlyAdmin: true,
+        },
+        {
           icon: 'mdi-history',
           label: this.$t('tasks.history'),
           callback: this.showSushiItemHistory,
@@ -530,6 +542,8 @@ export default {
           callback: this.copySushiId,
         },
       ];
+
+      return actions.filter(action => this.isAdmin || !action.onlyAdmin);
     },
   },
   mounted() {
@@ -565,6 +579,9 @@ export default {
     },
     showSushiItemHistory(item, opts = {}) {
       this.$refs.sushiHistory.showSushiItem(item, opts);
+    },
+    showSushiItemFiles(item) {
+      this.$refs.sushiFiles.showFiles(item);
     },
     async refreshSushiItems() {
       if (!this.hasInstitution) { return; }

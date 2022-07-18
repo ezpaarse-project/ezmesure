@@ -338,6 +338,7 @@
   },
   "sushi": {
     "copyId": "Copy ID",
+    "showFiles": "View files",
     "unableToCopyId": "Unable to copy in the clipboard",
     "idCopied": "ID copied in the clipboard",
     "importState": "Import state",
@@ -356,6 +357,11 @@
       "report_download_pr": "PR report download",
       "report_download_dr": "DR report download",
       "report_download_ir": "IR report download"
+    },
+    "files": {
+      "title": "Available files",
+      "noFilesAvailable": "No files available",
+      "nbFiles": "1 file | {count} files"
     }
   },
   "reports": {
@@ -473,6 +479,7 @@
   "itemsDeleted": "{count} element(s) deleted",
   "update": "Update",
   "create": "Create",
+  "download": "Download",
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
   "invalidDate": "Invalid date",

@@ -338,6 +338,7 @@
   },
   "sushi": {
     "copyId": "Copier l'ID",
+    "showFiles": "Voir les fichiers",
     "unableToCopyId": "Impossible de copier dans le presse-papier",
     "idCopied": "ID copié dans le presse-papier",
     "importState": "État de l'import",
@@ -356,6 +357,11 @@
       "report_download_pr": "Téléchargement de rapport PR",
       "report_download_dr": "Téléchargement de rapport DR",
       "report_download_ir": "Téléchargement de rapport IR"
+    },
+    "files": {
+      "title": "Fichiers disponibles",
+      "noFilesAvailable": "Aucun fichier disponible",
+      "nbFiles": "1 fichier | {count} fichiers"
     }
   },
   "reports": {
@@ -473,6 +479,7 @@
   "itemsDeleted": "{count} élement(s) supprimé(s)",
   "update": "Mettre à jour",
   "create": "Créer",
+  "download": "Télécharger",
   "administration": "Administration",
   "informationSubmitted": "Informations transmises",
   "invalidDate": "Date invalide",
