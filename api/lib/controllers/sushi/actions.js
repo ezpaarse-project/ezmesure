@@ -1,7 +1,9 @@
 const fs = require('fs-extra');
+const path = require('path');
 const format = require('date-fns/format');
 const subMonths = require('date-fns/subMonths');
 const { v4: uuidv4 } = require('uuid');
+const send = require('koa-send');
 
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
@@ -293,6 +295,15 @@ exports.getFileList = async (ctx) => {
       .filter((file) => file.isFile() || file.isDirectory())
       .map((file) => readFile(path.resolve(sushiDir), '.', file.name)),
   );
+};
+
+exports.downloadFile = async (ctx) => {
+  const { sushi, institution } = ctx.state;
+  const { filePath } = ctx.params;
+
+  await send(ctx, filePath, {
+    root: sushiService.getSushiDirectory({ sushi, institution }),
+  });
 };
 
 exports.harvestSushi = async (ctx) => {

@@ -26,6 +26,7 @@ const {
   importSushiItems,
   downloadReport,
   getFileList,
+  downloadFile,
   getTasks,
   getAvailableReports,
 } = require('./actions');
@@ -353,6 +354,21 @@ router.route({
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/files/:filePath(.*)',
+  handler: [
+    commonHandlers,
+    downloadFile,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+      filePath: Joi.string().trim().regex(/^[a-z0-9/_.-]+$/).required(),
     },
   },
 });
