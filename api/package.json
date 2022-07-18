@@ -47,6 +47,7 @@
     "koa-joi-router": "^8.0.0",
     "koa-jwt": "^3.5.1",
     "koa-mount": "^4.0.0",
+    "koa-send": "^5.0.1",
     "koa-static": "^5.0.0",
     "mjml": "^4.5.0",
     "mongodb": "^3.1.9",
