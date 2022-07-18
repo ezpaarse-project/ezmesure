@@ -1520,6 +1520,66 @@
           "paused",
           "jobCounts"
         ]
+      },
+      "File": {
+        "title": "File",
+        "x-stoplight": {
+          "id": "sgs0cpyla8792"
+        },
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "File name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "directory",
+              "file"
+            ],
+            "description": "File type"
+          },
+          "size": {
+            "type": "integer",
+            "description": "File size in Bytes"
+          },
+          "mtime": {
+            "type": "string",
+            "description": "Last modification date"
+          },
+          "children": {
+            "$ref": "#/components/schemas/File"
+          },
+          "href": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to the file"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "size",
+          "mtime"
+        ],
+        "x-examples": {
+          "example-1": {
+            "name": "string",
+            "type": "directory",
+            "size": 0,
+            "mtime": "string",
+            "children": {
+              "name": "string",
+              "type": "directory",
+              "size": 0,
+              "mtime": "string",
+              "children": {},
+              "href": "http://example.com"
+            },
+            "href": "http://example.com"
+          }
+        }
       }
     }
   },
@@ -4998,6 +5058,49 @@
           },
           "description": ""
         }
+      }
+    },
+    "/sushi/{id}/files": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "List files in the directory of a SUSHI item",
+        "tags": [
+          "Sushi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-sushi-id-files",
+        "description": "List files in the directory of a SUSHI item.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/sushi/{id}/report.json": {
