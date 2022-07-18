@@ -255,7 +255,7 @@ exports.getFileList = async (ctx) => {
   try {
     rootFiles = await fs.readdir(sushiDir, { withFileTypes: true });
   } catch (e) {
-    if (e.code !== 'ENOTFOUND') { throw e; }
+    if (e.code !== 'ENOENT') { throw e; }
     rootFiles = [];
   }
 
