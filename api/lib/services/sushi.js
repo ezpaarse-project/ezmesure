@@ -250,20 +250,28 @@ function getReportFilename(options) {
   return `${reportType}_${beginDate}_${endDate}.json`;
 }
 
-function getReportPath(options) {
+function getSushiDirectory(options) {
   const {
     sushi,
-    endpoint,
     institution,
-    reportType = DEFAULT_REPORT_TYPE,
   } = options;
   const indexPrefix = institution.get('indexPrefix');
 
   return path.resolve(
     storageDir,
     indexPrefix || 'no_prefix',
-    endpoint.getId(),
+    sushi.get('endpointId'),
     sushi.getId(),
+  );
+}
+
+function getReportPath(options) {
+  const {
+    reportType = DEFAULT_REPORT_TYPE,
+  } = options;
+
+  return path.resolve(
+    getSushiDirectory(options),
     reportType,
     getReportFilename(options),
   );
@@ -452,6 +460,7 @@ module.exports = {
   getReportDownloadConfig,
   validateReport,
   getReportFilename,
+  getSushiDirectory,
   getReportPath,
   getReportTmpPath,
   getAvailableReports,
