@@ -244,6 +244,57 @@ exports.downloadReport = async (ctx) => {
   ctx.body = { message };
 };
 
+exports.getFileList = async (ctx) => {
+  const { sushi, institution } = ctx.state;
+
+  const sushiDir = sushiService.getSushiDirectory({ sushi, institution });
+  let rootFiles;
+
+  try {
+    rootFiles = await fs.readdir(sushiDir, { withFileTypes: true });
+  } catch (e) {
+    if (e.code !== 'ENOTFOUND') { throw e; }
+    rootFiles = [];
+  }
+
+  const readFile = async (root, parentDirPath, filename) => {
+    const filePath = path.resolve(root, parentDirPath, filename);
+    const stat = await fs.stat(filePath);
+
+    if (stat.isFile()) {
+      return {
+        name: filename,
+        type: 'file',
+        size: stat.size,
+        mtime: stat.mtime,
+        href: `/api/sushi/${sushi.getId()}/files/${parentDirPath}/${filename}`,
+      };
+    }
+
+    const children = await fs.readdir(filePath, { withFileTypes: true });
+
+    return {
+      name: filename,
+      type: 'directory',
+      size: stat.size,
+      mtime: stat.mtime,
+      children: await Promise.all(
+        children
+          .filter((file) => file.isFile() || file.isDirectory())
+          .map((file) => readFile(root, path.join(parentDirPath, filename), file.name)),
+      ),
+    };
+  };
+
+  ctx.status = 200;
+  ctx.type = 'json';
+  ctx.body = await Promise.all(
+    rootFiles
+      .filter((file) => file.isFile() || file.isDirectory())
+      .map((file) => readFile(path.resolve(sushiDir), '.', file.name)),
+  );
+};
+
 exports.harvestSushi = async (ctx) => {
   ctx.action = 'sushi/harvest';
   const { body = {} } = ctx.request;
