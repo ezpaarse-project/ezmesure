@@ -133,7 +133,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :disabled="deleting || locked" @click="deleteData">
+        <v-list-item :disabled="deleting || locked" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
@@ -305,19 +305,27 @@
           </template>
 
           <v-list>
-            <v-list-item
-              v-for="action in itemActions"
-              :key="action.icon"
-              :disabled="action.disabled"
-              @click="action.callback(item)"
+            <template
+              v-for="(action, index) in itemActions"
             >
-              <v-list-item-icon>
-                <v-icon>{{ action.icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title v-text="action.label" />
-              </v-list-item-content>
-            </v-list-item>
+              <v-divider
+                v-if="action.divider"
+                :key="index"
+              />
+              <v-list-item
+                v-else
+                :key="action.icon"
+                :disabled="action.disabled"
+                @click="action.callback(item)"
+              >
+                <v-list-item-icon>
+                  <v-icon>{{ action.icon }}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title v-text="action.label" />
+                </v-list-item-content>
+              </v-list-item>
+            </template>
           </v-list>
         </v-menu>
       </template>
@@ -521,6 +529,15 @@ export default {
           disabled: this.locked,
         },
         {
+          icon: 'mdi-delete',
+          label: this.$t('delete'),
+          callback: this.deleteSushiItem,
+          disabled: this.deleting,
+        },
+        {
+          divider: true,
+        },
+        {
           icon: 'mdi-file-search',
           label: this.$t('reports.availableReports'),
           callback: this.showAvailableReports,
@@ -686,25 +703,31 @@ export default {
       this.$set(this, 'loadingItems', {});
     },
 
-    async deleteData() {
-      if (!this.hasSelection) {
+    async deleteSushiItem(item) {
+      await this.deleteSushiItems([item]);
+    },
+
+    async deleteSushiItems(selection) {
+      if (!Array.isArray(selection) && !this.hasSelection) {
         return;
       }
 
-      const deleteData = await this.$refs.confirm.open({
+      const selected = Array.isArray(selection) ? selection : this.selected;
+
+      const confirmDelete = await this.$refs.confirm.open({
         title: this.$t('areYouSure'),
-        message: this.$t('sushi.deleteNbCredentials', { number: this.selected.length }),
+        message: this.$t('sushi.deleteNbCredentials', { number: selected.length }),
         agreeText: this.$t('delete'),
         disagreeText: this.$t('cancel'),
       });
 
-      if (!deleteData) {
+      if (!confirmDelete) {
         return;
       }
 
       this.deleting = true;
 
-      const ids = this.selected.map(select => select.id);
+      const ids = selected.map(select => select.id);
       let response;
 
       try {
@@ -713,7 +736,7 @@ export default {
           throw new Error('invalid response');
         }
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: this.selected.length }));
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: selected.length }));
         this.deleting = false;
         return;
       }
