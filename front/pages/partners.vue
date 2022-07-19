@@ -83,9 +83,11 @@ export default {
       const search = this.search.toLowerCase();
       const automations = this.selectedAutomations;
 
-      if (!search && automations.length === 0) { return this.partners; }
+      if (!search && automations.length === 0) {
+        return this.partners.slice().sort(this.sortByName);
+      }
 
-      return this.partners.filter((partner) => {
+      const partners = this.partners.filter((partner) => {
         const {
           name: orgName,
           acronym,
@@ -108,10 +110,15 @@ export default {
 
         return false;
       });
+
+      return partners.sort(this.sortByName);
     },
   },
 
   methods: {
+    sortByName(a, b) {
+      return (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1);
+    },
     deselectAutomation(label) {
       this.selectedAutomations = this.selectedAutomations.filter(l => l !== label);
     },
