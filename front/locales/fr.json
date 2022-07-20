@@ -301,7 +301,7 @@
         "1000": "Service indisponible",
         "1010": "Service surchargé",
         "1020": "Trop de requêtes",
-        "1030": "Informations insufisantes",
+        "1030": "Informations insuffisantes",
         "2000": "Demandeur non autorisé",
         "2010": "Demandeur non autorisé",
         "2020": "Clé d'API invalide",
