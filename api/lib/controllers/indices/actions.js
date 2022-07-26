@@ -1,5 +1,6 @@
 const elastic = require('../../services/elastic');
 const indexTemplate = require('../../utils/index-template');
+const publisherTemplate = require('../../utils/publisher-template');
 
 exports.getIndex = async (ctx) => {
   const { index } = ctx.request.params;
@@ -14,7 +15,8 @@ exports.getIndex = async (ctx) => {
 };
 
 exports.createIndex = async (ctx) => {
-  const { index } = ctx.request.params;
+  const { query, params } = ctx.request;
+  const { index } = params;
 
   const { body: exists } = await elastic.indices.exists({ index });
 
@@ -22,12 +24,12 @@ exports.createIndex = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.index.alreadyExists', index));
   }
 
-  const { body } = await elastic.indices.create({
+  const elasticResponse = await elastic.indices.create({
     index,
-    body: indexTemplate,
+    body: query?.type === 'publisher' ? publisherTemplate : indexTemplate,
   });
 
-  ctx.body = body;
+  ctx.body = elasticResponse?.body;
 };
 
 exports.deleteIndex = async (ctx) => {

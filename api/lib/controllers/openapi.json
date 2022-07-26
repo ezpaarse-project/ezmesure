@@ -2074,7 +2074,7 @@
             "description": "Conflict"
           }
         },
-        "description": "Initialize an index with an access events oriented mapping",
+        "description": "Initialize an index with a predefined mapping, either for access events or publisher data.",
         "tags": [
           "Institutions",
           "Administration"
@@ -2082,6 +2082,21 @@
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ezpaarse",
+                "publisher"
+              ],
+              "default": "ezpaarse"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "the type of index"
           }
         ]
       },
