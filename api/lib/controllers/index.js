@@ -23,6 +23,7 @@ const spaces = require('./spaces');
 const indices = require('./indices');
 const roles = require('./roles');
 const queues = require('./queues');
+const kibana = require('./kibana');
 
 const openapi = require('./openapi.json');
 
@@ -79,5 +80,6 @@ app.use(spaces.prefix('/spaces').middleware());
 app.use(indices.prefix('/indices').middleware());
 app.use(roles.prefix('/roles').middleware());
 app.use(queues.prefix('/queues').middleware());
+app.use(kibana.prefix('/kibana').middleware());
 
 module.exports = app;
