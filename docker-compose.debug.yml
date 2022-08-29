@@ -20,6 +20,7 @@ services:
     command: --requirepass "${EZMESURE_REDIS_PASSWORD:-changeme}"
     ports:
       - 6379:6379
+    restart: unless-stopped
 
   api:
     image: node:14.17.1
