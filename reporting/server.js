@@ -25,8 +25,12 @@ indexes.findOrCreate();
 puppeteer.testPuppeteer();
 
 // CronTab for reporting job
-const job = new CronJob(cron, () => {
-  generatePendingReports();
+const job = new CronJob({
+  cronTime: cron,
+  runOnInit: true,
+  onTick: () => {
+    generatePendingReports();
+  },
 });
 job.start();
 
