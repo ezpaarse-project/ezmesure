@@ -1,27 +1,35 @@
 const elastic = require('../../services/elastic');
+const { appLogger } = require('../../services/logger');
 
 let metrics = {};
 
 exports.getMetric = async () => {
-  const { body: result } = await elastic.search({
-    body: {
-      size: 0,
-      track_total_hits: true,
-      aggs: {
-        indices: { cardinality: { field: '_index' } },
-        titles: { cardinality: { field: 'publication_title' } },
-        platforms: { cardinality: { field: 'platform' } },
-        maxDate: { max: { field: 'datetime' } },
-        minDate: { min: { field: 'datetime' } },
+  appLogger.info('[metric]: Get metric is started');
+  let result;
+  try {
+    result = await elastic.search({
+      body: {
+        size: 0,
+        track_total_hits: true,
+        aggs: {
+          indices: { cardinality: { field: '_index' } },
+          titles: { cardinality: { field: 'publication_title' } },
+          platforms: { cardinality: { field: 'platform' } },
+          maxDate: { max: { field: 'datetime' } },
+          minDate: { min: { field: 'datetime' } },
+        },
       },
-    },
-  });
+    });
+  } catch (err) {
+    appLogger.error('[metric]: Cannot get metrics in elastic');
+    return;
+  }
 
   const {
     took,
     hits = {},
     aggregations = {},
-  } = result;
+  } = result.body;
 
   const {
     titles = {},
@@ -51,6 +59,8 @@ exports.getMetric = async () => {
       indices: indices.value,
     },
   };
+  appLogger.info(`docs: ${metrics.docs} | titles: ${metrics.metrics.titles} | platforms: ${metrics.metrics.platforms} | indices: ${metrics.metrics.indices}`);
+  appLogger.info('[metric]: Get metric is end');
 };
 
 /**
