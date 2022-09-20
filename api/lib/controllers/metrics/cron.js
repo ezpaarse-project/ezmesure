@@ -3,7 +3,7 @@ const { getMetric } = require('./metrics');
 
 const job = new CronJob({
   cronTime: '0 0 0 * * *',
-  onTick: getMetric(),
+  onTick: getMetric,
   runOnInit: true,
 });
 

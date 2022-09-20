@@ -21,7 +21,7 @@ exports.getMetric = async () => {
       },
     });
   } catch (err) {
-    appLogger.error('[metric]: Cannot get metrics in elastic');
+    appLogger.error('[metric]: updated global metrics');
     return;
   }
 
@@ -60,7 +60,6 @@ exports.getMetric = async () => {
     },
   };
   appLogger.info(`docs: ${metrics.docs} | titles: ${metrics.metrics.titles} | platforms: ${metrics.metrics.platforms} | indices: ${metrics.metrics.indices}`);
-  appLogger.info('[metric]: Get metric is end');
 };
 
 /**
