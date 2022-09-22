@@ -3,7 +3,7 @@ const { appLogger } = require('../../services/logger');
 
 let metrics = {};
 
-exports.getMetric = async () => {
+exports.getMetrics = async () => {
   appLogger.info('[metric]: Get metric is started');
   let result;
   try {
@@ -19,9 +19,10 @@ exports.getMetric = async () => {
           minDate: { min: { field: 'datetime' } },
         },
       },
-    });
+    }, { requestTimeout: '600s' });
   } catch (err) {
     appLogger.error('[metric]: updated global metrics');
+    appLogger.error(err.message);
     return;
   }
 
