@@ -26,7 +26,6 @@ export SERVER_PORT="5601"
 export XPACK_MONITORING_ENABLED="true"
 export XPACK_SECURITY_ENCRYPTIONKEY="e558e233df22145278e760c7b26ea9e9c9f72102"
 export XPACK_REPORTING_KIBANASERVER_HOSTNAME=${THIS_HOST}
-export KIBANA_DEFAULTAPPID="dashboard/homepage"
 
 # default values for elastic.yml or kibana.yml configuration
 export EZMESURE_ES_DISCOVERY=""
