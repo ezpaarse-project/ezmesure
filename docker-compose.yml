@@ -47,6 +47,7 @@ services:
       - ELASTICSEARCH_USERNAME=${KIBANA_USERNAME:-kibana_system}
       - SERVER_BASEPATH
       - SERVER_PUBLICBASEURL=https://${EZMESURE_DOMAIN}${SERVER_BASEPATH}
+      - SERVER_DEFAULTROUTE=/app/dashboards
       - SERVER_HOST
       - SERVER_PORT
       - THIS_HOST
