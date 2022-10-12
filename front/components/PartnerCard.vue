@@ -19,9 +19,6 @@
       <div class="title">
         {{ partnerName }}
       </div>
-      <div class="body-2">
-        {{ indexCount }} <abbr :title="$t('partners.ecs')">ECs</abbr> {{ $t('partners.ecsLoaded') }}
-      </div>
     </v-card-text>
 
     <v-divider />
@@ -142,11 +139,6 @@ export default {
       }
 
       return contacts;
-    },
-    indexCount() {
-      const n = parseInt(this.partner?.indexCount, 10);
-      if (Number.isNaN(n)) { return '0'; }
-      return n.toLocaleString();
     },
     automations() {
       return [
