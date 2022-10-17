@@ -121,3 +121,9 @@ errors:
   password:
     expires: Votre demande de réinitialisation de mot de passe est expirée
     invalidToken: Le token est invalide
+
+  activity:
+    failedToQuery: Impossible de récupérer l'activité
+
+  metric:
+    notFound: Métrique [%s] introuvable

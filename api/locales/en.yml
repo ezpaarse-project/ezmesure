@@ -121,3 +121,9 @@ errors:
   password:
     expires: Your password reset request has expired
     invalidToken: The token is invalid
+
+  activity:
+    failedToQuery: Failed to query activity
+
+  metric:
+    notFound: Metric [%s] not found

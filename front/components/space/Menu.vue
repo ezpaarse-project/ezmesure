@@ -114,6 +114,10 @@ export default {
         href: '/admin',
         children: [
           {
+            title: this.$t('menu.activity'),
+            href: '/activity',
+          },
+          {
             title: this.$t('menu.institutions'),
             href: '/institutions',
           },
