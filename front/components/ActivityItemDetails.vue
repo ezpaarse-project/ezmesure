@@ -4,7 +4,7 @@
       v-for="(meta, index) in metadata"
       :key="index"
     >
-      <span class="font-weight-bold">{{ meta.name }}</span><span>{{ meta.value }}</span>
+      <span class="font-weight-bold">{{ meta.name }}</span> <span>{{ meta.value }}</span>
     </div>
   </div>
 </template>
