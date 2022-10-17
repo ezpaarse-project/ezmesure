@@ -24,6 +24,7 @@ const indices = require('./indices');
 const roles = require('./roles');
 const queues = require('./queues');
 const kibana = require('./kibana');
+const activity = require('./activity');
 
 const openapi = require('./openapi.json');
 
@@ -81,5 +82,6 @@ app.use(indices.prefix('/indices').middleware());
 app.use(roles.prefix('/roles').middleware());
 app.use(queues.prefix('/queues').middleware());
 app.use(kibana.prefix('/kibana').middleware());
+app.use(activity.prefix('/activity').middleware());
 
 module.exports = app;
