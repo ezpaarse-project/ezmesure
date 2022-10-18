@@ -87,28 +87,30 @@ export default {
         return this.partners.slice().sort(this.sortByName);
       }
 
-      const partners = this.partners.filter((partner) => {
+      const includeSearch = (partner) => {
         const {
           name: orgName,
           acronym,
           techContactName,
           docContactName,
+        } = partner;
+
+        if (orgName?.toLowerCase?.()?.includes(search)) { return true; }
+        if (acronym?.toLowerCase?.()?.includes(search)) { return true; }
+        if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
+        if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
+        return false;
+      };
+
+      const partners = this.partners.filter((partner) => {
+        const {
           auto = {},
         } = partner;
 
-        if (search) {
-          if (orgName && orgName.toLowerCase().includes(search)) { return true; }
-          if (acronym && acronym.toLowerCase().includes(search)) { return true; }
-          if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
-          if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
-          return false;
-        }
+        const searchMatch = !search || includeSearch(partner);
+        const autoMatch = automations.length === 0 || automations.every(label => auto?.[label]);
 
-        if (automations.length > 0) {
-          return automations.some(label => auto?.[label]);
-        }
-
-        return false;
+        return searchMatch && autoMatch;
       });
 
       return partners.sort(this.sortByName);
