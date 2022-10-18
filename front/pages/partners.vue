@@ -5,10 +5,19 @@
         mdi-charity
       </v-icon>
 
-      <h1
-        class="display-1 text-center mb-2"
-        v-text="$t('partners.count', { count: partners.length })"
-      />
+      <h1 class="display-1 text-center mb-2">
+        <span v-if="filteredPartners.length === partners.length">
+          {{ $t('partners.count', { count: partners.length }) }}
+        </span>
+        <span v-else>
+          {{
+            $t('partners.filteredCount', {
+              count: filteredPartners.length,
+              total: partners.length
+            })
+          }}
+        </span>
+      </h1>
     </v-layout>
 
     <v-row align="center" justify="center">

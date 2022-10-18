@@ -92,6 +92,7 @@
     "documentary": "Documentaire",
     "search": "Rechercher",
     "count": "Nos {count} partenaires",
+    "filteredCount": "Nos {count} (sur {total}) partenaires",
     "automated": "Automatisé",
     "links": "Liens",
     "noContacts": "Pas de correspondants",
