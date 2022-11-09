@@ -127,7 +127,7 @@
       "user/register": "Enregistrement",
       "user/refresh": "Mise à jour de profil",
       "user/connection": "Connexion",
-      "file/upload": "Téléversement de fichier",
+      "file/upload": "Dépôt de fichier",
       "file/list": "Consultation des fichiers",
       "file/delete": "Suppression de fichier",
       "file/delete-many": "Suppression de fichiers",
