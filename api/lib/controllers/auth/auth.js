@@ -149,6 +149,8 @@ exports.renaterLogin = async (ctx) => {
 };
 
 exports.elasticLogin = async (ctx) => {
+  ctx.action = 'user/connection';
+
   const { username, password } = ctx.request.body;
   const basicString = Buffer.from(`${username}:${password}`).toString('base64');
   let user;
@@ -175,6 +177,7 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
   ctx.body = user;
   ctx.status = 200;
