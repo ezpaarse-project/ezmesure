@@ -345,13 +345,6 @@ async function importSushiReport(options = {}) {
     return obj;
   };
 
-  /**
-   * Sanitize string for use in an Elasticsearch document ID
-   * @param {String} str
-   * @returns lowercased string with only underscores and alphanumeric characters
-   */
-  const sanitizeIdentifier = (str) => (str || '').replace(/[^a-z0-9_]+/gi, '_').toLowerCase();
-
   const reportHeader = {
     Created: report?.Report_Header?.Created,
     Created_By: report?.Report_Header?.Created_By,
