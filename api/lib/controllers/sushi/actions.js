@@ -315,6 +315,7 @@ exports.harvestSushi = async (ctx) => {
     reportType,
     ignoreValidation,
     harvestId,
+    timeout,
   } = body;
   let { beginDate, endDate } = body;
   const {
@@ -388,6 +389,7 @@ exports.harvestSushi = async (ctx) => {
       institutionId: institution.getId(),
       harvestId: harvestId || uuidv4(),
       username: user.username,
+      timeout,
       reportType,
       index,
       beginDate,
@@ -403,7 +405,7 @@ exports.harvestSushi = async (ctx) => {
 
   await task.save();
   await harvestQueue.add(
-    { taskId: task.getId() },
+    { taskId: task.getId(), timeout },
     { jobId: task.getId() },
   );
 

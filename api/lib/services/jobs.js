@@ -62,8 +62,12 @@ harvestQueue
   })
   .on('failed', (job, err) => {
     appLogger.error(`${logPrefix} Job [${job?.id}] failed`);
-    appLogger.error(err.message);
-    appLogger.error(err.stack);
+
+    if (err?.code !== 'E_JOB_TIMEOUT') {
+      appLogger.error(err.message);
+      appLogger.error(err.stack);
+    }
+
     handleFinishedJob(job);
   })
   .on('lock-extension-failed', (job, err) => {

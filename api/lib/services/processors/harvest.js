@@ -524,23 +524,7 @@ async function importSushiReport(options = {}) {
   appLogger.info(`Sushi report ${sushi.getId()} imported`);
 }
 
-async function processJob(job) {
-  const { taskId } = job?.data || {};
-
-  if (!taskId) {
-    appLogger.error(`[Harvest Job #${job?.id}] No associated task ID, removing job`);
-    return job.remove();
-  }
-
-  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
-
-  const task = await Task.findById(taskId);
-
-  if (!task) {
-    appLogger.error(`[Harvest Job #${job?.id}] Associated task [${taskId}] does not exist, removing job`);
-    return job.remove();
-  }
-
+async function processJob(job, task) {
   if (job.attemptsMade > 0) {
     appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade + 1})`);
     task.log('info', `New attempt (total: ${job.attemptsMade + 1})`);
@@ -632,6 +616,43 @@ async function processJob(job) {
   return task.get('result');
 }
 
-module.exports = function handle(job) {
-  return processJob(job);
+module.exports = async function handle(job) {
+  const jobTimeout = Number.isInteger(job?.data?.timeout) ? job.data.timeout : 600;
+  let task;
+
+  function timeoutHandler() {
+    process.send({ cmd: 'failed', value: { message: 'Job timed out', code: 'E_JOB_TIMEOUT' } });
+    process.exit(1);
+  }
+
+  const timeoutId = setTimeout(() => {
+    appLogger.error(`[Harvest Job #${job?.id}] Timeout of ${jobTimeout}s exceeded, killing process`);
+
+    if (!task) { timeoutHandler(); }
+
+    // Try to gracefully fail
+    task.fail([`Timeout of ${jobTimeout}s exceeded`]);
+    task.save().finally(timeoutHandler);
+
+    // Kill process if it's taking too long to gracefully stop
+    setTimeout(timeoutHandler, 5000);
+  }, jobTimeout * 1000);
+
+  const { taskId } = job?.data || {};
+
+  if (!taskId) {
+    appLogger.error(`[Harvest Job #${job?.id}] No associated task ID, removing job`);
+    return job.remove();
+  }
+
+  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
+
+  task = await Task.findById(taskId);
+
+  if (!task) {
+    appLogger.error(`[Harvest Job #${job?.id}] Associated task [${taskId}] does not exist, removing job`);
+    return job.remove();
+  }
+
+  return processJob(job, task).finally(() => clearTimeout(timeoutId));
 };

@@ -340,6 +340,7 @@ router.route({
       forceDownload: Joi.boolean().default(false),
       reportType: Joi.string().trim().lowercase().default('tr'),
       ignoreValidation: Joi.boolean(),
+      timeout: Joi.number().integer().min(10).default(600),
     },
   },
 });

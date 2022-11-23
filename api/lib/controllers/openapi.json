@@ -5063,6 +5063,17 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Whether to download the report even if a local copy exists"
+                  },
+                  "ignoreValidation": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Try to import the report even if validation fails"
+                  },
+                  "timeout": {
+                    "type": "integer",
+                    "description": "Maximum job duration in seconds",
+                    "minimum": 10,
+                    "default": 600
                   }
                 },
                 "required": [
