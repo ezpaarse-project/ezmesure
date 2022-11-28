@@ -92,12 +92,17 @@ exports.cancelOne = async (ctx) => {
     }
   }
 
+  if (!task) {
+    ctx.throw(404, ctx.$t('errors.task.notFound'));
+  }
+
   if (task && !task.isDone()) {
     task.cancel();
     await task.save();
   }
 
-  ctx.status = 204;
+  ctx.status = 200;
+  ctx.body = task;
 };
 
 exports.deleteOne = async (ctx) => {
