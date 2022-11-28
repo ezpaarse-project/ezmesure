@@ -61,9 +61,10 @@ harvestQueue
     handleFinishedJob(job);
   })
   .on('failed', (job, err) => {
-    appLogger.error(`${logPrefix} Job [${job?.id}] failed`);
-
-    if (err?.code !== 'E_JOB_TIMEOUT') {
+    if (job?.isDiscarded?.()) {
+      appLogger.error(`${logPrefix} Job [${job?.id}] has been cancelled`);
+    } else if (err?.code !== 'E_JOB_TIMEOUT') {
+      appLogger.error(`${logPrefix} Job [${job?.id}] failed`);
       appLogger.error(err.message);
       appLogger.error(err.stack);
     }

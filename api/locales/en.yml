@@ -47,7 +47,7 @@ errors:
     invalidFrequency: Fréquence invalide
     unauthorized: You are not authorized to access this task
     cannotDeleteActiveTask: Cannot delete active task
-    cannnotCancelActiveTask: Cannot cancel an active task
+    cannotCancelJobWithoutPID: Cannot cancel task, the process is not identifiable
 
   institution:
     notFound: Institution not found

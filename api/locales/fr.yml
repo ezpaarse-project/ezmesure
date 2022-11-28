@@ -47,7 +47,7 @@ errors:
     invalidFrequency: Fréquence invalide
     unauthorized: Vous n'êtes pas autorisé à accéder à cette tâche
     cannotDeleteActiveTask: Impossible de supprimer une tâche active
-    cannnotCancelActiveTask: Impossible d'annuler une tâche active
+    cannotCancelJobWithoutPID: Impossible d'annuler la tâche, le processus n'est pas identifiable
 
   institution:
     notFound: Établissement introuvable

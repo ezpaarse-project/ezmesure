@@ -78,29 +78,26 @@ exports.cancelOne = async (ctx) => {
   const { taskId } = ctx.params;
 
   const task = await Task.findById(taskId);
-
-  if (!task) {
-    ctx.throw(404, ctx.$t('errors.task.notFound'));
-    return;
-  }
-
   const job = await harvestQueue.getJob(taskId);
 
   if (job) {
     if (await job.isActive()) {
-      ctx.throw(409, ctx.$t('errors.task.cannnotCancelActiveTask'));
-    }
+      if (!job?.data?.pid) {
+        ctx.throw(500, ctx.$t('errors.task.cannotCancelJobWithoutPID'));
+      }
 
-    await job.remove();
+      process.kill(job.data.pid, 'SIGTERM');
+    } else {
+      await job.remove();
+    }
   }
 
-  if (!task.isDone()) {
+  if (task && !task.isDone()) {
     task.cancel();
     await task.save();
   }
 
-  ctx.status = 200;
-  ctx.body = task;
+  ctx.status = 204;
 };
 
 exports.deleteOne = async (ctx) => {
@@ -110,7 +107,7 @@ exports.deleteOne = async (ctx) => {
 
   if (job) {
     if (await job.isActive()) {
-      ctx.throw(409, ctx.$t('errors.tasks.cannnotDeleteActiveTask'));
+      ctx.throw(409, ctx.$t('errors.task.cannotDeleteActiveTask'));
     }
 
     await job.remove();
