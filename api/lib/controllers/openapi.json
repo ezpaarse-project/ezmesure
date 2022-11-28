@@ -5798,14 +5798,24 @@
         "summary": "Cancel a task",
         "operationId": "post-tasks-id-_cancel",
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
           },
           "403": {
             "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           }
         },
         "description": "Cancel a task, and interrupt the associated job if it's active.",
