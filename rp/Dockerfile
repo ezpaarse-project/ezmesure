@@ -22,6 +22,8 @@ RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log \
   && ln -sf /proc/self/fd/1 /var/log/shibboleth/signature.log \
   && ln -sf /proc/self/fd/1 /var/log/shibboleth/transaction.log
 
+COPY ./apache2/sites-available /etc/apache2/sites-available
+COPY ./shibboleth /etc/shibboleth
 COPY ./httpd-foreground /usr/local/bin/
 CMD [ "httpd-foreground" ]
 
