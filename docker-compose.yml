@@ -148,12 +148,9 @@ services:
       - EZMESURE_FRONT_URL=${EZMESURE_FRONT_URL:-http://front:8080}
       - EZMESURE_API_URL=${EZMESURE_API_URL:-http://api:3000}
       - EZMESURE_KIBANA_URL=http://${EZMESURE_KIBANA_HOST:-kibana}:${EZMESURE_KIBANA_PORT:-5601}
-    working_dir: /var/www/html
     volumes:
-      - ./rp/shibboleth:/etc/shibboleth
       - ./rp/shibboleth/ssl:/etc/shibboleth/ssl
       - ./rp/apache2/ssl:/etc/ssl/certificates
-      - ./rp/apache2/sites-available:/etc/apache2/sites-available
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth
     restart: unless-stopped
