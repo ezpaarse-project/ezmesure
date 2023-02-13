@@ -211,13 +211,7 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
 
   if (!paramNames.has('attributes_to_show')) {
-    params.Attributes_To_Show = optionalAttributes.get(reportType)?.join?.(paramSeparator);
-  }
-  if (!paramNames.has('access_type')) {
-    params.Access_Type = ['Controlled', 'OA_Gold'].join(paramSeparator);
-  }
-  if (!paramNames.has('section_type')) {
-    params.Section_Type = ['Article', 'Book', 'Chapter', 'Other', 'Section'].join(paramSeparator);
+    params.attributes_to_show = optionalAttributes.get(reportType)?.join?.(paramSeparator);
   }
 
   if (requestorId) { params.requestor_id = requestorId; }
