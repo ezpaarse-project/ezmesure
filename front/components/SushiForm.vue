@@ -88,7 +88,7 @@
             <v-col cols="6">
               <v-text-field
                 v-model="sushiForm.requestorId"
-                :label="$t('institutions.sushi.requestorId')"
+                :label="requestorIdLabel"
                 :hint="requireRequestorId ? $t('institutions.sushi.necessaryField') : null"
                 :persistent-hint="requireRequestorId && !sushiForm.requestorId"
                 outlined
@@ -98,7 +98,7 @@
             <v-col cols="6">
               <v-text-field
                 v-model="sushiForm.customerId"
-                :label="$t('institutions.sushi.customerId')"
+                :label="customerIdLabel"
                 :hint="requireCustomerId ? $t('institutions.sushi.necessaryField') : null"
                 :persistent-hint="requireCustomerId && !sushiForm.customerId"
                 outlined
@@ -108,7 +108,7 @@
 
           <v-text-field
             v-model="sushiForm.apiKey"
-            :label="$t('institutions.sushi.apiKey')"
+            :label="apiKeyLabel"
             :hint="requireApiKey ? $t('institutions.sushi.necessaryField') : null"
             :persistent-hint="requireApiKey && !sushiForm.apiKey"
             outlined
