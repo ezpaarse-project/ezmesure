@@ -67,6 +67,20 @@ services:
     command: --requirepass "${EZMESURE_REDIS_PASSWORD:-changeme}"
     restart: unless-stopped
 
+  postgres:
+    image: postgres:15.1-alpine3.16
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${EZMESURE_POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${EZMESURE_POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: ${POSTGRES_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${POSTGRES_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${POSTGRES_HEALTHCHECK_RETRIES:-5}
+
   api:
     build:
       context: ./api
@@ -86,6 +100,7 @@ services:
       - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
       - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
       - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
+      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZMESURE_POSTGRES_DB}?schema=public
       - EZMESURE_HARVEST_CONCURRENCY
       - ELASTICSEARCH_PASSWORD
       - KIBANA_PASSWORD
