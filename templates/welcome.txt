@@ -1,4 +1,4 @@
-Bienvenue {{ user.full_name }},
+Bienvenue {{ user.fullName }},
 Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ user.username }}</strong>
 
 Cordialement,
