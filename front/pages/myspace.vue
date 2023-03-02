@@ -23,7 +23,7 @@
         <div v-text="$t('myspace.determineAccesRight')" />
       </v-alert>
       <v-text-field
-        :value="user.full_name"
+        :value="user.fullName"
         :label="$t('myspace.name')"
         readonly
         outlined
