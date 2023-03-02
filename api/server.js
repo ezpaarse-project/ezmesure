@@ -131,7 +131,6 @@ app.use(mount('/', controller));
 
 function start() {
   notifications.start(appLogger);
-  depositors.start(appLogger);
   opendata.startCron(appLogger);
   cronMetrics.start();
 
