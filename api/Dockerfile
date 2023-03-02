@@ -7,4 +7,4 @@ COPY package*.json ./
 RUN npm ci --only=production
 COPY . .
 
-ENTRYPOINT ["node", "server.js"]
+CMD ["node", "server.js"]
