@@ -7,10 +7,11 @@ const config = require('config');
 const path = require('path');
 const { STATUS_CODES } = require('http');
 
+const usersService = require('./lib/entities/users.service');
+
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
 const notifications = require('./lib/services/notifications');
-const depositors = require('./lib/services/depositors');
 const Task = require('./lib/models/Task');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
@@ -204,10 +205,29 @@ async function createAdmin() {
   const username = config.get('admin.username');
   const password = config.get('admin.password');
   const email = config.get('admin.email');
+  const fullName = 'ezMESURE Administrator';
 
   if (!username || !password) { return; }
 
   appLogger.info(`Creating or updating admin user [${username}]`);
+
+  const adminData = {
+    username,
+    email,
+    fullName,
+    isAdmin: true,
+    metadata: { acceptedTerms: true },
+  };
+
+  try {
+    await usersService.upsert({
+      where: { username },
+      update: adminData,
+      create: adminData,
+    });
+  } catch (e) {
+    appLogger.error(`Failed to update admin in the DB : ${e.message}`);
+  }
 
   try {
     await elastic.security.putUser({
@@ -216,7 +236,7 @@ async function createAdmin() {
       body: {
         password,
         email,
-        full_name: 'ezMESURE Administrator',
+        full_name: fullName,
         roles: ['superuser'],
         metadata: {
           acceptedTerms: true,
@@ -224,7 +244,7 @@ async function createAdmin() {
       },
     });
   } catch (e) {
-    appLogger.error(`Failed to create admin : ${e.message}`);
+    appLogger.error(`Failed to update admin in Elasticsearch : ${e.message}`);
   }
 }
 
