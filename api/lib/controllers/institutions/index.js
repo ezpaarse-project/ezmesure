@@ -4,9 +4,9 @@ const { Joi } = require('koa-joi-router');
 const {
   requireJwt,
   requireUser,
-  requireAnyRole,
   fetchInstitution,
   requireContact,
+  requireAdmin,
 } = require('../../services/auth');
 
 const {
@@ -14,14 +14,11 @@ const {
   createInstitution,
   deleteInstitution,
   getInstitution,
-  getSelfInstitution,
   getInstitutionMembers,
   addInstitutionMember,
   removeInstitutionMember,
   updateInstitution,
   getSushiData,
-  refreshInstitutions,
-  refreshInstitution,
   getInstitutionContacts,
 } = require('./actions');
 
@@ -39,7 +36,6 @@ router.route({
   method: 'GET',
   path: '/:institutionId/sushi',
   handler: [
-    requireAnyRole(['sushi_form', 'admin', 'superuser']),
     fetchInstitution(),
     requireContact(),
     getSushiData,
@@ -57,17 +53,6 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/self',
-  handler: [
-    requireAnyRole(['institution_form', 'sushi_form', 'admin', 'superuser']),
-    getSelfInstitution,
-  ],
-});
-
-router.use(requireAnyRole(['institution_form', 'admin', 'superuser']));
-
-router.route({
-  method: 'GET',
   path: '/:institutionId',
   handler: [
     fetchInstitution(),
@@ -77,7 +62,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:institutionId/members',
+  path: '/:institutionId/memberships',
   handler: [
     fetchInstitution(),
     requireContact(),
@@ -107,7 +92,7 @@ router.route({
 
 router.route({
   method: 'PUT',
-  path: '/:institutionId/members/:username',
+  path: '/:institutionId/memberships/:username',
   handler: [
     fetchInstitution(),
     requireContact(),
@@ -121,15 +106,16 @@ router.route({
     },
     body: {
       readonly: Joi.boolean().default(true),
-      docContact: Joi.boolean(),
-      techContact: Joi.boolean(),
+      isDocContact: Joi.boolean().default(false),
+      isTechContact: Joi.boolean().default(false),
+      isGuest: Joi.boolean().default(false),
     },
   },
 });
 
 router.route({
   method: 'DELETE',
-  path: '/:institutionId/members/:username',
+  path: '/:institutionId/memberships/:username',
   handler: [
     fetchInstitution(),
     requireContact(),
@@ -151,7 +137,7 @@ router.route({
     type: 'json',
     maxBody: '3mb',
     query: {
-      creator: Joi.boolean(),
+      addAsMember: Joi.boolean(),
     },
   },
 });
@@ -188,7 +174,7 @@ router.route({
   },
 });
 
-router.use(requireAnyRole(['admin', 'superuser']));
+router.use(requireAdmin);
 
 router.route({
   method: 'DELETE',

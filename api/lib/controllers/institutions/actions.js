@@ -1,19 +1,18 @@
 const config = require('config');
-const elastic = require('../../services/elastic');
-const depositors = require('../../services/depositors');
-const indexTemplate = require('../../utils/depositors-template');
+const institutionsService = require('../../entities/institutions.service');
+const institutionsDto = require('../../entities/institutions.dto');
+const membershipService = require('../../entities/memberships.service');
+const usersService = require('../../entities/users.service');
 
-const Institution = require('../../models/Institution');
 const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 
+const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
-
-const depositorsIndex = config.depositors.index;
 
 function sendValidateInstitution(receivers, data) {
   return sendMail({
@@ -24,22 +23,6 @@ function sendValidateInstitution(receivers, data) {
     ...generateMail('validate-institution', data),
   });
 }
-
-const isAdmin = (user) => {
-  const roles = new Set((user && user.roles) || []);
-  return (roles.has('admin') || roles.has('superuser'));
-};
-
-const ensureIndex = async () => {
-  const { body: exists } = await elastic.indices.exists({ index: depositorsIndex });
-
-  if (!exists) {
-    await elastic.indices.create({
-      index: depositorsIndex,
-      body: indexTemplate,
-    });
-  }
-};
 
 function sendNewContact(receiver) {
   const data = {
@@ -56,72 +39,51 @@ function sendNewContact(receiver) {
 }
 
 exports.getInstitutions = async (ctx) => {
-  await ensureIndex();
-
   ctx.type = 'json';
-  ctx.body = await Institution.findAll();
+  ctx.body = await institutionsService.findMany({});
 };
 
 exports.getInstitution = async (ctx) => {
-  await ensureIndex();
-
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = ctx.state.institution;
 };
 
-exports.getSelfInstitution = async (ctx) => {
-  await ensureIndex();
-
-  const { username, roles } = ctx.state.user;
-  const institution = await Institution.findOneByCreatorOrRole(username, roles);
-
-  if (!institution) {
-    ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
-    return;
-  }
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = institution;
-};
-
 exports.createInstitution = async (ctx) => {
   ctx.action = 'institutions/create';
-  await ensureIndex();
-
   const { user } = ctx.state;
   const { body } = ctx.request;
-  const { creator } = ctx.query;
-  const { logo } = body;
-  const { username, roles } = ctx.state.user;
+  const { addAsMember } = ctx.query;
+  const { username, isAdmin } = user;
+  let memberships;
 
   ctx.metadata = {
-    institutionName: body.name,
+    institutionName: body?.name,
   };
 
-  if (!isAdmin(user)) {
-    const selfInstitution = await Institution.findOneByCreatorOrRole(username, roles);
+  const base64logo = body?.logo;
+  const schema = institutionsDto[isAdmin ? 'adminCreateSchema' : 'createSchema'];
+  const { error, value: institutionData } = schema.validate(body);
 
-    if (selfInstitution) {
-      ctx.throw(409, ctx.$t('errors.institution.alreadyAttached'));
-      return;
-    }
+  if (error) { ctx.throw(error); }
+
+  if (!isAdmin || addAsMember !== false) {
+    memberships = {
+      create: [{
+        username,
+        isDocContact: true,
+        isTechContact: true,
+      }],
+    };
   }
 
-  const institution = new Institution(body, {
-    schema: isAdmin(user) ? 'adminCreate' : 'create',
+  if (base64logo) {
+    institutionData.logoId = await imagesService.storeLogo(base64logo);
+  }
+
+  const institution = await institutionsService.create({
+    data: { ...institutionData, memberships },
   });
-
-  if (!isAdmin(user) || creator !== false) {
-    institution.setCreator(username);
-  }
-
-  if (logo) {
-    await institution.updateLogo(logo);
-  }
-
-  await institution.save();
 
   ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
@@ -137,7 +99,7 @@ exports.updateInstitution = async (ctx) => {
 
   ctx.metadata = {
     institutionId: institution.id,
-    institutionName: institution.get('name'),
+    institutionName: institution.name,
   };
 
   if (!body) {
@@ -145,33 +107,50 @@ exports.updateInstitution = async (ctx) => {
     return;
   }
 
-  const wasValidated = institution.get('validated');
-  const wasSushiReady = institution.get('sushiReadySince');
+  const schema = institutionsDto[user.isAdmin ? 'adminUpdateSchema' : 'updateSchema'];
+  const { error, value: institutionData } = schema.validate(body);
 
-  institution.update(body, {
-    schema: isAdmin(user) ? 'adminUpdate' : 'update',
+  if (error) { ctx.throw(error); }
+
+  const wasValidated = institution.validated;
+  const oldLogoId = institution.logoId;
+  const wasSushiReady = institution.sushiReadySince;
+
+  if (institutionData.logo) {
+    institutionData.logoId = await imagesService.storeLogo(institutionData.logo);
+  }
+
+  // FIXME: handle admin restricted fields
+  const updatedInstitution = await institutionsService.update({
+    where: { id: institution.id },
+    data: {
+      ...institutionData,
+      logo: undefined,
+    },
   });
 
-  if (body.logo) {
-    await institution.updateLogo(body.logo);
-  } else if (body.logo === null) {
-    await institution.removeLogo();
+  if (institutionData.logo && oldLogoId) {
+    await imagesService.remove(oldLogoId);
   }
 
-  try {
-    await institution.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  if (!wasValidated && institutionData.validated === true) {
+    const contactMemberships = await membershipService.findMany({
+      where: {
+        institutionId: ctx.state.institution.id,
+        OR: [
+          { isDocContact: true },
+          { isTechContact: true },
+        ],
+      },
+      include: { user: true },
+    });
 
-  if (!wasValidated && body.validated === true) {
-    let contacts = await institution.getContacts();
-    contacts = contacts?.map?.((e) => e.email);
+    const contacts = contactMemberships?.map?.((m) => m.user.email);
 
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
         await sendValidateInstitution(contacts, {
-          manageMemberLink: `${origin}/institutions/self/members`,
+          manageMemberLink: `${origin}/institutions/self/memberships`,
           manageSushiLink: `${origin}/institutions/self/sushi`,
         });
       } catch (err) {
@@ -180,7 +159,7 @@ exports.updateInstitution = async (ctx) => {
     }
   }
 
-  const sushiReadySince = institution.get('sushiReadySince');
+  const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
                          || (!wasSushiReady && sushiReadySince);
 
@@ -200,25 +179,29 @@ exports.updateInstitution = async (ctx) => {
   }
 
   ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = updatedInstitution;
 };
 
 exports.deleteInstitution = async (ctx) => {
   ctx.action = 'institutions/delete';
   const { institutionId } = ctx.params;
+
   const { institution } = ctx.state;
 
   ctx.metadata = {
     institutionId: institution.id,
-    institutionName: institution.get('name'),
+    institutionName: institution.name,
   };
 
   ctx.status = 200;
-  ctx.body = await Institution.deleteOne(institutionId);
+  ctx.body = await institutionsService.delete({ where: { id: institutionId } });
 };
 
 exports.getInstitutionMembers = async (ctx) => {
-  const members = await ctx.state.institution.getMembers();
+  const members = await membershipService.findMany({
+    where: { institutionId: ctx.state.institution.id },
+    include: { user: true },
+  });
 
   ctx.type = 'json';
   ctx.status = 200;
@@ -242,78 +225,69 @@ exports.addInstitutionMember = async (ctx) => {
   const { username } = ctx.params;
   const { body = {} } = ctx.request;
   const {
-    readonly = true,
-    docContact,
-    techContact,
+    id: institutionId,
+    name: institutionName,
+  } = institution;
+  const {
+    isDocContact = false,
+    isTechContact = false,
+    isGuest = false,
   } = body;
 
   ctx.metadata = {
-    institutionId: institution.id,
-    institutionName: institution.get('name'),
+    institutionId,
+    institutionName,
     username,
   };
 
-  const role = institution.getRole();
-  const readonlyRole = institution.getRole({ readonly: true });
+  const user = await usersService.findUnique({
+    where: { username },
+    select: {
+      memberships: {
+        where: { institutionId },
+      },
+    },
+  });
 
-  if (!role) {
-    ctx.throw(409, ctx.$t('errors.institution.noRole'));
-  }
-
-  const member = await elastic.security.findUser({ username });
-
-  if (!member) {
+  if (!user) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
+  const membership = user.memberships?.[0];
+  const memberIsContact = membership?.isDocContact || membership?.isTechContact;
+  const memberBecomesContact = isDocContact || isTechContact;
+
   // Only admins can update institution contacts
-  if (institution.isContact(member) && !userIsAdmin) {
+  if ((memberIsContact || memberBecomesContact) && !userIsAdmin) {
     ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
   }
 
-  const wasContact = institution.isContact(member);
-
-  // If the user is not already a member, check if it belongs to another institution
-  if (!institution.isMember(member) && !institution.isCreator(member)) {
-    const memberInstitution = await Institution.findOneByCreatorOrRole(
-      member.username,
-      member.roles,
-    );
-
-    if (memberInstitution) {
-      ctx.throw(409, ctx.$t('errors.members.alreadyMember', memberInstitution.get('name')));
-      return;
-    }
+  if (membership) {
+    await membershipService.update({
+      where: {
+        username_institutionId: { username, institutionId },
+      },
+      data: {
+        isDocContact,
+        isTechContact,
+        isGuest,
+      },
+    });
+  } else {
+    await membershipService.create({
+      data: {
+        isDocContact,
+        isTechContact,
+        isGuest,
+        user: { connect: { username } },
+        institution: { connect: { id: institutionId } },
+      },
+    });
   }
 
-  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
-
-  userRoles.add(readonly ? readonlyRole : role);
-  userRoles.delete(readonly ? role : readonlyRole);
-
-  if (userIsAdmin) {
-    if (docContact === true) { userRoles.add(Institution.docRole()); }
-    if (docContact === false) { userRoles.delete(Institution.docRole()); }
-    if (techContact === true) { userRoles.add(Institution.techRole()); }
-    if (techContact === false) { userRoles.delete(Institution.techRole()); }
-  }
-
-  member.roles = Array.from(userRoles);
-
-  try {
-    await elastic.security.putUser({ username, refresh: true, body: member });
-  } catch (e) {
-    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
-  }
-
-  if (institution.isCreator(member)) {
-    institution.setCreator(null);
-    await institution.save();
-  }
-
-  if (!wasContact && institution.isContact(member)) {
+  if (!memberIsContact && memberBecomesContact) {
     try {
-      await sendNewContact(member.email);
+      await sendNewContact(user.email);
     } catch (err) {
       appLogger.error(`Failed to send new contact mail: ${err}`);
     }
@@ -328,44 +302,46 @@ exports.removeInstitutionMember = async (ctx) => {
 
   const { institution, userIsAdmin } = ctx.state;
   const { username } = ctx.params;
+  const { id: institutionId } = institution;
 
   ctx.metadata = {
     institutionId: institution.id,
-    institutionName: institution.get('name'),
+    institutionName: institution.name,
     username,
   };
 
-  const role = institution.getRole();
-  const readonlyRole = institution.getRole({ readonly: true });
+  const user = await usersService.findUnique({
+    where: { username },
+    select: {
+      memberships: {
+        where: { institutionId },
+      },
+    },
+  });
 
-  if (!role) {
-    ctx.throw(409, ctx.$t('errors.institution.noRole'));
-  }
-
-  const member = await elastic.security.findUser({ username });
-
-  if (!member) {
+  if (!user) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
-  if (institution.isContact(member) && !userIsAdmin) {
+
+  const membership = user.memberships?.[0];
+  const memberIsContact = membership?.isDocContact || membership?.isTechContact;
+
+  if (memberIsContact && !userIsAdmin) {
     ctx.throw(409, ctx.$t('errors.members.cannotRemoveContact'));
   }
 
-  const userRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
-
-  if (!userRoles.has(role) && !userRoles.has(readonlyRole)) {
+  if (!membership) {
     ctx.status = 200;
     ctx.body = { message: ctx.$t('nothingToDo') };
     return;
   }
 
-  userRoles.delete(role);
-  userRoles.delete(readonlyRole);
-
-  member.roles = Array.from(userRoles);
-
   try {
-    await elastic.security.putUser({ username: member.username, refresh: true, body: member });
+    await membershipService.delete({
+      where: {
+        username_institutionId: { username, institutionId },
+      },
+    });
   } catch (e) {
     ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
   }
