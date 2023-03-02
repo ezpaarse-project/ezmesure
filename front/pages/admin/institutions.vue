@@ -247,7 +247,7 @@ export default {
       this.$refs.institutionForm.editInstitution(item);
     },
     createInstitution() {
-      this.$refs.institutionForm.createInstitution({ saveCreator: false });
+      this.$refs.institutionForm.createInstitution({ addAsMember: false });
     },
     onInstitutionsRemove(removedIds) {
       const removeDeleted = institution => !removedIds.some(id => institution.id === id);
