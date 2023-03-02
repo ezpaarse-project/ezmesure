@@ -1,0 +1,212 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("EZMESURE_POSTGRES_URL")
+}
+
+model Institution {
+  id                  String             @id @default(cuid())
+  parentInstitutionId String?
+  parentInstitution   Institution?       @relation("ParentInstitution", fields: [parentInstitutionId], references: [id])
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  name                String
+  validated           Boolean            @default(false)
+  hidePartner         Boolean            @default(false)
+  tags                String[]
+  logoId              String?
+  type                String?
+  acronym             String?
+  websiteUrl          String?
+  city                String?
+  uai                 String?
+  social              Json?
+  auto                Json?
+  sushiReadySince     DateTime?
+  memberships         Membership[]
+  spaces              Space[]
+  historyEntries      HistoryEntry[]
+  sushiCredentials    SushiCredentials[]
+  childInstitutions   Institution[]      @relation("ParentInstitution")
+  repositories        Repository[]
+}
+
+model User {
+  username              String                 @id
+  fullName              String
+  email                 String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  isAdmin               Boolean                @default(false)
+  metadata              Json?
+  memberships           Membership[]
+  spacePermissions      SpacePermission[]
+  historyEntries        HistoryEntry[]
+  repositoryPermissions RepositoryPermission[]
+}
+
+model Membership {
+  username      String
+  user          User        @relation(fields: [username], references: [username], onDelete: Cascade)
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  isDocContact  Boolean     @default(false)
+  isTechContact Boolean     @default(false)
+  isGuest       Boolean     @default(false)
+  permissions   String[]
+
+  @@id([username, institutionId])
+}
+
+model Space {
+  id               String            @id
+  institutionId    String
+  institution      Institution?      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  type             String            @db.VarChar(50)
+  spacePermissions SpacePermission[]
+}
+
+model SpacePermission {
+  username String
+  spaceId  String
+  user     User    @relation(fields: [username], references: [username], onDelete: Cascade)
+  space    Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  readonly Boolean @default(false)
+  locked   Boolean @default(false)
+
+  @@id([username, spaceId])
+}
+
+model Repository {
+  id            String                 @id @default(cuid())
+  institutionId String
+  institution   Institution?           @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  pattern       String
+  dataType      String                 @db.VarChar(50)
+  permissions   RepositoryPermission[]
+
+  @@unique([institutionId, pattern])
+}
+
+model RepositoryPermission {
+  username     String
+  user         User       @relation(fields: [username], references: [username], onDelete: Cascade)
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  readonly     Boolean    @default(false)
+  locked       Boolean    @default(false)
+
+  @@id([username, repositoryId])
+}
+
+model HistoryEntry {
+  id            String      @id @default(cuid())
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [username])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  type          String      @db.VarChar(50)
+  message       String?
+  data          Json
+}
+
+model HarvestJob {
+  id          String         @id @default(cuid())
+  requestId   String
+  requests    HarvestRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  status      String
+  runningTime Int
+  result      Json
+  logs        Log[]
+  steps       Step[]
+}
+
+model HarvestRequest {
+  id            String           @id @default(cuid())
+  credentialsId String
+  credentials   SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  reportId      String
+  HarvestJob    HarvestJob[]
+}
+
+model Log {
+  id      String     @id @default(cuid())
+  jobId   String
+  job     HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  date    DateTime   @default(now())
+  type    String     @db.VarChar(50)
+  message String
+}
+
+model Step {
+  id          String     @id @default(cuid())
+  jobId       String
+  job         HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  startedAt   DateTime
+  label       String     @db.VarChar(50)
+  status      String     @db.VarChar(50)
+  runningTime Int
+  data        Json
+}
+
+model SushiEndpoint {
+  id                 String             @id @default(cuid())
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  sushiUrl           String
+  vendor             String
+  description        String?
+  counterVersion     String?
+  technicalProvider  String?
+  requireCustomerId  Boolean            @default(false)
+  requireRequestorId Boolean            @default(false)
+  requireApiKey      Boolean            @default(false)
+  defaultCustomerId  String?
+  defaultRequestorId String?
+  defaultApiKey      String?
+  paramSeparator     String?
+  tags               String[]
+  credentials        SushiCredentials[]
+  defaultParameters  SushiParameter[]
+}
+
+model SushiCredentials {
+  id              String           @id @default(cuid())
+  institutionId   String
+  endpointId      String
+  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  params          SushiParameter[]
+  harvestRequests HarvestRequest[]
+}
+
+model SushiParameter {
+  id            String            @id @default(cuid())
+  credentialsId String?
+  endpointId    String?
+  credentials   SushiCredentials? @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  endpoint      SushiEndpoint?    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  name          String
+  value         String
+  scope         String
+}
