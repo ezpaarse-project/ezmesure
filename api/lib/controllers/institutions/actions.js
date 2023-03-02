@@ -374,22 +374,6 @@ exports.removeInstitutionMember = async (ctx) => {
   ctx.body = { message: ctx.$t('userUpdated') };
 };
 
-exports.refreshInstitutions = async (ctx) => {
-  const results = await depositors.refresh();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = results;
-};
-
-exports.refreshInstitution = async (ctx) => {
-  await ctx.state.institution.refreshIndexCount();
-  await ctx.state.institution.refreshContacts();
-
-  ctx.status = 200;
-  ctx.body = ctx.state.institution;
-};
-
 exports.getSushiData = async (ctx) => {
   const options = {};
   const connection = ctx.query?.connection;

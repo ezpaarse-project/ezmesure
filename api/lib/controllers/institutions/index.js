@@ -236,24 +236,4 @@ router.route({
   },
 });
 
-router.route({
-  method: 'POST',
-  path: '/:institutionId/_refresh',
-  handler: [
-    fetchInstitution(),
-    refreshInstitution,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
-  path: '/_refresh',
-  handler: refreshInstitutions,
-});
-
 module.exports = router;
