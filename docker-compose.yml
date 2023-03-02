@@ -27,7 +27,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    mem_limit: ${EZMESURE_ES_MEM_LIMIT}
     volumes:
       - "./data/elastic/data:/usr/share/elasticsearch/data"
       - "./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
