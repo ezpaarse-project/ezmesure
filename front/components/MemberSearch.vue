@@ -45,7 +45,7 @@
                 <v-icon>mdi-account-circle</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title v-text="item.full_name" />
+                <v-list-item-title v-text="item.fullName" />
               </v-list-item-content>
             </template>
           </v-autocomplete>
@@ -61,13 +61,13 @@
 
           <template v-if="isAdmin">
             <v-checkbox
-              v-model="docContact"
+              v-model="isDocContact"
               :label="$t('institutions.members.documentaryCorrespondent')"
               hide-details
               @change="handleContactChange"
             />
             <v-checkbox
-              v-model="techContact"
+              v-model="isTechContact"
               :label="$t('institutions.members.technicalCorrespondent')"
               hide-details
               @change="handleContactChange"
@@ -129,14 +129,14 @@ export default {
       search: null,
       selected: null,
       selectedPermission: 'read',
-      techContact: false,
-      docContact: false,
+      isTechContact: false,
+      isDocContact: false,
       users: [],
     };
   },
   computed: {
     isAdmin() {
-      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+      return this.$auth?.user?.isAdmin;
     },
     errorMessages() {
       return this.failedToSearch ? [this.$t('institutions.members.failedToSearch')] : [];
@@ -212,13 +212,11 @@ export default {
       this.addMemberError = null;
 
       const { username } = this.selected;
-      const readonly = this.selectedPermission !== 'write';
 
       try {
-        await this.$axios.put(`/institutions/${this.institutionId}/members/${username}`, {
-          readonly,
-          docContact: this.isAdmin ? this.docContact : undefined,
-          techContact: this.isAdmin ? this.techContact : undefined,
+        await this.$axios.put(`/institutions/${this.institutionId}/memberships/${username}`, {
+          isDocContact: this.isAdmin ? this.isDocContact : undefined,
+          isTechContact: this.isAdmin ? this.isTechContact : undefined,
         });
         this.showMemberMenu = false;
         this.$emit('added');

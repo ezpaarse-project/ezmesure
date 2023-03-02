@@ -43,7 +43,7 @@ export default {
   },
   computed: {
     isAdmin() {
-      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+      return this.$auth?.user?.isAdmin;
     },
     isContact() {
       const isTech = this.member?.techContact;

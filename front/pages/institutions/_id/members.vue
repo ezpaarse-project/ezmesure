@@ -21,7 +21,7 @@
       :headers="headers"
       :items="members"
       :loading="refreshing"
-      sort-by="full_name"
+      sort-by="fullName"
       item-key="username"
     >
       <template v-slot:top="{ originalItemsLength }">
@@ -34,14 +34,14 @@
 
       <template v-slot:item.correspondent="{ item }">
         <v-chip
-          v-if="item.techContact"
+          v-if="item.isTechContact"
           small
           label
           color="secondary"
           v-text="$t('institutions.members.technical')"
         />
         <v-chip
-          v-if="item.docContact"
+          v-if="item.isDocContact"
           small
           label
           color="secondary"
@@ -115,14 +115,14 @@ export default {
     store,
     params,
     app,
-    $auth,
-    redirect,
+    // $auth,
+    // redirect,
   }) {
     let institution = null;
 
-    if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
-      return redirect({ name: 'myspace' });
-    }
+    // if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
+    //   return redirect({ name: 'myspace' });
+    // }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
@@ -143,7 +143,7 @@ export default {
       headers: [
         {
           text: app.i18n.t('institutions.members.name'),
-          value: 'full_name',
+          value: 'user.fullName',
         },
         {
           text: app.i18n.t('institutions.members.username'),
@@ -188,7 +188,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.members = await this.$axios.$get(`/institutions/${this.institution.id}/members`);
+        this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`);
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));
       }

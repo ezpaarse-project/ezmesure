@@ -29,13 +29,13 @@
 
         <template v-if="isAdmin">
           <v-checkbox
-            v-model="docContact"
+            v-model="isDocContact"
             :label="$t('institutions.members.documentaryCorrespondent')"
             hide-details
             @change="handleContactChange"
           />
           <v-checkbox
-            v-model="techContact"
+            v-model="isTechContact"
             :label="$t('institutions.members.technicalCorrespondent')"
             hide-details
             @change="handleContactChange"
@@ -85,22 +85,22 @@ export default {
       username: '',
       fullName: '',
       readonly: true,
-      docContact: false,
-      techContact: false,
+      isDocContact: false,
+      isTechContact: false,
     };
   },
   computed: {
     isAdmin() {
-      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+      return this.$auth?.user?.isAdmin;
     },
   },
   methods: {
     updateMember(memberData = {}) {
       this.username = memberData?.username || '';
-      this.fullName = memberData?.full_name || ''; // eslint-disable-line camelcase
+      this.fullName = memberData?.fullName || ''; // eslint-disable-line camelcase
       this.readonly = memberData?.readonly !== false;
-      this.docContact = memberData?.docContact === true;
-      this.techContact = memberData?.techContact === true;
+      this.isDocContact = memberData?.isDocContact === true;
+      this.isTechContact = memberData?.isTechContact === true;
       this.show = true;
     },
 
@@ -116,11 +116,11 @@ export default {
       this.saving = true;
       this.saveError = null;
 
-      const url = `/institutions/${this.institutionId}/members/${this.username}`;
+      const url = `/institutions/${this.institutionId}/memberships/${this.username}`;
       const body = {
         readonly: this.readonly,
-        docContact: this.isAdmin ? this.docContact : undefined,
-        techContact: this.isAdmin ? this.techContact : undefined,
+        isDocContact: this.isAdmin ? this.isDocContact : undefined,
+        isTechContact: this.isAdmin ? this.isTechContact : undefined,
       };
 
       try {

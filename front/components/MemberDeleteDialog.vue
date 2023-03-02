@@ -50,7 +50,7 @@ export default {
   methods: {
     confirmRemove(memberData = {}) {
       this.member.username = memberData?.username || '';
-      this.member.fullName = memberData?.full_name || ''; // eslint-disable-line camelcase
+      this.member.fullName = memberData?.fullName || '';
       this.member.creator = memberData?.creator;
       this.show = true;
     },
@@ -64,7 +64,7 @@ export default {
         if (this.member.creator) {
           await this.$axios.$delete(`/institutions/${this.institutionId}/creator`);
         }
-        await this.$axios.$delete(`/institutions/${this.institutionId}/members/${this.member.username}`);
+        await this.$axios.$delete(`/institutions/${this.institutionId}/memberships/${this.member.username}`);
         this.show = false;
         this.$emit('removed');
       } catch (e) {
