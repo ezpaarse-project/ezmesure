@@ -2,6 +2,8 @@ const { auth } = require('config');
 const jwt = require('koa-jwt');
 const elastic = require('./elastic');
 const { getModel } = require('../models/TypedModel');
+const institutionsService = require('../entities/institutions.service');
+const usersService = require('../entities/users.service');
 
 const requireJwt = jwt({
   secret: auth.secret,
@@ -9,22 +11,22 @@ const requireJwt = jwt({
 });
 
 const requireUser = async (ctx, next) => {
-  if (!ctx.state.user || !ctx.state.user.username) {
+  const username = ctx.state?.user?.username;
+
+  if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
 
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  const roles = new Set(user.roles || []);
-
   ctx.state.user = user;
-  ctx.state.userIsAdmin = (roles.has('admin') || roles.has('superuser'));
+  ctx.state.userIsAdmin = user.isAdmin;
 
   await next();
 };
@@ -53,7 +55,7 @@ const requireAnyRole = (role) => async (ctx, next) => {
 };
 
 const requireAdmin = (ctx, next) => {
-  if (!ctx.state?.userIsAdmin) {
+  if (!ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.perms.feature'));
   }
 
@@ -86,7 +88,24 @@ function fetchModel(modelName, opts = {}) {
       modelId = ctx.query[queryField];
     }
 
-    const item = modelId && await getModel(modelName).findById(modelId);
+    let item;
+    if (modelName === 'institution') {
+      item = modelId && await institutionsService.findUnique({
+        where: { id: modelId },
+        include: {
+          memberships: {
+            where: {
+              OR: [
+                { isDocContact: true },
+                { isTechContact: true },
+              ],
+            },
+          },
+        },
+      });
+    } else {
+      item = modelId && await getModel(modelName).findById(modelId);
+    }
 
     if (!item && !ignoreNotFound) {
       ctx.throw(404, ctx.$t(`errors.${modelName}.notFound`));
@@ -102,15 +121,16 @@ function fetchModel(modelName, opts = {}) {
  * Middleware that checks that user is either admin or institution contact
  * Assumes that ctx.state contains institution and user
  */
-function requireContact(opts = {}) {
-  const { allowCreator } = opts;
-
+function requireContact() {
   return (ctx, next) => {
-    const { user, institution, userIsAdmin } = ctx.state;
+    const { user, institution } = ctx.state;
 
-    if (userIsAdmin) { return next(); }
-    if (user && institution && institution.isContact(user)) { return next(); }
-    if (allowCreator && user && institution && institution.isCreator(user)) { return next(); }
+    if (user?.isAdmin) { return next(); }
+
+    const isContact = institution?.memberships?.some?.((m) => (
+      (m?.username === user?.username) && (m.isDocContact || m.isTechContact)
+    ));
+    if (isContact) { return next(); }
 
     ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
     return undefined;
