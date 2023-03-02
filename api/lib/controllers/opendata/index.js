@@ -9,7 +9,6 @@ const {
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
-router.use(requireAnyRole(['institution_form', 'admin', 'superuser']));
 
 router.route({
   method: 'GET',
