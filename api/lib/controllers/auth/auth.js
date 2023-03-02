@@ -1,10 +1,10 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const {
-  addHours, differenceInHours, isBefore, parseISO,
-} = require('date-fns');
+const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
+const usersService = require('../../entities/users.service');
+const membershipsService = require('../../entities/memberships.service');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 
@@ -69,12 +69,26 @@ function sendNewUserToContacts(receivers, data) {
 exports.renaterLogin = async (ctx) => {
   const { query } = ctx.request;
   const headers = ctx.request.header;
-  const props = {
-    full_name: decode(headers.displayname || headers.cn || headers.givenname),
-    email: decode(headers.mail),
-    roles: ['new_user'],
+
+  const email = decode(headers.mail);
+  const idp = headers['shib-identity-provider'];
+
+  if (!idp) {
+    ctx.throw(400, ctx.$t('errors.auth.IDPNotFound'));
+    return;
+  }
+
+  if (!email) {
+    ctx.throw(400, ctx.$t('errors.auth.noEmailInHeaders'));
+    return;
+  }
+
+  const userProps = {
+    username: email.split('@')[0].toLowerCase(),
+    fullName: decode(headers.displayname || headers.cn || headers.givenname),
+    email,
     metadata: {
-      idp: headers['shib-identity-provider'],
+      idp,
       uid: headers.uid,
       org: decode(headers.o),
       unit: decode(headers.ou),
@@ -85,37 +99,29 @@ exports.renaterLogin = async (ctx) => {
     },
   };
 
-  if (!props.metadata.idp) {
-    ctx.throw(400, ctx.$t('errors.auth.IDPNotFound'));
-    return;
-  }
+  const { username } = userProps;
 
-  if (!props.email) {
-    ctx.throw(400, ctx.$t('errors.auth.noEmailInHeaders'));
-    return;
-  }
-
-  const username = props.email.split('@')[0].toLowerCase();
-
-  let user = await elastic.security.findUser({ username });
+  let user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.action = 'user/register';
     ctx.metadata = { username };
 
-    const now = new Date();
-    props.metadata.createdAt = now;
-    props.metadata.updatedAt = now;
-    props.metadata.acceptedTerms = false;
-    props.password = await randomString();
+    userProps.metadata.acceptedTerms = false;
 
-    await elastic.security.putUser({ username, body: props });
-    user = await elastic.security.findUser({ username });
+    // First create the user in the DB
+    user = await usersService.create({ data: userProps });
 
-    if (!user) {
-      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
-      return;
-    }
+    // Then create the associated user in Elasticsearch
+    await elastic.security.putUser({
+      username,
+      body: {
+        email,
+        full_name: userProps.fullName,
+        password: await randomString(),
+        roles: ['new_user'],
+      },
+    });
 
     try {
       await sendWelcomeMail(user);
@@ -126,17 +132,16 @@ exports.renaterLogin = async (ctx) => {
     ctx.action = 'user/refresh';
     ctx.metadata = { username };
 
-    props.metadata.updatedAt = new Date();
-    props.metadata.createdAt = user.metadata.createdAt;
-    props.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
-    props.roles = user.roles;
-    props.username = username;
+    userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      await elastic.security.putUser({ username, body: props });
-      user = props;
+      // Only update the user in the DB, Elasticsearch will be synchronized later
+      user = await usersService.update({
+        where: { username },
+        data: userProps,
+      });
     } catch (e) {
-      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
+      ctx.throw(500, e);
       return;
     }
   } else {
@@ -177,6 +182,18 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  // Make sure that the user exists in the DB
+  await usersService.upsert({
+    where: { username },
+    update: {},
+    create: {
+      username,
+      email: user.email,
+      fullName: user.full_name,
+      isAdmin: user.roles?.includes?.('superuser'),
+    },
+  });
+
   ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
   ctx.body = user;
@@ -184,32 +201,35 @@ exports.elasticLogin = async (ctx) => {
 };
 
 exports.acceptTerms = async (ctx) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const { user } = ctx.state;
+  const { email, username } = user;
 
-  const origin = ctx.get('origin');
-
-  if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+  if (user?.metadata?.acceptTerms === true) {
+    ctx.status = 204;
     return;
   }
 
-  user.metadata.acceptedTerms = true;
-  await elastic.security.putUser({ username: user.username, body: user });
+  await usersService.update({
+    where: { username },
+    data: {
+      metadata: { acceptedTerms: true },
+    },
+  });
 
-  const { email } = user;
+  const origin = ctx.get('origin');
   const [, domain] = email.split('@');
 
-  let res;
+  let correspondents;
   try {
-    res = await elastic.search({
-      index: '.security',
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { type: 'user' } },
-              { terms: { roles: ['doc_contact', 'tech_contact'] } },
-              { wildcard: { email: { value: `*@${domain}` } } },
+    correspondents = await usersService.findMany({
+      select: { email: true },
+      where: {
+        email: { endsWith: `@${domain}` },
+        memberships: {
+          some: {
+            OR: [
+              { isDocContact: true },
+              { isTechContact: true },
             ],
           },
         },
@@ -219,9 +239,8 @@ exports.acceptTerms = async (ctx) => {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }
 
-  const correspondents = res?.body?.hits?.hits;
   if (Array.isArray(correspondents) && correspondents.length > 0) {
-    const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
+    const emails = correspondents.map((c) => c?.email).filter((x) => x);
 
     try {
       await sendNewUserToContacts(emails, {
@@ -338,7 +357,7 @@ exports.changePassword = async (ctx) => {
 };
 
 exports.getUser = async (ctx) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await usersService.findUnique({ where: { username: ctx.state.user.username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
