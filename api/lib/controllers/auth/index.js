@@ -12,6 +12,7 @@ const {
   getResetToken,
   resetPassword,
   changePassword,
+  getMemberships,
 } = require('./auth');
 
 const schema = {
@@ -53,6 +54,7 @@ router.route({
 router.use(requireJwt, requireUser);
 
 router.get('/', getUser);
+router.get('/memberships', getMemberships);
 router.get('/token', getToken);
 router.post('/terms/accept', acceptTerms);
 router.route({

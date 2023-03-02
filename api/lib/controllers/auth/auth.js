@@ -373,6 +373,15 @@ exports.getToken = async (ctx) => {
   ctx.body = generateToken(ctx.state.user);
 };
 
+exports.getMemberships = async (ctx) => {
+  const { username } = ctx.state.user;
+  ctx.status = 200;
+  ctx.body = await membershipsService.findMany({
+    where: { username },
+    include: { institution: true },
+  });
+};
+
 exports.logout = async (ctx) => {
   ctx.cookies.set(cookie, null, { httpOnly: true });
   ctx.redirect(decodeURIComponent('/myspace'));
