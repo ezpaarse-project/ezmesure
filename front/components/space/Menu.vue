@@ -22,32 +22,6 @@
       </v-list-item>
 
       <v-list-group
-        v-if="institutionMenu"
-        :value="$nuxt.$route.name.includes(institutionMenu.title.toLowerCase())"
-      >
-        <template v-slot:activator>
-          <v-list-item-title
-            class="grey--text text--darken-3 uppercase"
-            v-text="institutionMenu.title"
-          />
-        </template>
-
-        <v-list-item
-          v-for="child in institutionMenu.children"
-          :key="child.title"
-          router
-          exact
-          :to="{ path: `${institutionMenu.href}${child.href}` }"
-          ripple
-        >
-          <v-list-item-title
-            class="grey--text text--darken-3 uppercase pl-5"
-            v-text="child.title"
-          />
-        </v-list-item>
-      </v-list-group>
-
-      <v-list-group
         v-if="isAdmin"
         :value="$nuxt.$route.name.indexOf(administration.title.toLowerCase()) !== -1"
       >
@@ -106,6 +80,7 @@ export default {
         { title: this.$t('menu.myDeposits'), href: '/files' },
         { title: this.$t('menu.kibanIdentifiers'), href: '/kibana' },
         { title: this.$t('menu.authentificationToken'), href: '/token' },
+        { title: this.$t('menu.myInstitutions'), href: '/my-institutions' },
       ];
     },
     administration() {
@@ -171,7 +146,7 @@ export default {
       return Array.isArray(roles) ? roles : [];
     },
     isAdmin() {
-      return this.userRoles.some(role => ['admin', 'superuser'].includes(role));
+      return this.$auth?.user?.isAdmin;
     },
     isContact() {
       return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));

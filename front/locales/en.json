@@ -12,6 +12,7 @@
     "authentificationToken": "Authentification token",
     "administration": "Administration",
     "myInstitution": "My institution",
+    "myInstitutions": "My institutions",
     "institutions": "Institutions",
     "sushiEndpoints": "SUSHI endpoints",
     "activity": "Activity",
@@ -202,6 +203,7 @@
     "newInstitution": "New institution",
     "notMember": "You don't belong to an institution yet.",
     "declareMyInstitution": "Declare my institution",
+    "declareNewInstitution": "Declare a new institution",
     "doesNotExist": "The institution you are trying to access is not registered.",
     "institution": {
       "title": "My institution",

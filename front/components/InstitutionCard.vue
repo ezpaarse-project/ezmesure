@@ -1,66 +1,40 @@
 <template>
-  <v-card class="w-600 mx-auto">
-    <v-img
-      v-if="institution.logoId"
-      :src="`/api/assets/logos/${institution.logoId}`"
-      contain
-      height="100"
-    />
-
-    <v-divider v-if="institution.logoId" />
+  <v-card class="d-flex flex-column">
+    <v-responsive :aspect-ratio="3" class="shrink">
+      <v-sheet
+        color="grey lighten-4"
+        class="fill-height d-flex align-center justify-center"
+      >
+        <v-img
+          v-if="logoSrc"
+          :aspect-ratio="3"
+          :src="logoSrc"
+          contain
+        />
+        <span v-else class="font-weight-light text--secondary">
+          Pas de logo
+        </span>
+      </v-sheet>
+    </v-responsive>
 
     <v-card-title>
-      {{ $t('institutions.institution.identity') }}
+      {{ institutionName }}
     </v-card-title>
 
-    <v-list two-line>
-      <v-list-item v-for="field in fields" :key="field.name">
-        <v-list-item-icon>
-          <v-icon color="secondary">
-            {{ field.icon }}
-          </v-icon>
-        </v-list-item-icon>
+    <v-spacer />
 
-        <v-list-item-content>
-          <v-list-item-title v-text="field.value" />
-          <v-list-item-subtitle v-text="$t(`institutions.institution.${field.name}`)" />
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-
-    <v-divider />
-
-    <v-card-title>
-      {{ $t('institutions.institution.status') }}
-
-      <v-spacer />
-
+    <v-card-text class="d-flex align-center justify-space-between">
       <v-chip
-        label
         :color="institution.validated ? 'success' : 'default'"
+        label
         outlined
+        small
       >
         <span v-if="institution.validated" v-text="$t('institutions.institution.validated')" />
         <span v-else v-text="$t('institutions.institution.notValidated')" />
       </v-chip>
-    </v-card-title>
 
-    <v-divider />
-
-    <v-card-title>
-      {{ $t('institutions.institution.attachedDomains') }}
-    </v-card-title>
-
-    <v-card-text>
-      <template v-if="hasDomains">
-        <v-list-item v-for="domain in institution.domains" :key="domain">
-          <v-list-item-content>
-            <v-list-item-title>{{ domain }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-
-      <p v-else v-text="$t('institutions.institution.noAttachedDomains')" />
+      <slot name="menu" />
     </v-card-text>
   </v-card>
 </template>
@@ -81,6 +55,15 @@ export default {
     };
   },
   computed: {
+    institutionName() {
+      let name = this.institution?.name;
+
+      if (name && this.institution?.acronym) {
+        name = `${name} (${this.institution.acronym})`;
+      }
+
+      return name;
+    },
     fields() {
       let { name } = this.institution;
 
@@ -89,7 +72,6 @@ export default {
       }
 
       const fields = [
-        { name: 'name', value: name, icon: 'mdi-card-account-details' },
         { name: 'homepage', value: this.institution.homepage, icon: 'mdi-web' },
         { name: 'city', value: this.institution.city, icon: 'mdi-map-marker' },
         { name: 'type', value: this.institution.type, icon: 'mdi-tag' },
@@ -102,8 +84,7 @@ export default {
       return fields.filter(f => f.value);
     },
     logoSrc() {
-      if (this.institution?.logoId) { return `/api/assets/logos/${this.institution.logoId}`; }
-      return defaultLogo;
+      return this.institution?.logoId && `/api/assets/logos/${this.institution.logoId}`;
     },
     hasDomains() {
       return Array.isArray(this.institution?.domains) && this.institution.domains.length > 0;

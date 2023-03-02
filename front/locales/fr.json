@@ -12,6 +12,7 @@
     "authentificationToken": "Token d'authentification",
     "administration": "Administration",
     "myInstitution": "Mon établissement",
+    "myInstitutions": "Mes établissements",
     "institutions": "Établissements",
     "sushiEndpoints": "Points d'accès SUSHI",
     "activity": "Activité",
@@ -202,6 +203,7 @@
     "newInstitution": "Nouvel établissement",
     "notMember": "Vous n'appartenez pas encore à un établissement.",
     "declareMyInstitution": "Déclarer mon établissement",
+    "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
     "institution": {
       "title": "Mon établissement",
