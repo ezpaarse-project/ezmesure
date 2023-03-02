@@ -31,9 +31,11 @@
                 <v-col cols="12" sm="6">
                   <v-text-field
                     v-model="institution.name"
-                    :label="$t('institutions.institution.title')"
+                    :label="`${$t('institutions.institution.title')} *`"
+                    :rules="[v => !!v || $t('fieldIsRequired')]"
                     hide-details
                     outlined
+                    required
                   />
                 </v-col>
 
@@ -48,7 +50,7 @@
 
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="institution.website"
+                    v-model="institution.websiteUrl"
                     :label="$t('institutions.institution.homepage')"
                     hide-details
                     outlined
@@ -95,7 +97,7 @@
               <v-row>
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="institution.twitterUrl"
+                    v-model="institution.social.twitterUrl"
                     :label="$t('institutions.institution.twitterUrl')"
                     append-icon="mdi-twitter"
                     hide-details
@@ -104,7 +106,7 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="institution.linkedinUrl"
+                    v-model="institution.social.linkedinUrl"
                     :label="$t('institutions.institution.linkedinUrl')"
                     append-icon="mdi-linkedin"
                     hide-details
@@ -113,7 +115,7 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="institution.youtubeUrl"
+                    v-model="institution.social.youtubeUrl"
                     :label="$t('institutions.institution.youtubeUrl')"
                     append-icon="mdi-youtube"
                     hide-details
@@ -122,7 +124,7 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="institution.facebookUrl"
+                    v-model="institution.social.facebookUrl"
                     :label="$t('institutions.institution.facebookUrl')"
                     append-icon="mdi-facebook"
                     hide-details
@@ -240,41 +242,6 @@
                     hide-details
                   />
                 </v-col>
-
-                <v-col cols="12">
-                  <v-checkbox
-                    v-model="identicalNames"
-                    :label="$t('institutions.institution.identicalNames')"
-                    hide-details
-                    @change="duplicatePrefix"
-                  />
-                </v-col>
-
-                <v-col cols="12" sm="4">
-                  <v-text-field
-                    v-model="institution.indexPrefix"
-                    :label="$t('institutions.institution.associatedIndex')"
-                    :rules="indexPrefixRules"
-                    outlined
-                    @input="duplicatePrefix"
-                  />
-                </v-col>
-                <v-col cols="12" sm="4">
-                  <v-text-field
-                    v-model="institution.role"
-                    :label="$t('institutions.institution.associatedRole')"
-                    :disabled="identicalNames"
-                    outlined
-                  />
-                </v-col>
-                <v-col cols="12" sm="4">
-                  <v-text-field
-                    v-model="institution.space"
-                    :label="$t('institutions.institution.associatedSpace')"
-                    :disabled="identicalNames"
-                    outlined
-                  />
-                </v-col>
               </v-row>
             </v-card-text>
           </v-card>
@@ -324,7 +291,7 @@ export default {
       show: false,
       saving: false,
       valid: false,
-      saveCreator: false,
+      addAsMember: false,
 
       openData: null,
 
@@ -337,19 +304,9 @@ export default {
       logoHasError: false,
 
       institution: {
+        social: {},
         auto: {},
       },
-
-      indexPrefixRules: [
-        (value) => {
-          const pattern = /^[a-z0-9][a-z0-9_.-]*$/;
-
-          if (value === '' || pattern.test(value)) {
-            return true;
-          }
-          return this.$t('institutions.institution.mustMatch', { pattern: pattern.toString() });
-        },
-      ],
     };
   },
   computed: {
@@ -372,29 +329,18 @@ export default {
       return Array.isArray(this.$auth?.user?.roles) && this.$auth.user.roles.length > 0;
     },
     isAdmin() {
-      if (this.hasRoles) {
-        return this.$auth.user.roles.some(role => ['admin', 'superuser'].includes(role));
-      }
-      return false;
+      return this.$auth?.user?.isAdmin;
     },
   },
   methods: {
-    duplicatePrefix() {
-      if (this.identicalNames) {
-        this.institution.space = this.institution.indexPrefix;
-        this.institution.role = this.institution.indexPrefix;
-      }
-    },
     editInstitution(institution) {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
 
       this.institution = JSON.parse(JSON.stringify(institution));
+      this.institution.social = this.institution.social || {};
       this.institution.auto = this.institution.auto || {};
-
-      const { role, space, indexPrefix } = this.institution;
-      this.identicalNames = (role === space && role === indexPrefix);
 
       this.logoPreview = null;
       this.logoHasError = false;
@@ -404,7 +350,7 @@ export default {
 
     createInstitution(opts = {}) {
       this.editInstitution({}, opts);
-      this.saveCreator = (opts.saveCreator !== false);
+      this.addAsMember = (opts.addAsMember !== false);
     },
 
     async onLogoChange() {
@@ -452,11 +398,14 @@ export default {
 
       const fields = [
         ['name', 'uo_lib_officiel'],
-        ['website', 'url'],
+        ['websiteUrl', 'url'],
         ['uai', 'uai'],
         ['type', 'type_d_etablissement'],
         ['city', 'com_nom'],
         ['acronym', 'sigle'],
+      ];
+
+      const socialFields = [
         ['twitterUrl', 'compte_twitter'],
         ['linkedinUrl', 'compte_linkedin'],
         ['youtubeUrl', 'compte_youtube'],
@@ -465,6 +414,9 @@ export default {
 
       fields.forEach(([institutionKey, openDataKey]) => {
         this.$set(this.institution, institutionKey, this.openData[openDataKey] || '');
+      });
+      socialFields.forEach(([institutionKey, openDataKey]) => {
+        this.$set(this.institution.social, institutionKey, this.openData[openDataKey] || '');
       });
     },
 
@@ -475,13 +427,15 @@ export default {
         if (this.institution.id) {
           await this.$axios.$put(`/institutions/${this.institution.id}`, this.institution);
         } else {
-          const params = { creator: this.saveCreator };
+          const params = { addAsMember: this.addAsMember };
           await this.$axios.$post('/institutions', this.institution, { params });
         }
         this.$emit('update');
       } catch (e) {
         if (e?.response?.status === 413) {
           this.$store.dispatch('snacks/error', this.$t('institutions.institution.imageTooLarge'));
+        } else if (e?.response?.data?.error) {
+          this.$store.dispatch('snacks/error', e.response.data.error);
         } else {
           this.$store.dispatch('snacks/error', this.$t('institutions.institution.unableToUpate'));
         }
