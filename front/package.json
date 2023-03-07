@@ -4,10 +4,10 @@
   "description": "ezmesure front",
   "author": "ezTeam",
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider nuxt",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate"
+    "generate": "NODE_OPTIONS=--openssl-legacy-provider nuxt generate"
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
@@ -28,8 +28,6 @@
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-loader": "^2.2.1",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-vue": "^5.2.3",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2"
+    "eslint-plugin-vue": "^5.2.3"
   }
 }

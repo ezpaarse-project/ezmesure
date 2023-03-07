@@ -1,5 +1,3 @@
-import colors from 'vuetify/lib/util/colors';
-
 module.exports = {
   /*
   ** Headers of the page
@@ -20,7 +18,7 @@ module.exports = {
   ],
   css: [
     'swagger-ui/dist/swagger-ui.css',
-    '~/assets/css/custom.scss',
+    '~/assets/css/custom.css',
   ],
   ssr: false,
   telemetry: false,
@@ -70,17 +68,7 @@ module.exports = {
   },
   devModules: [
     '@nuxtjs/auth',
-    ['@nuxtjs/vuetify', {
-      theme: {
-        themes: {
-          light: {
-            primary: colors.purple,
-            secondary: colors.grey.darken2,
-            accent: colors.lightBlue,
-          },
-        },
-      },
-    }],
+    ['@nuxtjs/vuetify', { optionsPath: './vuetify.options.js' }],
   ],
   auth: {
     scopeKey: 'roles',

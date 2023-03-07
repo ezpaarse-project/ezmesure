@@ -1,13 +1,19 @@
-FROM node:14.17.1-alpine3.13
-LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
+FROM node:18.14.2-alpine3.16 as builder
 
-RUN mkdir -p /usr/src/app
+WORKDIR /app
+
+COPY package*.json .
+RUN npm ci
+COPY . .
+RUN npm run build && NODE_ENV=production npm ci --omit=dev
+
+
+FROM node:18.14.2-alpine3.16
+LABEL maintainer="ezTEAM <ezteam@couperin.org>"
+
 WORKDIR /usr/src/app
+COPY --chown=node:node --from=builder /app .
 
-COPY package.json /usr/src/app/
-RUN npm install && npm cache clean --force
-COPY . /usr/src/app
-
-RUN npm run build
+EXPOSE 3000
 
 ENTRYPOINT ["npm", "start"]
