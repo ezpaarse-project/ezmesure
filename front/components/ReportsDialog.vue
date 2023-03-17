@@ -137,7 +137,8 @@ export default {
       if (this.showAllReports) { return this.reports; }
 
       return this.reports.filter((report) => {
-        if (typeof report?.['Report_ID'] !== 'string') { return false; }
+        // eslint-disable-next-line camelcase
+        if (typeof report?.Report_ID !== 'string') { return false; }
         return !report.Report_ID.includes('_');
       });
     },
