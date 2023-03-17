@@ -163,7 +163,7 @@
             <SushiParam
               v-for="(param, index) in endpointParams"
               :key="`e-param-${index}`"
-              v-model="endpointParams[index]"
+              :value="endpointParams[index]"
               :top-text="$t('sushi.unchangeableParam')"
               class="my-2"
               readonly
