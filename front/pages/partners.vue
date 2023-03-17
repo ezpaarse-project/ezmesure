@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import PartnerCard from '~/components/PartnerCard.vue.vue';
+import PartnerCard from '~/components/PartnerCard.vue';
 
 export default {
   components: {
