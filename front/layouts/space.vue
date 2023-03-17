@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Menu />
+    <SpaceMenu />
 
     <AppBar />
 
@@ -17,13 +17,13 @@
 <script>
 import AppBar from '~/components/AppBar.vue';
 import Snackbar from '~/components/Snackbar.vue';
-import Menu from '~/components/space/Menu.vue';
+import SpaceMenu from '~/components/space/SpaceMenu.vue';
 
 export default {
   components: {
     AppBar,
     Snackbar,
-    Menu,
+    SpaceMenu,
   },
 };
 </script>
