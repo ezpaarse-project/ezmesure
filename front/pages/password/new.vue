@@ -15,8 +15,12 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('password.forgot')" />
+            <v-toolbar-title>
+              {{ $t('password.forgot') }}
+            </v-toolbar-title>
+
             <v-spacer />
+
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 

@@ -15,7 +15,9 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('contact.contactUs')" />
+            <v-toolbar-title>
+              {{ $t('contact.contactUs') }}
+            </v-toolbar-title>
             <v-spacer />
             <v-icon>mdi-email-edit</v-icon>
           </v-toolbar>
@@ -91,14 +93,17 @@
 
           <v-card-actions>
             <v-spacer />
-            <v-btn color="error" @click="$router.go(-1)" v-text="$t('cancel')" />
+            <v-btn color="error" @click="$router.go(-1)">
+              {{ $t('cancel') }}
+            </v-btn>
             <v-btn
               :disabled="!valid"
               :loading="loading"
               color="primary"
               @click="validate"
-              v-text="$t('send')"
-            />
+            >
+              {{ $t('send') }}
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>

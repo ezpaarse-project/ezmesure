@@ -6,7 +6,9 @@
     :color="currentMessage.color"
     :timeout="currentMessage.timeout"
   >
-    <div v-for="(text, i) in lines" :key="i" v-text="text" />
+    <div v-for="(text, i) in lines" :key="i">
+      {{ text }}
+    </div>
 
     <template #action="{ attrs }">
       <v-btn
@@ -14,8 +16,9 @@
         text
         v-bind="attrs"
         @click.native="visible = false"
-        v-text="$t('close')"
-      />
+      >
+        {{ $t('close') }}
+      </v-btn>
     </template>
   </v-snackbar>
 </template>

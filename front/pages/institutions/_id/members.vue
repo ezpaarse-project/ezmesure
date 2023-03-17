@@ -18,7 +18,7 @@
 
     <v-data-table
       v-if="hasInstitution"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="members"
       :loading="refreshing"
       sort-by="fullName"
@@ -32,32 +32,35 @@
         </v-toolbar>
       </template>
 
-      <template #item.correspondent="{ item }">
+      <template #[`item.correspondent`]="{ item }">
         <v-chip
           v-if="item.isTechContact"
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.technical')"
-        />
+        >
+          {{ $t('institutions.members.technical') }}
+        </v-chip>
         <v-chip
           v-if="item.isDocContact"
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.documentary')"
-        />
+        >
+          {{ $t('institutions.members.documentary') }}
+        </v-chip>
         <v-chip
           v-if="item.creator"
           small
           label
           color="secondary"
           outlined
-          v-text="$t('institutions.members.creator')"
-        />
+        >
+          {{ $t('institutions.members.creator') }}
+        </v-chip>
       </template>
 
-      <template #item.readonly="{ item }">
+      <template #[`item.readonly`]="{ item }">
         <span v-if="item.readonly">
           {{ $t('institutions.members.read') }}
         </span>
@@ -66,7 +69,7 @@
         </span>
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <MemberActions
           :member="item"
           @permissions="updateMember(item)"
@@ -76,8 +79,13 @@
     </v-data-table>
 
     <v-card-text v-else>
-      <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
-      <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
+      <div class="mb-2">
+        {{ $t('institutions.notAttachedToAnyInstitution') }}
+      </div>
+
+      <a :href="'/info/institution'">
+        {{ $t('institutions.reportInstitutionInformation') }}
+      </a>
     </v-card-text>
 
     <MemberUpdateDialog
@@ -140,7 +148,7 @@ export default {
       refreshing: false,
       institution,
       members: [],
-      headers: [
+      tableHeaders: [
         {
           text: app.i18n.t('institutions.members.name'),
           value: 'user.fullName',

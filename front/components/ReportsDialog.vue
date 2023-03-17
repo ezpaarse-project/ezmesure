@@ -22,18 +22,19 @@
       <v-card-text v-if="hasExceptions">
         <v-alert text color="error">
           <v-row align="center" no-gutters>
-            <v-col
-              class="grow"
-              v-text="$t('reports.sushiReturnedErrors')"
-            />
+            <v-col class="grow">
+              {{ $t('reports.sushiReturnedErrors') }}
+            </v-col>
+
             <v-col class="shrink">
               <v-btn
                 color="error"
                 small
                 outlined
                 @click="editSushiItem"
-                v-text="$t('reports.checkCredentials')"
-              />
+              >
+                {{ $t('reports.checkCredentials') }}
+              </v-btn>
             </v-col>
           </v-row>
 
@@ -41,8 +42,9 @@
             <li
               v-for="(message, index) in exceptionStrings"
               :key="index"
-              v-text="message"
-            />
+            >
+              {{ message }}
+            </li>
           </ul>
         </v-alert>
       </v-card-text>

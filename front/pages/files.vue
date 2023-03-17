@@ -35,8 +35,12 @@
     </ToolBar>
 
     <v-tabs v-model="activeFilesTab" grow>
-      <v-tab href="#tab-files-list" v-text="$t('files.list')" />
-      <v-tab href="#tab-files-upload" v-text="$t('files.submit')" />
+      <v-tab href="#tab-files-list">
+        {{ $t('files.list') }}
+      </v-tab>
+      <v-tab href="#tab-files-upload">
+        {{ $t('files.submit') }}
+      </v-tab>
     </v-tabs>
 
     <v-tabs-items v-model="activeFilesTab">

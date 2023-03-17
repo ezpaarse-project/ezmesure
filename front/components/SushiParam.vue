@@ -1,7 +1,10 @@
 <template>
   <v-card outlined>
     <v-card-text>
-      <p v-if="topText" v-text="topText" />
+      <p v-if="topText">
+        {{ topText }}
+      </p>
+
       <v-row>
         <v-col cols="12">
           <v-select

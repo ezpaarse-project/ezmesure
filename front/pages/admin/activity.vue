@@ -14,7 +14,7 @@
     </ToolBar>
 
     <v-data-table
-      :headers="headers"
+      :headers="tableHeaders"
       :items="activity"
       :loading="loading"
       :options.sync="tableOptions"
@@ -53,8 +53,9 @@
                     class="text-h4 mx-2"
                     v-bind="attrs"
                     v-on="on"
-                    v-text="$dateFunctions.format(new Date(date), 'PPP')"
-                  />
+                  >
+                    {{ $dateFunctions.format(new Date(date), 'PPP') }}
+                  </span>
                 </template>
 
                 <v-date-picker
@@ -138,14 +139,16 @@
         </v-container>
       </template>
 
-      <template #item.action="{ item }">
+      <template #[`item.action`]="{ item }">
         <v-hover v-slot="{ hover }">
           <span>
-            <span
-              v-if="$te(`activity.actions.${item.action}`)"
-              v-text="$t(`activity.actions.${item.action}`)"
-            />
-            <span v-else v-text="item.action" />
+            <span v-if="$te(`activity.actions.${item.action}`)">
+              {{ $t(`activity.actions.${item.action}`) }}
+            </span>
+            <span v-else>
+              {{ item.action }}
+            </span>
+
             <v-btn
               v-if="hover"
               x-small
@@ -161,14 +164,14 @@
         </v-hover>
       </template>
 
-      <template #item.datetime="{ item }">
+      <template #[`item.datetime`]="{ item }">
         <LocalDate
           :date="item.datetime"
           format="Pp"
         />
       </template>
 
-      <template #item.user.name="{ item }">
+      <template #[`item.user.name`]="{ item }">
         <v-menu
           v-if="item.user"
           :close-on-content-click="false"
@@ -198,7 +201,9 @@
                 </v-list-item-action>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.user.name" />
+                  <v-list-item-title>
+                    {{ item.user.name }}
+                  </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
 
@@ -238,11 +243,11 @@
         </v-menu>
       </template>
 
-      <template #item.details="{ item }">
+      <template #[`item.details`]="{ item }">
         <ActivityItemDetails :item="item" />
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-btn
           text
           small
@@ -317,7 +322,7 @@ export default {
     },
   },
   computed: {
-    headers() {
+    tableHeaders() {
       return [
         { text: this.$t('date'), value: 'datetime', width: '180px' },
         { text: this.$t('activity.user'), value: 'user.name', width: '250px' },

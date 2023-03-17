@@ -1,8 +1,9 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title v-if="endpointForm.id" class="headline" v-text="formTitle" />
-      <v-card-title v-else class="headline" v-text="$t('endpoints.addEndpoint')" />
+      <v-card-title class="headline">
+        {{ endpointForm.id ? formTitle : $t('endpoints.addEndpoint') }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="endpointForm" ref="form" v-model="valid" @submit.prevent="save">
@@ -112,7 +113,9 @@
           required
         />
 
-        <p v-text="$t('endpoints.pleaseEnterParams')" />
+        <p>
+          {{ $t('endpoints.pleaseEnterParams') }}
+        </p>
 
         <v-btn
           type="submit"
@@ -150,8 +153,9 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('add')"
-        />
+        >
+          {{ editMode ? $t('update') : $t('add') }}
+        </v-btn>
       </v-card-actions>
 
       <ConfirmDialog ref="confirm" />

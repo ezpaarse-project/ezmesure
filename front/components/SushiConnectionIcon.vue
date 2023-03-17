@@ -31,19 +31,19 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              <span
-                v-if="success === true"
-                v-text="$t('institutions.sushi.connectionSuccessful')"
-              />
-              <span
-                v-else-if="success === false"
-                v-text="$t('institutions.sushi.connectionFailed')"
-              />
-              <span
-                v-else
-                v-text="$t('institutions.sushi.connectionUntested')"
-              />
+              <span v-if="success === true">
+                {{ $t('institutions.sushi.connectionSuccessful') }}
+              </span>
+
+              <span v-else-if="success === false">
+                {{ $t('institutions.sushi.connectionFailed') }}
+              </span>
+
+              <span v-else>
+                {{ $t('institutions.sushi.connectionUntested') }}
+              </span>
             </v-list-item-title>
+
             <v-list-item-subtitle v-if="date">
               {{ $t('institutions.sushi.testedOn', { date: localDate }) }}
             </v-list-item-subtitle>
@@ -55,7 +55,9 @@
 
       <v-card-text v-if="hasExceptions">
         <ul>
-          <li v-for="(exception, index) in exceptions" :key="index" v-text="exception" />
+          <li v-for="(exception, index) in exceptions" :key="index">
+            {{ exception }}
+          </li>
         </ul>
       </v-card-text>
 

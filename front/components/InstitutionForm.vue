@@ -173,18 +173,18 @@
 
                     <v-fade-transition>
                       <v-overlay v-if="hover" absolute>
-                        <div
-                          v-if="draggingFile"
-                          v-text="$t('institutions.institution.dropImageHere')"
-                        />
+                        <div v-if="draggingFile">
+                          {{ $t('institutions.institution.dropImageHere') }}
+                        </div>
 
                         <div v-else>
-                          <v-btn
-                            v-if="logoPreview || institution.logoId"
-                            @click="removeLogo"
-                            v-text="$t('delete')"
-                          />
-                          <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
+                          <v-btn v-if="logoPreview || institution.logoId" @click="removeLogo">
+                            {{ $t('delete') }}
+                          </v-btn>
+
+                          <v-btn @click="$refs.logo.click()">
+                            {{ $t('modify') }}
+                          </v-btn>
                         </div>
                       </v-overlay>
                     </v-fade-transition>
@@ -251,7 +251,9 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false" v-text="$t('cancel')" />
+        <v-btn text @click="show = false">
+          {{ $t('cancel') }}
+        </v-btn>
 
         <v-btn
           type="submit"

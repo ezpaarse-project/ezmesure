@@ -1,12 +1,20 @@
 <template>
   <v-row>
     <v-col v-for="field in fields" :key="field.label" cols="12">
-      <div class="font-weight-medium" v-text="field.label" />
-      <div class="text-muted" v-text="field.value" />
+      <div class="font-weight-medium">
+        {{ field.label }}
+      </div>
+
+      <div class="text-muted">
+        {{ field.value }}
+      </div>
     </v-col>
 
     <v-col v-if="hasParams" cols="12">
-      <div class="font-weight-medium" v-text="$t('advancedSettings')" />
+      <div class="font-weight-medium">
+        {{ $t('advancedSettings') }}
+      </div>
+
       <v-chip v-for="param in item.params" :key="param.name" label class="mr-1">
         {{ param.name }} = {{ param.value }}
       </v-chip>

@@ -56,10 +56,22 @@
                     <span v-if="upload.error" class="error--text">
                       {{ upload.errorMessage || $t('error') }}
                     </span>
-                    <span v-else-if="upload.done" v-text="$t('files.uploaded')" />
-                    <span v-else-if="upload.progress" v-text="$t('files.loadingInProgress')" />
-                    <span v-else-if="upload.validating" v-text="$t('files.validatingFile')" />
-                    <span v-else v-text="$t('files.isWaiting')" />
+
+                    <span v-else-if="upload.done">
+                      {{ $t('files.uploaded') }}
+                    </span>
+
+                    <span v-else-if="upload.progress">
+                      {{ $t('files.loadingInProgress') }}
+                    </span>
+
+                    <span v-else-if="upload.validating">
+                      {{ $t('files.validatingFile') }}
+                    </span>
+
+                    <span v-else>
+                      {{ $t('files.isWaiting') }}
+                    </span>
                   </div>
                 </v-flex>
 
@@ -87,7 +99,7 @@ import Papa from 'papaparse';
 import prettyBytes from 'pretty-bytes';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CancelToken, isCancel } from 'axios';
-import FileInput from './FileInput';
+import FileInput from './FileInput.vue';
 
 export default {
   components: {
@@ -177,7 +189,7 @@ export default {
             cancelToken: source.token,
             onUploadProgress: (event) => {
               if (event.lengthComputable) {
-                upload.progress = Math.floor(event.loaded / event.total * 100);
+                upload.progress = Math.floor((event.loaded / event.total) * 100);
               }
             },
           });

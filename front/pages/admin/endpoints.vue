@@ -84,7 +84,9 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('validate')" />
+            <v-list-item-title>
+              {{ $t('validate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -97,7 +99,9 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('invalidate')" />
+            <v-list-item-title>
+              {{ $t('invalidate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -106,7 +110,9 @@
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('delete')" />
+            <v-list-item-title>
+              {{ $t('delete') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -115,7 +121,9 @@
             <v-icon>mdi-close</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('deselect')" />
+            <v-list-item-title>
+              {{ $t('deselect') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -123,7 +131,7 @@
 
     <v-data-table
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="endpoints"
       :loading="refreshing"
       :search="search"
@@ -142,7 +150,7 @@
         </td>
       </template>
 
-      <template #item.validated="{ item }">
+      <template #[`item.validated`]="{ item }">
         <v-chip
           v-if="item.validated"
           label
@@ -154,7 +162,7 @@
         </v-chip>
       </template>
 
-      <template #item.tags="{ item }">
+      <template #[`item.tags`]="{ item }">
         <v-chip
           v-for="(tag, index) in item.tags"
           :key="index"
@@ -168,7 +176,7 @@
         </v-chip>
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
             <v-btn
@@ -192,7 +200,9 @@
                 <v-icon>{{ action.icon }}</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="action.label" />
+                <v-list-item-title>
+                  {{ action.label }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -244,7 +254,7 @@ export default {
       const tags = new Set(this.endpoints.flatMap((e) => (Array.isArray(e?.tags) ? e.tags : [])));
       return Array.from(tags);
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           text: this.$t('endpoints.vendor'),

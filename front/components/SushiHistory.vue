@@ -20,7 +20,7 @@
       </v-toolbar>
 
       <v-data-table
-        :headers="headers"
+        :headers="tableHeaders"
         :items="tasks"
         :loading="refreshing"
         item-key="id"
@@ -32,15 +32,15 @@
         :expanded="expandedRows"
         @update:expanded="onExpandedChange"
       >
-        <template #item.createdAt="{ item }">
+        <template #[`item.createdAt`]="{ item }">
           <LocalDate :date="item.createdAt" />
         </template>
 
-        <template #item.runningTime="{ item }">
+        <template #[`item.runningTime`]="{ item }">
           <LocalDuration :ms="item.runningTime" />
         </template>
 
-        <template #item.status="{ item }">
+        <template #[`item.status`]="{ item }">
           <TaskLabel :task="item" />
         </template>
 
@@ -49,13 +49,17 @@
             <v-timeline align-top dense>
               <template v-if="item.steps">
                 <v-timeline-item hide-dot>
-                  <div class="subtitle-1" v-text="$t('tasks.parameters')" />
+                  <div class="subtitle-1">
+                    {{ $t('tasks.parameters') }}
+                  </div>
                 </v-timeline-item>
 
                 <TaskParams :params="item.params" />
 
                 <v-timeline-item hide-dot>
-                  <div class="subtitle-1" v-text="$t('tasks.steps.title')" />
+                  <div class="subtitle-1">
+                    {{ $t('tasks.steps.title') }}
+                  </div>
                 </v-timeline-item>
 
                 <StepTimelineItem
@@ -66,7 +70,9 @@
               </template>
 
               <v-timeline-item hide-dot>
-                <div class="subtitle-1" v-text="$t('tasks.logs')" />
+                <div class="subtitle-1">
+                  {{ $t('tasks.logs') }}
+                </div>
               </v-timeline-item>
 
               <v-timeline-item hide-dot class="mb-4">
@@ -123,7 +129,7 @@ export default {
     },
     sushiVendor() { return this.sushi?.vendor; },
     sushiPackage() { return this.sushi?.package; },
-    headers() {
+    tableHeaders() {
       return [
         {
           align: 'left',

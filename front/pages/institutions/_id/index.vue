@@ -36,19 +36,24 @@
       <v-alert
         type="error"
         :value="true"
-        v-text="$t('institutions.unableToRetriveInformations')"
-      />
+      >
+        {{ $t('institutions.unableToRetriveInformations') }}
+      </v-alert>
     </v-card-text>
 
     <v-card-text v-else-if="selfInstitution">
       <v-card class="mx-auto w-600">
         <v-card-text class="text-center">
-          <p class="body-1" v-text="$t('institutions.notMember')" />
+          <p class="body-1">
+            {{ $t('institutions.notMember') }}
+          </p>
+
           <v-btn
             color="primary"
             @click="createInstitution"
-            v-text="$t('institutions.declareMyInstitution')"
-          />
+          >
+            {{ $t('institutions.declareMyInstitution') }}
+          </v-btn>
         </v-card-text>
       </v-card>
     </v-card-text>
@@ -59,7 +64,10 @@
           <v-icon size="50" class="mb-2">
             mdi-ghost
           </v-icon>
-          <p class="body-1" v-text="$t('institutions.doesNotExist')" />
+
+          <p class="body-1">
+            {{ $t('institutions.doesNotExist') }}
+          </p>
         </v-card-text>
       </v-card>
     </v-card-text>

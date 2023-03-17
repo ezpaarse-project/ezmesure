@@ -45,7 +45,9 @@
                 <v-icon>mdi-account-circle</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title v-text="item.fullName" />
+                <v-list-item-title>
+                  {{ item.fullName }}
+                </v-list-item-title>
               </v-list-item-content>
             </template>
           </v-autocomplete>

@@ -19,8 +19,13 @@
         prominent
         :value="!hasRoles"
       >
-        <div class="headline" v-text="$t('myspace.noRoles')" />
-        <div v-text="$t('myspace.determineAccesRight')" />
+        <div class="headline">
+          {{ $t('myspace.noRoles') }}
+        </div>
+
+        <div>
+          {{ $t('myspace.determineAccesRight') }}
+        </div>
       </v-alert>
       <v-text-field
         :value="user.fullName"
@@ -59,8 +64,14 @@
 
       <v-card v-if="hasRoles" outlined>
         <v-card-text>
-          <div class="title" v-text="$t('myspace.yourRights')" />
-          <div class="mb-2" v-text="$t('myspace.whatDoesRoles')" />
+          <div class="title">
+            {{ $t('myspace.yourRights') }}
+          </div>
+
+          <div class="mb-2">
+            {{ $t('myspace.whatDoesRoles') }}
+          </div>
+
           <div>
             <v-chip
               v-for="role in user.roles"

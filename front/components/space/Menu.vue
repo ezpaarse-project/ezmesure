@@ -28,8 +28,9 @@
         <template #activator>
           <v-list-item-title
             class="grey--text text--darken-3 uppercase"
-            v-text="administration.title"
-          />
+          >
+            {{ administration.title }}
+          </v-list-item-title>
         </template>
 
         <v-list-item
@@ -42,8 +43,9 @@
         >
           <v-list-item-title
             class="grey--text text--darken-3 uppercase pl-5"
-            v-text="child.title"
-          />
+          >
+            {{ child.title }}
+          </v-list-item-title>
         </v-list-item>
       </v-list-group>
     </v-list>
@@ -55,8 +57,9 @@
           color="red lighten-2"
           dark
           :href="logoutUrl"
-          v-text="$t('menu.logout')"
-        />
+        >
+          {{ $t('menu.logout') }}
+        </v-btn>
       </div>
     </template>
   </v-navigation-drawer>

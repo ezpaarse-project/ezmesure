@@ -1,7 +1,11 @@
 <template>
   <v-timeline-item hide-dot>
     <div v-for="(item, i) in items" :key="i">
-      <strong v-text="item.label" /> {{ item.value }}
+      <strong>
+        {{ item.label }}
+      </strong>
+
+      {{ item.value }}
     </div>
   </v-timeline-item>
 </template>

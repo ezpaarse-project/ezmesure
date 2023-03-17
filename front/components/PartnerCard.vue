@@ -24,7 +24,9 @@
     <v-divider />
 
     <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.correspondents')" />
+      <div class="subtitle-1">
+        {{ $t('partners.correspondents') }}
+      </div>
 
       <template v-if="hasContacts">
         <div v-for="contact in contacts" :key="contact.name">
@@ -51,7 +53,9 @@
     <v-divider />
 
     <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.automated')" />
+      <div class="subtitle-1">
+        {{ $t('partners.automated') }}
+      </div>
 
       <template v-if="hasAutomation">
         <v-chip
@@ -75,7 +79,9 @@
     <v-divider />
 
     <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.links')" />
+      <div class="subtitle-1">
+        {{ $t('partners.links') }}
+      </div>
 
       <template v-if="hasLinks">
         <v-btn

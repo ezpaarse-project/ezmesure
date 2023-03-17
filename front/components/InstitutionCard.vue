@@ -30,8 +30,11 @@
         outlined
         small
       >
-        <span v-if="institution.validated" v-text="$t('institutions.institution.validated')" />
-        <span v-else v-text="$t('institutions.institution.notValidated')" />
+        {{
+          institution.validated
+            ? $t('institutions.institution.validated')
+            : $t('institutions.institution.notValidated')
+        }}
       </v-chip>
 
       <slot name="menu" />

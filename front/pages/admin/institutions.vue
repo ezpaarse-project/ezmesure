@@ -51,7 +51,7 @@
 
     <v-data-table
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="institutions"
       :search="search"
       :loading="refreshing"
@@ -59,13 +59,13 @@
       item-key="id"
       show-select
     >
-      <template #item.name="{ item }">
+      <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/institutions/${item.id}`">
           {{ item.name }}
         </nuxt-link>
       </template>
 
-      <template #item.automatisations="{ item }">
+      <template #[`item.automatisations`]="{ item }">
         <v-chip
           label
           small
@@ -95,19 +95,23 @@
         </v-chip>
       </template>
 
-      <template #item.status="{ item }">
+      <template #[`item.status`]="{ item }">
         <v-chip
           label
           small
           :color="item.validated ? 'success' : 'default'"
           outlined
         >
-          <span v-if="item.validated" v-text="$t('institutions.institution.validated')" />
-          <span v-else v-text="$t('institutions.institution.notValidated')" />
+          <template v-if="item.validated">
+            {{ $t('institutions.institution.validated') }}
+          </template>
+          <template v-else>
+            {{ $t('institutions.institution.notValidated') }}
+          </template>
         </v-chip>
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
             <v-btn
@@ -127,7 +131,9 @@
                 <v-icon>mdi-pencil</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('modify')" />
+                <v-list-item-title>
+                  {{ $t('modify') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -136,7 +142,9 @@
                 <v-icon>mdi-key</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('institutions.sushi.credentials')" />
+                <v-list-item-title>
+                  {{ $t('institutions.sushi.credentials') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -145,7 +153,9 @@
                 <v-icon>mdi-account-multiple</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('institutions.members.members')" />
+                <v-list-item-title>
+                  {{ $t('institutions.members.members') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -154,7 +164,9 @@
                 <v-icon>mdi-identifier</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('copyId')" />
+                <v-list-item-title>
+                  {{ $t('copyId') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -204,7 +216,7 @@ export default {
       }
       return this.$t('menu.institutions');
     },
-    headers() {
+    tableHeaders() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },

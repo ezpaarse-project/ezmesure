@@ -2,18 +2,18 @@
   <v-data-table
     v-model="selected"
     :items="files"
-    :headers="headers"
+    :headers="tableHeaders"
     :loading="loading"
     item-key="name"
     show-select
     :no-data-text="$t('files.noFile')"
     :no-results-text="$t('files.noFile')"
   >
-    <template #item.lastModified="{ item }">
+    <template #[`item.lastModified`]="{ item }">
       {{ item.prettyLastModified }}
     </template>
 
-    <template #item.size="{ item }">
+    <template #[`item.size`]="{ item }">
       {{ item.prettySize }}
     </template>
   </v-data-table>
@@ -47,7 +47,7 @@ export default {
     noFileSelected() {
       return this.selected.length === 0;
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           align: 'left',

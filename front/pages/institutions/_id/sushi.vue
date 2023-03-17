@@ -52,8 +52,13 @@
             prominent
             icon="mdi-lock"
           >
-            <div class="text-h6" v-text="$t('sushi.managementIsLocked')" />
-            <div v-if="lockReason" v-text="$t('reason', { reason: lockReason })" />
+            <div class="text-h6">
+              {{ $t('sushi.managementIsLocked') }}
+            </div>
+
+            <div v-if="lockReason">
+              {{ $t('reason', { reason: lockReason }) }}
+            </div>
           </v-alert>
         </v-col>
       </v-row>
@@ -66,13 +71,17 @@
             prominent
             icon="mdi-bell-alert"
           >
-            <div v-if="lockReason" v-text="$t('reason', { reason: lockReason })" />
+            <div v-if="lockReason">
+              {{ $t('reason', { reason: lockReason }) }}
+            </div>
+
             <v-row align="center">
               <v-col class="grow">
                 <div
                   class="text-h6"
-                  v-text="$tc('sushi.youHaveUntestedCredentials', untestedItems.length)"
-                />
+                >
+                  {{ $tc('sushi.youHaveUntestedCredentials', untestedItems.length) }}
+                </div>
               </v-col>
               <v-col class="shrink">
                 <v-btn
@@ -129,7 +138,9 @@
             <v-icon>mdi-connection</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('institutions.sushi.checkConnection')" />
+            <v-list-item-title>
+              {{ $t('institutions.sushi.checkConnection') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -138,7 +149,9 @@
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('delete')" />
+            <v-list-item-title>
+              {{ $t('delete') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -147,7 +160,9 @@
             <v-icon>mdi-close</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('deselect')" />
+            <v-list-item-title>
+              {{ $t('deselect') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -156,7 +171,7 @@
     <v-data-table
       v-if="hasInstitution"
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
@@ -266,7 +281,7 @@
         </td>
       </template>
 
-      <template #item.status="{ item }">
+      <template #[`item.status`]="{ item }">
         <SushiConnectionIcon
           :connection="item.connection"
           :loading="loadingItems[item.id]"
@@ -275,14 +290,14 @@
         />
       </template>
 
-      <template #item.latestImportTask="{ item }">
+      <template #[`item.latestImportTask`]="{ item }">
         <TaskLabel
           :task="item.latestImportTask"
           @click="showSushiItemHistory(item, { openLatest: true })"
         />
       </template>
 
-      <template #item.latestImportTask.createdAt="{ item }">
+      <template #[`item.latestImportTask.createdAt`]="{ item }">
         <LocalDate
           v-if="item.latestImportTask"
           :date="item.latestImportTask.createdAt"
@@ -290,7 +305,7 @@
         />
       </template>
 
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
             <v-btn
@@ -322,7 +337,9 @@
                   <v-icon>{{ action.icon }}</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title v-text="action.label" />
+                  <v-list-item-title>
+                    {{ action.label }}
+                  </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </template>
@@ -333,8 +350,13 @@
 
     <v-card v-else tile flat color="transparent">
       <v-card-text>
-        <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
-        <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
+        <div class="mb-2">
+          {{ $t('institutions.notAttachedToAnyInstitution') }}
+        </div>
+
+        <a :href="'/info/institution'">
+          {{ $t('institutions.reportInstitutionInformation') }}
+        </a>
       </v-card-text>
     </v-card>
   </section>
@@ -442,7 +464,7 @@ export default {
 
       return this.$dateFunctions.format(localDate, 'P');
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           text: this.$t('status'),
