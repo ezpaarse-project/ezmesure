@@ -43,7 +43,7 @@
           hide-details
           max-width="200"
         >
-          <template v-slot:selection="{ item }">
+          <template #selection="{ item }">
             <v-chip
               :color="item.color"
               label
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import PartnerCard from '~/components/PartnerCard.vue';
+import PartnerCard from '~/components/PartnerCard.vue.vue';
 
 export default {
   components: {
@@ -117,7 +117,7 @@ export default {
         } = partner;
 
         const searchMatch = !search || includeSearch(partner);
-        const autoMatch = automations.length === 0 || automations.every(label => auto?.[label]);
+        const autoMatch = automations.length === 0 || automations.every((label) => auto?.[label]);
 
         return searchMatch && autoMatch;
       });
@@ -131,7 +131,7 @@ export default {
       return (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1);
     },
     deselectAutomation(label) {
-      this.selectedAutomations = this.selectedAutomations.filter(l => l !== label);
+      this.selectedAutomations = this.selectedAutomations.filter((l) => l !== label);
     },
   },
 };

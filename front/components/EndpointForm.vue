@@ -160,8 +160,8 @@
 </template>
 
 <script>
-import ConfirmDialog from '~/components/ConfirmDialog';
-import SushiParam from '~/components/SushiParam';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import SushiParam from '~/components/SushiParam.vue';
 
 export default {
   components: {
@@ -279,7 +279,7 @@ export default {
     async save() {
       this.saving = true;
 
-      this.endpointForm.params = this.endpointForm.params.filter(param => param.name);
+      this.endpointForm.params = this.endpointForm.params.filter((param) => param.name);
 
       try {
         if (this.endpointForm.id) {

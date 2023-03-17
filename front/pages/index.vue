@@ -118,7 +118,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .main-cover {
   background-image: url('/images/dashboard_r10_light.jpg');

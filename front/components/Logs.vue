@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     coloredLogs() {
-      return this.logs.map(log => ({
+      return this.logs.map((log) => ({
         ...log,
         color: logColors.get(log.type) || 'white--text',
       }));

@@ -69,9 +69,9 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import InstitutionForm from '~/components/InstitutionForm';
-import InstitutionCard from '~/components/InstitutionCard';
+import ToolBar from '~/components/space/ToolBar.vue';
+import InstitutionForm from '~/components/InstitutionForm.vue';
+import InstitutionCard from '~/components/InstitutionCard.vue';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
 
@@ -123,16 +123,16 @@ export default {
       return Array.isArray(roles) ? roles : [];
     },
     isAdmin() {
-      return this.userRoles.some(role => ['admin', 'superuser'].includes(role));
+      return this.userRoles.some((role) => ['admin', 'superuser'].includes(role));
     },
     isMember() {
       if (!this.institution?.role) { return false; }
 
       const roles = new Set([this.institution.role, `${this.institution.role}_read_only`]);
-      return this.userRoles.some(role => roles.has(role));
+      return this.userRoles.some((role) => roles.has(role));
     },
     isContact() {
-      return this.isMember && this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
+      return this.isMember && this.userRoles.some((role) => ['doc_contact', 'tech_contact'].includes(role));
     },
     isCreator() {
       const creator = this.institution?.creator;

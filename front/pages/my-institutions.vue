@@ -29,7 +29,7 @@
               #menu
             >
               <v-menu left bottom>
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     color="primary"
                     small
@@ -117,9 +117,9 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import InstitutionForm from '~/components/InstitutionForm';
-import InstitutionCard from '~/components/InstitutionCard';
+import ToolBar from '~/components/space/ToolBar.vue';
+import InstitutionForm from '~/components/InstitutionForm.vue';
+import InstitutionCard from '~/components/InstitutionCard.vue';
 
 export default {
   layout: 'space',

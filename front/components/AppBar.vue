@@ -30,7 +30,7 @@
       <v-btn text exact to="/contact-us" v-text="$t('menu.contact')" />
 
       <v-menu tilev-model="chooseLanguage" offset-y>
-        <template v-slot:activator="{ on, value }">
+        <template #activator="{ on, value }">
           <v-btn
             text
             v-on="on"
@@ -62,7 +62,7 @@
     </v-toolbar-items>
 
     <v-bottom-sheet v-model="sheet">
-      <template v-slot:activator="{ on }">
+      <template #activator="{ on }">
         <v-btn class="hidden-md-and-up" icon dark v-on="on">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
@@ -103,7 +103,7 @@ export default {
   },
   computed: {
     currentLocal() {
-      return this.$i18n.locales.find(locale => locale.code === this.$i18n.locale).name;
+      return this.$i18n.locales.find((locale) => locale.code === this.$i18n.locale).name;
     },
   },
 };

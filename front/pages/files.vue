@@ -51,11 +51,10 @@
   </section>
 </template>
 
-
 <script>
-import FileList from '~/components/file/FileList';
-import FileUploader from '~/components/file/FileUploader';
-import ToolBar from '~/components/space/ToolBar';
+import FileList from '~/components/file/FileList.vue';
+import FileUploader from '~/components/file/FileUploader.vue';
+import ToolBar from '~/components/space/ToolBar.vue';
 
 export default {
   layout: 'space',

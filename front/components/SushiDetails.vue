@@ -46,7 +46,7 @@ export default {
         { value: this.item?.customerId, label: this.$t('institutions.sushi.customerId') },
         { value: this.item?.apiKey, label: this.$t('institutions.sushi.apiKey') },
         { value: this.item?.comment, label: this.$t('institutions.sushi.comment') },
-      ].filter(f => f.value);
+      ].filter((f) => f.value);
     },
   },
 };

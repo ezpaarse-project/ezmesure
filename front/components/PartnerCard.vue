@@ -29,7 +29,7 @@
       <template v-if="hasContacts">
         <div v-for="contact in contacts" :key="contact.name">
           <v-tooltip right>
-            <template v-slot:activator="{ on }">
+            <template #activator="{ on }">
               <v-chip class="mb-1" :color="contact.color" outlined v-on="on">
                 <v-icon small left>
                   {{ contact.icon }}
@@ -146,7 +146,7 @@ export default {
         { label: 'ezmesure', color: 'purple', automated: this.partner?.auto?.ezmesure },
         { label: 'report', color: 'blue', automated: this.partner?.auto?.report },
         { label: 'sushi', color: 'red', automated: this.partner?.auto?.sushi },
-      ].filter(auto => auto.automated);
+      ].filter((auto) => auto.automated);
     },
     hasAutomation() {
       return this.automations.length > 0;

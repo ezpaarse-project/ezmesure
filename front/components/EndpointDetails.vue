@@ -65,7 +65,7 @@ export default {
 
         { value: this.createdAt, label: this.$t('endpoints.createdAt') },
         { value: this.updatedAt, label: this.$t('endpoints.updatedAt') },
-      ].filter(f => f.value);
+      ].filter((f) => f.value);
     },
   },
 };

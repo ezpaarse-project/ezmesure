@@ -25,7 +25,7 @@
         item-key="name"
         open-on-click
       >
-        <template v-slot:prepend="{ item, open }">
+        <template #prepend="{ item, open }">
           <v-icon v-if="item.children">
             {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
           </v-icon>
@@ -34,7 +34,7 @@
           </v-icon>
         </template>
 
-        <template v-slot:append="{ item }">
+        <template #append="{ item }">
           <span v-if="Array.isArray(item.children)" class="caption">
             {{ $tc('sushi.files.nbFiles', item.children.length) }}
           </span>
@@ -69,7 +69,7 @@
 
 <script>
 import prettyBytes from 'pretty-bytes';
-import LocalDate from '~/components/LocalDate';
+import LocalDate from '~/components/LocalDate.vue';
 
 export default {
   components: {

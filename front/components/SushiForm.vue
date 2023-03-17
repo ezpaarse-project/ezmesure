@@ -20,7 +20,7 @@
             return-object
             @change="onEndpointChange"
           >
-            <template v-slot:item="{ item }">
+            <template #item="{ item }">
               <v-list-item-content>
                 <v-list-item-title v-text="item.vendor" />
                 <v-list-item-subtitle>
@@ -41,7 +41,7 @@
               </v-list-item-content>
             </template>
 
-            <template v-slot:no-data>
+            <template #no-data>
               <v-list-item to="/contact-us">
                 <v-list-item-avatar>
                   <v-icon>
@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import SushiParam from '~/components/SushiParam';
+import SushiParam from '~/components/SushiParam.vue';
 
 export default {
   components: {
@@ -257,7 +257,7 @@ export default {
         this.sushiForm.params = [];
       }
 
-      this.endpoint = this.endpoints.find(endpoint => endpoint?.id === sushiData?.endpointId);
+      this.endpoint = this.endpoints.find((endpoint) => endpoint?.id === sushiData?.endpointId);
       this.formTitle = this.sushiForm.vendor;
       this.show = true;
     },
@@ -290,7 +290,7 @@ export default {
     async save() {
       this.saving = true;
 
-      this.sushiForm.params = this.sushiForm.params.filter(param => param.name);
+      this.sushiForm.params = this.sushiForm.params.filter((param) => param.name);
 
       try {
         if (this.sushiForm.id) {

@@ -101,7 +101,7 @@
     <ConfirmDialog ref="confirm" />
 
     <v-menu nudge-width="100" style="z-index:100" top offset-y>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-slide-y-reverse-transition>
           <v-btn
             v-show="hasSelection"
@@ -168,7 +168,7 @@
       item-key="id"
       sort-by="vendor"
     >
-      <template v-slot:top="{ originalItemsLength }">
+      <template #top="{ originalItemsLength }">
         <v-toolbar flat>
           <v-toolbar-title>
             {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
@@ -184,7 +184,7 @@
             transition="scale-transition"
             origin="top right"
           >
-            <template v-slot:activator="{ on }">
+            <template #activator="{ on }">
               <v-chip
                 outlined
                 label
@@ -259,14 +259,14 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:expanded-item="{ headers, item }">
+      <template #expanded-item="{ headers, item }">
         <td />
         <td :colspan="headers.length - 1" class="py-4">
           <SushiDetails :item="item" />
         </td>
       </template>
 
-      <template v-slot:item.status="{ item }">
+      <template #item.status="{ item }">
         <SushiConnectionIcon
           :connection="item.connection"
           :loading="loadingItems[item.id]"
@@ -275,14 +275,14 @@
         />
       </template>
 
-      <template v-slot:item.latestImportTask="{ item }">
+      <template #item.latestImportTask="{ item }">
         <TaskLabel
           :task="item.latestImportTask"
           @click="showSushiItemHistory(item, { openLatest: true })"
         />
       </template>
 
-      <template v-slot:item.latestImportTask.createdAt="{ item }">
+      <template #item.latestImportTask.createdAt="{ item }">
         <LocalDate
           v-if="item.latestImportTask"
           :date="item.latestImportTask.createdAt"
@@ -290,9 +290,9 @@
         />
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #item.actions="{ item }">
         <v-menu>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               icon
               v-bind="attrs"
@@ -341,16 +341,16 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import SushiDetails from '~/components/SushiDetails';
-import SushiConnectionIcon from '~/components/SushiConnectionIcon';
-import SushiForm from '~/components/SushiForm';
-import SushiHistory from '~/components/SushiHistory';
-import SushiFiles from '~/components/SushiFiles';
-import ReportsDialog from '~/components/ReportsDialog';
-import ConfirmDialog from '~/components/ConfirmDialog';
-import LocalDate from '~/components/LocalDate';
-import TaskLabel from '~/components/TaskLabel';
+import ToolBar from '~/components/space/ToolBar.vue';
+import SushiDetails from '~/components/SushiDetails.vue';
+import SushiConnectionIcon from '~/components/SushiConnectionIcon.vue';
+import SushiForm from '~/components/SushiForm.vue';
+import SushiHistory from '~/components/SushiHistory.vue';
+import SushiFiles from '~/components/SushiFiles.vue';
+import ReportsDialog from '~/components/ReportsDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import LocalDate from '~/components/LocalDate.vue';
+import TaskLabel from '~/components/TaskLabel.vue';
 
 export default {
   layout: 'space',
@@ -509,7 +509,7 @@ export default {
       return this.untestedItems.length > 0;
     },
     untestedItems() {
-      return this.sushiItems.filter(item => (typeof item?.connection?.success !== 'boolean'));
+      return this.sushiItems.filter((item) => (typeof item?.connection?.success !== 'boolean'));
     },
     testingConnection() {
       return Object.keys(this.loadingItems).length > 0;
@@ -560,7 +560,7 @@ export default {
         },
       ];
 
-      return actions.filter(action => this.isAdmin || !action.onlyAdmin);
+      return actions.filter((action) => this.isAdmin || !action.onlyAdmin);
     },
   },
   mounted() {
@@ -727,7 +727,7 @@ export default {
 
       this.deleting = true;
 
-      const ids = selected.map(select => select.id);
+      const ids = selected.map((select) => select.id);
       let response;
 
       try {
@@ -743,8 +743,8 @@ export default {
 
       this.deleting = false;
 
-      const failed = response.filter(item => item?.status !== 'deleted');
-      const deleted = response.filter(item => item?.status === 'deleted');
+      const failed = response.filter((item) => item?.status !== 'deleted');
+      const deleted = response.filter((item) => item?.status === 'deleted');
 
       failed.forEach(({ id }) => {
         this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
@@ -753,7 +753,7 @@ export default {
       if (deleted.length > 0) {
         this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
 
-        const removeDeleted = ({ id }) => !deleted.some(item => item.id === id);
+        const removeDeleted = ({ id }) => !deleted.some((item) => item.id === id);
         this.sushiItems = this.sushiItems.filter(removeDeleted);
         this.selected = this.selected.filter(removeDeleted);
       }

@@ -81,7 +81,7 @@ export default {
         { name: 'indexCount', value: this.institution.indexCount, icon: 'mdi-counter' },
       ];
 
-      return fields.filter(f => f.value);
+      return fields.filter((f) => f.value);
     },
     logoSrc() {
       return this.institution?.logoId && `/api/assets/logos/${this.institution.logoId}`;

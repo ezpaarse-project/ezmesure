@@ -35,7 +35,7 @@ export default {
         { label: this.$t('tasks.params.reportType'), value: this.params?.reportType?.toUpperCase?.() },
         { label: this.$t('tasks.params.period'), value: this.period },
         { label: this.$t('tasks.params.index'), value: this.params?.index },
-      ].filter(x => x.value);
+      ].filter((x) => x.value);
     },
   },
 };

@@ -32,19 +32,19 @@
         :expanded="expandedRows"
         @update:expanded="onExpandedChange"
       >
-        <template v-slot:item.createdAt="{ item }">
+        <template #item.createdAt="{ item }">
           <LocalDate :date="item.createdAt" />
         </template>
 
-        <template v-slot:item.runningTime="{ item }">
+        <template #item.runningTime="{ item }">
           <LocalDuration :ms="item.runningTime" />
         </template>
 
-        <template v-slot:item.status="{ item }">
+        <template #item.status="{ item }">
           <TaskLabel :task="item" />
         </template>
 
-        <template v-slot:expanded-item="{ headers, item }">
+        <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length">
             <v-timeline align-top dense>
               <template v-if="item.steps">
@@ -91,12 +91,12 @@
 </template>
 
 <script>
-import Logs from '~/components/Logs';
-import TaskLabel from '~/components/TaskLabel';
-import LocalDate from '~/components/LocalDate';
-import LocalDuration from '~/components/LocalDuration';
-import StepTimelineItem from '~/components/StepTimelineItem';
-import TaskParams from '~/components/TaskParams';
+import Logs from '~/components/Logs.vue';
+import TaskLabel from '~/components/TaskLabel.vue';
+import LocalDate from '~/components/LocalDate.vue';
+import LocalDuration from '~/components/LocalDuration.vue';
+import StepTimelineItem from '~/components/StepTimelineItem.vue';
+import TaskParams from '~/components/TaskParams.vue';
 
 export default {
   components: {
@@ -166,7 +166,7 @@ export default {
         const idToExpand = opts?.openLatest && sushiData?.latestImportTask?.id;
 
         if (idToExpand) {
-          this.expandedRows = this.tasks.filter(task => task.id === idToExpand);
+          this.expandedRows = this.tasks.filter((task) => task.id === idToExpand);
         }
       });
     },

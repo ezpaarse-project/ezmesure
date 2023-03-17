@@ -141,12 +141,12 @@ export default {
     },
     emailRules() {
       return [
-        v => !!v || this.$t('contact.emailIsRequired'),
-        v => /.+@.+\..+/.test(v) || this.$t('contact.emailMustBeValid'),
+        (v) => !!v || this.$t('contact.emailIsRequired'),
+        (v) => /.+@.+\..+/.test(v) || this.$t('contact.emailMustBeValid'),
       ];
     },
-    messageRules() { return [v => !!v || this.$t('contact.contentIsRequired')]; },
-    subjectRules() { return [v => !!v || this.$t('contact.subjectIsRequired')]; },
+    messageRules() { return [(v) => !!v || this.$t('contact.contentIsRequired')]; },
+    subjectRules() { return [(v) => !!v || this.$t('contact.subjectIsRequired')]; },
   },
   methods: {
     async validate() {

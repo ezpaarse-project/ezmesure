@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
+import ToolBar from '~/components/space/ToolBar.vue';
 
 export default {
   layout: 'space',

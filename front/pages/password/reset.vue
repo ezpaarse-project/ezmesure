@@ -69,7 +69,6 @@
                 {{ $t('password.reset') }}
               </v-btn>
 
-
               <a href="/authenticate" class="caption">
                 {{ $t('password.backToLogin') }}
               </a>

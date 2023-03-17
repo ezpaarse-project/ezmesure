@@ -145,7 +145,7 @@
               </v-alert>
 
               <v-hover v-model="hoverLogo" class="mx-auto">
-                <template v-slot:default="{ hover }">
+                <template #default="{ hover }">
                   <v-card
                     width="320"
                     @dragover.prevent="onDragOver"
@@ -271,15 +271,15 @@
 </template>
 
 <script>
-import OpenDataSearch from '~/components/OpenDataSearch';
+import OpenDataSearch from '~/components/OpenDataSearch.vue';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
 
-const toBase64 = file => new Promise((resolve, reject) => {
+const toBase64 = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.readAsBinaryString(file);
   reader.onload = () => resolve(btoa(reader.result));
-  reader.onerror = error => reject(error);
+  reader.onerror = (error) => reject(error);
 });
 
 export default {
@@ -314,7 +314,7 @@ export default {
       return !!this.institution.id;
     },
     vendors() {
-      return this.platforms.map(p => p.vendor);
+      return this.platforms.map((p) => p.vendor);
     },
     members() {
       const members = this.institution?.contacts;

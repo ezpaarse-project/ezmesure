@@ -14,7 +14,7 @@ export default {
     },
     highlight: {
       type: Function,
-      default: x => x,
+      default: (x) => x,
     },
   },
   computed: {

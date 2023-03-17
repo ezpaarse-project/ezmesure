@@ -25,7 +25,7 @@
         v-if="isAdmin"
         :value="$nuxt.$route.name.indexOf(administration.title.toLowerCase()) !== -1"
       >
-        <template v-slot:activator>
+        <template #activator>
           <v-list-item-title
             class="grey--text text--darken-3 uppercase"
             v-text="administration.title"
@@ -48,7 +48,7 @@
       </v-list-group>
     </v-list>
 
-    <template v-slot:append>
+    <template #append>
       <div class="pa-2">
         <v-btn
           block
@@ -149,7 +149,7 @@ export default {
       return this.$auth?.user?.isAdmin;
     },
     isContact() {
-      return this.userRoles.some(role => ['doc_contact', 'tech_contact'].includes(role));
+      return this.userRoles.some((role) => ['doc_contact', 'tech_contact'].includes(role));
     },
     canAccessInstitution() {
       return this.isAdmin || this.institutionFeatureEnabled;

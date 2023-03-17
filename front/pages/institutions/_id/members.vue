@@ -24,7 +24,7 @@
       sort-by="fullName"
       item-key="username"
     >
-      <template v-slot:top="{ originalItemsLength }">
+      <template #top="{ originalItemsLength }">
         <v-toolbar flat>
           <v-toolbar-title>
             {{ $t('institutions.members.title', { total: originalItemsLength }) }}
@@ -32,7 +32,7 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:item.correspondent="{ item }">
+      <template #item.correspondent="{ item }">
         <v-chip
           v-if="item.isTechContact"
           small
@@ -57,7 +57,7 @@
         />
       </template>
 
-      <template v-slot:item.readonly="{ item }">
+      <template #item.readonly="{ item }">
         <span v-if="item.readonly">
           {{ $t('institutions.members.read') }}
         </span>
@@ -66,7 +66,7 @@
         </span>
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #item.actions="{ item }">
         <MemberActions
           :member="item"
           @permissions="updateMember(item)"
@@ -94,11 +94,11 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import MemberActions from '~/components/MemberActions';
-import MemberSearch from '~/components/MemberSearch';
-import MemberDeleteDialog from '~/components/MemberDeleteDialog';
-import MemberUpdateDialog from '~/components/MemberUpdateDialog';
+import ToolBar from '~/components/space/ToolBar.vue';
+import MemberActions from '~/components/MemberActions.vue';
+import MemberSearch from '~/components/MemberSearch.vue';
+import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
+import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
 
 export default {
   layout: 'space',

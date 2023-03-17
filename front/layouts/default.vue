@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import AppBar from '~/components/AppBar';
-import Snackbar from '~/components/Snackbar';
+import AppBar from '~/components/AppBar.vue';
+import Snackbar from '~/components/Snackbar.vue';
 
 export default {
   components: {

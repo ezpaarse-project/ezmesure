@@ -8,7 +8,7 @@
   >
     <div v-for="(text, i) in lines" :key="i" v-text="text" />
 
-    <template v-slot:action="{ attrs }">
+    <template #action="{ attrs }">
       <v-btn
         dark
         text
@@ -56,7 +56,7 @@ export default {
     lines() {
       const text = this.currentMessage?.text;
       const lines = Array.isArray(text) ? text : [text];
-      return lines.map(x => x);
+      return lines.map((x) => x);
     },
   },
   methods: {

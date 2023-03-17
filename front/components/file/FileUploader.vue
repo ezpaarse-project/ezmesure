@@ -150,7 +150,7 @@ export default {
     },
 
     async uploadNextFile() {
-      const upload = this.uploads.find(u => !u.done);
+      const upload = this.uploads.find((u) => !u.done);
       if (!upload) {
         this.uploading = false;
         this.$emit('upload');
@@ -221,11 +221,11 @@ export default {
 
         Papa.parse(file, {
           delimiter: ';',
-          error: e => reject(e),
+          error: (e) => reject(e),
           step: ({ data: row, errors }, parser) => {
             lineNumber += 1;
 
-            if (row.filter(f => f.trim()).length === 0) {
+            if (row.filter((f) => f.trim()).length === 0) {
               emptyLines += 1;
               return;
             }
@@ -250,7 +250,7 @@ export default {
             if (typeof columns === 'undefined') {
               columns = row;
 
-              const missingField = mandatoryFields.find(field => !columns.includes(field));
+              const missingField = mandatoryFields.find((field) => !columns.includes(field));
 
               if (missingField) {
                 err = new Error(this.$t('files.missingField', { missingField }));
@@ -287,11 +287,11 @@ export default {
     },
 
     removeUpload(id) {
-      this.uploads = this.uploads.filter(upload => upload.id !== id);
+      this.uploads = this.uploads.filter((upload) => upload.id !== id);
     },
 
     clearCompletedUploads() {
-      this.uploads = this.uploads.filter(u => !u.done);
+      this.uploads = this.uploads.filter((u) => !u.done);
     },
   },
 };
