@@ -6,18 +6,18 @@
       <nuxt />
     </v-main>
 
-    <Snackbar />
+    <AppSnackbar />
   </v-app>
 </template>
 
 <script>
 import AppBar from '~/components/AppBar.vue';
-import Snackbar from '~/components/Snackbar.vue';
+import AppSnackbar from '~/components/AppSnackbar.vue';
 
 export default {
   components: {
     AppBar,
-    Snackbar,
+    AppSnackbar,
   },
 };
 </script>

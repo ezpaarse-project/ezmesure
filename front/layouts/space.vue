@@ -10,19 +10,19 @@
       </v-card>
     </v-main>
 
-    <Snackbar />
+    <AppSnackbar />
   </v-app>
 </template>
 
 <script>
 import AppBar from '~/components/AppBar.vue';
-import Snackbar from '~/components/Snackbar.vue';
+import AppSnackbar from '~/components/AppSnackbar.vue';
 import SpaceMenu from '~/components/space/SpaceMenu.vue';
 
 export default {
   components: {
     AppBar,
-    Snackbar,
+    AppSnackbar,
     SpaceMenu,
   },
 };
