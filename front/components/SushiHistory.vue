@@ -76,7 +76,7 @@
               </v-timeline-item>
 
               <v-timeline-item hide-dot class="mb-4">
-                <Logs :logs="item.logs" />
+                <LogsPreview :logs="item.logs" />
               </v-timeline-item>
             </v-timeline>
           </td>
@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import Logs from '~/components/Logs.vue';
+import LogsPreview from '~/components/LogsPreview.vue';
 import TaskLabel from '~/components/TaskLabel.vue';
 import LocalDate from '~/components/LocalDate.vue';
 import LocalDuration from '~/components/LocalDuration.vue';
@@ -106,7 +106,7 @@ import TaskParams from '~/components/TaskParams.vue';
 
 export default {
   components: {
-    Logs,
+    LogsPreview,
     TaskLabel,
     LocalDate,
     StepTimelineItem,
