@@ -19,5 +19,11 @@ export default {
     AppBar,
     AppSnackbar,
   },
+  head() {
+    return this.$nuxtI18nHead({
+      addDirAttribute: true,
+      addSeoAttributes: true,
+    });
+  },
 };
 </script>

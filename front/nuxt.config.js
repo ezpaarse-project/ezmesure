@@ -36,7 +36,7 @@ module.exports = {
       credentials: true,
       proxy: true,
     }],
-    'nuxt-i18n',
+    '@nuxtjs/i18n',
   ],
   i18n: {
     baseUrl: process.env.APPLI_APACHE_SERVERNAME,
@@ -62,6 +62,7 @@ module.exports = {
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'ezmesure_i18n',
+      redirectOn: 'all',
       alwaysRedirect: true,
       fallbackLocale: 'en',
     },

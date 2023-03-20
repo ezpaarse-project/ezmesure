@@ -48,5 +48,11 @@ export default {
       return this.error.message;
     },
   },
+  head() {
+    return this.$nuxtI18nHead({
+      addDirAttribute: true,
+      addSeoAttributes: true,
+    });
+  },
 };
 </script>
