@@ -55,7 +55,6 @@ module.exports = {
       },
     ],
     defaultLocale: 'fr',
-    seo: true,
     lazy: true,
     langDir: 'locales/',
     strategy: 'no_prefix',
