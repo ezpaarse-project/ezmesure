@@ -33,8 +33,12 @@
           flat
           dense
         >
-          <v-toolbar-title v-text="$t('kibana.passwordLost')" />
+          <v-toolbar-title>
+            {{ $t('kibana.passwordLost') }}
+          </v-toolbar-title>
+
           <v-spacer />
+
           <v-icon>mdi-lock-question</v-icon>
         </v-toolbar>
 
@@ -56,8 +60,9 @@
             prominent
             dense
             type="success"
-            v-text="$t('kibana.newPasswordSentByEmail')"
-          />
+          >
+            {{ $t('kibana.newPasswordSentByEmail') }}
+          </v-alert>
 
           <!-- eslint-disable-next-line vue/no-v-html -->
           <p class="mt-2" v-html="$t('kibana.resetPassword')" />
@@ -67,14 +72,19 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="showPasswordReset = false" v-text="$t('close')" />
+
+          <v-btn text @click="showPasswordReset = false">
+            {{ $t('close') }}
+          </v-btn>
+
           <v-btn
             color="primary"
             text
             :loading="resettingPassword"
             @click="resetPassword"
-            v-text="$t('reset')"
-          />
+          >
+            {{ $t('reset') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -82,7 +92,7 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
+import ToolBar from '~/components/space/ToolBar.vue';
 
 export default {
   layout: 'space',

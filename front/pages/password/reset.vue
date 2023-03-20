@@ -15,8 +15,12 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('password.forgot')" />
+            <v-toolbar-title>
+              {{ $t('password.forgot') }}
+            </v-toolbar-title>
+
             <v-spacer />
+
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 
@@ -39,15 +43,18 @@
               block
               color="primary"
               to="/authenticate"
-              v-text="$t('password.backToLogin')"
-            />
+            >
+              {{ $t('password.backToLogin') }}
+            </v-btn>
 
             <v-form
               v-if="!reset"
               v-model="resetFormValid"
               @submit.prevent="resetPassword"
             >
-              <p v-text="$t('password.enterUser')" />
+              <p>
+                {{ $t('password.enterUser') }}
+              </p>
 
               <v-text-field
                 v-model="username"
@@ -68,7 +75,6 @@
               >
                 {{ $t('password.reset') }}
               </v-btn>
-
 
               <a href="/authenticate" class="caption">
                 {{ $t('password.backToLogin') }}

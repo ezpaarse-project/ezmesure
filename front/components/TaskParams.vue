@@ -1,7 +1,11 @@
 <template>
   <v-timeline-item hide-dot>
     <div v-for="(item, i) in items" :key="i">
-      <strong v-text="item.label" /> {{ item.value }}
+      <strong>
+        {{ item.label }}
+      </strong>
+
+      {{ item.value }}
     </div>
   </v-timeline-item>
 </template>
@@ -35,7 +39,7 @@ export default {
         { label: this.$t('tasks.params.reportType'), value: this.params?.reportType?.toUpperCase?.() },
         { label: this.$t('tasks.params.period'), value: this.period },
         { label: this.$t('tasks.params.index'), value: this.params?.index },
-      ].filter(x => x.value);
+      ].filter((x) => x.value);
     },
   },
 };

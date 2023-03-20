@@ -4,13 +4,13 @@
       :title="toolbarTitle"
       :dark="hasSelection"
     >
-      <template v-if="hasSelection" v-slot:nav-icon>
+      <template v-if="hasSelection" #nav-icon>
         <v-btn icon @click="clearSelection">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </template>
 
-      <template v-if="hasSelection" v-slot:default>
+      <template v-if="hasSelection" #default>
         <v-spacer />
 
         <v-btn text @click="deleteInstitutions">
@@ -21,8 +21,7 @@
         </v-btn>
       </template>
 
-
-      <template v-else v-slot:default>
+      <template v-else #default>
         <v-spacer />
 
         <v-btn text @click="createInstitution">
@@ -52,7 +51,7 @@
 
     <v-data-table
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="institutions"
       :search="search"
       :loading="refreshing"
@@ -60,13 +59,13 @@
       item-key="id"
       show-select
     >
-      <template v-slot:item.name="{ item }">
+      <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/institutions/${item.id}`">
           {{ item.name }}
         </nuxt-link>
       </template>
 
-      <template v-slot:item.automatisations="{ item }">
+      <template #[`item.automatisations`]="{ item }">
         <v-chip
           label
           small
@@ -96,21 +95,24 @@
         </v-chip>
       </template>
 
-      <template v-slot:item.status="{ item }">
+      <template #[`item.status`]="{ item }">
         <v-chip
           label
           small
           :color="item.validated ? 'success' : 'default'"
           outlined
         >
-          <span v-if="item.validated" v-text="$t('institutions.institution.validated')" />
-          <span v-else v-text="$t('institutions.institution.notValidated')" />
+          {{
+            item.validated
+              ? $t('institutions.institution.validated')
+              : $t('institutions.institution.notValidated')
+          }}
         </v-chip>
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-menu>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               icon
               v-bind="attrs"
@@ -128,7 +130,9 @@
                 <v-icon>mdi-pencil</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('modify')" />
+                <v-list-item-title>
+                  {{ $t('modify') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -137,7 +141,9 @@
                 <v-icon>mdi-key</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('institutions.sushi.credentials')" />
+                <v-list-item-title>
+                  {{ $t('institutions.sushi.credentials') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -146,7 +152,9 @@
                 <v-icon>mdi-account-multiple</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('institutions.members.members')" />
+                <v-list-item-title>
+                  {{ $t('institutions.members.members') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -155,7 +163,9 @@
                 <v-icon>mdi-identifier</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="$t('copyId')" />
+                <v-list-item-title>
+                  {{ $t('copyId') }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -169,9 +179,9 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import InstitutionForm from '~/components/InstitutionForm';
-import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog';
+import ToolBar from '~/components/space/ToolBar.vue';
+import InstitutionForm from '~/components/InstitutionForm.vue';
+import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 
 export default {
   layout: 'space',
@@ -205,7 +215,7 @@ export default {
       }
       return this.$t('menu.institutions');
     },
-    headers() {
+    tableHeaders() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
@@ -250,7 +260,7 @@ export default {
       this.$refs.institutionForm.createInstitution({ addAsMember: false });
     },
     onInstitutionsRemove(removedIds) {
-      const removeDeleted = institution => !removedIds.some(id => institution.id === id);
+      const removeDeleted = (institution) => !removedIds.some((id) => institution.id === id);
       this.institutions = this.institutions.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },

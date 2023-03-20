@@ -6,18 +6,24 @@
       <nuxt />
     </v-main>
 
-    <Snackbar />
+    <AppSnackbar />
   </v-app>
 </template>
 
 <script>
-import AppBar from '~/components/AppBar';
-import Snackbar from '~/components/Snackbar';
+import AppBar from '~/components/AppBar.vue';
+import AppSnackbar from '~/components/AppSnackbar.vue';
 
 export default {
   components: {
     AppBar,
-    Snackbar,
+    AppSnackbar,
+  },
+  head() {
+    return this.$nuxtI18nHead({
+      addDirAttribute: true,
+      addSeoAttributes: true,
+    });
   },
 };
 </script>

@@ -145,7 +145,7 @@
               </v-alert>
 
               <v-hover v-model="hoverLogo" class="mx-auto">
-                <template v-slot:default="{ hover }">
+                <template #default="{ hover }">
                   <v-card
                     width="320"
                     @dragover.prevent="onDragOver"
@@ -173,18 +173,18 @@
 
                     <v-fade-transition>
                       <v-overlay v-if="hover" absolute>
-                        <div
-                          v-if="draggingFile"
-                          v-text="$t('institutions.institution.dropImageHere')"
-                        />
+                        <div v-if="draggingFile">
+                          {{ $t('institutions.institution.dropImageHere') }}
+                        </div>
 
                         <div v-else>
-                          <v-btn
-                            v-if="logoPreview || institution.logoId"
-                            @click="removeLogo"
-                            v-text="$t('delete')"
-                          />
-                          <v-btn @click="$refs.logo.click()" v-text="$t('modify')" />
+                          <v-btn v-if="logoPreview || institution.logoId" @click="removeLogo">
+                            {{ $t('delete') }}
+                          </v-btn>
+
+                          <v-btn @click="$refs.logo.click()">
+                            {{ $t('modify') }}
+                          </v-btn>
                         </div>
                       </v-overlay>
                     </v-fade-transition>
@@ -251,7 +251,9 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false" v-text="$t('cancel')" />
+        <v-btn text @click="show = false">
+          {{ $t('cancel') }}
+        </v-btn>
 
         <v-btn
           type="submit"
@@ -271,15 +273,15 @@
 </template>
 
 <script>
-import OpenDataSearch from '~/components/OpenDataSearch';
+import OpenDataSearch from '~/components/OpenDataSearch.vue';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
 
-const toBase64 = file => new Promise((resolve, reject) => {
+const toBase64 = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.readAsBinaryString(file);
   reader.onload = () => resolve(btoa(reader.result));
-  reader.onerror = error => reject(error);
+  reader.onerror = (error) => reject(error);
 });
 
 export default {
@@ -314,7 +316,7 @@ export default {
       return !!this.institution.id;
     },
     vendors() {
-      return this.platforms.map(p => p.vendor);
+      return this.platforms.map((p) => p.vendor);
     },
     members() {
       const members = this.institution?.contacts;

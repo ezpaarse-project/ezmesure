@@ -2,18 +2,18 @@
   <v-data-table
     v-model="selected"
     :items="files"
-    :headers="headers"
+    :headers="tableHeaders"
     :loading="loading"
     item-key="name"
     show-select
     :no-data-text="$t('files.noFile')"
     :no-results-text="$t('files.noFile')"
   >
-    <template v-slot:item.lastModified="{ item }">
+    <template #[`item.lastModified`]="{ item }">
       {{ item.prettyLastModified }}
     </template>
 
-    <template v-slot:item.size="{ item }">
+    <template #[`item.size`]="{ item }">
       {{ item.prettySize }}
     </template>
   </v-data-table>
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     files() {
-      return this.hostedFiles.map(file => ({
+      return this.hostedFiles.map((file) => ({
         ...file,
         prettySize: prettyBytes(file.size),
         prettyCreatedAt: new Date(file.createdAt).toLocaleString(),
@@ -47,7 +47,7 @@ export default {
     noFileSelected() {
       return this.selected.length === 0;
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           align: 'left',
@@ -93,7 +93,7 @@ export default {
       if (!this.selected.length === 0) { return; }
 
       this.loading = true;
-      const entries = this.selected.map(f => f.name);
+      const entries = this.selected.map((f) => f.name);
 
       try {
         await this.$axios.post('/files/delete_batch', { entries });

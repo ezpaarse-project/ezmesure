@@ -4,7 +4,7 @@
     :close-on-content-click="false"
     :nudge-width="200"
   >
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ on, attrs }">
       <v-btn
         color="primary"
         v-bind="attrs"
@@ -40,12 +40,14 @@
             return-object
             autofocus
           >
-            <template v-slot:item="{ item }">
+            <template #item="{ item }">
               <v-list-item-avatar>
                 <v-icon>mdi-account-circle</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title v-text="item.fullName" />
+                <v-list-item-title>
+                  {{ item.fullName }}
+                </v-list-item-title>
               </v-list-item-content>
             </template>
           </v-autocomplete>
@@ -184,7 +186,6 @@ export default {
         this.selectedPermission = 'write';
       }
     },
-
 
     doSearch: debounce(async function doSearch() {
       if (!this.search) {

@@ -15,7 +15,9 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('authenticate.restrictedAccess')" />
+            <v-toolbar-title>
+              {{ $t('authenticate.restrictedAccess') }}
+            </v-toolbar-title>
             <v-spacer />
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
@@ -32,7 +34,9 @@
                 </div>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <p v-text="$t('authenticate.kibanaAuth')" />
+                <p>
+                  {{ $t('authenticate.kibanaAuth') }}
+                </p>
 
                 <v-alert
                   v-model="showError"
@@ -79,8 +83,9 @@
                       type="submit"
                       :loading="connecting"
                       :disabled="!loginFormValid"
-                      v-text="$t('authenticate.logIn')"
-                    />
+                    >
+                      {{ $t('authenticate.logIn') }}
+                    </v-btn>
                   </v-row>
                 </v-form>
               </v-expansion-panel-content>
@@ -97,14 +102,17 @@
                 </div>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <p v-text="$t('authenticate.logInWithProvider')" />
+                <p>
+                  {{ $t('authenticate.logInWithProvider') }}
+                </p>
 
                 <p class="text-center">
                   <v-btn
                     color="primary"
                     :href="`/login?origin=${$auth.$state.redirect || '/myspace'}`"
-                    v-text="$t('authenticate.logIn')"
-                  />
+                  >
+                    {{ $t('authenticate.logIn') }}
+                  </v-btn>
                 </p>
               </v-expansion-panel-content>
             </v-expansion-panel>

@@ -15,8 +15,12 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('password.forgot')" />
+            <v-toolbar-title>
+              {{ $t('password.forgot') }}
+            </v-toolbar-title>
+
             <v-spacer />
+
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 
@@ -30,7 +34,7 @@
 </template>
 
 <script>
-import PasswordForm from '~/components/PasswordForm';
+import PasswordForm from '~/components/PasswordForm.vue';
 
 export default {
   middleware({ route, error }) {

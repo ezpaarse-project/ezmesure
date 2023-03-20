@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import PasswordForm from '~/components/PasswordForm';
+import PasswordForm from '~/components/PasswordForm.vue';
 
 export default {
   middleware: ['auth'],

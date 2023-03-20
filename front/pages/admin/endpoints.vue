@@ -52,7 +52,7 @@
     <EndpointsDeleteDialog ref="deleteDialog" @removed="onEndpointsRemove" />
 
     <v-menu nudge-width="100" style="z-index:100" top offset-y>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-slide-y-reverse-transition>
           <v-btn
             v-show="hasSelection"
@@ -84,7 +84,9 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('validate')" />
+            <v-list-item-title>
+              {{ $t('validate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -97,7 +99,9 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('invalidate')" />
+            <v-list-item-title>
+              {{ $t('invalidate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -106,7 +110,9 @@
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('delete')" />
+            <v-list-item-title>
+              {{ $t('delete') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -115,7 +121,9 @@
             <v-icon>mdi-close</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('deselect')" />
+            <v-list-item-title>
+              {{ $t('deselect') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -123,7 +131,7 @@
 
     <v-data-table
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="endpoints"
       :loading="refreshing"
       :search="search"
@@ -135,14 +143,14 @@
       item-key="id"
       sort-by="vendor"
     >
-      <template v-slot:expanded-item="{ headers, item }">
+      <template #expanded-item="{ headers, item }">
         <td />
         <td :colspan="headers.length - 1" class="py-4">
           <EndpointDetails :item="item" />
         </td>
       </template>
 
-      <template v-slot:item.validated="{ item }">
+      <template #[`item.validated`]="{ item }">
         <v-chip
           v-if="item.validated"
           label
@@ -154,7 +162,7 @@
         </v-chip>
       </template>
 
-      <template v-slot:item.tags="{ item }">
+      <template #[`item.tags`]="{ item }">
         <v-chip
           v-for="(tag, index) in item.tags"
           :key="index"
@@ -168,9 +176,9 @@
         </v-chip>
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-menu>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               icon
               v-bind="attrs"
@@ -192,7 +200,9 @@
                 <v-icon>{{ action.icon }}</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="action.label" />
+                <v-list-item-title>
+                  {{ action.label }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -203,10 +213,10 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import EndpointForm from '~/components/EndpointForm';
-import EndpointDetails from '~/components/EndpointDetails';
-import EndpointsDeleteDialog from '~/components/EndpointsDeleteDialog';
+import ToolBar from '~/components/space/ToolBar.vue';
+import EndpointForm from '~/components/EndpointForm.vue';
+import EndpointDetails from '~/components/EndpointDetails.vue';
+import EndpointsDeleteDialog from '~/components/EndpointsDeleteDialog.vue';
 
 export default {
   layout: 'space',
@@ -241,10 +251,10 @@ export default {
       return this?.endpoints.length || 0;
     },
     availableTags() {
-      const tags = new Set(this.endpoints.flatMap(e => (Array.isArray(e?.tags) ? e.tags : [])));
+      const tags = new Set(this.endpoints.flatMap((e) => (Array.isArray(e?.tags) ? e.tags : [])));
       return Array.from(tags);
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           text: this.$t('endpoints.vendor'),
@@ -275,10 +285,10 @@ export default {
       return this.selected.length > 0;
     },
     hasValidatedInSelection() {
-      return this.selected.some(endpoint => endpoint?.validated);
+      return this.selected.some((endpoint) => endpoint?.validated);
     },
     hasNonValidatedInSelection() {
-      return this.selected.some(endpoint => !endpoint?.validated);
+      return this.selected.some((endpoint) => !endpoint?.validated);
     },
     itemActions() {
       return [
@@ -352,7 +362,7 @@ export default {
     },
 
     onEndpointsRemove(removedIds) {
-      const removeDeleted = endpoint => !removedIds.some(id => endpoint.id === id);
+      const removeDeleted = (endpoint) => !removedIds.some((id) => endpoint.id === id);
       this.endpoints = this.endpoints.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },

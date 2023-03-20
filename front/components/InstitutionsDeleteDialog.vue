@@ -84,7 +84,7 @@ export default {
 
       this.removing = false;
       this.show = false;
-      this.$emit('removed', deleted.map(d => d.id));
+      this.$emit('removed', deleted.map((d) => d.id));
     },
   },
 };

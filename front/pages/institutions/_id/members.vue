@@ -18,13 +18,13 @@
 
     <v-data-table
       v-if="hasInstitution"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="members"
       :loading="refreshing"
       sort-by="fullName"
       item-key="username"
     >
-      <template v-slot:top="{ originalItemsLength }">
+      <template #top="{ originalItemsLength }">
         <v-toolbar flat>
           <v-toolbar-title>
             {{ $t('institutions.members.title', { total: originalItemsLength }) }}
@@ -32,32 +32,35 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:item.correspondent="{ item }">
+      <template #[`item.correspondent`]="{ item }">
         <v-chip
           v-if="item.isTechContact"
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.technical')"
-        />
+        >
+          {{ $t('institutions.members.technical') }}
+        </v-chip>
         <v-chip
           v-if="item.isDocContact"
           small
           label
           color="secondary"
-          v-text="$t('institutions.members.documentary')"
-        />
+        >
+          {{ $t('institutions.members.documentary') }}
+        </v-chip>
         <v-chip
           v-if="item.creator"
           small
           label
           color="secondary"
           outlined
-          v-text="$t('institutions.members.creator')"
-        />
+        >
+          {{ $t('institutions.members.creator') }}
+        </v-chip>
       </template>
 
-      <template v-slot:item.readonly="{ item }">
+      <template #[`item.readonly`]="{ item }">
         <span v-if="item.readonly">
           {{ $t('institutions.members.read') }}
         </span>
@@ -66,7 +69,7 @@
         </span>
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <MemberActions
           :member="item"
           @permissions="updateMember(item)"
@@ -76,8 +79,13 @@
     </v-data-table>
 
     <v-card-text v-else>
-      <div class="mb-2" v-text="$t('institutions.notAttachedToAnyInstitution')" />
-      <a :href="'/info/institution'" v-text="$t('institutions.reportInstitutionInformation')" />
+      <div class="mb-2">
+        {{ $t('institutions.notAttachedToAnyInstitution') }}
+      </div>
+
+      <a :href="'/info/institution'">
+        {{ $t('institutions.reportInstitutionInformation') }}
+      </a>
     </v-card-text>
 
     <MemberUpdateDialog
@@ -94,11 +102,11 @@
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import MemberActions from '~/components/MemberActions';
-import MemberSearch from '~/components/MemberSearch';
-import MemberDeleteDialog from '~/components/MemberDeleteDialog';
-import MemberUpdateDialog from '~/components/MemberUpdateDialog';
+import ToolBar from '~/components/space/ToolBar.vue';
+import MemberActions from '~/components/MemberActions.vue';
+import MemberSearch from '~/components/MemberSearch.vue';
+import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
+import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
 
 export default {
   layout: 'space',
@@ -140,7 +148,7 @@ export default {
       refreshing: false,
       institution,
       members: [],
-      headers: [
+      tableHeaders: [
         {
           text: app.i18n.t('institutions.members.name'),
           value: 'user.fullName',

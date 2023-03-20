@@ -4,7 +4,9 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
     </slot>
 
-    <v-toolbar-title v-text="title" />
+    <v-toolbar-title>
+      {{ title }}
+    </v-toolbar-title>
 
     <slot />
   </v-toolbar>

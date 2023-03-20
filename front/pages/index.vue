@@ -7,10 +7,9 @@
     </v-container>
 
     <v-container grid-list-xl class="my-6">
-      <h3
-        class="display-1 grey--text text--darken-2 text-center my-3"
-        v-text="$t('home.whatDoesEzMESURE')"
-      />
+      <h3 class="display-1 grey--text text--darken-2 text-center my-3">
+        {{ $t('home.whatDoesEzMESURE') }}
+      </h3>
 
       <v-layout justify-center wrap>
         <v-flex v-for="(feature, i) in features" :key="i" d-flex shrink>
@@ -22,18 +21,21 @@
               width="100%"
             />
             <v-card-text>
-              <h2 class="subtitle-1 font-weight-bold mb-2 text--primary" v-text="feature.title" />
-              <p class="mb-2" v-text="feature.text" />
+              <h2 class="subtitle-1 font-weight-bold mb-2 text--primary">
+                {{ feature.title }}
+              </h2>
+              <p class="mb-2">
+                {{ feature.text }}
+              </p>
             </v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
     </v-container>
 
-    <h3
-      class="headline grey--text text--darken-2 text-center"
-      v-text="$t('home.supportedBy')"
-    />
+    <h3 class="headline grey--text text--darken-2 text-center">
+      {{ $t('home.supportedBy') }}
+    </h3>
 
     <v-container grid-list-lg class="mt-4">
       <v-layout justify-center wrap>
@@ -57,8 +59,9 @@
             to="/partners"
             large
             class="white primary--text"
-            v-text="$t('home.discoverOurPartners')"
-          />
+          >
+            {{ $t('home.discoverOurPartners') }}
+          </v-btn>
         </v-flex>
       </v-layout>
     </v-container>
@@ -117,7 +120,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .main-cover {

@@ -35,8 +35,12 @@
     </ToolBar>
 
     <v-tabs v-model="activeFilesTab" grow>
-      <v-tab href="#tab-files-list" v-text="$t('files.list')" />
-      <v-tab href="#tab-files-upload" v-text="$t('files.submit')" />
+      <v-tab href="#tab-files-list">
+        {{ $t('files.list') }}
+      </v-tab>
+      <v-tab href="#tab-files-upload">
+        {{ $t('files.submit') }}
+      </v-tab>
     </v-tabs>
 
     <v-tabs-items v-model="activeFilesTab">
@@ -51,11 +55,10 @@
   </section>
 </template>
 
-
 <script>
-import FileList from '~/components/file/FileList';
-import FileUploader from '~/components/file/FileUploader';
-import ToolBar from '~/components/space/ToolBar';
+import FileList from '~/components/file/FileList.vue';
+import FileUploader from '~/components/file/FileUploader.vue';
+import ToolBar from '~/components/space/ToolBar.vue';
 
 export default {
   layout: 'space',

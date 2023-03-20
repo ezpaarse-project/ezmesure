@@ -1,8 +1,9 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title v-if="sushiForm.id" class="headline" v-text="formTitle" />
-      <v-card-title v-else class="headline" v-text="$t('institutions.sushi.addCredentials')" />
+      <v-card-title class="headline">
+        {{ sushiForm.id ? formTitle : $t('institutions.sushi.addCredentials') }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="sushiForm" ref="form" v-model="valid" @submit.prevent="save">
@@ -20,9 +21,12 @@
             return-object
             @change="onEndpointChange"
           >
-            <template v-slot:item="{ item }">
+            <template #item="{ item }">
               <v-list-item-content>
-                <v-list-item-title v-text="item.vendor" />
+                <v-list-item-title>
+                  {{ item.vendor }}
+                </v-list-item-title>
+
                 <v-list-item-subtitle>
                   <template v-if="Array.isArray(item.tags)">
                     <v-chip
@@ -41,7 +45,7 @@
               </v-list-item-content>
             </template>
 
-            <template v-slot:no-data>
+            <template #no-data>
               <v-list-item to="/contact-us">
                 <v-list-item-avatar>
                   <v-icon>
@@ -130,7 +134,9 @@
             {{ $t('advancedSettings') }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
+            <p>
+              {{ $t('institutions.sushi.pleaseEnterParams') }}
+            </p>
 
             <v-btn
               type="submit"
@@ -157,7 +163,7 @@
             <SushiParam
               v-for="(param, index) in endpointParams"
               :key="`e-param-${index}`"
-              v-model="endpointParams[index]"
+              :value="endpointParams[index]"
               :top-text="$t('sushi.unchangeableParam')"
               class="my-2"
               readonly
@@ -180,15 +186,16 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('add')"
-        />
+        >
+          {{ editMode ? $t('update') : $t('add') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import SushiParam from '~/components/SushiParam';
+import SushiParam from '~/components/SushiParam.vue';
 
 export default {
   components: {
@@ -257,7 +264,7 @@ export default {
         this.sushiForm.params = [];
       }
 
-      this.endpoint = this.endpoints.find(endpoint => endpoint?.id === sushiData?.endpointId);
+      this.endpoint = this.endpoints.find((endpoint) => endpoint?.id === sushiData?.endpointId);
       this.formTitle = this.sushiForm.vendor;
       this.show = true;
     },
@@ -290,7 +297,7 @@ export default {
     async save() {
       this.saving = true;
 
-      this.sushiForm.params = this.sushiForm.params.filter(param => param.name);
+      this.sushiForm.params = this.sushiForm.params.filter((param) => param.name);
 
       try {
         if (this.sushiForm.id) {

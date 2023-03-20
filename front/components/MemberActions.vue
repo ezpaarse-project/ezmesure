@@ -1,6 +1,6 @@
 <template>
   <v-menu>
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ on, attrs }">
       <v-btn
         icon
         :disabled="isContact && !isAdmin"
@@ -23,7 +23,9 @@
           <v-icon>{{ action.icon }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title v-text="action.label" />
+          <v-list-item-title>
+            {{ action.label }}
+          </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
