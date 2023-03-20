@@ -102,12 +102,11 @@
           :color="item.validated ? 'success' : 'default'"
           outlined
         >
-          <template v-if="item.validated">
-            {{ $t('institutions.institution.validated') }}
-          </template>
-          <template v-else>
-            {{ $t('institutions.institution.notValidated') }}
-          </template>
+          {{
+            item.validated
+              ? $t('institutions.institution.validated')
+              : $t('institutions.institution.notValidated')
+          }}
         </v-chip>
       </template>
 
