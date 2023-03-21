@@ -237,9 +237,6 @@ async function createAdmin() {
         email,
         full_name: fullName,
         roles: ['superuser'],
-        metadata: {
-          acceptedTerms: true,
-        },
       },
     });
   } catch (e) {
