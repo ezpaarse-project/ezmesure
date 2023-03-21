@@ -5,6 +5,7 @@ const mount = require('koa-mount');
 const cors = require('koa-cors');
 const config = require('config');
 const path = require('path');
+const { setTimeout } = require('timers/promises');
 const { STATUS_CODES } = require('http');
 
 const usersService = require('./lib/entities/users.service');
@@ -180,8 +181,6 @@ async function waitForElasticsearch() {
       }
 
       appLogger.info(`Elasticsearch not ready yet (status: ${status})`);
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (e) {
       const status = (e.meta && e.meta.body && e.meta.body.status);
 
@@ -190,10 +189,10 @@ async function waitForElasticsearch() {
       } else {
         appLogger.info(`Cannot connect to Elasticsearch yet : ${e.message}`);
       }
-
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
+
+    // eslint-disable-next-line no-await-in-loop
+    await setTimeout(5000);
   }
 
   appLogger.error('Elasticsearch does not respond or is in a bad state');
