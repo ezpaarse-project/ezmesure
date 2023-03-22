@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class RepositorysService {
   /**

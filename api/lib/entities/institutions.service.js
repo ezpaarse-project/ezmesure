@@ -1,6 +1,7 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Institution} Institution */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs */
@@ -8,6 +9,7 @@ const prisma = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs */
+/* eslint-enable max-len */
 
 module.exports = class InstitutionsService {
   /**

@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiParameter} SushiParameter */
 /** @typedef {import('@prisma/client').Prisma.SushiParameterUpdateArgs} SushiParameterUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiParameterUpsertArgs} SushiParameterUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiParameterFindUniqueArgs} SushiParameterFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiParameterFindManyArgs} SushiParameterFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiParameterCreateArgs} SushiParameterCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class SushiParametersService {
   /**

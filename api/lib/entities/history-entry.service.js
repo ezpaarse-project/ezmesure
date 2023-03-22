@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HistoryEntry} HistoryEntry */
 /** @typedef {import('@prisma/client').Prisma.HistoryEntryUpdateArgs} HistoryEntryUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HistoryEntryUpsertArgs} HistoryEntryUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.HistoryEntryFindUniqueArgs} HistoryEntryFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HistoryEntryFindManyArgs} HistoryEntryFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.HistoryEntryCreateArgs} HistoryEntryCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class HistoryEntrysService {
   /**

@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Log} Log */
 /** @typedef {import('@prisma/client').Prisma.LogUpdateArgs} LogUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.LogUpsertArgs} LogUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.LogFindUniqueArgs} LogFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.LogFindManyArgs} LogFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.LogCreateArgs} LogCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class LogsService {
   /**

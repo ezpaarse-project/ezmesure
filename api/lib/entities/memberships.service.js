@@ -1,6 +1,7 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Membership} Membership */
 /** @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs */
@@ -8,6 +9,7 @@ const prisma = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs */
+/* eslint-enable max-len */
 
 module.exports = class MembershipsService {
   /**

@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
 /** @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class UsersService {
   /**

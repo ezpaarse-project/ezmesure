@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestRequest} HarvestRequest */
 /** @typedef {import('@prisma/client').Prisma.HarvestRequestUpdateArgs} HarvestRequestUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestRequestUpsertArgs} HarvestRequestUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestRequestFindUniqueArgs} HarvestRequestFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestRequestFindManyArgs} HarvestRequestFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestRequestCreateArgs} HarvestRequestCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class HarvestRequestsService {
   /**

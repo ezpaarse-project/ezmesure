@@ -1,12 +1,14 @@
 // @ts-check
 const prisma = require('../services/prisma.service');
 
+/* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Step} Step */
 /** @typedef {import('@prisma/client').Prisma.StepUpdateArgs} StepUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.StepUpsertArgs} StepUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.StepFindUniqueArgs} StepFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.StepFindManyArgs} StepFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.StepCreateArgs} StepCreateArgs */
+/* eslint-enable max-len */
 
 module.exports = class StepsService {
   /**
