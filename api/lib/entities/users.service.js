@@ -1,5 +1,5 @@
 // @ts-check
-const prisma = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
