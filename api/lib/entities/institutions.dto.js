@@ -32,19 +32,19 @@ const regularFields = {
 };
 
 /**
- * Fields that can be changed by admins
- */
-const requiredFields = {
-  name: regularFields.name.required(),
-};
-
-/**
  * Fields that cannot be changed by regular users
  */
 const restrictedFields = {
   validated: Joi.boolean(),
   hidePartner: Joi.boolean(),
   tags: Joi.array().items(Joi.string()),
+};
+
+/**
+ * Fields that can be changed by admins
+ */
+const requiredFields = {
+  name: regularFields.name.required(),
 };
 
 /**
@@ -73,20 +73,19 @@ const immutableFields = Object.fromEntries(
  */
 const adminCreateSchema = {
   ...regularFields,
-  ...requiredFields,
   ...restrictedFields,
+  ...requiredFields,
   ...immutableFields,
-
-  validated: restrictedFields.validated.default(false),
-  hidePartner: restrictedFields.hidePartner.default(false),
-
-  auto: regularFields.auto.keys({
-    ezmesure: Joi.boolean().default(false),
-    ezpaarse: Joi.boolean().default(false),
-    report: Joi.boolean().default(false),
-    sushi: Joi.boolean().default(false),
-  }).default(),
 };
+
+adminCreateSchema.validated = adminCreateSchema.validated.default(false);
+adminCreateSchema.hidePartner = adminCreateSchema.hidePartner.default(false);
+adminCreateSchema.auto = adminCreateSchema.auto.keys({
+  ezmesure: Joi.boolean().default(false),
+  ezpaarse: Joi.boolean().default(false),
+  report: Joi.boolean().default(false),
+  sushi: Joi.boolean().default(false),
+}).default();
 
 /**
  * Schema to be applied when an administrator updates an institution
