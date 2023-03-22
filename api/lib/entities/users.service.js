@@ -8,6 +8,7 @@ const { client: prisma, Prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class UsersService {
@@ -49,5 +50,18 @@ module.exports = class UsersService {
    */
   static upsert(params) {
     return prisma.user.upsert(params);
+  }
+
+  /**
+   * @param {UserDeleteArgs} params
+   * @returns {Promise<User | null>}
+   */
+  static delete(params) {
+    return prisma.user.delete(params).catch((e) => {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return null;
+      }
+      throw e;
+    });
   }
 };

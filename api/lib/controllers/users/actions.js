@@ -1,36 +1,15 @@
-const config = require('config');
-const elastic = require('../../services/elastic');
-const indexTemplate = require('../../utils/depositors-template');
-
-const Institution = require('../../models/Institution');
-
-const depositorsIndex = config.depositors.index;
-
-const isAdmin = (user) => {
-  const roles = new Set((user && user.roles) || []);
-  return (roles.has('admin') || roles.has('superuser'));
-};
-
-const ensureIndex = async () => {
-  const { body: exists } = await elastic.indices.exists({ index: depositorsIndex });
-
-  if (!exists) {
-    await elastic.indices.create({
-      index: depositorsIndex,
-      body: indexTemplate,
-    });
-  }
-};
+const usersService = require('../../entities/users.service');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
+  const { user: connectedUser } = ctx.state;
 
-  const { body: user, statusCode } = await elastic.security.getUser(
-    { username },
-    { ignore: [404] },
-  );
+  const user = await usersService.findUnique({
+    select: connectedUser.isAdmin ? null : { fullName: true, username: true },
+    where: { username },
+  });
 
-  if (statusCode === 404) {
+  if (!user) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
@@ -38,61 +17,49 @@ exports.getUser = async (ctx) => {
   ctx.body = user;
 };
 
-exports.getUserInstitution = async (ctx) => {
-  await ensureIndex();
-
-  const { username } = ctx.request.params;
-
-  const user = await elastic.security.findUser({ username });
-
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.user.notFound'));
-  }
-
-  const institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
-
-  if (!institution) {
-    ctx.throw(404, ctx.$t('errors.institution.notAssigned'));
-    return;
-  }
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = institution;
-};
-
 exports.list = async (ctx) => {
-  const search = ctx.query.q;
-
   const { user } = ctx.state;
 
-  const { size = 10, source = 'full_name,username' } = ctx.query;
+  const {
+    q: search = '',
+    size = 10,
+    source = 'fullName,username',
+  } = ctx.query;
 
-  if (source !== 'full_name,username' && !isAdmin(user)) {
+  if (source !== 'fullName,username' && !user.isAdmin) {
     ctx.throw(403, ctx.$t('errors.perms.feature'));
   }
 
-  const query = {
-    bool: {
-      filter: {
-        term: { type: 'user' },
-      },
+  const select = Object.assign(
+    {},
+    ...source.split(',').map((field) => ({ [field.trim()]: true })),
+  );
+
+  const users = await usersService.findMany({
+    take: Number.parseInt(size, 10),
+    select,
+    where: {
+      OR: [
+        { username: { contains: search, mode: 'insensitive' } },
+        { fullName: { contains: search, mode: 'insensitive' } },
+      ],
     },
-  };
+  });
 
-  if (search) {
-    query.bool.minimum_should_match = 1;
-    query.bool.should = [
-      { wildcard: { full_name: `*${search}*` } },
-      { wildcard: { username: `*${search}*` } },
-    ];
-  }
+  ctx.type = 'json';
+  ctx.body = users;
+};
 
-  const { body = {} } = await elastic.search({
-    index: '.security',
-    _source: source,
-    size,
-    body: { query },
+exports.createOrReplaceUser = async (ctx) => {
+  const { username } = ctx.params;
+  const { body } = ctx.request;
+
+  const userExists = !!await usersService.findUnique({ where: { username } });
+
+  ctx.body = await usersService.upsert({
+    where: { username },
+    update: { ...body, username },
+    create: { ...body, username },
   });
 
   const users = body.hits && body.hits.hits;
@@ -101,32 +68,32 @@ exports.list = async (ctx) => {
     ctx.throw(500, ctx.$t('errors.users.failedToQuery'));
   }
 
-  ctx.type = 'json';
-  ctx.body = users.map((u) => u._source); // eslint-disable-line no-underscore-dangle
+  ctx.status = userExists ? 200 : 201;
 };
 
 exports.updateUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
-  const { body: result } = await elastic.security.putUser({
-    username,
-    body,
-    refresh: true,
+  const userExists = !!await usersService.findUnique({ where: { username } });
+
+  if (!userExists) {
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
+  }
+
+  ctx.body = await usersService.update({
+    where: { username },
+    data: { ...body, username },
   });
 
-  ctx.status = (result && result.created) ? 201 : 200;
-  ctx.body = result;
+  ctx.status = 200;
 };
 
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
 
-  const { body: result } = await elastic.security.deleteUser({
-    username,
-    refresh: true,
-  }, { ignore: [404] });
+  const found = !!await usersService.delete({ where: { username } });
 
   ctx.status = 200;
-  ctx.body = result;
+  ctx.body = { found };
 };
