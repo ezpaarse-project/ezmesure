@@ -100,6 +100,10 @@ export default {
             href: '/institutions',
           },
           {
+            title: this.$t('menu.users'),
+            href: '/users',
+          },
+          {
             title: this.$t('menu.sushiEndpoints'),
             href: '/endpoints',
           },

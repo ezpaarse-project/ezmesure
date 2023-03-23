@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "allowJs": true
+  },
   "vueCompilerOptions": {
     "target": 2.7
   }

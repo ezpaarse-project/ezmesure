@@ -501,6 +501,20 @@
     "unableToCopy": "Unable to copy in the clipboard",
     "textCopied": "Text copied in the clipboard"
   },
+  "users": {
+    "updateUser": "Update user",
+    "deleteNbUsers": "You are about to delete {number} users. The associated indices, spaces and roles will not be affected.",
+    "newUser": "New user",
+    "doesNotExist": "The user you are trying to access is not registered.",
+    "unableToFetchInformations": "Unable to retrieve institution information",
+    "user": {
+      "general": "General",
+      "fullName": "Full name",
+      "username": "Username",
+      "email": "Email address",
+      "isAdmin": "Is Administrator ?"
+    }
+  },
   "url": "URL",
   "type": "Type",
   "copyId": "Copy ID",

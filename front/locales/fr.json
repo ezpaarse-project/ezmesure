@@ -501,6 +501,20 @@
     "unableToCopy": "Impossible de copier dans le presse-papier",
     "textCopied": "Texte copié dans le presse-papier"
   },
+  "users": {
+    "updateUser": "Mettre à jour l'utilisateur",
+    "deleteNbUsers": "Vous allez supprimer {number} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "newUser": "Nouvel utilisateur",
+    "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
+    "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
+    "user": {
+      "general": "Général",
+      "fullName": "Nom complet",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse email",
+      "isAdmin": "Est Administrateur ?"
+    }
+  },
   "url": "URL",
   "type": "Type",
   "copyId": "Copier l'ID",
