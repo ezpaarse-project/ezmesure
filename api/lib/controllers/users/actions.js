@@ -30,10 +30,13 @@ exports.list = async (ctx) => {
     ctx.throw(403, ctx.$t('errors.perms.feature'));
   }
 
-  const select = Object.assign(
+  let select = Object.assign(
     {},
     ...source.split(',').map((field) => ({ [field.trim()]: true })),
   );
+  if (source === '*') {
+    select = undefined;
+  }
 
   const users = await usersService.findMany({
     take: Number.parseInt(size, 10),
