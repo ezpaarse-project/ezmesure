@@ -65,12 +65,6 @@ exports.createOrReplaceUser = async (ctx) => {
     create: { ...body, username },
   });
 
-  const users = body.hits && body.hits.hits;
-
-  if (!Array.isArray(users)) {
-    ctx.throw(500, ctx.$t('errors.users.failedToQuery'));
-  }
-
   ctx.status = userExists ? 200 : 201;
 };
 
