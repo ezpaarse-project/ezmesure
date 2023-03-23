@@ -123,19 +123,7 @@
             "example": "john.doo",
             "readOnly": true
           },
-          "roles": {
-            "type": "array",
-            "example": [
-              "kibana_user",
-              "univ-foobar"
-            ],
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "example": "bibcnrs"
-            }
-          },
-          "full_name": {
+          "fullName": {
             "type": "string",
             "example": "John Doo"
           },
@@ -144,22 +132,24 @@
             "example": "doo.john@ezpaarse.org",
             "format": "email"
           },
-          "enabled": {
+          "createdAt": {
+            "type": "string",
+            "example": "2018-04-12T13:33:00.930Z",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2018-05-15T03:23:43.391Z",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "isAdmin": {
             "type": "boolean"
           },
           "metadata": {
             "type": "object",
             "properties": {
-              "createdAt": {
-                "type": "string",
-                "example": "2018-04-12T13:33:00.930Z",
-                "format": "date-time"
-              },
-              "updatedAt": {
-                "type": "string",
-                "example": "2018-05-15T03:23:43.391Z",
-                "format": "date-time"
-              },
               "remoteUser": {
                 "type": "string",
                 "example": "doo.john.6"
@@ -859,7 +849,7 @@
         "description": "",
         "type": "object",
         "properties": {
-          "full_name": {
+          "fullName": {
             "type": "string",
             "minLength": 1,
             "description": "Member full name"
@@ -885,7 +875,7 @@
           }
         },
         "required": [
-          "full_name",
+          "fullName",
           "roles",
           "readonly",
           "docContact",
@@ -5835,7 +5825,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Member"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               }
@@ -5929,7 +5919,7 @@
         ]
       },
       "put": {
-        "summary": "Update a user",
+        "summary": "Create or replace a user",
         "operationId": "put-users-username",
         "responses": {
           "200": {
@@ -5937,12 +5927,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "created": {
-                      "type": "boolean"
-                    }
-                  }
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -5952,12 +5937,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "created": {
-                      "type": "boolean"
-                    }
-                  }
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -5972,7 +5952,7 @@
             "description": "Forbidden"
           }
         },
-        "description": "Update a user",
+        "description": "Create or replace a user",
         "tags": [
           "Users",
           "Administration"
@@ -5986,19 +5966,51 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/User"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "password": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                ]
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Partially update a user",
+        "operationId": "patch-users-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Partially update a user",
+        "tags": [
+          "Users",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
               }
             }
           }
@@ -6031,7 +6043,7 @@
             "description": "Forbidden"
           }
         },
-        "description": "Delete a Kibana user",
+        "description": "Delete a user",
         "security": [
           {
             "bearerAuth": []
@@ -6039,7 +6051,7 @@
         ],
         "tags": [
           "Administration",
-          "Kibana"
+          "Users"
         ]
       }
     },
