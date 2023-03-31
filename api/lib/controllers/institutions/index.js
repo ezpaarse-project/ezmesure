@@ -25,7 +25,6 @@ const {
 const {
   getInstitutionState,
   validateInstitution,
-  deleteInstitutionCreator,
 } = require('./admin');
 
 router.use(requireJwt, requireUser);
