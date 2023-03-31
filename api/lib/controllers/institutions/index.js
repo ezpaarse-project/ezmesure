@@ -159,21 +159,6 @@ router.route({
   },
 });
 
-router.route({
-  method: 'DELETE',
-  path: '/:institutionId/creator',
-  handler: [
-    fetchInstitution(),
-    requireContact(),
-    deleteInstitutionCreator,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-
 router.use(requireAdmin);
 
 router.route({
