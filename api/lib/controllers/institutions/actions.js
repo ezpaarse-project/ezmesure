@@ -256,6 +256,7 @@ exports.addInstitutionMember = async (ctx) => {
   const membership = user.memberships?.[0];
   const memberIsContact = membership?.isDocContact || membership?.isTechContact;
   const memberBecomesContact = isDocContact || isTechContact;
+  let newMembership;
 
   // Only admins can update institution contacts
   if ((memberIsContact || memberBecomesContact) && !userIsAdmin) {
@@ -263,7 +264,7 @@ exports.addInstitutionMember = async (ctx) => {
   }
 
   if (membership) {
-    await membershipService.update({
+    newMembership = await membershipService.update({
       where: {
         username_institutionId: { username, institutionId },
       },
@@ -274,7 +275,7 @@ exports.addInstitutionMember = async (ctx) => {
       },
     });
   } else {
-    await membershipService.create({
+    newMembership = await membershipService.create({
       data: {
         isDocContact,
         isTechContact,
@@ -294,7 +295,7 @@ exports.addInstitutionMember = async (ctx) => {
   }
 
   ctx.status = 200;
-  ctx.body = { message: 'user updated' };
+  ctx.body = newMembership;
 };
 
 exports.removeInstitutionMember = async (ctx) => {
