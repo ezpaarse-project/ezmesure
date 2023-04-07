@@ -148,7 +148,7 @@ model Log {
   jobId   String
   job     HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   date    DateTime   @default(now())
-  type    String     @db.VarChar(50)
+  level   String     @db.VarChar(50)
   message String
 }
 
