@@ -22,7 +22,8 @@
     "users": "Utilisateurs",
     "logout": "Déconnexion",
     "contact": "Contact",
-    "report": "Mes rapports"
+    "report": "Mes rapports",
+    "adminReport": "ezREEPORT"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -518,7 +519,11 @@
   },
   "report": {
     "title": "Mes rapports",
-    "health": "État de santé"
+    "health": "État de santé",
+    "admin": {
+      "taskTab": "Administration des tâches",
+      "adminTab": "Administration générale"
+    }
   },
   "url": "URL",
   "type": "Type",

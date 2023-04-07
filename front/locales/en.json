@@ -22,7 +22,8 @@
     "users": "Users",
     "logout": "Logout",
     "contact": "Contact",
-    "report": "My reports"
+    "report": "My reports",
+    "adminReport": "ezREEPORT"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -518,7 +519,11 @@
   },
   "report": {
     "title": "My reports",
-    "health": "Health status"
+    "health": "Health status",
+    "admin": {
+      "taskTab": "Task administration",
+      "adminTab": "General administration"
+    }
   },
   "url": "URL",
   "type": "Type",

@@ -108,6 +108,10 @@ export default {
             title: this.$t('menu.sushiEndpoints'),
             href: '/endpoints',
           },
+          {
+            title: this.$t('menu.adminReport'),
+            href: '/report',
+          },
         ],
       };
     },
