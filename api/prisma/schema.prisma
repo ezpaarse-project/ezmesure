@@ -166,47 +166,36 @@ model Step {
 }
 
 model SushiEndpoint {
-  id                 String             @id @default(cuid())
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  sushiUrl           String
-  vendor             String
-  description        String?
-  counterVersion     String?
-  technicalProvider  String?
-  requireCustomerId  Boolean            @default(false)
-  requireRequestorId Boolean            @default(false)
-  requireApiKey      Boolean            @default(false)
-  defaultCustomerId  String?
-  defaultRequestorId String?
-  defaultApiKey      String?
-  paramSeparator     String?
-  tags               String[]
-  credentials        SushiCredentials[]
-  defaultParameters  SushiParameter[]
+  id                     String             @id @default(cuid())
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  sushiUrl               String
+  vendor                 String
+  tags                   String[]
+  description            String?
+  counterVersion         String?
+  technicalProvider      String?
+  requireCustomerId      Boolean            @default(false)
+  requireRequestorId     Boolean            @default(false)
+  requireApiKey          Boolean            @default(false)
+  ignoreReportValidation Boolean            @default(false)
+  defaultCustomerId      String?
+  defaultRequestorId     String?
+  defaultApiKey          String?
+  paramSeparator         String?
+  supportedReports       String[]
+  credentials            SushiCredentials[]
+  params                 Json[]
 }
 
 model SushiCredentials {
   id              String           @id @default(cuid())
-  institutionId   String
-  endpointId      String
-  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
-  params          SushiParameter[]
+  institutionId   String
+  endpointId      String
+  params          Json[]
+  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   harvestRequests HarvestRequest[]
-}
-
-model SushiParameter {
-  id            String            @id @default(cuid())
-  credentialsId String?
-  endpointId    String?
-  credentials   SushiCredentials? @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
-  endpoint      SushiEndpoint?    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  name          String
-  value         String
-  scope         String
 }
