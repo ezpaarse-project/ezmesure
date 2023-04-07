@@ -44,7 +44,7 @@ model User {
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   isAdmin               Boolean                @default(false)
-  metadata              Json?
+  metadata              Json                   @default("{}")
   memberships           Membership[]
   spacePermissions      SpacePermission[]
   historyEntries        HistoryEntry[]
