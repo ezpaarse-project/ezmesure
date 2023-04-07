@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
@@ -8,6 +8,7 @@ const { client: prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class SushiEndpointsService {
@@ -49,5 +50,18 @@ module.exports = class SushiEndpointsService {
    */
   static upsert(params) {
     return prisma.sushiEndpoint.upsert(params);
+  }
+
+  /**
+   * @param {SushiEndpointDeleteArgs} params
+   * @returns {Promise<SushiEndpoint | null>}
+   */
+  static delete(params) {
+    return prisma.sushiEndpoint.delete(params).catch((e) => {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return null;
+      }
+      throw e;
+    });
   }
 };

@@ -1,6 +1,11 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const SushiEndpoint = require('../../models/SushiEndpoint');
+
+const {
+  adminUpdateSchema,
+  adminCreateSchema,
+  adminImportSchema,
+} = require('../../entities/sushi-endpoint.dto');
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),
@@ -11,7 +16,6 @@ const {
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireAnyRole,
   fetchSushiEndpoint,
   requireAdmin,
 } = require('../../services/auth');
@@ -29,7 +33,6 @@ router.use(
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireAnyRole(['sushi_form', 'admin', 'superuser']),
 );
 
 router.route({
@@ -73,6 +76,7 @@ router.route({
   ],
   validate: {
     type: 'json',
+    body: adminCreateSchema,
   },
 });
 
@@ -87,10 +91,7 @@ router.route({
     query: {
       overwrite: Joi.boolean().default(false),
     },
-    body: Joi.array().required().items({
-      ...SushiEndpoint.getSchema('update'),
-      id: SushiEndpoint.getSchema('base')?.id,
-    }),
+    body: adminImportSchema,
   },
 });
 
@@ -106,6 +107,7 @@ router.route({
     params: {
       endpointId: Joi.string().trim().required(),
     },
+    body: adminUpdateSchema,
   },
 });
 
