@@ -220,18 +220,14 @@ import EndpointsDeleteDialog from '~/components/EndpointsDeleteDialog.vue';
 
 export default {
   layout: 'space',
-  middleware: ['auth', 'terms'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
     EndpointForm,
     EndpointDetails,
     EndpointsDeleteDialog,
   },
-  async asyncData({ $auth, redirect }) {
-    if (!$auth.hasScope('superuser') && !$auth.hasScope('admin')) {
-      return redirect({ name: 'myspace' });
-    }
-
+  data() {
     return {
       endpoints: [],
       selected: [],
