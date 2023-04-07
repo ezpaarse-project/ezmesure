@@ -11,10 +11,8 @@
       </v-btn>
     </ToolBar>
 
-    <v-card-text class="w-800 mx-auto">
-      <v-card>
-        <ezr-task-table />
-      </v-card>
+    <v-card-text class="pa-0">
+      <ezr-task-table />
     </v-card-text>
 
     <HealthDialog v-model="showHealthDialog" />
