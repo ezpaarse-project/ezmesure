@@ -763,6 +763,11 @@
               "null"
             ]
           },
+          "ignoreReportValidation": {
+            "description": "Whether to ignore the validation of the harvested reports",
+            "type": "boolean",
+            "default": false
+          },
           "requireCustomerId": {
             "description": "Whether the endpoint requires a customer ID",
             "type": "boolean",
@@ -815,12 +820,13 @@
           },
           "credentials": {
             "description": "SUSHI credentials associated with this endpoint",
+            "readOnly": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SushiCredentials"
             }
           },
-          "defaultParameters": {
+          "params": {
             "description": "List of default parameters associated with this endpoint",
             "type": "array",
             "items": {
@@ -870,25 +876,6 @@
         "description": "A SUSHI request parameter",
         "type": "object",
         "properties": {
-          "id": {
-            "$ref": "#/components/schemas/ItemID"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/ItemCreationDate"
-          },
-          "updatedAt": {
-            "$ref": "#/components/schemas/ItemUpdateDate"
-          },
-          "credentials": {
-            "description": "The SUSHI credentials that use this parameter",
-            "$ref": "#/components/schemas/SushiCredentials",
-            "nullable": true
-          },
-          "endpoint": {
-            "description": "The SUSHI endpoint that uses this parameter",
-            "$ref": "#/components/schemas/SushiEndpoint",
-            "nullable": true
-          },
           "name": {
             "description": "The parameter name",
             "type": "string"
