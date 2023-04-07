@@ -15,6 +15,7 @@ module.exports = {
   },
   plugins: [
     { src: '~/plugins/dates.js' },
+    '~/plugins/ezreeport.js',
   ],
   css: [
     'swagger-ui/dist/swagger-ui.css',
@@ -40,6 +41,7 @@ module.exports = {
   ],
   i18n: {
     baseUrl: process.env.APPLI_APACHE_SERVERNAME,
+    vueI18nLoader: true,
     locales: [
       {
         name: 'Français',

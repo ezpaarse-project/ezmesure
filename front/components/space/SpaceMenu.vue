@@ -81,6 +81,7 @@ export default {
       return [
         { title: this.$t('menu.profile'), href: '/myspace' },
         { title: this.$t('menu.myDeposits'), href: '/files' },
+        { title: this.$t('menu.report'), href: '/report' },
         { title: this.$t('menu.kibanIdentifiers'), href: '/kibana' },
         { title: this.$t('menu.authentificationToken'), href: '/token' },
         { title: this.$t('menu.myInstitutions'), href: '/my-institutions' },
