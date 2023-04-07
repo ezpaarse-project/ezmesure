@@ -29,7 +29,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-    "metadata" JSONB,
+    "metadata" JSONB NOT NULL DEFAULT '{}',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("username")
 );
@@ -130,7 +130,7 @@ CREATE TABLE "Log" (
     "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "type" VARCHAR(50) NOT NULL,
+    "level" VARCHAR(50) NOT NULL,
     "message" TEXT NOT NULL,
 
     CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
@@ -158,17 +158,20 @@ CREATE TABLE "SushiEndpoint" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "sushiUrl" TEXT NOT NULL,
     "vendor" TEXT NOT NULL,
+    "tags" TEXT[],
     "description" TEXT,
     "counterVersion" TEXT,
     "technicalProvider" TEXT,
     "requireCustomerId" BOOLEAN NOT NULL DEFAULT false,
     "requireRequestorId" BOOLEAN NOT NULL DEFAULT false,
     "requireApiKey" BOOLEAN NOT NULL DEFAULT false,
+    "ignoreReportValidation" BOOLEAN NOT NULL DEFAULT false,
     "defaultCustomerId" TEXT,
     "defaultRequestorId" TEXT,
     "defaultApiKey" TEXT,
     "paramSeparator" TEXT,
-    "tags" TEXT[],
+    "supportedReports" TEXT[],
+    "params" JSONB[],
 
     CONSTRAINT "SushiEndpoint_pkey" PRIMARY KEY ("id")
 );
@@ -176,26 +179,13 @@ CREATE TABLE "SushiEndpoint" (
 -- CreateTable
 CREATE TABLE "SushiCredentials" (
     "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "institutionId" TEXT NOT NULL,
     "endpointId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "params" JSONB[],
 
     CONSTRAINT "SushiCredentials_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SushiParameter" (
-    "id" TEXT NOT NULL,
-    "credentialsId" TEXT,
-    "endpointId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "name" TEXT NOT NULL,
-    "value" TEXT NOT NULL,
-    "scope" TEXT NOT NULL,
-
-    CONSTRAINT "SushiParameter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -251,9 +241,3 @@ ALTER TABLE "SushiCredentials" ADD CONSTRAINT "SushiCredentials_institutionId_fk
 
 -- AddForeignKey
 ALTER TABLE "SushiCredentials" ADD CONSTRAINT "SushiCredentials_endpointId_fkey" FOREIGN KEY ("endpointId") REFERENCES "SushiEndpoint"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SushiParameter" ADD CONSTRAINT "SushiParameter_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SushiParameter" ADD CONSTRAINT "SushiParameter_endpointId_fkey" FOREIGN KEY ("endpointId") REFERENCES "SushiEndpoint"("id") ON DELETE CASCADE ON UPDATE CASCADE;
