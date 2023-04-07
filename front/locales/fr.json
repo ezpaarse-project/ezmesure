@@ -521,7 +521,7 @@
     "title": "Mes rapports",
     "health": "État de santé",
     "admin": {
-      "taskTab": "Administration des tâches",
+      "taskTab": "Administration des rapports",
       "adminTab": "Administration générale"
     }
   },
