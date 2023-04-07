@@ -32,9 +32,7 @@ const requireUser = async (ctx, next) => {
 };
 
 const requireTermsOfUse = async (ctx, next) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
-
-  if (!user.metadata.acceptedTerms) {
+  if (!ctx.state?.user?.metadata?.acceptedTerms) {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }
