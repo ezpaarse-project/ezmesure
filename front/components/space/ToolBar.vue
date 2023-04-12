@@ -9,6 +9,10 @@
     </v-toolbar-title>
 
     <slot />
+
+    <template v-if="$slots.extension" #extension>
+      <slot name="extension" />
+    </template>
   </v-toolbar>
 </template>
 

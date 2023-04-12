@@ -15,6 +15,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    
+  reporting:
+    image: ghcr.io/ezpaarse-project/ezreeport-report:latest
+    entrypoint: ""
+    command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
+    environment:
+      - DATABASE_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZREEPORT_POSTGRES_DB}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   postgres:
     image: postgres:15.1-alpine3.16

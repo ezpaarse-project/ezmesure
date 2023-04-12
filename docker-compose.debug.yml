@@ -95,43 +95,80 @@ services:
     command: npm run dev
     restart: "no"
 
-  # reporting:
-  #   build:
-  #     context: ./reporting
-  #     args:
-  #       - http_proxy
-  #       - https_proxy
-  #   ports:
-  #     - 4000:3000
-  #   volumes:
-  #     - "./reporting/logs:/usr/src/app/logs"
-  #     - "./reporting/tmp:/usr/src/app/tmp"
-  #     - "./reporting:/usr/src/app"
-  #     - "./templates:/usr/src/app/templates"
-  #   working_dir: /usr/src/app
-  #   environment:
-  #     - NODE_ENV=development
-  #     - http_proxy
-  #     - https_proxy
-  #     - no_proxy=localhost,rp
-  #     - REPORTING_PORT=3000
-  #     - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
-  #     - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
-  #     - REPORTING_SMTP_HOST=maildev
-  #     - REPORTING_SMTP_PORT=25
-  #     - REPORTING_SMTP_SECURE=false
-  #     - REPORTING_SMTP_IGNORE_TLS=true
-  #     - REPORTING_SMTP_REJECT_UNAUTHORIZED
-  #     - REPORTING_SENDER
-  #     - REPORTING_INDEX=.ezreporting
-  #     - REPORTING_FREQUENCIES
-  #     - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
-  #     - KIBANA_EXTERNAL_URL
-  #     - NODE_CONFIG
-  #     - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
-  #     - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-  #   restart: "no"
-  #   command: npm run dev
+  reporting:
+    image: ghcr.io/ezpaarse-project/ezreeport-report:dev
+    ports:
+      - 8888:8080
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=localhost,elastic
+      # node
+      - NODE_ENV
+      - NODE_CONFIG
+      # redis
+      - REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
+      - REDIS_PORT=${EZMESURE_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
+      # elastic
+      - ELASTIC_URL=${EZMESURE_ELASTIC_SCHEME:-https}://${EZMESURE_ELASTIC_HOST:-elastic}:${EZMESURE_ELASTIC_PORT:-9200}
+      - ELASTIC_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - ELASTIC_REQUIRED_STATUS=${ELASTIC_REQUIRED_STATUS:-yellow}
+      - ELASTIC_MAX_TRIES
+      # database
+      - DATABASE_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZREEPORT_POSTGRES_DB}?schema=public
+      # workers
+      - WORKERS_CONCURRENCE=${EZREEPORT_WORKERS_CONCURRENCE}
+      - WORKERS_MAX_EXEC_TIME=${EZREEPORT_WORKERS_MAX_EXEC_TIME}
+      # report specfic
+      - REPORT_ADMIN_KEY=${EZREEPORT_REPORT_ADMIN_KEY}
+      - REPORT_CRON_TZ=${EZREEPORT_REPORT_CRON_TZ}
+      - REPORT_CRON_TIMER_GENERATE_REPORT=${EZREEPORT_REPORT_CRON_TIMER_GENERATE_REPORT}
+      - REPORT_CRON_TIMER_PURGE_OLD_REPORT=${EZREEPORT_REPORT_CRON_TIMER_PURGE_OLD_REPORT}
+      - REPORT_ITERATIONS_TO_LIVE=${EZREEPORT_REPORT_ITERATIONS_TO_LIVE}
+      - REPORT_DAYS_TO_LIVE=${EZREEPORT_REPORT_DAYS_TO_LIVE}
+      - EMAIL_DEV_TEAM=${EZREEPORT_EMAIL_DEV_TEAM}
+      # common
+      - API_ALLOWED_ORIGINS=${EZREEPORT_API_ALLOWED_ORIGINS} #TODO: maybe localhost ?
+      - LOG_LEVEL=${EZREEPORT_LOG_LEVEL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
+    restart: "no"
+
+  reporting-mail:
+    image: ghcr.io/ezpaarse-project/ezreeport-mail:dev
+    environment:
+      # node
+      - NODE_ENV
+      - NODE_CONFIG
+      # redis
+      - REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
+      - REDIS_PORT=${EZMESURE_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
+      # smtp
+      - SMTP_HOST=${EZMESURE_SMTP_HOST}
+      - SMTP_PORT=${EZMESURE_SMTP_PORT}
+      - SMTP_SECURE=${EZMESURE_SMTP_SECURE}
+      - SMTP_IGNORE_TLS=${EZMESURE_SMTP_IGNORE_TLS}
+      - SMTP_REJECT_UNAUTHORIZED=${EZMESURE_SMTP_REJECT_UNAUTHORIZED}
+      # workers
+      - WORKERS_CONCURRENCE=${EZREEPORT_WORKERS_CONCURRENCE}
+      - WORKERS_MAX_EXEC_TIME=${EZREEPORT_WORKERS_MAX_EXEC_TIME}
+      # mail specific
+      - EMAIL_SENDER=${EZREEPORT_EMAIL_SENDER}
+      - EMAIL_SUPPORT_TEAM=${EZREEPORT_EMAIL_SUPPORT_TEAM}
+      - EMAIL_ATTEMPTS=${EZREEPORT_EMAIL_ATTEMPTS}
+      - EMAIL_ATTEMPTS_INTERVAL=${EZREEPORT_EMAIL_ATTEMPTS_INTERVAL}
+      # common
+      - LOG_LEVEL=${EZREEPORT_LOG_LEVEL}
+    # depends_on:
+    #   redis:
+    #     condition: service_healthy
+    restart: "no"
 
   maildev:
     image: djfarrelly/maildev

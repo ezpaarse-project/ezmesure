@@ -21,7 +21,9 @@
     "sushi": "Sushi",
     "users": "Utilisateurs",
     "logout": "Déconnexion",
-    "contact": "Contact"
+    "contact": "Contact",
+    "report": "Mes rapports",
+    "adminReport": "ezREEPORT"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -513,6 +515,14 @@
       "username": "Nom d'utilisateur",
       "email": "Adresse email",
       "isAdmin": "Est Administrateur ?"
+    }
+  },
+  "report": {
+    "title": "Mes rapports",
+    "health": "État de santé",
+    "admin": {
+      "taskTab": "Administration des rapports",
+      "adminTab": "Administration générale"
     }
   },
   "url": "URL",
