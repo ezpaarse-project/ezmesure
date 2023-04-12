@@ -6,10 +6,10 @@
 
     <v-main>
       <ezr-provider
-        :api-url="'/report/api/v1/'"
         :token="debugToken"
         :namespace-logo-url="logoBaseUrl"
         :namespace-label="namespaceLabel"
+        api-url="/report/api/v1/"
       >
         <v-card flat tile color="transparent">
           <nuxt />
