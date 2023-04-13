@@ -6,7 +6,7 @@ const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const kibana = require('./kibana');
-const logger = require('./logger');
+const { appLogger } = require('./logger');
 
 const {
   sender,
@@ -216,8 +216,8 @@ async function getSentReports() {
       });
       dashboard = res;
     } catch (err) {
-      logger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
-      logger.error(err);
+      appLogger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
+      appLogger.error(err);
     }
 
     const dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
