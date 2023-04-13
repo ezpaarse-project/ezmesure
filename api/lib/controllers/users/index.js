@@ -20,6 +20,7 @@ router.route({
   handler: list,
   validate: {
     query: {
+      q: Joi.string().trim(),
       size: Joi.number().integer().min(0),
       source: Joi.string().trim(),
     },
