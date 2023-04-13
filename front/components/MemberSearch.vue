@@ -27,7 +27,7 @@
             :loading="loading"
             :search-input.sync="search"
             :item-disabled="(item) => !isAdmin && isConnectedUser(item)"
-            item-text="full_name"
+            item-text="fullName"
             :label="$t('search')"
             prepend-inner-icon="mdi-account-search"
             :error="failedToSearch"
@@ -159,7 +159,7 @@ export default {
   watch: {
     search(value) {
       // eslint-disable-next-line camelcase
-      if (this.selected?.full_name !== value) {
+      if (this.selected?.fullName !== value) {
         this.doSearch(value);
       }
     },
