@@ -169,8 +169,8 @@ exports.updateInstitution = async (ctx) => {
       to: supportRecipients,
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
-        institutionName: institution.get('name'),
-        institutionSushiLink: `${origin}/institutions/${institution.getId()}/sushi`,
+        institutionName: institution.name,
+        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {
