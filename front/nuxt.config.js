@@ -68,7 +68,7 @@ module.exports = {
       fallbackLocale: 'en',
     },
   },
-  devModules: [
+  buildModules: [
     '@nuxtjs/auth',
     ['@nuxtjs/vuetify', { optionsPath: './vuetify.options.js' }],
   ],
