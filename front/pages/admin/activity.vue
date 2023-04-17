@@ -367,6 +367,7 @@ export default {
         { header: 'sushi' },
         'sushi/create',
         'sushi/update',
+        'sushi/delete',
         'sushi/delete-many',
         'sushi/download-report',
         'sushi/harvest',
