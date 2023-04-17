@@ -2,7 +2,7 @@
   <v-dialog v-model="show" width="700">
     <v-card>
       <v-card-title class="headline">
-        {{ sushiForm.id ? formTitle : $t('institutions.sushi.addCredentials') }}
+        {{ formTitle }}
       </v-card-title>
 
       <v-card-text>
@@ -10,10 +10,13 @@
           <v-autocomplete
             ref="endpointsBox"
             v-model="endpoint"
-            :items="endpoints"
+            :items="availableEndpoints"
             :label="`${$t('institutions.sushi.endpoint')} *`"
             :rules="[v => !!v || $t('institutions.sushi.pleaseSelectEndpoint')]"
             item-text="vendor"
+            :search-input.sync="endpointSearch"
+            :loading="loadingEndpoints"
+            :hide-no-data="!endpointSearch"
             clearable
             outlined
             required
@@ -72,20 +75,18 @@
             disabled
           />
 
-          <v-text-field
-            v-model="sushiForm.vendor"
-            :label="`${$t('institutions.sushi.label')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
+          <v-combobox
+            v-model="sushiForm.tags"
+            :items="[]"
+            :label="$t('institutions.sushi.tags')"
+            item-text="name"
+            hide-selected
+            return-object
+            hide-no-data
+            multiple
+            small-chips
+            deletable-chips
             outlined
-            required
-          />
-
-          <v-text-field
-            v-model="sushiForm.package"
-            :label="`${$t('institutions.sushi.package')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
-            outlined
-            required
           />
 
           <v-row>
@@ -195,6 +196,7 @@
 </template>
 
 <script>
+import debounce from 'lodash.debounce';
 import SushiParam from '~/components/SushiParam.vue';
 
 export default {
@@ -213,11 +215,12 @@ export default {
       saving: false,
       institutionId: null,
       valid: false,
+      availableEndpoints: [],
       endpoint: null,
-      formTitle: '',
+      endpointSearch: '',
+      loadingEndpoints: false,
 
       sushiForm: {
-        vendor: '',
         requestorId: '',
         customerId: '',
         apiKey: '',
@@ -243,6 +246,18 @@ export default {
     apiKeyLabel() {
       return `${this.$t('institutions.sushi.apiKey')} ${this.requireApiKey ? '*' : ''}`;
     },
+    formTitle() {
+      return this.sushiForm.id
+        ? this.$t('institutions.sushi.updateCredentials')
+        : this.$t('institutions.sushi.addCredentials');
+    },
+  },
+  watch: {
+    endpointSearch(newValue) {
+      if (newValue) {
+        this.queryEndpoints(newValue);
+      }
+    },
   },
   methods: {
     editSushiItem(institution, sushiData = {}) {
@@ -251,8 +266,7 @@ export default {
       }
 
       this.institutionId = institution?.id;
-      this.sushiForm.vendor = sushiData.vendor || '';
-      this.sushiForm.package = sushiData.package || institution?.indexPrefix || '';
+      this.sushiForm.tags = Array.isArray(sushiData.tags) ? sushiData.tags : [];
       this.sushiForm.requestorId = sushiData.requestorId || '';
       this.sushiForm.customerId = sushiData.customerId || '';
       this.sushiForm.apiKey = sushiData.apiKey || '';
@@ -264,8 +278,8 @@ export default {
         this.sushiForm.params = [];
       }
 
-      this.endpoint = this.endpoints.find((endpoint) => endpoint?.id === sushiData?.endpointId);
-      this.formTitle = this.sushiForm.vendor;
+      this.endpoint = sushiData.endpoint;
+      this.availableEndpoints = [sushiData.endpoint];
       this.show = true;
     },
 
@@ -276,10 +290,6 @@ export default {
     onEndpointChange() {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
-      }
-
-      if (this.endpoint?.vendor) {
-        this.sushiForm.vendor = this.endpoint.vendor;
       }
 
       // workaround to hide vendors list on change
@@ -293,6 +303,16 @@ export default {
     removeParam(index) {
       this.$delete(this.sushiForm.params, index);
     },
+
+    queryEndpoints: debounce(async function queryEndpoints() {
+      this.loadingEndpoints = true;
+      try {
+        this.availableEndpoints = await this.$axios.$get('/sushi-endpoints', { params: { q: this.endpointSearch } });
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetrivePlatforms'));
+      }
+      this.loadingEndpoints = false;
+    }, 500),
 
     async save() {
       this.saving = true;
@@ -327,7 +347,6 @@ export default {
         return;
       }
 
-      this.$store.dispatch('snacks/success', this.$t('informationSubmitted'));
       this.saving = false;
       this.show = false;
     },

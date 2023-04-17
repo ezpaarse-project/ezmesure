@@ -62,40 +62,6 @@
           </v-alert>
         </v-col>
       </v-row>
-
-      <v-row v-if="hasUntestedItems" justify="center" class="mt-2">
-        <v-col style="max-width: 1000px">
-          <v-alert
-            outlined
-            type="info"
-            prominent
-            icon="mdi-bell-alert"
-          >
-            <div v-if="lockReason">
-              {{ $t('reason', { reason: lockReason }) }}
-            </div>
-
-            <v-row align="center">
-              <v-col class="grow">
-                <div
-                  class="text-h6"
-                >
-                  {{ $tc('sushi.youHaveUntestedCredentials', untestedItems.length) }}
-                </div>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                  color="info"
-                  :loading="testingConnection"
-                  @click="checkUntestedItems"
-                >
-                  {{ $t('institutions.sushi.checkConnection') }}
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-        </v-col>
-      </v-row>
     </v-container>
 
     <SushiForm
@@ -133,17 +99,6 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="testingConnection || locked" @click="checkMultipleConnection">
-          <v-list-item-icon>
-            <v-icon>mdi-connection</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t('institutions.sushi.checkConnection') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
         <v-list-item :disabled="deleting || locked" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
@@ -281,28 +236,17 @@
         </td>
       </template>
 
-      <template #[`item.status`]="{ item }">
-        <SushiConnectionIcon
-          :connection="item.connection"
-          :loading="loadingItems[item.id]"
-          :locked="locked"
-          @checkConnection="checkSingleConnection(item)"
-        />
-      </template>
-
-      <template #[`item.latestImportTask`]="{ item }">
-        <TaskLabel
-          :task="item.latestImportTask"
-          @click="showSushiItemHistory(item, { openLatest: true })"
-        />
-      </template>
-
-      <template #[`item.latestImportTask.createdAt`]="{ item }">
-        <LocalDate
-          v-if="item.latestImportTask"
-          :date="item.latestImportTask.createdAt"
-          format="Pp"
-        />
+      <template #[`item.tags`]="{ item }">
+        <v-chip
+          v-for="(tag, index) in item.tags"
+          :key="index"
+          small
+          label
+          class="mr-1"
+          color="secondary"
+        >
+          {{ tag }}
+        </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -365,14 +309,11 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import SushiDetails from '~/components/SushiDetails.vue';
-import SushiConnectionIcon from '~/components/SushiConnectionIcon.vue';
 import SushiForm from '~/components/SushiForm.vue';
 import SushiHistory from '~/components/SushiHistory.vue';
 import SushiFiles from '~/components/SushiFiles.vue';
 import ReportsDialog from '~/components/ReportsDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
-import LocalDate from '~/components/LocalDate.vue';
-import TaskLabel from '~/components/TaskLabel.vue';
 
 export default {
   layout: 'space',
@@ -380,13 +321,10 @@ export default {
   components: {
     ToolBar,
     SushiDetails,
-    SushiConnectionIcon,
     SushiForm,
     SushiHistory,
     SushiFiles,
     ReportsDialog,
-    LocalDate,
-    TaskLabel,
     ConfirmDialog,
   },
   async asyncData({
@@ -395,14 +333,9 @@ export default {
     params,
     app,
     $auth,
-    redirect,
   }) {
     let institution = null;
     let lockStatus;
-
-    if (!$auth.hasScope('superuser') && !$auth.hasScope('sushi_form')) {
-      return redirect({ name: 'myspace' });
-    }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
@@ -444,7 +377,7 @@ export default {
   },
   computed: {
     isAdmin() {
-      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+      return this.$auth.user?.isAdmin;
     },
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
@@ -467,47 +400,20 @@ export default {
     tableHeaders() {
       return [
         {
-          text: this.$t('status'),
-          value: 'status',
-          align: 'center',
-          width: '100px',
-        },
-        {
-          text: this.$t('institutions.sushi.label'),
-          value: 'vendor',
-        },
-        {
-          text: this.$t('institutions.sushi.package'),
-          value: 'package',
-          align: 'right',
-          width: '200px',
-        },
-        {
-          text: this.$t('sushi.latestImport'),
-          value: 'latestImportTask.createdAt',
-          align: 'right',
-          width: '160px',
-        },
-        {
-          text: this.$t('type'),
-          value: 'latestImportTask.params.reportType',
-          align: 'right',
-          width: '80px',
-          cellClass: 'text-uppercase',
-        },
-        {
-          text: this.$t('sushi.importState'),
-          value: 'latestImportTask',
-          align: 'right',
-          width: '200px',
+          text: this.$t('institutions.sushi.endpoint'),
+          value: 'endpoint.vendor',
           sort: (a, b) => {
-            if (a?.status === b?.status) { return 0; }
-            if (a?.status === 'finished') { return 1; }
-            if (b?.status === 'finished') { return -1; }
-            if (typeof a?.status !== 'string') { return -1; }
-            if (typeof b?.status !== 'string') { return 1; }
-            return a?.status > b?.status ? 1 : -1;
+            const vendor1 = a?.endpoint?.vendor?.toLowercase();
+            const vendor2 = b?.endpoint?.vendor?.toLowercase();
+
+            return vendor1 > vendor2 ? 1 : -1;
           },
+        },
+        {
+          text: this.$t('institutions.sushi.tags'),
+          value: 'tags',
+          align: 'right',
+          width: 'auto',
         },
         {
           text: this.$t('actions'),
@@ -628,11 +534,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, {
-          params: {
-            latestImportTask: true,
-          },
-        });
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`);
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }
@@ -677,54 +579,6 @@ export default {
       this.selected = [];
     },
 
-    checkUntestedItems() {
-      if (this.hasUntestedItems) {
-        this.selected = this.untestedItems.slice();
-        this.checkMultipleConnection();
-      }
-    },
-
-    async checkSingleConnection(sushiItem) {
-      this.$set(this, 'loadingItems', { [sushiItem.id]: true });
-
-      try {
-        this.$set(sushiItem, 'connection', await this.$axios.$get(`/sushi/${sushiItem.id}/connection`));
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
-      }
-
-      this.$set(this, 'loadingItems', {});
-    },
-
-    async checkMultipleConnection() {
-      if (!this.hasSelection) { return; }
-
-      const loadingItems = {};
-      const selected = this.selected.slice();
-
-      selected.forEach((s) => {
-        loadingItems[s.id] = true;
-      });
-
-      this.$set(this, 'loadingItems', loadingItems);
-      this.clearSelection();
-
-      for (let i = 0; i < selected.length; i += 1) {
-        const sushiItem = selected[i];
-
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          this.$set(sushiItem, 'connection', await this.$axios.$get(`/sushi/${sushiItem.id}/connection`));
-        } catch (e) {
-          this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem.vendor }));
-        }
-
-        this.loadingItems[sushiItem.id] = false;
-      }
-
-      this.$set(this, 'loadingItems', {});
-    },
-
     async deleteSushiItem(item) {
       await this.deleteSushiItems([item]);
     },
@@ -749,36 +603,33 @@ export default {
 
       this.deleting = true;
 
-      const ids = selected.map((select) => select.id);
-      let response;
+      const deleted = [];
+      const failed = [];
 
-      try {
-        response = await this.$axios.$post('/sushi/batch_delete', { ids });
-        if (!Array.isArray(response)) {
-          throw new Error('invalid response');
+      const requests = selected.map(async (item) => {
+        try {
+          await this.$axios.$delete(`/sushi/${item.id}`);
+          deleted.push(item);
+        } catch (e) {
+          failed.push(item);
         }
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: selected.length }));
-        this.deleting = false;
-        return;
-      }
-
-      this.deleting = false;
-
-      const failed = response.filter((item) => item?.status !== 'deleted');
-      const deleted = response.filter((item) => item?.status === 'deleted');
-
-      failed.forEach(({ id }) => {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id }));
       });
 
+      await Promise.allSettled(requests);
+
+      failed.forEach((item) => {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item?.endpoint?.vendor || item?.id }));
+      });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
       if (deleted.length > 0) {
         this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
-
-        const removeDeleted = ({ id }) => !deleted.some((item) => item.id === id);
-        this.sushiItems = this.sushiItems.filter(removeDeleted);
-        this.selected = this.selected.filter(removeDeleted);
       }
+
+      this.refreshSushiItems();
+      this.deleting = false;
     },
   },
 };
