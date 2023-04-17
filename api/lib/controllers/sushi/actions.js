@@ -5,46 +5,42 @@ const subMonths = require('date-fns/subMonths');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 
-const Sushi = require('../../models/Sushi');
 const Task = require('../../models/Task');
 const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
+const sushiCredentialsService = require('../../entities/sushi-credentials.service');
+
 exports.getAll = async (ctx) => {
-  const options = { filters: [] };
+  const where = {};
   const { query = {} } = ctx.request;
   const {
     id: sushiIds,
     institutionId,
     endpointId,
-    connection,
   } = query;
 
   if (sushiIds) {
-    options.filters.push(Sushi.filterById(Array.isArray(sushiIds) ? sushiIds : sushiIds.split(',').map((s) => s.trim())));
+    where.id = Array.isArray(sushiIds)
+      ? { in: sushiIds }
+      : { equals: sushiIds };
   }
   if (institutionId) {
-    options.filters.push(Sushi.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+    where.institutionId = Array.isArray(institutionId)
+      ? { in: institutionId }
+      : { equals: institutionId };
   }
   if (endpointId) {
-    options.filters.push(Sushi.filterBy('endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
-  }
-
-  if (connection === 'untested') {
-    options.must_not = [{
-      exists: { field: `${Sushi.type}.connection.success` },
-    }];
-  } else if (connection) {
-    options.filters.push({
-      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
-    });
+    where.endpointId = Array.isArray(endpointId)
+      ? { in: endpointId }
+      : { equals: endpointId };
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findAll(options);
+  ctx.body = await sushiCredentialsService.findMany({ where });
 };
 
 exports.getOne = async (ctx) => {
@@ -63,24 +59,26 @@ exports.getTasks = async (ctx) => {
 
 exports.addSushi = async (ctx) => {
   ctx.action = 'sushi/create';
-  const { body } = ctx.request;
-  const { institution, endpoint } = ctx.state;
-
-  const sushiData = {
-    ...body,
-    vendor: body.vendor || endpoint.get('vendor'),
-  };
+  const { body: sushiData } = ctx.request;
+  const { institution } = ctx.state;
 
   ctx.metadata = {
     vendor: sushiData.vendor,
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
-  const sushiItem = new Sushi(sushiData);
-  await sushiItem.save();
+  const sushiItem = await sushiCredentialsService.create({
+    data: {
+      ...sushiData,
+      endpoint: { connect: { id: sushiData?.endpointId } },
+      institution: { connect: { id: sushiData?.institutionId } },
+      endpointId: undefined,
+      institutionId: undefined,
+    },
+  });
 
-  ctx.metadata.sushiId = sushiItem.getId();
+  ctx.metadata.sushiId = sushiItem?.id;
   ctx.status = 201;
   ctx.body = sushiItem;
 };
@@ -90,24 +88,34 @@ exports.updateSushi = async (ctx) => {
   const { sushi, institution } = ctx.state;
   const { body } = ctx.request;
 
-  sushi.update(body);
-  sushi.set('connection', undefined);
-
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: sushi.endpoint?.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
-  try {
-    await sushi.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  const updatedSushiCredentials = await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: body,
+  });
 
   ctx.status = 200;
-  ctx.body = sushi;
+  ctx.body = updatedSushiCredentials;
+};
+
+exports.deleteOne = async (ctx) => {
+  ctx.action = 'sushi/delete';
+  const { sushi } = ctx.state;
+
+  ctx.metadata = {
+    sushiId: sushi?.id,
+    endpointVendor: sushi?.endpoint?.vendor,
+  };
+
+  await sushiCredentialsService.delete({ where: { id: sushi?.id } });
+
+  ctx.status = 204;
 };
 
 exports.deleteSushiData = async (ctx) => {
@@ -115,20 +123,27 @@ exports.deleteSushiData = async (ctx) => {
   const { body } = ctx.request;
   const { userIsAdmin, institution } = ctx.state;
 
-  const sushiItems = await Sushi.findManyById(body.ids);
+  const sushiItems = await sushiCredentialsService.findMany({
+    where: { id: { in: body.ids } },
+    include: {
+      endpoint: {
+        select: { vendor: true },
+      },
+    },
+  });
 
   const response = await Promise.all(sushiItems.map(async (sushiItem) => {
     const result = {
-      id: sushiItem.getId(),
-      vendor: sushiItem.get('vendor'),
+      id: sushiItem.id,
+      vendor: sushiItem.endpoint?.vendor,
     };
 
-    if (!userIsAdmin && (sushiItem.getInstitutionId() !== institution.id)) {
+    if (!userIsAdmin && (sushiItem.institutionId !== institution.id)) {
       return { ...result, status: 'failed' };
     }
 
     try {
-      await sushiItem.delete();
+      await sushiCredentialsService.delete({ where: { id: sushiItem.id } });
       return { ...result, status: 'deleted' };
     } catch (error) {
       appLogger.error(`Failed to delete sushi data: ${error}`);
@@ -418,11 +433,11 @@ exports.importSushiItems = async (ctx) => {
   const { body = [] } = ctx.request;
   const { overwrite } = ctx.query;
   const { institution } = ctx.state;
-  const institutionId = institution.getId();
+  const institutionId = institution.id;
 
   ctx.metadata = {
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    institutionId,
+    institutionName: institution.name,
   };
 
   const response = {
@@ -444,29 +459,34 @@ exports.importSushiItems = async (ctx) => {
     });
   };
 
-  const importItem = async (sushiData = {}) => {
-    if (sushiData.id) {
-      const sushiItem = await Sushi.findById(sushiData.id);
+  const importItem = async (data = {}) => {
+    if (data.id) {
+      const sushiItem = await sushiCredentialsService.findUnique({ where: { id: data.id } });
 
-      if (sushiItem && sushiItem.get('institutionId') !== institutionId) {
-        addResponseItem(sushiData, 'error', ctx.$t('errors.sushi.import.belongsToAnother', sushiItem.getId()));
+      if (sushiItem && sushiItem.institutionId !== institutionId) {
+        addResponseItem(sushiItem, 'error', ctx.$t('errors.sushi.import.belongsToAnother', sushiItem.id));
         return;
       }
 
       if (sushiItem && !overwrite) {
-        addResponseItem(sushiData, 'conflict', ctx.$t('errors.sushi.import.alreadyExists', sushiItem.getId()));
+        addResponseItem(sushiItem, 'conflict', ctx.$t('errors.sushi.import.alreadyExists', sushiItem.id));
         return;
       }
     }
 
-    const sushiItem = new Sushi({
-      ...sushiData,
-      institutionId,
+    const sushiData = {
+      ...data,
+      endpoint: { connect: { id: data?.endpointId } },
+      institution: { connect: { id: institutionId } },
+      endpointId: undefined,
+      institutionId: undefined,
+    };
+
+    const sushiItem = await sushiCredentialsService.upsert({
+      where: { id: sushiData.id },
+      create: sushiData,
+      update: sushiData,
     });
-
-    sushiItem.setId(sushiData.id);
-
-    await sushiItem.save();
 
     addResponseItem(sushiItem, 'created');
   };

@@ -1,8 +1,8 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
-const { getModel } = require('../models/TypedModel');
 const institutionsService = require('../entities/institutions.service');
 const sushiEndpointService = require('../entities/sushi-endpoint.service');
+const sushiCredentialsService = require('../entities/sushi-credentials.service');
 const usersService = require('../entities/users.service');
 
 const requireJwt = jwt({
@@ -88,6 +88,12 @@ function fetchModel(modelName, opts = {}) {
 
     let item;
 
+    const findOptions = {
+      where: { id: modelId },
+      include: opts?.include,
+      select: opts?.select,
+    };
+
     switch (modelName) {
       case 'institution':
         item = modelId && await institutionsService.findUnique({
@@ -106,13 +112,14 @@ function fetchModel(modelName, opts = {}) {
         break;
 
       case 'sushi-endpoint':
-        item = modelId && await sushiEndpointService.findUnique({
-          where: { id: modelId },
-        });
+        item = modelId && await sushiEndpointService.findUnique(findOptions);
+        break;
+
+      case 'sushi':
+        item = modelId && await sushiCredentialsService.findUnique(findOptions);
         break;
 
       default:
-        item = modelId && await getModel(modelName).findById(modelId);
     }
 
     if (!item && !ignoreNotFound) {

@@ -100,18 +100,18 @@ const DEFAULT_REPORT_TYPE = 'tr';
  *                         beginDate
  *                         endDate
  */
-async function getAvailableReports(endpoint, sushi) {
+async function getAvailableReports(endpoint = {}, sushi = {}) {
   const {
     sushiUrl,
     params: endpointParams,
-  } = endpoint?.getData?.();
+  } = endpoint;
 
   const {
     requestorId,
     customerId,
     apiKey,
     params: sushiParams,
-  } = sushi?.getData?.();
+  } = sushi;
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const params = {};
@@ -165,16 +165,16 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   const {
     sushiUrl,
     params: endpointParams,
-  } = endpoint.getData();
+  } = endpoint;
 
-  const paramSeparator = endpoint.get('paramSeparator') || '|';
+  const paramSeparator = endpoint.paramSeparator || '|';
 
   const {
     requestorId,
     customerId,
     apiKey,
     params: sushiParams,
-  } = sushi.getData();
+  } = sushi;
 
   const {
     reportType = DEFAULT_REPORT_TYPE,
@@ -249,13 +249,12 @@ function getSushiDirectory(options) {
     sushi,
     institution,
   } = options;
-  const indexPrefix = institution.get('indexPrefix');
 
   return path.resolve(
     storageDir,
-    indexPrefix || 'no_prefix',
-    sushi.get('endpointId'),
-    sushi.getId(),
+    institution.id,
+    sushi.endpointId,
+    sushi.id,
   );
 }
 
@@ -273,7 +272,7 @@ function getReportPath(options) {
 
 function getReportTmpPath(options) {
   const { sushi } = options;
-  return path.resolve(tmpDir, sushi.getId(), getReportFilename(options));
+  return path.resolve(tmpDir, sushi.id, getReportFilename(options));
 }
 
 /**

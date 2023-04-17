@@ -4,12 +4,10 @@ const institutionsDto = require('../../entities/institutions.dto');
 const membershipService = require('../../entities/memberships.service');
 const usersService = require('../../entities/users.service');
 
-const Sushi = require('../../models/Sushi');
-const Task = require('../../models/Task');
-
 const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
+const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
@@ -352,34 +350,18 @@ exports.removeInstitutionMember = async (ctx) => {
 };
 
 exports.getSushiData = async (ctx) => {
-  const options = {};
-  const connection = ctx.query?.connection;
-
-  if (connection === 'untested') {
-    options.must_not = [{
-      exists: { field: `${Sushi.type}.connection.success` },
-    }];
-  } else if (connection) {
-    options.filters = [{
-      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
-    }];
-  }
-
-  const sushiItems = await Sushi.findByInstitutionId(ctx.state.institution.id, options);
-
-  if (ctx?.query?.latestImportTask) {
-    const sushiMap = new Map(sushiItems.map((item) => [item.getId(), item]));
-    const latestTasks = await Task.findOnePerSushiId(Array.from(sushiMap.keys()));
-
-    if (Array.isArray(latestTasks)) {
-      latestTasks.forEach((task) => {
-        const sushiItem = sushiMap.get(task?.getParam?.('sushiId'));
-        if (sushiItem) {
-          sushiItem.set('latestImportTask', task);
-        }
-      });
-    }
-  }
+  const sushiItems = await sushiCredentialsService.findMany({
+    where: {
+      institutionId: ctx.state.institution.id,
+    },
+    include: {
+      endpoint: {
+        select: {
+          vendor: true,
+        },
+      },
+    },
+  });
 
   ctx.type = 'json';
   ctx.status = 200;

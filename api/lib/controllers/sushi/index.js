@@ -1,14 +1,19 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const Sushi = require('../../models/Sushi');
 const Institution = require('../../models/Institution');
+
+const {
+  createSchema,
+  importSchema,
+  updateSchema,
+} = require('../../entities/sushi-credentials.dto');
+
 const { stringifyException } = require('../../services/sushi');
 const {
   requireJwt,
   requireUser,
   requireAdmin,
   requireTermsOfUse,
-  requireAnyRole,
   fetchInstitution,
   fetchSushi,
   fetchSushiEndpoint,
@@ -29,6 +34,7 @@ const {
   downloadFile,
   getTasks,
   getAvailableReports,
+  deleteOne,
 } = require('./actions');
 
 const stringOrArray = Joi.alternatives().try(
@@ -40,7 +46,7 @@ let sushiLocked = false;
 let lockReason;
 
 const blockIfLocked = (ctx, next) => {
-  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.userIsAdmin) {
+  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.sushi.managementLocked'), { detail: lockReason });
   }
   return next();
@@ -50,7 +56,6 @@ router.use(
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireAnyRole(['sushi_form', 'admin', 'superuser']),
   blockIfLocked,
 );
 
@@ -138,7 +143,7 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: Sushi.getSchema('create'),
+    body: createSchema,
   },
 });
 
@@ -156,10 +161,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
       overwrite: Joi.boolean().default(false),
     },
-    body: Joi.array().required().items({
-      ...Sushi.getSchema('update'),
-      id: Sushi.getSchema('base')?.id,
-    }),
+    body: importSchema,
   },
 });
 
@@ -170,8 +172,8 @@ router.route({
  * Check that the institution is validated
  */
 const commonHandlers = [
-  fetchSushi(),
-  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.get?.('institutionId') }),
+  fetchSushi({ include: { endpoint: true } }),
+  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
   requireContact(),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
 ];
@@ -209,16 +211,16 @@ router.route({
   path: '/:sushiId/connection',
   handler: [
     commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     async (ctx) => {
       const { sushi, institution } = ctx.state;
 
       ctx.action = 'sushi/check-connection';
       ctx.metadata = {
-        sushiId: sushi.getId(),
-        vendor: sushi.get('vendor'),
-        institutionId: institution.getId(),
-        institutionName: institution.get('name'),
+        sushiId: sushi.id,
+        vendor: sushi.vendor,
+        institutionId: institution.id,
+        institutionName: institution.name,
       };
 
       let error;
@@ -257,7 +259,7 @@ router.route({
       }
 
       ctx.status = 200;
-      ctx.body = sushi.get('connection');
+      ctx.body = sushi.connection;
     },
   ],
   validate: {
@@ -272,7 +274,7 @@ router.route({
   path: '/:sushiId/reports',
   handler: [
     commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     getAvailableReports,
   ],
   validate: {
@@ -294,18 +296,32 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
-    body: Sushi.getSchema('update'),
+    body: updateSchema,
   },
 });
 
-requireAnyRole(['admin', 'superuser']);
+router.route({
+  method: 'DELETE',
+  path: '/:sushiId',
+  handler: [
+    commonHandlers,
+    deleteOne,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.use(requireAdmin);
 
 router.route({
   method: 'GET',
   path: '/:sushiId/report.json',
   handler: [
     commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     downloadReport,
   ],
   validate: {
@@ -324,7 +340,7 @@ router.route({
   path: '/:sushiId/_harvest',
   handler: [
     commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     harvestSushi,
   ],
   validate: {

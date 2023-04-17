@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
@@ -8,6 +8,7 @@ const { client: prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class SushiCredentialssService {
@@ -49,5 +50,18 @@ module.exports = class SushiCredentialssService {
    */
   static upsert(params) {
     return prisma.sushiCredentials.upsert(params);
+  }
+
+  /**
+   * @param {SushiCredentialsDeleteArgs} params
+   * @returns {Promise<SushiCredentials | null>}
+   */
+  static delete(params) {
+    return prisma.sushiCredentials.delete(params).catch((e) => {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return null;
+      }
+      throw e;
+    });
   }
 };
