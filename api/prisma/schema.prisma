@@ -197,6 +197,8 @@ model SushiCredentials {
   customerId      String?
   requestorId     String?
   apiKey          String?
+  comment         String?
+  tags            String[]
   params          Json[]
   institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
