@@ -7,6 +7,7 @@ exports.getAll = async (ctx) => {
     requireApiKey,
     isSushiCompliant,
     tags,
+    q: search,
   } = ctx.query;
 
   const where = {
@@ -19,6 +20,13 @@ exports.getAll = async (ctx) => {
   if (tags) {
     where.tags = {
       hasSome: Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim()),
+    };
+  }
+
+  if (search) {
+    where.vendor = {
+      contains: search,
+      mode: 'insensitive',
     };
   }
 

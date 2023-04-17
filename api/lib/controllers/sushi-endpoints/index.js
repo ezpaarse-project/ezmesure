@@ -48,6 +48,7 @@ router.route({
       requireApiKey: Joi.boolean(),
       isSushiCompliant: Joi.boolean(),
       tags: stringOrArray,
+      q: Joi.string(),
     },
   },
 });
