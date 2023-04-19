@@ -56,6 +56,9 @@
       "name": "Metrics"
     },
     {
+      "name": "Repositories"
+    },
+    {
       "name": "Sushi"
     },
     {
@@ -460,16 +463,25 @@
             "$ref": "#/components/schemas/ItemCreationDate"
           },
           "institution": {
-            "$ref": "#/components/schemas/Institution",
-            "nullable": true
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Institution",
+                "nullable": true
+              }
+            ]
           },
           "pattern": {
             "type": "string"
           },
-          "dataType": {
+          "institutionId": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "type": {
             "type": "string"
           },
           "permissions": {
+            "readOnly": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RepositoryPermission"
@@ -916,56 +928,6 @@
           }
         }
       },
-      "InstitutionsRefresh": {
-        "type": "object",
-        "properties": {
-          "errors": {
-            "type": "boolean",
-            "description": "true if one or more institutions failed to refresh"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "University of Foobar",
-                  "description": "name of the institution"
-                },
-                "indexPrefix": {
-                  "type": "string",
-                  "example": "univ-foobar",
-                  "description": "index prefix of the institution"
-                },
-                "indexCount": {
-                  "type": "integer",
-                  "example": 8542,
-                  "description": "total number of documents stored under the index prefix"
-                },
-                "docContactName": {
-                  "type": "string",
-                  "example": "John Doe",
-                  "description": "name of the documentary contact"
-                },
-                "techContactName": {
-                  "type": "string",
-                  "example": "John Doe",
-                  "description": "name of the technical contact"
-                },
-                "updated": {
-                  "type": "boolean",
-                  "description": "true is something changed"
-                },
-                "error": {
-                  "type": "string",
-                  "description": "an error message if refresh failed"
-                }
-              }
-            }
-          }
-        }
-      },
       "IndexList": {
         "type": "object",
         "properties": {
@@ -1338,43 +1300,6 @@
           "endpointId",
           "updatedAt",
           "createdAt"
-        ]
-      },
-      "Member": {
-        "description": "",
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Member full name"
-          },
-          "roles": {
-            "type": "array",
-            "description": "Kibana roles of the member",
-            "items": {
-              "type": "string"
-            }
-          },
-          "readonly": {
-            "type": "boolean",
-            "description": "Whether the member has Kibana write permission"
-          },
-          "docContact": {
-            "type": "boolean",
-            "description": "Whether the member is the documentary contact"
-          },
-          "techContact": {
-            "type": "boolean",
-            "description": "Whether the member is the technical contact"
-          }
-        },
-        "required": [
-          "fullName",
-          "roles",
-          "readonly",
-          "docContact",
-          "techContact"
         ]
       },
       "IndexPattern": {
@@ -4283,6 +4208,235 @@
         ],
         "tags": [
           "Jobs"
+        ]
+      }
+    },
+    "/repositories": {
+      "get": {
+        "operationId": "get-repositories",
+        "summary": "Get all repositories",
+        "description": "Get all data repositories",
+        "tags": [
+          "Repositories"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Repository"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "q",
+            "description": "A query for searching in repository patterns"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "Filter by repository type"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "institutionId",
+            "description": "Filter by institution ID"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a repository endpoint",
+        "description": "Create a new data repository",
+        "operationId": "post-repositories",
+        "tags": [
+          "Repositories"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  { "$ref": "#/components/schemas/Repository" },
+                  {
+                    "properties": {
+                      "institutionId": { "readOnly": false }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repositories/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the repository"
+        }
+      ],
+      "patch": {
+        "summary": "Update a data repository",
+        "description": "Update a data repository",
+        "operationId": "patch-repositories-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Repository"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a repository",
+        "description": "Get a data repository",
+        "operationId": "get-repository-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Repositories"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a repository",
+        "description": "Delete a data repository",
+        "operationId": "delete-repository-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Repositories"
         ]
       }
     },
