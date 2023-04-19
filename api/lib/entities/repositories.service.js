@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
@@ -8,6 +8,7 @@ const { client: prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class RepositorysService {
@@ -49,5 +50,18 @@ module.exports = class RepositorysService {
    */
   static upsert(params) {
     return prisma.repository.upsert(params);
+  }
+
+  /**
+   * @param {RepositoryDeleteArgs} params
+   * @returns {Promise<Repository | null>}
+   */
+  static delete(params) {
+    return prisma.repository.delete(params).catch((e) => {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return null;
+      }
+      throw e;
+    });
   }
 };
