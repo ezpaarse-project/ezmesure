@@ -24,6 +24,12 @@
     "port": "EZMESURE_REDIS_PORT",
     "password": "EZMESURE_REDIS_PASSWORD"
   },
+  "ezreeport": {
+    "host": "EZMESURE_REPORT_HOST",
+    "port": "EZMESURE_REPORT_PORT",
+    "syncSchedule": "EZMESURE_REPORT_SYNC_SCHEDULE",
+    "apiKey": "EZMESURE_REPORT_ADMIN_KEY"
+  },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
     "port": "EZMESURE_SMTP_PORT",
