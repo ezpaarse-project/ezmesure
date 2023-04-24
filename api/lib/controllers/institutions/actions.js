@@ -37,8 +37,20 @@ function sendNewContact(receiver) {
 }
 
 exports.getInstitutions = async (ctx) => {
+  const {
+    include: propsToInclude,
+  } = ctx.query;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
   ctx.type = 'json';
-  ctx.body = await institutionsService.findMany({});
+  ctx.body = await institutionsService.findMany({
+    include,
+  });
 };
 
 exports.getInstitution = async (ctx) => {

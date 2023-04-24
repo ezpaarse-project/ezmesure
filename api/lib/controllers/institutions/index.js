@@ -1,6 +1,8 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
+const { includableFields } = require('../../entities/institutions.dto');
+
 const {
   requireJwt,
   requireUser,
@@ -29,7 +31,17 @@ const {
 
 router.use(requireJwt, requireUser);
 
-router.get('/', getInstitutions);
+router.route({
+  method: 'GET',
+  path: '/',
+  handler: getInstitutions,
+  validate: {
+    query: {
+      q: Joi.string(),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    },
+  },
+});
 
 router.route({
   method: 'GET',
