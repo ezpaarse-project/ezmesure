@@ -528,6 +528,13 @@
       "adminTab": "Administration générale"
     }
   },
+  "repositories": {
+    "repositories": "Dépôts",
+    "xRepositories": "aucun dépôt | 1 dépôt | {count} dépôts",
+    "noRepository": "Aucun dépôt n'est encore attribué",
+    "pattern": "Pattern",
+    "type": "Type"
+  },
   "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",
   "type": "Type",

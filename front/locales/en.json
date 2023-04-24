@@ -528,6 +528,13 @@
       "adminTab": "General administration"
     }
   },
+  "repositories": {
+    "repositories": "Repositories",
+    "xRepositories": "no repositories | 1 repository | {count} repositories",
+    "noRepository": "No repositories has been assigned yet",
+    "pattern": "Pattern",
+    "type": "Type"
+  },
   "anErrorOccurred": "An error occurred",
   "url": "URL",
   "type": "Type",
