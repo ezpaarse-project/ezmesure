@@ -50,8 +50,8 @@ errors:
     cannotCancelJobWithoutPID: Impossible d'annuler la tâche, le processus n'est pas identifiable
 
   repository:
-    notFound: Zone de dépôt introuvable
-    alreadyExists: La zone de dépôt [%s] est déjà associée à l'établissement
+    notFound: Dépôt introuvable
+    alreadyExists: Le dépôt [%s] est déjà associé à l'établissement
 
   institution:
     notFound: Établissement introuvable
