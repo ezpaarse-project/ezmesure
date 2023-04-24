@@ -528,6 +528,7 @@
       "adminTab": "Administration générale"
     }
   },
+  "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",
   "type": "Type",
   "copyId": "Copier l'ID",
