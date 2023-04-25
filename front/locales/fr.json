@@ -513,6 +513,7 @@
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
     "user": {
+      "saved": "Utilisateur sauvegarder",
       "general": "Général",
       "fullName": "Nom complet",
       "username": "Nom d'utilisateur",
