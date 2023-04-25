@@ -55,6 +55,7 @@ async function syncUsers() {
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
     include: { memberships: true },
+    where: { validated: true },
   });
 
   appLogger.verbose(`[ezReeport] Synchronizing ${institutions?.length} namespaces`);
@@ -62,6 +63,7 @@ async function syncNamespaces() {
   const { data } = await axios.put('/admin/namespaces', institutions.map((i) => ({
     id: i.id,
     name: i.name,
+    logoId: i.logoId,
     fetchLogin: {},
     fetchOptions: {},
     members: i?.memberships.map((m) => ({
