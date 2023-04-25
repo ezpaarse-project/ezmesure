@@ -32,6 +32,12 @@ module.exports = {
     secure: false,
     ignoreTLS: false,
   },
+  ezreeport: {
+    host: 'reporting',
+    port: 8080,
+    syncSchedule: '0 0 0 * * *',
+    apiKey: '00000000-0000-0000-0000-000000000000',
+  },
   logs: {
     app: {
       Console: {

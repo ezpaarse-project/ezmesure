@@ -65,6 +65,21 @@
         </nuxt-link>
       </template>
 
+      <template #[`item.repositories`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.repositories)"
+          small
+          class="elevation-1"
+          @click="$refs.repositoriesDialog.display(item)"
+        >
+          {{ $tc('repositories.xRepositories', item.repositories.length) }}
+
+          <v-icon right small>
+            mdi-cog
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.automatisations`]="{ item }">
         <v-chip
           label
@@ -175,6 +190,7 @@
 
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
     <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
+    <RepositoriesDialog ref="repositoriesDialog" />
   </section>
 </template>
 
@@ -182,6 +198,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
+import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 
 export default {
   layout: 'space',
@@ -190,6 +207,7 @@ export default {
     ToolBar,
     InstitutionForm,
     InstitutionsDeleteDialog,
+    RepositoriesDialog,
   },
   data() {
     return {
@@ -219,8 +237,7 @@ export default {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
-        { text: 'Index', value: 'index.prefix' },
-        { text: 'ECs', value: 'index.count' },
+        { text: this.$t('repositories.repositories'), value: 'repositories' },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
           text: this.$t('institutions.institution.status'),
@@ -242,7 +259,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.institutions = await this.$axios.$get('/institutions');
+        this.institutions = await this.$axios.$get('/institutions', { params: { include: 'repositories' } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }

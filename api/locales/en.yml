@@ -49,6 +49,10 @@ errors:
     cannotDeleteActiveTask: Cannot delete active task
     cannotCancelJobWithoutPID: Cannot cancel task, the process is not identifiable
 
+  repository:
+    notFound: Repository not found
+    alreadyExists: The repository [%s] is already associated to the institution
+
   institution:
     notFound: Institution not found
     unauthorized: You are not allowed to access this institution

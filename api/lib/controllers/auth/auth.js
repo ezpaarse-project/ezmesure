@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
+const ezreeport = require('../../services/ezreeport');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { sendMail, generateMail } = require('../../services/mail');
@@ -65,6 +66,11 @@ function sendNewUserToContacts(receivers, data) {
     ...generateMail('new-account', { data }),
   });
 }
+
+exports.getReportingToken = async (ctx) => {
+  const token = await ezreeport.getUserToken(ctx?.state?.user?.username);
+  ctx.body = { token };
+};
 
 exports.renaterLogin = async (ctx) => {
   const { query } = ctx.request;

@@ -74,7 +74,7 @@ CREATE TABLE "Repository" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "pattern" TEXT NOT NULL,
-    "dataType" VARCHAR(50) NOT NULL,
+    "type" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "Repository_pkey" PRIMARY KEY ("id")
 );
@@ -183,6 +183,11 @@ CREATE TABLE "SushiCredentials" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "institutionId" TEXT NOT NULL,
     "endpointId" TEXT NOT NULL,
+    "customerId" TEXT,
+    "requestorId" TEXT,
+    "apiKey" TEXT,
+    "comment" TEXT,
+    "tags" TEXT[],
     "params" JSONB[],
 
     CONSTRAINT "SushiCredentials_pkey" PRIMARY KEY ("id")

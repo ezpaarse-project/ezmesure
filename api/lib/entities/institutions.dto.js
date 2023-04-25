@@ -1,20 +1,17 @@
 const { Joi } = require('koa-joi-router');
 
-/**
- * Strip fields from a given schema
- * @param {Object} schema
- * @returns Object
- */
-function stripFieldsFrom(schema = {}) {
-  return Object.fromEntries(
-    Object.keys(schema).map((field) => ([field, Joi.any().strip()])),
-  );
-}
+const {
+  withModifiers,
+  ignoreFields,
+  requireFields,
+  withDefaults,
+} = require('./schema.utils');
 
 /**
- * Fields that can be changed by regular users
+ * Base schema
+ * @type import('joi').SchemaLike
  */
-const regularFields = {
+const schema = {
   parentInstitutionId: Joi.string().allow(null),
 
   name: Joi.string().trim().min(1),
@@ -29,91 +26,104 @@ const regularFields = {
 
   sushiReadySince: Joi.date().allow(null),
   logo: Joi.any().strip(),
-};
 
-/**
- * Fields that cannot be changed by regular users
- */
-const restrictedFields = {
   validated: Joi.boolean(),
   hidePartner: Joi.boolean(),
   tags: Joi.array().items(Joi.string()),
 };
 
 /**
- * Fields that can be changed by admins
+ * Fields that cannot be changed by regular users
  */
-const requiredFields = {
-  name: regularFields.name.required(),
-};
+const restrictedFields = [
+  'validated',
+  'hidePartner',
+  'tags',
+];
 
 /**
  * Fields that cannot be changed but could be found in a request body
  */
-const immutableFields = Object.fromEntries(
-  [
-    'id',
-    'updatedAt',
-    'createdAt',
-    'logoId',
-    'parentInstitution',
-    'memberships',
-    'spaces',
-    'historyEntries',
-    'sushiCredentials',
-    'childInstitutions',
-    'repositories',
-  ].map(
-    (field) => [field, Joi.any().strip()],
-  ),
-);
+const immutableFields = [
+  'id',
+  'updatedAt',
+  'createdAt',
+  'logoId',
+  'parentInstitution',
+  'memberships',
+  'spaces',
+  'historyEntries',
+  'sushiCredentials',
+  'childInstitutions',
+  'repositories',
+];
+
+/**
+ * Fields that can be populated with related items
+ */
+const includableFields = [
+  'parentInstitution',
+  'memberships',
+  'spaces',
+  'historyEntries',
+  'sushiCredentials',
+  'childInstitutions',
+  'repositories',
+];
 
 /**
  * Schema to be applied when an administrator creates an institution
  */
-const adminCreateSchema = {
-  ...regularFields,
-  ...restrictedFields,
-  ...requiredFields,
-  ...immutableFields,
-};
-
-adminCreateSchema.validated = adminCreateSchema.validated.default(false);
-adminCreateSchema.hidePartner = adminCreateSchema.hidePartner.default(false);
-adminCreateSchema.auto = adminCreateSchema.auto.keys({
-  ezmesure: Joi.boolean().default(false),
-  ezpaarse: Joi.boolean().default(false),
-  report: Joi.boolean().default(false),
-  sushi: Joi.boolean().default(false),
-}).default();
+const adminCreateSchema = withModifiers(
+  schema,
+  requireFields(['name']),
+  ignoreFields(immutableFields),
+  withDefaults({
+    validated: false,
+    hidePartner: false,
+  }),
+  {
+    auto: (s) => s.keys({
+      ezmesure: Joi.boolean().default(false),
+      ezpaarse: Joi.boolean().default(false),
+      report: Joi.boolean().default(false),
+      sushi: Joi.boolean().default(false),
+    }),
+  },
+);
 
 /**
  * Schema to be applied when an administrator updates an institution
  */
-const adminUpdateSchema = {
-  ...regularFields,
-  ...restrictedFields,
-  ...immutableFields,
-};
+const adminUpdateSchema = withModifiers(
+  schema,
+  ignoreFields(immutableFields),
+);
 
 /**
  * Schema to be applied when a regular user updates an institution
  */
-const updateSchema = {
-  ...regularFields,
-  ...stripFieldsFrom(restrictedFields),
-  ...immutableFields,
-};
+const updateSchema = withModifiers(
+  schema,
+  ignoreFields(restrictedFields),
+  ignoreFields(immutableFields),
+);
 
 /**
  * Schema to be applied when a regular user creates an institution
  */
-const createSchema = {
-  ...updateSchema,
-  ...requiredFields,
-};
+const createSchema = withModifiers(
+  schema,
+  ignoreFields(restrictedFields),
+  ignoreFields(immutableFields),
+  requireFields(['name']),
+);
 
 module.exports = {
+  schema,
+  restrictedFields,
+  immutableFields,
+  includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
   updateSchema: Joi.object(updateSchema).required(),

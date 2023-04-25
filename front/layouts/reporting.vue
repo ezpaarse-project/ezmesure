@@ -6,14 +6,30 @@
 
     <v-main>
       <ezr-provider
-        :token="debugToken"
+        :token="ezrToken"
         :namespace-logo-url="logoBaseUrl"
         :namespace-label="namespaceLabel"
         api-url="/report/api/v1/"
       >
-        <v-card flat tile color="transparent">
-          <nuxt />
-        </v-card>
+        <v-fade-transition>
+          <v-alert v-if="$fetchState.error" type="error" class="ma-2">
+            {{ $t('anErrorOccurred') }}
+          </v-alert>
+
+          <v-overlay
+            v-else-if="$fetchState.pending"
+            absolute
+          >
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            />
+          </v-overlay>
+
+          <v-card v-else flat tile color="transparent">
+            <nuxt />
+          </v-card>
+        </v-fade-transition>
       </ezr-provider>
     </v-main>
 
@@ -38,8 +54,11 @@ export default {
       addSeoAttributes: true,
     });
   },
+  async fetch() {
+    this.ezrToken = (await this.$axios.$get('/profile/reporting_token'))?.token;
+  },
   data: () => ({
-    debugToken: '',
+    ezrToken: '',
     logoBaseUrl: '/api/assets/logos/',
     namespaceLabel: {
       en: 'institution | institutions',
