@@ -52,6 +52,35 @@ async function syncUsers() {
 
 // #region Namespaces
 
+/** @typedef {import('@prisma/client').Institution} Institution */
+
+/**
+ * Updates (or create) a namespace in ezREEPORT from an institution
+ *
+ * @param {Institution} institution
+ * @returns The created namespace
+ */
+async function upsertNamespaceFromInstitution(institution) {
+  const body = {
+    name: institution.name,
+    logoId: institution.logoId,
+    fetchLogin: {},
+    fetchOptions: {},
+  };
+  const { data, status } = await axios.put(`/admin/namespaces/${institution.id}`, body);
+
+  return { data: data?.content, wasCreated: status === 201 };
+}
+
+/**
+ * Delete a namespace in ezREEPORT from an institution
+ *
+ * @param {Institution} institution
+ */
+async function deleteNamespaceFromInstitution(institution) {
+  await axios.delete(`/admin/namespaces/${institution.id}`);
+}
+
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
     include: { memberships: true },
@@ -123,4 +152,6 @@ module.exports = {
   startCron,
   sync,
   getUserToken,
+  upsertNamespaceFromInstitution,
+  deleteNamespaceFromInstitution,
 };
