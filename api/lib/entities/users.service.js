@@ -1,5 +1,7 @@
 // @ts-check
+const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
+const elastic = require('../services/elastic');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
@@ -12,6 +14,41 @@ const { client: prisma, Prisma } = require('../services/prisma.service');
 /* eslint-enable max-len */
 
 module.exports = class UsersService {
+  /**
+   * @returns {Promise<User>}
+   */
+  static async createAdmin() {
+    const username = config.get('admin.username');
+    const password = config.get('admin.password');
+    const email = config.get('admin.email');
+    const fullName = 'ezMESURE Administrator';
+
+    const adminData = {
+      username,
+      email,
+      fullName,
+      isAdmin: true,
+      metadata: { acceptedTerms: true },
+    };
+
+    await elastic.security.putUser({
+      username,
+      refresh: true,
+      body: {
+        password,
+        email,
+        full_name: fullName,
+        roles: ['superuser'],
+      },
+    });
+
+    return prisma.user.upsert({
+      where: { username },
+      update: adminData,
+      create: adminData,
+    });
+  }
+
   /**
    * @param {UserCreateArgs} params
    * @returns {Promise<User>}

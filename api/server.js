@@ -202,46 +202,11 @@ async function waitForElasticsearch() {
 }
 
 async function createAdmin() {
-  const username = config.get('admin.username');
-  const password = config.get('admin.password');
-  const email = config.get('admin.email');
-  const fullName = 'ezMESURE Administrator';
-
-  if (!username || !password) { return; }
-
-  appLogger.info(`Creating or updating admin user [${username}]`);
-
-  const adminData = {
-    username,
-    email,
-    fullName,
-    isAdmin: true,
-    metadata: { acceptedTerms: true },
-  };
-
   try {
-    await usersService.upsert({
-      where: { username },
-      update: adminData,
-      create: adminData,
-    });
-  } catch (e) {
-    appLogger.error(`Failed to update admin in the DB : ${e.message}`);
-  }
-
-  try {
-    await elastic.security.putUser({
-      username,
-      refresh: true,
-      body: {
-        password,
-        email,
-        full_name: fullName,
-        roles: ['superuser'],
-      },
-    });
-  } catch (e) {
-    appLogger.error(`Failed to update admin in Elasticsearch : ${e.message}`);
+    await usersService.createAdmin();
+    appLogger.info('Admin user is created');
+  } catch (err) {
+    appLogger.error(`Cannot create admin user : ${err}`);
   }
 }
 
