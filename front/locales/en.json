@@ -513,6 +513,7 @@
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
     "user": {
+      "saved": "User saved",
       "general": "General",
       "fullName": "Full name",
       "username": "Username",

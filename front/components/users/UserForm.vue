@@ -153,7 +153,7 @@ export default {
         return;
       }
 
-      this.$store.dispatch('snacks/success', this.$t('users.user.updated'));
+      this.$store.dispatch('snacks/success', this.$t('users.user.saved'));
       this.saving = false;
       this.show = false;
     },
