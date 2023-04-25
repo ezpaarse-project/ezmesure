@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
@@ -6,13 +5,12 @@ const elastic = require('../../services/elastic');
 const ezreeport = require('../../services/ezreeport');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
-const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
+const { sendWelcomeMail, sendPasswordRecovery, sendNewUserToContacts } = require('./mail');
+const randomString = require('./password');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
-const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supportRecipients');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -25,46 +23,6 @@ function decode(value) {
   if (typeof value !== 'string') { return value; }
 
   return Buffer.from(value, 'binary').toString('utf8');
-}
-
-function randomString() {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(5, (err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buffer.toString('hex'));
-      }
-    });
-  });
-}
-
-function sendWelcomeMail(user) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user }),
-  });
-}
-
-function sendPasswordRecovery(user, data) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, ...data }),
-  });
-}
-
-function sendNewUserToContacts(receivers, data) {
-  return sendMail({
-    from: sender,
-    to: receivers,
-    cc: supports,
-    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
-    ...generateMail('new-account', { data }),
-  });
 }
 
 exports.getReportingToken = async (ctx) => {
