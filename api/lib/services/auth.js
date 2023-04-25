@@ -168,7 +168,7 @@ function requireValidatedInstitution(opts = {}) {
     const { institution, userIsAdmin } = ctx.state;
 
     if (userIsAdmin && ignoreIfAdmin) { return next(); }
-    if (institution?.get?.('validated') === true) { return next(); }
+    if (institution?.validated === true) { return next(); }
 
     ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
     return undefined;
