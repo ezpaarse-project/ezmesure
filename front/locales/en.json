@@ -460,6 +460,7 @@
     "user": "User",
     "password": "Password",
     "repeatPassword": "Repeat password",
+    "passwordIsRequired": "Password required",
     "backToLogin": "Back to login",
     "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
     "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",

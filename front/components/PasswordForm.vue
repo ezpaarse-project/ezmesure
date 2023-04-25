@@ -19,10 +19,7 @@
         class="mb-2"
         :label="$t('password.password')"
         :type="showPassword ? 'text' : 'password'"
-        :rules="[
-          () => !!password || ($t('password.fieldIsRequired')),
-          () => !(password.length < 6) || ($t('password.length'))
-        ]"
+        :rules="passwordRules"
         prepend-inner-icon="mdi-lock"
         :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         outlined
@@ -36,11 +33,7 @@
         v-model="passwordRepeat"
         :label="$t('password.repeatPassword')"
         :type="showPassword ? 'text' : 'password'"
-        :rules="[
-          () => !!passwordRepeat || ($t('password.fieldIsRequired')),
-          () => passwordRepeat === password || ($t('password.notEqual')),
-          () => !(passwordRepeat.length < 6) || ($t('password.length'))
-        ]"
+        :rules="repeatPasswordRules"
         prepend-inner-icon="mdi-lock"
         outlined
         required
@@ -86,6 +79,21 @@ export default {
       validForm: false,
       saved: this.passwordSaved,
     };
+  },
+  computed: {
+    passwordRules() {
+      return [
+        !!this.password || this.$t('password.passwordIsRequired'),
+        !(this.password.length < 6) || this.$t('password.length'),
+      ];
+    },
+    repeatPasswordRules() {
+      return [
+        !!this.passwordRepeat || this.$t('password.passwordIsRequired'),
+        this.passwordRepeat === this.password || (this.$t('password.notEqual')),
+        !(this.passwordRepeat.length < 6) || (this.$t('password.length')),
+      ];
+    },
   },
   methods: {
     async query() {

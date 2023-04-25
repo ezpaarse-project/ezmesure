@@ -59,7 +59,7 @@
               <v-text-field
                 v-model="username"
                 :label="$t('password.user')"
-                :rules="[() => !!username || ($t('password.fieldIsRequired'))]"
+                :rules="fieldIsRequiredRules"
                 prepend-inner-icon="mdi-account"
                 outlined
                 required
@@ -98,6 +98,11 @@ export default {
       resetErrorText: '',
       reset: false,
     };
+  },
+  computed: {
+    fieldIsRequiredRules() {
+      return [!!this.username || this.$t('password.fieldIsRequired')];
+    },
   },
   methods: {
     async resetPassword() {
