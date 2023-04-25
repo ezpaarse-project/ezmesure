@@ -65,15 +65,3 @@ exports.validateInstitution = async (ctx) => {
   ctx.status = 200;
   ctx.body = institution;
 };
-
-exports.deleteInstitutionCreator = async (ctx) => {
-  const { institution } = ctx.state;
-
-  if (institution.get('creator')) {
-    await institution.setCreator(null);
-    await institution.save();
-  }
-
-  ctx.status = 200;
-  ctx.body = institution;
-};

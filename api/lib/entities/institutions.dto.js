@@ -12,7 +12,9 @@ const {
  * @type import('joi').SchemaLike
  */
 const schema = {
-  parentInstitutionId: Joi.string().allow(null),
+  id: Joi.string().trim(),
+  updatedAt: Joi.date(),
+  createdAt: Joi.date(),
 
   name: Joi.string().trim().min(1),
   type: Joi.string().allow(''),
@@ -26,10 +28,21 @@ const schema = {
 
   sushiReadySince: Joi.date().allow(null),
   logo: Joi.any().strip(),
+  logoId: Joi.string().allow(null),
 
   validated: Joi.boolean(),
   hidePartner: Joi.boolean(),
   tags: Joi.array().items(Joi.string()),
+
+  parentInstitutionId: Joi.string().allow(null),
+  parentInstitution: Joi.object(),
+
+  memberships: Joi.array().items(Joi.object()),
+  spaces: Joi.array().items(Joi.object()),
+  historyEntries: Joi.array().items(Joi.object()),
+  sushiCredentials: Joi.array().items(Joi.object()),
+  childInstitutions: Joi.array().items(Joi.object()),
+  repositories: Joi.array().items(Joi.object()),
 };
 
 /**

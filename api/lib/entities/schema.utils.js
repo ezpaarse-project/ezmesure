@@ -21,12 +21,14 @@ const { Joi } = require('koa-joi-router');
  * @returns {SchemaLike}  the modified schema
  */
 exports.withModifiers = function withModifiers(schema = {}, ...modifiers) {
-  return Object.fromEntries(
-    Object.entries(schema).map(([field, fieldSchema]) => ([
-      field,
-      modifiers?.[field]?.(fieldSchema) || fieldSchema,
-    ])),
-  );
+  return modifiers.reduce((acc, modifier) => (
+    Object.fromEntries(
+      Object.entries(acc).map(([field, fieldSchema]) => ([
+        field,
+        modifier?.[field]?.(fieldSchema) || fieldSchema,
+      ])),
+    )
+  ), schema);
 };
 
 /**
@@ -36,7 +38,7 @@ exports.withModifiers = function withModifiers(schema = {}, ...modifiers) {
  */
 exports.ignoreFields = function ignoreFields(fields = []) {
   return Object.fromEntries(
-    fields.map((field) => [field, Joi.any().strip()]),
+    fields.map((field) => [field, () => Joi.any().strip()]),
   );
 };
 
