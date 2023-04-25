@@ -19,10 +19,38 @@ const axios = Axios.create({
   headers: { 'X-Api-Key': apiKey },
 });
 
+// #region Users
+
 async function getUserToken(username) {
   const { data } = await axios.get(`/admin/users/${username}`);
   return data?.content?.token;
 }
+
+async function syncUsers() {
+  const users = await usersService.findMany();
+
+  appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
+
+  const { data } = await axios.put('/admin/users', users.map((u) => ({
+    isAdmin: u.isAdmin,
+    username: u.username,
+  })));
+
+  const results = data?.content?.users?.reduce?.((acc, user) => {
+    const counts = acc;
+    counts[user?.type] += 1;
+    return counts;
+  }, { created: 0, updated: 0, deleted: 0 });
+
+  appLogger.info('[ezReeport] Users synchronized');
+  appLogger.verbose(`[ezReeport] ${results?.created} users created`);
+  appLogger.verbose(`[ezReeport] ${results?.updated} users updated`);
+  appLogger.verbose(`[ezReeport] ${results?.deleted} users deleted`);
+}
+
+// #endregion Users
+
+// #region Namespaces
 
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
@@ -63,27 +91,7 @@ async function syncNamespaces() {
   appLogger.verbose(`[ezReeport] ${membershipsResults?.deleted} memberships deleted`);
 }
 
-async function syncUsers() {
-  const users = await usersService.findMany();
-
-  appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
-
-  const { data } = await axios.put('/admin/users', users.map((u) => ({
-    isAdmin: u.isAdmin,
-    username: u.username,
-  })));
-
-  const results = data?.content?.users?.reduce?.((acc, user) => {
-    const counts = acc;
-    counts[user?.type] += 1;
-    return counts;
-  }, { created: 0, updated: 0, deleted: 0 });
-
-  appLogger.info('[ezReeport] Users synchronized');
-  appLogger.verbose(`[ezReeport] ${results?.created} users created`);
-  appLogger.verbose(`[ezReeport] ${results?.updated} users updated`);
-  appLogger.verbose(`[ezReeport] ${results?.deleted} users deleted`);
-}
+// #endregion Namespace
 
 async function sync() {
   await syncUsers();
