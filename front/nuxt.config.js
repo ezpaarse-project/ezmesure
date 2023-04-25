@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   /*
   ** Headers of the page
@@ -109,6 +111,10 @@ module.exports = {
     ** Run ESLINT on save
     */
     extend(config, ctx) {
+      // https://github.com/vuetifyjs/vuetify/discussions/4068#discussioncomment-24984
+      config.resolve.alias.vue$ = path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm.js');
+      config.resolve.alias['^vuetify'] = path.resolve(__dirname, 'node_modules/vuetify');
+
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
