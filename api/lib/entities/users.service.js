@@ -2,6 +2,9 @@
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const elastic = require('../services/elastic');
+const { sendWelcomeMail } = require('../controllers/auth/mail');
+const { randomString } = require('../controllers/auth/password');
+const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
@@ -85,7 +88,32 @@ module.exports = class UsersService {
    * @param {UserUpsertArgs} params
    * @returns {Promise<User>}
    */
-  static upsert(params) {
+  static async upsert(params) {
+    // fullName, email, isAdmin POSTGRES
+
+    const tmpPassword = randomString();
+
+    try {
+      await elastic.security.putUser({
+        username: params.create.username,
+        body: {
+          password: tmpPassword,
+          email: params.create.email,
+          full_name: params.create.fullName,
+          roles: [],
+        },
+      });
+      appLogger.info('user created on elastic');
+    } catch (err) {
+      appLogger.error(`Failed to create user on elastic: ${err}`);
+    }
+
+    try {
+      await sendWelcomeMail(params.create);
+      appLogger.info('send welcome mail');
+    } catch (err) {
+      appLogger.error(`Failed to send mail: ${err}`);
+    }
     return prisma.user.upsert(params);
   }
 
