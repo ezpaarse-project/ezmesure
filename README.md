@@ -231,10 +231,12 @@ Don't forget to restore the environment variables after the modification.
 
 ### 6. Prepare start
 
-Before launching ezmesure, you must create the elastic container, for that you must use this command.
+Before launching ezmesure, you have to create the elastic container and launch the database migration, for that you have to use these commands :
 
 ```bash
-docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+docker compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+dco -f docker-compose.migrate.yml up
+dco -f docker-compose.migrate.yml down
 ```
 ### 7. Start
 
