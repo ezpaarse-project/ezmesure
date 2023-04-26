@@ -86,8 +86,8 @@ exports.renaterLogin = async (ctx) => {
         where: { username },
         data: userProps,
       });
-    } catch (e) {
-      ctx.throw(500, e);
+    } catch (err) {
+      ctx.throw(500, err);
       return;
     }
   } else {
