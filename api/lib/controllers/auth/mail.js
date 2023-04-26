@@ -4,12 +4,12 @@ const sender = config.get('notifications.sender');
 const supports = config.get('notifications.supportRecipients');
 const { sendMail, generateMail } = require('../../services/mail');
 
-exports.sendWelcomeMail = function sendWelcomeMail(user) {
+exports.sendWelcomeMail = function sendWelcomeMail(user, data) {
   return sendMail({
     from: sender,
     to: user.email,
     subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user }),
+    ...generateMail('welcome', { username: user.data, ...data }),
   });
 };
 

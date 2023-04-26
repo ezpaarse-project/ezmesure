@@ -1,5 +1,11 @@
 Bienvenue {{ user.fullName }},
 Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ user.username }}</strong>
 
+Vous pouvez utiliser le bouton suivant pour créer votre mot de passe :
+
+{{ recoveryLink }}
+
+Si vous n'utilisez pas ce lien dans les {{ validity }}, il expirera. Pour obtenir un nouveau lien de réinitialisation du mot de passe, visitez : {{ resetLink }}.
+
 Cordialement,
 L'équipe ezMESURE.
