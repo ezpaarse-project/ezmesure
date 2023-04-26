@@ -21,11 +21,20 @@ const axios = Axios.create({
 
 // #region Users
 
+/**
+ * Get token of a user from a ezREEPORT
+ *
+ * @param {string} username The username of the user
+ * @returns The token
+ */
 async function getUserToken(username) {
   const { data } = await axios.get(`/admin/users/${username}`);
   return data?.content?.token;
 }
 
+/**
+ * Sync ezREEPORT's namespaces with current users
+ */
 async function syncUsers() {
   const users = await usersService.findMany();
 
@@ -55,7 +64,7 @@ async function syncUsers() {
 /** @typedef {import('@prisma/client').Institution} Institution */
 
 /**
- * Updates (or create) a namespace in ezREEPORT from an institution
+ * Updates (or create) a namespace in ezREEPORT from an ezMESURE's institution
  *
  * @param {Institution} institution
  * @returns The created namespace
@@ -73,7 +82,7 @@ async function upsertNamespaceFromInstitution(institution) {
 }
 
 /**
- * Delete a namespace in ezREEPORT from an institution
+ * Delete a namespace in ezREEPORT from an ezMESURE's institution
  *
  * @param {Institution} institution
  */
@@ -81,6 +90,9 @@ async function deleteNamespaceFromInstitution(institution) {
   await axios.delete(`/admin/namespaces/${institution.id}`);
 }
 
+/**
+ * Sync ezREEPORT's namespaces with current institutions
+ */
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
     include: { memberships: true },
