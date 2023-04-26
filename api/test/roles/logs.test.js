@@ -29,8 +29,6 @@ describe('oooh', () => {
         res = err?.response;
       }
 
-      console.log(res?.data);
-
       expect(res).toHaveProperty('status', 200);
     });
 

@@ -19,6 +19,19 @@
     </mj-text>
 
     <mj-text>
+      Vous pouvez utiliser le bouton suivant pour créer votre mot de passe :
+    </mj-text>
+
+    <mj-button href="{{ recoveryLink }}" font-family="Helvetica" background-color="#9c27b0" color="white">
+      Créer votre mot de passe
+    </mj-button>
+
+    <mj-text>
+      Si vous n'utilisez pas ce lien dans les {{ validity }}, il expirera. Pour obtenir un nouveau lien de réinitialisation du mot de passe, visitez : <a href="resetLink">{{ resetLink }}</>.
+    </mj-text>
+
+
+    <mj-text>
       <p>Cordialement,</p>
       <p>L'équipe ezMESURE.</p>
     </mj-text>

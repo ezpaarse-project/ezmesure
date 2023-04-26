@@ -1,10 +1,7 @@
 // @ts-check
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const elastic = require('../services/elastic');
-const { sendWelcomeMail } = require('../controllers/auth/mail');
-const { randomString } = require('../controllers/auth/password');
-const { appLogger } = require('../services/logger');
+const elastic = require('../services/elastic/users');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
@@ -22,7 +19,6 @@ module.exports = class UsersService {
    */
   static async createAdmin() {
     const username = config.get('admin.username');
-    const password = config.get('admin.password');
     const email = config.get('admin.email');
     const fullName = 'ezMESURE Administrator';
 
@@ -34,16 +30,7 @@ module.exports = class UsersService {
       metadata: { acceptedTerms: true },
     };
 
-    await elastic.security.putUser({
-      username,
-      refresh: true,
-      body: {
-        password,
-        email,
-        full_name: fullName,
-        roles: ['superuser'],
-      },
-    });
+    await elastic.createAdmin();
 
     return prisma.user.upsert({
       where: { username },
@@ -56,7 +43,14 @@ module.exports = class UsersService {
    * @param {UserCreateArgs} params
    * @returns {Promise<User>}
    */
-  static create(params) {
+  static async create(params) {
+    const userData = {
+      username: params.data.username,
+      email: params.data.email,
+      fullName: params.data.fullName,
+    };
+    await elastic.createUser(userData);
+
     return prisma.user.create(params);
   }
 
@@ -80,7 +74,15 @@ module.exports = class UsersService {
    * @param {UserUpdateArgs} params
    * @returns {Promise<User>}
    */
-  static update(params) {
+  static async update(params) {
+    // TODO manage role
+    const userData = {
+      username: params.data.username?.toString() || '',
+      email: params.data.email?.toString() || '',
+      fullName: params.data.fullName?.toString() || '',
+    };
+
+    await elastic.updateUser(userData);
     return prisma.user.update(params);
   }
 
@@ -89,31 +91,13 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async upsert(params) {
-    // fullName, email, isAdmin POSTGRES
+    const userData = {
+      username: params?.create?.username,
+      email: params?.create?.email,
+      fullName: params?.create?.fullName,
+    };
 
-    const tmpPassword = randomString();
-
-    try {
-      await elastic.security.putUser({
-        username: params.create.username,
-        body: {
-          password: tmpPassword,
-          email: params.create.email,
-          full_name: params.create.fullName,
-          roles: [],
-        },
-      });
-      appLogger.info('user created on elastic');
-    } catch (err) {
-      appLogger.error(`Failed to create user on elastic: ${err}`);
-    }
-
-    try {
-      await sendWelcomeMail(params.create);
-      appLogger.info('send welcome mail');
-    } catch (err) {
-      appLogger.error(`Failed to send mail: ${err}`);
-    }
+    await elastic.createUser(userData);
     return prisma.user.upsert(params);
   }
 
@@ -121,7 +105,9 @@ module.exports = class UsersService {
    * @param {UserDeleteArgs} params
    * @returns {Promise<User | null>}
    */
-  static delete(params) {
+  static async delete(params) {
+    await elastic.deleteUser(params.where.username);
+
     return prisma.user.delete(params).catch((e) => {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
         return null;
