@@ -21,6 +21,8 @@ const axios = Axios.create({
 
 // #region Users
 
+/** @typedef {import('@prisma/client').User} User */
+
 /**
  * Get token of a user from a ezREEPORT
  *
@@ -30,6 +32,30 @@ const axios = Axios.create({
 async function getUserToken(username) {
   const { data } = await axios.get(`/admin/users/${username}`);
   return data?.content?.token;
+}
+
+/**
+ * Updates (or create) a user in ezREEPORT from an ezMESURE's user
+ *
+ * @param {User} user
+ * @returns The created user
+ */
+async function upsertUserFromUser(user) {
+  const body = {
+    isAdmin: user.isAdmin,
+  };
+  const { data, status } = await axios.put(`/admin/users/${user.username}`, body);
+
+  return { data: data?.content, wasCreated: status === 201 };
+}
+
+/**
+ * Delete a user in ezREEPORT from an ezMESURE's user
+ *
+ * @param {User} user
+ */
+async function deleteUserFromUser(user) {
+  await axios.delete(`/admin/users/${user.username}`);
 }
 
 /**
@@ -167,5 +193,9 @@ module.exports = {
   namespace: {
     upsertFromInstitution: upsertNamespaceFromInstitution,
     deleteFromInstitution: deleteNamespaceFromInstitution,
+  },
+  user: {
+    upsertFromUser: upsertUserFromUser,
+    deleteFromUser: deleteUserFromUser,
   },
 };
