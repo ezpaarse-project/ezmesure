@@ -21,8 +21,6 @@ const elastic = require('./lib/services/elastic');
 const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
 
-module.exports = { appLogger };
-
 const mailSender = config.get('notifications.sender');
 
 if (mailSender) {
