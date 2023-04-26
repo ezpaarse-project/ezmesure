@@ -32,7 +32,7 @@ exports.createAdmin = async function createAdmin() {
  * @param {string} user.email - Email of user
  * @param {string} user.fullName - Fullname of user
  */
-exports.createUser = async function createAdmin(user) {
+exports.createUser = async function createUser(user) {
   const tmpPassword = await randomString();
 
   await elastic.security.putUser({
