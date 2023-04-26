@@ -164,6 +164,8 @@ module.exports = {
   startCron,
   sync,
   getUserToken,
-  upsertNamespaceFromInstitution,
-  deleteNamespaceFromInstitution,
+  namespace: {
+    upsertFromInstitution: upsertNamespaceFromInstitution,
+    deleteFromInstitution: deleteNamespaceFromInstitution,
+  },
 };

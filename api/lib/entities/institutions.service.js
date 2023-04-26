@@ -1,7 +1,7 @@
 // @ts-check
 const { appLogger } = require('../services/logger');
 const { client: prisma } = require('../services/prisma.service');
-const { deleteNamespaceFromInstitution, upsertNamespaceFromInstitution } = require('../services/ezreeport');
+const ezreeport = require('../services/ezreeport');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Institution} Institution */
@@ -23,7 +23,7 @@ module.exports = class InstitutionsService {
 
     if (institution.validated) {
       try {
-        const { wasCreated } = await upsertNamespaceFromInstitution(institution);
+        const { wasCreated } = await ezreeport.namespace.upsertFromInstitution(institution);
         appLogger.verbose(`[ezReeport] Created namespace [${institution.id}]`);
         if (!wasCreated) {
           appLogger.warn(`[ezReeport] Namespace [${institution.id}] was edited instead of being created`);
@@ -61,7 +61,7 @@ module.exports = class InstitutionsService {
 
     if (institution.validated) {
       try {
-        const { wasCreated } = await upsertNamespaceFromInstitution(institution);
+        const { wasCreated } = await ezreeport.namespace.upsertFromInstitution(institution);
         appLogger.verbose(`[ezReeport] Edited namespace [${institution.id}]`);
         if (wasCreated) {
           appLogger.warn(`[ezReeport] Namespace [${institution.id}] was created instead of being edited`);
@@ -71,7 +71,7 @@ module.exports = class InstitutionsService {
       }
     } else {
       try {
-        await deleteNamespaceFromInstitution(institution);
+        await ezreeport.namespace.deleteFromInstitution(institution);
         appLogger.verbose(`[ezReeport] Deleted namespace [${institution.id}]`);
       } catch (error) {
         appLogger.error(`[ezReeport] Cannot delete namespace [${institution.id}]: ${error.message}`);
@@ -90,14 +90,14 @@ module.exports = class InstitutionsService {
 
     if (institution.validated) {
       try {
-        await upsertNamespaceFromInstitution(institution);
+        await ezreeport.namespace.upsertFromInstitution(institution);
         appLogger.verbose(`[ezReeport] Upserted namespace [${institution.id}]`);
       } catch (error) {
         appLogger.error(`[ezReeport] Cannot upsert namespace [${institution.id}]: ${error.message}`);
       }
     } else {
       try {
-        await deleteNamespaceFromInstitution(institution);
+        await ezreeport.namespace.deleteFromInstitution(institution);
         appLogger.verbose(`[ezReeport] Deleted namespace [${institution.id}]`);
       } catch (error) {
         appLogger.error(`[ezReeport] Cannot delete namespace [${institution.id}]: ${error.message}`);
@@ -115,7 +115,7 @@ module.exports = class InstitutionsService {
     const institution = await prisma.institution.delete(params);
 
     try {
-      await deleteNamespaceFromInstitution(institution);
+      await ezreeport.namespace.deleteFromInstitution(institution);
     } catch (error) {
       appLogger.error(`[ezReeport] Cannot delete namespace [${institution.id}]: ${error.message}`);
     }
