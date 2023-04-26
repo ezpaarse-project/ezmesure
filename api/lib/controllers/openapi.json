@@ -330,25 +330,11 @@
               "$ref": "#/components/schemas/Membership"
             }
           },
-          "spacePermissions": {
-            "description": "Space permissions of the user",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SpacePermission"
-            }
-          },
           "historyEntries": {
             "description": "History entries written by this user",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HistoryEntry"
-            }
-          },
-          "repositoryPermissions": {
-            "description": "Repository permissions of the user",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RepositoryPermission"
             }
           }
         }
@@ -387,6 +373,20 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "spacePermissions": {
+            "description": "Space permissions of the member",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpacePermission"
+            }
+          },
+          "repositoryPermissions": {
+            "description": "Repository permissions of the member",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RepositoryPermission"
             }
           }
         }

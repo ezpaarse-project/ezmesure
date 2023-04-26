@@ -33,9 +33,7 @@ const immutableFields = Object.fromEntries(
     'updatedAt',
     'createdAt',
     'memberships',
-    'spacePermissions',
     'historyEntries',
-    'repositoryPermissions',
   ].map(
     (field) => [field, Joi.any().strip()],
   ),
