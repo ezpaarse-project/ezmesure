@@ -73,25 +73,7 @@ exports.renaterLogin = async (ctx) => {
 
     userProps.metadata.acceptedTerms = false;
 
-    // First create the user in the DB
     user = await usersService.create({ data: userProps });
-
-    // Then create the associated user in Elasticsearch
-    await elastic.security.putUser({
-      username,
-      body: {
-        email,
-        full_name: userProps.fullName,
-        password: await randomString(),
-        roles: ['new_user'],
-      },
-    });
-
-    try {
-      await sendWelcomeMail(user);
-    } catch (err) {
-      appLogger.error(`Failed to send mail: ${err}`);
-    }
   } else if (query.refresh) {
     ctx.action = 'user/refresh';
     ctx.metadata = { username };
@@ -173,32 +155,20 @@ exports.acceptTerms = async (ctx) => {
     return;
   }
 
-  await usersService.update({
-    where: { username },
-    data: {
-      metadata: { acceptedTerms: true },
-    },
-  });
+  try {
+    await usersService.acceptTerms(username);
+  } catch (err) {
+    ctx.status = 500;
+    appLogger.error(`Failed to update user: ${err}`);
+    return;
+  }
 
   const origin = ctx.get('origin');
   const [, domain] = email.split('@');
 
   let correspondents;
   try {
-    correspondents = await usersService.findMany({
-      select: { email: true },
-      where: {
-        email: { endsWith: `@${domain}` },
-        memberships: {
-          some: {
-            OR: [
-              { isDocContact: true },
-              { isTechContact: true },
-            ],
-          },
-        },
-      },
-    });
+    correspondents = await usersService.findEmailOfCorrespondentsWithDomain(domain);
   } catch (err) {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }

@@ -71,6 +71,27 @@ module.exports = class UsersService {
   }
 
   /**
+   * @param {string} domain
+   * @returns {Promise<{email: string}[]> | null}
+   */
+  static findEmailOfCorrespondentsWithDomain(domain) {
+    return prisma.user.findMany({
+      select: { email: true },
+      where: {
+        email: { endsWith: `@${domain}` },
+        memberships: {
+          some: {
+            OR: [
+              { isDocContact: true },
+              { isTechContact: true },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * @param {UserUpdateArgs} params
    * @returns {Promise<User>}
    */
@@ -84,6 +105,21 @@ module.exports = class UsersService {
 
     await elastic.updateUser(userData);
     return prisma.user.update(params);
+  }
+
+  /**
+   * Accept terms for user.
+   * @param {string} username - Username.
+   *
+   * @returns {Promise<User>}
+   */
+  static async acceptTerms(username) {
+    return prisma.user.update({
+      where: { username },
+      data: {
+        metadata: { acceptedTerms: true },
+      },
+    });
   }
 
   /**
