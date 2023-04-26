@@ -38,35 +38,35 @@ model Institution {
 }
 
 model User {
-  username              String                 @id
-  fullName              String
-  email                 String
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  isAdmin               Boolean                @default(false)
-  metadata              Json                   @default("{}")
-  memberships           Membership[]
-  spacePermissions      SpacePermission[]
-  historyEntries        HistoryEntry[]
-  repositoryPermissions RepositoryPermission[]
+  username       String         @id
+  fullName       String
+  email          String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  isAdmin        Boolean        @default(false)
+  metadata       Json           @default("{}")
+  memberships    Membership[]
+  historyEntries HistoryEntry[]
 }
 
 model Membership {
-  username      String
-  user          User        @relation(fields: [username], references: [username], onDelete: Cascade)
-  institutionId String
-  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  isDocContact  Boolean     @default(false)
-  isTechContact Boolean     @default(false)
-  isGuest       Boolean     @default(false)
-  permissions   String[]
+  username              String
+  user                  User                   @relation(fields: [username], references: [username], onDelete: Cascade)
+  institutionId         String
+  institution           Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  isDocContact          Boolean                @default(false)
+  isTechContact         Boolean                @default(false)
+  isGuest               Boolean                @default(false)
+  permissions           String[]
+  spacePermissions      SpacePermission[]
+  repositoryPermissions RepositoryPermission[]
 
   @@id([username, institutionId])
 }
 
 model Space {
   id               String            @id
-  institutionId    String
+  institutionId    String?
   institution      Institution?      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -75,19 +75,20 @@ model Space {
 }
 
 model SpacePermission {
-  username String
-  spaceId  String
-  user     User    @relation(fields: [username], references: [username], onDelete: Cascade)
-  space    Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  readonly Boolean @default(false)
-  locked   Boolean @default(false)
+  username      String
+  institutionId String
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  spaceId       String
+  space         Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  readonly      Boolean    @default(false)
+  locked        Boolean    @default(false)
 
   @@id([username, spaceId])
 }
 
 model Repository {
   id            String                 @id @default(cuid())
-  institutionId String
+  institutionId String?
   institution   Institution?           @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
@@ -99,12 +100,13 @@ model Repository {
 }
 
 model RepositoryPermission {
-  username     String
-  user         User       @relation(fields: [username], references: [username], onDelete: Cascade)
-  repositoryId String
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  readonly     Boolean    @default(false)
-  locked       Boolean    @default(false)
+  username      String
+  institutionId String
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  repositoryId  String
+  repository    Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  readonly      Boolean    @default(false)
+  locked        Boolean    @default(false)
 
   @@id([username, repositoryId])
 }
