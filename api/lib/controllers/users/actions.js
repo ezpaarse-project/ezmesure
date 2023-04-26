@@ -73,10 +73,12 @@ exports.createOrReplaceUser = async (ctx) => {
   const mailData = mailDataForPasswordRecovery(origin, username);
   const userData = { username, email: body.email };
 
-  try {
-    await sendWelcomeMail(userData, mailData);
-  } catch (err) {
-    appLogger.error(`Failed to send mail: ${err}`);
+  if (!userExists) {
+    try {
+      await sendWelcomeMail(userData, mailData);
+    } catch (err) {
+      appLogger.error(`Failed to send mail: ${err}`);
+    }
   }
 
   ctx.status = userExists ? 200 : 201;

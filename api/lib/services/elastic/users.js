@@ -46,6 +46,25 @@ exports.createUser = async function createUser(user) {
   });
 };
 
+/**
+ * Update user in elastic.
+ *
+ * @param {Object} user - Config of user.
+ * @param {string} user.username - Username of user
+ * @param {string} user.email - Email of user
+ * @param {string} user.fullName - Fullname of user
+ */
+exports.updateUser = async function updateUser(user) {
+  // TODO manage role
+  await elastic.security.putUser({
+    username: user.username,
+    body: {
+      email: user.email,
+      full_name: user.fullName,
+    },
+  });
+};
+
 exports.deleteUser = async function deleteUser(username) {
   // TODO check if user exist
   return elastic.security.deleteUser({ username });

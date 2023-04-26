@@ -1,7 +1,7 @@
 // @ts-check
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const { createAdmin, createUser, deleteUser } = require('../services/elastic/users');
+const elastic = require('../services/elastic/users');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
@@ -30,7 +30,7 @@ module.exports = class UsersService {
       metadata: { acceptedTerms: true },
     };
 
-    await createAdmin();
+    await elastic.createAdmin();
 
     return prisma.user.upsert({
       where: { username },
@@ -49,7 +49,7 @@ module.exports = class UsersService {
       email: params.data.email,
       fullName: params.data.fullName,
     };
-    await createUser(userData);
+    await elastic.createUser(userData);
 
     return prisma.user.create(params);
   }
@@ -74,7 +74,15 @@ module.exports = class UsersService {
    * @param {UserUpdateArgs} params
    * @returns {Promise<User>}
    */
-  static update(params) {
+  static async update(params) {
+    // TODO manage role
+    const userData = {
+      username: params.data.username?.toString() || '',
+      email: params.data.email?.toString() || '',
+      fullName: params.data.fullName?.toString() || '',
+    };
+
+    await elastic.updateUser(userData);
     return prisma.user.update(params);
   }
 
@@ -84,12 +92,12 @@ module.exports = class UsersService {
    */
   static async upsert(params) {
     const userData = {
-      username: params.create.username,
-      email: params.create.email,
-      fullName: params.create.fullName,
+      username: params?.create?.username,
+      email: params?.create?.email,
+      fullName: params?.create?.fullName,
     };
 
-    await createUser(userData);
+    await elastic.createUser(userData);
     return prisma.user.upsert(params);
   }
 
@@ -98,7 +106,7 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    await deleteUser(params.where.username);
+    await elastic.deleteUser(params.where.username);
 
     return prisma.user.delete(params).catch((e) => {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
