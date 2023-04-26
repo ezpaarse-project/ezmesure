@@ -45,3 +45,8 @@ exports.createUser = async function createUser(user) {
     },
   });
 };
+
+exports.deleteUser = async function deleteUser(username) {
+  // TODO check if user exist
+  return elastic.security.deleteUser({ username });
+};

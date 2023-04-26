@@ -1,7 +1,7 @@
 // @ts-check
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const { createAdmin, createUser } = require('../services/elastic/users');
+const { createAdmin, createUser, deleteUser } = require('../services/elastic/users');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').User} User */
@@ -97,7 +97,9 @@ module.exports = class UsersService {
    * @param {UserDeleteArgs} params
    * @returns {Promise<User | null>}
    */
-  static delete(params) {
+  static async delete(params) {
+    await deleteUser(params.where.username);
+
     return prisma.user.delete(params).catch((e) => {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
         return null;
