@@ -120,7 +120,7 @@ async function deleteNamespaceFromInstitution(institution) {
  * Sync ezREEPORT's namespaces with current institutions
  */
 async function syncNamespaces() {
-  const institutions = await institutionsService.findMany({
+  const { data: institutions } = await institutionsService.findMany({
     include: { memberships: true },
     where: { validated: true },
   });

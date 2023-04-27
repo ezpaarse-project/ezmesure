@@ -47,10 +47,12 @@ exports.getInstitutions = async (ctx) => {
     include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
   }
 
-  ctx.type = 'json';
-  ctx.body = await institutionsService.findMany({
+  const { data: institution } = await institutionsService.findMany({
     include,
   });
+
+  ctx.type = 'json';
+  ctx.body = institution;
 };
 
 exports.getInstitution = async (ctx) => {
@@ -91,9 +93,21 @@ exports.createInstitution = async (ctx) => {
     institutionData.logoId = await imagesService.storeLogo(base64logo);
   }
 
-  const institution = await institutionsService.create({
+  const { data: institution, syncMap } = await institutionsService.create({
     data: { ...institutionData, memberships },
   });
+  appLogger.verbose(`Institution [${institution.id}] is created`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
+
+    if (result === true) {
+      appLogger.verbose(`[${service}] ${label} [${institution.id}] is created`);
+    } else {
+      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be created: ${result.message}`);
+    }
+  }
 
   ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
@@ -131,13 +145,25 @@ exports.updateInstitution = async (ctx) => {
   }
 
   // FIXME: handle admin restricted fields
-  const updatedInstitution = await institutionsService.update({
+  const { data: updatedInstitution, syncMap } = await institutionsService.update({
     where: { id: institution.id },
     data: {
       ...institutionData,
       logo: undefined,
     },
   });
+  appLogger.verbose(`Institution [${institution.id}] is updated`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
+
+    if (result === true) {
+      appLogger.verbose(`[${service}] ${label} [${institution.id}] is updated`);
+    } else {
+      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be updated: ${result.message}`);
+    }
+  }
 
   if (institutionData.logo && oldLogoId) {
     await imagesService.remove(oldLogoId);
@@ -203,8 +229,22 @@ exports.deleteInstitution = async (ctx) => {
     institutionName: institution.name,
   };
 
+  const { data, syncMap } = await institutionsService.delete({ where: { id: institutionId } });
+  appLogger.verbose(`Institution [${institution.id}] is deleted`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
+
+    if (result === true) {
+      appLogger.verbose(`[${service}] ${label} [${institution.id}] is deleted`);
+    } else {
+      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be deleted: ${result.message}`);
+    }
+  }
+
   ctx.status = 200;
-  ctx.body = await institutionsService.delete({ where: { id: institutionId } });
+  ctx.body = data;
 };
 
 exports.getInstitutionMembers = async (ctx) => {

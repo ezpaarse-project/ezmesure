@@ -97,7 +97,7 @@ function fetchModel(modelName, opts = {}) {
 
     switch (modelName) {
       case 'institution':
-        item = modelId && await institutionsService.findUnique({
+        item = modelId && (await institutionsService.findUnique({
           where: { id: modelId },
           include: {
             memberships: {
@@ -109,7 +109,7 @@ function fetchModel(modelName, opts = {}) {
               },
             },
           },
-        });
+        })).data;
         break;
 
       case 'sushi-endpoint':
