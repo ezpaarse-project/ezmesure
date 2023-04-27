@@ -250,7 +250,7 @@ exports.addInstitutionMember = async (ctx) => {
     username,
   };
 
-  const user = await usersService.findUnique({
+  const { data: user } = await usersService.findUnique({
     where: { username },
     select: {
       memberships: {
@@ -321,7 +321,7 @@ exports.removeInstitutionMember = async (ctx) => {
     username,
   };
 
-  const user = await usersService.findUnique({
+  const { data: user } = await usersService.findUnique({
     where: { username },
     select: {
       memberships: {

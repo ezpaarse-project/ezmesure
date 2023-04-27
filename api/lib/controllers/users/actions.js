@@ -7,7 +7,7 @@ exports.getUser = async (ctx) => {
   const { username } = ctx.params;
   const { user: connectedUser } = ctx.state;
 
-  const user = await usersService.findUnique({
+  const { data: user } = await usersService.findUnique({
     select: connectedUser.isAdmin ? null : { fullName: true, username: true },
     where: { username },
   });
@@ -41,7 +41,7 @@ exports.list = async (ctx) => {
     select = undefined;
   }
 
-  const users = await usersService.findMany({
+  const { data: users } = await usersService.findMany({
     take: Number.parseInt(size, 10),
     select,
     where: {
@@ -60,13 +60,25 @@ exports.createOrReplaceUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
-  const userExists = !!await usersService.findUnique({ where: { username } });
+  const userExists = !!(await usersService.findUnique({ where: { username } })).data;
 
-  ctx.body = await usersService.upsert({
+  const { user, syncMap } = await usersService.upsert({
     where: { username },
     update: { ...body, username },
     create: { ...body, username },
   });
+  appLogger.verbose(`User [${user.username}] is upserted`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    if (result === true) {
+      appLogger.verbose(`[${service}] User [${username}] is upserted`);
+    } else {
+      appLogger.error(`[${service}] User [${username}] cannot be upserted: ${result.message}`);
+    }
+  }
+
+  ctx.body = user;
 
   const origin = ctx.get('origin');
 
@@ -88,25 +100,46 @@ exports.updateUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
-  const userExists = !!await usersService.findUnique({ where: { username } });
+  const userExists = !!(await usersService.findUnique({ where: { username } })).data;
 
   if (!userExists) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  ctx.body = await usersService.update({
+  const { data: user, syncMap } = await usersService.update({
     where: { username },
     data: { ...body, username },
   });
+  appLogger.verbose(`User [${username}] is updated`);
 
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    if (result === true) {
+      appLogger.verbose(`[${service}] User [${username}] is updated`);
+    } else {
+      appLogger.error(`[${service}] User [${username}] cannot be updated: ${result.message}`);
+    }
+  }
+
+  ctx.body = user;
   ctx.status = 200;
 };
 
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
 
-  const found = !!await usersService.delete({ where: { username } });
+  const { data, syncMap } = await usersService.delete({ where: { username } });
+  appLogger.verbose(`User [${username}] is deleted`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    if (result === true) {
+      appLogger.verbose(`[${service}] User [${username}] is deleted`);
+    } else {
+      appLogger.error(`[${service}] User [${username}] cannot be deleted: ${result.message}`);
+    }
+  }
 
   ctx.status = 200;
-  ctx.body = { found };
+  ctx.body = { found: !!data };
 };

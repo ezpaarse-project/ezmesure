@@ -203,8 +203,17 @@ async function waitForElasticsearch() {
 
 async function createAdmin() {
   try {
-    await usersService.createAdmin();
+    const { syncMap } = await usersService.createAdmin();
     appLogger.info('Admin user is created');
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [service, result] of syncMap) {
+      if (result === true) {
+        appLogger.verbose(`[${service}] Admin user is created`);
+      } else {
+        appLogger.error(`[${service}] Admin user cannot be created: ${result.message}`);
+      }
+    }
   } catch (err) {
     appLogger.error(`Cannot create admin user : ${err}`);
   }

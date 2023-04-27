@@ -7,7 +7,6 @@ const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
 const { sendWelcomeMail, sendPasswordRecovery, sendNewUserToContacts } = require('./mail');
-const randomString = require('./password');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -65,7 +64,7 @@ exports.renaterLogin = async (ctx) => {
 
   const { username } = userProps;
 
-  let user = await usersService.findUnique({ where: { username } });
+  let { data: user } = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.action = 'user/register';
@@ -74,18 +73,18 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = false;
 
     // First create the user in the DB
-    user = await usersService.create({ data: userProps });
+    const res = await usersService.create({ data: userProps });
+    appLogger.verbose(`User [${username}] is created`);
+    user = res.data;
 
-    // Then create the associated user in Elasticsearch
-    await elastic.security.putUser({
-      username,
-      body: {
-        email,
-        full_name: userProps.fullName,
-        password: await randomString(),
-        roles: ['new_user'],
-      },
-    });
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [service, result] of res.syncMap) {
+      if (result === true) {
+        appLogger.verbose(`[${service}] User [${username}] is created`);
+      } else {
+        appLogger.error(`[${service}] User [${username}] cannot be created: ${result.message}`);
+      }
+    }
 
     try {
       await sendWelcomeMail(user);
@@ -100,10 +99,12 @@ exports.renaterLogin = async (ctx) => {
 
     try {
       // Only update the user in the DB, Elasticsearch will be synchronized later
-      user = await usersService.update({
+      // TODO: Huuuuh ?
+      const res = await usersService.update({
         where: { username },
         data: userProps,
       });
+      user = res.data;
     } catch (e) {
       ctx.throw(500, e);
       return;
@@ -141,13 +142,14 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   if (user.metadata && user.metadata._reserved) {
     ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
     return;
   }
 
   // Make sure that the user exists in the DB
-  await usersService.upsert({
+  const { syncMap } = await usersService.upsert({
     where: { username },
     update: {},
     create: {
@@ -157,6 +159,16 @@ exports.elasticLogin = async (ctx) => {
       isAdmin: user.roles?.includes?.('superuser'),
     },
   });
+  appLogger.verbose(`User [${username}] is upserted`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    if (result === true) {
+      appLogger.verbose(`[${service}] User [${username}] is upserted`);
+    } else {
+      appLogger.error(`[${service}] User [${username}] cannot be upserted: ${result.message}`);
+    }
+  }
 
   ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
@@ -173,19 +185,29 @@ exports.acceptTerms = async (ctx) => {
     return;
   }
 
-  await usersService.update({
+  const { syncMap } = await usersService.update({
     where: { username },
     data: {
       metadata: { acceptedTerms: true },
     },
   });
+  appLogger.verbose(`User [${username}] is upserted`);
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, result] of syncMap) {
+    if (result === true) {
+      appLogger.verbose(`[${service}] User [${username}] is upserted`);
+    } else {
+      appLogger.error(`[${service}] User [${username}] cannot be upserted: ${result.message}`);
+    }
+  }
 
   const origin = ctx.get('origin');
   const [, domain] = email.split('@');
 
   let correspondents;
   try {
-    correspondents = await usersService.findMany({
+    correspondents = (await usersService.findMany({
       select: { email: true },
       where: {
         email: { endsWith: `@${domain}` },
@@ -198,7 +220,7 @@ exports.acceptTerms = async (ctx) => {
           },
         },
       },
-    });
+    })).data;
   } catch (err) {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }
@@ -321,7 +343,9 @@ exports.changePassword = async (ctx) => {
 };
 
 exports.getUser = async (ctx) => {
-  const user = await usersService.findUnique({ where: { username: ctx.state.user.username } });
+  const { data: user } = await usersService.findUnique({
+    where: { username: ctx.state.user.username },
+  });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));

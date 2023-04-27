@@ -19,7 +19,7 @@ const requireUser = async (ctx, next) => {
     return;
   }
 
-  const user = await usersService.findUnique({ where: { username } });
+  const { data: user } = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));

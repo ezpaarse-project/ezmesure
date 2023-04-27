@@ -3,9 +3,9 @@ const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const elastic = require('../services/elastic/users');
 const ezreeport = require('../services/ezreeport');
-const { appLogger } = require('../services/logger');
 
 /* eslint-disable max-len */
+/** @typedef {Map<'elastic' | 'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
 /** @typedef {import('@prisma/client').User} User */
 /** @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs */
@@ -17,7 +17,7 @@ const { appLogger } = require('../services/logger');
 
 module.exports = class UsersService {
   /**
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async createAdmin() {
     const username = config.get('admin.username');
@@ -37,33 +37,37 @@ module.exports = class UsersService {
       create: adminData,
     });
 
+    /** @type {SyncMap} */
+    const syncMap = new Map();
     try {
       await elastic.createAdmin();
-      appLogger.verbose(`[elastic] Created admin [${username}]`);
+      syncMap.set('elastic', true);
     } catch (error) {
-      appLogger.error(`[elastic] Cannot create admin [${username}]: ${error.message}`);
+      syncMap.set('elastic', error);
     }
 
     try {
-      const { wasCreated } = await ezreeport.user.upsertFromUser(admin);
-      appLogger.verbose(`[ezReeport] Created admin [${username}]`);
-      if (!wasCreated) {
-        appLogger.warn(`[ezReeport] Admin [${username}] was edited instead of being created`);
-      }
+      await ezreeport.user.upsertFromUser(admin);
+      syncMap.set('ezreeport', true);
     } catch (error) {
-      appLogger.error(`[ezReeport] Cannot create admin [${username}]: ${error.message}`);
+      syncMap.set('ezreeport', error);
     }
 
-    return admin;
+    return {
+      data: admin,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserCreateArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async create(params) {
     const user = await prisma.user.create(params);
 
+    /** @type {SyncMap} */
+    const syncMap = new Map();
     try {
       const userData = {
         username: params.data.username,
@@ -72,49 +76,51 @@ module.exports = class UsersService {
       };
 
       await elastic.createUser(userData);
-      appLogger.verbose(`[elastic] Created user [${user.username}]`);
+      syncMap.set('elastic', true);
     } catch (error) {
-      appLogger.error(`[elastic] Cannot create user [${user.username}]: ${error.message}`);
+      syncMap.set('elastic', error);
     }
 
     try {
-      const { wasCreated } = await ezreeport.user.upsertFromUser(user);
-      appLogger.verbose(`[ezReeport] Created user [${user.username}]`);
-      if (!wasCreated) {
-        appLogger.warn(`[ezReeport] User [${user.username}] was edited instead of being created`);
-      }
+      await ezreeport.user.upsertFromUser(user);
+      syncMap.set('ezreeport', true);
     } catch (error) {
-      appLogger.error(`[ezReeport] Cannot create user [${user.username}]: ${error.message}`);
+      syncMap.set('ezreeport', error);
     }
 
-    return user;
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserFindManyArgs} params
-   * @returns {Promise<User[]>}
+   * @returns {Promise<{ data: User[] }>}
    */
-  static findMany(params) {
-    return prisma.user.findMany(params);
+  static async findMany(params) {
+    return { data: await prisma.user.findMany(params) };
   }
 
   /**
    * @param {UserFindUniqueArgs} params
-   * @returns {Promise<User | null>}
+   * @returns {Promise<{ data: User | null }>}
    */
-  static findUnique(params) {
-    return prisma.user.findUnique(params);
+  static async findUnique(params) {
+    return { data: await prisma.user.findUnique(params) };
   }
 
   /**
    * @param {UserUpdateArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async update(params) {
     // TODO manage role
 
     const user = await prisma.user.update(params);
 
+    /** @type {SyncMap} */
+    const syncMap = new Map();
     try {
       const userData = {
         username: params.data.username?.toString() || '',
@@ -123,31 +129,33 @@ module.exports = class UsersService {
       };
 
       await elastic.updateUser(userData);
-      appLogger.verbose(`[elastic] Edited user [${user.username}]`);
+      syncMap.set('elastic', true);
     } catch (error) {
-      appLogger.error(`[elastic] Cannot create user [${user.username}]: ${error.message}`);
+      syncMap.set('elastic', error);
     }
 
     try {
-      const { wasCreated } = await ezreeport.user.upsertFromUser(user);
-      appLogger.verbose(`[ezReeport] Edited user [${user.username}]`);
-      if (wasCreated) {
-        appLogger.warn(`[ezReeport] User [${user.username}] was created instead of being edited`);
-      }
+      await ezreeport.user.upsertFromUser(user);
+      syncMap.set('ezreeport', true);
     } catch (error) {
-      appLogger.error(`[ezReeport] Cannot edit user [${user.username}]: ${error.message}`);
+      syncMap.set('ezreeport', error);
     }
 
-    return user;
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserUpsertArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async upsert(params) {
     const user = await prisma.user.upsert(params);
 
+    /** @type {SyncMap} */
+    const syncMap = new Map();
     try {
       const userData = {
         username: params?.create?.username,
@@ -156,51 +164,59 @@ module.exports = class UsersService {
       };
 
       await elastic.createUser(userData);
-      appLogger.verbose(`[elastic] Upserted user [${user.username}]`);
+      syncMap.set('elastic', true);
     } catch (error) {
-      appLogger.error(`[elastic] Cannot create user [${user.username}]: ${error.message}`);
+      syncMap.set('elastic', error);
     }
 
     try {
       await ezreeport.user.upsertFromUser(user);
-      appLogger.verbose(`[ezReeport] Upserted user [${user.username}]`);
+      syncMap.set('ezreeport', true);
     } catch (error) {
-      appLogger.error(`[ezReeport] Cannot upsert user [${user.username}]: ${error.message}`);
+      syncMap.set('ezreeport', error);
     }
 
-    return user;
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserDeleteArgs} params
-   * @returns {Promise<User | null>}
+   * @returns {Promise<{ data: User | null, syncMap: SyncMap }>}
    */
   static async delete(params) {
     let user;
+    /** @type {SyncMap} */
+    const syncMap = new Map();
 
     try {
       user = await prisma.user.delete(params);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+        return { data: null, syncMap };
       }
       throw error;
     }
 
     try {
       await elastic.deleteUser(params.where.username);
-      appLogger.verbose(`[elastic] Deleted user [${user.username}]`);
+      syncMap.set('elastic', true);
     } catch (error) {
-      appLogger.error(`[elastic] Cannot delete user [${user.username}]: ${error.message}`);
+      syncMap.set('elastic', error);
     }
 
     try {
       await ezreeport.user.deleteFromUser(user);
-      appLogger.verbose(`[ezReeport] Deleted user [${user.username}]`);
+      syncMap.set('ezreeport', true);
     } catch (error) {
-      appLogger.error(`[ezReeport] Cannot delete user [${user.username}]: ${error.message}`);
+      syncMap.set('ezreeport', error);
     }
 
-    return user;
+    return {
+      data: user,
+      syncMap,
+    };
   }
 };

@@ -44,9 +44,9 @@ async function upsertUserFromUser(user) {
   const body = {
     isAdmin: user.isAdmin,
   };
-  const { data, status } = await axios.put(`/admin/users/${user.username}`, body);
+  const { data } = await axios.put(`/admin/users/${user.username}`, body);
 
-  return { data: data?.content, wasCreated: status === 201 };
+  return data?.content;
 }
 
 /**
@@ -62,7 +62,7 @@ async function deleteUserFromUser(user) {
  * Sync ezREEPORT's namespaces with current users
  */
 async function syncUsers() {
-  const users = await usersService.findMany();
+  const { data: users } = await usersService.findMany();
 
   appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
 
@@ -102,9 +102,9 @@ async function upsertNamespaceFromInstitution(institution) {
     fetchLogin: {},
     fetchOptions: {},
   };
-  const { data, status } = await axios.put(`/admin/namespaces/${institution.id}`, body);
+  const { data } = await axios.put(`/admin/namespaces/${institution.id}`, body);
 
-  return { data: data?.content, wasCreated: status === 201 };
+  return data?.content;
 }
 
 /**
