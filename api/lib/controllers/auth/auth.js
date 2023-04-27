@@ -99,7 +99,8 @@ exports.renaterLogin = async (ctx) => {
 
     try {
       // Only update the user in the DB, Elasticsearch will be synchronized later
-      // TODO: Huuuuh ?
+      // TODO: This statement is wrong since usersService sync with Elastic, we need to choose
+      // if we keep that behavior, or if we need to directly hit prisma
       const res = await usersService.update({
         where: { username },
         data: userProps,
