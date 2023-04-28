@@ -102,9 +102,8 @@ exports.renaterLogin = async (ctx) => {
         where: { username },
         data: userProps,
       });
-      user = res.data;
-    } catch (e) {
-      ctx.throw(500, e);
+    } catch (err) {
+      ctx.throw(500, err);
       return;
     }
   } else {
@@ -183,21 +182,12 @@ exports.acceptTerms = async (ctx) => {
     return;
   }
 
-  const { syncMap } = await usersService.update({
-    where: { username },
-    data: {
-      metadata: { acceptedTerms: true },
-    },
-  });
-  appLogger.verbose(`User [${username}] is updated`);
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [service, result] of syncMap) {
-    if (result === true) {
-      appLogger.verbose(`[${service}] User [${username}] is updated`);
-    } else {
-      appLogger.error(`[${service}] User [${username}] cannot be updated: ${result.message}`);
-    }
+  try {
+    await usersService.acceptTerms(username);
+  } catch (err) {
+    ctx.status = 500;
+    appLogger.error(`Failed to update user: ${err}`);
+    return;
   }
 
   const origin = ctx.get('origin');
@@ -205,20 +195,7 @@ exports.acceptTerms = async (ctx) => {
 
   let correspondents;
   try {
-    ({ data: correspondents } = await usersService.findMany({
-      select: { email: true },
-      where: {
-        email: { endsWith: `@${domain}` },
-        memberships: {
-          some: {
-            OR: [
-              { isDocContact: true },
-              { isTechContact: true },
-            ],
-          },
-        },
-      },
-    }));
+    correspondents = await usersService.findEmailOfCorrespondentsWithDomain(domain);
   } catch (err) {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }

@@ -111,6 +111,27 @@ module.exports = class UsersService {
   }
 
   /**
+   * @param {string} domain
+   * @returns {Promise<{email: string}[]> | null}
+   */
+  static findEmailOfCorrespondentsWithDomain(domain) {
+    return prisma.user.findMany({
+      select: { email: true },
+      where: {
+        email: { endsWith: `@${domain}` },
+        memberships: {
+          some: {
+            OR: [
+              { isDocContact: true },
+              { isTechContact: true },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * @param {UserUpdateArgs} params
    * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
@@ -145,6 +166,21 @@ module.exports = class UsersService {
       data: user,
       syncMap,
     };
+  }
+
+  /**
+   * Accept terms for user.
+   * @param {string} username - Username.
+   *
+   * @returns {Promise<User>}
+   */
+  static async acceptTerms(username) {
+    return prisma.user.update({
+      where: { username },
+      data: {
+        metadata: { acceptedTerms: true },
+      },
+    });
   }
 
   /**
