@@ -1,7 +1,9 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
+const ezreeport = require('../services/ezreeport');
 
 /* eslint-disable max-len */
+/** @typedef {Map<'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
 /** @typedef {import('@prisma/client').Institution} Institution */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs */
@@ -14,49 +16,125 @@ const { client: prisma } = require('../services/prisma.service');
 module.exports = class InstitutionsService {
   /**
    * @param {InstitutionCreateArgs} params
-   * @returns {Promise<Institution>}
+   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
    */
-  static create(params) {
-    return prisma.institution.create(params);
+  static async create(params) {
+    const institution = await prisma.institution.create(params);
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    if (institution.validated) {
+      try {
+        await ezreeport.namespace.upsertFromInstitution(institution);
+        syncMap.set('ezreeport', true);
+      } catch (error) {
+        syncMap.set('ezreeport', error);
+      }
+    }
+
+    return {
+      data: institution,
+      syncMap,
+    };
   }
 
   /**
    * @param {InstitutionFindManyArgs} params
-   * @returns {Promise<Institution[]>}
+   * @returns {Promise<{ data: Institution[] }>}
    */
-  static findMany(params) {
-    return prisma.institution.findMany(params);
+  static async findMany(params) {
+    return { data: await prisma.institution.findMany(params) };
   }
 
   /**
    * @param {InstitutionFindUniqueArgs} params
-   * @returns {Promise<Institution | null>}
+   * @returns {Promise<{ data: Institution | null }>}
    */
-  static findUnique(params) {
-    return prisma.institution.findUnique(params);
+  static async findUnique(params) {
+    return { data: await prisma.institution.findUnique(params) };
   }
 
   /**
    * @param {InstitutionUpdateArgs} params
-   * @returns {Promise<Institution>}
+   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
    */
-  static update(params) {
-    return prisma.institution.update(params);
+  static async update(params) {
+    const institution = await prisma.institution.update(params);
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    if (institution.validated) {
+      try {
+        await ezreeport.namespace.upsertFromInstitution(institution);
+        syncMap.set('ezreeport', true);
+      } catch (error) {
+        syncMap.set('ezreeport', error);
+      }
+    } else {
+      try {
+        await ezreeport.namespace.deleteFromInstitution(institution);
+        syncMap.set('ezreeport', true);
+      } catch (error) {
+        syncMap.set('ezreeport', error);
+      }
+    }
+
+    return {
+      data: institution,
+      syncMap,
+    };
   }
 
   /**
    * @param {InstitutionUpsertArgs} params
-   * @returns {Promise<Institution>}
+   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
    */
-  static upsert(params) {
-    return prisma.institution.upsert(params);
+  static async upsert(params) {
+    const institution = await prisma.institution.upsert(params);
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    if (institution.validated) {
+      try {
+        await ezreeport.namespace.upsertFromInstitution(institution);
+        syncMap.set('ezreeport', true);
+      } catch (error) {
+        syncMap.set('ezreeport', error);
+      }
+    } else {
+      try {
+        await ezreeport.namespace.deleteFromInstitution(institution);
+        syncMap.set('ezreeport', true);
+      } catch (error) {
+        syncMap.set('ezreeport', error);
+      }
+    }
+
+    return {
+      data: institution,
+      syncMap,
+    };
   }
 
   /**
    * @param {InstitutionDeleteArgs} params
-   * @returns {Promise<Institution>}
+   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
    */
-  static delete(params) {
-    return prisma.institution.delete(params);
+  static async delete(params) {
+    const institution = await prisma.institution.delete(params);
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    try {
+      await ezreeport.namespace.deleteFromInstitution(institution);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: institution,
+      syncMap,
+    };
   }
 };

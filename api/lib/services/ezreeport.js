@@ -19,14 +19,110 @@ const axios = Axios.create({
   headers: { 'X-Api-Key': apiKey },
 });
 
+// #region Users
+
+/** @typedef {import('@prisma/client').User} User */
+
+/**
+ * Get token of a user from a ezREEPORT
+ *
+ * @param {string} username The username of the user
+ * @returns The token
+ */
 async function getUserToken(username) {
   const { data } = await axios.get(`/admin/users/${username}`);
   return data?.content?.token;
 }
 
+/**
+ * Updates (or create) a user in ezREEPORT from an ezMESURE's user
+ *
+ * @param {User} user
+ * @returns The created user
+ */
+async function upsertUserFromUser(user) {
+  const body = {
+    isAdmin: user.isAdmin,
+  };
+  const { data } = await axios.put(`/admin/users/${user.username}`, body);
+
+  return data?.content;
+}
+
+/**
+ * Delete a user in ezREEPORT from an ezMESURE's user
+ *
+ * @param {User} user
+ */
+async function deleteUserFromUser(user) {
+  await axios.delete(`/admin/users/${user.username}`);
+}
+
+/**
+ * Sync ezREEPORT's namespaces with current users
+ */
+async function syncUsers() {
+  const { data: users } = await usersService.findMany();
+
+  appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
+
+  const { data } = await axios.put('/admin/users', users.map((u) => ({
+    isAdmin: u.isAdmin,
+    username: u.username,
+  })));
+
+  const results = data?.content?.users?.reduce?.((acc, user) => {
+    const counts = acc;
+    counts[user?.type] += 1;
+    return counts;
+  }, { created: 0, updated: 0, deleted: 0 });
+
+  appLogger.info('[ezReeport] Users synchronized');
+  appLogger.verbose(`[ezReeport] ${results?.created} users created`);
+  appLogger.verbose(`[ezReeport] ${results?.updated} users updated`);
+  appLogger.verbose(`[ezReeport] ${results?.deleted} users deleted`);
+}
+
+// #endregion Users
+
+// #region Namespaces
+
+/** @typedef {import('@prisma/client').Institution} Institution */
+
+/**
+ * Updates (or create) a namespace in ezREEPORT from an ezMESURE's institution
+ *
+ * @param {Institution} institution
+ * @returns The created namespace
+ */
+async function upsertNamespaceFromInstitution(institution) {
+  const body = {
+    name: institution.name,
+    logoId: institution.logoId,
+    fetchLogin: {},
+    fetchOptions: {},
+  };
+  const { data } = await axios.put(`/admin/namespaces/${institution.id}`, body);
+
+  return data?.content;
+}
+
+/**
+ * Delete a namespace in ezREEPORT from an ezMESURE's institution
+ *
+ * @param {Institution} institution
+ */
+async function deleteNamespaceFromInstitution(institution) {
+  await axios.delete(`/admin/namespaces/${institution.id}`);
+}
+
+/**
+ * Sync ezREEPORT's namespaces with current institutions
+ */
 async function syncNamespaces() {
-  const institutions = await institutionsService.findMany({
+  const { data: institutions } = await institutionsService.findMany({
     include: { memberships: true },
+    where: { validated: true },
   });
 
   appLogger.verbose(`[ezReeport] Synchronizing ${institutions?.length} namespaces`);
@@ -34,6 +130,7 @@ async function syncNamespaces() {
   const { data } = await axios.put('/admin/namespaces', institutions.map((i) => ({
     id: i.id,
     name: i.name,
+    logoId: i.logoId,
     fetchLogin: {},
     fetchOptions: {},
     members: i?.memberships.map((m) => ({
@@ -63,27 +160,7 @@ async function syncNamespaces() {
   appLogger.verbose(`[ezReeport] ${membershipsResults?.deleted} memberships deleted`);
 }
 
-async function syncUsers() {
-  const users = await usersService.findMany();
-
-  appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
-
-  const { data } = await axios.put('/admin/users', users.map((u) => ({
-    isAdmin: u.isAdmin,
-    username: u.username,
-  })));
-
-  const results = data?.content?.users?.reduce?.((acc, user) => {
-    const counts = acc;
-    counts[user?.type] += 1;
-    return counts;
-  }, { created: 0, updated: 0, deleted: 0 });
-
-  appLogger.info('[ezReeport] Users synchronized');
-  appLogger.verbose(`[ezReeport] ${results?.created} users created`);
-  appLogger.verbose(`[ezReeport] ${results?.updated} users updated`);
-  appLogger.verbose(`[ezReeport] ${results?.deleted} users deleted`);
-}
+// #endregion Namespace
 
 async function sync() {
   await syncUsers();
@@ -113,4 +190,12 @@ module.exports = {
   startCron,
   sync,
   getUserToken,
+  namespace: {
+    upsertFromInstitution: upsertNamespaceFromInstitution,
+    deleteFromInstitution: deleteNamespaceFromInstitution,
+  },
+  user: {
+    upsertFromUser: upsertUserFromUser,
+    deleteFromUser: deleteUserFromUser,
+  },
 };

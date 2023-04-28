@@ -2,8 +2,10 @@
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const elastic = require('../services/elastic/users');
+const ezreeport = require('../services/ezreeport');
 
 /* eslint-disable max-len */
+/** @typedef {Map<'elastic' | 'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
 /** @typedef {import('@prisma/client').User} User */
 /** @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs */
@@ -15,7 +17,7 @@ const elastic = require('../services/elastic/users');
 
 module.exports = class UsersService {
   /**
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async createAdmin() {
     const username = config.get('admin.username');
@@ -29,45 +31,83 @@ module.exports = class UsersService {
       isAdmin: true,
       metadata: { acceptedTerms: true },
     };
-
-    await elastic.createAdmin();
-
-    return prisma.user.upsert({
+    const admin = await prisma.user.upsert({
       where: { username },
       update: adminData,
       create: adminData,
     });
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    try {
+      await elastic.createAdmin();
+      syncMap.set('elastic', true);
+    } catch (error) {
+      syncMap.set('elastic', error);
+    }
+
+    try {
+      await ezreeport.user.upsertFromUser(admin);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: admin,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserCreateArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async create(params) {
-    const userData = {
-      username: params.data.username,
-      email: params.data.email,
-      fullName: params.data.fullName,
-    };
-    await elastic.createUser(userData);
+    const user = await prisma.user.create(params);
 
-    return prisma.user.create(params);
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    try {
+      const userData = {
+        username: params.data.username,
+        email: params.data.email,
+        fullName: params.data.fullName,
+      };
+
+      await elastic.createUser(userData);
+      syncMap.set('elastic', true);
+    } catch (error) {
+      syncMap.set('elastic', error);
+    }
+
+    try {
+      await ezreeport.user.upsertFromUser(user);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserFindManyArgs} params
-   * @returns {Promise<User[]>}
+   * @returns {Promise<{ data: User[] }>}
    */
-  static findMany(params) {
-    return prisma.user.findMany(params);
+  static async findMany(params) {
+    return { data: await prisma.user.findMany(params) };
   }
 
   /**
    * @param {UserFindUniqueArgs} params
-   * @returns {Promise<User | null>}
+   * @returns {Promise<{ data: User | null }>}
    */
-  static findUnique(params) {
-    return prisma.user.findUnique(params);
+  static async findUnique(params) {
+    return { data: await prisma.user.findUnique(params) };
   }
 
   /**
@@ -93,18 +133,39 @@ module.exports = class UsersService {
 
   /**
    * @param {UserUpdateArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async update(params) {
     // TODO manage role
-    const userData = {
-      username: params.data.username?.toString() || '',
-      email: params.data.email?.toString() || '',
-      fullName: params.data.fullName?.toString() || '',
-    };
 
-    await elastic.updateUser(userData);
-    return prisma.user.update(params);
+    const user = await prisma.user.update(params);
+
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    try {
+      const userData = {
+        username: params.data.username?.toString() || '',
+        email: params.data.email?.toString() || '',
+        fullName: params.data.fullName?.toString() || '',
+      };
+
+      await elastic.updateUser(userData);
+      syncMap.set('elastic', true);
+    } catch (error) {
+      syncMap.set('elastic', error);
+    }
+
+    try {
+      await ezreeport.user.upsertFromUser(user);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
@@ -124,31 +185,74 @@ module.exports = class UsersService {
 
   /**
    * @param {UserUpsertArgs} params
-   * @returns {Promise<User>}
+   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
    */
   static async upsert(params) {
-    const userData = {
-      username: params?.create?.username,
-      email: params?.create?.email,
-      fullName: params?.create?.fullName,
-    };
+    const user = await prisma.user.upsert(params);
 
-    await elastic.createUser(userData);
-    return prisma.user.upsert(params);
+    /** @type {SyncMap} */
+    const syncMap = new Map();
+    try {
+      const userData = {
+        username: params?.create?.username,
+        email: params?.create?.email,
+        fullName: params?.create?.fullName,
+      };
+
+      await elastic.createUser(userData);
+      syncMap.set('elastic', true);
+    } catch (error) {
+      syncMap.set('elastic', error);
+    }
+
+    try {
+      await ezreeport.user.upsertFromUser(user);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: user,
+      syncMap,
+    };
   }
 
   /**
    * @param {UserDeleteArgs} params
-   * @returns {Promise<User | null>}
+   * @returns {Promise<{ data: User | null, syncMap: SyncMap }>}
    */
   static async delete(params) {
-    await elastic.deleteUser(params.where.username);
+    let user;
+    /** @type {SyncMap} */
+    const syncMap = new Map();
 
-    return prisma.user.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
-        return null;
+    try {
+      user = await prisma.user.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return { data: null, syncMap };
       }
-      throw e;
-    });
+      throw error;
+    }
+
+    try {
+      await elastic.deleteUser(params.where.username);
+      syncMap.set('elastic', true);
+    } catch (error) {
+      syncMap.set('elastic', error);
+    }
+
+    try {
+      await ezreeport.user.deleteFromUser(user);
+      syncMap.set('ezreeport', true);
+    } catch (error) {
+      syncMap.set('ezreeport', error);
+    }
+
+    return {
+      data: user,
+      syncMap,
+    };
   }
 };

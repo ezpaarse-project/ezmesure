@@ -19,7 +19,7 @@ const requireUser = async (ctx, next) => {
     return;
   }
 
-  const user = await usersService.findUnique({ where: { username } });
+  const { data: user } = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -97,7 +97,7 @@ function fetchModel(modelName, opts = {}) {
 
     switch (modelName) {
       case 'institution':
-        item = modelId && await institutionsService.findUnique({
+        item = modelId && (await institutionsService.findUnique({
           where: { id: modelId },
           include: {
             memberships: {
@@ -109,7 +109,7 @@ function fetchModel(modelName, opts = {}) {
               },
             },
           },
-        });
+        })).data;
         break;
 
       case 'sushi-endpoint':
