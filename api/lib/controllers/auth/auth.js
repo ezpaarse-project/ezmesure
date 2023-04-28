@@ -98,9 +98,6 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      // Only update the user in the DB, Elasticsearch will be synchronized later
-      // TODO: This statement is wrong since usersService sync with Elastic, we need to choose
-      // if we keep that behavior, or if we need to directly hit prisma
       const res = await usersService.update({
         where: { username },
         data: userProps,
@@ -192,14 +189,14 @@ exports.acceptTerms = async (ctx) => {
       metadata: { acceptedTerms: true },
     },
   });
-  appLogger.verbose(`User [${username}] is upserted`);
+  appLogger.verbose(`User [${username}] is updated`);
 
   // eslint-disable-next-line no-restricted-syntax
   for (const [service, result] of syncMap) {
     if (result === true) {
-      appLogger.verbose(`[${service}] User [${username}] is upserted`);
+      appLogger.verbose(`[${service}] User [${username}] is updated`);
     } else {
-      appLogger.error(`[${service}] User [${username}] cannot be upserted: ${result.message}`);
+      appLogger.error(`[${service}] User [${username}] cannot be updated: ${result.message}`);
     }
   }
 
@@ -208,7 +205,7 @@ exports.acceptTerms = async (ctx) => {
 
   let correspondents;
   try {
-    correspondents = (await usersService.findMany({
+    ({ data: correspondents } = await usersService.findMany({
       select: { email: true },
       where: {
         email: { endsWith: `@${domain}` },
@@ -221,7 +218,7 @@ exports.acceptTerms = async (ctx) => {
           },
         },
       },
-    })).data;
+    }));
   } catch (err) {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }
