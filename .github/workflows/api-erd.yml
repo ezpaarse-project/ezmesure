@@ -26,9 +26,6 @@ jobs:
       - name: Generate ERD
         run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -o "${{ env.OUT_PATH }}" https://p-erd.oxypomme.fr/erd/'
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
       - name: Commit files
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
