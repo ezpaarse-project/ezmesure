@@ -54,12 +54,11 @@ model Membership {
   user                  User                   @relation(fields: [username], references: [username], onDelete: Cascade)
   institutionId         String
   institution           Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  isDocContact          Boolean                @default(false)
-  isTechContact         Boolean                @default(false)
-  isGuest               Boolean                @default(false)
+  roles                 String[]
   permissions           String[]
   spacePermissions      SpacePermission[]
   repositoryPermissions RepositoryPermission[]
+  locked                Boolean                @default(false)
 
   @@id([username, institutionId])
 }

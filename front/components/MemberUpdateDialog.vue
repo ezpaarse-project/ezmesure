@@ -1,61 +1,86 @@
 <template>
   <v-dialog
+    ref="dialog"
     v-model="show"
     max-width="500px"
   >
-    <v-card>
+    <v-card ref="dialogTitle">
       <v-card-title>
         {{ $t('institutions.members.permissionsOf', { name: fullName }) }}
       </v-card-title>
 
+      <v-alert
+        type="info"
+        dense
+        outlined
+        :value="readonly"
+        class="ma-4"
+      >
+        {{ $t('institutions.members.notEditable') }}
+      </v-alert>
+
       <v-card-text>
-        <v-radio-group v-model="readonly">
-          <v-radio
-            :value="true"
-            :label="$t('institutions.members.read')"
-          />
-          <v-radio
-            :value="false"
-            :label="`${$t('institutions.members.read')} / ${$t('institutions.members.write')}`"
-          />
-        </v-radio-group>
-
-        <p v-if="readonly">
-          {{ $t('institutions.members.readPermDesc') }}
-        </p>
-        <p v-else>
-          {{ $t('institutions.members.writePermDesc') }}
-        </p>
-
-        <template v-if="isAdmin">
-          <v-checkbox
-            v-model="isDocContact"
-            :label="$t('institutions.members.documentaryCorrespondent')"
-            hide-details
-            @change="handleContactChange"
-          />
-          <v-checkbox
-            v-model="isTechContact"
-            :label="$t('institutions.members.technicalCorrespondent')"
-            hide-details
-            @change="handleContactChange"
-          />
-        </template>
-
-        <v-alert
-          type="error"
+        <v-treeview
+          v-model="permissions"
+          :items="availablePermissions"
+          :disabled="readonly"
+          selection-type="leaf"
+          color="primary"
+          selected-color="primary"
+          selectable
           dense
-          outlined
-          :value="!!saveError"
-          class="mt-4"
-        >
-          {{ saveError }}
-        </v-alert>
+          open-all
+        />
       </v-card-text>
+
+      <template v-if="isAdmin">
+        <v-divider />
+
+        <v-card-title>
+          {{ $t('institutions.members.roles') }}
+        </v-card-title>
+
+        <v-card-text>
+          <v-checkbox
+            v-model="roles"
+            :label="$t('institutions.members.documentaryCorrespondent')"
+            value="contact:doc"
+            hide-details
+            @change="handleContactChange"
+          />
+          <v-checkbox
+            v-model="roles"
+            :label="$t('institutions.members.technicalCorrespondent')"
+            value="contact:tech"
+            hide-details
+            @change="handleContactChange"
+          />
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-text>
+          <v-checkbox
+            v-model="locked"
+            :label="$t('institutions.members.locked')"
+            hide-details
+          />
+        </v-card-text>
+      </template>
+
+      <v-alert
+        type="error"
+        dense
+        outlined
+        :value="!!saveError"
+        class="ma-4"
+      >
+        {{ saveError }}
+      </v-alert>
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" :loading="saving" @click="save">
+        <v-btn color="primary" :loading="saving" :disabled="readonly" @click="save">
           <v-icon left>
             mdi-content-save
           </v-icon>
@@ -84,30 +109,54 @@ export default {
       saveError: null,
       username: '',
       fullName: '',
-      readonly: true,
-      isDocContact: false,
-      isTechContact: false,
+      roles: [],
+      permissions: [],
+      locked: false,
     };
   },
   computed: {
     isAdmin() {
       return this.$auth?.user?.isAdmin;
     },
+    readonly() {
+      return (this.locked === true) && !this.isAdmin;
+    },
+    availablePermissions() {
+      const createPermissonItem = (featureId, permissionId) => ({
+        id: `${featureId}:${permissionId}`,
+        name: this.$t(`institutions.members.permissionLabels.${featureId}:${permissionId}`),
+      });
+      const createFeatureItem = (featureId, permissionIds) => ({
+        id: featureId,
+        name: this.$t(`institutions.members.featureLabels.${featureId}`),
+        children: permissionIds?.map((id) => createPermissonItem(featureId, id)),
+      });
+
+      return [
+        createFeatureItem('institution', ['read', 'write']),
+        createFeatureItem('memberships', ['read', 'write', 'revoke']),
+        createFeatureItem('sushi', ['read', 'write', 'delete']),
+        createFeatureItem('reporting', ['read', 'write']),
+      ];
+    },
   },
   methods: {
     updateMember(memberData = {}) {
-      this.username = memberData?.username || '';
-      this.fullName = memberData?.fullName || ''; // eslint-disable-line camelcase
-      this.readonly = memberData?.readonly !== false;
-      this.isDocContact = memberData?.isDocContact === true;
-      this.isTechContact = memberData?.isTechContact === true;
-      this.show = true;
-    },
+      this.username = memberData?.user?.username || '';
+      this.fullName = memberData?.user?.fullName || '';
+      this.roles = Array.isArray(memberData?.roles) ? memberData.roles.slice() : [];
+      this.locked = (memberData?.locked === true);
+      this.permissions = Array.isArray(memberData?.permissions) ? memberData.permissions.slice() : [
+        'institution:read',
+        'memberships:read',
+      ];
 
-    handleContactChange(newValue) {
-      if (newValue === true) {
-        this.readonly = false;
-      }
+      this.show = true;
+      this.saveError = null;
+
+      this.$nextTick().then(() => {
+        this.$refs?.dialogTitle?.$el?.scrollIntoView?.();
+      });
     },
 
     async save() {
@@ -117,14 +166,13 @@ export default {
       this.saveError = null;
 
       const url = `/institutions/${this.institutionId}/memberships/${this.username}`;
-      const body = {
-        readonly: this.readonly,
-        isDocContact: this.isAdmin ? this.isDocContact : undefined,
-        isTechContact: this.isAdmin ? this.isTechContact : undefined,
-      };
 
       try {
-        await this.$axios.$put(url, body);
+        await this.$axios.$put(url, {
+          roles: this.roles,
+          permissions: this.permissions,
+          locked: this.isAdmin ? this.locked : undefined,
+        });
         this.show = false;
         this.$emit('updated');
       } catch (e) {

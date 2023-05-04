@@ -299,7 +299,34 @@
       "permissionsOf": "Permissions de {name}",
       "readPermDesc": "L'utilisateur peut consulter les tableaux de bord Kibana, sans les modifier.",
       "writePermDesc": "L'utilisateur peut consulter et modifier les tableaux de bord Kibana.",
-      "failedToUpdatePerms": "La mise à jour des permissions a échoué"
+      "personNotRegistered": "Cette personne n'est pas inscrite",
+      "failedToUpdatePerms": "La mise à jour des permissions a échoué",
+      "locked": "Empêcher la modification du membre",
+      "notEditable": "Ce membre n'est pas modifiable",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Contact documentaire",
+        "contact:tech": "Contact technique",
+        "guest": "Invité"
+      },
+      "featureLabels": {
+        "institution": "Données d'établissement",
+        "memberships": "Membres",
+        "sushi": "Identifiants SUSHI",
+        "reporting": "Reporting"
+      },
+      "permissionLabels": {
+        "institution:read": "Lecture",
+        "institution:write": "Modification",
+        "memberships:read": "Lecture",
+        "memberships:write": "Gestion des permissions",
+        "memberships:revoke": "Révocation",
+        "sushi:read": "Lecture",
+        "sushi:write": "Ajout et modification",
+        "sushi:delete": "Suppression",
+        "reporting:read": "Consultation des rapports",
+        "reporting:write": "Création et modification de rapports"
+      }
     },
     "sushi": {
       "title": "Identifiants SUSHI ({total})",

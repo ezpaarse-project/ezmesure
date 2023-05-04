@@ -1,14 +1,21 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { includableFields } = require('../../entities/institutions.dto');
+const {
+  allFields,
+  includableFields,
+} = require('../../entities/institutions.dto');
+const {
+  includableFields: membershipIncludableFields,
+  FEATURES,
+} = require('../../entities/memberships.dto');
 
 const {
   requireJwt,
   requireUser,
   fetchInstitution,
-  requireContact,
   requireAdmin,
+  requireMemberPermissions,
 } = require('../../services/auth');
 
 const {
@@ -36,10 +43,10 @@ router.route({
   path: '/',
   handler: getInstitutions,
   validate: {
-    query: {
+    query: Joi.object({
       q: Joi.string(),
       include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    },
+    }).rename('include[]', 'include'),
   },
 });
 
@@ -48,7 +55,7 @@ router.route({
   path: '/:institutionId/sushi',
   handler: [
     fetchInstitution(),
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.read),
     getSushiData,
   ],
   validate: {
@@ -76,13 +83,16 @@ router.route({
   path: '/:institutionId/memberships',
   handler: [
     fetchInstitution(),
-    requireContact(),
+    requireMemberPermissions(FEATURES.memberships.read),
     getInstitutionMembers,
   ],
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
     },
+    query: Joi.object({
+      include: Joi.array().single().items(Joi.string().valid(...membershipIncludableFields)),
+    }).rename('include[]', 'include'),
   },
 });
 
@@ -91,7 +101,7 @@ router.route({
   path: '/:institutionId/contacts',
   handler: [
     fetchInstitution(),
-    requireContact(),
+    requireMemberPermissions(FEATURES.memberships.read),
     getInstitutionContacts,
   ],
   validate: {
@@ -106,7 +116,7 @@ router.route({
   path: '/:institutionId/memberships/:username',
   handler: [
     fetchInstitution(),
-    requireContact(),
+    requireMemberPermissions(FEATURES.memberships.write),
     addInstitutionMember,
   ],
   validate: {
@@ -114,12 +124,6 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
       username: Joi.string().trim().required(),
-    },
-    body: {
-      readonly: Joi.boolean().default(true),
-      isDocContact: Joi.boolean().default(false),
-      isTechContact: Joi.boolean().default(false),
-      isGuest: Joi.boolean().default(false),
     },
   },
 });
@@ -129,7 +133,7 @@ router.route({
   path: '/:institutionId/memberships/:username',
   handler: [
     fetchInstitution(),
-    requireContact(),
+    requireMemberPermissions(FEATURES.memberships.revoke),
     removeInstitutionMember,
   ],
   validate: {
@@ -158,7 +162,7 @@ router.route({
   path: '/:institutionId',
   handler: [
     fetchInstitution(),
-    requireContact({ allowCreator: true }),
+    requireMemberPermissions(FEATURES.institution.write),
     updateInstitution,
   ],
   validate: {

@@ -99,6 +99,32 @@
       }
     },
     "schemas": {
+      "MemberRole": {
+        "type": "string",
+        "enum": [
+          "doc_contact",
+          "tech_contact",
+          "guest"
+        ]
+      },
+      "MemberPermissions": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "institution:read",
+            "institution:write",
+            "memberships:read",
+            "memberships:write",
+            "memberships:revoke",
+            "sushi:read",
+            "sushi:write",
+            "sushi:delete",
+            "reporting:read",
+            "reporting:write"
+          ]
+        }
+      },
       "ItemID": {
         "type": "string",
         "format": "cuid",
@@ -353,26 +379,18 @@
             "$ref": "#/components/schemas/Institution",
             "readOnly": true
           },
-          "isDocContact": {
-            "description": "Whether the user is a documentary contact of the institution",
-            "type": "boolean",
-            "default": false
-          },
-          "isTechContact": {
-            "description": "Whether the user is a technical contact of the institution",
-            "type": "boolean",
-            "default": false
-          },
-          "isGuest": {
-            "description": "Whether the user is a guest that does not belong to the real institution",
-            "type": "boolean",
-            "default": false
+          "roles": {
+            "description": "A list of user roles in the institution",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberRole"
+            }
           },
           "permissions": {
             "description": "A list of user permissions associated to the institution",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/MemberPermissions"
             }
           },
           "spacePermissions": {
@@ -388,6 +406,10 @@
             "items": {
               "$ref": "#/components/schemas/RepositoryPermission"
             }
+          },
+          "locked": {
+            "description": "Whether the member can be modified or not",
+            "type": "boolean"
           }
         }
       },

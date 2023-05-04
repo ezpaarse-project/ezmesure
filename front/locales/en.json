@@ -299,7 +299,33 @@
       "permissionsOf": "Permissions of {name}",
       "readPermDesc": "The user can view the Kibana dashboards, but can't modify them.",
       "writePermDesc": "The user can view and modify Kibana dashboards.",
-      "failedToUpdatePerms": "Failed to update user permissions"
+      "personNotRegistered": "This person is not registered",
+      "failedToUpdatePerms": "Failed to update user permissions",
+      "locked": "Prevent member modification",
+      "notEditable": "This member is not editable",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Documentary contact",
+        "contact:tech": "Technical contact",
+        "guest": "Guest"
+      },
+      "featureLabels": {
+        "institution": "Institution data",
+        "memberships": "Members",
+        "sushi": "SUSHI credentials"
+      },
+      "permissionLabels": {
+        "institution:read": "Read",
+        "institution:write": "Update",
+        "memberships:read": "Read",
+        "memberships:write": "Add and manage permissions",
+        "memberships:revoke": "Revocation",
+        "sushi:read": "Read",
+        "sushi:write": "Add and update",
+        "sushi:delete": "Delete",
+        "reporting:read": "View reports",
+        "reporting:write": "Create and update reports"
+      }
     },
     "sushi": {
       "title": "SUSHI credentials ({total})",

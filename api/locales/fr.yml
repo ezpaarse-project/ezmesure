@@ -70,6 +70,7 @@ errors:
     alreadyMember: "L'utilisateur appartient à un autre établissement : %s"
     cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
     cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
+    notEditable: Ce membre n'est pas modifiable
 
   user:
     notFound: Utilisateur introuvable

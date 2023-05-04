@@ -8,9 +8,22 @@ const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
+const MembershipsService = require('../../entities/memberships.service');
+
+const {
+  PERMISSIONS,
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  },
+  upsertSchema: membershipUpsertSchema,
+  adminUpsertSchema: membershipAdminUpsertSchema,
+} = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
+
+const adminFields = new Set(institutionsDto.adminFields);
 
 function sendValidateInstitution(receivers, data) {
   return sendMail({
@@ -83,8 +96,9 @@ exports.createInstitution = async (ctx) => {
     memberships = {
       create: [{
         username,
-        isDocContact: true,
-        isTechContact: true,
+        permissions: [...PERMISSIONS],
+        roles: [DOC_CONTACT, TECH_CONTACT],
+        locked: true,
       }],
     };
   }
@@ -173,10 +187,9 @@ exports.updateInstitution = async (ctx) => {
     const contactMemberships = await membershipService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
-        OR: [
-          { isDocContact: true },
-          { isTechContact: true },
-        ],
+        roles: {
+          hasSome: [DOC_CONTACT, TECH_CONTACT],
+        },
       },
       include: { user: true },
     });
@@ -248,15 +261,22 @@ exports.deleteInstitution = async (ctx) => {
 };
 
 exports.getInstitutionMembers = async (ctx) => {
-  const members = await membershipService.findMany({
+  const { include: propsToInclude } = ctx.query;
+  let include;
+
+  if (Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
+  const memberships = await membershipService.findMany({
     where: { institutionId: ctx.state.institution.id },
-    include: { user: true },
+    include,
   });
 
   ctx.type = 'json';
   ctx.status = 200;
 
-  ctx.body = Array.isArray(members) ? members : [];
+  ctx.body = Array.isArray(memberships) ? memberships : [];
 };
 
 exports.getInstitutionContacts = async (ctx) => {
@@ -271,18 +291,22 @@ exports.getInstitutionContacts = async (ctx) => {
 exports.addInstitutionMember = async (ctx) => {
   ctx.action = 'institutions/addMember';
 
-  const { institution, userIsAdmin } = ctx.state;
+  const {
+    institution,
+    user: connectedUser,
+  } = ctx.state;
   const { username } = ctx.params;
-  const { body = {} } = ctx.request;
   const {
     id: institutionId,
     name: institutionName,
   } = institution;
-  const {
-    isDocContact = false,
-    isTechContact = false,
-    isGuest = false,
-  } = body;
+
+  const schema = connectedUser?.isAdmin ? membershipAdminUpsertSchema : membershipUpsertSchema;
+  const { value: body } = schema.validate({
+    ...ctx.request.body,
+    institutionId,
+    username,
+  });
 
   ctx.metadata = {
     institutionId,
@@ -303,38 +327,28 @@ exports.addInstitutionMember = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
+  const { roles } = body;
   const membership = user.memberships?.[0];
-  const memberIsContact = membership?.isDocContact || membership?.isTechContact;
-  const memberBecomesContact = isDocContact || isTechContact;
-  let newMembership;
+  const memberIsContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
+  const memberBecomesContact = roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
 
-  // Only admins can update institution contacts
-  if ((memberIsContact || memberBecomesContact) && !userIsAdmin) {
-    ctx.throw(409, ctx.$t('errors.members.cannotUpdateContact'));
+  if ((membership?.locked) && !connectedUser?.isAdmin) {
+    ctx.throw(409, ctx.$t('errors.members.notEditable'));
   }
 
-  if (membership) {
-    newMembership = await membershipService.update({
-      where: {
-        username_institutionId: { username, institutionId },
-      },
-      data: {
-        isDocContact,
-        isTechContact,
-        isGuest,
-      },
-    });
-  } else {
-    newMembership = await membershipService.create({
-      data: {
-        isDocContact,
-        isTechContact,
-        isGuest,
-        user: { connect: { username } },
-        institution: { connect: { id: institutionId } },
-      },
-    });
-  }
+  const membershipData = {
+    ...body,
+    user: { connect: { username } },
+    institution: { connect: { id: institutionId } },
+  };
+
+  const newMembership = await MembershipsService.upsert({
+    where: {
+      username_institutionId: { username, institutionId },
+    },
+    create: membershipData,
+    update: membershipData,
+  });
 
   if (!memberIsContact && memberBecomesContact) {
     try {
@@ -351,7 +365,7 @@ exports.addInstitutionMember = async (ctx) => {
 exports.removeInstitutionMember = async (ctx) => {
   ctx.action = 'institutions/removeMember';
 
-  const { institution, userIsAdmin } = ctx.state;
+  const { institution, user: connectedUser } = ctx.state;
   const { username } = ctx.params;
   const { id: institutionId } = institution;
 
@@ -375,10 +389,9 @@ exports.removeInstitutionMember = async (ctx) => {
   }
 
   const membership = user.memberships?.[0];
-  const memberIsContact = membership?.isDocContact || membership?.isTechContact;
 
-  if (memberIsContact && !userIsAdmin) {
-    ctx.throw(409, ctx.$t('errors.members.cannotRemoveContact'));
+  if ((membership?.locked) && !connectedUser?.isAdmin) {
+    ctx.throw(409, ctx.$t('errors.members.notEditable'));
   }
 
   if (!membership) {
@@ -407,11 +420,7 @@ exports.getSushiData = async (ctx) => {
       institutionId: ctx.state.institution.id,
     },
     include: {
-      endpoint: {
-        select: {
-          vendor: true,
-        },
-      },
+      endpoint: true,
     },
   });
 

@@ -25,7 +25,7 @@
             style="height: 100%;"
           >
             <template
-              v-if="membership.isDocContact || membership.isTechContact"
+              v-if="membership?.roles?.some(r => r === 'contact:doc' || r === 'contact:tech')"
               #menu
             >
               <v-menu left bottom>

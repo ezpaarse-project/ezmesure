@@ -4,6 +4,13 @@ const { client: prisma, Prisma } = require('../services/prisma.service');
 const elastic = require('../services/elastic/users');
 const ezrUsers = require('../services/ezreeport/users');
 
+const {
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  }
+} = require('./memberships.dto');
+
 /* eslint-disable max-len */
 /** @typedef {Map<'elastic' | 'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
 /** @typedef {import('@prisma/client').User} User */
@@ -121,10 +128,9 @@ module.exports = class UsersService {
         email: { endsWith: `@${domain}` },
         memberships: {
           some: {
-            OR: [
-              { isDocContact: true },
-              { isTechContact: true },
-            ],
+            roles: {
+              hasSome: [DOC_CONTACT, TECH_CONTACT],
+            },
           },
         },
       },

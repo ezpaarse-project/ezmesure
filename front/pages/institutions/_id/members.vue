@@ -12,7 +12,7 @@
 
       <MemberSearch
         :institution-id="institutionId"
-        @added="refreshMembers"
+        @select="(user) => updateMember({ user })"
       />
     </ToolBar>
 
@@ -32,31 +32,16 @@
         </v-toolbar>
       </template>
 
-      <template #[`item.correspondent`]="{ item }">
+      <template #[`item.roles`]="{ item }">
         <v-chip
-          v-if="item.isTechContact"
+          v-for="role in item.roles"
+          :key="role"
           small
           label
           color="secondary"
+          class="mr-1"
         >
-          {{ $t('institutions.members.technical') }}
-        </v-chip>
-        <v-chip
-          v-if="item.isDocContact"
-          small
-          label
-          color="secondary"
-        >
-          {{ $t('institutions.members.documentary') }}
-        </v-chip>
-        <v-chip
-          v-if="item.creator"
-          small
-          label
-          color="secondary"
-          outlined
-        >
-          {{ $t('institutions.members.creator') }}
+          {{ $t(`institutions.members.roleNames.${role}`) }}
         </v-chip>
       </template>
 
@@ -162,8 +147,8 @@ export default {
           value: 'readonly',
         },
         {
-          text: app.i18n.t('institutions.members.correspondent'),
-          value: 'correspondent',
+          text: app.i18n.t('institutions.members.roles'),
+          value: 'roles',
         },
         {
           text: app.i18n.t('actions'),
@@ -196,7 +181,9 @@ export default {
       this.refreshing = true;
 
       try {
-        this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`);
+        this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`, {
+          params: { include: ['user'] },
+        });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));
       }
