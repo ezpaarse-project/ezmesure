@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
-const ezreeport = require('../services/ezreeport');
+const ezrNamespaces = require('../services/ezreeport/namespaces');
 
 /* eslint-disable max-len */
 /** @typedef {Map<'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
@@ -25,7 +25,7 @@ module.exports = class InstitutionsService {
     const syncMap = new Map();
     if (institution.validated) {
       try {
-        await ezreeport.namespace.upsertFromInstitution(institution);
+        await ezrNamespaces.upsertFromInstitution(institution);
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
@@ -65,14 +65,14 @@ module.exports = class InstitutionsService {
     const syncMap = new Map();
     if (institution.validated) {
       try {
-        await ezreeport.namespace.upsertFromInstitution(institution);
+        await ezrNamespaces.upsertFromInstitution(institution);
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
       }
     } else {
       try {
-        await ezreeport.namespace.deleteFromInstitution(institution);
+        await ezrNamespaces.deleteFromInstitution(institution);
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
@@ -96,14 +96,14 @@ module.exports = class InstitutionsService {
     const syncMap = new Map();
     if (institution.validated) {
       try {
-        await ezreeport.namespace.upsertFromInstitution(institution);
+        await ezrNamespaces.upsertFromInstitution(institution);
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
       }
     } else {
       try {
-        await ezreeport.namespace.deleteFromInstitution(institution);
+        await ezrNamespaces.deleteFromInstitution(institution);
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
@@ -126,7 +126,7 @@ module.exports = class InstitutionsService {
     /** @type {SyncMap} */
     const syncMap = new Map();
     try {
-      await ezreeport.namespace.deleteFromInstitution(institution);
+      await ezrNamespaces.deleteFromInstitution(institution);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);

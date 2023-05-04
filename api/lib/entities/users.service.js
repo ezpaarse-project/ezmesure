@@ -2,7 +2,7 @@
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const elastic = require('../services/elastic/users');
-const ezreeport = require('../services/ezreeport');
+const ezrUsers = require('../services/ezreeport/users');
 
 /* eslint-disable max-len */
 /** @typedef {Map<'elastic' | 'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
@@ -47,7 +47,7 @@ module.exports = class UsersService {
     }
 
     try {
-      await ezreeport.user.upsertFromUser(admin);
+      await ezrUsers.upsertFromUser(admin);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
@@ -82,7 +82,7 @@ module.exports = class UsersService {
     }
 
     try {
-      await ezreeport.user.upsertFromUser(user);
+      await ezrUsers.upsertFromUser(user);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
@@ -156,7 +156,7 @@ module.exports = class UsersService {
     }
 
     try {
-      await ezreeport.user.upsertFromUser(user);
+      await ezrUsers.upsertFromUser(user);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
@@ -206,7 +206,7 @@ module.exports = class UsersService {
     }
 
     try {
-      await ezreeport.user.upsertFromUser(user);
+      await ezrUsers.upsertFromUser(user);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
@@ -236,15 +236,17 @@ module.exports = class UsersService {
       throw error;
     }
 
-    try {
-      await elastic.deleteUser(params.where.username);
-      syncMap.set('elastic', true);
-    } catch (error) {
-      syncMap.set('elastic', error);
+    if (params.where.username) {
+      try {
+        await elastic.deleteUser(params.where.username);
+        syncMap.set('elastic', true);
+      } catch (error) {
+        syncMap.set('elastic', error);
+      }
     }
 
     try {
-      await ezreeport.user.deleteFromUser(user);
+      await ezrUsers.deleteFromUser(user);
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
