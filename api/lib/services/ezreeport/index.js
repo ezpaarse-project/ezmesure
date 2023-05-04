@@ -48,7 +48,7 @@ async function syncNamespaces() {
   const { data } = await ezrAxios.put('/admin/namespaces', institutions.map((i) => ({
     id: i.id,
     name: i.name,
-    logoId: i.logoId,
+    logoId: i.logoId || undefined,
     fetchLogin: {},
     fetchOptions: {},
     members: i?.memberships.map((m) => ({
