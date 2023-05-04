@@ -28,9 +28,6 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v3
-        with:
-            node-version-file: .nvmrc
-            cache: npm
 
       - name: Commit files
         run: |
