@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
-const ezreeport = require('../../services/ezreeport');
+const ezrUsers = require('../../services/ezreeport/users');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
@@ -25,7 +25,7 @@ function decode(value) {
 }
 
 exports.getReportingToken = async (ctx) => {
-  const token = await ezreeport.getUserToken(ctx?.state?.user?.username);
+  const token = await ezrUsers.getToken(ctx?.state?.user?.username);
   ctx.body = { token };
 };
 
