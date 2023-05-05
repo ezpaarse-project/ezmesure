@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
-const ezreeport = require('../../services/ezreeport');
+const ezrUsers = require('../../services/ezreeport/users');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
@@ -25,7 +25,7 @@ function decode(value) {
 }
 
 exports.getReportingToken = async (ctx) => {
-  const token = await ezreeport.getUserToken(ctx?.state?.user?.username);
+  const token = await ezrUsers.getToken(ctx?.state?.user?.username);
   ctx.body = { token };
 };
 
@@ -98,11 +98,22 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      const res = await usersService.update({
+      const { syncMap } = await usersService.update({
         where: { username },
         data: userProps,
       });
+      appLogger.info('User is updated');
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [service, result] of syncMap) {
+        if (result === true) {
+          appLogger.verbose(`[${service}] User is updated`);
+        } else {
+          appLogger.error(`[${service}] User cannot be updated: ${result.message}`);
+        }
+      }
     } catch (err) {
+      appLogger.error(`User cannot be update: ${err.message}`);
       ctx.throw(500, err);
       return;
     }
