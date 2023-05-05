@@ -13,6 +13,7 @@ env:
   PRISMA_SCHEMA: api/prisma/schema.prisma
   OUT_PATH: api/prisma/doc/ERD.svg
   COMMIT_NAME: 'doc(api): updated ERD[skip ci]'
+  ERD_WS: https://p-erd.oxypomme.fr/erd/
 
 jobs:
   generate-erd:
@@ -24,7 +25,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate ERD
-        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -o "${{ env.OUT_PATH }}" https://p-erd.oxypomme.fr/erd/'
+        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -o "${{ env.OUT_PATH }}" ${{ env.ERD_WS }}'
 
       - name: Commit files
         run: |
