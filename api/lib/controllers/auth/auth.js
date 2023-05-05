@@ -98,11 +98,22 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      const res = await usersService.update({
+      const { syncMap } = await usersService.update({
         where: { username },
         data: userProps,
       });
+      appLogger.info('User is updated');
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [service, result] of syncMap) {
+        if (result === true) {
+          appLogger.verbose(`[${service}] User is updated`);
+        } else {
+          appLogger.error(`[${service}] User cannot be updated: ${result.message}`);
+        }
+      }
     } catch (err) {
+      appLogger.error(`User cannot be update: ${err.message}`);
       ctx.throw(500, err);
       return;
     }
