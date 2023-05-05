@@ -101,7 +101,7 @@ export default {
   },
   computed: {
     fieldIsRequiredRules() {
-      return [!!this.username || this.$t('password.fieldIsRequired')];
+      return [!!this.username || this.$t('fieldIsRequired')];
     },
   },
   methods: {
