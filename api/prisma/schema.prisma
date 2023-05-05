@@ -130,6 +130,7 @@ model HarvestJob {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   status      String
+  params      Json
   runningTime Int
   result      Json
   logs        Log[]
