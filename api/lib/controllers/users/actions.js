@@ -62,7 +62,7 @@ exports.createOrReplaceUser = async (ctx) => {
 
   const userExists = !!(await usersService.findUnique({ where: { username } })).data;
 
-  const { user, syncMap } = await usersService.upsert({
+  const { data: user, syncMap } = await usersService.upsert({
     where: { username },
     update: { ...body, username },
     create: { ...body, username },
