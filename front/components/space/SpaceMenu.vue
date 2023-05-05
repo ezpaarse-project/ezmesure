@@ -115,93 +115,13 @@ export default {
         ],
       };
     },
-    institutionMenu() {
-      if (!this.canAccessSushi && !this.canAccessInstitution) {
-        return null;
-      }
-
-      const menuGroup = {
-        title: this.$t('menu.myInstitution'),
-        href: '/institutions',
-        children: [],
-      };
-
-      if (this.canAccessInstitution) {
-        menuGroup.children.push({
-          title: this.$t('menu.profile'),
-          href: '/self',
-        });
-      }
-
-      if (this.institution && this.canAccessMembers) {
-        menuGroup.children.push({
-          title: this.$t('menu.members'),
-          href: '/self/members',
-        });
-      }
-
-      if (this.institution && this.canAccessSushi) {
-        menuGroup.children.push({
-          title: this.$t('menu.sushi'),
-          href: '/self/sushi',
-        });
-      }
-
-      return menuGroup;
-    },
     drawer: {
       get() { return this.$store.state.drawer; },
       set(newVal) { this.$store.dispatch('SET_DRAWER', newVal); },
     },
-    userRoles() {
-      const roles = this.$auth?.user?.roles;
-      return Array.isArray(roles) ? roles : [];
-    },
     isAdmin() {
       return this.$auth?.user?.isAdmin;
     },
-    isContact() {
-      return this.userRoles.some((role) => ['doc_contact', 'tech_contact'].includes(role));
-    },
-    canAccessInstitution() {
-      return this.isAdmin || this.institutionFeatureEnabled;
-    },
-    canAccessMembers() {
-      return this.canAccessInstitution && (this.isAdmin || this.isInstitutionContact);
-    },
-    canAccessSushi() {
-      if (this.isAdmin) { return true; }
-
-      if (!this.institution?.validated) { return false; }
-      if (!this.sushiFeatureEnabled) { return false; }
-      if (!this.isInstitutionContact) { return false; }
-
-      return true;
-    },
-    institutionFeatureEnabled() {
-      return this.userRoles.includes('institution_form');
-    },
-    sushiFeatureEnabled() {
-      return this.userRoles.includes('sushi_form');
-    },
-    isInstitutionContact() {
-      if (!this.institution?.role) { return false; }
-      if (!this.isContact) { return false; }
-
-      return this.userRoles.includes(this.institution.role);
-    },
-  },
-
-  async mounted() {
-    if (!this.institutionFeatureEnabled && !this.sushiFeatureEnabled) { return; }
-
-    try {
-      this.institution = await this.$axios.$get('/institutions/self');
-    } catch (e) {
-      if (e.response?.status !== 404) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
-      }
-    }
   },
 };
 </script>

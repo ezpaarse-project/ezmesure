@@ -46,14 +46,12 @@
             :label="$t('institutions.members.documentaryCorrespondent')"
             value="contact:doc"
             hide-details
-            @change="handleContactChange"
           />
           <v-checkbox
             v-model="roles"
             :label="$t('institutions.members.technicalCorrespondent')"
             value="contact:tech"
             hide-details
-            @change="handleContactChange"
           />
         </v-card-text>
 

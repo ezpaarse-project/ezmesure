@@ -11,6 +11,7 @@
       </v-btn>
 
       <MemberSearch
+        v-if="canEditMemberships"
         :institution-id="institutionId"
         @select="(user) => updateMember({ user })"
       />
@@ -55,11 +56,37 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <MemberActions
-          :member="item"
-          @permissions="updateMember(item)"
-          @delete="removeMember(item)"
-        />
+        <v-menu>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>
+                mdi-cog
+              </v-icon>
+            </v-btn>
+          </template>
+
+          <v-list min-width="200">
+            <v-list-item
+              v-for="action in actions"
+              :key="action.icon"
+              :disabled="action.disabled"
+              @click="action.callback(item)"
+            >
+              <v-list-item-icon>
+                <v-icon>{{ action.icon }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ action.label }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
     </v-data-table>
 
@@ -88,7 +115,6 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
-import MemberActions from '~/components/MemberActions.vue';
 import MemberSearch from '~/components/MemberSearch.vue';
 import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
 import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
@@ -98,7 +124,6 @@ export default {
   middleware: ['auth', 'terms'],
   components: {
     ToolBar,
-    MemberActions,
     MemberSearch,
     MemberDeleteDialog,
     MemberUpdateDialog,
@@ -108,14 +133,8 @@ export default {
     store,
     params,
     app,
-    // $auth,
-    // redirect,
   }) {
     let institution = null;
-
-    // if (!$auth.hasScope('superuser') && !$auth.hasScope('institution_form')) {
-    //   return redirect({ name: 'myspace' });
-    // }
 
     try {
       institution = await $axios.$get(`/institutions/${params.id}`);
@@ -128,36 +147,9 @@ export default {
     }
 
     return {
-      valid: false,
-      lazy: false,
       refreshing: false,
       institution,
       members: [],
-      tableHeaders: [
-        {
-          text: app.i18n.t('institutions.members.name'),
-          value: 'user.fullName',
-        },
-        {
-          text: app.i18n.t('institutions.members.username'),
-          value: 'username',
-        },
-        {
-          text: app.i18n.t('institutions.members.permissions'),
-          value: 'readonly',
-        },
-        {
-          text: app.i18n.t('institutions.members.roles'),
-          value: 'roles',
-        },
-        {
-          text: app.i18n.t('actions'),
-          value: 'actions',
-          sortable: false,
-          width: '85px',
-          align: 'center',
-        },
-      ],
     };
   },
   computed: {
@@ -169,6 +161,68 @@ export default {
     },
     institutionId() {
       return this.institution?.id;
+    },
+    isAdmin() {
+      return this.$auth.user?.isAdmin;
+    },
+    userPermissions() {
+      const membership = this.$auth.user?.memberships?.find(
+        (m) => m?.institutionId === this.institution?.id,
+      );
+      return new Set(membership?.permissions);
+    },
+    canEditMemberships() {
+      return this.isAdmin || this.userPermissions.has('memberships:write');
+    },
+    canRevokeMemberships() {
+      return this.isAdmin || this.userPermissions.has('memberships:revoke');
+    },
+    isReadonly() {
+      return !this.isAdmin && !this.canEditMemberships && !this.canRevokeMemberships;
+    },
+    actions() {
+      return [
+        {
+          icon: 'mdi-shield',
+          label: this.$t('institutions.members.changePermissions'),
+          callback: this.updateMember,
+          disabled: !this.canEditMemberships,
+        },
+        {
+          icon: 'mdi-account-off',
+          label: this.$t('revoke'),
+          callback: this.removeMember,
+          disabled: !this.canRevokeMemberships,
+        },
+      ];
+    },
+    tableHeaders() {
+      const headers = [
+        {
+          text: this.$t('institutions.members.name'),
+          value: 'user.fullName',
+        },
+        {
+          text: this.$t('institutions.members.username'),
+          value: 'username',
+        },
+        {
+          text: this.$t('institutions.members.roles'),
+          value: 'roles',
+        },
+      ];
+
+      if (!this.isReadonly) {
+        headers.push({
+          text: this.$t('actions'),
+          value: 'actions',
+          sortable: false,
+          width: '85px',
+          align: 'center',
+        });
+      }
+
+      return headers;
     },
   },
   mounted() {

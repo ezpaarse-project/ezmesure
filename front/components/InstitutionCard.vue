@@ -12,7 +12,7 @@
           contain
         />
         <span v-else class="font-weight-light text--secondary">
-          Pas de logo
+          {{ $t('institutions.noLogo') }}
         </span>
       </v-sheet>
     </v-responsive>
@@ -37,7 +37,7 @@
         }}
       </v-chip>
 
-      <slot name="menu" />
+      <slot name="menu" :permissions="permissions" :validated="validated" />
     </v-card-text>
   </v-card>
 </template>
@@ -48,6 +48,10 @@ const defaultLogo = require('@/static/images/logo-etab.png');
 export default {
   props: {
     institution: {
+      type: Object,
+      default: () => ({}),
+    },
+    membership: {
       type: Object,
       default: () => ({}),
     },
@@ -89,8 +93,15 @@ export default {
     logoSrc() {
       return this.institution?.logoId && `/api/assets/logos/${this.institution.logoId}`;
     },
-    hasDomains() {
-      return Array.isArray(this.institution?.domains) && this.institution.domains.length > 0;
+    validated() {
+      return !!this.institution?.validated;
+    },
+    permissions() {
+      return new Set(
+        Array.isArray(this.membership?.permissions)
+          ? this.membership.permissions
+          : [],
+      );
     },
   },
 };

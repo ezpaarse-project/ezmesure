@@ -208,6 +208,7 @@
     "declareMyInstitution": "Déclarer mon établissement",
     "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
+    "noLogo": "Pas de logo",
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement *",
@@ -281,7 +282,7 @@
       "name": "Nom",
       "username": "Identifiant",
       "correspondent": "Correspondant",
-      "permissions": "Permissions Kibana",
+      "permissions": "Permissions",
       "read": "Lecture",
       "write": "Écriture",
       "updated": "Membre mis à jour",
@@ -310,7 +311,7 @@
         "guest": "Invité"
       },
       "featureLabels": {
-        "institution": "Données d'établissement",
+        "institution": "Fiche établissement",
         "memberships": "Membres",
         "sushi": "Identifiants SUSHI",
         "reporting": "Reporting"
@@ -319,7 +320,7 @@
         "institution:read": "Lecture",
         "institution:write": "Modification",
         "memberships:read": "Lecture",
-        "memberships:write": "Gestion des permissions",
+        "memberships:write": "Ajout et gestion des permissions",
         "memberships:revoke": "Révocation",
         "sushi:read": "Lecture",
         "sushi:write": "Ajout et modification",

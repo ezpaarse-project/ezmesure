@@ -208,6 +208,7 @@
     "declareMyInstitution": "Declare my institution",
     "declareNewInstitution": "Declare a new institution",
     "doesNotExist": "The institution you are trying to access is not registered.",
+    "noLogo": "No logo",
     "institution": {
       "title": "My institution",
       "name": "Institution name *",
@@ -281,7 +282,7 @@
       "name": "Name",
       "username": "Identifier",
       "correspondent": "Correspondent",
-      "permissions": "Kibana permissions",
+      "permissions": "Permissions",
       "read": "Read",
       "write": "Write",
       "updated": "Member updated",
@@ -310,7 +311,7 @@
         "guest": "Guest"
       },
       "featureLabels": {
-        "institution": "Institution data",
+        "institution": "Institution card",
         "memberships": "Members",
         "sushi": "SUSHI credentials"
       },
