@@ -540,6 +540,7 @@
     "newUser": "New user",
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
+    "createMailUserList": "New grouped mail",
     "user": {
       "saved": "User saved",
       "general": "General",

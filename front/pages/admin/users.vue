@@ -13,6 +13,13 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
+        <v-btn :href="userListMailLink" text>
+          <v-icon left>
+            mdi-email-multiple
+          </v-icon>
+          {{ $t('users.createMailUserList') }}
+        </v-btn>
+
         <v-btn text @click="deleteUsers">
           <v-icon left>
             mdi-delete
@@ -118,9 +125,6 @@ export default {
       selected: [],
       search: '',
       refreshing: false,
-      types: ['tech', 'doc'],
-      logo: null,
-      logoPreview: null,
       users: [],
     };
   },
@@ -151,6 +155,10 @@ export default {
           align: 'center',
         },
       ];
+    },
+    userListMailLink() {
+      const addresses = this.selected.map((user) => user.email).join(',');
+      return `mailto:${addresses}`;
     },
   },
   methods: {
