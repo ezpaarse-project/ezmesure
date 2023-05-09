@@ -44,6 +44,17 @@
           {{ $t('refresh') }}
         </v-btn>
 
+        <v-btn
+          text
+          color="black"
+          @click="showUsersFiltersDrawer = true"
+        >
+          <v-icon left>
+            mdi-filter
+          </v-icon>
+          {{ $t('filter') }}
+        </v-btn>
+
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -62,6 +73,7 @@
       :items="users"
       :search="search"
       :loading="refreshing"
+      :custom-filter="(value, search) => basicFilter(value, search)"
       sort-by="username"
       item-key="username"
       show-select
@@ -104,6 +116,7 @@
 
     <UserForm ref="userForm" @update="refreshUsers" />
     <UsersDeleteDialog ref="deleteDialog" @removed="onUsersRemove" />
+    <UsersFiltersDrawer v-model="filters" :show.sync="showUsersFiltersDrawer" />
   </section>
 </template>
 
@@ -111,6 +124,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import UserForm from '~/components/users/UserForm.vue';
 import UsersDeleteDialog from '~/components/users/UsersDeleteDialog.vue';
+import UsersFiltersDrawer from '~/components/users/UsersFiltersDrawer.vue';
 
 export default {
   layout: 'space',
@@ -119,13 +133,17 @@ export default {
     ToolBar,
     UserForm,
     UsersDeleteDialog,
+    UsersFiltersDrawer,
   },
   data() {
     return {
+      showUsersFiltersDrawer: false,
+
       selected: [],
       search: '',
       refreshing: false,
       users: [],
+      filters: {},
     };
   },
   mounted() {
@@ -143,13 +161,30 @@ export default {
     },
     tableHeaders() {
       return [
-        { text: this.$t('users.user.fullName'), value: 'fullName' },
-        { text: this.$t('users.user.username'), value: 'username' },
-        { text: this.$t('users.user.email'), value: 'email' },
-        { text: this.$t('users.user.isAdmin'), value: 'isAdmin' },
+        {
+          text: this.$t('users.user.fullName'),
+          value: 'fullName',
+          filter: (value) => this.basicStringFilter('fullName', value),
+        },
+        {
+          text: this.$t('users.user.username'),
+          value: 'username',
+          filter: (value) => this.basicStringFilter('username', value),
+        },
+        {
+          text: this.$t('users.user.email'),
+          value: 'email',
+          filter: (value) => this.basicStringFilter('email', value),
+        },
+        {
+          text: this.$t('users.user.isAdmin'),
+          value: 'isAdmin',
+          filter: (value) => this.filters.isAdmin === undefined || this.filters.isAdmin === value,
+        },
         {
           text: this.$t('actions'),
           value: 'actions',
+          filterable: false,
           sortable: false,
           width: '85px',
           align: 'center',
@@ -162,6 +197,27 @@ export default {
     },
   },
   methods: {
+    /**
+     * Basic filter applied by default to v-data-table
+     *
+     * @param {*} value The item's value
+     * @param {*} search The value searched
+     */
+    basicFilter(value, search) {
+      return value.toLowerCase().includes(search.toLowerCase());
+    },
+    /**
+     * Basic filter applied to fields using filter popups
+     *
+     * @param {string} field The filter's field
+     * @param {*} value The item's value
+     */
+    basicStringFilter(field, value) {
+      if (!this.filters[field]) {
+        return true;
+      }
+      return this.basicFilter(value, this.filters[field]);
+    },
     async refreshUsers() {
       this.refreshing = true;
 
