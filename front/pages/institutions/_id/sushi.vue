@@ -15,7 +15,6 @@
       />
 
       <v-btn
-        v-if="hasInstitution"
         color="primary"
         text
         :loading="refreshing"
@@ -28,7 +27,7 @@
       </v-btn>
 
       <v-btn
-        v-if="hasInstitution"
+        v-if="canEdit"
         color="primary"
         text
         @click.stop="createSushiItem"
@@ -99,7 +98,7 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="deleting || locked" @click="deleteSushiItems">
+        <v-list-item :disabled="deleting || locked || !canDelete" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
@@ -379,6 +378,18 @@ export default {
     isAdmin() {
       return this.$auth.user?.isAdmin;
     },
+    userPermissions() {
+      const membership = this.$auth.user?.memberships?.find(
+        (m) => m?.institutionId === this.institution?.id,
+      );
+      return new Set(membership?.permissions);
+    },
+    canEdit() {
+      return this.isAdmin || this.userPermissions.has('sushi:write');
+    },
+    canDelete() {
+      return this.isAdmin || this.userPermissions.has('sushi:delete');
+    },
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
       return Array.isArray(messages) && messages.length >= 1;
@@ -433,34 +444,25 @@ export default {
     hasSelection() {
       return this.selected.length > 0;
     },
-    hasUntestedItems() {
-      return this.untestedItems.length > 0;
-    },
-    untestedItems() {
-      return this.sushiItems.filter((item) => (typeof item?.connection?.success !== 'boolean'));
-    },
-    testingConnection() {
-      return Object.keys(this.loadingItems).length > 0;
-    },
     itemActions() {
       const actions = [
         {
           icon: 'mdi-pencil',
           label: this.$t('modify'),
           callback: this.editSushiItem,
-          disabled: this.locked,
+          disabled: this.locked || !this.canEdit,
         },
         {
           icon: 'mdi-content-copy',
           label: this.$t('duplicate'),
           callback: this.duplicateItem,
-          disabled: this.locked,
+          disabled: this.locked || !this.canEdit,
         },
         {
           icon: 'mdi-delete',
           label: this.$t('delete'),
           callback: this.deleteSushiItem,
-          disabled: this.deleting,
+          disabled: this.deleting || !this.canDelete,
         },
         {
           divider: true,
@@ -474,7 +476,7 @@ export default {
           icon: 'mdi-file-tree',
           label: this.$t('sushi.showFiles'),
           callback: this.showSushiItemFiles,
-          onlyAdmin: true,
+          hide: !this.isAdmin,
         },
         {
           icon: 'mdi-history',
@@ -488,7 +490,7 @@ export default {
         },
       ];
 
-      return actions.filter((action) => this.isAdmin || !action.onlyAdmin);
+      return actions.filter((action) => !action.hide);
     },
   },
   mounted() {
