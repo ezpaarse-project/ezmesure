@@ -5,7 +5,7 @@
     <AppBar />
 
     <v-main>
-      <v-card flat tile color="transparent">
+      <v-card flat tile color="transparent" style="height: 100%;">
         <nuxt />
       </v-card>
     </v-main>

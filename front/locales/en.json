@@ -115,7 +115,6 @@
     "details": "Details",
     "failedToLoad": "Failed to load activity",
     "noActivity": "This period has no registered activity",
-    "filter": "Filter",
     "actionTypes": {
       "users": "Users",
       "files": "Files",
@@ -540,6 +539,8 @@
     "newUser": "New user",
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
+    "createMailUserList": "New grouped mail",
+    "filtersTitle": "Filter users",
     "user": {
       "saved": "User saved",
       "general": "General",
@@ -593,6 +594,7 @@
   "save": "Save",
   "search": "Search",
   "apply": "Apply",
+  "filter": "Filter",
   "fixIt": "Fix it",
   "leaveIt": "Leave it as is",
   "nSelected": "{count} selected",

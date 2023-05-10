@@ -236,7 +236,7 @@
                 <v-icon left>
                   mdi-filter
                 </v-icon>
-                {{ $t('activity.filter') }}
+                {{ $t('filter') }}
               </v-btn>
             </v-card-actions>
           </v-card>
