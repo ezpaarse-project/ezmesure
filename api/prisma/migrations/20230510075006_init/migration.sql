@@ -38,10 +38,9 @@ CREATE TABLE "User" (
 CREATE TABLE "Membership" (
     "username" TEXT NOT NULL,
     "institutionId" TEXT NOT NULL,
-    "isDocContact" BOOLEAN NOT NULL DEFAULT false,
-    "isTechContact" BOOLEAN NOT NULL DEFAULT false,
-    "isGuest" BOOLEAN NOT NULL DEFAULT false,
+    "roles" TEXT[],
     "permissions" TEXT[],
+    "locked" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Membership_pkey" PRIMARY KEY ("username","institutionId")
 );
@@ -49,7 +48,7 @@ CREATE TABLE "Membership" (
 -- CreateTable
 CREATE TABLE "Space" (
     "id" TEXT NOT NULL,
-    "institutionId" TEXT NOT NULL,
+    "institutionId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "type" VARCHAR(50) NOT NULL,
@@ -60,6 +59,7 @@ CREATE TABLE "Space" (
 -- CreateTable
 CREATE TABLE "SpacePermission" (
     "username" TEXT NOT NULL,
+    "institutionId" TEXT NOT NULL,
     "spaceId" TEXT NOT NULL,
     "readonly" BOOLEAN NOT NULL DEFAULT false,
     "locked" BOOLEAN NOT NULL DEFAULT false,
@@ -70,7 +70,7 @@ CREATE TABLE "SpacePermission" (
 -- CreateTable
 CREATE TABLE "Repository" (
     "id" TEXT NOT NULL,
-    "institutionId" TEXT NOT NULL,
+    "institutionId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "pattern" TEXT NOT NULL,
@@ -82,6 +82,7 @@ CREATE TABLE "Repository" (
 -- CreateTable
 CREATE TABLE "RepositoryPermission" (
     "username" TEXT NOT NULL,
+    "institutionId" TEXT NOT NULL,
     "repositoryId" TEXT NOT NULL,
     "readonly" BOOLEAN NOT NULL DEFAULT false,
     "locked" BOOLEAN NOT NULL DEFAULT false,
@@ -110,6 +111,7 @@ CREATE TABLE "HarvestJob" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" TEXT NOT NULL,
+    "params" JSONB NOT NULL,
     "runningTime" INTEGER NOT NULL,
     "result" JSONB NOT NULL,
 
@@ -209,7 +211,7 @@ ALTER TABLE "Membership" ADD CONSTRAINT "Membership_institutionId_fkey" FOREIGN 
 ALTER TABLE "Space" ADD CONSTRAINT "Space_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_username_fkey" FOREIGN KEY ("username") REFERENCES "User"("username") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_username_institutionId_fkey" FOREIGN KEY ("username", "institutionId") REFERENCES "Membership"("username", "institutionId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -218,7 +220,7 @@ ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_spaceId_fkey" FORE
 ALTER TABLE "Repository" ADD CONSTRAINT "Repository_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_username_fkey" FOREIGN KEY ("username") REFERENCES "User"("username") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_username_institutionId_fkey" FOREIGN KEY ("username", "institutionId") REFERENCES "Membership"("username", "institutionId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_repositoryId_fkey" FOREIGN KEY ("repositoryId") REFERENCES "Repository"("id") ON DELETE CASCADE ON UPDATE CASCADE;
