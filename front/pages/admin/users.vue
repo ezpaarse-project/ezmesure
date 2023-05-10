@@ -86,9 +86,10 @@
 
       <template #[`item.memberships`]="{ item }">
         <v-chip
-          v-if="Array.isArray(item.memberships)"
+          v-if="Array.isArray(item.memberships) && item.memberships.length > 0"
           small
           class="elevation-1"
+          @click="$refs.membershipsDialog.display(item)"
         >
           {{ $tc('users.user.membershipsCount', item.memberships.length) }}
 
@@ -136,6 +137,7 @@
       :roles="availableMembershipsData.roles"
       :permissions="availableMembershipsData.permissions"
     />
+    <MembershipsDialog ref="membershipsDialog" />
   </section>
 </template>
 
@@ -144,6 +146,7 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import UserForm from '~/components/users/UserForm.vue';
 import UsersDeleteDialog from '~/components/users/UsersDeleteDialog.vue';
 import UsersFiltersDrawer from '~/components/users/UsersFiltersDrawer.vue';
+import MembershipsDialog from '~/components/users/MembershipsDialog.vue';
 
 export default {
   layout: 'space',
@@ -152,6 +155,7 @@ export default {
     ToolBar,
     UserForm,
     UsersDeleteDialog,
+    MembershipsDialog,
     UsersFiltersDrawer,
   },
   data() {
@@ -304,7 +308,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.users = await this.$axios.$get('/users', { params: { source: '*', include: 'memberships' } });
+        this.users = await this.$axios.$get('/users', { params: { source: '*', include: 'memberships.institution' } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('users.unableToFetchInformations'));
       }
