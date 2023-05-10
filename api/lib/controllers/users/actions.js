@@ -22,6 +22,9 @@ exports.getUser = async (ctx) => {
 
 exports.list = async (ctx) => {
   const { user } = ctx.state;
+  const {
+    include: propsToInclude,
+  } = ctx.query;
 
   const {
     q: search = '',
@@ -41,9 +44,16 @@ exports.list = async (ctx) => {
     select = undefined;
   }
 
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
   const { data: users } = await usersService.findMany({
     take: Number.parseInt(size, 10),
     select,
+    include,
     where: {
       OR: [
         { username: { contains: search, mode: 'insensitive' } },
