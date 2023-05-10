@@ -34,17 +34,17 @@
           <v-text-field
             :value="value.fullName"
             :label="$t('users.user.fullName')"
+            prepend-icon="mdi-account"
             hide-details
             @input="onFilterUpdate('fullName', $event)"
           />
         </v-col>
-      </v-row>
 
-      <v-row>
         <v-col>
           <v-text-field
             :value="value.username"
             :label="$t('users.user.username')"
+            prepend-icon="mdi-account-outline"
             hide-details
             @input="onFilterUpdate('username', $event)"
           />
@@ -56,18 +56,19 @@
           <v-text-field
             :value="value.email"
             :label="$t('users.user.email')"
+            prepend-icon="mdi-email"
             hide-details
             @input="onFilterUpdate('email', $event)"
           />
         </v-col>
-      </v-row>
 
-      <v-row>
         <v-col>
           <v-select
             :value="value.isAdmin"
             :items="nullableBooleanOptions"
             :label="$t('users.user.isAdmin')"
+            prepend-icon="mdi-security"
+            hide-details
             @change="onFilterUpdate('isAdmin', typeof $event === 'boolean' ? $event : undefined)"
           />
         </v-col>
@@ -79,10 +80,15 @@
             :value="value.permissions"
             :items="permissions"
             :label="$t('users.user.permissions')"
+            prepend-icon="mdi-key"
             multiple
-            small-chips
+            hide-details
             @change="onFilterUpdate('permissions', $event)"
-          />
+          >
+            <template #selection="{ item }">
+              <UserTagChip :tag="item" />
+            </template>
+          </v-select>
         </v-col>
       </v-row>
 
@@ -92,9 +98,31 @@
             :value="value.roles"
             :items="roles"
             :label="$t('users.user.roles')"
+            prepend-icon="mdi-tag"
+            multiple
+            hide-details
+            @change="onFilterUpdate('roles', $event)"
+          >
+            <template #selection="{ item }">
+              <UserTagChip :tag="item" />
+            </template>
+          </v-select>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <v-select
+            :value="value.institutions"
+            :items="institutions"
+            :label="$t('users.user.memberships')"
+            prepend-icon="mdi-domain"
+            item-text="acronym"
+            item-value="id"
             multiple
             small-chips
-            @change="onFilterUpdate('roles', $event)"
+            hide-details
+            @change="onFilterUpdate('institutions', $event)"
           />
         </v-col>
       </v-row>
@@ -103,7 +131,12 @@
 </template>
 
 <script>
+import UserTagChip from './UserTagChip.vue';
+
 export default {
+  components: {
+    UserTagChip,
+  },
   props: {
     value: {
       type: Object,
@@ -112,6 +145,10 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    institutions: {
+      type: Array,
+      default: () => [],
     },
     permissions: {
       type: Array,

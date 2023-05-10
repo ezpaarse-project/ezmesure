@@ -134,6 +134,7 @@
     <UsersFiltersDrawer
       v-model="filters"
       :show.sync="showUsersFiltersDrawer"
+      :institutions="availableMembershipsData.institutions"
       :roles="availableMembershipsData.roles"
       :permissions="availableMembershipsData.permissions"
     />
@@ -235,6 +236,7 @@ export default {
         memberships,
         permissions: [...new Set(data.permissions)],
         roles: [...new Set(data.roles)],
+        institutions: [...data.institutions.values()],
       };
     },
     userListMailLink() {
@@ -281,6 +283,11 @@ export default {
         shouldItemShow = this.filters.roles.some((r) => data.roles.has(r));
       }
 
+      // Filter by institution
+      if (this.filters.institutions?.length > 0 && shouldItemShow) {
+        shouldItemShow = this.filters.institutions.some((id) => data.institutions.has(id));
+      }
+
       return shouldItemShow;
     },
     /**
@@ -288,20 +295,26 @@ export default {
      *
      * @param {any[]} memberships The user's memberships
      *
-     * @returns user's permissions, roles
+     * @returns user's permissions, roles, institutions
      */
     extractMembershipsData(memberships) {
       const permissions = [];
       const roles = [];
+      const institutions = new Map();
       // eslint-disable-next-line no-restricted-syntax
-      for (const membership of memberships) {
+      for (const membership of (memberships ?? [])) {
         permissions.push(...(membership.permissions ?? []));
         roles.push(...(membership.roles ?? []));
+
+        if (membership.institution) {
+          institutions.set(membership.institution.id, membership.institution);
+        }
       }
 
       return {
         permissions: new Set(permissions),
         roles: new Set(roles),
+        institutions,
       };
     },
     async refreshUsers() {
