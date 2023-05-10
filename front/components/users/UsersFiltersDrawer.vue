@@ -72,6 +72,32 @@
           />
         </v-col>
       </v-row>
+
+      <v-row>
+        <v-col>
+          <v-select
+            :value="value.permissions"
+            :items="permissions"
+            :label="$t('users.user.permissions')"
+            multiple
+            small-chips
+            @change="onFilterUpdate('permissions', $event)"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <v-select
+            :value="value.roles"
+            :items="roles"
+            :label="$t('users.user.roles')"
+            multiple
+            small-chips
+            @change="onFilterUpdate('roles', $event)"
+          />
+        </v-col>
+      </v-row>
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -86,6 +112,14 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    permissions: {
+      type: Array,
+      default: () => [],
+    },
+    roles: {
+      type: Array,
+      default: () => [],
     },
   },
   emits: ['input', 'update:show'],

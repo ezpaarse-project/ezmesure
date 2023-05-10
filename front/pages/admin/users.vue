@@ -73,7 +73,7 @@
       :items="users"
       :search="search"
       :loading="refreshing"
-      :custom-filter="(value, search) => basicFilter(value, search)"
+      :custom-filter="basicFilter"
       sort-by="username"
       item-key="username"
       show-select
@@ -82,6 +82,20 @@
         <v-icon v-if="item.isAdmin">
           mdi-security
         </v-icon>
+      </template>
+
+      <template #[`item.memberships`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.memberships)"
+          small
+          class="elevation-1"
+        >
+          {{ $tc('users.user.membershipsCount', item.memberships.length) }}
+
+          <v-icon right small>
+            mdi-domain
+          </v-icon>
+        </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -116,7 +130,12 @@
 
     <UserForm ref="userForm" @update="refreshUsers" />
     <UsersDeleteDialog ref="deleteDialog" @removed="onUsersRemove" />
-    <UsersFiltersDrawer v-model="filters" :show.sync="showUsersFiltersDrawer" />
+    <UsersFiltersDrawer
+      v-model="filters"
+      :show.sync="showUsersFiltersDrawer"
+      :roles="availableMembershipsData.roles"
+      :permissions="availableMembershipsData.permissions"
+    />
   </section>
 </template>
 
@@ -182,6 +201,11 @@ export default {
           filter: (value) => this.filters.isAdmin === undefined || this.filters.isAdmin === value,
         },
         {
+          text: this.$t('users.user.memberships'),
+          value: 'memberships',
+          filter: (value) => this.membershipsFilter(value),
+        },
+        {
           text: this.$t('actions'),
           value: 'actions',
           filterable: false,
@@ -190,6 +214,24 @@ export default {
           align: 'center',
         },
       ];
+    },
+    availableMembershipsData() {
+      if (!Array.isArray(this.users)) {
+        return [];
+      }
+
+      const memberships = this.users
+        .filter((u) => Array.isArray(u.memberships))
+        .map((u) => u.memberships)
+        .flat();
+
+      const data = this.extractMembershipsData(memberships);
+
+      return {
+        memberships,
+        permissions: [...new Set(data.permissions)],
+        roles: [...new Set(data.roles)],
+      };
     },
     userListMailLink() {
       const addresses = this.selected.map((user) => user.email).join(',');
@@ -218,11 +260,51 @@ export default {
       }
       return this.basicFilter(value, this.filters[field]);
     },
+    /**
+     * Filter applied to memberships
+     */
+    membershipsFilter(value) {
+      const data = this.extractMembershipsData(value);
+
+      let shouldItemShow = true;
+      // Filter by permissions
+      if (this.filters.permissions?.length > 0 && shouldItemShow) {
+        shouldItemShow = this.filters.permissions.some((p) => data.permissions.has(p));
+      }
+
+      // Filter by roles
+      if (this.filters.roles?.length > 0 && shouldItemShow) {
+        shouldItemShow = this.filters.roles.some((r) => data.roles.has(r));
+      }
+
+      return shouldItemShow;
+    },
+    /**
+     * Parse user's memberships to extract some data about user
+     *
+     * @param {any[]} memberships The user's memberships
+     *
+     * @returns user's permissions, roles
+     */
+    extractMembershipsData(memberships) {
+      const permissions = [];
+      const roles = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const membership of memberships) {
+        permissions.push(...(membership.permissions ?? []));
+        roles.push(...(membership.roles ?? []));
+      }
+
+      return {
+        permissions: new Set(permissions),
+        roles: new Set(roles),
+      };
+    },
     async refreshUsers() {
       this.refreshing = true;
 
       try {
-        this.users = await this.$axios.$get('/users', { params: { source: '*' } });
+        this.users = await this.$axios.$get('/users', { params: { source: '*', include: 'memberships' } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('users.unableToFetchInformations'));
       }

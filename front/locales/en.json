@@ -551,7 +551,11 @@
       "fullName": "Full name",
       "username": "Username",
       "email": "Email address",
-      "isAdmin": "Is Administrator ?"
+      "isAdmin": "Is Administrator ?",
+      "memberships": "Institutions",
+      "membershipsCount": "{count} institution|{count} institutions",
+      "roles": "Roles",
+      "permissions": "Permissions"
     }
   },
   "report": {
