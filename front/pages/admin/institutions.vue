@@ -65,6 +65,21 @@
         </nuxt-link>
       </template>
 
+      <template #[`item.memberships`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.memberships)"
+          small
+          class="elevation-1"
+          :to="`/institutions/${item.id}/members`"
+        >
+          {{ $tc('institutions.institution.membersCount', item.memberships.length) }}
+
+          <v-icon right small>
+            mdi-open-in-app
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.repositories`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.repositories)"
@@ -237,6 +252,7 @@ export default {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
+        { text: this.$t('institutions.institution.members'), value: 'memberships' },
         { text: this.$t('repositories.repositories'), value: 'repositories' },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
@@ -259,7 +275,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.institutions = await this.$axios.$get('/institutions', { params: { include: 'repositories' } });
+        this.institutions = await this.$axios.$get('/institutions', { params: { include: ['repositories', 'memberships'] } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }

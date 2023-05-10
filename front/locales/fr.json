@@ -211,6 +211,8 @@
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement *",
+      "members": "Membres",
+      "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
       "nameError": "Veuillez saisir un nom d'établissement.",
       "indexCount": "Évènements de consultations indexés",
