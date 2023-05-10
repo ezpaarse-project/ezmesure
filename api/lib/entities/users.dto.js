@@ -44,6 +44,7 @@ const immutableFields = Object.fromEntries(
  */
 const includableFields = [
   'memberships',
+  'memberships.institution',
   'historyEntries',
 ];
 

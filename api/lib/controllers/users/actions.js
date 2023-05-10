@@ -47,7 +47,17 @@ exports.list = async (ctx) => {
   let include;
 
   if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+    include = Object.fromEntries(
+      propsToInclude.map(
+        (prop) => {
+          const [parent, child] = prop.split('.', 2);
+          if (child) {
+            return [parent, { include: { [child]: true } }];
+          }
+          return [prop, true];
+        },
+      ),
+    );
   }
 
   const { data: users } = await usersService.findMany({
