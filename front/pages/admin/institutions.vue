@@ -75,7 +75,7 @@
           {{ $tc('institutions.institution.membersCount', item.memberships.length) }}
 
           <v-icon right small>
-            mdi-open-in-app
+            mdi-account-multiple
           </v-icon>
         </v-chip>
       </template>
@@ -246,7 +246,7 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('menu.institutions');
+      return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
     },
     tableHeaders() {
       return [

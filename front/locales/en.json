@@ -199,6 +199,7 @@
     "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
+    "toolbarTitle": "Institutions ({count})",
     "title": "Institution",
     "updateInstitution": "Update institution",
     "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
@@ -536,6 +537,7 @@
     "textCopied": "Text copied in the clipboard"
   },
   "users": {
+    "toolbarTitle": "Users ({count})",
     "updateUser": "Update user",
     "deleteNbUsers": "You are about to delete {number} users. The associated indices, spaces and roles will not be affected.",
     "newUser": "New user",

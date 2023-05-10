@@ -199,6 +199,7 @@
     "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
+    "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
     "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
@@ -536,6 +537,7 @@
     "textCopied": "Texte copié dans le presse-papier"
   },
   "users": {
+    "toolbarTitle": "Utilisateurs ({count})",
     "updateUser": "Mettre à jour l'utilisateur",
     "deleteNbUsers": "Vous allez supprimer {number} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
     "newUser": "Nouvel utilisateur",

@@ -157,7 +157,7 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('menu.users');
+      return this.$t('users.toolbarTitle', { count: this.users?.length ?? '?' });
     },
     tableHeaders() {
       return [
