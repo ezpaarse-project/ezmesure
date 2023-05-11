@@ -8,7 +8,7 @@ const {
   MEMBER_ROLES: {
     docContact: DOC_CONTACT,
     techContact: TECH_CONTACT,
-  }
+  },
 } = require('./memberships.dto');
 
 /* eslint-disable max-len */

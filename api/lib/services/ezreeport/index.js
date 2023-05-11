@@ -49,12 +49,15 @@ async function syncNamespaces() {
     id: i.id,
     name: i.name,
     logoId: i.logoId || undefined,
-    fetchLogin: {},
+    fetchLogin: { elastic: { username: `report.${i.id}` } },
     fetchOptions: {},
-    members: i?.memberships.map((m) => ({
-      access: 'READ_WRITE',
-      username: m.username,
-    })),
+    members: i?.memberships
+      // Only keeping users which have access to reporting
+      .filter((m) => !!m.permissions.find((p) => /^reporting:/.test(p)))
+      .map((m) => ({
+        access: m.permissions.find((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
+        username: m.username,
+      })),
   })));
 
   const namespacesResults = data?.content?.namespaces?.reduce?.((acc, namespace) => {
