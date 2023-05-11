@@ -63,14 +63,31 @@
         </v-col>
 
         <v-col>
-          <v-select
-            :value="value.isAdmin"
-            :items="nullableBooleanOptions"
-            :label="$t('users.user.isAdmin')"
+          <v-input
             prepend-icon="mdi-security"
             hide-details
-            @change="onFilterUpdate('isAdmin', typeof $event === 'boolean' ? $event : undefined)"
-          />
+            style="padding-top: 12px; margin-top: 4px;"
+          >
+            <v-label class="button-group-label">
+              {{ $t('users.user.isAdmin') }}
+            </v-label>
+
+            <v-btn-toggle
+              :value="value.isAdmin"
+              dense
+              rounded
+              color="primary"
+              @change="onFilterUpdate('isAdmin', $event)"
+            >
+              <v-btn :value="true" small outlined>
+                {{ $t('yes') }}
+              </v-btn>
+
+              <v-btn :value="false" small outlined>
+                {{ $t('no') }}
+              </v-btn>
+            </v-btn-toggle>
+          </v-input>
         </v-col>
       </v-row>
 
@@ -160,35 +177,11 @@ export default {
     },
   },
   emits: ['input', 'update:show'],
-  computed: {
-    nullableBooleanOptions() {
-      return [
-        { text: '', value: undefined },
-        { text: this.$t('yes'), value: true },
-        { text: this.$t('no'), value: false },
-      ];
-    },
-  },
   methods: {
     onFilterUpdate(field, val) {
       const filters = { ...this.value };
       filters[field] = val;
       this.$emit('input', filters);
-    },
-    onThreeStateClick(field) {
-      let val = this.value[field];
-      switch (val) {
-        case true:
-          val = false;
-          break;
-        case false:
-          val = undefined;
-          break;
-        default:
-          val = true;
-          break;
-      }
-      this.onFilterUpdate(field, val);
     },
     clearFilters() {
       this.$emit('input', {});
@@ -197,3 +190,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.button-group-label {
+  position: absolute !important;
+  max-width: 133%;
+  transform-origin: top left;
+  transform: translateY(-16px) scale(.75);
+}
+
+.button-group-label + * {
+  transform: translateY(5px)
+}
+</style>
