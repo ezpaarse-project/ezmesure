@@ -12,7 +12,7 @@ async function upsertNamespaceFromInstitution(institution) {
   const body = {
     name: institution.name,
     logoId: institution.logoId,
-    fetchLogin: {},
+    fetchLogin: { elastic: { username: `report.${institution.id}` } },
     fetchOptions: {},
   };
   const { data } = await ezrAxios.put(`/admin/namespaces/${institution.id}`, body);

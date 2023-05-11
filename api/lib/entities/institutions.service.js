@@ -1,9 +1,10 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
 const ezrNamespaces = require('../services/ezreeport/namespaces');
+const elastic = require('../services/elastic/users');
 
 /* eslint-disable max-len */
-/** @typedef {Map<'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
+/** @typedef {Map<'ezreeport' | 'ezreeport-user', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
 /** @typedef {import('@prisma/client').Institution} Institution */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs */
@@ -29,6 +30,20 @@ module.exports = class InstitutionsService {
         syncMap.set('ezreeport', true);
       } catch (error) {
         syncMap.set('ezreeport', error);
+      }
+
+      // Create reporting user
+      try {
+        // TODO: DO NOT CREATE USER IF EXISTS
+        // TODO: Give rights to institution indexs
+        await elastic.createUser({
+          username: `report.${institution.id}`,
+          email: 'noreply.report@ezmesure.couperin.org',
+          fullName: `Reporting ${institution.acronym ?? institution.id}`,
+        });
+        syncMap.set('ezreeport-user', true);
+      } catch (error) {
+        syncMap.set('ezreeport-user', error);
       }
     }
 
@@ -77,6 +92,14 @@ module.exports = class InstitutionsService {
       } catch (error) {
         syncMap.set('ezreeport', error);
       }
+
+      // Delete reporting user
+      try {
+        await elastic.deleteUser(`report.${institution.id}`);
+        syncMap.set('ezreeport-user', true);
+      } catch (error) {
+        syncMap.set('ezreeport-user', error);
+      }
     }
 
     return {
@@ -108,6 +131,14 @@ module.exports = class InstitutionsService {
       } catch (error) {
         syncMap.set('ezreeport', error);
       }
+
+      // Delete reporting user
+      try {
+        await elastic.deleteUser(`report.${institution.id}`);
+        syncMap.set('ezreeport-user', true);
+      } catch (error) {
+        syncMap.set('ezreeport-user', error);
+      }
     }
 
     return {
@@ -130,6 +161,14 @@ module.exports = class InstitutionsService {
       syncMap.set('ezreeport', true);
     } catch (error) {
       syncMap.set('ezreeport', error);
+    }
+
+    // Delete reporting user
+    try {
+      await elastic.deleteUser(`report.${institution.id}`);
+      syncMap.set('ezreeport-user', true);
+    } catch (error) {
+      syncMap.set('ezreeport-user', error);
     }
 
     return {
