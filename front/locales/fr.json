@@ -303,6 +303,7 @@
       "failedToUpdatePerms": "La mise à jour des permissions a échoué",
       "locked": "Empêcher la modification du membre",
       "notEditable": "Ce membre n'est pas modifiable",
+      "accessRights": "Droits d'accès",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Contact documentaire",
@@ -564,6 +565,11 @@
     "noRepository": "Aucun dépôt n'est encore attribué",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "Aucun",
+    "read": "Lecture",
+    "write": "Lecture / Écriture"
   },
   "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",

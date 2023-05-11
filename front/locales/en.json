@@ -303,6 +303,7 @@
       "failedToUpdatePerms": "Failed to update user permissions",
       "locked": "Prevent member modification",
       "notEditable": "This member is not editable",
+      "accessRights": "Access rights",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Documentary contact",
@@ -564,6 +565,11 @@
     "noRepository": "No repositories has been assigned yet",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "None",
+    "read": "Read",
+    "write": "Read / Write"
   },
   "anErrorOccurred": "An error occurred",
   "url": "URL",

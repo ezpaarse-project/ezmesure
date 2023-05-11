@@ -29,7 +29,6 @@
           selected-color="primary"
           selectable
           dense
-          open-all
         />
       </v-card-text>
 
