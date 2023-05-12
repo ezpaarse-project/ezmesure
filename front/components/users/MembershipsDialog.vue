@@ -82,7 +82,6 @@
 </template>
 
 <script>
-import chroma from 'chroma-js';
 import UserTagChip from './UserTagChip.vue';
 
 export default {
@@ -97,66 +96,10 @@ export default {
       scopeColors: {},
     };
   },
-  computed: {
-    tags() {
-      const tagsSet = new Set();
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const membership of this.memberships) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const tag of membership.roles) {
-          tagsSet.add(tag);
-          this.generateColorForTag(tag);
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const tag of membership.permissions) {
-          tagsSet.add(tag);
-          this.generateColorForTag(tag);
-        }
-      }
-
-      return [...tagsSet];
-    },
-    tagColors() {
-      const res = {};
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const tag of this.tags) {
-        const [scope] = tag.split(':', 2);
-        res[tag] = this.scopeColors[scope];
-      }
-
-      return res;
-    },
-  },
   methods: {
     display(user) {
       this.memberships = Array.isArray(user?.memberships) ? user.memberships : [];
       this.show = true;
-    },
-    generateColorForTag(tag) {
-      const [scope] = tag.split(':', 2);
-      if (!scope) {
-        return '';
-      }
-
-      if (!this.scopeColors[scope]) {
-        // https://stackoverflow.com/a/3426956
-        let hash = 0;
-        for (let i = 0; i < scope.length; i += 1) {
-          // eslint-disable-next-line no-bitwise
-          hash = scope.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        // eslint-disable-next-line no-bitwise
-        const color = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-        const background = '#00000'.substring(0, 7 - color.length) + color;
-        this.scopeColors[scope] = {
-          background,
-          color: chroma.contrast(background, 'black') < 5 ? 'white' : 'black',
-        };
-      }
-
-      return this.scopeColors[scope];
     },
   },
 };
