@@ -1,3 +1,4 @@
+// @ts-check
 const ezrAxios = require('./axios');
 
 /** @typedef {import('@prisma/client').Institution} Institution */
@@ -6,13 +7,13 @@ const ezrAxios = require('./axios');
  * Updates (or create) a namespace in ezREEPORT from an ezMESURE's institution
  *
  * @param {Institution} institution
- * @returns The created namespace
+ * @returns The updated/created namespace
  */
 async function upsertNamespaceFromInstitution(institution) {
   const body = {
     name: institution.name,
-    logoId: institution.logoId,
-    fetchLogin: {},
+    logoId: institution.logoId || undefined,
+    fetchLogin: { elastic: { username: `report.${institution.id}` } },
     fetchOptions: {},
   };
   const { data } = await ezrAxios.put(`/admin/namespaces/${institution.id}`, body);

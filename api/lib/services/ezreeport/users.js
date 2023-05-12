@@ -1,3 +1,4 @@
+// @ts-check
 const ezrAxios = require('./axios');
 
 /** @typedef {import('@prisma/client').User} User */

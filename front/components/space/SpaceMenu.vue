@@ -78,14 +78,23 @@ export default {
       return this.$config.shibbolethEnabled ? '/Shibboleth.sso/Logout?return=/logout' : '/logout';
     },
     links() {
-      return [
+      const links = [
         { title: this.$t('menu.profile'), href: '/myspace' },
         { title: this.$t('menu.myDeposits'), href: '/files' },
-        { title: this.$t('menu.report'), href: '/report' },
         { title: this.$t('menu.kibanIdentifiers'), href: '/kibana' },
         { title: this.$t('menu.authentificationToken'), href: '/token' },
         { title: this.$t('menu.myInstitutions'), href: '/my-institutions' },
       ];
+
+      // Add reporting link if user have permission on at least one institution or if admin
+      if (
+        this.$auth?.user?.isAdmin
+        || this.$auth?.user?.memberships?.some((m) => m.permissions.includes('reporting:read'))
+      ) {
+        links.splice(2, 0, { title: this.$t('menu.report'), href: '/report' });
+      }
+
+      return links;
     },
     administration() {
       return {

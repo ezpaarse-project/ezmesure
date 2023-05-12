@@ -23,7 +23,7 @@ const requireUser = async (ctx, next) => {
     return;
   }
 
-  const { data: user } = await usersService.findUnique({ where: { username } });
+  const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -109,7 +109,7 @@ function fetchModel(modelName, opts = {}) {
               where: { username },
             },
           },
-        })).data;
+        }));
         break;
 
       case 'sushi-endpoint':

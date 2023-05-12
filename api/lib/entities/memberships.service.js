@@ -1,14 +1,17 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
+const hooks = require('../hooks');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Membership} Membership */
-/** @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').Membership} Membership
+ * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ */
 /* eslint-enable max-len */
 
 module.exports = class MembershipsService {
@@ -16,8 +19,12 @@ module.exports = class MembershipsService {
    * @param {MembershipCreateArgs} params
    * @returns {Promise<Membership>}
    */
-  static create(params) {
-    return prisma.membership.create(params);
+  static async create(params) {
+    const membership = await prisma.membership.create(params);
+
+    hooks.emit('membership:upsert', membership);
+
+    return membership;
   }
 
   /**
@@ -40,23 +47,35 @@ module.exports = class MembershipsService {
    * @param {MembershipUpdateArgs} params
    * @returns {Promise<Membership>}
    */
-  static update(params) {
-    return prisma.membership.update(params);
+  static async update(params) {
+    const membership = await prisma.membership.update(params);
+
+    hooks.emit('membership:upsert', membership);
+
+    return membership;
   }
 
   /**
    * @param {MembershipUpsertArgs} params
    * @returns {Promise<Membership>}
    */
-  static upsert(params) {
-    return prisma.membership.upsert(params);
+  static async upsert(params) {
+    const membership = await prisma.membership.upsert(params);
+
+    hooks.emit('membership:upsert', membership);
+
+    return membership;
   }
 
   /**
    * @param {MembershipDeleteArgs} params
    * @returns {Promise<Membership>}
    */
-  static delete(params) {
-    return prisma.membership.delete(params);
+  static async delete(params) {
+    const membership = await prisma.membership.delete(params);
+
+    hooks.emit('membership:delete', membership);
+
+    return membership;
   }
 };

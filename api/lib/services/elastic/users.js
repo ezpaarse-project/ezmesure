@@ -51,6 +51,27 @@ exports.createUser = async function createUser(user) {
 };
 
 /**
+ * Get user in elastic
+ *
+ * @param {string} username User's username
+ *
+ * @returns {Promise<Object | null>} The user found, or null if not
+ */
+exports.getUserByUsername = async function getUserByUsername(username) {
+  try {
+    const { body } = await elastic.security.getUser({
+      username,
+    });
+    return body[username];
+  } catch (error) {
+    if (error.statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+/**
  * Update user in elastic.
  *
  * @param {Object} user - Config of user.
@@ -79,6 +100,5 @@ exports.updateUser = function updateUser(user) {
  * @returns {Promise<Object>} Deleted user.
  */
 exports.deleteUser = function deleteUser(username) {
-  // TODO check if user exist
   return elastic.security.deleteUser({ username });
 };

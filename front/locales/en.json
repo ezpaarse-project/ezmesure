@@ -564,6 +564,7 @@
     "health": "Health status",
     "admin": {
       "taskTab": "Task administration",
+      "activityTab": "ezREEPORT activity",
       "adminTab": "General administration"
     }
   },

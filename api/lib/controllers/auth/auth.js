@@ -64,7 +64,7 @@ exports.renaterLogin = async (ctx) => {
 
   const { username } = userProps;
 
-  let { data: user } = await usersService.findUnique({ where: { username } });
+  let user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.action = 'user/register';
@@ -72,19 +72,8 @@ exports.renaterLogin = async (ctx) => {
 
     userProps.metadata.acceptedTerms = false;
 
-    // First create the user in the DB
-    const res = await usersService.create({ data: userProps });
-    appLogger.verbose(`User [${username}] is created`);
-    user = res.data;
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [service, result] of res.syncMap) {
-      if (result === true) {
-        appLogger.verbose(`[${service}] User [${username}] is created`);
-      } else {
-        appLogger.error(`[${service}] User [${username}] cannot be created: ${result.message}`);
-      }
-    }
+    // First create the user
+    user = await usersService.create({ data: userProps });
 
     try {
       await sendWelcomeMail(user);
@@ -98,22 +87,13 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      const { syncMap } = await usersService.update({
+      await usersService.update({
         where: { username },
         data: userProps,
       });
-      appLogger.info('User is updated');
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const [service, result] of syncMap) {
-        if (result === true) {
-          appLogger.verbose(`[${service}] User is updated`);
-        } else {
-          appLogger.error(`[${service}] User cannot be updated: ${result.message}`);
-        }
-      }
+      appLogger.info(`User [${user.username}] is updated`);
     } catch (err) {
-      appLogger.error(`User cannot be update: ${err.message}`);
+      appLogger.error(`User [${user.username}] cannot be updated: ${err.message}`);
       ctx.throw(500, err);
       return;
     }
@@ -157,7 +137,7 @@ exports.elasticLogin = async (ctx) => {
   }
 
   // Make sure that the user exists in the DB
-  const { syncMap } = await usersService.upsert({
+  await usersService.upsert({
     where: { username },
     update: {},
     create: {
@@ -168,15 +148,6 @@ exports.elasticLogin = async (ctx) => {
     },
   });
   appLogger.verbose(`User [${username}] is upserted`);
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [service, result] of syncMap) {
-    if (result === true) {
-      appLogger.verbose(`[${service}] User [${username}] is upserted`);
-    } else {
-      appLogger.error(`[${service}] User [${username}] cannot be upserted: ${result.message}`);
-    }
-  }
 
   ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
@@ -329,7 +300,7 @@ exports.changePassword = async (ctx) => {
 };
 
 exports.getUser = async (ctx) => {
-  const { data: user } = await usersService.findUnique({
+  const user = await usersService.findUnique({
     where: { username: ctx.state.user.username },
     include: { memberships: true },
   });
