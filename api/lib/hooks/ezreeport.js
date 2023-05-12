@@ -142,6 +142,19 @@ ezrEmitter.on(
     } catch (error) {
       appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] cannot be created in elastic:\n${error}`);
     }
+
+    try {
+      const memberships = await prisma.membership.findMany({
+        where: { institutionId: institution.id },
+      });
+      // eslint-disable-next-line no-restricted-syntax
+      for (const membership of memberships) {
+        // Using event of THIS event handler (not the whole bus)
+        ezrEmitter.emit('membership:upsert', membership);
+      }
+    } catch (error) {
+      appLogger.verbose(`[ezreeport][hooks] Memberships of [${institution.id}] cannot be getted:\n${error}`);
+    }
   },
 );
 
@@ -177,5 +190,65 @@ ezrEmitter.on(
 );
 
 // #endregion Institutions
+
+// #region Memberships
+
+ezrEmitter.on(
+  'membership:create',
+  /**
+   * @param {Membership} membership
+  */
+  (membership) => ezrEmitter.emit('membership:upsert', membership),
+);
+
+ezrEmitter.on(
+  'membership:update',
+  /**
+   * @param {Membership} membership
+   */
+  (membership) => ezrEmitter.emit('membership:upsert', membership),
+);
+
+ezrEmitter.on(
+  'membership:upsert',
+  /**
+   * @param {Membership} membership
+   */
+  async (membership) => {
+    const { username, institutionId, permissions } = membership;
+
+    if (!permissions.some((p) => /^reporting:/.test(p))) {
+      // Using event of THIS event handler (not the whole bus)
+      ezrEmitter.emit('membership:delete', membership);
+      return;
+    }
+
+    try {
+      await ezrMemberships.upsertFromMembership(membership);
+      appLogger.verbose(`[ezreeport][hooks] Membership between user [${username}] and institution [${institutionId}] is upserted`);
+    } catch (error) {
+      appLogger.error(`[ezreeport][hooks] Membership between user [${username}] and institution [${institutionId}] cannot be upserted:\n${error}`);
+    }
+  },
+);
+
+ezrEmitter.on(
+  'membership:delete',
+  /**
+   * @param {Membership} membership
+   */
+  async (membership) => {
+    const { username, institutionId } = membership;
+
+    try {
+      await ezrMemberships.deleteFromMembership(membership);
+      appLogger.verbose(`[ezreeport][hooks] Membership between user [${username}] and institution [${institutionId}] is deleted`);
+    } catch (error) {
+      appLogger.error(`[ezreeport][hooks] Membership between user [${username}] and institution [${institutionId}] cannot be deleted:\n${error}`);
+    }
+  },
+);
+
+// #endregion Memberships
 
 module.exports = ezrEmitter;

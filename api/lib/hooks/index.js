@@ -48,4 +48,10 @@ registerEvent('institution:update');
 registerEvent('institution:upsert');
 registerEvent('institution:delete');
 
+// Membership events
+registerEvent('membership:create');
+registerEvent('membership:update');
+registerEvent('membership:upsert');
+registerEvent('membership:delete');
+
 module.exports = eventEmitter;

@@ -136,4 +136,38 @@ elasticEmitter.on(
 // );
 // // #endregion Institutions
 
+// // #region Memberships
+// elasticEmitter.on(
+//   'membership:create',
+//   /**
+//    * @param {Membership} membership
+//    */
+//   async (membership) => {},
+// );
+
+// elasticEmitter.on(
+//   'membership:update',
+//   /**
+//    * @param {Membership} membership
+//    */
+//   async (membership) => {},
+// );
+
+// elasticEmitter.on(
+//   'membership:upsert',
+//   /**
+//    * @param {Membership} membership
+//    */
+//   async (membership) => {},
+// );
+
+// elasticEmitter.on(
+//   'membership:delete',
+//   /**
+//    * @param {Membership} membership
+//    */
+//   async (membership) => {},
+// );
+// // #endregion Memberships
+
 module.exports = elasticEmitter;
