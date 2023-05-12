@@ -234,8 +234,8 @@ export default {
 
       return {
         memberships,
-        permissions: [...new Set(data.permissions)],
-        roles: [...new Set(data.roles)],
+        permissions: [...data.permissions],
+        roles: [...data.roles],
         institutions: [...data.institutions.values()],
       };
     },
