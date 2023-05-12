@@ -1,179 +1,81 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
-const ezrNamespaces = require('../services/ezreeport/namespaces');
-const elastic = require('../services/elastic/users');
+const hooks = require('../hooks');
 
 /* eslint-disable max-len */
-/** @typedef {Map<'ezreeport' | 'ezreeport-user', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
-/** @typedef {import('@prisma/client').Institution} Institution */
-/** @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
+ */
 /* eslint-enable max-len */
 
 module.exports = class InstitutionsService {
   /**
    * @param {InstitutionCreateArgs} params
-   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
+   * @returns {Promise<Institution>}
    */
   static async create(params) {
     const institution = await prisma.institution.create(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    if (institution.validated) {
-      try {
-        await ezrNamespaces.upsertFromInstitution(institution);
-        syncMap.set('ezreeport', true);
-      } catch (error) {
-        syncMap.set('ezreeport', error);
-      }
+    hooks.emit('institution:create', institution, institution);
 
-      // Create reporting user
-      try {
-        // TODO: DO NOT CREATE USER IF EXISTS
-        // TODO: Give rights to institution indexs
-        await elastic.createUser({
-          username: `report.${institution.id}`,
-          email: 'noreply.report@ezmesure.couperin.org',
-          fullName: `Reporting ${institution.acronym ?? institution.id}`,
-        });
-        syncMap.set('ezreeport-user', true);
-      } catch (error) {
-        syncMap.set('ezreeport-user', error);
-      }
-    }
-
-    return {
-      data: institution,
-      syncMap,
-    };
+    return institution;
   }
 
   /**
    * @param {InstitutionFindManyArgs} params
-   * @returns {Promise<{ data: Institution[] }>}
+   * @returns {Promise<Institution[]>}
    */
-  static async findMany(params) {
-    return { data: await prisma.institution.findMany(params) };
+  static findMany(params) {
+    return prisma.institution.findMany(params);
   }
 
   /**
    * @param {InstitutionFindUniqueArgs} params
-   * @returns {Promise<{ data: Institution | null }>}
+   * @returns {Promise<Institution | null>}
    */
-  static async findUnique(params) {
-    return { data: await prisma.institution.findUnique(params) };
+  static findUnique(params) {
+    return prisma.institution.findUnique(params);
   }
 
   /**
    * @param {InstitutionUpdateArgs} params
-   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
+   * @returns {Promise<Institution>}
    */
   static async update(params) {
     const institution = await prisma.institution.update(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    if (institution.validated) {
-      try {
-        await ezrNamespaces.upsertFromInstitution(institution);
-        syncMap.set('ezreeport', true);
-      } catch (error) {
-        syncMap.set('ezreeport', error);
-      }
-    } else {
-      try {
-        await ezrNamespaces.deleteFromInstitution(institution);
-        syncMap.set('ezreeport', true);
-      } catch (error) {
-        syncMap.set('ezreeport', error);
-      }
+    hooks.emit('institution:update', institution);
 
-      // Delete reporting user
-      try {
-        await elastic.deleteUser(`report.${institution.id}`);
-        syncMap.set('ezreeport-user', true);
-      } catch (error) {
-        syncMap.set('ezreeport-user', error);
-      }
-    }
-
-    return {
-      data: institution,
-      syncMap,
-    };
+    return institution;
   }
 
   /**
    * @param {InstitutionUpsertArgs} params
-   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
+   * @returns {Promise<Institution>}
    */
   static async upsert(params) {
     const institution = await prisma.institution.upsert(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    if (institution.validated) {
-      try {
-        await ezrNamespaces.upsertFromInstitution(institution);
-        syncMap.set('ezreeport', true);
-      } catch (error) {
-        syncMap.set('ezreeport', error);
-      }
-    } else {
-      try {
-        await ezrNamespaces.deleteFromInstitution(institution);
-        syncMap.set('ezreeport', true);
-      } catch (error) {
-        syncMap.set('ezreeport', error);
-      }
+    hooks.emit('institution:upsert', institution);
 
-      // Delete reporting user
-      try {
-        await elastic.deleteUser(`report.${institution.id}`);
-        syncMap.set('ezreeport-user', true);
-      } catch (error) {
-        syncMap.set('ezreeport-user', error);
-      }
-    }
-
-    return {
-      data: institution,
-      syncMap,
-    };
+    return institution;
   }
 
   /**
    * @param {InstitutionDeleteArgs} params
-   * @returns {Promise<{ data: Institution, syncMap: SyncMap }>}
+   * @returns {Promise<Institution>}
    */
   static async delete(params) {
     const institution = await prisma.institution.delete(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    try {
-      await ezrNamespaces.deleteFromInstitution(institution);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
+    hooks.emit('institution:delete', institution);
 
-    // Delete reporting user
-    try {
-      await elastic.deleteUser(`report.${institution.id}`);
-      syncMap.set('ezreeport-user', true);
-    } catch (error) {
-      syncMap.set('ezreeport-user', error);
-    }
-
-    return {
-      data: institution,
-      syncMap,
-    };
+    return institution;
   }
 };

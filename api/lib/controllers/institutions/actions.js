@@ -8,7 +8,7 @@ const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
-const MembershipsService = require('../../entities/memberships.service');
+const membershipsService = require('../../entities/memberships.service');
 
 const {
   PERMISSIONS,
@@ -60,7 +60,7 @@ exports.getInstitutions = async (ctx) => {
     include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
   }
 
-  const { data: institution } = await institutionsService.findMany({
+  const institution = await institutionsService.findMany({
     include,
   });
 
@@ -107,21 +107,10 @@ exports.createInstitution = async (ctx) => {
     institutionData.logoId = await imagesService.storeLogo(base64logo);
   }
 
-  const { data: institution, syncMap } = await institutionsService.create({
+  const institution = await institutionsService.create({
     data: { ...institutionData, memberships },
   });
   appLogger.verbose(`Institution [${institution.id}] is created`);
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [service, result] of syncMap) {
-    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
-
-    if (result === true) {
-      appLogger.verbose(`[${service}] ${label} [${institution.id}] is created`);
-    } else {
-      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be created: ${result.message}`);
-    }
-  }
 
   ctx.metadata.institutionId = institution.id;
   ctx.status = 201;
@@ -159,7 +148,7 @@ exports.updateInstitution = async (ctx) => {
   }
 
   // FIXME: handle admin restricted fields
-  const { data: updatedInstitution, syncMap } = await institutionsService.update({
+  const updatedInstitution = await institutionsService.update({
     where: { id: institution.id },
     data: {
       ...institutionData,
@@ -167,17 +156,6 @@ exports.updateInstitution = async (ctx) => {
     },
   });
   appLogger.verbose(`Institution [${institution.id}] is updated`);
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [service, result] of syncMap) {
-    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
-
-    if (result === true) {
-      appLogger.verbose(`[${service}] ${label} [${institution.id}] is updated`);
-    } else {
-      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be updated: ${result.message}`);
-    }
-  }
 
   if (institutionData.logo && oldLogoId) {
     await imagesService.remove(oldLogoId);
@@ -242,19 +220,8 @@ exports.deleteInstitution = async (ctx) => {
     institutionName: institution.name,
   };
 
-  const { data, syncMap } = await institutionsService.delete({ where: { id: institutionId } });
+  const data = await institutionsService.delete({ where: { id: institutionId } });
   appLogger.verbose(`Institution [${institution.id}] is deleted`);
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [service, result] of syncMap) {
-    const label = service === 'ezreeport' ? 'Namespace' : 'Institution';
-
-    if (result === true) {
-      appLogger.verbose(`[${service}] ${label} [${institution.id}] is deleted`);
-    } else {
-      appLogger.error(`[${service}] ${label} [${institution.id}] cannot be deleted: ${result.message}`);
-    }
-  }
 
   ctx.status = 200;
   ctx.body = data;
@@ -314,7 +281,7 @@ exports.addInstitutionMember = async (ctx) => {
     username,
   };
 
-  const { data: user } = await usersService.findUnique({
+  const user = await usersService.findUnique({
     where: { username },
     select: {
       memberships: {
@@ -342,13 +309,14 @@ exports.addInstitutionMember = async (ctx) => {
     institution: { connect: { id: institutionId } },
   };
 
-  const newMembership = await MembershipsService.upsert({
+  const newMembership = await membershipsService.upsert({
     where: {
       username_institutionId: { username, institutionId },
     },
     create: membershipData,
     update: membershipData,
   });
+  appLogger.info(`Membership between user [${username}] and institution [${institutionId}] is upserted`);
 
   if (!memberIsContact && memberBecomesContact) {
     try {
@@ -375,7 +343,7 @@ exports.removeInstitutionMember = async (ctx) => {
     username,
   };
 
-  const { data: user } = await usersService.findUnique({
+  const user = await usersService.findUnique({
     where: { username },
     select: {
       memberships: {

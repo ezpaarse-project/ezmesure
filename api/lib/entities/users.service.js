@@ -1,8 +1,7 @@
 // @ts-check
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const elastic = require('../services/elastic/users');
-const ezrUsers = require('../services/ezreeport/users');
+const hooks = require('../hooks');
 
 const {
   MEMBER_ROLES: {
@@ -12,19 +11,20 @@ const {
 } = require('./memberships.dto');
 
 /* eslint-disable max-len */
-/** @typedef {Map<'elastic' | 'ezreeport', true | Error>} SyncMap Key is the service, value is `true` if synced, an error is not */
-/** @typedef {import('@prisma/client').User} User */
-/** @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').User} User
+ * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
+ * @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs
+ */
 /* eslint-enable max-len */
 
 module.exports = class UsersService {
   /**
-   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
+   * @returns {Promise<User>}
    */
   static async createAdmin() {
     const username = config.get('admin.username');
@@ -44,77 +44,37 @@ module.exports = class UsersService {
       create: adminData,
     });
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    try {
-      await elastic.createAdmin();
-      syncMap.set('elastic', true);
-    } catch (error) {
-      syncMap.set('elastic', error);
-    }
+    hooks.emit('user:create-admin', admin);
 
-    try {
-      await ezrUsers.upsertFromUser(admin);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
-
-    return {
-      data: admin,
-      syncMap,
-    };
+    return admin;
   }
 
   /**
    * @param {UserCreateArgs} params
-   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
+   * @returns {Promise<User>}
    */
   static async create(params) {
     const user = await prisma.user.create(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    try {
-      const userData = {
-        username: params.data.username,
-        email: params.data.email,
-        fullName: params.data.fullName,
-      };
+    hooks.emit('user:create', user);
 
-      await elastic.createUser(userData);
-      syncMap.set('elastic', true);
-    } catch (error) {
-      syncMap.set('elastic', error);
-    }
-
-    try {
-      await ezrUsers.upsertFromUser(user);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
-
-    return {
-      data: user,
-      syncMap,
-    };
+    return user;
   }
 
   /**
    * @param {UserFindManyArgs} params
-   * @returns {Promise<{ data: User[] }>}
+   * @returns {Promise<User[]>}
    */
-  static async findMany(params) {
-    return { data: await prisma.user.findMany(params) };
+  static findMany(params) {
+    return prisma.user.findMany(params);
   }
 
   /**
    * @param {UserFindUniqueArgs} params
-   * @returns {Promise<{ data: User | null }>}
+   * @returns {Promise<User | null>}
    */
-  static async findUnique(params) {
-    return { data: await prisma.user.findUnique(params) };
+  static findUnique(params) {
+    return prisma.user.findUnique(params);
   }
 
   /**
@@ -139,39 +99,16 @@ module.exports = class UsersService {
 
   /**
    * @param {UserUpdateArgs} params
-   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
+   * @returns {Promise<User>}
    */
   static async update(params) {
     // TODO manage role
 
     const user = await prisma.user.update(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    try {
-      const userData = {
-        username: params.data.username?.toString() || '',
-        email: params.data.email?.toString() || '',
-        fullName: params.data.fullName?.toString() || '',
-      };
+    hooks.emit('user:update', user);
 
-      await elastic.updateUser(userData);
-      syncMap.set('elastic', true);
-    } catch (error) {
-      syncMap.set('elastic', error);
-    }
-
-    try {
-      await ezrUsers.upsertFromUser(user);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
-
-    return {
-      data: user,
-      syncMap,
-    };
+    return user;
   }
 
   /**
@@ -191,76 +128,34 @@ module.exports = class UsersService {
 
   /**
    * @param {UserUpsertArgs} params
-   * @returns {Promise<{ data: User, syncMap: SyncMap }>}
+   * @returns {Promise<User>}
    */
   static async upsert(params) {
     const user = await prisma.user.upsert(params);
 
-    /** @type {SyncMap} */
-    const syncMap = new Map();
-    try {
-      const userData = {
-        username: params?.create?.username,
-        email: params?.create?.email,
-        fullName: params?.create?.fullName,
-      };
+    hooks.emit('user:upsert', user);
 
-      await elastic.createUser(userData);
-      syncMap.set('elastic', true);
-    } catch (error) {
-      syncMap.set('elastic', error);
-    }
-
-    try {
-      await ezrUsers.upsertFromUser(user);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
-
-    return {
-      data: user,
-      syncMap,
-    };
+    return user;
   }
 
   /**
    * @param {UserDeleteArgs} params
-   * @returns {Promise<{ data: User | null, syncMap: SyncMap }>}
+   * @returns {Promise<User | null>}
    */
   static async delete(params) {
     let user;
-    /** @type {SyncMap} */
-    const syncMap = new Map();
 
     try {
       user = await prisma.user.delete(params);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return { data: null, syncMap };
+        return null;
       }
       throw error;
     }
 
-    if (params.where.username) {
-      try {
-        await elastic.deleteUser(params.where.username);
-        syncMap.set('elastic', true);
-      } catch (error) {
-        syncMap.set('elastic', error);
-      }
-    }
+    hooks.emit('user:delete', user);
 
-    try {
-      await ezrUsers.deleteFromUser(user);
-      syncMap.set('ezreeport', true);
-    } catch (error) {
-      syncMap.set('ezreeport', error);
-    }
-
-    return {
-      data: user,
-      syncMap,
-    };
+    return user;
   }
 };

@@ -13,9 +13,9 @@ const { syncSchedule } = config.get('ezreeport');
  * Sync ezREEPORT's users with current users
  */
 async function syncUsers() {
-  const { data: users } = await usersService.findMany();
+  const users = await usersService.findMany({});
 
-  appLogger.verbose(`[ezReeport] Synchronizing ${users?.length} users`);
+  appLogger.verbose(`[ezreeport] Synchronizing ${users?.length} users`);
 
   const { data } = await ezrAxios.put('/admin/users', users.map((u) => ({
     isAdmin: u.isAdmin,
@@ -28,22 +28,22 @@ async function syncUsers() {
     return counts;
   }, { created: 0, updated: 0, deleted: 0 });
 
-  appLogger.info('[ezReeport] Users synchronized');
-  appLogger.verbose(`[ezReeport] ${results?.created} users created`);
-  appLogger.verbose(`[ezReeport] ${results?.updated} users updated`);
-  appLogger.verbose(`[ezReeport] ${results?.deleted} users deleted`);
+  appLogger.info('[ezreeport] Users synchronized');
+  appLogger.verbose(`[ezreeport] ${results?.created} users created`);
+  appLogger.verbose(`[ezreeport] ${results?.updated} users updated`);
+  appLogger.verbose(`[ezreeport] ${results?.deleted} users deleted`);
 }
 
 /**
  * Sync ezREEPORT's namespaces with current institutions
  */
 async function syncNamespaces() {
-  const { data: institutions } = await institutionsService.findMany({
+  const institutions = await institutionsService.findMany({
     include: { memberships: true },
     where: { validated: true },
   });
 
-  appLogger.verbose(`[ezReeport] Synchronizing ${institutions?.length} namespaces`);
+  appLogger.verbose(`[ezreeport] Synchronizing ${institutions?.length} namespaces`);
 
   const { data } = await ezrAxios.put('/admin/namespaces', institutions.map((i) => ({
     id: i.id,
@@ -72,13 +72,13 @@ async function syncNamespaces() {
     return counts;
   }, { created: 0, updated: 0, deleted: 0 });
 
-  appLogger.info('[ezReeport] Namespaces synchronized');
-  appLogger.verbose(`[ezReeport] ${namespacesResults?.created} namespaces created`);
-  appLogger.verbose(`[ezReeport] ${namespacesResults?.updated} namespaces updated`);
-  appLogger.verbose(`[ezReeport] ${namespacesResults?.deleted} namespaces deleted`);
-  appLogger.verbose(`[ezReeport] ${membershipsResults?.created} memberships created`);
-  appLogger.verbose(`[ezReeport] ${membershipsResults?.updated} memberships updated`);
-  appLogger.verbose(`[ezReeport] ${membershipsResults?.deleted} memberships deleted`);
+  appLogger.info('[ezreeport] Namespaces synchronized');
+  appLogger.verbose(`[ezreeport] ${namespacesResults?.created} namespaces created`);
+  appLogger.verbose(`[ezreeport] ${namespacesResults?.updated} namespaces updated`);
+  appLogger.verbose(`[ezreeport] ${namespacesResults?.deleted} namespaces deleted`);
+  appLogger.verbose(`[ezreeport] ${membershipsResults?.created} memberships created`);
+  appLogger.verbose(`[ezreeport] ${membershipsResults?.updated} memberships updated`);
+  appLogger.verbose(`[ezreeport] ${membershipsResults?.deleted} memberships deleted`);
 }
 
 async function sync() {
@@ -91,13 +91,13 @@ async function startCron() {
     cronTime: syncSchedule,
     runOnInit: true,
     onTick: async () => {
-      appLogger.verbose('[ezReeport] Starting synchronization');
+      appLogger.verbose('[ezreeport] Starting synchronization');
       try {
         await sync();
-        appLogger.info('[ezReeport] Synchronized');
+        appLogger.info('[ezreeport] Synchronized');
       } catch (e) {
         const message = e?.response?.data?.content?.message || e.message;
-        appLogger.error(`[ezReeport] Failed to synchronize: ${message}`);
+        appLogger.error(`[ezreeport] Failed to synchronize: ${message}`);
       }
     },
   });
