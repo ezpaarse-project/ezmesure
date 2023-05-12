@@ -15,6 +15,7 @@
       <template #extension>
         <v-tabs v-model="currentTab" grow>
           <v-tab>{{ $t('report.admin.taskTab') }}</v-tab>
+          <v-tab>{{ $t('report.admin.activityTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.adminTab') }}</v-tab>
         </v-tabs>
       </template>
@@ -25,13 +26,18 @@
         <!-- tasks tab -->
         <v-tab-item class="pa-1">
           <v-row>
-            <v-col cols="12" sm="5" md="4">
+            <v-col>
               <v-card>
                 <ezr-template-list />
               </v-card>
             </v-col>
+          </v-row>
+        </v-tab-item>
 
-            <v-col cols="12" sm="7" md="8">
+        <!-- activity tab -->
+        <v-tab-item class="pa-1">
+          <v-row>
+            <v-col>
               <v-card>
                 <ezr-history-table />
               </v-card>

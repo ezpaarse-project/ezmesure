@@ -555,6 +555,7 @@
     "health": "État de santé",
     "admin": {
       "taskTab": "Administration des rapports",
+      "activityTab": "Activité d'ezREEPORT",
       "adminTab": "Administration générale"
     }
   },
