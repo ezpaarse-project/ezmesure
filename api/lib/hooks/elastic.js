@@ -14,160 +14,143 @@ const elasticEmitter = new EventEmitter();
  */
 
 // #region Users
-elasticEmitter.on(
-  'user:create-admin',
-  /**
-   * @param {User} user
-   */
-  async (user) => {
-    try {
-      await elasticUsers.createAdmin();
-      appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] is created`);
-    } catch (error) {
-      appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] cannot be created: ${error.message}`);
-    }
-  },
-);
 
-elasticEmitter.on(
-  'user:create',
-  /**
-   * @param {User} user
-   */
-  async (user) => {
-    try {
-      await elasticUsers.createUser({
-        username: user.username,
-        email: user.email,
-        fullName: user.fullName,
-      });
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] is created`);
-    } catch (error) {
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be created: ${error.message}`);
-    }
-  },
-);
+/**
+ * @param {User} user
+ */
+const onAdminUserCreate = async (user) => {
+  try {
+    await elasticUsers.createAdmin();
+    appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] is created`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] cannot be created: ${error.message}`);
+  }
+};
 
-elasticEmitter.on(
-  'user:update',
-  /**
-   * @param {User} user
-   */
-  async (user) => {
-    try {
-      await elasticUsers.updateUser({
-        username: user.username,
-        email: user.email,
-        fullName: user.fullName,
-      });
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
-    } catch (error) {
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
-    }
-  },
-);
+/**
+ * @param {User} user
+ */
+const onUserCreate = async (user) => {
+  try {
+    await elasticUsers.createUser({
+      username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+    });
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] is created`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be created: ${error.message}`);
+  }
+};
 
-elasticEmitter.on(
-  'user:upsert',
-  /**
-   * @param {User} user
-   */
-  async (user) => {
-    try {
+/**
+ * @param {User} user
+ */
+const onUserUpdate = async (user) => {
+  try {
+    await elasticUsers.updateUser({
+      username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+    });
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
+  }
+};
+
+/**
+ * @param {User} user
+ */
+const onUserDelete = async (user) => {
+  try {
+    await elasticUsers.deleteUser(user.username);
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] is deleted`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be deleted: ${error.message}`);
+  }
+};
+
+/**
+ * @param {User} user
+ */
+const onUserUpsert = async (user) => {
+  try {
     // Using events of THIS event handler (not the whole bus)
-      if (await elasticUsers.getUserByUsername(user.username)) {
-        elasticEmitter.emit('user:update', user);
-      } else {
-        elasticEmitter.emit('user:create', user);
-      }
-    } catch (error) {
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be upserted: ${error.message}`);
+    if (await elasticUsers.getUserByUsername(user.username)) {
+      return onUserUpdate(user);
     }
-  },
-);
 
-elasticEmitter.on(
-  'user:delete',
-  /**
-   * @param {User} user
-   */
-  async (user) => {
-    try {
-      await elasticUsers.deleteUser(user.username);
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] is deleted`);
-    } catch (error) {
-      appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be deleted: ${error.message}`);
-    }
-  },
-);
+    return onUserCreate(user);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be upserted: ${error.message}`);
+  }
+};
+
+elasticEmitter.on('user:create-admin', onAdminUserCreate);
+elasticEmitter.on('user:create', onUserCreate);
+elasticEmitter.on('user:update', onUserUpdate);
+elasticEmitter.on('user:upsert', onUserUpsert);
+elasticEmitter.on('user:delete', onUserDelete);
+
 // #endregion Users
 
-// // #region Institutions
-// elasticEmitter.on(
-//   'institution:create',
-//   /**
-//    * @param {Institution} institution
-//    */
-//   async (institution) => {},
-// );
+// #region Memberships
 
-// elasticEmitter.on(
-//   'institution:update',
-//   /**
-//    * @param {Institution} institution
-//    */
-//   async (institution) => {},
-// );
+// /**
+//  * @param {Membership} membership
+//  */
+// const onMembershipCreate = async (membership) => {};
 
-// elasticEmitter.on(
-//   'institution:upsert',
-//   /**
-//    * @param {Institution} institution
-//    */
-//   async (institution) => {},
-// );
+// /**
+//  * @param {Membership} membership
+//  */
+// const onMembershipUpdate = async (membership) => {};
 
-// elasticEmitter.on(
-//   'institution:delete',
-//   /**
-//    * @param {Institution} institution
-//    */
-//   async (institution) => {},
-// );
-// // #endregion Institutions
+// /**
+//  * @param {Membership} membership
+// */
+// const onMembershipDelete = async (membership) => {};
 
-// // #region Memberships
-// elasticEmitter.on(
-//   'membership:create',
-//   /**
-//    * @param {Membership} membership
-//    */
-//   async (membership) => {},
-// );
+// /**
+//  * @param {Membership} membership
+//  */
+// const onMembershipUpsert = async (membership) => {};
 
-// elasticEmitter.on(
-//   'membership:update',
-//   /**
-//    * @param {Membership} membership
-//    */
-//   async (membership) => {},
-// );
+// elasticEmitter.on('membership:create', onMembershipCreate);
+// elasticEmitter.on('membership:update', onMembershipUpdate);
+// elasticEmitter.on('membership:upsert', onMembershipUpsert);
+// elasticEmitter.on('membership:delete', onMembershipDelete);
 
-// elasticEmitter.on(
-//   'membership:upsert',
-//   /**
-//    * @param {Membership} membership
-//    */
-//   async (membership) => {},
-// );
+// #endregion Memberships
 
-// elasticEmitter.on(
-//   'membership:delete',
-//   /**
-//    * @param {Membership} membership
-//    */
-//   async (membership) => {},
-// );
-// // #endregion Memberships
+// #region Institutions
+
+// /**
+//  * @param {Institution} institution
+//  */
+// const onInstitutionCreate = async (institution) => {};
+
+// /**
+//  * @param {Institution} institution
+//  */
+// const onInstitutionUpdate = async (institution) => {};
+
+// /**
+//  * @param {Institution} institution
+// */
+// const onInstitutionDelete = async (institution) => {};
+
+// /**
+//  * @param {Institution} institution
+//  */
+// const onInstitutionUpsert = async (institution) => {};
+
+// elasticEmitter.on('institution:create', onInstitutionCreate);
+// elasticEmitter.on('institution:update', onInstitutionUpdate);
+// elasticEmitter.on('institution:upsert', onInstitutionUpsert);
+// elasticEmitter.on('institution:delete', onInstitutionDelete);
+
+// #endregion Institutions
 
 module.exports = elasticEmitter;

@@ -42,16 +42,16 @@ registerEvent('user:update');
 registerEvent('user:upsert');
 registerEvent('user:delete');
 
-// Institution events
-registerEvent('institution:create');
-registerEvent('institution:update');
-registerEvent('institution:upsert');
-registerEvent('institution:delete');
-
 // Membership events
 registerEvent('membership:create');
 registerEvent('membership:update');
 registerEvent('membership:upsert');
 registerEvent('membership:delete');
+
+// Institution events
+registerEvent('institution:create');
+registerEvent('institution:update');
+registerEvent('institution:upsert');
+registerEvent('institution:delete');
 
 module.exports = eventEmitter;
