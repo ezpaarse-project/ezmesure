@@ -199,6 +199,7 @@
     "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
+    "toolbarTitle": "Institutions ({count})",
     "title": "Institution",
     "updateInstitution": "Update institution",
     "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
@@ -211,6 +212,8 @@
     "institution": {
       "title": "My institution",
       "name": "Institution name *",
+      "members": "Members",
+      "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
       "nameError": "Please enter an institution name.",
       "indexCount": "Indexed consultation events",
@@ -303,6 +306,7 @@
       "failedToUpdatePerms": "Failed to update user permissions",
       "locked": "Prevent member modification",
       "notEditable": "This member is not editable",
+      "accessRights": "Access rights",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Documentary contact",
@@ -534,6 +538,7 @@
     "textCopied": "Text copied in the clipboard"
   },
   "users": {
+    "toolbarTitle": "Users ({count})",
     "updateUser": "Update user",
     "deleteNbUsers": "You are about to delete {number} users. The associated indices, spaces and roles will not be affected.",
     "newUser": "New user",
@@ -547,7 +552,11 @@
       "fullName": "Full name",
       "username": "Username",
       "email": "Email address",
-      "isAdmin": "Is Administrator ?"
+      "isAdmin": "Is Administrator ?",
+      "memberships": "Institutions",
+      "membershipsCount": "{count} institution|{count} institutions",
+      "roles": "Roles",
+      "permissions": "Permissions"
     }
   },
   "report": {
@@ -565,6 +574,11 @@
     "noRepository": "No repositories has been assigned yet",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "None",
+    "read": "Read",
+    "write": "Read / Write"
   },
   "anErrorOccurred": "An error occurred",
   "url": "URL",

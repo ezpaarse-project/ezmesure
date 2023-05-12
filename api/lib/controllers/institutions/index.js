@@ -9,6 +9,9 @@ const {
   includableFields: membershipIncludableFields,
   FEATURES,
 } = require('../../entities/memberships.dto');
+const {
+  includableFields: repositoryIncludableFields,
+} = require('../../entities/repositories.dto');
 
 const {
   requireJwt,
@@ -29,6 +32,7 @@ const {
   updateInstitution,
   getSushiData,
   getInstitutionContacts,
+  getInstitutionRepositories,
 } = require('./actions');
 
 const {
@@ -76,6 +80,24 @@ router.route({
     fetchInstitution(),
     getInstitution,
   ],
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/repositories',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.read),
+    getInstitutionRepositories,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    query: Joi.object({
+      include: Joi.array().single().items(Joi.string().valid(...repositoryIncludableFields)),
+    }).rename('include[]', 'include'),
+  },
 });
 
 router.route({

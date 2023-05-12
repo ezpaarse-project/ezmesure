@@ -199,6 +199,7 @@
     "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
+    "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
     "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
@@ -211,6 +212,8 @@
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement *",
+      "members": "Membres",
+      "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
       "nameError": "Veuillez saisir un nom d'établissement.",
       "indexCount": "Évènements de consultations indexés",
@@ -303,6 +306,7 @@
       "failedToUpdatePerms": "La mise à jour des permissions a échoué",
       "locked": "Empêcher la modification du membre",
       "notEditable": "Ce membre n'est pas modifiable",
+      "accessRights": "Droits d'accès",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Contact documentaire",
@@ -534,6 +538,7 @@
     "textCopied": "Texte copié dans le presse-papier"
   },
   "users": {
+    "toolbarTitle": "Utilisateurs ({count})",
     "updateUser": "Mettre à jour l'utilisateur",
     "deleteNbUsers": "Vous allez supprimer {number} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
     "newUser": "Nouvel utilisateur",
@@ -547,7 +552,11 @@
       "fullName": "Nom complet",
       "username": "Nom d'utilisateur",
       "email": "Adresse email",
-      "isAdmin": "Est Administrateur ?"
+      "isAdmin": "Est Administrateur ?",
+      "memberships": "Établissements",
+      "membershipsCount": "{count} établissement|{count} établissements",
+      "roles": "Roles",
+      "permissions": "Permissions"
     }
   },
   "report": {
@@ -565,6 +574,11 @@
     "noRepository": "Aucun dépôt n'est encore attribué",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "Aucun",
+    "read": "Lecture",
+    "write": "Lecture / Écriture"
   },
   "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",

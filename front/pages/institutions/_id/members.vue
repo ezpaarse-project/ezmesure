@@ -46,13 +46,19 @@
         </v-chip>
       </template>
 
-      <template #[`item.readonly`]="{ item }">
-        <span v-if="item.readonly">
-          {{ $t('institutions.members.read') }}
-        </span>
-        <span v-else>
-          {{ $t('institutions.members.read') }} / {{ $t('institutions.members.write') }}
-        </span>
+      <template #[`item.repositoryPermissions`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.repositoryPermissions)"
+          small
+          class="elevation-1"
+          @click="$refs?.accessDialog?.display(institution, item)"
+        >
+          {{ $tc('repositories.xRepositories', item.repositoryPermissions.length) }}
+
+          <v-icon right small>
+            mdi-security
+          </v-icon>
+        </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -110,6 +116,7 @@
       :institution-id="institutionId"
       @removed="refreshMembers"
     />
+    <MemberAccessDialog ref="accessDialog" @change="refreshMembers" />
   </section>
 </template>
 
@@ -118,6 +125,7 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import MemberSearch from '~/components/MemberSearch.vue';
 import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
 import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
+import MemberAccessDialog from '~/components/MemberAccessDialog.vue';
 
 export default {
   layout: 'space',
@@ -127,6 +135,7 @@ export default {
     MemberSearch,
     MemberDeleteDialog,
     MemberUpdateDialog,
+    MemberAccessDialog,
   },
   async asyncData({
     $axios,
@@ -207,6 +216,10 @@ export default {
           value: 'username',
         },
         {
+          text: this.$t('institutions.members.accessRights'),
+          value: 'repositoryPermissions',
+        },
+        {
           text: this.$t('institutions.members.roles'),
           value: 'roles',
         },
@@ -236,7 +249,7 @@ export default {
 
       try {
         this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`, {
-          params: { include: ['user'] },
+          params: { include: ['user', 'repositoryPermissions'] },
         });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));

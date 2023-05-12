@@ -1,4 +1,9 @@
 const repositoriesService = require('../../entities/repositories.service');
+const repoPermissionsService = require('../../entities/repository-permissions.service');
+const {
+  upsertSchema: permissionUpsertSchema,
+} = require('../../entities/repository-permissions.dto');
+
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
@@ -97,4 +102,60 @@ exports.deleteOne = async (ctx) => {
   await repositoriesService.delete({ where: { id: repositoryId } });
 
   ctx.status = 204;
+};
+
+exports.upsertPermission = async (ctx) => {
+  const { repository } = ctx.state;
+  const { username } = ctx.params;
+
+  const { value: body } = permissionUpsertSchema.validate({
+    ...ctx.request.body,
+    institutionId: repository.institutionId,
+    repositoryId: repository.id,
+    username,
+  });
+
+  const permissionData = {
+    ...body,
+    repository: { connect: { id: repository.id } },
+    membership: {
+      connect: {
+        username_institutionId: {
+          username,
+          institutionId: repository.institutionId,
+        },
+      },
+    },
+  };
+
+  const updatedPermissions = await repoPermissionsService.upsert({
+    where: {
+      username_repositoryId: {
+        username,
+        repositoryId: repository.id,
+      },
+    },
+    create: permissionData,
+    update: permissionData,
+  });
+
+  ctx.status = 200;
+  ctx.body = updatedPermissions;
+};
+
+exports.deletePermission = async (ctx) => {
+  const { repository } = ctx.state;
+  const { username } = ctx.params;
+
+  const updatedPermissions = await repoPermissionsService.delete({
+    where: {
+      username_repositoryId: {
+        username,
+        repositoryId: repository.id,
+      },
+    },
+  });
+
+  ctx.status = 200;
+  ctx.body = updatedPermissions;
 };
