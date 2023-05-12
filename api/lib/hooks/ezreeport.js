@@ -1,5 +1,5 @@
 // @ts-check
-const EventEmitter = require('node:events');
+const hookEmitter = require('./_hookEmitter');
 
 const { appLogger } = require('../services/logger');
 
@@ -9,8 +9,6 @@ const elasticUsers = require('../services/elastic/users');
 const ezrUsers = require('../services/ezreeport/users');
 const ezrNamespaces = require('../services/ezreeport/namespaces');
 const ezrMemberships = require('../services/ezreeport/memberships');
-
-const ezrEmitter = new EventEmitter();
 
 /**
  * @typedef {import('@prisma/client').User} User
@@ -49,11 +47,11 @@ const onUserUpsert = async (user) => {
   }
 };
 
-ezrEmitter.on('user:create-admin', onUserUpsert);
-ezrEmitter.on('user:create', onUserUpsert);
-ezrEmitter.on('user:update', onUserUpsert);
-ezrEmitter.on('user:upsert', onUserUpsert);
-ezrEmitter.on('user:delete', onUserDelete);
+hookEmitter.on('user:create-admin', onUserUpsert);
+hookEmitter.on('user:create', onUserUpsert);
+hookEmitter.on('user:update', onUserUpsert);
+hookEmitter.on('user:upsert', onUserUpsert);
+hookEmitter.on('user:delete', onUserDelete);
 
 // #endregion Users
 
@@ -91,10 +89,10 @@ const onMembershipUpsert = async (membership) => {
   }
 };
 
-ezrEmitter.on('membership:create', onMembershipUpsert);
-ezrEmitter.on('membership:update', onMembershipUpsert);
-ezrEmitter.on('membership:upsert', onMembershipUpsert);
-ezrEmitter.on('membership:delete', onMembershipDelete);
+hookEmitter.on('membership:create', onMembershipUpsert);
+hookEmitter.on('membership:update', onMembershipUpsert);
+hookEmitter.on('membership:upsert', onMembershipUpsert);
+hookEmitter.on('membership:delete', onMembershipDelete);
 
 // #endregion Memberships
 
@@ -177,11 +175,11 @@ const onInstitutionUpsert = async (institution) => {
   }
 };
 
-ezrEmitter.on('institution:create', onInstitutionUpsert);
-ezrEmitter.on('institution:update', onInstitutionUpsert);
-ezrEmitter.on('institution:upsert', onInstitutionUpsert);
-ezrEmitter.on('institution:delete', onInstitutionDelete);
+hookEmitter.on('institution:create', onInstitutionUpsert);
+hookEmitter.on('institution:update', onInstitutionUpsert);
+hookEmitter.on('institution:upsert', onInstitutionUpsert);
+hookEmitter.on('institution:delete', onInstitutionDelete);
 
 // #endregion Institutions
 
-module.exports = ezrEmitter;
+module.exports = hookEmitter;

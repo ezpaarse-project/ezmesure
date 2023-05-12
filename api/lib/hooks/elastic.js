@@ -1,11 +1,9 @@
 // @ts-check
-const EventEmitter = require('node:events');
+const hookEmitter = require('./_hookEmitter');
 
 const { appLogger } = require('../services/logger');
 
 const elasticUsers = require('../services/elastic/users');
-
-const elasticEmitter = new EventEmitter();
 
 /**
  * @typedef {import('@prisma/client').User} User
@@ -87,11 +85,11 @@ const onUserUpsert = async (user) => {
   }
 };
 
-elasticEmitter.on('user:create-admin', onAdminUserCreate);
-elasticEmitter.on('user:create', onUserCreate);
-elasticEmitter.on('user:update', onUserUpdate);
-elasticEmitter.on('user:upsert', onUserUpsert);
-elasticEmitter.on('user:delete', onUserDelete);
+hookEmitter.on('user:create-admin', onAdminUserCreate);
+hookEmitter.on('user:create', onUserCreate);
+hookEmitter.on('user:update', onUserUpdate);
+hookEmitter.on('user:upsert', onUserUpsert);
+hookEmitter.on('user:delete', onUserDelete);
 
 // #endregion Users
 
@@ -153,4 +151,4 @@ elasticEmitter.on('user:delete', onUserDelete);
 
 // #endregion Institutions
 
-module.exports = elasticEmitter;
+module.exports = hookEmitter;
