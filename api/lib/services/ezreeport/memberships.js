@@ -11,7 +11,7 @@ const ezrAxios = require('./axios');
  */
 async function upsertMembershipFromMembership(membership) {
   const body = {
-    access: membership.permissions.find((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
+    access: membership.permissions.some((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
   };
   const { data } = await ezrAxios.put(`/admin/namespaces/${membership.institutionId}/members/${membership.username}`, body);
 

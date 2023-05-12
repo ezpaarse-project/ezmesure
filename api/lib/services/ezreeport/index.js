@@ -53,9 +53,9 @@ async function syncNamespaces() {
     fetchOptions: {},
     members: i?.memberships
       // Only keeping users which have access to reporting
-      .filter((m) => !!m.permissions.find((p) => /^reporting:/.test(p)))
+      .filter((m) => m.permissions.some((p) => /^reporting:/.test(p)))
       .map((m) => ({
-        access: m.permissions.find((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
+        access: m.permissions.some((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
         username: m.username,
       })),
   })));
