@@ -34,17 +34,17 @@
           <v-text-field
             :value="value.fullName"
             :label="$t('users.user.fullName')"
+            prepend-icon="mdi-account"
             hide-details
             @input="onFilterUpdate('fullName', $event)"
           />
         </v-col>
-      </v-row>
 
-      <v-row>
         <v-col>
           <v-text-field
             :value="value.username"
             :label="$t('users.user.username')"
+            prepend-icon="mdi-account-outline"
             hide-details
             @input="onFilterUpdate('username', $event)"
           />
@@ -56,19 +56,90 @@
           <v-text-field
             :value="value.email"
             :label="$t('users.user.email')"
+            prepend-icon="mdi-email"
             hide-details
             @input="onFilterUpdate('email', $event)"
           />
+        </v-col>
+
+        <v-col>
+          <v-input
+            prepend-icon="mdi-security"
+            hide-details
+            style="padding-top: 12px; margin-top: 4px;"
+          >
+            <v-label class="button-group-label">
+              {{ $t('users.user.isAdmin') }}
+            </v-label>
+
+            <v-btn-toggle
+              :value="value.isAdmin"
+              dense
+              rounded
+              color="primary"
+              @change="onFilterUpdate('isAdmin', $event)"
+            >
+              <v-btn :value="true" small outlined>
+                {{ $t('yes') }}
+              </v-btn>
+
+              <v-btn :value="false" small outlined>
+                {{ $t('no') }}
+              </v-btn>
+            </v-btn-toggle>
+          </v-input>
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
           <v-select
-            :value="value.isAdmin"
-            :items="nullableBooleanOptions"
-            :label="$t('users.user.isAdmin')"
-            @change="onFilterUpdate('isAdmin', typeof $event === 'boolean' ? $event : undefined)"
+            :value="value.permissions"
+            :items="permissions"
+            :label="$t('users.user.permissions')"
+            prepend-icon="mdi-key"
+            multiple
+            hide-details
+            @change="onFilterUpdate('permissions', $event)"
+          >
+            <template #selection="{ item }">
+              <UserTagChip :tag="item" />
+            </template>
+          </v-select>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <v-select
+            :value="value.roles"
+            :items="roles"
+            :label="$t('users.user.roles')"
+            prepend-icon="mdi-tag"
+            multiple
+            hide-details
+            @change="onFilterUpdate('roles', $event)"
+          >
+            <template #selection="{ item }">
+              <UserTagChip :tag="item" />
+            </template>
+          </v-select>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
+          <v-select
+            :value="value.institutions"
+            :items="institutions"
+            :label="$t('users.user.memberships')"
+            prepend-icon="mdi-domain"
+            item-text="acronym"
+            item-value="id"
+            multiple
+            small-chips
+            hide-details
+            @change="onFilterUpdate('institutions', $event)"
           />
         </v-col>
       </v-row>
@@ -77,7 +148,12 @@
 </template>
 
 <script>
+import UserTagChip from './UserTagChip.vue';
+
 export default {
+  components: {
+    UserTagChip,
+  },
   props: {
     value: {
       type: Object,
@@ -87,37 +163,25 @@ export default {
       type: Boolean,
       required: true,
     },
-  },
-  emits: ['input', 'update:show'],
-  computed: {
-    nullableBooleanOptions() {
-      return [
-        { text: '', value: undefined },
-        { text: this.$t('yes'), value: true },
-        { text: this.$t('no'), value: false },
-      ];
+    institutions: {
+      type: Array,
+      default: () => [],
+    },
+    permissions: {
+      type: Array,
+      default: () => [],
+    },
+    roles: {
+      type: Array,
+      default: () => [],
     },
   },
+  emits: ['input', 'update:show'],
   methods: {
     onFilterUpdate(field, val) {
       const filters = { ...this.value };
       filters[field] = val;
       this.$emit('input', filters);
-    },
-    onThreeStateClick(field) {
-      let val = this.value[field];
-      switch (val) {
-        case true:
-          val = false;
-          break;
-        case false:
-          val = undefined;
-          break;
-        default:
-          val = true;
-          break;
-      }
-      this.onFilterUpdate(field, val);
     },
     clearFilters() {
       this.$emit('input', {});
@@ -126,3 +190,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.button-group-label {
+  position: absolute !important;
+  max-width: 133%;
+  transform-origin: top left;
+  transform: translateY(-16px) scale(.75);
+}
+
+.button-group-label + * {
+  transform: translateY(5px)
+}
+</style>
