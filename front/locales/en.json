@@ -307,6 +307,7 @@
       "locked": "Prevent member modification",
       "notEditable": "This member is not editable",
       "accessRights": "Access rights",
+      "institutionManagement": "Institution management",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Documentary contact",

@@ -32,6 +32,7 @@ const {
   updateInstitution,
   getSushiData,
   getInstitutionContacts,
+  getInstitutionMember,
   getInstitutionRepositories,
 } = require('./actions');
 
@@ -129,6 +130,22 @@ router.route({
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/memberships/:username',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.read),
+    getInstitutionMember,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
     },
   },
 });

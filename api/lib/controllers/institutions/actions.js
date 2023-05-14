@@ -24,8 +24,6 @@ const {
 const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
 
-const adminFields = new Set(institutionsDto.adminFields);
-
 function sendValidateInstitution(receivers, data) {
   return sendMail({
     from: sender,
@@ -245,6 +243,28 @@ exports.getInstitutionRepositories = async (ctx) => {
   ctx.status = 200;
 
   ctx.body = Array.isArray(repositories) ? repositories : [];
+};
+
+exports.getInstitutionMember = async (ctx) => {
+  const { institutionId, username } = ctx.params;
+  const { include: propsToInclude } = ctx.query;
+  let include;
+
+  if (Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
+  const membership = await membershipService.findUnique({
+    where: {
+      username_institutionId: { institutionId, username },
+    },
+    include,
+  });
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = membership;
 };
 
 exports.getInstitutionMembers = async (ctx) => {

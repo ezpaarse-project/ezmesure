@@ -2,12 +2,14 @@
   <v-dialog
     ref="dialog"
     v-model="show"
-    max-width="500px"
+    max-width="900px"
   >
     <v-card ref="dialogTitle">
       <v-card-title>
         {{ $t('institutions.members.permissionsOf', { name: fullName }) }}
       </v-card-title>
+
+      <v-divider />
 
       <v-alert
         type="info"
@@ -19,16 +21,31 @@
         {{ $t('institutions.members.notEditable') }}
       </v-alert>
 
+      <v-card-title>
+        {{ $t('institutions.members.institutionManagement') }}
+      </v-card-title>
+
       <v-card-text>
-        <v-treeview
-          v-model="permissions"
-          :items="availablePermissions"
-          :disabled="readonly"
-          selection-type="leaf"
-          color="primary"
-          selected-color="primary"
-          selectable
-          dense
+        <MemberInstitutionPermissions
+          :institution-id="institutionId"
+          :username="username"
+          class="px-0"
+          @change="hasChanged = true"
+        />
+      </v-card-text>
+
+      <v-divider />
+
+      <v-card-title>
+        {{ $t('repositories.repositories') }}
+      </v-card-title>
+
+      <v-card-text>
+        <MemberRepoPermissions
+          :institution-id="institutionId"
+          :username="username"
+          class="px-0"
+          @change="hasChanged = true"
         />
       </v-card-text>
 
@@ -42,16 +59,53 @@
         <v-card-text>
           <v-checkbox
             v-model="roles"
-            :label="$t('institutions.members.documentaryCorrespondent')"
             value="contact:doc"
             hide-details
-          />
+            :disabled="saving"
+            @click="save"
+          >
+            <template #label>
+              {{ $t('institutions.members.documentaryCorrespondent') }}
+              <v-slide-x-transition mode="out-in">
+                <v-icon v-if="successfulSave" key="icon-success" color="success" right>
+                  mdi-check
+                </v-icon>
+                <v-progress-circular
+                  v-else-if="saving"
+                  key="loader"
+                  class="ml-2"
+                  indeterminate
+                  size="18"
+                  width="2"
+                />
+              </v-slide-x-transition>
+            </template>
+          </v-checkbox>
+
           <v-checkbox
             v-model="roles"
-            :label="$t('institutions.members.technicalCorrespondent')"
             value="contact:tech"
             hide-details
-          />
+            :disabled="saving"
+            @click="save"
+          >
+            <template #label>
+              {{ $t('institutions.members.technicalCorrespondent') }}
+              <v-slide-x-transition mode="out-in">
+                <v-icon v-if="successfulSave" key="icon-success" color="success" right>
+                  mdi-check
+                </v-icon>
+                <v-progress-circular
+                  v-else-if="saving"
+                  key="loader"
+                  class="ml-2"
+                  indeterminate
+                  size="18"
+                  width="2"
+                />
+              </v-slide-x-transition>
+            </template>
+          </v-checkbox>
         </v-card-text>
 
         <v-divider />
@@ -59,9 +113,27 @@
         <v-card-text>
           <v-checkbox
             v-model="locked"
-            :label="$t('institutions.members.locked')"
             hide-details
-          />
+            :disabled="saving"
+            @click="save"
+          >
+            <template #label>
+              {{ $t('institutions.members.locked') }}
+              <v-slide-x-transition mode="out-in">
+                <v-icon v-if="successfulSave" key="icon-success" color="success" right>
+                  mdi-check
+                </v-icon>
+                <v-progress-circular
+                  v-else-if="saving"
+                  key="loader"
+                  class="ml-2"
+                  indeterminate
+                  size="18"
+                  width="2"
+                />
+              </v-slide-x-transition>
+            </template>
+          </v-checkbox>
         </v-card-text>
       </template>
 
@@ -77,14 +149,8 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" :loading="saving" :disabled="readonly" @click="save">
-          <v-icon left>
-            mdi-content-save
-          </v-icon>
-          {{ $t('save') }}
-        </v-btn>
         <v-btn outlined @click="show = false">
-          {{ $t('cancel') }}
+          {{ $t('close') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -92,7 +158,14 @@
 </template>
 
 <script>
+import MemberRepoPermissions from '~/components/MemberRepoPermissions.vue';
+import MemberInstitutionPermissions from '~/components/MemberInstitutionPermissions.vue';
+
 export default {
+  components: {
+    MemberRepoPermissions,
+    MemberInstitutionPermissions,
+  },
   props: {
     institutionId: {
       type: String,
@@ -104,10 +177,11 @@ export default {
       show: false,
       saving: false,
       saveError: null,
+      successfulSave: false,
+      hasChanged: false,
       username: '',
       fullName: '',
       roles: [],
-      permissions: [],
       locked: false,
     };
   },
@@ -118,23 +192,12 @@ export default {
     readonly() {
       return (this.locked === true) && !this.isAdmin;
     },
-    availablePermissions() {
-      const createPermissonItem = (featureId, permissionId) => ({
-        id: `${featureId}:${permissionId}`,
-        name: this.$t(`institutions.members.permissionLabels.${featureId}:${permissionId}`),
-      });
-      const createFeatureItem = (featureId, permissionIds) => ({
-        id: featureId,
-        name: this.$t(`institutions.members.featureLabels.${featureId}`),
-        children: permissionIds?.map((id) => createPermissonItem(featureId, id)),
-      });
-
-      return [
-        createFeatureItem('institution', ['read', 'write']),
-        createFeatureItem('memberships', ['read', 'write', 'revoke']),
-        createFeatureItem('sushi', ['read', 'write', 'delete']),
-        createFeatureItem('reporting', ['read', 'write']),
-      ];
+  },
+  watch: {
+    show(visible) {
+      if (!visible && this.hasChanged) {
+        this.$emit('updated');
+      }
     },
   },
   methods: {
@@ -143,13 +206,10 @@ export default {
       this.fullName = memberData?.user?.fullName || '';
       this.roles = Array.isArray(memberData?.roles) ? memberData.roles.slice() : [];
       this.locked = (memberData?.locked === true);
-      this.permissions = Array.isArray(memberData?.permissions) ? memberData.permissions.slice() : [
-        'institution:read',
-        'memberships:read',
-      ];
 
       this.show = true;
       this.saveError = null;
+      this.hasChanged = false;
 
       this.$nextTick().then(() => {
         this.$refs?.dialogTitle?.$el?.scrollIntoView?.();
@@ -167,11 +227,11 @@ export default {
       try {
         await this.$axios.$put(url, {
           roles: this.roles,
-          permissions: this.permissions,
           locked: this.isAdmin ? this.locked : undefined,
         });
-        this.show = false;
-        this.$emit('updated');
+        this.successfulSave = true;
+        this.hasChanged = true;
+        setTimeout(() => { this.successfulSave = false; }, 1000);
       } catch (e) {
         const message = e?.response?.data?.error;
         this.saveError = message || this.$t('institutions.members.failedToUpdatePerms');

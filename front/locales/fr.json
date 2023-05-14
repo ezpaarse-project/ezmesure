@@ -307,6 +307,7 @@
       "locked": "Empêcher la modification du membre",
       "notEditable": "Ce membre n'est pas modifiable",
       "accessRights": "Droits d'accès",
+      "institutionManagement": "Gestion de l'établissement",
       "roles": "Roles",
       "roleNames": {
         "contact:doc": "Contact documentaire",

@@ -51,7 +51,7 @@
           v-if="Array.isArray(item.repositoryPermissions)"
           small
           class="elevation-1"
-          @click="$refs?.accessDialog?.display(institution, item)"
+          @click="updateMember(item)"
         >
           {{ $tc('repositories.xRepositories', item.repositoryPermissions.length) }}
 
@@ -116,7 +116,6 @@
       :institution-id="institutionId"
       @removed="refreshMembers"
     />
-    <MemberAccessDialog ref="accessDialog" @change="refreshMembers" />
   </section>
 </template>
 
@@ -125,7 +124,6 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import MemberSearch from '~/components/MemberSearch.vue';
 import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
 import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
-import MemberAccessDialog from '~/components/MemberAccessDialog.vue';
 
 export default {
   layout: 'space',
@@ -135,7 +133,6 @@ export default {
     MemberSearch,
     MemberDeleteDialog,
     MemberUpdateDialog,
-    MemberAccessDialog,
   },
   async asyncData({
     $axios,
