@@ -136,18 +136,11 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
-  // Make sure that the user exists in the DB
-  await usersService.upsert({
-    where: { username },
-    update: {},
-    create: {
-      username,
-      email: user.email,
-      fullName: user.full_name,
-      isAdmin: user.roles?.includes?.('superuser'),
-    },
-  });
-  appLogger.verbose(`User [${username}] is upserted`);
+  user = await usersService.findUnique({ where: { username } });
+
+  if (!user) {
+    ctx.throw(401);
+  }
 
   ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
