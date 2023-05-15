@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
+const usersElastic = require('../../services/elastic/users');
 const ezreeport = require('../../services/ezreeport');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
-const { sendWelcomeMail, sendPasswordRecovery, sendNewUserToContacts } = require('./mail');
-const randomString = require('./password');
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -81,7 +81,6 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      // Only update the user in the DB, Elasticsearch will be synchronized later
       user = await usersService.update({
         where: { username },
         data: userProps,
@@ -146,12 +145,21 @@ exports.elasticLogin = async (ctx) => {
   ctx.status = 200;
 };
 
-exports.acceptTerms = async (ctx) => {
-  const { user } = ctx.state;
-  const { email, username } = user;
+exports.activate = async (ctx) => {
+  const { body } = ctx.request;
+  const { password } = body;
 
-  if (user?.metadata?.acceptTerms === true) {
-    ctx.status = 204;
+  const { username, email } = ctx.state.user;
+
+  try {
+    const user = await usersService.findUnique({ where: { username } });
+    if (user.metadata.acceptedTerms) {
+      ctx.throw(401, ctx.$t('errors.termsOfUse'));
+      return;
+    }
+  } catch (err) {
+    ctx.status = 500;
+    appLogger.error(`Failed to update user: ${err}`);
     return;
   }
 
@@ -162,6 +170,26 @@ exports.acceptTerms = async (ctx) => {
     appLogger.error(`Failed to update user: ${err}`);
     return;
   }
+
+  const userElastic = await usersElastic.getUser(username);
+
+  if (!userElastic) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+  await usersElastic.updatePassword(username, password);
+
+  let user;
+
+  try {
+    user = await usersService.findUnique({ where: { username } });
+  } catch (err) {
+    ctx.status = 500;
+    appLogger.error(`Failed to get user: ${err}`);
+    return;
+  }
+
+  await sendWelcomeMail(user);
 
   const origin = ctx.get('origin');
   const [, domain] = email.split('@');
@@ -186,7 +214,8 @@ exports.acceptTerms = async (ctx) => {
     }
   }
 
-  ctx.status = 204;
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
 exports.getResetToken = async (ctx) => {
@@ -222,32 +251,27 @@ exports.getResetToken = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const { token, password } = ctx.request.body;
+  const { password } = ctx.request.body;
+  const { username } = ctx.state.user;
 
-  let decoded;
-  try {
-    decoded = jwt.verify(token, secret);
-  } catch (err) {
-    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
-    return;
-  }
-
-  const { username, expiresAt, createdAt } = decoded;
-
-  let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
-  if (!tokenIsValid) {
-    ctx.throw(400, ctx.$t('errors.password.expires'));
-    return;
-  }
-
-  const user = await elastic.security.findUser({ username });
+  const user = await usersService.findUnique({ where: { username } });
   if (!user) {
     ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
     return;
   }
 
-  if (user && user.metadata && user.metadata.passwordDate) {
-    tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+  let decoded;
+  // TODO create middleware to add the content of token in state in param token
+  try {
+    decoded = jwt.verify(ctx.request.headers.authorization.split('Bearer ')[1], secret);
+  } catch (err) {
+    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
+    return;
+  }
+  const { createdAt } = decoded;
+
+  if (user?.metadata?.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(404, ctx.$t('errors.password.expires'));
@@ -255,16 +279,19 @@ exports.resetPassword = async (ctx) => {
     }
   }
 
-  await elastic.security.changePassword({
-    username,
-    body: {
-      password,
-    },
-  });
-
   user.metadata.passwordDate = new Date();
-  user.password = password;
-  await elastic.security.putUser({ username, body: user });
+
+  try {
+    await usersService.update({
+      where: { username },
+      data: { ...user, username },
+    });
+  } catch (err) {
+    ctx.throw(500, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };
@@ -273,19 +300,16 @@ exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;
 
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const { username } = ctx.state.user;
+
+  const user = await usersElastic.getUser(username);
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  await elastic.security.changePassword({
-    username: ctx.state.user.username,
-    body: {
-      password,
-    },
-  });
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };

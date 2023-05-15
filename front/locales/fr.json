@@ -466,7 +466,8 @@
     "notEqual": "Les mots de passes ne correspondent pas",
     "updated": "Mot de passe mis à jour",
     "pattern": "Minimum 6 caractères",
-    "length": "Le mot de passe doit contenir au moins 6 caractères"
+    "length": "Le mot de passe doit contenir au moins 6 caractères",
+    "update": "Mettre à jour votre mot de passe"
   },
   "contact": {
     "contactUs": "Nous contacter",
@@ -494,7 +495,7 @@
     "500": "Une erreur interne est survenue",
     "generic": "Une erreur inattendue est survenue"
   },
-  "validation": {
+  "account": {
     "title": "Activation du compte",
     "description": "Afin d'utiliser ce service, vous vous engagez à respecter le <a href=\"https://www.cnil.fr/fr/reglement-europeen-protection-donnees\" target=\"_blank\">règlement général sur la protection des données</a>.",
     "acceptTerms": "Veuillez accepter les conditions d'utilisation.",

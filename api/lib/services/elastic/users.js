@@ -27,25 +27,41 @@ exports.createAdmin = async function createAdmin() {
 };
 
 /**
- * Create user in elastic with random password.
+ * Get user with his username in elastic.
  *
- * @param {Object} user - Config of user.
- * @param {string} user.username - Username of user
- * @param {string} user.email - Email of user
- * @param {string} user.fullName - Fullname of user
+ * @param {string} username - Username of user.
  *
  * @return {Promise<Object>} Created user.
  */
-exports.createUser = async function createUser(user) {
-  const tmpPassword = await randomString();
+exports.getUser = async function getUser(username) {
+  return elastic.security.findUser({ username });
+};
+
+/**
+ * Create or update user in elastic.
+ *
+ * @param {Object} user - Config of user.
+ * @param {string} user.username - Username of user.
+ * @param {string} user.email - Email of user.
+ * @param {string} user.fullName - Fullname of user.
+ * @param {string} user.roles - Roles of user.hould generate password
+ *
+ * @return {Promise<Object>} Created user.
+ */
+exports.upsertUser = async function upsertUser(user) {
+  let { password = undefined } = user;
+
+  if (!password) {
+    password = await randomString();
+  }
 
   return elastic.security.putUser({
     username: user.username,
     body: {
       email: user.email,
       full_name: user.fullName,
-      password: tmpPassword,
-      roles: ['new_user'],
+      roles: user.roles || [],
+      password,
     },
   });
 };
@@ -78,7 +94,25 @@ exports.updateUser = function updateUser(user) {
  * @param {string} username - Username of user.
  * @returns {Promise<Object>} Deleted user.
  */
-exports.deleteUser = function deleteUser(username) {
-  // TODO check if user exist
+exports.deleteUser = async function deleteUser(username) {
+  const userExist = await this.getUser(username);
+  if (!userExist) return;
   return elastic.security.deleteUser({ username });
+};
+
+/**
+ * Update password of user in elastic
+ *
+ * @param {*} username - Username of user.
+ * @param {*} password - Password of user.
+ *
+ * @returns {Promise<Object>} Updated user.
+ */
+exports.updatePassword = function updatePassword(username, password) {
+  return elastic.security.changePassword({
+    username,
+    body: {
+      password,
+    },
+  });
 };

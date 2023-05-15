@@ -8,18 +8,13 @@ const { requireJwt, requireUser } = require('../../services/auth');
 const {
   getToken,
   getUser,
-  acceptTerms,
   getResetToken,
   resetPassword,
   changePassword,
   getMemberships,
   getReportingToken,
+  activate,
 } = require('./auth');
-
-const schema = {
-  password: Joi.string().trim().min(6).required(),
-  passwordRepeat: Joi.string().trim().min(6).equal(Joi.ref('password')).required(),
-};
 
 router.route({
   method: 'POST',
@@ -36,6 +31,8 @@ router.route({
   },
 });
 
+router.use(requireJwt, requireUser);
+
 router.route({
   method: 'POST',
   path: '/password/_reset',
@@ -46,19 +43,32 @@ router.route({
   validate: {
     type: 'json',
     body: Joi.object({
-      token: Joi.string().trim().required(),
-      ...schema,
+      password: Joi.string().trim().min(6).required(),
     }),
   },
 });
 
-router.use(requireJwt, requireUser);
+router.route({
+  method: 'POST',
+  path: '/_activate',
+  handler: [
+    bodyParser(),
+    activate,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.object({
+      password: Joi.string().trim().min(6).required(),
+      acceptTerms: Joi.boolean().valid(true).required(),
+    }),
+  },
+});
 
 router.get('/', getUser);
 router.get('/reporting_token', getReportingToken);
 router.get('/memberships', getMemberships);
 router.get('/token', getToken);
-router.post('/terms/accept', acceptTerms);
+
 router.route({
   method: 'PUT',
   path: '/password',
@@ -68,7 +78,9 @@ router.route({
   ],
   validate: {
     type: 'json',
-    body: Joi.object(schema),
+    body: Joi.object({
+      password: Joi.string().trim().min(6).required(),
+    }),
   },
 });
 

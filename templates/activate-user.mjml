@@ -19,6 +19,14 @@
     </mj-text>
 
     <mj-text>
+      Vous pouvez activer votre compte en créant votre mot de passe en cliquant sur le bouton suivant :
+    </mj-text>
+
+    <mj-button href="{{ activateLink }}" font-family="Helvetica" background-color="#9c27b0" color="white">
+      Activer votre compte
+    </mj-button>
+
+    <mj-text>
       <p>Cordialement,</p>
       <p>L'équipe ezMESURE.</p>
     </mj-text>

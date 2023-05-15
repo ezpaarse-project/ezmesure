@@ -49,7 +49,7 @@ module.exports = class UsersService {
       email: params.data.email,
       fullName: params.data.fullName,
     };
-    await elastic.createUser(userData);
+    await elastic.upsertUser(userData);
 
     return prisma.user.create(params);
   }
@@ -101,6 +101,9 @@ module.exports = class UsersService {
       username: params.data.username?.toString() || '',
       email: params.data.email?.toString() || '',
       fullName: params.data.fullName?.toString() || '',
+      metadata: {
+        passwordDate: params.data?.metadata?.passwordDate?.toString() || '',
+      },
     };
 
     await elastic.updateUser(userData);
@@ -127,13 +130,16 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async upsert(params) {
-    const userData = {
-      username: params?.create?.username,
-      email: params?.create?.email,
-      fullName: params?.create?.fullName,
-    };
+    const elasticUser = await elastic.getUser(params?.create?.username);
+    if (!elasticUser) {
+      const userData = {
+        username: params?.create?.username,
+        email: params?.create?.email,
+        fullName: params?.create?.fullName,
+      };
+      await elastic.upsertUser(userData);
+    }
 
-    await elastic.createUser(userData);
     return prisma.user.upsert(params);
   }
 
@@ -142,7 +148,9 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    await elastic.deleteUser(params.where.username);
+    if (params?.where?.username) {
+      await elastic.deleteUser(params.where.username);
+    }
 
     return prisma.user.delete(params).catch((e) => {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
@@ -150,5 +158,14 @@ module.exports = class UsersService {
       }
       throw e;
     });
+  }
+
+  /**
+   * @param {string} username
+   * @param {string} password
+   * @returns {Promise<User>}
+   */
+  static async updatePassword(username, password) {
+    return elastic.updatePassword(username, password);
   }
 };
