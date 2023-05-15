@@ -28,8 +28,9 @@ exports.randomString = function randomString() {
  * Generates a token for the activation of the user's account.
  *
  * @param {string} origin - Host origin.
- * @param {string} username - Username of the user who needs to activate his account..
- * @returns 
+ * @param {string} username - Username of the user who needs to activate his account.
+ *
+ * @returns {string}
  */
 exports.activateUserLink = function activateUserLink(origin, username) {
   const currentDate = new Date();
@@ -43,6 +44,14 @@ exports.activateUserLink = function activateUserLink(origin, username) {
   return `${origin}/activate?token=${token}`;
 };
 
+/**
+ * Generates data for the content of the email for password recovery.
+ *
+ * @param {string} origin - Host origin.
+ * @param {string} username - Username of the user who needs to recreate his password.
+ *
+ * @returns {Object}
+ */
 exports.mailDataForPasswordRecovery = function mailDataForPasswordRecovery(origin, username) {
   const currentDate = new Date();
   const expiresAt = addHours(currentDate, passwordResetValidity);
