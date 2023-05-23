@@ -21,7 +21,7 @@ env:
   ERD_WS_KEY: ${{ secrets.PRISMA_ERD_API_KEY }}
 
 jobs:
-  generate-erd:
+  generate-db-doc:
     permissions: write-all
     runs-on: ubuntu-latest
 
