@@ -1,4 +1,4 @@
-name: Generate ERD of api database
+name: Generate database documentation of api database
 
 on:
   push:
@@ -11,8 +11,14 @@ on:
 
 env:
   PRISMA_SCHEMA: api/prisma/schema.prisma
-  OUT_PATH: api/prisma/doc/ERD.svg
-  COMMIT_NAME: 'doc(api): updated ERD[skip ci]'
+  OUT_ERD_PATH: api/prisma/doc/ERD.svg
+  OUT_DIC_PATH: api/prisma/doc/DIC.md
+  DIC_NAME: ezMESURE
+  COMMIT_NAME: 'doc(api): updated database documentation[skip ci]'
+  COMMIT_BODY: '${{ github.event.compare }}'
+  COMMIT_FOOTER: 'Co-authored-by: @${{ github.event.sender.login }}'
+  ERD_WS: https://p-erd.oxypomme.fr/
+  ERD_WS_KEY: ${{ secrets.PRISMA_ERD_API_KEY }}
 
 jobs:
   generate-erd:
@@ -24,7 +30,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate ERD
-        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -o "${{ env.OUT_PATH }}" https://p-erd.oxypomme.fr/erd/'
+        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_ERD_PATH }}" ${{ env.ERD_WS }}/erd/'
+
+      - name: Generate Data dictionary
+        run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_DIC_PATH }}" ${{ env.ERD_WS }}/dict/\?name\=${{ env.DIC_NAME }}'
 
       - name: Setup Node
         uses: actions/setup-node@v3
