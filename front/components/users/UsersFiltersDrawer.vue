@@ -133,8 +133,8 @@
             :value="value.institutions"
             :items="institutions"
             :label="$t('users.user.memberships')"
+            :item-text="(v) => v.acronym || v.name"
             prepend-icon="mdi-domain"
-            item-text="acronym"
             item-value="id"
             multiple
             small-chips
