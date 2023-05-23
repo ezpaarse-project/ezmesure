@@ -516,10 +516,12 @@
         "type": "object",
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/User",
+            "readOnly": true
           },
           "repository": {
-            "$ref": "#/components/schemas/Repository"
+            "$ref": "#/components/schemas/Repository",
+            "readOnly": true
           },
           "permissions": {
             "description": "User permissions for the repository",
@@ -3070,6 +3072,60 @@
         "description": "Remove a member from an institution"
       }
     },
+    "/institutions/{id}/repositories": {
+      "get": {
+        "summary": "Get institution repositories",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Repository"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-institutions-:id-repositories",
+        "description": "Get the repositories of an institution. Must be either admin or have read access to members."
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ]
+    },
     "/institutions/{id}/state": {
       "parameters": [
         {
@@ -4441,6 +4497,108 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Repositories"
+        ]
+      }
+    },
+    "/repositories/{id}/permissions/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the repository"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "username of the member"
+        }
+      ],
+      "put": {
+        "summary": "Set repository permissions for a user",
+        "description": "Set repository permissions for a user",
+        "operationId": "put-repositories-id-permissions-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryPermission"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Repository"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete repository permissions for a user",
+        "description": "Delete repository permissions for a user, so that he cannot access it anymore",
+        "operationId": "delete-repository-id-permissions-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryPermission"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
