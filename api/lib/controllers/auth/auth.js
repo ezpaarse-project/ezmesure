@@ -149,45 +149,29 @@ exports.activate = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;
 
-  const { username, email } = ctx.state.user;
+  const { user, email } = ctx.state.user;
+
+  if (user.metadata.acceptedTerms) {
+    ctx.throw(409, ctx.$t('errors.termsOfUse'));
+    return;
+  }
 
   try {
-    const user = await usersService.findUnique({ where: { username } });
-    if (user.metadata.acceptedTerms) {
-      ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
-      return;
-    }
+    await usersService.acceptTerms(user.username);
   } catch (err) {
     ctx.status = 500;
     appLogger.error(`Failed to update user: ${err}`);
     return;
   }
 
-  try {
-    await usersService.acceptTerms(username);
-  } catch (err) {
-    ctx.status = 500;
-    appLogger.error(`Failed to update user: ${err}`);
-    return;
-  }
-
-  const userElastic = await usersElastic.getUser(username);
+  const userElastic = await usersElastic.getUser(user.username);
 
   if (!userElastic) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
-  await usersElastic.updatePassword(username, password);
 
-  let user;
-
-  try {
-    user = await usersService.findUnique({ where: { username } });
-  } catch (err) {
-    ctx.status = 500;
-    appLogger.error(`Failed to get user: ${err}`);
-    return;
-  }
+  await usersElastic.updatePassword(user.username, password);
 
   await sendWelcomeMail(user);
 
