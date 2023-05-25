@@ -1,15 +1,5 @@
 <template>
   <section>
-    <v-alert
-      class="mt-1"
-      :value="sendError"
-      dismissible
-      prominent
-      dense
-      type="error"
-    >
-      {{ sendErrorText }}
-    </v-alert>
     <v-text-field
       v-model="password"
       class="mb-2"
@@ -46,8 +36,6 @@ export default {
       passwordRepeat: '',
       sendingPassword: false,
       showPassword: false,
-      sendError: null,
-      sendErrorText: '',
       validForm: false,
     };
   },
