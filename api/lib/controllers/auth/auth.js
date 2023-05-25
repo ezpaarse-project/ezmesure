@@ -149,10 +149,11 @@ exports.activate = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;
 
-  const { user, email } = ctx.state.user;
+  const { user } = ctx.state;
+  const { email } = user;
 
-  if (user.metadata.acceptedTerms) {
-    ctx.throw(409, ctx.$t('errors.termsOfUse'));
+  if (user?.metadata?.acceptedTerms) {
+    ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
     return;
   }
 
@@ -242,8 +243,10 @@ exports.resetPassword = async (ctx) => {
 
   const user = await usersService.findUnique({ where: { username } });
 
+  user.metadata = user.metadata || {};
+
   if (user?.metadata?.passwordDate) {
-    const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(404, ctx.$t('errors.password.expires'));
