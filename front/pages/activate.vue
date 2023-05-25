@@ -23,7 +23,7 @@
               {{ $t("account.acceptTerms") }}
             </v-alert>
 
-            <v-form @submit.prevent="submit">
+            <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
               <!-- eslint-disable-next-line -->
               <p v-html="$t('validation.description')" />
@@ -74,6 +74,13 @@ export default {
       activated: false,
       password: false,
     };
+  },
+  computed: {
+    validForm() {
+      return [
+        !!this.password && !(this.password.length < 6) && this.accepted,
+      ];
+    },
   },
   methods: {
     setPassword(value) {

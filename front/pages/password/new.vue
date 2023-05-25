@@ -14,7 +14,7 @@
           </v-toolbar>
 
           <v-card-text>
-            <v-form @submit.prevent="submit">
+            <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
 
               <v-btn
@@ -54,6 +54,13 @@ export default {
       password: false,
       accepted: false,
     };
+  },
+  computed: {
+    validForm() {
+      return [
+        !!this.password && !(this.password.length < 6),
+      ];
+    },
   },
   methods: {
     setPassword(value) {
