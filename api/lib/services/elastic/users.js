@@ -38,13 +38,38 @@ exports.getUser = async function getUser(username) {
 };
 
 /**
- * Create or update user in elastic.
+ * Create user in elastic.
  *
  * @param {Object} user - Config of user.
  * @param {string} user.username - Username of user.
  * @param {string} user.email - Email of user.
  * @param {string} user.fullName - Fullname of user.
  * @param {string} user.roles - Roles of user.hould generate password
+ *
+ * @return {Promise<Object>} Created user.
+ */
+exports.createUser = async function createUser(user) {
+  const password = await randomString();
+
+  return elastic.security.putUser({
+    username: user.username,
+    body: {
+      email: user.email,
+      full_name: user.fullName,
+      roles: user.roles || [],
+      password,
+    },
+  });
+};
+
+/**
+ * Create or update user in elastic.
+ *
+ * @param {Object} user - Config of user.
+ * @param {string} user.username - Username of user.
+ * @param {string} user.email - Email of user.
+ * @param {string} user.fullName - Fullname of user.
+ * @param {Array} user.roles - Roles of user.hould generate password
  *
  * @return {Promise<Object>} Created user.
  */
