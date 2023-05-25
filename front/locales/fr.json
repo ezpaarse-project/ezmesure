@@ -209,6 +209,9 @@
     "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
     "noLogo": "Pas de logo",
+    "reports": {
+      "reports": "Rapports"
+    },
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement *",
