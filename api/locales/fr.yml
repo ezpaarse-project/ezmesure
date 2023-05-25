@@ -72,6 +72,7 @@ errors:
     cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
 
   user:
+    alreadyActivated: Ce compte est déjà activé
     notFound: Utilisateur introuvable
     noEmail: L'email obligatoire est absent du profil utilisateur
     failedToSave: Impossible de sauvegarder les données utilisateur

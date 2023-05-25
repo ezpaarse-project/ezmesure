@@ -154,7 +154,7 @@ exports.activate = async (ctx) => {
   try {
     const user = await usersService.findUnique({ where: { username } });
     if (user.metadata.acceptedTerms) {
-      ctx.throw(401, ctx.$t('errors.termsOfUse'));
+      ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
       return;
     }
   } catch (err) {
@@ -204,6 +204,7 @@ exports.activate = async (ctx) => {
   if (Array.isArray(correspondents) && correspondents.length > 0) {
     const emails = correspondents.map((c) => c?.email).filter((x) => x);
 
+    // TODO manage this if the user belongs to several institutions
     try {
       await sendNewUserToContacts(emails, {
         manageMemberLink: `${origin}/institutions/self/members`,
@@ -223,7 +224,7 @@ exports.getResetToken = async (ctx) => {
 
   const username = body.username || ctx.state.user.username;
 
-  const user = await elastic.security.findUser({ username });
+  const user = await usersElastic.getUser(username);
 
   if (!user) {
     ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
@@ -253,22 +254,9 @@ exports.getResetToken = async (ctx) => {
 exports.resetPassword = async (ctx) => {
   const { password } = ctx.request.body;
   const { username } = ctx.state.user;
+  const { createdAt } = ctx.state.jwtdata;
 
   const user = await usersService.findUnique({ where: { username } });
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
-    return;
-  }
-
-  let decoded;
-  // TODO create middleware to add the content of token in state in param token
-  try {
-    decoded = jwt.verify(ctx.request.headers.authorization.split('Bearer ')[1], secret);
-  } catch (err) {
-    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
-    return;
-  }
-  const { createdAt } = decoded;
 
   if (user?.metadata?.passwordDate) {
     const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
@@ -284,7 +272,7 @@ exports.resetPassword = async (ctx) => {
   try {
     await usersService.update({
       where: { username },
-      data: { ...user, username },
+      data: user,
     });
   } catch (err) {
     ctx.throw(500, ctx.$t('errors.auth.noUserFound'));
