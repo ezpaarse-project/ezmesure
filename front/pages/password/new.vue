@@ -14,6 +14,16 @@
           </v-toolbar>
 
           <v-card-text>
+            <v-alert
+              class="mt-1"
+              :value="error"
+              dismissible
+              prominent
+              dense
+              type="error"
+            >
+              {{ sendErrorText }}
+            </v-alert>
             <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
 
@@ -22,7 +32,7 @@
                 color="primary"
                 type="submit"
                 class="my-2"
-                :disabled="password < 6"
+                :disabled="!validForm"
                 :loading="loading"
               >
                 {{ $t("password.update") }}
@@ -53,14 +63,10 @@ export default {
       loading: false,
       password: false,
       accepted: false,
+      validForm: false,
+      error: null,
+      sendErrorText: '',
     };
-  },
-  computed: {
-    validForm() {
-      return [
-        !!this.password && !(this.password.length < 6),
-      ];
-    },
   },
   methods: {
     setPassword(value) {
@@ -76,6 +82,13 @@ export default {
         this.$router.replace({ path: '/myspace' });
       } catch (e) {
         this.error = true;
+        if (e.response.status >= 400 && e.response.status < 500) {
+          this.sendErrorText = e.response.data.error;
+        } else if (e.response.statusText) {
+          this.sendErrorText = e.response.statusText;
+        } else {
+          this.sendErrorText = e.message;
+        }
       }
       this.loading = false;
     },

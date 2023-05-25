@@ -23,6 +23,16 @@
               {{ $t("account.acceptTerms") }}
             </v-alert>
 
+            <v-alert
+              class="mt-1"
+              :value="error"
+              dismissible
+              prominent
+              dense
+              type="error"
+            >
+              {{ sendErrorText }}
+            </v-alert>
             <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
               <!-- eslint-disable-next-line -->
@@ -39,7 +49,7 @@
                 color="primary"
                 type="submit"
                 class="my-2"
-                :disabled="!accepted"
+                :disabled="validForm"
                 :loading="loading"
               >
                 {{ $t("account.activate") }}
@@ -70,17 +80,12 @@ export default {
       pleaseAccept: false,
       accepted: false,
       error: false,
+      sendErrorText: '',
       loading: false,
       activated: false,
       password: false,
+      validForm: false,
     };
-  },
-  computed: {
-    validForm() {
-      return [
-        !!this.password && !(this.password.length < 6) && this.accepted,
-      ];
-    },
   },
   methods: {
     setPassword(value) {
@@ -117,6 +122,13 @@ export default {
         this.$router.replace({ path: '/myspace' });
       } catch (e) {
         this.error = true;
+        if (e.response.status >= 400 && e.response.status < 500) {
+          this.sendErrorText = e.response.data.error;
+        } else if (e.response.statusText) {
+          this.sendErrorText = e.response.statusText;
+        } else {
+          this.sendErrorText = e.message;
+        }
       }
 
       this.loading = false;
