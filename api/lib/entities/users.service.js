@@ -48,6 +48,7 @@ module.exports = class UsersService {
       username: params.data.username,
       email: params.data.email,
       fullName: params.data.fullName,
+      roles: [],
     };
     await elastic.upsertUser(userData);
 
