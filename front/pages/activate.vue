@@ -10,19 +10,6 @@
           </v-toolbar>
 
           <v-card-text>
-            <v-alert v-model="error" dismissible prominent dense type="error">
-              {{ $t("errors.generic") }}
-            </v-alert>
-            <v-alert
-              v-model="pleaseAccept"
-              dismissible
-              prominent
-              dense
-              type="error"
-            >
-              {{ $t("account.acceptTerms") }}
-            </v-alert>
-
             <v-alert
               class="mt-1"
               :value="error"
@@ -36,12 +23,12 @@
             <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
               <!-- eslint-disable-next-line -->
-              <p v-html="$t('validation.description')" />
+              <p v-html="$t('account.description')" />
 
               <v-checkbox
                 v-model="accepted"
-                :rules="[() => !!accepted || $t('validation.acceptTerms')]"
-                :label="$t('validation.readAndAccept')"
+                :rules="[() => !!accepted || $t('account.acceptTerms')]"
+                :label="$t('account.readAndAccept')"
               />
 
               <v-btn
@@ -49,7 +36,7 @@
                 color="primary"
                 type="submit"
                 class="my-2"
-                :disabled="validForm"
+                :disabled="!validForm"
                 :loading="loading"
               >
                 {{ $t("account.activate") }}
@@ -92,15 +79,16 @@ export default {
       this.password = value;
     },
     async submit() {
-      this.loading = true;
-
       this.error = false;
       this.pleaseAccept = false;
 
       if (!this.accepted) {
         this.pleaseAccept = true;
+        this.sendErrorText = this.$t('account.acceptTerms');
         return;
       }
+
+      this.loading = true;
 
       try {
         let headers;
