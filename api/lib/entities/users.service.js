@@ -1,4 +1,5 @@
 // @ts-check
+const elasticUsers = require('../services/elastic/users');
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const hooks = require('../hooks');
@@ -55,9 +56,7 @@ module.exports = class UsersService {
    */
   static async create(params) {
     const user = await prisma.user.create(params);
-
     hooks.emit('user:create', user);
-
     return user;
   }
 
@@ -103,11 +102,8 @@ module.exports = class UsersService {
    */
   static async update(params) {
     // TODO manage role
-
     const user = await prisma.user.update(params);
-
     hooks.emit('user:update', user);
-
     return user;
   }
 
@@ -132,9 +128,7 @@ module.exports = class UsersService {
    */
   static async upsert(params) {
     const user = await prisma.user.upsert(params);
-
     hooks.emit('user:upsert', user);
-
     return user;
   }
 
@@ -157,5 +151,14 @@ module.exports = class UsersService {
     hooks.emit('user:delete', user);
 
     return user;
+  }
+
+  /**
+   * @param {string} username
+   * @param {string} password
+   * @returns {Promise<User>}
+   */
+  static async updatePassword(username, password) {
+    return elasticUsers.updatePassword(username, password);
   }
 };

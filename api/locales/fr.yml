@@ -73,6 +73,7 @@ errors:
     notEditable: Ce membre n'est pas modifiable
 
   user:
+    alreadyActivated: Ce compte est déjà activé
     notFound: Utilisateur introuvable
     noEmail: L'email obligatoire est absent du profil utilisateur
     failedToSave: Impossible de sauvegarder les données utilisateur
