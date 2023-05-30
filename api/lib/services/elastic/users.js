@@ -74,9 +74,10 @@ exports.createUser = async function createUser(user) {
  * @return {Promise<Object>} Created user.
  */
 exports.upsertUser = async function upsertUser(user) {
-  let { password = undefined } = user;
+  let { password } = user;
 
-  if (!password) {
+  const userExist = await this.getUser(user.username);
+  if (!userExist) {
     password = await randomString();
   }
 
@@ -120,9 +121,7 @@ exports.updateUser = function updateUser(user) {
  * @returns {Promise<Object>} Deleted user.
  */
 exports.deleteUser = async function deleteUser(username) {
-  const userExist = await this.getUser(username);
-  if (!userExist) return;
-  return elastic.security.deleteUser({ username });
+  return elastic.security.deleteUser({ username }, { ignore: [404] });
 };
 
 /**

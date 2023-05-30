@@ -13,7 +13,7 @@ const requireJwt = jwt({
 });
 
 const requireUser = async (ctx, next) => {
-  const username = ctx.state?.jwt?.username || ctx.state?.jwtdata.username;
+  const username = ctx.state?.jwtdata?.username;
 
   if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
