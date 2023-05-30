@@ -2,14 +2,13 @@
   <v-menu
     v-model="showMemberMenu"
     :close-on-content-click="false"
-    :nudge-width="200"
+    :nudge-width="250"
   >
     <template #activator="{ on, attrs }">
       <v-btn
         color="primary"
         v-bind="attrs"
         v-on="on"
-        @click="resetForm"
       >
         <v-icon left>
           mdi-account-plus
@@ -18,95 +17,67 @@
       </v-btn>
     </template>
 
-    <v-card>
+    <v-card :loading="loading" min-height="250">
+      <v-card-title primary-title>
+        {{ $t('institutions.members.addMember') }}
+
+        <v-spacer />
+
+        <v-btn icon @click="closeMenu">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+
       <v-card-text>
         <v-form>
-          <v-autocomplete
-            v-model="selected"
-            :items="users"
-            :loading="loading"
-            :search-input.sync="search"
-            :item-disabled="(item) => !isAdmin && isConnectedUser(item)"
-            item-text="fullName"
+          <v-text-field
+            v-model="search"
             :label="$t('search')"
-            prepend-inner-icon="mdi-account-search"
             :error="failedToSearch"
             :error-messages="errorMessages"
-            no-filter
-            clearable
-            hide-no-data
-            dense
-            outlined
-            return-object
-            autofocus
-          >
-            <template #item="{ item }">
-              <v-list-item-avatar>
-                <v-icon>mdi-account-circle</v-icon>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ item.fullName }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </template>
-          </v-autocomplete>
-
-          <v-select
-            v-model="selectedPermission"
-            :items="permissions"
-            :label="$t('institutions.members.permissions')"
-            dense
-            outlined
+            prepend-inner-icon="mdi-account-search"
             hide-details
-          />
-
-          <template v-if="isAdmin">
-            <v-checkbox
-              v-model="isDocContact"
-              :label="$t('institutions.members.documentaryCorrespondent')"
-              hide-details
-              @change="handleContactChange"
-            />
-            <v-checkbox
-              v-model="isTechContact"
-              :label="$t('institutions.members.technicalCorrespondent')"
-              hide-details
-              @change="handleContactChange"
-            />
-          </template>
-
-          <v-alert
-            type="error"
             dense
             outlined
-            :value="!!addMemberError"
-            class="mt-4"
-          >
-            {{ addMemberError }}
-          </v-alert>
+            autofocus
+          />
         </v-form>
       </v-card-text>
 
-      <v-card-actions>
-        <v-spacer />
-
-        <v-btn
-          color="primary"
-          :disabled="!selected"
-          :loading="addingMember"
-          @click="addSelectedMember"
+      <v-list v-if="hasUsers">
+        <v-list-item
+          v-for="user in users" :key="user.username"
+          :disabled="!isAdmin && isConnectedUser(user)"
         >
-          <v-icon left>
-            mdi-account-plus
-          </v-icon>
-          {{ $t('add') }}
-        </v-btn>
+          <v-list-item-avatar>
+            <v-icon>mdi-account-circle</v-icon>
+          </v-list-item-avatar>
 
-        <v-btn outlined @click="closeMenu">
-          {{ $t('close') }}
-        </v-btn>
-      </v-card-actions>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ user.fullName }}
+            </v-list-item-title>
+          </v-list-item-content>
+
+          <v-list-item-action>
+            <v-btn small color="primary" @click="select(user)">
+              <v-icon>
+                mdi-account-plus
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+
+      <v-card-text v-else class="text-center">
+        <div v-if="hasSearched" class="text-center">
+          {{ $t('institutions.members.personNotRegistered') }}
+        </div>
+
+        <v-icon v-else size="64" color="grey lighten-2">
+          mdi-account-search
+        </v-icon>
+      </v-card-text>
     </v-card>
   </v-menu>
 </template>
@@ -125,14 +96,9 @@ export default {
     return {
       showMemberMenu: false,
       loading: false,
-      addingMember: false,
-      addMemberError: null,
       failedToSearch: false,
+      hasSearched: false,
       search: null,
-      selected: null,
-      selectedPermission: 'read',
-      isTechContact: false,
-      isDocContact: false,
       users: [],
     };
   },
@@ -143,24 +109,19 @@ export default {
     errorMessages() {
       return this.failedToSearch ? [this.$t('institutions.members.failedToSearch')] : [];
     },
-    permissions() {
-      return [
-        {
-          value: 'read',
-          text: this.$t('institutions.members.read'),
-        },
-        {
-          value: 'write',
-          text: `${this.$t('institutions.members.read')} / ${this.$t('institutions.members.write')}`,
-        },
-      ];
+    hasUsers() {
+      return Array.isArray(this.users) && this.users.length > 0;
     },
   },
   watch: {
     search(value) {
-      // eslint-disable-next-line camelcase
-      if (this.selected?.fullName !== value) {
+      if (value) {
         this.doSearch(value);
+      }
+    },
+    showMemberMenu(isVisible, wasVisible) {
+      if (isVisible && !wasVisible) {
+        this.resetForm();
       }
     },
   },
@@ -169,22 +130,20 @@ export default {
       this.showMemberMenu = false;
     },
 
+    select(user) {
+      this.$emit('select', user);
+      this.closeMenu();
+    },
+
     resetForm() {
       this.search = null;
-      this.selected = null;
-      this.selectedPermission = 'read';
-      this.addMemberError = null;
       this.failedToSearch = false;
+      this.hasSearched = false;
+      this.users = [];
     },
 
     isConnectedUser(item) {
       return item?.username === this.$auth?.user?.username;
-    },
-
-    handleContactChange(newValue) {
-      if (newValue === true) {
-        this.selectedPermission = 'write';
-      }
     },
 
     doSearch: debounce(async function doSearch() {
@@ -203,31 +162,9 @@ export default {
         this.failedToSearch = true;
       }
 
+      this.hasSearched = true;
       this.loading = false;
     }, 500),
-
-    async addSelectedMember() {
-      if (!this.selected?.username || !this.institutionId) { return; }
-
-      this.addingMember = true;
-      this.addMemberError = null;
-
-      const { username } = this.selected;
-
-      try {
-        await this.$axios.put(`/institutions/${this.institutionId}/memberships/${username}`, {
-          isDocContact: this.isAdmin ? this.isDocContact : undefined,
-          isTechContact: this.isAdmin ? this.isTechContact : undefined,
-        });
-        this.showMemberMenu = false;
-        this.$emit('added');
-      } catch (e) {
-        const message = e?.response?.data?.error;
-        this.addMemberError = message || this.$t('institutions.members.failedToAdd');
-      }
-
-      this.addingMember = false;
-    },
   },
 };
 </script>

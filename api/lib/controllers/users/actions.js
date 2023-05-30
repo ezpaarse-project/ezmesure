@@ -22,6 +22,9 @@ exports.getUser = async (ctx) => {
 
 exports.list = async (ctx) => {
   const { user } = ctx.state;
+  const {
+    include: propsToInclude,
+  } = ctx.query;
 
   const {
     q: search = '',
@@ -41,9 +44,26 @@ exports.list = async (ctx) => {
     select = undefined;
   }
 
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(
+      propsToInclude.map(
+        (prop) => {
+          const [parent, child] = prop.split('.', 2);
+          if (child) {
+            return [parent, { include: { [child]: true } }];
+          }
+          return [prop, true];
+        },
+      ),
+    );
+  }
+
   const users = await usersService.findMany({
     take: Number.parseInt(size, 10),
     select,
+    include,
     where: {
       OR: [
         { username: { contains: search, mode: 'insensitive' } },
@@ -60,13 +80,16 @@ exports.createOrReplaceUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
-  const userExists = !!await usersService.findUnique({ where: { username } });
+  const userExists = !!(await usersService.findUnique({ where: { username } }));
 
-  ctx.body = await usersService.upsert({
+  const user = await usersService.upsert({
     where: { username },
     update: { ...body, username },
     create: { ...body, username },
   });
+  appLogger.verbose(`User [${user.username}] is upserted`);
+
+  ctx.body = user;
 
   if (!userExists) {
     const origin = ctx.get('origin');
@@ -86,24 +109,27 @@ exports.updateUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
-  const userExists = !!await usersService.findUnique({ where: { username } });
+  const userExists = !!(await usersService.findUnique({ where: { username } }));
 
   if (!userExists) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
   }
 
-  ctx.body = await usersService.update({
+  const user = await usersService.update({
     where: { username },
     data: { ...body, username },
   });
+  appLogger.verbose(`User [${username}] is updated`);
 
+  ctx.body = user;
   ctx.status = 200;
 };
 
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
 
-  const found = !!await usersService.delete({ where: { username } });
+  const found = !!(await usersService.delete({ where: { username } }));
+  appLogger.verbose(`User [${username}] is deleted`);
 
   ctx.status = 200;
   ctx.body = { found };

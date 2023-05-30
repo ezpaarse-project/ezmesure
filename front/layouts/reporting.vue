@@ -12,8 +12,19 @@
         api-url="/report/api/v1/"
       >
         <v-fade-transition>
-          <v-alert v-if="$fetchState.error" type="error" class="ma-2">
-            {{ $t('anErrorOccurred') }}
+          <v-alert v-if="$fetchState.error" type="error" class="ma-2" prominent>
+            <div class="d-flex align-center">
+              {{ $t('anErrorOccurred') }}
+
+              <v-spacer />
+
+              <v-btn @click="$fetch">
+                {{ $t('retry') }}
+                <v-icon right>
+                  mdi-reload
+                </v-icon>
+              </v-btn>
+            </div>
           </v-alert>
 
           <v-overlay

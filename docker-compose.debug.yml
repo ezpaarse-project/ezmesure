@@ -44,7 +44,6 @@ services:
       - "./api:/usr/src/app"
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
-      - "./templates:/usr/src/app/templates"
     working_dir: /usr/src/app
     environment:
       - http_proxy

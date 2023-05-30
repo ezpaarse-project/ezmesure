@@ -79,6 +79,7 @@
             v-model="sushiForm.tags"
             :items="[]"
             :label="$t('institutions.sushi.tags')"
+            :hint="$t('institutions.sushi.tagsDescription')"
             item-text="name"
             hide-selected
             return-object
@@ -86,6 +87,7 @@
             multiple
             small-chips
             deletable-chips
+            persistent-hint
             outlined
           />
 

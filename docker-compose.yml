@@ -128,7 +128,6 @@ services:
     volumes:
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
       - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
-      - "./templates:/usr/src/app/templates"
     restart: unless-stopped
 
   front:
@@ -194,7 +193,7 @@ services:
       - ELASTIC_REQUIRED_STATUS
       - ELASTIC_MAX_TRIES
       # database
-      - DATABASE_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZREEPORT_POSTGRES_DB}?schema=public
+      - DATABASE_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZREEPORT_POSTGRES_DB:-ezreeport}?schema=public
       # workers
       - WORKERS_CONCURRENCE=${EZREEPORT_WORKERS_CONCURRENCE}
       - WORKERS_MAX_EXEC_TIME=${EZREEPORT_WORKERS_MAX_EXEC_TIME}

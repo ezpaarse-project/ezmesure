@@ -49,8 +49,8 @@ export default {
   },
   methods: {
     confirmRemove(memberData = {}) {
-      this.member.username = memberData?.username || '';
-      this.member.fullName = memberData?.fullName || '';
+      this.member.username = memberData?.user?.username || '';
+      this.member.fullName = memberData?.user?.fullName || '';
       this.member.creator = memberData?.creator;
       this.show = true;
     },
@@ -68,7 +68,8 @@ export default {
         this.show = false;
         this.$emit('removed');
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.members.failedToRemoveMember'));
+        const msg = e?.response?.data?.error;
+        this.$store.dispatch('snacks/error', msg || this.$t('institutions.members.failedToRemoveMember'));
       }
 
       this.removing = false;

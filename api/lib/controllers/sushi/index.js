@@ -17,8 +17,8 @@ const {
   fetchInstitution,
   fetchSushi,
   fetchSushiEndpoint,
-  requireContact,
   requireValidatedInstitution,
+  requireMemberPermissions,
 } = require('../../services/auth');
 
 const {
@@ -36,6 +36,8 @@ const {
   getAvailableReports,
   deleteOne,
 } = require('./actions');
+
+const { FEATURES } = require('../../entities/memberships.dto');
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),
@@ -119,7 +121,7 @@ router.route({
       ctx.state.institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
       return next();
     },
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.delete),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
     deleteSushiData,
   ],
@@ -136,7 +138,7 @@ router.route({
   path: '/',
   handler: [
     fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.write),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.request?.body?.endpointId }),
     addSushi,
@@ -152,7 +154,7 @@ router.route({
   path: '/_import',
   handler: [
     fetchInstitution({ query: 'institutionId' }),
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.write),
     importSushiItems,
   ],
   validate: {
@@ -171,10 +173,10 @@ router.route({
  * Check that the user is either admin or institution contact
  * Check that the institution is validated
  */
-const commonHandlers = [
+const commonHandlers = (requiredPermission) => [
   fetchSushi({ include: { endpoint: true } }),
   fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
-  requireContact(),
+  requireMemberPermissions(requiredPermission),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
 ];
 
@@ -182,7 +184,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     getOne,
   ],
   validate: {
@@ -196,7 +198,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId/tasks',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     getTasks,
   ],
   validate: {
@@ -210,7 +212,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId/connection',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     async (ctx) => {
       const { sushi, institution } = ctx.state;
@@ -273,7 +275,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId/reports',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     getAvailableReports,
   ],
@@ -288,7 +290,7 @@ router.route({
   method: 'PATCH',
   path: '/:sushiId',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.write),
     updateSushi,
   ],
   validate: {
@@ -304,7 +306,7 @@ router.route({
   method: 'DELETE',
   path: '/:sushiId',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.delete),
     deleteOne,
   ],
   validate: {
@@ -320,7 +322,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId/report.json',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.delete),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     downloadReport,
   ],
@@ -339,7 +341,8 @@ router.route({
   method: 'POST',
   path: '/:sushiId/_harvest',
   handler: [
-    commonHandlers,
+    fetchSushi({ include: { endpoint: true } }),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     harvestSushi,
   ],
@@ -365,7 +368,8 @@ router.route({
   method: 'GET',
   path: '/:sushiId/files',
   handler: [
-    commonHandlers,
+    fetchSushi({ include: { endpoint: true } }),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
     getFileList,
   ],
   validate: {
@@ -379,7 +383,8 @@ router.route({
   method: 'GET',
   path: '/:sushiId/files/:filePath(.*)',
   handler: [
-    commonHandlers,
+    fetchSushi({ include: { endpoint: true } }),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
     downloadFile,
   ],
   validate: {

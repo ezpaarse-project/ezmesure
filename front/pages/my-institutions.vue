@@ -22,13 +22,13 @@
         >
           <InstitutionCard
             :institution="membership.institution"
+            :membership="membership"
             style="height: 100%;"
           >
             <template
-              v-if="membership.isDocContact || membership.isTechContact"
-              #menu
+              #menu="{ permissions, validated }"
             >
-              <v-menu left bottom>
+              <v-menu v-if="permissions.size > 0" left bottom>
                 <template #activator="{ on, attrs }">
                   <v-btn
                     color="primary"
@@ -45,7 +45,10 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="editInstitution(membership.institution)">
+                  <v-list-item
+                    :disabled="!permissions.has('institution:write')"
+                    @click="editInstitution(membership.institution)"
+                  >
                     <v-list-item-icon>
                       <v-icon>mdi-pencil</v-icon>
                     </v-list-item-icon>
@@ -57,7 +60,7 @@
                   </v-list-item>
 
                   <v-list-item
-                    :disabled="!membership.institution.validated"
+                    :disabled="!validated || !permissions.has('sushi:read')"
                     :to="`/institutions/${membership.institution.id}/sushi`"
                   >
                     <v-list-item-icon>
@@ -71,7 +74,7 @@
                   </v-list-item>
 
                   <v-list-item
-                    :disabled="!membership.institution.validated"
+                    :disabled="!validated || !permissions.has('memberships:read')"
                     :to="`/institutions/${membership.institution.id}/members`"
                   >
                     <v-list-item-icon>
@@ -80,6 +83,20 @@
                     <v-list-item-content>
                       <v-list-item-title>
                         {{ $t('institutions.members.members') }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item
+                    :disabled="!validated || !permissions.has('reporting:read')"
+                    :to="`/report/?institution=${membership.institution.id}`"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-file-chart-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ $t('institutions.reports.reports') }}
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
@@ -144,24 +161,6 @@ export default {
   computed: {
     toolbarTitle() {
       return this.$t('menu.myInstitutions');
-    },
-    headers() {
-      return [
-        { text: this.$t('institutions.title'), value: 'institution.name' },
-        { text: this.$t('institutions.institution.acronym'), value: 'institution.acronym' },
-        {
-          text: this.$t('institutions.institution.status'),
-          value: 'status',
-          width: '150px',
-        },
-        {
-          text: this.$t('actions'),
-          value: 'actions',
-          sortable: false,
-          width: '85px',
-          align: 'center',
-        },
-      ];
     },
   },
   methods: {

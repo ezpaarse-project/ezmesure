@@ -115,7 +115,6 @@
     "details": "Details",
     "failedToLoad": "Impossible de charger l'activité",
     "noActivity": "Aucune activité enregistrée durant cette période",
-    "filter": "Filtrer",
     "actionTypes": {
       "users": "Utilisateurs",
       "files": "Fichiers",
@@ -200,6 +199,7 @@
     "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
+    "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
     "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
@@ -208,9 +208,15 @@
     "declareMyInstitution": "Déclarer mon établissement",
     "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
+    "noLogo": "Pas de logo",
+    "reports": {
+      "reports": "Rapports"
+    },
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement *",
+      "members": "Membres",
+      "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
       "nameError": "Veuillez saisir un nom d'établissement.",
       "indexCount": "Évènements de consultations indexés",
@@ -281,7 +287,7 @@
       "name": "Nom",
       "username": "Identifiant",
       "correspondent": "Correspondant",
-      "permissions": "Permissions Kibana",
+      "permissions": "Permissions",
       "read": "Lecture",
       "write": "Écriture",
       "updated": "Membre mis à jour",
@@ -299,7 +305,36 @@
       "permissionsOf": "Permissions de {name}",
       "readPermDesc": "L'utilisateur peut consulter les tableaux de bord Kibana, sans les modifier.",
       "writePermDesc": "L'utilisateur peut consulter et modifier les tableaux de bord Kibana.",
-      "failedToUpdatePerms": "La mise à jour des permissions a échoué"
+      "personNotRegistered": "Cette personne n'est pas inscrite",
+      "failedToUpdatePerms": "La mise à jour des permissions a échoué",
+      "locked": "Empêcher la modification du membre",
+      "notEditable": "Ce membre n'est pas modifiable",
+      "accessRights": "Droits d'accès",
+      "institutionManagement": "Gestion de l'établissement",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Contact documentaire",
+        "contact:tech": "Contact technique",
+        "guest": "Invité"
+      },
+      "featureLabels": {
+        "institution": "Fiche établissement",
+        "memberships": "Membres",
+        "sushi": "Identifiants SUSHI",
+        "reporting": "Reporting"
+      },
+      "permissionLabels": {
+        "institution:read": "Lecture",
+        "institution:write": "Modification",
+        "memberships:read": "Lecture",
+        "memberships:write": "Ajout et gestion des permissions",
+        "memberships:revoke": "Révocation",
+        "sushi:read": "Lecture",
+        "sushi:write": "Ajout et modification",
+        "sushi:delete": "Suppression",
+        "reporting:read": "Consultation des rapports",
+        "reporting:write": "Création et modification de rapports"
+      }
     },
     "sushi": {
       "title": "Identifiants SUSHI ({total})",
@@ -309,7 +344,8 @@
       "updateCredentials": "Mettre à jour des identifiants",
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
-      "tags": "Étiquettes",
+      "tags": "Étiquettes (profils, comptes, fonds, antennes, etc.)",
+      "tagsDescription": "Les étiquettes définies ici pourront être utilisées dans vos tableaux de bord, à travers le champ X_Tags",
       "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
       "endpoint": "Point d'accès",
       "package": "Package",
@@ -508,18 +544,25 @@
     "textCopied": "Texte copié dans le presse-papier"
   },
   "users": {
+    "toolbarTitle": "Utilisateurs ({count})",
     "updateUser": "Mettre à jour l'utilisateur",
     "deleteNbUsers": "Vous allez supprimer {number} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
     "newUser": "Nouvel utilisateur",
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
+    "createMailUserList": "Nouveau mail groupé",
+    "filtersTitle": "Filtrer les utilisateurs",
     "user": {
-      "saved": "Utilisateur sauvegarder",
+      "saved": "Utilisateur sauvegardé",
       "general": "Général",
       "fullName": "Nom complet",
       "username": "Nom d'utilisateur",
       "email": "Adresse email",
-      "isAdmin": "Est Administrateur ?"
+      "isAdmin": "Est Administrateur ?",
+      "memberships": "Établissements",
+      "membershipsCount": "{count} établissement|{count} établissements",
+      "roles": "Roles",
+      "permissions": "Permissions"
     }
   },
   "report": {
@@ -527,6 +570,7 @@
     "health": "État de santé",
     "admin": {
       "taskTab": "Administration des rapports",
+      "activityTab": "Activité d'ezREEPORT",
       "adminTab": "Administration générale"
     }
   },
@@ -536,6 +580,11 @@
     "noRepository": "Aucun dépôt n'est encore attribué",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "Aucun",
+    "read": "Lecture",
+    "write": "Lecture / Écriture"
   },
   "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",
@@ -566,6 +615,7 @@
   "save": "Sauvegarder",
   "search": "Rechercher",
   "apply": "Appliquer",
+  "filter": "Filtrer",
   "fixIt": "Corriger",
   "leaveIt": "Laisser tel quel",
   "nSelected": "{count} sélectionné(s)",

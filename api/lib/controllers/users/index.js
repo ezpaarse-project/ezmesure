@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { adminUpdateSchema, adminCreateSchema } = require('../../entities/users.dto');
+const { adminUpdateSchema, adminCreateSchema, includableFields } = require('../../entities/users.dto');
 
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
@@ -23,6 +23,7 @@ router.route({
       q: Joi.string().trim(),
       size: Joi.number().integer().min(0),
       source: Joi.string().trim(),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
     },
   },
 });

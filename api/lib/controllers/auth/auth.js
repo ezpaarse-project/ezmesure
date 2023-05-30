@@ -2,8 +2,9 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
+
 const usersElastic = require('../../services/elastic/users');
-const ezreeport = require('../../services/ezreeport');
+const ezrUsers = require('../../services/ezreeport/users');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
@@ -26,7 +27,7 @@ function decode(value) {
 }
 
 exports.getReportingToken = async (ctx) => {
-  const token = await ezreeport.getUserToken(ctx?.state?.user?.username);
+  const token = await ezrUsers.getToken(ctx?.state?.user?.username);
   ctx.body = { token };
 };
 
@@ -73,7 +74,14 @@ exports.renaterLogin = async (ctx) => {
 
     userProps.metadata.acceptedTerms = false;
 
+    // First create the user
     user = await usersService.create({ data: userProps });
+
+    try {
+      await sendWelcomeMail(user);
+    } catch (err) {
+      appLogger.error(`Failed to send mail: ${err}`);
+    }
   } else if (query.refresh) {
     ctx.action = 'user/refresh';
     ctx.metadata = { username };
@@ -81,11 +89,13 @@ exports.renaterLogin = async (ctx) => {
     userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      user = await usersService.update({
+      await usersService.update({
         where: { username },
         data: userProps,
       });
+      appLogger.info(`User [${user.username}] is updated`);
     } catch (err) {
+      appLogger.error(`User [${user.username}] cannot be updated: ${err.message}`);
       ctx.throw(500, err);
       return;
     }
@@ -122,22 +132,17 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   if (user.metadata && user.metadata._reserved) {
     ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
     return;
   }
 
-  // Make sure that the user exists in the DB
-  await usersService.upsert({
-    where: { username },
-    update: {},
-    create: {
-      username,
-      email: user.email,
-      fullName: user.full_name,
-      isAdmin: user.roles?.includes?.('superuser'),
-    },
-  });
+  user = await usersService.findUnique({ where: { username } });
+
+  if (!user) {
+    ctx.throw(401);
+  }
 
   ctx.metadata = { username };
   ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
@@ -290,7 +295,10 @@ exports.changePassword = async (ctx) => {
 };
 
 exports.getUser = async (ctx) => {
-  const user = await usersService.findUnique({ where: { username: ctx.state.user.username } });
+  const user = await usersService.findUnique({
+    where: { username: ctx.state.user.username },
+    include: { memberships: true },
+  });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));

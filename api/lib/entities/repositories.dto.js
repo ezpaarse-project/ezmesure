@@ -36,6 +36,14 @@ const immutableFields = [
 ];
 
 /**
+ * Fields that can be populated with related items
+ */
+const includableFields = [
+  'permissions',
+  'institution',
+];
+
+/**
  * Schema to be applied when an administrator creates a repository
  */
 const adminCreateSchema = withModifiers(
@@ -62,6 +70,7 @@ const adminImportSchema = Joi.array().required().items({
 
 module.exports = {
   schema,
+  includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
   adminImportSchema,

@@ -1,16 +1,26 @@
 // @ts-check
+const elasticUsers = require('../services/elastic/users');
 const config = require('config');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const elastic = require('../services/elastic/users');
+const hooks = require('../hooks');
+
+const {
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  },
+} = require('./memberships.dto');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').User} User */
-/** @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').User} User
+ * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
+ * @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs
+ */
 /* eslint-enable max-len */
 
 module.exports = class UsersService {
@@ -29,14 +39,15 @@ module.exports = class UsersService {
       isAdmin: true,
       metadata: { acceptedTerms: true },
     };
-
-    await elastic.createAdmin();
-
-    return prisma.user.upsert({
+    const admin = await prisma.user.upsert({
       where: { username },
       update: adminData,
       create: adminData,
     });
+
+    hooks.emit('user:create-admin', admin);
+
+    return admin;
   }
 
   /**
@@ -44,15 +55,9 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async create(params) {
-    const userData = {
-      username: params.data.username,
-      email: params.data.email,
-      fullName: params.data.fullName,
-      roles: [],
-    };
-    await elastic.upsertUser(userData);
-
-    return prisma.user.create(params);
+    const user = await prisma.user.create(params);
+    hooks.emit('user:create', user);
+    return user;
   }
 
   /**
@@ -82,10 +87,9 @@ module.exports = class UsersService {
         email: { endsWith: `@${domain}` },
         memberships: {
           some: {
-            OR: [
-              { isDocContact: true },
-              { isTechContact: true },
-            ],
+            roles: {
+              hasSome: [DOC_CONTACT, TECH_CONTACT],
+            },
           },
         },
       },
@@ -98,17 +102,9 @@ module.exports = class UsersService {
    */
   static async update(params) {
     // TODO manage role
-    const userData = {
-      username: params.data.username?.toString() || '',
-      email: params.data.email?.toString() || '',
-      fullName: params.data.fullName?.toString() || '',
-      metadata: {
-        passwordDate: params.data?.metadata?.passwordDate?.toString() || '',
-      },
-    };
-
-    await elastic.updateUser(userData);
-    return prisma.user.update(params);
+    const user = await prisma.user.update(params);
+    hooks.emit('user:update', user);
+    return user;
   }
 
   /**
@@ -131,17 +127,9 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async upsert(params) {
-    const elasticUser = await elastic.getUser(params?.create?.username);
-    if (!elasticUser) {
-      const userData = {
-        username: params?.create?.username,
-        email: params?.create?.email,
-        fullName: params?.create?.fullName,
-      };
-      await elastic.upsertUser(userData);
-    }
-
-    return prisma.user.upsert(params);
+    const user = await prisma.user.upsert(params);
+    hooks.emit('user:upsert', user);
+    return user;
   }
 
   /**
@@ -149,16 +137,20 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    if (params?.where?.username) {
-      await elastic.deleteUser(params.where.username);
-    }
+    let user;
 
-    return prisma.user.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+    try {
+      user = await prisma.user.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return null;
       }
-      throw e;
-    });
+      throw error;
+    }
+
+    hooks.emit('user:delete', user);
+
+    return user;
   }
 
   /**
@@ -167,6 +159,6 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async updatePassword(username, password) {
-    return elastic.updatePassword(username, password);
+    return elasticUsers.updatePassword(username, password);
   }
 };

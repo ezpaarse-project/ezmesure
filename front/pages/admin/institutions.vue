@@ -65,6 +65,21 @@
         </nuxt-link>
       </template>
 
+      <template #[`item.memberships`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.memberships)"
+          small
+          class="elevation-1"
+          :to="`/institutions/${item.id}/members`"
+        >
+          {{ $tc('institutions.institution.membersCount', item.memberships.length) }}
+
+          <v-icon right small>
+            mdi-account-multiple
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.repositories`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.repositories)"
@@ -173,6 +188,17 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item :to="`/admin/report/?institution=${item.id}`">
+              <v-list-item-icon>
+                <v-icon>mdi-file-chart-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('institutions.reports.reports') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item @click="copyInstitutionId(item)">
               <v-list-item-icon>
                 <v-icon>mdi-identifier</v-icon>
@@ -231,12 +257,13 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('menu.institutions');
+      return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
     },
     tableHeaders() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
+        { text: this.$t('institutions.institution.members'), value: 'memberships' },
         { text: this.$t('repositories.repositories'), value: 'repositories' },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
@@ -259,7 +286,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.institutions = await this.$axios.$get('/institutions', { params: { include: 'repositories' } });
+        this.institutions = await this.$axios.$get('/institutions', { params: { include: ['repositories', 'memberships'] } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }

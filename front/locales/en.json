@@ -115,7 +115,6 @@
     "details": "Details",
     "failedToLoad": "Failed to load activity",
     "noActivity": "This period has no registered activity",
-    "filter": "Filter",
     "actionTypes": {
       "users": "Users",
       "files": "Files",
@@ -200,6 +199,7 @@
     "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
+    "toolbarTitle": "Institutions ({count})",
     "title": "Institution",
     "updateInstitution": "Update institution",
     "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
@@ -208,9 +208,15 @@
     "declareMyInstitution": "Declare my institution",
     "declareNewInstitution": "Declare a new institution",
     "doesNotExist": "The institution you are trying to access is not registered.",
+    "noLogo": "No logo",
+    "reports": {
+      "reports": "Reports"
+    },
     "institution": {
       "title": "My institution",
       "name": "Institution name *",
+      "members": "Members",
+      "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
       "nameError": "Please enter an institution name.",
       "indexCount": "Indexed consultation events",
@@ -281,7 +287,7 @@
       "name": "Name",
       "username": "Identifier",
       "correspondent": "Correspondent",
-      "permissions": "Kibana permissions",
+      "permissions": "Permissions",
       "read": "Read",
       "write": "Write",
       "updated": "Member updated",
@@ -299,7 +305,35 @@
       "permissionsOf": "Permissions of {name}",
       "readPermDesc": "The user can view the Kibana dashboards, but can't modify them.",
       "writePermDesc": "The user can view and modify Kibana dashboards.",
-      "failedToUpdatePerms": "Failed to update user permissions"
+      "personNotRegistered": "This person is not registered",
+      "failedToUpdatePerms": "Failed to update user permissions",
+      "locked": "Prevent member modification",
+      "notEditable": "This member is not editable",
+      "accessRights": "Access rights",
+      "institutionManagement": "Institution management",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Documentary contact",
+        "contact:tech": "Technical contact",
+        "guest": "Guest"
+      },
+      "featureLabels": {
+        "institution": "Institution card",
+        "memberships": "Members",
+        "sushi": "SUSHI credentials"
+      },
+      "permissionLabels": {
+        "institution:read": "Read",
+        "institution:write": "Update",
+        "memberships:read": "Read",
+        "memberships:write": "Add and manage permissions",
+        "memberships:revoke": "Revocation",
+        "sushi:read": "Read",
+        "sushi:write": "Add and update",
+        "sushi:delete": "Delete",
+        "reporting:read": "View reports",
+        "reporting:write": "Create and update reports"
+      }
     },
     "sushi": {
       "title": "SUSHI credentials ({total})",
@@ -309,7 +343,8 @@
       "updateCredentials": "Update credentials",
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
-      "tags": "Tags",
+      "tags": "Tags (profiles, accounts, funds, antennas, etc.)",
+      "tagsDescription": "The tags defined here will be usable in your dashboards, using the X_Tags field",
       "unableToRetriveSushiData": "Unable to retrieve sushi information",
       "endpoint": "Endpoint",
       "package": "Package",
@@ -509,18 +544,25 @@
     "textCopied": "Text copied in the clipboard"
   },
   "users": {
+    "toolbarTitle": "Users ({count})",
     "updateUser": "Update user",
     "deleteNbUsers": "You are about to delete {number} users. The associated indices, spaces and roles will not be affected.",
     "newUser": "New user",
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
+    "createMailUserList": "New grouped mail",
+    "filtersTitle": "Filter users",
     "user": {
       "saved": "User saved",
       "general": "General",
       "fullName": "Full name",
       "username": "Username",
       "email": "Email address",
-      "isAdmin": "Is Administrator ?"
+      "isAdmin": "Is Administrator ?",
+      "memberships": "Institutions",
+      "membershipsCount": "{count} institution|{count} institutions",
+      "roles": "Roles",
+      "permissions": "Permissions"
     }
   },
   "report": {
@@ -528,6 +570,7 @@
     "health": "Health status",
     "admin": {
       "taskTab": "Task administration",
+      "activityTab": "ezREEPORT activity",
       "adminTab": "General administration"
     }
   },
@@ -537,6 +580,11 @@
     "noRepository": "No repositories has been assigned yet",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "permissions": {
+    "none": "None",
+    "read": "Read",
+    "write": "Read / Write"
   },
   "anErrorOccurred": "An error occurred",
   "url": "URL",
@@ -567,6 +615,7 @@
   "save": "Save",
   "search": "Search",
   "apply": "Apply",
+  "filter": "Filter",
   "fixIt": "Fix it",
   "leaveIt": "Leave it as is",
   "nSelected": "{count} selected",

@@ -6,6 +6,10 @@ const sushiCredentialsService = require('../entities/sushi-credentials.service')
 const usersService = require('../entities/users.service');
 const RepositorysService = require('../entities/repositories.service');
 
+const { MEMBER_ROLES } = require('../entities/memberships.dto');
+
+const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
+
 const requireJwt = jwt({
   secret: auth.secret,
   cookie: auth.cookie,
@@ -76,6 +80,7 @@ function fetchModel(modelName, opts = {}) {
   } = opts;
 
   return async (ctx, next) => {
+    const username = ctx.state?.user?.username;
     let modelId;
 
     if (typeof getId === 'function') {
@@ -98,19 +103,14 @@ function fetchModel(modelName, opts = {}) {
 
     switch (modelName) {
       case 'institution':
-        item = modelId && await institutionsService.findUnique({
+        item = modelId && (await institutionsService.findUnique({
           where: { id: modelId },
           include: {
             memberships: {
-              where: {
-                OR: [
-                  { isDocContact: true },
-                  { isTechContact: true },
-                ],
-              },
+              where: { username },
             },
           },
-        });
+        }));
         break;
 
       case 'sushi-endpoint':
@@ -148,12 +148,34 @@ function requireContact() {
 
     if (user?.isAdmin) { return next(); }
 
-    const isContact = institution?.memberships?.some?.((m) => (
-      (m?.username === user?.username) && (m.isDocContact || m.isTechContact)
-    ));
+    const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
+    const isContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
     if (isContact) { return next(); }
 
     ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
+    return undefined;
+  };
+}
+
+/**
+ * Middleware that checks that user has a sufficient permission level on a feature
+ * Assumes that ctx.state contains institution and user
+ */
+function requireMemberPermissions(...permissions) {
+  return (ctx, next) => {
+    const { user, institution } = ctx.state;
+
+    if (user?.isAdmin) { return next(); }
+
+    const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
+    const memberPermissions = new Set(
+      Array.isArray(membership?.permissions) ? membership?.permissions : [],
+    );
+    const hasPermissions = memberPermissions.has('all') || permissions.every((perm) => memberPermissions.has(perm));
+
+    if (hasPermissions) { return next(); }
+
+    ctx.throw(403, ctx.$t('errors.perms.feature'));
     return undefined;
   };
 }
@@ -183,6 +205,7 @@ module.exports = {
   requireTermsOfUse,
   requireAnyRole,
   requireContact,
+  requireMemberPermissions,
   requireValidatedInstitution,
   fetchModel,
   fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
