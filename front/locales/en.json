@@ -218,6 +218,8 @@
       "nameError": "Please enter an institution name.",
       "indexCount": "Indexed consultation events",
       "indexPrefix": "Allocated prefix for indices",
+      "namespace": "Institution namespace",
+      "namespaceHint": "Prefix added to entities related to the institution (repositories, Kibana spaces)",
       "role": "Associated role",
       "uai": "RAU",
       "uaiExample": "e.g. 1234567A",

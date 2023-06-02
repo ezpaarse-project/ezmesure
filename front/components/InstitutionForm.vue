@@ -230,6 +230,15 @@
             <v-card-text>
               <v-row>
                 <v-col cols="12">
+                  <v-text-field
+                    v-model="institution.namespace"
+                    :label="$t('institutions.institution.namespace')"
+                    :hint="$t('institutions.institution.namespaceHint')"
+                    :rules="namespaceRules"
+                    persistent-hint
+                    outlined
+                    dense
+                  />
                   <v-checkbox
                     v-model="institution.validated"
                     :label="$t('institutions.institution.valid')"
@@ -275,6 +284,7 @@
 <script>
 import OpenDataSearch from '~/components/OpenDataSearch.vue';
 
+const idPattern = /^[a-z0-9][a-z0-9_.-]*$/;
 const defaultLogo = require('@/static/images/logo-etab.png');
 
 const toBase64 = (file) => new Promise((resolve, reject) => {
@@ -309,6 +319,10 @@ export default {
         social: {},
         auto: {},
       },
+
+      namespaceRules: [
+        (v) => (!v || idPattern.test(v)) || this.$t('fieldMustMatch', { pattern: idPattern.toString() }),
+      ],
     };
   },
   computed: {

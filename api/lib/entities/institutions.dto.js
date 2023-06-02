@@ -17,6 +17,7 @@ const schema = {
   createdAt: Joi.date(),
 
   name: Joi.string().trim().min(1),
+  namespace: Joi.string().trim().allow(''),
   type: Joi.string().allow(''),
   acronym: Joi.string().allow(''),
   websiteUrl: Joi.string().allow(''),
@@ -48,10 +49,11 @@ const schema = {
 /**
  * Fields that cannot be changed by regular users
  */
-const restrictedFields = [
+const adminFields = [
   'validated',
   'hidePartner',
   'tags',
+  'namespace',
 ];
 
 /**
@@ -118,7 +120,7 @@ const adminUpdateSchema = withModifiers(
  */
 const updateSchema = withModifiers(
   schema,
-  ignoreFields(restrictedFields),
+  ignoreFields(adminFields),
   ignoreFields(immutableFields),
 );
 
@@ -127,14 +129,14 @@ const updateSchema = withModifiers(
  */
 const createSchema = withModifiers(
   schema,
-  ignoreFields(restrictedFields),
+  ignoreFields(adminFields),
   ignoreFields(immutableFields),
   requireFields(['name']),
 );
 
 module.exports = {
   schema,
-  restrictedFields,
+  adminFields,
   immutableFields,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),

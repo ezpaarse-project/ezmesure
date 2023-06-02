@@ -218,6 +218,8 @@
       "nameError": "Veuillez saisir un nom d'établissement.",
       "indexCount": "Évènements de consultations indexés",
       "indexPrefix": "Préfixe alloué pour les index",
+      "namespace": "Espace de nommage",
+      "namespaceHint": "Préfixe ajouté aux entités liées à l'établissement (entrepôts, espaces Kibana)",
       "role": "Rôle associé",
       "uai": "UAI",
       "uaiExample": "ex: 1234567A",
