@@ -5,6 +5,7 @@ CREATE TABLE "Institution" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
+    "namespace" TEXT,
     "validated" BOOLEAN NOT NULL DEFAULT false,
     "hidePartner" BOOLEAN NOT NULL DEFAULT false,
     "tags" TEXT[],
@@ -51,7 +52,12 @@ CREATE TABLE "Space" (
     "institutionId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "initials" TEXT,
+    "color" TEXT,
     "type" VARCHAR(50) NOT NULL,
+    "indexPatterns" JSONB[],
 
     CONSTRAINT "Space_pkey" PRIMARY KEY ("id")
 );
