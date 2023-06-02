@@ -250,7 +250,7 @@
       "invalidate": "Invalidate",
       "validated": "Validated",
       "notValidated": "Not validated",
-      "showPartner": "Do not show as partner",
+      "hidePartner": "Do not show as partner",
       "failedToUpdateValidation": "Failed to update validation",
       "attachedDomains": "Attached domains",
       "noAttachedDomains": "There's no domain attached to this institution yet.",
