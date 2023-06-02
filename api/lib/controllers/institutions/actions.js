@@ -10,6 +10,7 @@ const { appLogger } = require('../../services/logger');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const membershipsService = require('../../entities/memberships.service');
 const repositoriesService = require('../../entities/repositories.service');
+const spacesService = require('../../entities/spaces.service');
 
 const {
   PERMISSIONS,
@@ -243,6 +244,25 @@ exports.getInstitutionRepositories = async (ctx) => {
   ctx.status = 200;
 
   ctx.body = Array.isArray(repositories) ? repositories : [];
+};
+
+exports.getInstitutionSpaces = async (ctx) => {
+  const { include: propsToInclude } = ctx.query;
+  let include;
+
+  if (Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
+  const spaces = await spacesService.findMany({
+    where: { institutionId: ctx.state.institution.id },
+    include,
+  });
+
+  ctx.type = 'json';
+  ctx.status = 200;
+
+  ctx.body = Array.isArray(spaces) ? spaces : [];
 };
 
 exports.getInstitutionMember = async (ctx) => {

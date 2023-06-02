@@ -17,6 +17,7 @@ model Institution {
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   name                String
+  namespace           String?
   validated           Boolean            @default(false)
   hidePartner         Boolean            @default(false)
   tags                String[]
@@ -64,13 +65,18 @@ model Membership {
 }
 
 model Space {
-  id               String            @id
-  institutionId    String?
-  institution      Institution?      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  type             String            @db.VarChar(50)
-  spacePermissions SpacePermission[]
+  id            String            @id
+  institutionId String?
+  institution   Institution?      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  name          String
+  description   String?
+  initials      String?
+  color         String?
+  type          String            @db.VarChar(50)
+  indexPatterns Json[]
+  permissions   SpacePermission[]
 }
 
 model SpacePermission {

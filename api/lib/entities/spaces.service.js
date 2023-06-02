@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Space} Space */
@@ -8,6 +8,7 @@ const { client: prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
 /* eslint-enable max-len */
 
 module.exports = class SpacesService {
@@ -49,5 +50,18 @@ module.exports = class SpacesService {
    */
   static upsert(params) {
     return prisma.space.upsert(params);
+  }
+
+  /**
+   * @param {SpaceDeleteArgs} params
+   * @returns {Promise<Space | null>}
+   */
+  static delete(params) {
+    return prisma.space.delete(params).catch((e) => {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return null;
+      }
+      throw e;
+    });
   }
 };

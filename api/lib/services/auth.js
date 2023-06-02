@@ -5,6 +5,7 @@ const sushiEndpointService = require('../entities/sushi-endpoint.service');
 const sushiCredentialsService = require('../entities/sushi-credentials.service');
 const usersService = require('../entities/users.service');
 const RepositorysService = require('../entities/repositories.service');
+const SpacesService = require('../entities/spaces.service');
 
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
 
@@ -124,6 +125,10 @@ function fetchModel(modelName, opts = {}) {
         item = modelId && await RepositorysService.findUnique(findOptions);
         break;
 
+      case 'space':
+        item = modelId && await SpacesService.findUnique(findOptions);
+        break;
+
       default:
     }
 
@@ -211,4 +216,5 @@ module.exports = {
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
   fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'repositoryId', ...opts }),
+  fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };

@@ -2,7 +2,6 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
-  allFields,
   includableFields,
 } = require('../../entities/institutions.dto');
 const {
@@ -11,6 +10,9 @@ const {
 } = require('../../entities/memberships.dto');
 const {
   includableFields: repositoryIncludableFields,
+} = require('../../entities/repositories.dto');
+const {
+  includableFields: spaceIncludableFields,
 } = require('../../entities/repositories.dto');
 
 const {
@@ -34,6 +36,7 @@ const {
   getInstitutionContacts,
   getInstitutionMember,
   getInstitutionRepositories,
+  getInstitutionSpaces,
 } = require('./actions');
 
 const {
@@ -97,6 +100,24 @@ router.route({
     },
     query: Joi.object({
       include: Joi.array().single().items(Joi.string().valid(...repositoryIncludableFields)),
+    }).rename('include[]', 'include'),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/spaces',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.read),
+    getInstitutionSpaces,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    query: Joi.object({
+      include: Joi.array().single().items(Joi.string().valid(...spaceIncludableFields)),
     }).rename('include[]', 'include'),
   },
 });
