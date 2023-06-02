@@ -87,10 +87,7 @@ export default {
       ];
 
       // Add reporting link if user have permission on at least one institution or if admin
-      if (
-        this.$auth?.user?.isAdmin
-        || this.$auth?.user?.memberships?.some((m) => m.permissions.includes('reporting:read'))
-      ) {
+      if (this.$auth?.user?.memberships?.some((m) => m.permissions.includes('reporting:read'))) {
         links.splice(2, 0, { title: this.$t('menu.report'), href: '/report' });
       }
 

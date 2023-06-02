@@ -86,6 +86,20 @@
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
+
+                  <v-list-item
+                    :disabled="!validated || !permissions.has('reporting:read')"
+                    :to="`/report/?institution=${membership.institution.id}`"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-file-chart-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ $t('institutions.reports.reports') }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
                 </v-list>
               </v-menu>
             </template>

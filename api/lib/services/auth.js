@@ -14,10 +14,11 @@ const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 const requireJwt = jwt({
   secret: auth.secret,
   cookie: auth.cookie,
+  key: 'jwtdata',
 });
 
 const requireUser = async (ctx, next) => {
-  const username = ctx.state?.user?.username;
+  const username = ctx.state?.jwtdata?.username;
 
   if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));

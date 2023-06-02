@@ -12,7 +12,10 @@
     </ToolBar>
 
     <v-card-text class="pa-0">
-      <ezr-task-table />
+      <ezr-task-table
+        :current-namespace.sync="currentInstitution"
+        :allowed-namespaces="allowedInstitutions"
+      />
     </v-card-text>
 
     <HealthDialog v-model="showHealthDialog" />
@@ -33,5 +36,18 @@ export default {
   data: () => ({
     showHealthDialog: false,
   }),
+  computed: {
+    currentInstitution: {
+      get() {
+        return this.$route.query.institution?.toString();
+      },
+      set(institution) {
+        this.$router.replace({ query: { institution } });
+      },
+    },
+    allowedInstitutions() {
+      return this.$auth.user.memberships.map((m) => m.institutionId);
+    },
+  },
 };
 </script>

@@ -28,6 +28,14 @@
           <v-row>
             <v-col>
               <v-card>
+                <ezr-task-table :current-namespace.sync="currentInstitution" />
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col>
+              <v-card>
                 <ezr-template-list />
               </v-card>
             </v-col>
@@ -85,5 +93,15 @@ export default {
     showHealthDialog: false,
     currentTab: 0,
   }),
+  computed: {
+    currentInstitution: {
+      get() {
+        return this.$route.query.institution?.toString();
+      },
+      set(institution) {
+        this.$router.replace({ query: { institution } });
+      },
+    },
+  },
 };
 </script>

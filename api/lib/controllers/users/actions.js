@@ -1,7 +1,7 @@
 const usersService = require('../../entities/users.service');
-const { sendWelcomeMail } = require('../auth/mail');
+const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
-const { mailDataForPasswordRecovery } = require('../auth/password');
+const { activateUserLink } = require('../auth/password');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -91,14 +91,12 @@ exports.createOrReplaceUser = async (ctx) => {
 
   ctx.body = user;
 
-  const origin = ctx.get('origin');
-
-  const mailData = mailDataForPasswordRecovery(origin, username);
-  const userData = { username, email: body.email };
-
   if (!userExists) {
+    const origin = ctx.get('origin');
+    const link = activateUserLink(origin, username);
+    const userData = { username, email: body.email };
     try {
-      await sendWelcomeMail(userData, mailData);
+      await sendActivateUserMail(userData, link);
     } catch (err) {
       appLogger.error(`Failed to send mail: ${err}`);
     }

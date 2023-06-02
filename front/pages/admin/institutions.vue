@@ -203,6 +203,17 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item :to="`/admin/report/?institution=${item.id}`">
+              <v-list-item-icon>
+                <v-icon>mdi-file-chart-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('institutions.reports.reports') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item @click="copyInstitutionId(item)">
               <v-list-item-icon>
                 <v-icon>mdi-identifier</v-icon>

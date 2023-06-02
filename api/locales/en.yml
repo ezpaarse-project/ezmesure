@@ -73,6 +73,7 @@ errors:
     notEditable: This member is not editable
 
   user:
+    alreadyActivated: this account is already activated
     notFound: User not found
     noEmail: mandatory email is missing from user profile
     failedToSave: Failed to save user data

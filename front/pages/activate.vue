@@ -1,16 +1,12 @@
 <template>
   <v-container fluid fill-height>
-    <v-row align="center" justify="center">
-      <v-col style="max-width: 600px">
+    <v-layout align-center justify-center>
+      <v-flex xs12 sm8 md4>
         <v-card class="elevation-12">
           <v-toolbar color="primary" dark flat dense>
-            <v-toolbar-title>
-              {{ $t("password.forgot") }}
-            </v-toolbar-title>
-
+            <v-toolbar-title>{{ $t("account.title") }}</v-toolbar-title>
             <v-spacer />
-
-            <v-icon>mdi-lock</v-icon>
+            <v-icon>mdi-text</v-icon>
           </v-toolbar>
 
           <v-card-text>
@@ -26,6 +22,14 @@
             </v-alert>
             <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
+              <!-- eslint-disable-next-line -->
+              <p v-html="$t('account.description')" />
+
+              <v-checkbox
+                v-model="accepted"
+                :rules="[() => !!accepted || $t('account.acceptTerms')]"
+                :label="$t('account.readAndAccept')"
+              />
 
               <v-btn
                 block
@@ -35,13 +39,13 @@
                 :disabled="!validForm"
                 :loading="loading"
               >
-                {{ $t("password.update") }}
+                {{ $t("account.activate") }}
               </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
-      </v-col>
-    </v-row>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
@@ -49,8 +53,8 @@
 import PasswordForm from '~/components/PasswordForm.vue';
 
 export default {
-  middleware({ route, error }) {
-    if (!route?.query?.token) {
+  middleware({ $auth, route, error }) {
+    if (!$auth?.loggedIn && !route?.query?.token) {
       return error({ statusCode: 404 });
     }
     return true;
@@ -60,12 +64,14 @@ export default {
   },
   data() {
     return {
-      loading: false,
-      password: false,
+      pleaseAccept: false,
       accepted: false,
-      validForm: false,
-      error: null,
+      error: false,
       sendErrorText: '',
+      loading: false,
+      activated: false,
+      password: false,
+      validForm: false,
     };
   },
   methods: {
@@ -73,12 +79,34 @@ export default {
       this.password = value;
     },
     async submit() {
+      this.error = false;
+      this.pleaseAccept = false;
+
+      if (!this.accepted) {
+        this.pleaseAccept = true;
+        this.sendErrorText = this.$t('account.acceptTerms');
+        return;
+      }
+
+      this.loading = true;
+
       try {
-        const headers = { Authorization: `Bearer ${this.$route.query.token}` };
-        this.loading = true;
-        await this.$axios.$post('/profile/password/_reset', {
-          password: this.password,
-        }, { headers });
+        let headers;
+        if (this.$route.query.token) {
+          headers = { Authorization: `Bearer ${this.$route.query.token}` };
+        }
+        await this.$axios.$post(
+          '/profile/_activate',
+          {
+            password: this.password,
+            acceptTerms: this.accepted,
+            username: this.$route.query.username,
+          },
+          { headers },
+        );
+
+        await this.$auth.fetchUser();
+
         this.$router.replace({ path: '/myspace' });
       } catch (e) {
         this.error = true;
@@ -90,10 +118,8 @@ export default {
           this.sendErrorText = e.message;
         }
       }
+
       this.loading = false;
-    },
-    async savePassword() {
-      this.$router.push('/authenticate?provider=kibana');
     },
   },
 };

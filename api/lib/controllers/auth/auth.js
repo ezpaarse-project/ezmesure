@@ -2,11 +2,13 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
+
+const usersElastic = require('../../services/elastic/users');
 const ezrUsers = require('../../services/ezreeport/users');
 const usersService = require('../../entities/users.service');
 const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
-const { sendWelcomeMail, sendPasswordRecovery, sendNewUserToContacts } = require('./mail');
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -148,22 +150,36 @@ exports.elasticLogin = async (ctx) => {
   ctx.status = 200;
 };
 
-exports.acceptTerms = async (ctx) => {
-  const { user } = ctx.state;
-  const { email, username } = user;
+exports.activate = async (ctx) => {
+  const { body } = ctx.request;
+  const { password } = body;
 
-  if (user?.metadata?.acceptTerms === true) {
-    ctx.status = 204;
+  const { user } = ctx.state;
+  const { email } = user;
+
+  if (user?.metadata?.acceptedTerms) {
+    ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
     return;
   }
 
   try {
-    await usersService.acceptTerms(username);
+    await usersService.acceptTerms(user.username);
   } catch (err) {
     ctx.status = 500;
     appLogger.error(`Failed to update user: ${err}`);
     return;
   }
+
+  const userElastic = await usersElastic.getUser(user.username);
+
+  if (!userElastic) {
+    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+    return;
+  }
+
+  await usersElastic.updatePassword(user.username, password);
+
+  await sendWelcomeMail(user);
 
   const origin = ctx.get('origin');
   const [, domain] = email.split('@');
@@ -178,6 +194,7 @@ exports.acceptTerms = async (ctx) => {
   if (Array.isArray(correspondents) && correspondents.length > 0) {
     const emails = correspondents.map((c) => c?.email).filter((x) => x);
 
+    // TODO manage this if the user belongs to several institutions
     try {
       await sendNewUserToContacts(emails, {
         manageMemberLink: `${origin}/institutions/self/members`,
@@ -188,7 +205,8 @@ exports.acceptTerms = async (ctx) => {
     }
   }
 
-  ctx.status = 204;
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
 exports.getResetToken = async (ctx) => {
@@ -196,7 +214,7 @@ exports.getResetToken = async (ctx) => {
 
   const username = body.username || ctx.state.user.username;
 
-  const user = await elastic.security.findUser({ username });
+  const user = await usersElastic.getUser(username);
 
   if (!user) {
     ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
@@ -224,32 +242,16 @@ exports.getResetToken = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const { token, password } = ctx.request.body;
+  const { password } = ctx.request.body;
+  const { username } = ctx.state.user;
+  const { createdAt } = ctx.state.jwtdata;
 
-  let decoded;
-  try {
-    decoded = jwt.verify(token, secret);
-  } catch (err) {
-    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
-    return;
-  }
+  const user = await usersService.findUnique({ where: { username } });
 
-  const { username, expiresAt, createdAt } = decoded;
+  user.metadata = user.metadata || {};
 
-  let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
-  if (!tokenIsValid) {
-    ctx.throw(400, ctx.$t('errors.password.expires'));
-    return;
-  }
-
-  const user = await elastic.security.findUser({ username });
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
-    return;
-  }
-
-  if (user && user.metadata && user.metadata.passwordDate) {
-    tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+  if (user?.metadata?.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(404, ctx.$t('errors.password.expires'));
@@ -257,16 +259,19 @@ exports.resetPassword = async (ctx) => {
     }
   }
 
-  await elastic.security.changePassword({
-    username,
-    body: {
-      password,
-    },
-  });
-
   user.metadata.passwordDate = new Date();
-  user.password = password;
-  await elastic.security.putUser({ username, body: user });
+
+  try {
+    await usersService.update({
+      where: { username },
+      data: user,
+    });
+  } catch (err) {
+    ctx.throw(500, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };
@@ -275,19 +280,16 @@ exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;
 
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const { username } = ctx.state.user;
+
+  const user = await usersElastic.getUser(username);
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  await elastic.security.changePassword({
-    username: ctx.state.user.username,
-    body: {
-      password,
-    },
-  });
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };
