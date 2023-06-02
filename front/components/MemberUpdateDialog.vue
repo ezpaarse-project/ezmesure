@@ -49,6 +49,21 @@
         />
       </v-card-text>
 
+      <v-divider />
+
+      <v-card-title>
+        {{ $t('spaces.spaces') }}
+      </v-card-title>
+
+      <v-card-text>
+        <MemberSpacePermissions
+          :institution-id="institutionId"
+          :username="username"
+          class="px-0"
+          @change="hasChanged = true"
+        />
+      </v-card-text>
+
       <template v-if="isAdmin">
         <v-divider />
 
@@ -159,11 +174,13 @@
 
 <script>
 import MemberRepoPermissions from '~/components/MemberRepoPermissions.vue';
+import MemberSpacePermissions from '~/components/MemberSpacePermissions.vue';
 import MemberInstitutionPermissions from '~/components/MemberInstitutionPermissions.vue';
 
 export default {
   components: {
     MemberRepoPermissions,
+    MemberSpacePermissions,
     MemberInstitutionPermissions,
   },
   props: {

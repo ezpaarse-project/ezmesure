@@ -579,6 +579,21 @@
     "pattern": "Pattern",
     "type": "Type"
   },
+  "spaces": {
+    "spaces": "Espaces",
+    "xSpaces": "aucun espace | 1 espace | {count} espaces",
+    "noSpace": "Aucun espace n'est encore attribué",
+    "id": "Identifiant",
+    "type": "Type",
+    "types": {
+      "ezpaarse": "ezPAARSE",
+      "counter5": "COUNTER 5"
+    },
+    "descriptions": {
+      "ezpaarse": "Espace ezPAARSE",
+      "counter5": "Espace éditeurs"
+    }
+  },
   "permissions": {
     "none": "Aucun",
     "read": "Lecture",
@@ -597,6 +612,8 @@
   "status": "Statut",
   "date": "Date",
   "duration": "Durée",
+  "description": "Description",
+  "initials": "Initiales",
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",
@@ -634,6 +651,8 @@
   "areYouSure": "Êtes-vous sûr ?",
   "fieldIsRequired": "Ce champ est requis",
   "fieldMustMatch": "Ce champ doit correspondre à : {pattern}",
+  "maxLength": "Longueur maximale : {n} caractères",
+  "open": "Ouvrir",
   "send": "Envoyer",
   "yes": "Oui",
   "no": "Non",

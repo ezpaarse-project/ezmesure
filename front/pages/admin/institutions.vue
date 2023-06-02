@@ -95,6 +95,21 @@
         </v-chip>
       </template>
 
+      <template #[`item.spaces`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.spaces)"
+          small
+          class="elevation-1"
+          @click="$refs.spacesDialog.display(item)"
+        >
+          {{ $tc('spaces.xSpaces', item.spaces.length) }}
+
+          <v-icon right small>
+            mdi-cog
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.automatisations`]="{ item }">
         <v-chip
           label
@@ -206,6 +221,7 @@
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
     <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
     <RepositoriesDialog ref="repositoriesDialog" />
+    <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
   </section>
 </template>
 
@@ -214,6 +230,7 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
+import SpacesDialog from '~/components/SpacesDialog.vue';
 
 export default {
   layout: 'space',
@@ -223,6 +240,7 @@ export default {
     InstitutionForm,
     InstitutionsDeleteDialog,
     RepositoriesDialog,
+    SpacesDialog,
   },
   data() {
     return {
@@ -252,8 +270,21 @@ export default {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
-        { text: this.$t('institutions.institution.members'), value: 'memberships' },
-        { text: this.$t('repositories.repositories'), value: 'repositories' },
+        {
+          text: this.$t('institutions.institution.members'),
+          width: '150px',
+          value: 'memberships',
+        },
+        {
+          text: this.$t('repositories.repositories'),
+          width: '150px',
+          value: 'repositories',
+        },
+        {
+          text: this.$t('spaces.spaces'),
+          width: '150px',
+          value: 'spaces',
+        },
         { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
           text: this.$t('institutions.institution.status'),
@@ -275,7 +306,11 @@ export default {
       this.refreshing = true;
 
       try {
-        this.institutions = await this.$axios.$get('/institutions', { params: { include: ['repositories', 'memberships'] } });
+        this.institutions = await this.$axios.$get('/institutions', {
+          params: {
+            include: ['repositories', 'memberships', 'spaces'],
+          },
+        });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }

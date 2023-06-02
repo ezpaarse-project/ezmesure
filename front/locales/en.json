@@ -574,10 +574,25 @@
   },
   "repositories": {
     "repositories": "Repositories",
-    "xRepositories": "no repositories | 1 repository | {count} repositories",
-    "noRepository": "No repositories has been assigned yet",
+    "xRepositories": "no repository | 1 repository | {count} repositories",
+    "noRepository": "No repository has been assigned yet",
     "pattern": "Pattern",
     "type": "Type"
+  },
+  "spaces": {
+    "spaces": "Spaces",
+    "xSpaces": "no space | 1 space | {count} spaces",
+    "noSpace": "No space has been assigned yet",
+    "id": "Identifier",
+    "type": "Type",
+    "types": {
+      "ezpaarse": "ezPAARSE",
+      "counter5": "COUNTER 5"
+    },
+    "descriptions": {
+      "ezpaarse": "ezPAARSE space",
+      "counter5": "Publisher space"
+    }
   },
   "permissions": {
     "none": "None",
@@ -597,6 +612,8 @@
   "status": "Status",
   "date": "Date",
   "duration": "Duration",
+  "description": "Description",
+  "initials": "Initials",
   "language": "Language",
   "refresh": "Refresh",
   "delete": "Remove",
@@ -634,6 +651,8 @@
   "areYouSure": "Are you sure ?",
   "fieldIsRequired": "This field is required",
   "fieldMustMatch": "This field must match : {pattern}",
+  "maxLength": "Maximum length: {n} characters",
+  "open": "Open",
   "send": "Send",
   "yes": "Yes",
   "no": "No",
