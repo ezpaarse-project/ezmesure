@@ -43,7 +43,7 @@
       <v-container v-if="hasSpaces">
         <v-row>
           <v-col v-for="space in spaces" :key="space.id" cols="12">
-            <SpaceCard :space="space" :namespace="institution.namespace">
+            <SpaceCard :space="space">
               <template #actions>
                 <v-spacer />
 

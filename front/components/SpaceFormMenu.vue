@@ -42,7 +42,7 @@
             v-model="spaceId"
             :label="`${$t('identifier')} *`"
             :rules="[v => !!v || $t('fieldIsRequired')]"
-            :prefix="`${namespace}-`"
+            :prefix="namespace && `${namespace}-`"
             outlined
             autofocus
             required
@@ -138,7 +138,7 @@ export default {
       ];
     },
     namespace() {
-      return this.institution?.namespace;
+      return this.institution?.namespace || '';
     },
   },
   methods: {
@@ -152,7 +152,11 @@ export default {
       this.spaceInitials = this.space?.initials || '';
       this.spaceDescription = this.space?.description || '';
 
-      if (!this.space?.id) {
+      if (this.spaceId) {
+        if (this.namespace && this.spaceId?.startsWith?.(`${this.namespace}-`)) {
+          this.spaceId = this.spaceId.substring(this.namespace.length + 1);
+        };
+      } else {
         this.applyPreset();
       }
     },
@@ -175,7 +179,7 @@ export default {
           method: this.editMode ? 'PATCH' : 'POST',
           url: this.editMode ? `/kibana-spaces/${this.space.id}` : '/kibana-spaces',
           data: {
-            id: this.spaceId,
+            id: this.namespace ? `${this.namespace}-${this.spaceId}` : this.spaceId,
             type: this.spaceType,
             name: this.spaceName,
             initials: this.spaceInitials,
