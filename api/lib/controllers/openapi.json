@@ -417,7 +417,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ItemID"
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_.-]*$",
+            "example": "ezpaarse",
+            "description": "ID of the space. The institution namespace is used as a prefix when the actual Kibana space is created."
           },
           "updatedAt": {
             "$ref": "#/components/schemas/ItemUpdateDate"
@@ -427,17 +430,45 @@
           },
           "institution": {
             "description": "The institution associated to this space",
-            "$ref": "#/components/schemas/Institution",
-            "nullable": true
+            "allOf": [
+              { "$ref": "#/components/schemas/Institution" },
+              { "readOnly": true }
+            ]
+          },
+          "institutionId": {
+            "description": "ID of the institution associated to this space",
+            "allOf": [
+              { "$ref": "#/components/schemas/ItemID" },
+              { "readOnly": false }
+            ]
           },
           "type": {
             "description": "Space type",
-            "example": "counter",
+            "example": "counter5",
             "type": "string"
           },
-          "spacePermissions": {
+          "name": {
+            "description": "Space name",
+            "type": "string"
+          },
+          "description": {
+            "description": "Space description",
+            "type": "string"
+          },
+          "initials": {
+            "description": "Space initials",
+            "example": "EZ",
+            "type": "string"
+          },
+          "color": {
+            "description": "Space color",
+            "example": "#458df9",
+            "type": "string"
+          },
+          "permissions": {
             "description": "List of permissions associated to this space",
             "type": "array",
+            "readOnly": true,
             "items": {
               "$ref": "#/components/schemas/SpacePermission"
             }
@@ -450,19 +481,21 @@
         "properties": {
           "user": {
             "description": "The user associated to this permission",
-            "$ref": "#/components/schemas/User"
+            "allOf": [
+              { "$ref": "#/components/schemas/User" },
+              { "readOnly": true }
+            ]
           },
           "space": {
             "description": "The space associated to this permission",
-            "$ref": "#/components/schemas/Space"
+            "allOf": [
+              { "$ref": "#/components/schemas/Space" },
+              { "readOnly": true }
+            ]
           },
           "readonly": {
-            "description": "User permissions for the space",
-            "type": "string",
-            "enum": [
-              "read",
-              "read_write"
-            ]
+            "description": "Whether the user has read of read/write access to the space",
+            "type": "boolean"
           },
           "locked": {
             "description": "Whether the permission can be modified by admins only",
@@ -4579,7 +4612,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Repository"
+                "$ref": "#/components/schemas/RepositoryPermission"
               }
             }
           }
@@ -4775,6 +4808,348 @@
         ],
         "tags": [
           "Administration",
+          "Kibana"
+        ]
+      }
+    },
+    "/kibana-spaces": {
+      "get": {
+        "summary": "List affected Kibana spaces",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "q",
+            "in": "query",
+            "description": "A query, for search"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "type",
+            "in": "query",
+            "example": "counter5",
+            "description": "Filter spaces by type"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "institutionId",
+            "in": "query",
+            "description": "Filter spaces by institution ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Space"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "operationId": "get-kibana-spaces",
+        "description": "List Kibana spaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a Kibana space",
+        "operationId": "post-kibana-spaces",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Create and assign a new Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Space"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/kibana-spaces/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get a Kibana space",
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-kibana-spaces-id",
+        "description": "Get a specific Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update a Kibana space",
+        "operationId": "patch-kibana-spaces-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Update a Kibana space",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Space"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete a Kibana space",
+        "operationId": "delete-kibana-space-spaceId",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Delete a Kibana space",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Kibana"
+        ]
+      }
+    },
+    "/kibana-spaces/{id}/permissions/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the space"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "username of the member"
+        }
+      ],
+      "put": {
+        "summary": "Set space permissions for a user",
+        "description": "Set space permissions for a user",
+        "operationId": "put-kibana-spaces-id-permissions-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpacePermission"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Kibana"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpacePermission"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete space permissions for a user",
+        "description": "Delete space permissions for a user, so that he cannot access it anymore",
+        "operationId": "delete-space-id-permissions-username",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpacePermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
           "Kibana"
         ]
       }
@@ -5214,7 +5589,7 @@
       }
     },
     "/sushi/batch_delete": {
-      "post": {
+    "post": {
         "summary": "Delete multiple Sushi items",
         "operationId": "post-sushi-batch_delete",
         "responses": {
