@@ -110,36 +110,6 @@
         </v-chip>
       </template>
 
-      <template #[`item.automatisations`]="{ item }">
-        <v-chip
-          label
-          small
-          :outlined="!item.auto.ezpaarse"
-          :text-color="item.auto.ezpaarse ? 'white' : 'grey'"
-          :color="item.auto.ezpaarse ? 'green' : 'grey'"
-        >
-          ezPAARSE
-        </v-chip>
-        <v-chip
-          label
-          small
-          :outlined="!item.auto.ezmesure"
-          :text-color="item.auto.ezmesure ? 'white' : 'grey'"
-          :color="item.auto.ezmesure ? 'green' : 'grey'"
-        >
-          ezMESURE
-        </v-chip>
-        <v-chip
-          label
-          small
-          :outlined="!item.auto.report"
-          :text-color="item.auto.report ? 'white' : 'grey'"
-          :color="item.auto.report ? 'green' : 'grey'"
-        >
-          Reporting
-        </v-chip>
-      </template>
-
       <template #[`item.status`]="{ item }">
         <v-chip
           label
@@ -296,7 +266,6 @@ export default {
           width: '150px',
           value: 'spaces',
         },
-        { text: this.$t('institutions.institution.automations'), value: 'automatisations' },
         {
           text: this.$t('institutions.institution.status'),
           value: 'status',
