@@ -251,6 +251,7 @@ export default {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
+        { text: this.$t('institutions.institution.namespace'), value: 'namespace' },
         {
           text: this.$t('institutions.institution.members'),
           width: '150px',
