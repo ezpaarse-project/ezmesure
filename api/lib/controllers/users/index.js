@@ -5,7 +5,6 @@ const {
   adminUpdateSchema,
   adminCreateSchema,
   includableFields,
-  adminImportSchema,
 } = require('../../entities/users.dto');
 
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
@@ -93,7 +92,7 @@ router.route({
     params: {
       overwrite: Joi.boolean().default(false),
     },
-    body: adminImportSchema,
+    body: Joi.array(),
   },
 });
 

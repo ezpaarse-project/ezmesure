@@ -70,15 +70,15 @@ const adminUpdateSchema = withModifiers(
 /**
  * Schema to be applied when an administrator imports multiple spaces
  */
-const adminImportSchema = Joi.array().required().items(withModifiers(
+const adminImportSchema = withModifiers(
   schema,
   requireFields(['username']),
-));
+);
 
 module.exports = {
   schema,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
-  adminImportSchema,
+  adminImportSchema: Joi.object(adminImportSchema).required(),
 };

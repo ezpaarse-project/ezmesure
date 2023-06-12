@@ -2,6 +2,7 @@ const usersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
 const { activateUserLink } = require('../auth/password');
+const { adminImportSchema } = require('../../entities/users.dto');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -128,7 +129,14 @@ exports.importUsers = async (ctx) => {
     });
   };
 
-  const importItem = async (item = {}) => {
+  const importItem = async (itemData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(itemData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
     if (item.username) {
       const user = await usersService.findUnique({
         where: { username: item.username },
