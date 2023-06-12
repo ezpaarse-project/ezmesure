@@ -209,6 +209,90 @@ exports.updateInstitution = async (ctx) => {
   ctx.body = updatedInstitution;
 };
 
+exports.importInstitutions = async (ctx) => {
+  ctx.action = 'institutions/import';
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  const importItem = async (item = {}) => {
+    if (item.id) {
+      const institution = await institutionsService.findUnique({
+        where: { id: item.id },
+      });
+
+      if (institution && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.institution.import.alreadyExists', institution.id));
+        return;
+      }
+    }
+
+    const base64logo = item.logo;
+
+    const institutionData = {
+      ...item,
+      logo: undefined,
+      logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+      spaces: {
+        connectOrCreate: item.spaces?.map?.((spaceData) => ({
+          where: { id: spaceData.id },
+          create: spaceData,
+        })),
+      },
+      repositories: {
+        connectOrCreate: item.repositories?.map?.((repoData) => ({
+          where: {
+            institutionId_pattern: {
+              institutionId: item.id,
+              pattern: repoData?.pattern,
+            },
+          },
+          create: repoData,
+        })),
+      },
+    };
+
+    const institution = await institutionsService.upsert({
+      where: { id: item?.id },
+      create: institutionData,
+      update: institutionData,
+    });
+
+    addResponseItem(institution, 'created');
+  };
+
+  for (let i = 0; i < body.length; i += 1) {
+    const institutionData = body[i] || {};
+
+    try {
+      await importItem(institutionData); // eslint-disable-line no-await-in-loop
+    } catch (e) {
+      addResponseItem(institutionData, 'error', e.message);
+    }
+  }
+
+  ctx.type = 'json';
+  ctx.body = response;
+};
+
 exports.deleteInstitution = async (ctx) => {
   ctx.action = 'institutions/delete';
   const { institutionId } = ctx.params;

@@ -347,10 +347,12 @@
           },
           "metadata": {
             "description": "Metadata properties associated to the user",
-            "type": ["object", "null"]
+            "type": "object",
+            "nullable": true
           },
           "memberships": {
             "description": "User memberships",
+            "readOnly": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Membership"
@@ -359,6 +361,7 @@
           "historyEntries": {
             "description": "History entries written by this user",
             "type": "array",
+            "readOnly": true,
             "items": {
               "$ref": "#/components/schemas/HistoryEntry"
             }
@@ -6903,6 +6906,140 @@
         "tags": [
           "Users"
         ]
+      }
+    },
+    "/users/_import": {
+      "post": {
+        "summary": "Import a list of users",
+        "operationId": "post-users-import",
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same username already exists"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/User"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "description": "Import a list of users",
+        "tags": [
+          "Users",
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/User" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "description": "Username",
+                          "type": "string",
+                          "example": "john.doo"
+                        },
+                        "memberships": {
+                          "$ref": "#/components/schemas/Membership"
+                        }
+                      }
+                    }
+
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/users/{username}": {

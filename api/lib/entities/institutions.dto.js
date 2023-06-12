@@ -134,6 +134,20 @@ const createSchema = withModifiers(
   requireFields(['name']),
 );
 
+/**
+ * Schema to be applied when an administrator imports institutions
+ */
+const adminImportSchema = Joi.array().required().items(withModifiers(
+  schema,
+  ignoreFields(immutableFields),
+  {
+    id: () => schema.id,
+    spaces: () => schema.spaces,
+    repositories: () => schema.repositories,
+    logo: () => Joi.string().base64(),
+  },
+));
+
 module.exports = {
   schema,
   adminFields,
@@ -143,4 +157,5 @@ module.exports = {
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
   updateSchema: Joi.object(updateSchema).required(),
   createSchema: Joi.object(createSchema).required(),
+  adminImportSchema,
 };

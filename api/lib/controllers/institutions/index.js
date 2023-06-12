@@ -3,6 +3,7 @@ const { Joi } = require('koa-joi-router');
 
 const {
   includableFields,
+  adminImportSchema,
 } = require('../../entities/institutions.dto');
 const {
   includableFields: membershipIncludableFields,
@@ -27,6 +28,7 @@ const {
   getInstitutions,
   createInstitution,
   deleteInstitution,
+  importInstitutions,
   getInstitution,
   getInstitutionMembers,
   addInstitutionMember,
@@ -214,6 +216,21 @@ router.route({
     query: {
       addAsMember: Joi.boolean(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: [
+    importInstitutions,
+  ],
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: adminImportSchema,
   },
 });
 

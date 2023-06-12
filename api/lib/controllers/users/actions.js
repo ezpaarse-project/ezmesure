@@ -105,6 +105,83 @@ exports.createOrReplaceUser = async (ctx) => {
   ctx.status = userExists ? 200 : 201;
 };
 
+exports.importUsers = async (ctx) => {
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  const importItem = async (item = {}) => {
+    if (item.username) {
+      const user = await usersService.findUnique({
+        where: { username: item.username },
+      });
+
+      if (user && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.user.import.alreadyExists', user.id));
+        return;
+      }
+    }
+
+    const userData = {
+      username: item.username,
+      fullName: item.fullName,
+      email: item.email,
+      isAdmin: !!item.isAdmin,
+      metadata: item.metadata,
+      memberships: {
+        connectOrCreate: item.memberships?.map?.((membership) => ({
+          where: {
+            username_institutionId: {
+              institutionId: membership?.institutionId,
+              username: membership?.username,
+            },
+          },
+          create: { ...membership, username: undefined },
+        })),
+      },
+    };
+
+    const user = await usersService.upsert({
+      where: { username: item.username },
+      create: userData,
+      update: userData,
+    });
+
+    addResponseItem(user, 'created');
+  };
+
+  for (let i = 0; i < body.length; i += 1) {
+    const userData = body[i] || {};
+
+    try {
+      await importItem(userData); // eslint-disable-line no-await-in-loop
+    } catch (e) {
+      addResponseItem(userData, 'error', e.message);
+    }
+  }
+
+  ctx.type = 'json';
+  ctx.body = response;
+};
+
 exports.updateUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;

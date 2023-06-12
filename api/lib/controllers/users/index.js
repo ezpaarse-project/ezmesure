@@ -1,7 +1,12 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { adminUpdateSchema, adminCreateSchema, includableFields } = require('../../entities/users.dto');
+const {
+  adminUpdateSchema,
+  adminCreateSchema,
+  includableFields,
+  adminImportSchema,
+} = require('../../entities/users.dto');
 
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
@@ -10,6 +15,7 @@ const {
   createOrReplaceUser,
   updateUser,
   deleteUser,
+  importUsers,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -75,6 +81,19 @@ router.route({
     params: {
       username: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: importUsers,
+  validate: {
+    type: 'json',
+    params: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: adminImportSchema,
   },
 });
 
