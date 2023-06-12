@@ -230,7 +230,7 @@ router.route({
     query: {
       overwrite: Joi.boolean().default(false),
     },
-    body: adminImportSchema,
+    body: Joi.array(),
   },
 });
 

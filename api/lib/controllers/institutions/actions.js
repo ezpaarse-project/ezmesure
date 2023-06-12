@@ -1,8 +1,15 @@
 const config = require('config');
 const institutionsService = require('../../entities/institutions.service');
-const institutionsDto = require('../../entities/institutions.dto');
 const membershipService = require('../../entities/memberships.service');
 const usersService = require('../../entities/users.service');
+
+const {
+  adminCreateSchema,
+  adminUpdateSchema,
+  createSchema,
+  updateSchema,
+  adminImportSchema,
+} = require('../../entities/institutions.dto');
 
 const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
@@ -87,7 +94,7 @@ exports.createInstitution = async (ctx) => {
   };
 
   const base64logo = body?.logo;
-  const schema = institutionsDto[isAdmin ? 'adminCreateSchema' : 'createSchema'];
+  const schema = isAdmin ? adminCreateSchema : createSchema;
   const { error, value: institutionData } = schema.validate(body);
 
   if (error) { ctx.throw(error); }
@@ -134,7 +141,7 @@ exports.updateInstitution = async (ctx) => {
     return;
   }
 
-  const schema = institutionsDto[user.isAdmin ? 'adminUpdateSchema' : 'updateSchema'];
+  const schema = user.isAdmin ? adminUpdateSchema : updateSchema;
   const { error, value: institutionData } = schema.validate(body);
 
   if (error) { ctx.throw(error); }
@@ -233,7 +240,14 @@ exports.importInstitutions = async (ctx) => {
     });
   };
 
-  const importItem = async (item = {}) => {
+  const importItem = async (itemData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(itemData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
     if (item.id) {
       const institution = await institutionsService.findUnique({
         where: { id: item.id },
