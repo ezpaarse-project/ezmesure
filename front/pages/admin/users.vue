@@ -321,7 +321,13 @@ export default {
       this.refreshing = true;
 
       try {
-        this.users = await this.$axios.$get('/users', { params: { source: '*', include: 'memberships.institution' } });
+        this.users = await this.$axios.$get('/users', {
+          params: {
+            size: 10000,
+            source: '*',
+            include: 'memberships.institution',
+          },
+        });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('users.unableToFetchInformations'));
       }
