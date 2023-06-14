@@ -3,6 +3,10 @@ const institutionsService = require('../../entities/institutions.service');
 const membershipService = require('../../entities/memberships.service');
 const usersService = require('../../entities/users.service');
 
+/**
+ * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
+ */
+
 const {
   adminCreateSchema,
   adminUpdateSchema,
@@ -261,6 +265,7 @@ exports.importInstitutions = async (ctx) => {
 
     const base64logo = item.logo;
 
+    /** @type {InstitutionCreateInput} */
     const institutionData = {
       ...item,
       logo: undefined,
@@ -286,6 +291,17 @@ exports.importInstitutions = async (ctx) => {
         connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
           where: { id: sushi.id },
           create: { ...sushi, institutionId: undefined },
+        })),
+      },
+      memberships: {
+        connectOrCreate: item.memberships?.map?.((membership) => ({
+          where: {
+            username_institutionId: {
+              institutionId: membership.institutionId,
+              username: membership.username,
+            },
+          },
+          create: { ...membership, institutionId: undefined },
         })),
       },
     };
