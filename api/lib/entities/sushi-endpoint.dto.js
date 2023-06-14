@@ -76,14 +76,14 @@ const adminUpdateSchema = withModifiers(
 /**
  * Schema to be applied when an administrator import multiple SUSHI endpoints
  */
-const adminImportSchema = Joi.array().required().items({
-  ...adminCreateSchema,
-  id: schema.id,
-});
+const adminImportSchema = withModifiers(
+  adminCreateSchema,
+  { id: () => schema.id },
+);
 
 module.exports = {
   schema,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
-  adminImportSchema,
+  adminImportSchema: Joi.object(adminImportSchema).required(),
 };

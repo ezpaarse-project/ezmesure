@@ -1,3 +1,4 @@
+const { adminImportSchema } = require('../../entities/sushi-endpoint.dto');
 const sushiEndpointService = require('../../entities/sushi-endpoint.service');
 
 exports.getAll = async (ctx) => {
@@ -116,16 +117,27 @@ exports.importEndpoints = async (ctx) => {
   };
 
   const importItem = async (endpointData = {}) => {
-    if (endpointData.id) {
-      const endpoint = await sushiEndpointService.findUnique({ where: { id: endpointData.id } });
+    const { value: item, error } = adminImportSchema.validate(endpointData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const endpoint = await sushiEndpointService.findUnique({ where: { id: item.id } });
 
       if (endpoint && !overwrite) {
-        addResponseItem(endpointData, 'conflict', ctx.$t('errors.endpoint.import.alreadyExists', endpoint.id));
+        addResponseItem(item, 'conflict', ctx.$t('errors.endpoint.import.alreadyExists', endpoint.id));
         return;
       }
     }
 
-    const endpoint = await sushiEndpointService.create({ data: endpointData });
+    const endpoint = await sushiEndpointService.upsert({
+      where: { id: item?.id },
+      create: item,
+      update: item,
+    });
 
     addResponseItem(endpoint, 'created');
   };
