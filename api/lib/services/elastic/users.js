@@ -43,8 +43,8 @@ exports.getUser = async function getUser(username) {
  * @param {Object} user - Config of user.
  * @param {string} user.username - Username of user.
  * @param {string} user.email - Email of user.
- * @param {string} user.fullName - Fullname of user.
- * @param {string} user.roles - Roles of user.hould generate password
+ * @param {string} user.fullName - Full name of user.
+ * @param {string[]} user.roles - Roles of user.
  *
  * @return {Promise<Object>} Created user.
  */
