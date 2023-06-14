@@ -144,6 +144,7 @@ const adminImportSchema = withModifiers(
     id: () => schema.id,
     spaces: () => schema.spaces,
     repositories: () => schema.repositories,
+    sushiCredentials: () => schema.sushiCredentials,
     logo: () => Joi.string().base64(),
   },
 );

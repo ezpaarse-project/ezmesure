@@ -282,6 +282,12 @@ exports.importInstitutions = async (ctx) => {
           create: repoData,
         })),
       },
+      sushiCredentials: {
+        connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
+          where: { id: sushi.id },
+          create: { ...sushi, institutionId: undefined },
+        })),
+      },
     };
 
     const institution = await institutionsService.upsert({
