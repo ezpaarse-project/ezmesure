@@ -23,6 +23,10 @@ export default {
   },
   computed: {
     style() {
+      if (!this.tag) {
+        return {};
+      }
+
       const [scope] = this.tag.split(':', 2);
       if (!scopeColors[scope]) {
         // https://stackoverflow.com/a/3426956

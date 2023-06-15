@@ -564,7 +564,10 @@
       "memberships": "Établissements",
       "membershipsCount": "{count} établissement|{count} établissements",
       "roles": "Roles",
-      "permissions": "Permissions"
+      "no_roles": "Aucun rôle",
+      "permissions": "Permissions",
+      "no_permissions": "Aucune permission",
+      "no_institution": "Aucun établissement"
     }
   },
   "report": {

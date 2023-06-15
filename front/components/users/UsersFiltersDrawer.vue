@@ -95,7 +95,7 @@
         <v-col>
           <v-select
             :value="value.permissions"
-            :items="permissions"
+            :items="permissionsItems"
             :label="$t('users.user.permissions')"
             prepend-icon="mdi-key"
             multiple
@@ -103,7 +103,10 @@
             @change="onFilterUpdate('permissions', $event)"
           >
             <template #selection="{ item }">
-              <UserTagChip :tag="item" />
+              <UserTagChip v-if="item.value" :tag="item.value" />
+              <template v-else>
+                {{ item.text }}
+              </template>
             </template>
           </v-select>
         </v-col>
@@ -113,7 +116,7 @@
         <v-col>
           <v-select
             :value="value.roles"
-            :items="roles"
+            :items="rolesItems"
             :label="$t('users.user.roles')"
             prepend-icon="mdi-tag"
             multiple
@@ -121,7 +124,10 @@
             @change="onFilterUpdate('roles', $event)"
           >
             <template #selection="{ item }">
-              <UserTagChip :tag="item" />
+              <UserTagChip v-if="item.value" :tag="item.value" />
+              <template v-else>
+                {{ item.text }}
+              </template>
             </template>
           </v-select>
         </v-col>
@@ -131,16 +137,22 @@
         <v-col>
           <v-select
             :value="value.institutions"
-            :items="institutions"
+            :items="institutionItems"
             :label="$t('users.user.memberships')"
-            :item-text="(v) => v.acronym || v.name"
             prepend-icon="mdi-domain"
-            item-value="id"
             multiple
-            small-chips
             hide-details
             @change="onFilterUpdate('institutions', $event)"
-          />
+          >
+            <template #selection="{item}">
+              <v-chip v-if="item.value" small>
+                {{ item.text }}
+              </v-chip>
+              <template v-else>
+                {{ item.text }}
+              </template>
+            </template>
+          </v-select>
         </v-col>
       </v-row>
     </v-container>
@@ -177,6 +189,72 @@ export default {
     },
   },
   emits: ['input', 'update:show'],
+  computed: {
+    /**
+     * Permissions list for v-select, with dynamic disabled state and no_permissions item
+     */
+    permissionsItems() {
+      const isDisabled = this.value.permissions?.includes('');
+      const permissions = this.permissions.map((p) => ({
+        value: p,
+        text: p,
+        disabled: isDisabled,
+      }));
+
+      return [
+        {
+          // '' actually means: no permissions
+          value: '',
+          text: this.$t('users.user.no_permissions'),
+          disabled: !isDisabled && this.value.permissions?.length > 0,
+        },
+        ...permissions,
+      ];
+    },
+    /**
+     * Roles list for v-select, with dynamic disabled state and no_roles item
+     */
+    rolesItems() {
+      const isDisabled = this.value.roles?.includes('');
+      const roles = this.roles.map((r) => ({
+        value: r,
+        text: r,
+        disabled: isDisabled,
+      }));
+
+      return [
+        {
+          // '' actually means: no roles
+          value: '',
+          text: this.$t('users.user.no_roles'),
+          disabled: !isDisabled && this.value.roles?.length > 0,
+        },
+        ...roles,
+      ];
+    },
+    /**
+     * Roles list for v-select, with dynamic disabled state, proper value/text
+     * and no_institutions item
+     */
+    institutionItems() {
+      const isDisabled = this.value.institutions?.includes('');
+      const institutions = this.institutions.map((v) => ({
+        value: v.id,
+        text: v.acronym || v.name,
+        disabled: isDisabled,
+      }));
+
+      return [
+        {
+          // '' actually means: no institution
+          value: '',
+          text: this.$t('users.user.no_institution'),
+          disabled: !isDisabled && this.value.institutions?.length > 0,
+        },
+        ...institutions,
+      ];
+    },
+  },
   methods: {
     onFilterUpdate(field, val) {
       const filters = { ...this.value };
