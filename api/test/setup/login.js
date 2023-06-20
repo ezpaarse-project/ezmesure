@@ -1,6 +1,10 @@
+const config = require('config');
 const ezmesure = require('./ezmesure');
 
-const login = async (username, password) => {
+const usernameAdmin = config.get('admin.username');
+const passwordAdmin = config.get('admin.password');
+
+async function login(username, password) {
   let res;
 
   try {
@@ -21,6 +25,13 @@ const login = async (username, password) => {
   const match = /^eztoken=([a-zA-Z0-9_.-]+);/i.exec(token);
   [, token] = match;
   return token;
-};
+}
 
-module.exports = login;
+async function getAdminToken() {
+  return login(usernameAdmin, passwordAdmin);
+}
+
+module.exports = {
+  login,
+  getAdminToken,
+};
