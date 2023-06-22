@@ -1,9 +1,9 @@
 const ezmesure = require('./ezmesure');
 
-const login = require('./login');
+const { getAdminToken } = require('./login');
 
-const createIndex = async (indexName) => {
-  const token = await login('ezmesure-admin', 'changeme');
+const createIndexAsAdmin = async (indexName) => {
+  const token = await getAdminToken();
   let res;
   try {
     await ezmesure({
@@ -14,14 +14,14 @@ const createIndex = async (indexName) => {
       },
     });
   } catch (err) {
-    console.error(err?.response?.data);
+    res = err?.response;
     return;
   }
   return res?.data?.created;
 };
 
-const deleteIndex = async (indexName) => {
-  const token = await login('ezmesure-admin', 'changeme');
+const deleteIndexAsAdmin = async (indexName) => {
+  const token = await getAdminToken();
   let res;
   try {
     res = await ezmesure({
@@ -32,13 +32,13 @@ const deleteIndex = async (indexName) => {
       },
     });
   } catch (err) {
-    // console.error(err?.response?.data);
+    res = err?.response;
     return;
   }
   return res?.status === 204;
 };
 
 module.exports = {
-  createIndex,
-  deleteIndex,
+  createIndexAsAdmin,
+  deleteIndexAsAdmin,
 };

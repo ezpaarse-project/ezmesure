@@ -1,10 +1,16 @@
 const config = require('config');
+const jwt = require('jsonwebtoken');
+const { addHours } = require('date-fns');
+
+const passwordResetValidity = config.get('passwordResetValidity');
+const secret = config.get('auth.secret');
+
 const ezmesure = require('./ezmesure');
 
 const usernameAdmin = config.get('admin.username');
 const passwordAdmin = config.get('admin.password');
 
-async function login(username, password) {
+async function getToken(username, password) {
   let res;
 
   try {
@@ -28,10 +34,22 @@ async function login(username, password) {
 }
 
 async function getAdminToken() {
-  return login(usernameAdmin, passwordAdmin);
+  return getToken(usernameAdmin, passwordAdmin);
+}
+
+async function getUserTokenForActivate(username) {
+  const currentDate = new Date();
+  const expiresAt = addHours(currentDate, passwordResetValidity);
+
+  return jwt.sign({
+    username,
+    createdAt: currentDate,
+    expiresAt,
+  }, secret);
 }
 
 module.exports = {
-  login,
+  getToken,
   getAdminToken,
+  getUserTokenForActivate,
 };

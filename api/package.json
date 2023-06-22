@@ -7,7 +7,7 @@
     "dev": "nodemon -w server.js -w config/ -w lib/ server.js",
     "start": "node server.js",
     "lint": "eslint --ext .js .",
-    "test": "jest",
+    "test": "NODE_ENV= jest --runInBand --verbose",
     "db:migrate": "prisma migrate deploy"
   },
   "repository": {

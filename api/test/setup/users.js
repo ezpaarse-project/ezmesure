@@ -8,14 +8,19 @@ const secret = config.get('auth.secret');
 const ezmesure = require('./ezmesure');
 const { getAdminToken } = require('./login');
 
-async function createUserAsAdmin(username, email, fullName, isAdmin) {
-  let res;
+const defaultUser = {
+  username: 'user.test',
+  email: 'user.test@test.fr',
+  fullName: 'User test',
+  isAdmin: false,
+  password: 'changeme',
+};
 
-  // TODO use node config
+async function createUserAsAdmin(username, email, fullName, isAdmin) {
   const token = await getAdminToken();
 
   try {
-    res = await ezmesure({
+    await ezmesure({
       method: 'PUT',
       url: `/users/${username}`,
       headers: {
@@ -29,10 +34,9 @@ async function createUserAsAdmin(username, email, fullName, isAdmin) {
       },
     });
   } catch (err) {
-    console.error(err?.response?.data);
     return;
   }
-  return res?.status;
+  return defaultUser;
 }
 
 async function activateUser(username, password) {
@@ -55,11 +59,10 @@ async function activateUser(username, password) {
       data: {
         password,
         acceptTerms: true,
-        username,
       },
     });
   } catch (err) {
-    console.error(err?.response?.data);
+    res = err?.response;
     return;
   }
   return res?.status;
@@ -79,14 +82,37 @@ async function deleteUserAsAdmin(username) {
       },
     });
   } catch (err) {
-    console.error(err?.response?.data);
+    res = err?.response;
     return;
   }
   return res?.status;
 }
 
+async function createActivatedUserAsAdmin(user) {
+  await createUserAsAdmin(user.username, user.email, user.fullName, user.isAdmin);
+  await activateUser(user.username, user.password);
+}
+
+async function createDefaultActivatedUserAsAdmin() {
+  await createActivatedUserAsAdmin(defaultUser);
+  return defaultUser;
+}
+
+async function createDefaultUserAsAdmin() {
+  await createUserAsAdmin(
+    defaultUser.username,
+    defaultUser.email,
+    defaultUser.fullName,
+    defaultUser.isAdmin,
+  );
+  return defaultUser;
+}
+
 module.exports = {
   createUserAsAdmin,
+  createDefaultUserAsAdmin,
   activateUser,
   deleteUserAsAdmin,
+  createActivatedUserAsAdmin,
+  createDefaultActivatedUserAsAdmin,
 };
