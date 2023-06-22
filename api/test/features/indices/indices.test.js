@@ -162,7 +162,7 @@ describe('[indices]: Test indices features', () => {
       describe('DELETE /indices/<id> - Delete index without token', () => {
         const indexName = 'test';
 
-        it('Should get HTTP status 403', async () => {
+        it('Should get HTTP status 401', async () => {
           let res;
           try {
             res = await ezmesure({
