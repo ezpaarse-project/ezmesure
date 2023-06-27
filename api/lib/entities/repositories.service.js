@@ -1,5 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
+const hooks = require('../hooks');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
@@ -16,8 +17,10 @@ module.exports = class RepositorysService {
    * @param {RepositoryCreateArgs} params
    * @returns {Promise<Repository>}
    */
-  static create(params) {
-    return prisma.repository.create(params);
+  static async create(params) {
+    const repository = await prisma.repository.create(params);
+    hooks.emit('repository:create', repository);
+    return repository;
   }
 
   /**
@@ -40,28 +43,38 @@ module.exports = class RepositorysService {
    * @param {RepositoryUpdateArgs} params
    * @returns {Promise<Repository>}
    */
-  static update(params) {
-    return prisma.repository.update(params);
+  static async update(params) {
+    const repository = await prisma.repository.update(params);
+    hooks.emit('repository:update', repository);
+    return repository;
   }
 
   /**
    * @param {RepositoryUpsertArgs} params
    * @returns {Promise<Repository>}
    */
-  static upsert(params) {
-    return prisma.repository.upsert(params);
+  static async upsert(params) {
+    const repository = await prisma.repository.upsert(params);
+    hooks.emit('repository:upsert', repository);
+    return repository;
   }
 
   /**
    * @param {RepositoryDeleteArgs} params
    * @returns {Promise<Repository | null>}
    */
-  static delete(params) {
-    return prisma.repository.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+  static async delete(params) {
+    let repository;
+    try {
+      repository = await prisma.repository.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return null;
       }
-      throw e;
-    });
+      throw error;
+    }
+    hooks.emit('repository:delete', repository);
+
+    return repository;
   }
 };

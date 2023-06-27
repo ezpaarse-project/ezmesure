@@ -4,11 +4,13 @@ const hookEmitter = require('./_hookEmitter');
 const { appLogger } = require('../services/logger');
 
 const elasticUsers = require('../services/elastic/users');
+const elasticRoles = require('../services/elastic/roles');
 
 /**
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@prisma/client').Institution} Institution
  * @typedef {import('@prisma/client').Membership} Membership
+ * @typedef {import('@prisma/client').Repository} Repository
  */
 
 // #region Users
@@ -150,5 +152,53 @@ hookEmitter.on('user:delete', onUserDelete);
 // elasticEmitter.on('institution:delete', onInstitutionDelete);
 
 // #endregion Institutions
+
+// #region Repositories
+
+/**
+ * @param { Repository } repository
+ */
+const onRepositoryUpsert = async (repository) => {
+  const readOnlyRole = `${repository?.id}_readonly`;
+  const allRole = `${repository?.id}_all`;
+  try {
+    await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read']);
+    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is upserted`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] cannot be upserted:\n${error}`);
+  }
+
+  try {
+    await elasticRoles.upsertRole(allRole, [repository.pattern], ['all']);
+    appLogger.verbose(`[elastic][hooks] Role [${allRole}] is upserted`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Role [${allRole}] cannot be upserted:\n${error}`);
+  }
+};
+
+const onRepositoryDelete = async (repository) => {
+  const readOnlyRole = `${repository?.id}_readonly`;
+  const allRole = `${repository?.id}_all`;
+  try {
+    await elasticRoles.deleteRole(readOnlyRole);
+    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is deleted`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
+  }
+
+  try {
+    await elasticRoles.deleteRole(allRole);
+    appLogger.verbose(`[elastic][hooks] Role [${allRole}] is deleted`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Role [${allRole}] cannot be deleted:\n${error}`);
+  }
+};
+
+hookEmitter.on('repository:create', onRepositoryUpsert);
+hookEmitter.on('repository:update', onRepositoryUpsert);
+hookEmitter.on('repository:upsert', onRepositoryUpsert);
+hookEmitter.on('repository:delete', onRepositoryDelete);
+
+// #endregion Repositories
 
 module.exports = hookEmitter;
