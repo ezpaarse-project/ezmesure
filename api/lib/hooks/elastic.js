@@ -3,6 +3,8 @@ const hookEmitter = require('./_hookEmitter');
 
 const { appLogger } = require('../services/logger');
 
+const { client: prisma } = require('../services/prisma.service');
+
 const elasticUsers = require('../services/elastic/users');
 const elasticRoles = require('../services/elastic/roles');
 
@@ -11,6 +13,7 @@ const elasticRoles = require('../services/elastic/roles');
  * @typedef {import('@prisma/client').Institution} Institution
  * @typedef {import('@prisma/client').Membership} Membership
  * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  */
 
 // #region Users
@@ -36,6 +39,7 @@ const onUserCreate = async (user) => {
       username: user.username,
       email: user.email,
       fullName: user.fullName,
+      roles: [],
     });
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is created`);
   } catch (error) {
@@ -47,11 +51,23 @@ const onUserCreate = async (user) => {
  * @param {User} user
  */
 const onUserUpdate = async (user) => {
+  let elasticUser;
+  try {
+    elasticUser = await elasticUsers.getUserByUsername(user.username);
+    if (!elasticUser) {
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be getted: ${error.message}`);
+    return;
+  }
+
   try {
     await elasticUsers.updateUser({
       username: user.username,
       email: user.email,
       fullName: user.fullName,
+      roles: elasticUser.roles,
     });
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
   } catch (error) {
@@ -156,11 +172,17 @@ hookEmitter.on('user:delete', onUserDelete);
 // #region Repositories
 
 /**
+ * @param {Repository} repository
+ * @param {string} modifier
+ */
+const generateRoleName = (repository, modifier) => `${repository.pattern}.${repository.type}.${modifier}.${repository.id}`;
+
+/**
  * @param { Repository } repository
  */
 const onRepositoryUpsert = async (repository) => {
-  const readOnlyRole = `${repository?.id}_readonly`;
-  const allRole = `${repository?.id}_all`;
+  const readOnlyRole = generateRoleName(repository, 'readonly');
+  const allRole = generateRoleName(repository, 'all');
   try {
     await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read']);
     appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is upserted`);
@@ -176,9 +198,12 @@ const onRepositoryUpsert = async (repository) => {
   }
 };
 
+/**
+ * @param { Repository } repository
+ */
 const onRepositoryDelete = async (repository) => {
-  const readOnlyRole = `${repository?.id}_readonly`;
-  const allRole = `${repository?.id}_all`;
+  const readOnlyRole = generateRoleName(repository, 'readonly');
+  const allRole = generateRoleName(repository, 'all');
   try {
     await elasticRoles.deleteRole(readOnlyRole);
     appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is deleted`);
@@ -200,5 +225,112 @@ hookEmitter.on('repository:upsert', onRepositoryUpsert);
 hookEmitter.on('repository:delete', onRepositoryDelete);
 
 // #endregion Repositories
+
+// #region Repositories-permissions
+
+/**
+ * @param { RepositoryPermission } permission
+ */
+const onRepositoryPermissionUpsert = async (permission) => {
+  let user;
+  try {
+    user = await elasticUsers.getUserByUsername(permission.username);
+    if (!user) {
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
+    return;
+  }
+
+  let repository;
+  try {
+    repository = await prisma.repository.findUnique({
+      where: { id: permission.repositoryId },
+    });
+    if (!repository) {
+      throw new Error('Repository not found');
+    }
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    return;
+  }
+
+  /** @type {{roles: string[]}} */
+  let { roles } = user;
+  const readonlyRole = generateRoleName(repository, 'readonly');
+  const allRole = generateRoleName(repository, 'all');
+
+  if (permission.readonly) {
+    roles = roles.filter((r) => r !== allRole);
+    roles.push(readonlyRole);
+  } else {
+    roles = roles.filter((r) => r !== readonlyRole);
+    roles.push(allRole);
+  }
+
+  try {
+    await elasticUsers.updateUser({
+      username: permission.username,
+      email: user.email,
+      fullName: user.full_name,
+      roles: [...new Set([...roles])],
+    });
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
+  }
+};
+
+/**
+ * @param { RepositoryPermission } permission
+ */
+const onRepositoryPermissionDelete = async (permission) => {
+  let user;
+  try {
+    user = await elasticUsers.getUserByUsername(permission.username);
+    if (!user) {
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
+    return;
+  }
+
+  let repository;
+  try {
+    repository = await prisma.repository.findUnique({
+      where: { id: permission.repositoryId },
+    });
+    if (!repository) {
+      throw new Error('Repository not found');
+    }
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    return;
+  }
+
+  const oldRole = generateRoleName(repository, permission.readonly ? 'readonly' : 'all');
+  const roles = user.roles.filter((r) => r !== oldRole);
+
+  try {
+    await elasticUsers.updateUser({
+      username: permission.username,
+      email: user.email,
+      fullName: user.full_name,
+      roles,
+    });
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
+  } catch (error) {
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
+  }
+};
+
+hookEmitter.on('repository_permission:create', onRepositoryPermissionUpsert);
+hookEmitter.on('repository_permission:update', onRepositoryPermissionUpsert);
+hookEmitter.on('repository_permission:upsert', onRepositoryPermissionUpsert);
+hookEmitter.on('repository_permission:delete', onRepositoryPermissionDelete);
+
+// #endregion Repositories-permissions
 
 module.exports = hookEmitter;

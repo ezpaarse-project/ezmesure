@@ -28,9 +28,11 @@ async function upsertReportUserFromInstitution(institution) {
 
   const isUserExist = await elasticUsers.getUserByUsername(user.username);
   if (isUserExist) {
-    return elasticUsers.updateUser(user);
+    await elasticUsers.updateUser(user);
+  } else {
+    await elasticUsers.createUser(user);
   }
-  return elasticUsers.createUser(user);
+  return user;
 }
 
 /**

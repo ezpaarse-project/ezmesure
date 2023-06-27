@@ -12,7 +12,7 @@ const hooks = require('../hooks');
 /** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class RepositorysService {
+module.exports = class RepositoriesService {
   /**
    * @param {RepositoryCreateArgs} params
    * @returns {Promise<Repository>}
