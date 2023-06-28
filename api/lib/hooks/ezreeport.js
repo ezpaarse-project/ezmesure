@@ -26,7 +26,7 @@ const onUserDelete = async (user) => {
     await ezrUsers.deleteFromUser(user);
     appLogger.verbose(`[ezreeport][hooks] User [${user.username}] is deleted`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] User [${user.username}] cannot be deleted:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] User [${user.username}] cannot be deleted:\n${error}`);
   }
 };
 
@@ -38,7 +38,7 @@ const onUserUpsert = async (user) => {
     await ezrUsers.upsertFromUser(user);
     appLogger.verbose(`[ezreeport][hooks] User [${user.username}] is upserted`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] User [${user.username}] cannot be upserted:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] User [${user.username}] cannot be upserted:\n${error}`);
   }
 };
 
@@ -101,7 +101,7 @@ const onInstitutionDelete = async (institution) => {
     await ezrNamespaces.deleteFromInstitution(institution);
     appLogger.verbose(`[ezreeport][hooks] Namespace [${institution.id}] is deleted`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] Namespace [${institution.id}] cannot be deleted:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] Namespace [${institution.id}] cannot be deleted:\n${error}`);
   }
 
   // Delete reporting user
@@ -110,7 +110,7 @@ const onInstitutionDelete = async (institution) => {
     username = (await ezrReportingUsers.deleteReportUserFromInstitution(institution)).username;
     appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is deleted in elastic`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] cannot be deleted in elastic:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be deleted in elastic:\n${error}`);
   }
 };
 
@@ -129,7 +129,7 @@ const onInstitutionUpsert = async (institution) => {
     created = true;
     appLogger.verbose(`[ezreeport][hooks] Namespace [${institution.id}] is upserted`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] Namespace [${institution.id}] cannot be upserted:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] Namespace [${institution.id}] cannot be upserted:\n${error}`);
   }
 
   // Upsert reporting user
@@ -138,7 +138,7 @@ const onInstitutionUpsert = async (institution) => {
     username = (await ezrReportingUsers.upsertReportUserFromInstitution(institution)).username;
     appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
   }
 
   if (!created) {
@@ -153,7 +153,7 @@ const onInstitutionUpsert = async (institution) => {
       memberships.map((membership) => onMembershipUpsert(membership)),
     );
   } catch (error) {
-    appLogger.verbose(`[ezreeport][hooks] Memberships of [${institution.id}] cannot be getted:\n${error}`);
+    appLogger.error(`[ezreeport][hooks] Memberships of [${institution.id}] cannot be upserted:\n${error}`);
   }
 };
 
