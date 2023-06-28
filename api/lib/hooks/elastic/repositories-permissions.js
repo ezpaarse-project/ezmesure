@@ -3,10 +3,9 @@ const hookEmitter = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
-const { client: prisma } = require('../../services/prisma.service');
 const elasticUsers = require('../../services/elastic/users');
 
-const { generateRoleNameFromRepository } = require('../utils');
+const { generateRolesOfMembership } = require('../utils');
 
 /**
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
@@ -27,38 +26,13 @@ const onRepositoryPermissionUpsert = async (permission) => {
     return;
   }
 
-  let repository;
-  try {
-    repository = await prisma.repository.findUnique({
-      where: { id: permission.repositoryId },
-    });
-    if (!repository) {
-      throw new Error('Repository not found');
-    }
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
-    return;
-  }
-
-  /** @type {{roles: string[]}} */
-  let { roles } = user;
-  const readonlyRole = generateRoleNameFromRepository(repository, 'readonly');
-  const allRole = generateRoleNameFromRepository(repository, 'all');
-
-  if (permission.readonly) {
-    roles = roles.filter((r) => r !== allRole);
-    roles.push(readonlyRole);
-  } else {
-    roles = roles.filter((r) => r !== readonlyRole);
-    roles.push(allRole);
-  }
-
+  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
   try {
     await elasticUsers.updateUser({
       username: permission.username,
       email: user.email,
       fullName: user.full_name,
-      roles: [...new Set([...roles])],
+      roles,
     });
     appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
   } catch (error) {
@@ -81,21 +55,18 @@ const onRepositoryPermissionDelete = async (permission) => {
     return;
   }
 
-  let repository;
+  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
   try {
-    repository = await prisma.repository.findUnique({
-      where: { id: permission.repositoryId },
+    await elasticUsers.updateUser({
+      username: permission.username,
+      email: user.email,
+      fullName: user.full_name,
+      roles,
     });
-    if (!repository) {
-      throw new Error('Repository not found');
-    }
+    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
   } catch (error) {
-    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
-    return;
+    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
   }
-
-  const oldRole = generateRoleNameFromRepository(repository, permission.readonly ? 'readonly' : 'all');
-  const roles = user.roles.filter((r) => r !== oldRole);
 
   try {
     await elasticUsers.updateUser({
