@@ -1,5 +1,7 @@
 // @ts-check
 const elasticUsers = require('../elastic/users');
+const { client: prisma } = require('../prisma.service');
+const { generateRoleNameFromRepository } = require('../../hooks/utils');
 
 /** @typedef {import('@prisma/client').Institution} Institution */
 
@@ -15,15 +17,29 @@ const getReportUserFromInstitution = (institution) => ({
 /**
  * Upsert user used for reporting in Elastic
  *
- * @param {Institution} institution
+ * @param {{ id: string }} param0
  *
  * @returns The elastic user
  */
-async function upsertReportUserFromInstitution(institution) {
-  // TODO: Give rights to institution indexes
+async function upsertReportUserFromInstitution({ id }) {
+  const institution = await prisma.institution.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      repositories: true,
+    },
+  });
+
+  if (!institution) {
+    throw new Error('Not found');
+  }
+
+  const roles = institution.repositories.map((repository) => generateRoleNameFromRepository(repository, 'readonly'));
+
   const user = {
     ...getReportUserFromInstitution(institution),
-    roles: [],
+    roles,
   };
 
   const isUserExist = await elasticUsers.getUserByUsername(user.username);
