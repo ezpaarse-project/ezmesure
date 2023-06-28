@@ -1,11 +1,11 @@
 // @ts-check
-const hookEmitter = require('../_hookEmitter');
+const hookEmitter = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
 const kibana = require('../../services/kibana');
 
-const { generateRoleNameFromSpace } = require('./_utils');
+const { generateRoleNameFromSpace } = require('../utils');
 
 /**
  * @typedef {import('@prisma/client').Space} Space

@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../_hookEmitter');
+const hookEmitter = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -7,6 +7,7 @@ const { client: prisma } = require('../../services/prisma.service');
 
 const ezrReportingUsers = require('../../services/ezreeport/reportingUsers');
 const ezrNamespaces = require('../../services/ezreeport/namespaces');
+
 const { onMembershipUpsert } = require('./memberships');
 
 /**

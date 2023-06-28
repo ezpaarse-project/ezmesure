@@ -1,11 +1,11 @@
 // @ts-check
-const hookEmitter = require('../_hookEmitter');
+const hookEmitter = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
 const elasticRoles = require('../../services/elastic/roles');
 
-const { generateRoleNameFromRepository } = require('./_utils');
+const { generateRoleNameFromRepository } = require('../utils');
 
 /**
  * @typedef {import('@prisma/client').Repository} Repository

@@ -6,16 +6,16 @@ const { appLogger } = require('../../services/logger');
 const { client: prisma } = require('../../services/prisma.service');
 const elasticUsers = require('../../services/elastic/users');
 
-const { generateRoleNameFromRepository } = require('../utils');
+const { generateRoleNameFromSpace } = require('../utils');
 
 /**
- * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
+ * @typedef {import('@prisma/client').SpacePermission} SpacePermission
  */
 
 /**
- * @param { RepositoryPermission } permission
+ * @param { SpacePermission } permission
  */
-const onRepositoryPermissionUpsert = async (permission) => {
+const onSpacePermissionUpsert = async (permission) => {
   let user;
   try {
     user = await elasticUsers.getUserByUsername(permission.username);
@@ -27,23 +27,23 @@ const onRepositoryPermissionUpsert = async (permission) => {
     return;
   }
 
-  let repository;
+  let space;
   try {
-    repository = await prisma.repository.findUnique({
-      where: { id: permission.repositoryId },
+    space = await prisma.space.findUnique({
+      where: { id: permission.spaceId },
     });
-    if (!repository) {
-      throw new Error('Repository not found');
+    if (!space) {
+      throw new Error('space not found');
     }
   } catch (error) {
-    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] space [${permission.spaceId}] cannot be getted: ${error.message}`);
     return;
   }
 
   /** @type {{roles: string[]}} */
   let { roles } = user;
-  const readonlyRole = generateRoleNameFromRepository(repository, 'readonly');
-  const allRole = generateRoleNameFromRepository(repository, 'all');
+  const readonlyRole = generateRoleNameFromSpace(space, 'readonly');
+  const allRole = generateRoleNameFromSpace(space, 'all');
 
   if (permission.readonly) {
     roles = roles.filter((r) => r !== allRole);
@@ -67,9 +67,9 @@ const onRepositoryPermissionUpsert = async (permission) => {
 };
 
 /**
- * @param { RepositoryPermission } permission
+ * @param { SpacePermission } permission
  */
-const onRepositoryPermissionDelete = async (permission) => {
+const onSpacePermissionDelete = async (permission) => {
   let user;
   try {
     user = await elasticUsers.getUserByUsername(permission.username);
@@ -81,20 +81,20 @@ const onRepositoryPermissionDelete = async (permission) => {
     return;
   }
 
-  let repository;
+  let space;
   try {
-    repository = await prisma.repository.findUnique({
-      where: { id: permission.repositoryId },
+    space = await prisma.space.findUnique({
+      where: { id: permission.spaceId },
     });
-    if (!repository) {
-      throw new Error('Repository not found');
+    if (!space) {
+      throw new Error('space not found');
     }
   } catch (error) {
-    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] space [${permission.spaceId}] cannot be getted: ${error.message}`);
     return;
   }
 
-  const oldRole = generateRoleNameFromRepository(repository, permission.readonly ? 'readonly' : 'all');
+  const oldRole = generateRoleNameFromSpace(space, permission.readonly ? 'readonly' : 'all');
   const roles = user.roles.filter((r) => r !== oldRole);
 
   try {
@@ -110,7 +110,7 @@ const onRepositoryPermissionDelete = async (permission) => {
   }
 };
 
-hookEmitter.on('repository_permission:create', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:update', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:upsert', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:delete', onRepositoryPermissionDelete);
+hookEmitter.on('space_permission:create', onSpacePermissionUpsert);
+hookEmitter.on('space_permission:update', onSpacePermissionUpsert);
+hookEmitter.on('space_permission:upsert', onSpacePermissionUpsert);
+hookEmitter.on('space_permission:delete', onSpacePermissionDelete);

@@ -1,6 +1,13 @@
 /**
+ * @typedef {import('@prisma/client').Space} Space
  * @typedef {import('@prisma/client').Repository} Repository
  */
+
+/**
+ * @param {Space} space
+ * @param {string} modifier
+ */
+module.exports.generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${space.type}.${modifier}`;
 
 /**
  * @param {Repository} repository
