@@ -1,6 +1,6 @@
 // @ts-check
-const elasticUsers = require('../services/elastic/users');
 const config = require('config');
+const elasticUsers = require('../services/elastic/users');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const hooks = require('../hooks');
 

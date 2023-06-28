@@ -7,6 +7,7 @@ const { client: prisma } = require('../services/prisma.service');
 
 const elasticUsers = require('../services/elastic/users');
 const elasticRoles = require('../services/elastic/roles');
+const kibana = require('../services/kibana');
 
 /**
  * @typedef {import('@prisma/client').User} User
@@ -14,6 +15,7 @@ const elasticRoles = require('../services/elastic/roles');
  * @typedef {import('@prisma/client').Membership} Membership
  * @typedef {import('@prisma/client').Repository} Repository
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
+ * @typedef {import('@prisma/client').Space} Space
  */
 
 // #region Users
@@ -26,7 +28,7 @@ const onAdminUserCreate = async (user) => {
     await elasticUsers.createAdmin();
     appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] is created`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Admin user [${user.username}] cannot be created: ${error.message}`);
+    appLogger.error(`[elastic][hooks] Admin user [${user.username}] cannot be created: ${error.message}`);
   }
 };
 
@@ -43,7 +45,7 @@ const onUserCreate = async (user) => {
     });
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is created`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be created: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be created: ${error.message}`);
   }
 };
 
@@ -58,7 +60,7 @@ const onUserUpdate = async (user) => {
       throw new Error('User not found');
     }
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be getted: ${error.message}`);
     return;
   }
 
@@ -71,7 +73,7 @@ const onUserUpdate = async (user) => {
     });
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
   }
 };
 
@@ -83,7 +85,7 @@ const onUserDelete = async (user) => {
     await elasticUsers.deleteUser(user.username);
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is deleted`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be deleted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be deleted: ${error.message}`);
   }
 };
 
@@ -99,7 +101,7 @@ const onUserUpsert = async (user) => {
 
     return onUserCreate(user);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${user.username}] cannot be upserted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be upserted: ${error.message}`);
   }
 };
 
@@ -175,26 +177,26 @@ hookEmitter.on('user:delete', onUserDelete);
  * @param {Repository} repository
  * @param {string} modifier
  */
-const generateRoleName = (repository, modifier) => `${repository.pattern}.${repository.type}.${modifier}.${repository.id}`;
+const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}.${repository.id}`;
 
 /**
  * @param { Repository } repository
  */
 const onRepositoryUpsert = async (repository) => {
-  const readOnlyRole = generateRoleName(repository, 'readonly');
-  const allRole = generateRoleName(repository, 'all');
+  const readOnlyRole = generateRoleNameFromRepository(repository, 'readonly');
+  const allRole = generateRoleNameFromRepository(repository, 'all');
   try {
     await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read']);
     appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is upserted`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] cannot be upserted:\n${error}`);
+    appLogger.error(`[elastic][hooks] Role [${readOnlyRole}] cannot be upserted:\n${error}`);
   }
 
   try {
     await elasticRoles.upsertRole(allRole, [repository.pattern], ['all']);
     appLogger.verbose(`[elastic][hooks] Role [${allRole}] is upserted`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Role [${allRole}] cannot be upserted:\n${error}`);
+    appLogger.error(`[elastic][hooks] Role [${allRole}] cannot be upserted:\n${error}`);
   }
 };
 
@@ -202,20 +204,20 @@ const onRepositoryUpsert = async (repository) => {
  * @param { Repository } repository
  */
 const onRepositoryDelete = async (repository) => {
-  const readOnlyRole = generateRoleName(repository, 'readonly');
-  const allRole = generateRoleName(repository, 'all');
+  const readOnlyRole = generateRoleNameFromRepository(repository, 'readonly');
+  const allRole = generateRoleNameFromRepository(repository, 'all');
   try {
     await elasticRoles.deleteRole(readOnlyRole);
     appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is deleted`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
+    appLogger.error(`[elastic][hooks] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
   }
 
   try {
     await elasticRoles.deleteRole(allRole);
     appLogger.verbose(`[elastic][hooks] Role [${allRole}] is deleted`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Role [${allRole}] cannot be deleted:\n${error}`);
+    appLogger.error(`[elastic][hooks] Role [${allRole}] cannot be deleted:\n${error}`);
   }
 };
 
@@ -239,7 +241,7 @@ const onRepositoryPermissionUpsert = async (permission) => {
       throw new Error('User not found');
     }
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
     return;
   }
 
@@ -252,14 +254,14 @@ const onRepositoryPermissionUpsert = async (permission) => {
       throw new Error('Repository not found');
     }
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
     return;
   }
 
   /** @type {{roles: string[]}} */
   let { roles } = user;
-  const readonlyRole = generateRoleName(repository, 'readonly');
-  const allRole = generateRoleName(repository, 'all');
+  const readonlyRole = generateRoleNameFromRepository(repository, 'readonly');
+  const allRole = generateRoleNameFromRepository(repository, 'all');
 
   if (permission.readonly) {
     roles = roles.filter((r) => r !== allRole);
@@ -278,7 +280,7 @@ const onRepositoryPermissionUpsert = async (permission) => {
     });
     appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
   }
 };
 
@@ -293,7 +295,7 @@ const onRepositoryPermissionDelete = async (permission) => {
       throw new Error('User not found');
     }
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
     return;
   }
 
@@ -306,11 +308,11 @@ const onRepositoryPermissionDelete = async (permission) => {
       throw new Error('Repository not found');
     }
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
+    appLogger.error(`[elastic][hooks] Repository [${permission.repositoryId}] cannot be getted: ${error.message}`);
     return;
   }
 
-  const oldRole = generateRoleName(repository, permission.readonly ? 'readonly' : 'all');
+  const oldRole = generateRoleNameFromRepository(repository, permission.readonly ? 'readonly' : 'all');
   const roles = user.roles.filter((r) => r !== oldRole);
 
   try {
@@ -322,7 +324,7 @@ const onRepositoryPermissionDelete = async (permission) => {
     });
     appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
   } catch (error) {
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
+    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
   }
 };
 
@@ -332,5 +334,139 @@ hookEmitter.on('repository_permission:upsert', onRepositoryPermissionUpsert);
 hookEmitter.on('repository_permission:delete', onRepositoryPermissionDelete);
 
 // #endregion Repositories-permissions
+
+// #region Space
+
+/**
+ * @param {Space} space
+ * @param {string} modifier
+ */
+const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${space.type}.${modifier}`;
+
+// space.${space.id}.${space.type}.readonly
+/**
+ * @param { Space } space
+ */
+const onSpaceCreate = async (space) => {
+  try {
+    await kibana.createSpace({
+      id: space.id,
+      name: space.name,
+      initials: space.initials || undefined,
+      color: space.color || undefined,
+    });
+    appLogger.verbose(`[kibana][hooks] Space [${space.id}] is created`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be created: ${error.message}`);
+    return;
+  }
+
+  const readonlyRole = generateRoleNameFromSpace(space, 'readonly');
+  try {
+    await kibana.putRole({
+      name: readonlyRole,
+      kibana: [
+        {
+          spaces: [space.id],
+          base: ['read'],
+        },
+      ],
+    });
+    appLogger.verbose(`[kibana][hooks] Role [${readonlyRole}] is created`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Role [${readonlyRole}] cannot be created: ${error.message}`);
+  }
+
+  const allRole = generateRoleNameFromSpace(space, 'all');
+  try {
+    await kibana.putRole({
+      name: allRole,
+      kibana: [
+        {
+          spaces: [space.id],
+          base: ['all'],
+        },
+      ],
+    });
+    appLogger.verbose(`[kibana][hooks] Role [${allRole}] is created`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Role [${allRole}] cannot be created: ${error.message}`);
+  }
+
+  // TODO: create index pattern
+};
+
+/**
+ * @param { Space } space
+ */
+const onSpaceUpdate = async (space) => {
+  try {
+    await kibana.updateSpace({
+      id: space.id,
+      name: space.name,
+      initials: space.initials,
+      color: space.color,
+    });
+    appLogger.verbose(`[kibana][hooks] Space [${space.id}] is updated`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be updated: ${error.message}`);
+  }
+};
+
+/**
+ * @param { Space } space
+ */
+const onSpaceUpsert = async (space) => {
+  let spaceExist = false;
+  try {
+    spaceExist = !!(await kibana.getSpace(space.id));
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be getted: ${error.message}`);
+    return;
+  }
+
+  if (spaceExist) {
+    return onSpaceUpdate(space);
+  }
+  return onSpaceCreate(space);
+};
+
+/**
+ * @param { Space } space
+ */
+const onSpaceDelete = async (space) => {
+  try {
+    await kibana.deleteSpace(space.id);
+    appLogger.verbose(`[kibana][hooks] Space [${space.id}] is deleted`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be deleted: ${error.message}`);
+    return;
+  }
+
+  const readonlyRole = generateRoleNameFromSpace(space, 'readonly');
+  try {
+    await kibana.deleteRole(readonlyRole);
+    appLogger.verbose(`[kibana][hooks] Role [${readonlyRole}] is created`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Role [${readonlyRole}] cannot be created: ${error.message}`);
+  }
+
+  const allRole = generateRoleNameFromSpace(space, 'all');
+  try {
+    await kibana.deleteRole(allRole);
+    appLogger.verbose(`[kibana][hooks] Role [${allRole}] is created`);
+  } catch (error) {
+    appLogger.error(`[kibana][hooks] Role [${allRole}] cannot be created: ${error.message}`);
+  }
+
+  // TODO: delete index pattern
+};
+
+hookEmitter.on('space:create', onSpaceCreate);
+hookEmitter.on('space:update', onSpaceUpdate);
+hookEmitter.on('space:upsert', onSpaceUpsert);
+hookEmitter.on('space:delete', onSpaceDelete);
+
+// #endregion Space
 
 module.exports = hookEmitter;
