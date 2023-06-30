@@ -14,7 +14,7 @@ const { generateRolesOfMembership } = require('../utils');
 /**
  * @param { RepositoryPermission } permission
  */
-const onRepositoryPermissionUpsert = async (permission) => {
+const onRepositoryPermissionModified = async (permission) => {
   let user;
   try {
     user = await elasticUsers.getUserByUsername(permission.username);
@@ -40,48 +40,7 @@ const onRepositoryPermissionUpsert = async (permission) => {
   }
 };
 
-/**
- * @param { RepositoryPermission } permission
- */
-const onRepositoryPermissionDelete = async (permission) => {
-  let user;
-  try {
-    user = await elasticUsers.getUserByUsername(permission.username);
-    if (!user) {
-      throw new Error('User not found');
-    }
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
-    return;
-  }
-
-  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
-  try {
-    await elasticUsers.updateUser({
-      username: permission.username,
-      email: user.email,
-      fullName: user.full_name,
-      roles,
-    });
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
-  }
-
-  try {
-    await elasticUsers.updateUser({
-      username: permission.username,
-      email: user.email,
-      fullName: user.full_name,
-      roles,
-    });
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
-  }
-};
-
-hookEmitter.on('repository_permission:create', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:update', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:upsert', onRepositoryPermissionUpsert);
-hookEmitter.on('repository_permission:delete', onRepositoryPermissionDelete);
+hookEmitter.on('repository_permission:create', onRepositoryPermissionModified);
+hookEmitter.on('repository_permission:update', onRepositoryPermissionModified);
+hookEmitter.on('repository_permission:upsert', onRepositoryPermissionModified);
+hookEmitter.on('repository_permission:delete', onRepositoryPermissionModified);
