@@ -17,11 +17,11 @@ const getReportUserFromInstitution = (institution) => ({
 /**
  * Upsert user used for reporting in Elastic
  *
- * @param {{ id: string }} param0
+ * @param {string} id
  *
  * @returns The elastic user
  */
-async function upsertReportUserFromInstitution({ id }) {
+async function upsertReportUserFromInstitutionId(id) {
   const institution = await prisma.institution.findUnique({
     where: {
       id,
@@ -85,7 +85,7 @@ async function syncReportUsersFromInstitutions(toUpsert, toDelete) {
   for (const { institutionToUpsert, idToDelete } of actions) {
     const promises = [];
     if (institutionToUpsert) {
-      promises[0] = upsertReportUserFromInstitution(institutionToUpsert);
+      promises[0] = upsertReportUserFromInstitutionId(institutionToUpsert.id);
     }
     if (idToDelete) {
       const data = /** @type {Institution} */ ({ id: idToDelete });
@@ -113,6 +113,6 @@ async function syncReportUsersFromInstitutions(toUpsert, toDelete) {
 module.exports = {
   getReportUserFromInstitution,
   deleteReportUserFromInstitution,
-  upsertReportUserFromInstitution,
+  upsertReportUserFromInstitutionId,
   syncReportUsersFromInstitutions,
 };

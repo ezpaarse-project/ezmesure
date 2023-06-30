@@ -19,9 +19,9 @@ const onRepositoryModified = async (repository) => {
 
   let username;
   try {
-    username = (await ezrReportingUsers.upsertReportUserFromInstitution({
-      id: repository.institutionId,
-    }))?.username;
+    username = (
+      await ezrReportingUsers.upsertReportUserFromInstitutionId(repository.institutionId)
+    )?.username;
     appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
   } catch (error) {
     appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);

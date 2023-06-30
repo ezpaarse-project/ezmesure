@@ -56,7 +56,9 @@ const onInstitutionUpsert = async (institution) => {
   // Upsert reporting user
   let username;
   try {
-    username = (await ezrReportingUsers.upsertReportUserFromInstitution(institution))?.username;
+    username = (
+      await ezrReportingUsers.upsertReportUserFromInstitutionId(institution?.id)
+    )?.username;
     appLogger.verbose(`[ezreeport][hooks] Reporting user [${username}] is upserted in elastic`);
   } catch (error) {
     appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be upserted in elastic:\n${error}`);
