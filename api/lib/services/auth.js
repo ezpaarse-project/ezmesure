@@ -4,7 +4,7 @@ const institutionsService = require('../entities/institutions.service');
 const sushiEndpointService = require('../entities/sushi-endpoint.service');
 const sushiCredentialsService = require('../entities/sushi-credentials.service');
 const usersService = require('../entities/users.service');
-const RepositorysService = require('../entities/repositories.service');
+const RepositoriesService = require('../entities/repositories.service');
 const SpacesService = require('../entities/spaces.service');
 
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
@@ -123,7 +123,7 @@ function fetchModel(modelName, opts = {}) {
         break;
 
       case 'repository':
-        item = modelId && await RepositorysService.findUnique(findOptions);
+        item = modelId && await RepositoriesService.findUnique(findOptions);
         break;
 
       case 'space':

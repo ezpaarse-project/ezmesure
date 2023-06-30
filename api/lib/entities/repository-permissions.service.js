@@ -1,4 +1,5 @@
 // @ts-check
+const hooks = require('../hooks');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
@@ -16,8 +17,12 @@ module.exports = class RepositoryPermissionsService {
    * @param {RepositoryPermissionCreateArgs} params
    * @returns {Promise<RepositoryPermission>}
    */
-  static create(params) {
-    return prisma.repositoryPermission.create(params);
+  static async create(params) {
+    const permission = await prisma.repositoryPermission.create(params);
+
+    hooks.emit('repository_permission:create', permission);
+
+    return permission;
   }
 
   /**
@@ -40,28 +45,42 @@ module.exports = class RepositoryPermissionsService {
    * @param {RepositoryPermissionUpdateArgs} params
    * @returns {Promise<RepositoryPermission>}
    */
-  static update(params) {
-    return prisma.repositoryPermission.update(params);
+  static async update(params) {
+    const permission = await prisma.repositoryPermission.update(params);
+
+    hooks.emit('repository_permission:update', permission);
+
+    return permission;
   }
 
   /**
    * @param {RepositoryPermissionUpsertArgs} params
    * @returns {Promise<RepositoryPermission>}
    */
-  static upsert(params) {
-    return prisma.repositoryPermission.upsert(params);
+  static async upsert(params) {
+    const permission = await prisma.repositoryPermission.upsert(params);
+
+    hooks.emit('repository_permission:upsert', permission);
+
+    return permission;
   }
 
   /**
    * @param {RepositoryPermissionDeleteArgs} params
    * @returns {Promise<RepositoryPermission | null>}
    */
-  static delete(params) {
-    return prisma.repositoryPermission.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+  static async delete(params) {
+    let permission;
+    try {
+      permission = await prisma.repositoryPermission.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return null;
       }
-      throw e;
-    });
+      throw error;
+    }
+    hooks.emit('repository_permission:delete', permission);
+
+    return permission;
   }
 };

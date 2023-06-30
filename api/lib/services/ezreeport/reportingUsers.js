@@ -1,5 +1,7 @@
 // @ts-check
 const elasticUsers = require('../elastic/users');
+const { client: prisma } = require('../prisma.service');
+const { generateRoleNameFromRepository } = require('../../hooks/utils');
 
 /** @typedef {import('@prisma/client').Institution} Institution */
 
@@ -15,22 +17,38 @@ const getReportUserFromInstitution = (institution) => ({
 /**
  * Upsert user used for reporting in Elastic
  *
- * @param {Institution} institution
+ * @param {string} id
  *
  * @returns The elastic user
  */
-async function upsertReportUserFromInstitution(institution) {
-  // TODO: Give rights to institution indexes
+async function upsertReportUserFromInstitutionId(id) {
+  const institution = await prisma.institution.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      repositories: true,
+    },
+  });
+
+  if (!institution) {
+    throw new Error('Not found');
+  }
+
+  const roles = institution.repositories.map((repository) => generateRoleNameFromRepository(repository, 'readonly'));
+
   const user = {
     ...getReportUserFromInstitution(institution),
-    roles: [],
+    roles,
   };
 
   const isUserExist = await elasticUsers.getUserByUsername(user.username);
   if (isUserExist) {
-    return elasticUsers.updateUser(user);
+    await elasticUsers.updateUser(user);
+  } else {
+    await elasticUsers.createUser(user);
   }
-  return elasticUsers.createUser(user);
+  return user;
 }
 
 /**
@@ -67,7 +85,7 @@ async function syncReportUsersFromInstitutions(toUpsert, toDelete) {
   for (const { institutionToUpsert, idToDelete } of actions) {
     const promises = [];
     if (institutionToUpsert) {
-      promises[0] = upsertReportUserFromInstitution(institutionToUpsert);
+      promises[0] = upsertReportUserFromInstitutionId(institutionToUpsert.id);
     }
     if (idToDelete) {
       const data = /** @type {Institution} */ ({ id: idToDelete });
@@ -95,6 +113,6 @@ async function syncReportUsersFromInstitutions(toUpsert, toDelete) {
 module.exports = {
   getReportUserFromInstitution,
   deleteReportUserFromInstitution,
-  upsertReportUserFromInstitution,
+  upsertReportUserFromInstitutionId,
   syncReportUsersFromInstitutions,
 };
