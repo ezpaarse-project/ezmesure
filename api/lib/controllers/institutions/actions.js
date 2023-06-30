@@ -341,7 +341,7 @@ exports.deleteInstitution = async (ctx) => {
   };
 
   const data = await institutionsService.delete({ where: { id: institutionId } });
-  appLogger.verbose(`Institution [${institution.id}] is deleted`);
+  appLogger.verbose(`Institution [${institution?.id}] is deleted`);
 
   ctx.status = 200;
   ctx.body = data;
