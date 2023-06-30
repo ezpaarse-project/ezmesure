@@ -57,7 +57,9 @@ exports.createUser = async function createUser(user) {
   });
 };
 
-/** | undefined
+/**
+ * Upsert a user.
+ *
  * @param {string} user.username - Username of user.
  * @param {string | undefined} user.email - Email of user.
  * @param {string | undefined} user.fullName - Fullname of user.

@@ -19,6 +19,7 @@ const onSpaceCreate = async (space) => {
     await kibana.createSpace({
       id: space.id,
       name: space.name,
+      description: space.description,
       initials: space.initials || undefined,
       color: space.color || undefined,
     });
@@ -59,8 +60,6 @@ const onSpaceCreate = async (space) => {
   } catch (error) {
     appLogger.error(`[kibana][hooks] Role [${allRole}] cannot be created: ${error.message}`);
   }
-
-  // TODO: create index pattern
 };
 
 /**
