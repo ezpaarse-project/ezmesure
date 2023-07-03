@@ -19,7 +19,7 @@ const onSpaceCreate = async (space) => {
     await kibana.createSpace({
       id: space.id,
       name: space.name,
-      description: space.description,
+      description: space.description || undefined,
       initials: space.initials || undefined,
       color: space.color || undefined,
     });
@@ -74,7 +74,7 @@ const onSpaceUpdate = async (space) => {
     await kibana.updateSpace({
       id: space.id,
       name: space.name,
-      description: space.description,
+      description: space.description || undefined,
       initials: space.initials || undefined,
       color: space.color || undefined,
     });
@@ -90,7 +90,7 @@ const onSpaceUpdate = async (space) => {
 const onSpaceUpsert = async (space) => {
   let spaceExist = false;
   try {
-    spaceExist = !!(await kibana.getSpace(space.id));
+    spaceExist = (await kibana.getSpace(space.id)).status !== 404;
   } catch (error) {
     appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be getted: ${error.message}`);
     return;
@@ -110,24 +110,30 @@ const onSpaceDelete = async (space) => {
     await kibana.deleteSpace(space.id);
     appLogger.verbose(`[kibana][hooks] Space [${space.id}] is deleted`);
   } catch (error) {
-    appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be deleted: ${error.message}`);
+    if (error.response?.status !== 404) {
+      appLogger.error(`[kibana][hooks] Space [${space.id}] cannot be deleted: ${error.message}`);
+    }
     return;
   }
 
   const readonlyRole = generateRoleNameFromSpace(space, 'readonly');
   try {
     await kibana.deleteRole(readonlyRole);
-    appLogger.verbose(`[kibana][hooks] Role [${readonlyRole}] is created`);
+    appLogger.verbose(`[kibana][hooks] Role [${readonlyRole}] is deleted`);
   } catch (error) {
-    appLogger.error(`[kibana][hooks] Role [${readonlyRole}] cannot be created: ${error.message}`);
+    if (error.response?.status !== 404) {
+      appLogger.error(`[kibana][hooks] Role [${readonlyRole}] cannot be deleted: ${error.message}`);
+    }
   }
 
   const allRole = generateRoleNameFromSpace(space, 'all');
   try {
     await kibana.deleteRole(allRole);
-    appLogger.verbose(`[kibana][hooks] Role [${allRole}] is created`);
+    appLogger.verbose(`[kibana][hooks] Role [${allRole}] is deleted`);
   } catch (error) {
-    appLogger.error(`[kibana][hooks] Role [${allRole}] cannot be created: ${error.message}`);
+    if (error.response?.status !== 404) {
+      appLogger.error(`[kibana][hooks] Role [${allRole}] cannot be deleted: ${error.message}`);
+    }
   }
 
   // TODO: delete index pattern
