@@ -70,8 +70,9 @@ const onSpaceUpdate = async (space) => {
     await kibana.updateSpace({
       id: space.id,
       name: space.name,
-      initials: space.initials,
-      color: space.color,
+      description: space.description,
+      initials: space.initials || undefined,
+      color: space.color || undefined,
     });
     appLogger.verbose(`[kibana][hooks] Space [${space.id}] is updated`);
   } catch (error) {
