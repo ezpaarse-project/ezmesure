@@ -33,12 +33,14 @@ const onSpaceCreate = async (space) => {
   try {
     await kibana.putRole({
       name: readonlyRole,
-      kibana: [
-        {
-          spaces: [space.id],
-          base: ['read'],
-        },
-      ],
+      body: {
+        kibana: [
+          {
+            spaces: [space.id],
+            base: ['read'],
+          },
+        ],
+      },
     });
     appLogger.verbose(`[kibana][hooks] Role [${readonlyRole}] is created`);
   } catch (error) {
@@ -49,12 +51,14 @@ const onSpaceCreate = async (space) => {
   try {
     await kibana.putRole({
       name: allRole,
-      kibana: [
-        {
-          spaces: [space.id],
-          base: ['all'],
-        },
-      ],
+      body: {
+        kibana: [
+          {
+            spaces: [space.id],
+            base: ['all'],
+          },
+        ],
+      },
     });
     appLogger.verbose(`[kibana][hooks] Role [${allRole}] is created`);
   } catch (error) {
@@ -129,8 +133,8 @@ const onSpaceDelete = async (space) => {
   // TODO: delete index pattern
 };
 
-hookEmitter.on('space:create', onSpaceCreate);
-hookEmitter.on('space:update', onSpaceUpdate);
+hookEmitter.on('space:create', onSpaceUpsert);
+hookEmitter.on('space:update', onSpaceUpsert);
 hookEmitter.on('space:upsert', onSpaceUpsert);
 hookEmitter.on('space:delete', onSpaceDelete);
 
