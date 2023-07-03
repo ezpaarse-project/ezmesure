@@ -79,12 +79,18 @@ client.putRole = (opts) => {
   return axiosClient.put(`/api/security/role/${options.name}`, options.body || {});
 };
 
-client.deleteRole = (name) => {
+client.deleteRole = async (name) => {
   if (!name) {
     throw new Error('Missing required parameter: name');
   }
 
-  return axiosClient.delete(`/api/security/role/${name}`);
+  try {
+    await axiosClient.delete(`/api/security/role/${name}`);
+  } catch (error) {
+    if (error.response?.status !== 404) {
+      throw error;
+    }
+  }
 };
 
 client.getRole = (name) => {
