@@ -70,11 +70,15 @@ export default {
   },
   data: () => ({
     ezrToken: '',
-    logoBaseUrl: '/api/assets/logos/',
     namespaceLabel: {
       en: 'institution | institutions',
       fr: 'établissement | établissements',
     },
   }),
+  computed: {
+    logoBaseUrl() {
+      return `${window.location.origin}/api/assets/logos/`;
+    },
+  },
 };
 </script>

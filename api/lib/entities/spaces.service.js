@@ -1,5 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
+const hooks = require('../hooks');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Space} Space */
@@ -16,8 +17,12 @@ module.exports = class SpacesService {
    * @param {SpaceCreateArgs} params
    * @returns {Promise<Space>}
    */
-  static create(params) {
-    return prisma.space.create(params);
+  static async create(params) {
+    const space = await prisma.space.create(params);
+
+    hooks.emit('space:create', space);
+
+    return space;
   }
 
   /**
@@ -40,28 +45,44 @@ module.exports = class SpacesService {
    * @param {SpaceUpdateArgs} params
    * @returns {Promise<Space>}
    */
-  static update(params) {
-    return prisma.space.update(params);
+  static async update(params) {
+    const space = await prisma.space.update(params);
+
+    hooks.emit('space:update', space);
+
+    return space;
   }
 
   /**
    * @param {SpaceUpsertArgs} params
    * @returns {Promise<Space>}
    */
-  static upsert(params) {
-    return prisma.space.upsert(params);
+  static async upsert(params) {
+    const space = await prisma.space.upsert(params);
+
+    hooks.emit('space:upsert', space);
+
+    return space;
   }
 
   /**
    * @param {SpaceDeleteArgs} params
    * @returns {Promise<Space | null>}
    */
-  static delete(params) {
-    return prisma.space.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+  static async delete(params) {
+    let space;
+
+    try {
+      space = await prisma.space.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return null;
       }
-      throw e;
-    });
+      throw error;
+    }
+
+    hooks.emit('space:delete', space);
+
+    return space;
   }
 };

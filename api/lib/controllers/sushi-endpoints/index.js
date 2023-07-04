@@ -4,7 +4,6 @@ const { Joi } = require('koa-joi-router');
 const {
   adminUpdateSchema,
   adminCreateSchema,
-  adminImportSchema,
 } = require('../../entities/sushi-endpoint.dto');
 
 const stringOrArray = Joi.alternatives().try(
@@ -92,7 +91,7 @@ router.route({
     query: {
       overwrite: Joi.boolean().default(false),
     },
-    body: adminImportSchema,
+    body: Joi.array(),
   },
 });
 

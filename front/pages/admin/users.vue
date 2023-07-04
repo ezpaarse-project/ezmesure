@@ -275,17 +275,32 @@ export default {
       let shouldItemShow = true;
       // Filter by permissions
       if (this.filters.permissions?.length > 0 && shouldItemShow) {
-        shouldItemShow = this.filters.permissions.some((p) => data.permissions.has(p));
+        // '' actually means: no permissions
+        if (this.filters.permissions.includes('')) {
+          shouldItemShow = data.permissions.size === 0;
+        } else {
+          shouldItemShow = this.filters.permissions.some((p) => data.permissions.has(p));
+        }
       }
 
       // Filter by roles
       if (this.filters.roles?.length > 0 && shouldItemShow) {
-        shouldItemShow = this.filters.roles.some((r) => data.roles.has(r));
+        // '' actually means: no roles
+        if (this.filters.roles.includes('')) {
+          shouldItemShow = data.roles.size === 0;
+        } else {
+          shouldItemShow = this.filters.roles.some((p) => data.roles.has(p));
+        }
       }
 
       // Filter by institution
       if (this.filters.institutions?.length > 0 && shouldItemShow) {
-        shouldItemShow = this.filters.institutions.some((id) => data.institutions.has(id));
+        // '' actually means: no institutions
+        if (this.filters.institutions.includes('')) {
+          shouldItemShow = data.institutions.size === 0;
+        } else {
+          shouldItemShow = this.filters.institutions.some((p) => data.institutions.has(p));
+        }
       }
 
       return shouldItemShow;

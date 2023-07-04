@@ -1,6 +1,7 @@
 const config = require('config');
 const { CronJob } = require('cron');
 const ezrAxios = require('./axios');
+const reportingUsers = require('./reportingUsers');
 
 const { appLogger } = require('../logger');
 
@@ -45,11 +46,11 @@ async function syncNamespaces() {
 
   appLogger.verbose(`[ezreeport] Synchronizing ${institutions?.length} namespaces`);
 
-  const { data } = await ezrAxios.put('/admin/namespaces', institutions.map((i) => ({
+  const namespaces = institutions.map((i) => ({
     id: i.id,
     name: i.name,
     logoId: i.logoId || undefined,
-    fetchLogin: { elastic: { username: `report.${i.id}` } },
+    fetchLogin: { elastic: { username: reportingUsers.getReportUserFromInstitution(i).username } },
     fetchOptions: {},
     members: i?.memberships
       // Only keeping users which have access to reporting
@@ -58,7 +59,9 @@ async function syncNamespaces() {
         access: m.permissions.some((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
         username: m.username,
       })),
-  })));
+  }));
+
+  const { data } = await ezrAxios.put('/admin/namespaces', namespaces);
 
   const namespacesResults = data?.content?.namespaces?.reduce?.((acc, namespace) => {
     const counts = acc;
@@ -79,6 +82,19 @@ async function syncNamespaces() {
   appLogger.verbose(`[ezreeport] ${membershipsResults?.created} memberships created`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.updated} memberships updated`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.deleted} memberships deleted`);
+
+  reportingUsers.syncReportUsersFromInstitutions(
+    institutions,
+    data?.content?.namespaces?.map((n) => (n.type === 'deleted' ? n.data : undefined)) ?? [],
+  )
+    .then((results) => {
+      appLogger.info('[ezreeport] Reporting users synchronized');
+      appLogger.verbose(`[ezreeport] ${results.upserted} reporting users upserted`);
+      appLogger.verbose(`[ezreeport] ${results.deleted} reporting users deleted`);
+    })
+    .catch((err) => {
+      appLogger.info(`[ezreeport] Cannot synchronize reporting users: ${err}`);
+    });
 }
 
 async function sync() {

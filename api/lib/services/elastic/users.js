@@ -3,10 +3,16 @@ const elastic = require('.');
 const { randomString } = require('../../controllers/auth/password');
 
 /**
+ * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
+ * @typedef {import('@elastic/elasticsearch').estypes.SecurityPutUserResponse} ElasticUserCreated
+ * @typedef {import('@elastic/elasticsearch').estypes.SecurityDeleteUserResponse} ElasticUserDeleted
+ */
+
+/**
  * Create user admin in elastic.
  * Used at the start of the server.
  *
- * @return {Promise<Object>} Admin created.
+ * @return {Promise<ElasticUserCreated>} Admin created.
  */
 exports.createAdmin = async function createAdmin() {
   const username = config.get('admin.username');
@@ -27,26 +33,15 @@ exports.createAdmin = async function createAdmin() {
 };
 
 /**
- * Get user with his username in elastic.
- *
- * @param {string} username - Username of user.
- *
- * @return {Promise<Object>} Created user.
- */
-exports.getUser = async function getUser(username) {
-  return elastic.security.findUser({ username });
-};
-
-/**
  * Create user in elastic.
  *
  * @param {Object} user - Config of user.
  * @param {string} user.username - Username of user.
- * @param {string} user.email - Email of user.
- * @param {string} user.fullName - Fullname of user.
- * @param {string} user.roles - Roles of user.hould generate password
+ * @param {string | undefined} user.email - Email of user.
+ * @param {string | undefined} user.fullName - Full name of user.
+ * @param {string[]} user.roles - Roles of user.
  *
- * @return {Promise<Object>} Created user.
+ * @return {Promise<ElasticUserCreated>} Created user.
  */
 exports.createUser = async function createUser(user) {
   const password = await randomString();
@@ -63,15 +58,14 @@ exports.createUser = async function createUser(user) {
 };
 
 /**
- * Create or update user in elastic.
+ * Upsert a user.
  *
- * @param {Object} user - Config of user.
  * @param {string} user.username - Username of user.
- * @param {string} user.email - Email of user.
- * @param {string} user.fullName - Fullname of user.
- * @param {Array} user.roles - Roles of user.hould generate password
+ * @param {string | undefined} user.email - Email of user.
+ * @param {string | undefined} user.fullName - Fullname of user.
+ * @param {string[]} user.roles - Roles of user.
  *
- * @return {Promise<Object>} Created user.
+ * @return {Promise<ElasticUserCreated>} Created user.
  */
 exports.upsertUser = async function upsertUser(user) {
   let { password } = user;
@@ -97,7 +91,7 @@ exports.upsertUser = async function upsertUser(user) {
  *
  * @param {string} username User's username
  *
- * @returns {Promise<Object | null>} The user found, or null if not
+ * @returns {Promise<ElasticUser | null>} The user found, or null if not
  */
 exports.getUserByUsername = async function getUserByUsername(username) {
   try {
@@ -118,19 +112,19 @@ exports.getUserByUsername = async function getUserByUsername(username) {
  *
  * @param {Object} user - Config of user.
  * @param {string} user.username - Username of user.
- * @param {string} user.email - Email of user.
- * @param {string} user.fullName - Fullname of user.
+ * @param {string | undefined} user.email - Email of user.
+ * @param {string | undefined} user.fullName - Fullname of user.
+ * @param {string[]} user.roles - Roles of user.
  *
- * @return {Promise<Object>} Updated user.
+ * @return {Promise<ElasticUserCreated>} Updated user.
  */
 exports.updateUser = function updateUser(user) {
-  // TODO manage role
   return elastic.security.putUser({
     username: user.username,
     body: {
       email: user.email,
       full_name: user.fullName,
-      roles: [],
+      roles: user.roles || [],
     },
   });
 };
@@ -139,7 +133,7 @@ exports.updateUser = function updateUser(user) {
  * Delete user in elastic.
  *
  * @param {string} username - Username of user.
- * @returns {Promise<Object>} Deleted user.
+ * @returns {Promise<ElasticUserDeleted>} Deleted user.
  */
 exports.deleteUser = async function deleteUser(username) {
   return elastic.security.deleteUser({ username }, { ignore: [404] });
@@ -148,10 +142,10 @@ exports.deleteUser = async function deleteUser(username) {
 /**
  * Update password of user in elastic
  *
- * @param {*} username - Username of user.
- * @param {*} password - Password of user.
+ * @param {string} username - Username of user.
+ * @param {string} password - Password of user.
  *
- * @returns {Promise<Object>} Updated user.
+ * @returns {Promise<{}>} Updated user.
  */
 exports.updatePassword = function updatePassword(username, password) {
   return elastic.security.changePassword({

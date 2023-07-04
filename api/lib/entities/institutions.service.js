@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 const hooks = require('../hooks');
 
 /* eslint-disable max-len */
@@ -69,10 +69,19 @@ module.exports = class InstitutionsService {
 
   /**
    * @param {InstitutionDeleteArgs} params
-   * @returns {Promise<Institution>}
+   * @returns {Promise<Institution | null>}
    */
   static async delete(params) {
-    const institution = await prisma.institution.delete(params);
+    let institution;
+
+    try {
+      institution = await prisma.institution.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return null;
+      }
+      throw error;
+    }
 
     hooks.emit('institution:delete', institution);
 
