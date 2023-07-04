@@ -15,8 +15,8 @@ const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[institutions]: Test institutions features', () => {
   describe('Read', () => {
-    describe('Admin', () => {
-      describe('GET /institutions - Get institutions with admin token', () => {
+    describe('As admin', () => {
+      describe('GET /institutions - Get institutions', () => {
         let token;
         let id;
 
@@ -67,7 +67,7 @@ describe('[institutions]: Test institutions features', () => {
         });
       });
 
-      describe('GET /institutions/<id> - Get institution [Test] with admin token', () => {
+      describe('GET /institutions/<id> - Get institution [Test]', () => {
         let token;
         let id;
 
@@ -119,7 +119,7 @@ describe('[institutions]: Test institutions features', () => {
       });
     });
 
-    describe('User', () => {
+    describe('As user', () => {
       describe('GET /institutions - Get institution with user-test token', () => {
         let token;
         let id;
@@ -285,7 +285,7 @@ describe('[institutions]: Test institutions features', () => {
     });
 
     describe('Without token', () => {
-      describe('GET /institutions - Get institutions without token', () => {
+      describe('GET /institutions - Get institutions', () => {
         let id;
         beforeAll(async () => {
           id = await createInstitutionAsAdmin({ name: 'Test', namespace: 'test' });
@@ -310,7 +310,7 @@ describe('[institutions]: Test institutions features', () => {
         });
       });
 
-      describe('GET /institutions/<id> - Get institution [Test] without token', () => {
+      describe('GET /institutions/<id> - Get institution [Test]', () => {
         let id;
 
         beforeAll(async () => {

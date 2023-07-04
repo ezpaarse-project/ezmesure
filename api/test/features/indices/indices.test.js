@@ -6,8 +6,8 @@ const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../
 
 describe('[indices]: Test indices features', () => {
   describe('Create', () => {
-    describe('Admin', () => {
-      describe('PUT /indices/<id> - Create new index with admin token', () => {
+    describe('As admin', () => {
+      describe('PUT /indices/<id> - Create new index', () => {
         let adminToken;
         const indexName = 'test';
         beforeAll(async () => {
@@ -35,8 +35,8 @@ describe('[indices]: Test indices features', () => {
         });
       });
     });
-    describe('User', () => {
-      describe('PUT /indices/<id> - Create new index with user token', () => {
+    describe('As user', () => {
+      describe('PUT /indices/<id> - Create new index', () => {
         let userTest;
         let userToken;
         const indexName = 'test';
@@ -70,7 +70,7 @@ describe('[indices]: Test indices features', () => {
     });
 
     describe('Without token', () => {
-      describe('PUT /indices/<id> - Create new index without token', () => {
+      describe('PUT /indices/<id> - Create new index', () => {
         const indexName = 'test';
 
         it('Should get HTTP status 401', async () => {
@@ -93,8 +93,8 @@ describe('[indices]: Test indices features', () => {
     });
   });
   describe('Delete', () => {
-    describe('Admin', () => {
-      describe('DELETE /indices/<id> - Delete index with admin token', () => {
+    describe('As admin', () => {
+      describe('DELETE /indices/<id> - Delete index', () => {
         let adminToken;
         const indexName = 'test';
 
@@ -125,8 +125,8 @@ describe('[indices]: Test indices features', () => {
       });
     });
 
-    describe('User', () => {
-      describe('DELETE /indices/<id> - Delete index with user token', () => {
+    describe('As user', () => {
+      describe('DELETE /indices/<id> - Delete index', () => {
         let userTest;
         let userToken;
         const indexName = 'test';
@@ -159,7 +159,7 @@ describe('[indices]: Test indices features', () => {
     });
 
     describe('Without token', () => {
-      describe('DELETE /indices/<id> - Delete index without token', () => {
+      describe('DELETE /indices/<id> - Delete index', () => {
         const indexName = 'test';
 
         it('Should get HTTP status 401', async () => {

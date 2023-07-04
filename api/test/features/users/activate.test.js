@@ -5,7 +5,7 @@ const { getAdminToken, getUserTokenForActivate } = require('../../setup/login');
 
 describe('[users]: Test users features', () => {
   describe('Activate', () => {
-    describe('User', () => {
+    describe('As user', () => {
       describe('POST /profile/_activate - activate new user "user.test" with user-test token', () => {
         let userToken;
         let adminToken;

@@ -5,8 +5,8 @@ const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test users features', () => {
   describe('Read', () => {
-    describe('Admin', () => {
-      describe('GET /users - Get all users with admin token', () => {
+    describe('As admin', () => {
+      describe('GET /users - Get all users', () => {
         let token;
         beforeAll(async () => {
           token = await getAdminToken();
@@ -31,7 +31,7 @@ describe('[users]: Test users features', () => {
         });
       });
 
-      describe('GET /users/user.test - Get user with his username "user.test" with admin token', () => {
+      describe('GET /users/user.test - Get user with his username "user.test"', () => {
         let token;
         let userTest;
 
@@ -71,7 +71,7 @@ describe('[users]: Test users features', () => {
         });
       });
 
-      describe('GET /users/user-test - Get a user that doesn\'t exist with admin token', () => {
+      describe('GET /users/user-test - Get a user that doesn\'t exist', () => {
         let token;
         beforeAll(async () => {
           token = await getAdminToken();
@@ -96,7 +96,7 @@ describe('[users]: Test users features', () => {
     });
 
     describe('Without token', () => {
-      describe('GET /users - Get all users without token', () => {
+      describe('GET /users - Get all users', () => {
         it('Should get HTTP status 401', async () => {
           let res;
           try {
@@ -111,7 +111,7 @@ describe('[users]: Test users features', () => {
         });
       });
 
-      describe('GET /users/user.test - Get user with his username "user.test" without token', () => {
+      describe('GET /users/user.test - Get user with his username "user.test"', () => {
         let userTest;
         beforeAll(async () => {
           userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);

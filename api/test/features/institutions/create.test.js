@@ -6,8 +6,8 @@ const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[institutions]: Test institutions features', () => {
   describe('Create', () => {
-    describe('Admin', () => {
-      describe('POST /institutions - Create new institution with admin token', () => {
+    describe('As admin', () => {
+      describe('POST /institutions - Create new institution', () => {
         let token;
         let id;
         beforeAll(async () => {
@@ -79,8 +79,8 @@ describe('[institutions]: Test institutions features', () => {
       });
     });
 
-    describe('User', () => {
-      describe('POST /institutions - Create new institution with admin token', () => {
+    describe('As user', () => {
+      describe('POST /institutions - Create new institution', () => {
         let userTest;
         let token;
         let id;
@@ -184,7 +184,7 @@ describe('[institutions]: Test institutions features', () => {
     });
 
     describe('Without token', () => {
-      describe('POST /institutions - Create new institution without token', () => {
+      describe('POST /institutions - Create new institution', () => {
         let id;
         let token;
         beforeAll(async () => {

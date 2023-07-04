@@ -12,7 +12,7 @@ const {
 
 describe('[users]: Test users features', () => {
   describe('Login', () => {
-    describe('Admin', () => {
+    describe('As admin', () => {
       describe('POST /login/local - Login with admin account', () => {
         it('Should get auth token', async () => {
           let res;

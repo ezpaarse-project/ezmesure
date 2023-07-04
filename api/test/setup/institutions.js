@@ -42,6 +42,7 @@ async function createInstitutionAsAdmin(data) {
   }
   return res?.data?.id;
 }
+
 async function deleteInstitutionAsAdmin(id) {
   let res;
 

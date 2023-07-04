@@ -5,8 +5,8 @@ const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test users features', () => {
   describe('Delete', () => {
-    describe('Admin', () => {
-      describe('DELETE /users/user.test - Delete user "user.test" with admin token', () => {
+    describe('As admin', () => {
+      describe('DELETE /users/user.test - Delete user "user.test"', () => {
         let token;
         let userTest;
 
@@ -38,7 +38,7 @@ describe('[users]: Test users features', () => {
       });
     });
     describe('Without token', () => {
-      describe('DELETE /users/user.test - Delete user "user.test" without token', () => {
+      describe('DELETE /users/user.test - Delete user "user.test"', () => {
         let token;
         let userTest;
         beforeAll(async () => {

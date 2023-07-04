@@ -5,8 +5,8 @@ const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test users features', () => {
   describe('Create', () => {
-    describe('Admin', () => {
-      describe('PUT /users/user.test - Create new user "user.test" with admin token', () => {
+    describe('As admin', () => {
+      describe('PUT /users/user.test - Create new user "user.test"', () => {
         let token;
         const username = 'user.test';
 
@@ -69,7 +69,7 @@ describe('[users]: Test users features', () => {
       });
     });
     describe('Without token', () => {
-      describe('PUT /users/user.test - Create new user without token', () => {
+      describe('PUT /users/user.test - Create new user', () => {
         it('Should create new user "user.test"', async () => {
           let res;
           try {

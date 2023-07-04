@@ -10,8 +10,8 @@ const { getAdminToken } = require('../../setup/login');
 
 describe('[logs]: Test logs features', () => {
   describe('Insert', () => {
-    describe('Admin', () => {
-      describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index with admin token', () => {
+    describe('As admin', () => {
+      describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index', () => {
         let adminToken;
         beforeAll(async () => {
           adminToken = await getAdminToken();
@@ -53,9 +53,9 @@ describe('[logs]: Test logs features', () => {
         });
       });
     });
-    describe('User', () => {
+    describe('As user', () => {
       // TODO create roles
-      // describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index with user token who has roles', () => {
+      // describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
       //   let userTest;
       //   let userToken;
       //   const indexName = 'index-test';
@@ -92,7 +92,7 @@ describe('[logs]: Test logs features', () => {
       //   });
       // });
 
-      describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index with user token who has not roles', () => {
+      describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
         let userTest;
         let userToken;
         const indexName = 'index-test';

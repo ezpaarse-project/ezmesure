@@ -6,8 +6,8 @@ const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[institutions]: Test institutions features', () => {
   describe('Update', () => {
-    describe('Admin', () => {
-      describe('PUT /institutions/<id> - Update institution [Test] with admin token', () => {
+    describe('As admin', () => {
+      describe('PUT /institutions/<id> - Update institution [Test]', () => {
         let token;
         let id;
 
@@ -61,8 +61,8 @@ describe('[institutions]: Test institutions features', () => {
         });
       });
     });
-    describe('User', () => {
-      describe('PUT /institutions/<id> - Update institution created by user with user token', () => {
+    describe('As user', () => {
+      describe('PUT /institutions/<id> - Update institution created by user', () => {
         let userToken;
         let id;
         let userTest;
@@ -139,7 +139,7 @@ describe('[institutions]: Test institutions features', () => {
         });
       });
 
-      describe('PUT /institutions/<id> - Update institution created by admin with admin token', () => {
+      describe('PUT /institutions/<id> - Update institution created by admin', () => {
         let adminToken;
         let id;
         let userTest;
@@ -213,7 +213,7 @@ describe('[institutions]: Test institutions features', () => {
       });
     });
     describe('Without token', () => {
-      describe('PUT /institutions/<id> - Update institution without token', () => {
+      describe('PUT /institutions/<id> - Update institution', () => {
         let id;
         let token;
         beforeAll(async () => {
