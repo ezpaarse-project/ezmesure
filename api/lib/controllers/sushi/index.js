@@ -341,9 +341,7 @@ router.route({
   method: 'POST',
   path: '/:sushiId/_harvest',
   handler: [
-    fetchSushi({ include: { endpoint: true } }),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
+    fetchSushi({ include: { endpoint: true, institution: true } }),
     harvestSushi,
   ],
   validate: {

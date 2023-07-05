@@ -50,4 +50,14 @@ module.exports = class LogsService {
   static upsert(params) {
     return prisma.log.upsert(params);
   }
+
+  /**
+   * @param {string} jobId - identifier of the associated harvest job
+   * @param {string} level - log level
+   * @param {string} message - log message
+   * @returns {Promise<Log>}
+   */
+  static log(jobId, level, message) {
+    return prisma.log.create({ data: { jobId, level, message } });
+  }
 };

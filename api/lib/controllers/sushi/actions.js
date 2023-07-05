@@ -11,7 +11,9 @@ const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
+const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
+const harvestJobsService = require('../../entities/harvest-job.service');
 
 exports.getAll = async (ctx) => {
   const where = {};
@@ -332,43 +334,46 @@ exports.harvestSushi = async (ctx) => {
     harvestId,
     timeout,
   } = body;
+
   let { beginDate, endDate } = body;
-  const {
-    endpoint,
-    sushi,
-    user,
-    institution,
-  } = ctx.state;
+
+  const { sushi, user } = ctx.state;
+  const { endpoint, institution } = sushi;
 
   let index = target;
 
   if (!index) {
-    const prefix = institution.get('indexPrefix');
+    const repository = await repositoriesService.findFirst({
+      where: {
+        institutionId: institution.id,
+        type: 'counter5',
+      },
+    });
 
-    if (!prefix) {
-      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.getId()));
+    if (!repository?.pattern) {
+      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.id));
     }
 
-    index = `${prefix}-publisher`;
+    index = repository.pattern.replace(/[*]/g, '');
   }
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
     reportType,
   };
 
-  const currentTask = await Task.findOne({
-    filters: [
-      Task.filterBy('params.sushiId', sushi.getId()),
-      Task.filterBy('status', ['waiting', 'running']),
-    ],
+  const currentTask = await harvestJobsService.findFirst({
+    where: {
+      credentialsId: sushi.id,
+      status: { in: ['waiting', 'running'] },
+    },
   });
 
   if (currentTask) {
-    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.getId(), currentTask.get('status')));
+    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.id, currentTask.status));
   }
 
   const { body: perm } = await elastic.security.hasPrivileges({
@@ -379,7 +384,7 @@ exports.harvestSushi = async (ctx) => {
   }, {
     headers: { 'es-security-runas-user': user.username },
   });
-  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
+  const canWrite = perm?.index?.[index]?.write;
 
   if (!canWrite) {
     ctx.throw(403, `you don't have permission to write in ${index}`);
@@ -395,13 +400,16 @@ exports.harvestSushi = async (ctx) => {
     endDate = beginDate;
   }
 
-  const task = new Task({
-    type: 'sushi-harvest',
+  const task = await harvestJobsService.create({
+    data: {
+      credentials: {
+        connect: { id: sushi.id },
+      },
     status: 'waiting',
     params: {
-      sushiId: sushi.getId(),
-      endpointId: sushi.get('endpointId'),
-      institutionId: institution.getId(),
+        sushiId: sushi.id,
+        endpointId: endpoint.id,
+        institutionId: institution.id,
       harvestId: harvestId || uuidv4(),
       username: user.username,
       timeout,
@@ -411,17 +419,17 @@ exports.harvestSushi = async (ctx) => {
       endDate,
       forceDownload,
       ignoreValidation,
-      endpointVendor: endpoint.get('vendor'),
-      sushiLabel: sushi.get('vendor'),
-      sushiPackage: sushi.get('package'),
-      institutionName: institution.get('name'),
+        endpointVendor: endpoint.vendor,
+        sushiLabel: endpoint.vendor,
+        sushiTags: sushi.tags,
+        institutionName: institution.name,
+      },
     },
   });
 
-  await task.save();
   await harvestQueue.add(
-    { taskId: task.getId(), timeout },
-    { jobId: task.getId() },
+    { taskId: task.id, timeout },
+    { jobId: task.id },
   );
 
   ctx.type = 'json';
