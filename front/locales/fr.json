@@ -574,7 +574,8 @@
     "title": "Mes rapports",
     "health": "État de santé",
     "admin": {
-      "taskTab": "Administration des rapports",
+      "taskTab": "Gestion des rapports",
+      "templateTab": "Gestion des modèles",
       "activityTab": "Activité d'ezREEPORT",
       "adminTab": "Administration générale"
     }

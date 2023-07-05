@@ -15,6 +15,7 @@
       <template #extension>
         <v-tabs v-model="currentTab" grow>
           <v-tab>{{ $t('report.admin.taskTab') }}</v-tab>
+          <v-tab>{{ $t('report.admin.templateTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.activityTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.adminTab') }}</v-tab>
         </v-tabs>
@@ -25,49 +26,28 @@
       <v-tabs-items v-model="currentTab">
         <!-- tasks tab -->
         <v-tab-item class="pa-1">
-          <v-row>
-            <v-col>
-              <v-card>
-                <ezr-task-table :current-namespace.sync="currentInstitution" />
-              </v-card>
-            </v-col>
-          </v-row>
+          <ezr-task-table :current-namespace.sync="currentInstitution" />
+        </v-tab-item>
 
-          <v-row>
-            <v-col>
-              <v-card>
-                <ezr-template-list />
-              </v-card>
-            </v-col>
-          </v-row>
+        <!-- template tab -->
+        <v-tab-item class="pa-1">
+          <ezr-template-list />
         </v-tab-item>
 
         <!-- activity tab -->
         <v-tab-item class="pa-1">
-          <v-row>
-            <v-col>
-              <v-card>
-                <ezr-history-table />
-              </v-card>
-            </v-col>
-          </v-row>
+          <ezr-history-table />
         </v-tab-item>
 
         <!-- "admin" tab -->
-        <v-tab-item class="pa-1 w-800 mx-auto">
+        <v-tab-item class="pa-1">
           <v-row>
             <v-col>
-              <v-card>
-                <ezr-cron-list />
-              </v-card>
+              <ezr-cron-list />
             </v-col>
-          </v-row>
 
-          <v-row>
             <v-col>
-              <v-card>
-                <ezr-queue-list />
-              </v-card>
+              <ezr-queue-list />
             </v-col>
           </v-row>
         </v-tab-item>

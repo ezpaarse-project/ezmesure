@@ -574,7 +574,8 @@
     "title": "My reports",
     "health": "Health status",
     "admin": {
-      "taskTab": "Task administration",
+      "taskTab": "Task management",
+      "templateTab": "Template management",
       "activityTab": "ezREEPORT activity",
       "adminTab": "General administration"
     }
