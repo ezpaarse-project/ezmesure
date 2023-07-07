@@ -71,15 +71,34 @@ export default {
   },
   data: () => ({
     showHealthDialog: false,
-    currentTab: 0,
   }),
   computed: {
+    /**
+     * Keep selected institution in query
+     */
     currentInstitution: {
       get() {
         return this.$route.query.institution?.toString();
       },
       set(institution) {
         this.$router.replace({ query: { institution } });
+      },
+    },
+    /**
+     * Keep current tab in query
+     */
+    currentTab: {
+      get() {
+        const tabParam = this.$route.query.tab?.toString();
+        const tab = Number.parseInt(tabParam, 10);
+        if (Number.isNaN(tab)) {
+          return 0;
+        }
+        return tab;
+      },
+      set(tab) {
+        const tabParam = tab ? tab.toString() : undefined;
+        this.$router.push({ query: { tab: tabParam } });
       },
     },
   },
