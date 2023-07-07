@@ -6710,8 +6710,8 @@
               "type": "array"
             },
             "in": "query",
-            "name": "sushiId",
-            "description": "filter tasks by SUSHI ID"
+            "name": "credentialsId",
+            "description": "filter tasks by ID of SUSHI credentials"
           },
           {
             "schema": {
@@ -6728,6 +6728,14 @@
             "in": "query",
             "name": "harvestId",
             "description": "filter tasks by harvest ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "distinct",
+            "description": "a combination of fields that should be distinct"
           },
           {
             "schema": {

@@ -1,5 +1,7 @@
-const Task = require('../../models/Task');
+const harvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
+
+/** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
 
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
@@ -11,63 +13,59 @@ exports.getAll = async (ctx) => {
     status,
     type,
     harvestId,
-    sushiId,
+    credentialsId,
     endpointId,
     institutionId,
-    collapse,
+    distinct: distinctFields,
   } = query;
 
-  const filters = [];
+  /** @type {HarvestJobWhereInput} */
+  const where = {};
 
   if (taskIds) {
-    filters.push(Task.filterById(Array.isArray(taskIds) ? taskIds : taskIds.split(',').map((s) => s.trim())));
+    where.id = { in: Array.isArray(taskIds) ? taskIds : taskIds.split(',').map((s) => s.trim()) };
   }
   if (status) {
-    filters.push(Task.filterBy('status', Array.isArray(status) ? status : status.split(',').map((s) => s.trim())));
+    where.status = { in: Array.isArray(status) ? status : status.split(',').map((s) => s.trim()) };
   }
   if (type) {
-    filters.push(Task.filterBy('type', Array.isArray(type) ? type : type.split(',').map((s) => s.trim())));
+    where.reportType = { in: Array.isArray(type) ? type : type.split(',').map((s) => s.trim()) };
   }
   if (institutionId) {
-    filters.push(Task.filterBy('params.institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+    where.institutionId = { in: Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim()) };
   }
-  if (sushiId) {
-    filters.push(Task.filterBy('params.sushiId', Array.isArray(sushiId) ? sushiId : sushiId.split(',').map((s) => s.trim())));
+  if (credentialsId) {
+    where.credentialsId = { in: Array.isArray(credentialsId) ? credentialsId : credentialsId.split(',').map((s) => s.trim()) };
   }
   if (endpointId) {
-    filters.push(Task.filterBy('params.endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
+    where.credentials = {
+      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) }
+    };
   }
   if (harvestId) {
-    filters.push(Task.filterBy('params.harvestId', Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim())));
+    where.params = { path: 'harvestId', in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
   }
 
-  const options = { filters, size };
-
-  if (typeof collapse === 'string') {
-    options.collapse = { field: `${Task.type}.${collapse}` };
+  let distinct;
+  if (distinctFields) {
+    distinct = Array.isArray(distinctFields) ? distinctFields : distinctFields.split(',').map((s) => s.trim());
   }
 
-  ctx.body = await Task.findAll(options);
+  ctx.body = await harvestJobService.findMany({
+    where,
+    distinct,
+    take: size,
+  });
 };
 
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
-  const { user, userIsAdmin } = ctx.state;
 
-  const task = await Task.findById(taskId);
+  const task = await harvestJobService.findUnique({ where: { id: taskId } });
 
   if (!task) {
     ctx.throw(404, ctx.$t('errors.task.notFound'));
     return;
-  }
-
-  if (!userIsAdmin) {
-    const institution = await task.getInstitution();
-
-    if (!institution || !institution.isContact(user)) {
-      ctx.throw(403, ctx.$t('errors.task.unauthorized'));
-      return;
-    }
   }
 
   ctx.status = 200;
@@ -77,7 +75,7 @@ exports.getOne = async (ctx) => {
 exports.cancelOne = async (ctx) => {
   const { taskId } = ctx.params;
 
-  const task = await Task.findById(taskId);
+  let task = await harvestJobService.findUnique({ where: { id: taskId } });
   const job = await harvestQueue.getJob(taskId);
 
   if (job) {
@@ -96,9 +94,8 @@ exports.cancelOne = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.task.notFound'));
   }
 
-  if (task && !task.isDone()) {
-    task.cancel();
-    await task.save();
+  if (task && !harvestJobService.isDone(task)) {
+    task = await harvestJobService.cancel(task);
   }
 
   ctx.status = 200;
@@ -118,7 +115,7 @@ exports.deleteOne = async (ctx) => {
     await job.remove();
   }
 
-  await Task.deleteOne(taskId);
+  await harvestJobService.delete({ where: { id: taskId } });
 
   ctx.status = 204;
 };
