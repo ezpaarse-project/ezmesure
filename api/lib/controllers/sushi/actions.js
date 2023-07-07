@@ -212,10 +212,10 @@ exports.downloadReport = async (ctx) => {
   let { beginDate, endDate } = query;
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
   if (!beginDate && !endDate) {
