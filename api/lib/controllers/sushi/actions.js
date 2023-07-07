@@ -8,7 +8,6 @@ const isValidDate = require('date-fns/isValid');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 
-const Task = require('../../models/Task');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
@@ -16,7 +15,6 @@ const { harvestQueue } = require('../../services/jobs');
 const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
-const { importSchema } = require('../../entities/sushi-credentials.dto');
 
 exports.getAll = async (ctx) => {
   const where = {};
@@ -59,7 +57,7 @@ exports.getTasks = async (ctx) => {
   const { sushi } = ctx.state;
 
   ctx.status = 200;
-  ctx.body = await Task.findBySushiId(sushi.getId());
+  ctx.body = await harvestJobsService.findMany({ where: { credentialsId: sushi.id } });
 };
 
 exports.addSushi = async (ctx) => {
