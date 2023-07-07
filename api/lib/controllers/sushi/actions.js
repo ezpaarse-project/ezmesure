@@ -1,12 +1,14 @@
 const fs = require('fs-extra');
 const path = require('path');
 const format = require('date-fns/format');
+const isBefore = require('date-fns/isBefore');
 const subMonths = require('date-fns/subMonths');
+const parseISO = require('date-fns/parseISO');
+const isValidDate = require('date-fns/isValid');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 
 const Task = require('../../models/Task');
-const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
@@ -14,6 +16,7 @@ const { harvestQueue } = require('../../services/jobs');
 const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
+const { importSchema } = require('../../entities/sushi-credentials.dto');
 
 exports.getAll = async (ctx) => {
   const where = {};
@@ -335,9 +338,7 @@ exports.harvestSushi = async (ctx) => {
     timeout,
   } = body;
 
-  let { beginDate, endDate } = body;
-
-  const { sushi, user } = ctx.state;
+  const { sushi } = ctx.state;
   const { endpoint, institution } = sushi;
 
   let index = target;
@@ -376,22 +377,21 @@ exports.harvestSushi = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.id, currentTask.status));
   }
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username: user.username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': user.username },
-  });
-  const canWrite = perm?.index?.[index]?.write;
+  let beginDate = body.beginDate && parseISO(body.beginDate, 'yyyy-MM');
+  let endDate = body.endDate && parseISO(body.endDate, 'yyyy-MM');
 
-  if (!canWrite) {
-    ctx.throw(403, `you don't have permission to write in ${index}`);
+  if (beginDate && !isValidDate(beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.beginDate));
+  }
+  if (endDate && !isValidDate(endDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.endDate));
+  }
+  if (beginDate && endDate && isBefore(endDate, beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidPeriod', body.beginDate, body.endDate));
   }
 
   if (!beginDate && !endDate) {
-    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    const prevMonth = subMonths(new Date(), 1);
     beginDate = prevMonth;
     endDate = prevMonth;
   } else if (!beginDate) {
@@ -405,25 +405,15 @@ exports.harvestSushi = async (ctx) => {
       credentials: {
         connect: { id: sushi.id },
       },
-    status: 'waiting',
-    params: {
-        sushiId: sushi.id,
-        endpointId: endpoint.id,
-        institutionId: institution.id,
+      status: 'waiting',
       harvestId: harvestId || uuidv4(),
-      username: user.username,
       timeout,
       reportType,
       index,
-      beginDate,
-      endDate,
+      beginDate: format(beginDate, 'yyyy-MM'),
+      endDate: format(endDate, 'yyyy-MM'),
       forceDownload,
       ignoreValidation,
-        endpointVendor: endpoint.vendor,
-        sushiLabel: endpoint.vendor,
-        sushiTags: sushi.tags,
-        institutionName: institution.name,
-      },
     },
   });
 

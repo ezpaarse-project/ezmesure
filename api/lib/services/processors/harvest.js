@@ -10,7 +10,6 @@ const { appLogger } = require('../logger');
 const sushiService = require('../sushi');
 const elastic = require('../elastic');
 
-const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobService = require('../../entities/harvest-job.service');
 const stepService = require('../../entities/step.service');
 const logService = require('../../entities/log.service');
@@ -32,14 +31,7 @@ class HarvestError extends Error {
 /**
  * @typedef {object} ImportOptions
  * @property {SushiCredentials} sushi - The SUSHI item to be harvested
- * @property {HarvestJob} task - The
- * @property {string} index - The elasticsearch index where the report should be imported
- * @property {string} username - The username to use for elasticsearch actions
- * @property {string} beginDate - Start date of the report period
- * @property {string} endDate - End date of the report period
- * @property {string} harvestId - Arbitrary ID to associate with this harvest job
- * @property {string} reportType - The type of report to harvest
- * @property {boolean} forceDownload - Download the report even if a local copy exists
+ * @property {HarvestJob} task - The harvest job data
  */
 
 /**
@@ -51,14 +43,16 @@ async function importSushiReport(options = {}) {
   const {
     sushi,
     task,
+  } = options;
+
+  const {
     index,
-    username,
     beginDate,
     endDate,
     forceDownload,
     harvestId,
     reportType = sushiService.DEFAULT_REPORT_TYPE,
-  } = options;
+  } = task;
 
   const {
     institution,
@@ -95,6 +89,7 @@ async function importSushiReport(options = {}) {
         ...task,
         logs: { createMany: { data: newLogs } },
         result: task.result || undefined,
+        credentials: undefined,
       },
     }).catch((err) => {
       appLogger.error(`Failed to save sushi task ${task.id}`);
@@ -360,10 +355,7 @@ async function importSushiReport(options = {}) {
   };
 
   const insertItems = async (bulkOps) => {
-    const { body: bulkResult } = await elastic.bulk(
-      { body: bulkOps },
-      { headers: { 'es-security-runas-user': username } },
-    );
+    const { body: bulkResult } = await elastic.bulk({ body: bulkOps });
 
     if (!Array.isArray(bulkResult?.items)) { return; }
 
@@ -610,26 +602,16 @@ async function processJob(job, taskData) {
     await logService.log(job.id, 'info', `New attempt (total: ${job.attemptsMade + 1})`);
   }
 
-  const { params: taskParams = {} } = task;
   const {
-    sushiId,
+    credentials,
+    credentialsId,
     beginDate,
     endDate,
     reportType,
-  } = taskParams;
+  } = task;
 
-  appLogger.verbose(`[Harvest Job #${job.id}] Fetching SUSHI credentials [${sushiId}]`);
-
-  const sushi = await sushiCredentialsService.findUnique({
-    where: { id: sushiId },
-    include: {
-      institution: true,
-      endpoint: true,
-    },
-  });
-
-  if (!sushi) {
-    throw new HarvestError(`SUSHI item [${sushiId}] not found`);
+  if (!credentials) {
+    throw new HarvestError(`SUSHI item [${credentialsId}] not found`);
   }
 
   task.status = 'running';
@@ -648,17 +630,17 @@ async function processJob(job, taskData) {
     data: {
       ...task,
       result: task.result || undefined,
+      credentials: undefined,
     },
   });
 
   try {
     await importSushiReport({
-      ...taskParams,
-      sushi,
+      sushi: credentials,
       task,
     });
   } catch (err) {
-    appLogger.error(`Failed to import sushi report [${sushi.id}]`);
+    appLogger.error(`Failed to import sushi report [${credentials.id}]`);
     await logService.log(job.id, 'error', err.message);
 
     if (err instanceof HarvestError) {
@@ -737,7 +719,17 @@ module.exports = async function handle(job) {
   const { taskId } = job?.data || {};
 
   appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
-  task = taskId && await harvestJobService.findUnique({ where: { id: taskId } });
+  task = taskId && await harvestJobService.findUnique({
+    where: { id: taskId },
+    include: {
+      credentials: {
+        include: {
+          endpoint: true,
+          institution: true,
+        },
+      },
+    },
+  });
 
   if (!task) {
     appLogger.error(`[Harvest Job #${job?.id}] Associated task [${taskId || 'n/a'}] does not exist, removing job`);

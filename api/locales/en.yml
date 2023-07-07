@@ -12,6 +12,8 @@ errors:
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
     taskExists: "SUSHI item [%s] already have an associated task (status: [%s])"
+    invalidDate: The date [%s] is invalid
+    invalidPeriod: The period [from %s to %s] is invalid
 
   queue:
     notFound: Queue not found
