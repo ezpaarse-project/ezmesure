@@ -1,10 +1,11 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
@@ -61,6 +62,25 @@ module.exports = class HarvestJobsService {
   }
 
   /**
+   * @param {HarvestJobDeleteArgs} params
+   * @returns {Promise<HarvestJob | null>}
+   */
+  static async delete(params) {
+    let job;
+
+    try {
+      job = await prisma.harvestJob.delete(params);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return null;
+      }
+      throw error;
+    }
+
+    return job;
+  }
+
+  /**
    * @param {HarvestJob} job
    * @param {object} options
    * @returns {Promise<HarvestJob>}
@@ -80,6 +100,25 @@ module.exports = class HarvestJobsService {
     return prisma.harvestJob.update({
       where: { id: job.id },
       data: { status, runningTime },
+    });
+  }
+
+  /**
+   * Returns whether the job is terminated or not by checking its status
+   * @param {HarvestJob} job - The job to check
+   */
+  static isDone(job) {
+    return ['finished', 'failed', 'cancelled', 'delayed'].includes(job?.status);
+  }
+
+  /**
+   * Cancel a job
+   * @param {HarvestJob} job - The job to cancel
+   */
+  static cancel(job) {
+    return prisma.harvestJob.update({
+      where: { id: job.id },
+      data: { status: 'cancelled' },
     });
   }
 };
