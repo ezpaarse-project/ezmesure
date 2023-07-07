@@ -113,24 +113,24 @@ CREATE TABLE "HistoryEntry" (
 -- CreateTable
 CREATE TABLE "HarvestJob" (
     "id" TEXT NOT NULL,
-    "requestId" TEXT NOT NULL,
+    "credentialsId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "startedAt" TIMESTAMP(3),
+    "beginDate" TEXT NOT NULL,
+    "endDate" TEXT NOT NULL,
     "status" TEXT NOT NULL,
-    "params" JSONB NOT NULL,
-    "runningTime" INTEGER NOT NULL,
-    "result" JSONB NOT NULL,
+    "reportType" TEXT NOT NULL,
+    "harvestId" TEXT NOT NULL,
+    "index" TEXT NOT NULL,
+    "runningTime" INTEGER,
+    "timeout" INTEGER NOT NULL,
+    "forceDownload" BOOLEAN NOT NULL DEFAULT false,
+    "ignoreValidation" BOOLEAN NOT NULL DEFAULT false,
+    "params" JSONB DEFAULT '{}',
+    "result" JSONB,
 
     CONSTRAINT "HarvestJob_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "HarvestRequest" (
-    "id" TEXT NOT NULL,
-    "credentialsId" TEXT NOT NULL,
-    "reportId" TEXT NOT NULL,
-
-    CONSTRAINT "HarvestRequest_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -238,10 +238,7 @@ ALTER TABLE "HistoryEntry" ADD CONSTRAINT "HistoryEntry_institutionId_fkey" FORE
 ALTER TABLE "HistoryEntry" ADD CONSTRAINT "HistoryEntry_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HarvestJob" ADD CONSTRAINT "HarvestJob_requestId_fkey" FOREIGN KEY ("requestId") REFERENCES "HarvestRequest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "HarvestRequest" ADD CONSTRAINT "HarvestRequest_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "HarvestJob" ADD CONSTRAINT "HarvestJob_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "HarvestJob"("id") ON DELETE CASCADE ON UPDATE CASCADE;
