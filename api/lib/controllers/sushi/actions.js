@@ -289,7 +289,7 @@ exports.getFileList = async (ctx) => {
         type: 'file',
         size: stat.size,
         mtime: stat.mtime,
-        href: `/api/sushi/${sushi.getId()}/files/${parentDirPath}/${filename}`,
+        href: `/api/sushi/${sushi.id}/files/${parentDirPath}/${filename}`,
       };
     }
 
