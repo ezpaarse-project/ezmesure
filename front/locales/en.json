@@ -332,8 +332,8 @@
       "entryCompleted": "Entry completed",
       "entryCompletedOn": "Entry completed on {date}",
       "entryInProgress": "Entry in progress",
-      "iResumeMyEntry": "I resume my entry",
-      "iCompletedMyEntry": "I completed my entry",
+      "resumeMyEntry": "Resume my entry",
+      "validateMyCredentials": "Validate my credentials",
       "resumeEntryQuestion": "Resume your entry ?",
       "resumeEntryDesc": "You have declared the completion of your credentials on {date}. Do you want to resume your entry ?",
       "readyPopup": {
