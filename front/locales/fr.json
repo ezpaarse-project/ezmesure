@@ -415,8 +415,8 @@
       "entryCompleted": "Saisie terminée",
       "entryCompletedOn": "Saisie terminée le {date}",
       "entryInProgress": "Saisie en cours",
-      "iResumeMyEntry": "Je reprends ma saisie",
-      "iCompletedMyEntry": "J'ai terminé ma saisie",
+      "resumeMyEntry": "Reprendre ma saisie",
+      "validateMyCredentials": "Valider mes identifiants",
       "resumeEntryQuestion": "Reprendre votre saisie ?",
       "resumeEntryDesc": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Souhaitez-vous la reprendre ?",
       "readyPopup": {

@@ -238,7 +238,21 @@
       <template #top="{ originalItemsLength }">
         <v-toolbar flat>
           <v-toolbar-title>
-            {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
+            <div>{{ $t('institutions.sushi.title', { total: originalItemsLength }) }}</div>
+
+            <v-chip
+              small
+              outlined
+            >
+              <v-icon v-if="sushiReady" left color="primary">
+                mdi-checkbox-marked-circle-outline
+              </v-icon>
+              {{
+                sushiReady
+                  ? $t('institutions.sushi.entryCompletedOn', { date: sushiReadySince })
+                  : $t('institutions.sushi.entryInProgress')
+              }}
+            </v-chip>
           </v-toolbar-title>
 
           <v-spacer />
@@ -253,9 +267,8 @@
           >
             <template #activator="{ on }">
               <v-chip
-                outlined
                 label
-                :color="sushiReady ? 'success' : 'secondary'"
+                :color="sushiReady ? 'secondary' : 'primary'"
                 v-on="on"
               >
                 <v-progress-circular
@@ -265,13 +278,10 @@
                   width="2"
                 />
                 <template v-else>
-                  <v-icon v-if="sushiReady" left>
-                    mdi-checkbox-marked-circle-outline
-                  </v-icon>
                   {{
                     sushiReady
-                      ? $t('institutions.sushi.entryCompletedOn', { date: sushiReadySince })
-                      : $t('institutions.sushi.entryInProgress')
+                      ? $t('institutions.sushi.resumeMyEntry')
+                      : $t('institutions.sushi.validateMyCredentials')
                   }}
                   <v-icon right>
                     mdi-chevron-down
@@ -284,8 +294,8 @@
               <v-card-title>
                 {{
                   sushiReady
-                    ? $t('institutions.sushi.entryCompleted')
-                    : $t('institutions.sushi.entryInProgress')
+                    ? $t('institutions.sushi.resumeMyEntry')
+                    : $t('institutions.sushi.validateMyCredentials')
                 }}
               </v-card-title>
 
@@ -314,10 +324,14 @@
                   @click="toggleSushiReady"
                 >
                   <v-icon left>
-                    {{ sushiReady ? 'mdi-text-box-edit-outline' : 'mdi-text-box-check-outline' }}
+                    {{
+                      sushiReady ? 'mdi-text-box-edit-outline' : 'mdi-text-box-check-outline'
+                    }}
                   </v-icon>
                   {{
-                    $t(`institutions.sushi.${sushiReady ? 'iResumeMyEntry' : 'iCompletedMyEntry'}`)
+                    sushiReady
+                      ? $t('institutions.sushi.resumeMyEntry')
+                      : $t('institutions.sushi.validateMyCredentials')
                   }}
                 </v-btn>
               </v-card-actions>
