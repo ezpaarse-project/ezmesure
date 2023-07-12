@@ -170,7 +170,7 @@ exports.activate = async (ctx) => {
     return;
   }
 
-  const userElastic = await usersElastic.getUser(user.username);
+  const userElastic = await usersElastic.getUserByUsername(user.username);
 
   if (!userElastic) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -214,7 +214,7 @@ exports.getResetToken = async (ctx) => {
 
   const username = body.username || ctx.state.user.username;
 
-  const user = await usersElastic.getUser(username);
+  const user = await usersElastic.getUserByUsername(username);
 
   if (!user) {
     ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
@@ -282,7 +282,7 @@ exports.changePassword = async (ctx) => {
 
   const { username } = ctx.state.user;
 
-  const user = await usersElastic.getUser(username);
+  const user = await usersElastic.getUserByUsername(username);
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
