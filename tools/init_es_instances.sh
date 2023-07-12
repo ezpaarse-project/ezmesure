@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 INSTANCES_FILE="$SCRIPT_DIR/../certs/instances.yml"
