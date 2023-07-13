@@ -4,38 +4,24 @@ const { getAdminToken } = require('./login');
 
 const createIndexAsAdmin = async (indexName) => {
   const token = await getAdminToken();
-  let res;
-  try {
-    await ezmesure({
-      method: 'PUT',
-      url: `/indices/${indexName}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
-  return res?.data?.created;
+  return ezmesure({
+    method: 'PUT',
+    url: `/indices/${indexName}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 const deleteIndexAsAdmin = async (indexName) => {
   const token = await getAdminToken();
-  let res;
-  try {
-    res = await ezmesure({
-      method: 'DELETE',
-      url: `/indices/${indexName}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
-  return res?.status === 204;
+  return ezmesure({
+    method: 'DELETE',
+    url: `/indices/${indexName}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 module.exports = {

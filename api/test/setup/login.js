@@ -11,21 +11,14 @@ const usernameAdmin = config.get('admin.username');
 const passwordAdmin = config.get('admin.password');
 
 async function getToken(username, password) {
-  let res;
-
-  try {
-    res = await ezmesure({
-      method: 'POST',
-      url: '/login/local',
-      data: {
-        username,
-        password,
-      },
-    });
-  } catch (err) {
-    console.error(err?.response?.data);
-    return;
-  }
+  const res = await ezmesure({
+    method: 'POST',
+    url: '/login/local',
+    data: {
+      username,
+      password,
+    },
+  });
 
   let token = res?.headers['set-cookie'][0];
   const match = /^eztoken=([a-zA-Z0-9_.-]+);/i.exec(token);

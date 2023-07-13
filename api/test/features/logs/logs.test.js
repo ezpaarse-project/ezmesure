@@ -21,19 +21,14 @@ describe('[logs]: Test logs features', () => {
         it('Should upload ec in index "index-test"', async () => {
           const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/logs/index-test',
-              data: await fs.readFile(pathFile, 'utf-8'),
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/logs/index-test',
+            data: await fs.readFile(pathFile, 'utf-8'),
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
@@ -55,42 +50,37 @@ describe('[logs]: Test logs features', () => {
     });
     describe('As user', () => {
       // TODO create roles
-      // describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
-      //   let userTest;
-      //   let userToken;
-      //   const indexName = 'index-test';
+      describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
+        let userTest;
+        let userToken;
+        const indexName = 'index-test';
 
-      //   beforeAll(async () => {
-      //     userTest = await createDefaultActivatedUserAsAdmin();
-      //     userToken = await getToken(userTest.username, userTest.password);
-      //     await createIndexAsAdmin(indexName);
-      //   });
+        beforeAll(async () => {
+          userTest = await createDefaultActivatedUserAsAdmin();
+          userToken = await getToken(userTest.username, userTest.password);
+          await createIndexAsAdmin(indexName);
+        });
 
-      //   it('Should get HTTP status 403', async () => {
-      //     const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+        it('Should get HTTP status 403', async () => {
+          const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-      //     let res;
-      //     try {
-      //       res = await ezmesure({
-      //         method: 'POST',
-      //         url: '/logs/index-test',
-      //         data: await fs.readFile(pathFile, 'utf-8'),
-      //         headers: {
-      //           Authorization: `Bearer ${userToken}`,
-      //         },
-      //       });
-      //     } catch (err) {
-      //       res = err?.response;
-      //     }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/logs/index-test',
+            data: await fs.readFile(pathFile, 'utf-8'),
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
 
-      //     expect(res).toHaveProperty('status', 403);
-      //   });
+          expect(res).toHaveProperty('status', 403);
+        });
 
-      //   afterAll(async () => {
-      //     await deleteIndexAsAdmin('index-test');
-      //     await deleteUserAsAdmin(userTest.username);
-      //   });
-      // });
+        afterAll(async () => {
+          await deleteIndexAsAdmin('index-test');
+          await deleteUserAsAdmin(userTest.username);
+        });
+      });
 
       describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
         let userTest;
@@ -106,19 +96,14 @@ describe('[logs]: Test logs features', () => {
         it('Should get HTTP status 403', async () => {
           const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/logs/index-test',
-              data: await fs.readFile(pathFile, 'utf-8'),
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/logs/index-test',
+            data: await fs.readFile(pathFile, 'utf-8'),
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 403);
         });

@@ -6,48 +6,40 @@ const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[institutions]: Test repository features', () => {
   describe('Create', () => {
+    const institutionTest = {
+      name: 'Test',
+      namespace: 'test',
+    };
     describe('As admin', () => {
       describe('Institution created by admin', () => {
         describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
           let adminToken;
           let institutionId;
           let repositoryConfig;
+
           beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
-
-            institutionId = await createInstitutionAsAdmin(institution);
-
+            institutionId = await createInstitutionAsAdmin(institutionTest);
             repositoryConfig = {
               type: 'ezPAARSE',
               institutionId,
               pattern: 'ezpaarse-*',
             };
-
             adminToken = await getAdminToken();
           });
 
           it('Should create repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                headers: {
-                  Authorization: `Bearer ${adminToken}`,
-                },
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 201);
 
             const repository = res?.data;
-
             expect(repository?.id).not.toBeNull();
             expect(repository).toHaveProperty('institutionId', institutionId);
             expect(repository?.createdAt).not.toBeNull();
@@ -66,41 +58,28 @@ describe('[institutions]: Test repository features', () => {
           let institutionId;
           let repositoryConfig;
           beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
-
-            institutionId = await createInstitutionAsAdmin(institution);
-
+            institutionId = await createInstitutionAsAdmin(institutionTest);
             repositoryConfig = {
               type: 'COUNTER 5',
               institutionId,
               pattern: 'publisher-*',
             };
-
             adminToken = await getAdminToken();
           });
 
           it('Should create repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                headers: {
-                  Authorization: `Bearer ${adminToken}`,
-                },
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 201);
 
             const repository = res?.data;
-
             expect(repository?.id).not.toBeNull();
             expect(repository).toHaveProperty('institutionId', institutionId);
             expect(repository?.createdAt).not.toBeNull();
@@ -119,41 +98,28 @@ describe('[institutions]: Test repository features', () => {
           let institutionId;
           let repositoryConfig;
           beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
-
-            institutionId = await createInstitutionAsAdmin(institution);
-
+            institutionId = await createInstitutionAsAdmin(institutionTest);
             repositoryConfig = {
               type: 'random',
               institutionId,
               pattern: 'random-*',
             };
-
             adminToken = await getAdminToken();
           });
 
           it('Should create repositories of type [random] and pattern [random-*]', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                headers: {
-                  Authorization: `Bearer ${adminToken}`,
-                },
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 201);
 
             const repository = res?.data;
-
             expect(repository?.id).not.toBeNull();
             expect(repository).toHaveProperty('institutionId', institutionId);
             expect(repository?.createdAt).not.toBeNull();
@@ -175,16 +141,12 @@ describe('[institutions]: Test repository features', () => {
           let institutionId;
           let repositoryConfig;
           let userTest;
-          beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
 
+          beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             userToken = await getToken(userTest.username, userTest.password);
 
-            institutionId = await createInstitution(institution, userTest);
+            institutionId = await createInstitution(institutionTest, userTest);
 
             repositoryConfig = {
               type: 'COUNTER 5',
@@ -194,19 +156,14 @@ describe('[institutions]: Test repository features', () => {
           });
 
           it('Should get HTTP status 403', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 403);
           });
@@ -224,17 +181,11 @@ describe('[institutions]: Test repository features', () => {
           let institutionId;
           let repositoryConfig;
           let userTest;
-          beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
 
+          beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             userToken = await getToken(userTest.username, userTest.password);
-
-            institutionId = await createInstitutionAsAdmin(institution);
-
+            institutionId = await createInstitutionAsAdmin(institutionTest);
             repositoryConfig = {
               type: 'COUNTER 5',
               institutionId,
@@ -243,19 +194,14 @@ describe('[institutions]: Test repository features', () => {
           });
 
           it('Should get HTTP status 403', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 403);
           });
@@ -273,15 +219,10 @@ describe('[institutions]: Test repository features', () => {
           let institutionId;
           let repositoryConfig;
           let userTest;
+
           beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
-
             userTest = await createDefaultActivatedUserAsAdmin();
-            institutionId = await createInstitution(institution, userTest);
-
+            institutionId = await createInstitution(institutionTest, userTest);
             repositoryConfig = {
               type: 'COUNTER 5',
               institutionId,
@@ -290,16 +231,11 @@ describe('[institutions]: Test repository features', () => {
           });
 
           it('Should get HTTP status 401', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 401);
           });
@@ -315,14 +251,9 @@ describe('[institutions]: Test repository features', () => {
         describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
           let institutionId;
           let repositoryConfig;
+
           beforeAll(async () => {
-            const institution = {
-              name: 'Test',
-              namespace: 'test',
-            };
-
-            institutionId = await createInstitutionAsAdmin(institution);
-
+            institutionId = await createInstitutionAsAdmin(institutionTest);
             repositoryConfig = {
               type: 'COUNTER 5',
               institutionId,
@@ -331,16 +262,11 @@ describe('[institutions]: Test repository features', () => {
           });
 
           it('Should get HTTP status 401', async () => {
-            let res;
-            try {
-              res = await ezmesure({
-                method: 'POST',
-                url: '/repositories',
-                data: repositoryConfig,
-              });
-            } catch (err) {
-              res = err?.response;
-            }
+            const res = await ezmesure({
+              method: 'POST',
+              url: '/repositories',
+              data: repositoryConfig,
+            });
 
             expect(res).toHaveProperty('status', 401);
           });

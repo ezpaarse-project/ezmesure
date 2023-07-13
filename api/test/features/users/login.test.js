@@ -15,20 +15,14 @@ describe('[users]: Test users features', () => {
     describe('As admin', () => {
       describe('POST /login/local - Login with admin account', () => {
         it('Should get auth token', async () => {
-          let res;
-
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/login/local',
-              data: {
-                username: usernameAdmin,
-                password: passwordAdmin,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/login/local',
+            data: {
+              username: usernameAdmin,
+              password: passwordAdmin,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
         });
@@ -44,20 +38,14 @@ describe('[users]: Test users features', () => {
         });
 
         it('Should get auth token', async () => {
-          let res;
-
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/login/local',
-              data: {
-                username: userTest.username,
-                password: userTest.password,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/login/local',
+            data: {
+              username: userTest.username,
+              password: userTest.password,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
         });
@@ -76,20 +64,14 @@ describe('[users]: Test users features', () => {
         });
 
         it('Should get HTTP status 401', async () => {
-          let res;
-
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/login/local',
-              data: {
-                username: userTest.username,
-                password: userTest.password,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/login/local',
+            data: {
+              username: userTest.username,
+              password: userTest.password,
+            },
+          });
 
           expect(res).toHaveProperty('status', 401);
         });
@@ -103,20 +85,14 @@ describe('[users]: Test users features', () => {
     describe('Someone not registered', () => {
       describe('POST /login/local - Login with not activate user [user.test] account', () => {
         it('Should get HTTP status 401', async () => {
-          let res;
-
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/login/local',
-              data: {
-                username: 'toto',
-                password: 'titi',
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/login/local',
+            data: {
+              username: 'toto',
+              password: 'titi',
+            },
+          });
 
           expect(res).toHaveProperty('status', 401);
         });

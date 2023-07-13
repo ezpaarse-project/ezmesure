@@ -8,52 +8,42 @@ describe('[institutions]: Test institutions features', () => {
   describe('Create', () => {
     describe('As admin', () => {
       describe('POST /institutions - Create new institution', () => {
-        let token;
-        let id;
+        let adminToken;
+        let institutionId;
+
         beforeAll(async () => {
-          token = await getAdminToken();
+          adminToken = await getAdminToken();
         });
 
         it('Should create new institution [Test]', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/institutions',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              data: {
-                name: 'Test',
-                namespace: 'test',
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/institutions',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+            data: {
+              name: 'Test',
+              namespace: 'test',
+            },
+          });
 
-          id = res?.data?.id;
+          institutionId = res?.data?.id;
           expect(res).toHaveProperty('status', 201);
         });
 
         it('Should get institutions', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${id}`,
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/institutions/${institutionId}`,
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
           const institution = res?.data;
-
           expect(institution?.id).not.toBeNull();
           expect(institution).toHaveProperty('parentInstitutionId', null);
           expect(institution?.createdAt).not.toBeNull();
@@ -74,7 +64,7 @@ describe('[institutions]: Test institutions features', () => {
         });
 
         afterAll(async () => {
-          await deleteInstitutionAsAdmin(id);
+          await deleteInstitutionAsAdmin(institutionId);
         });
       });
     });
@@ -82,54 +72,43 @@ describe('[institutions]: Test institutions features', () => {
     describe('As user', () => {
       describe('POST /institutions - Create new institution', () => {
         let userTest;
-        let token;
-        let id;
+        let userToken;
+        let institutionId;
+
         beforeAll(async () => {
           userTest = await createDefaultActivatedUserAsAdmin();
-          token = await getToken(userTest.username, userTest.password);
+          userToken = await getToken(userTest.username, userTest.password);
         });
 
         it('Should create new institution [Test]', async () => {
-          let res;
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/institutions',
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+            data: {
+              name: 'Test',
+              namespace: 'test',
+            },
+          });
 
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/institutions',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              data: {
-                name: 'Test',
-                namespace: 'test',
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
-
-          id = res?.data?.id;
+          institutionId = res?.data?.id;
           expect(res).toHaveProperty('status', 201);
         });
 
         it('Should get institution [Test]', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${id}`,
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/institutions/${institutionId}`,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
           const institution = res?.data;
-
           expect(institution?.id).not.toBeNull();
           expect(institution).toHaveProperty('parentInstitutionId', null);
           expect(institution?.createdAt).not.toBeNull();
@@ -149,9 +128,8 @@ describe('[institutions]: Test institutions features', () => {
           expect(institution).toHaveProperty('sushiReadySince', null);
 
           const memberships = institution?.memberships[0];
-
           expect(memberships).toHaveProperty('username', 'user.test');
-          expect(memberships).toHaveProperty('institutionId', id);
+          expect(memberships).toHaveProperty('institutionId', institutionId);
           expect(memberships).toHaveProperty('locked', true);
 
           const { permissions } = memberships;
@@ -177,7 +155,7 @@ describe('[institutions]: Test institutions features', () => {
         });
 
         afterAll(async () => {
-          await deleteInstitutionAsAdmin(id);
+          await deleteInstitutionAsAdmin(institutionId);
           await deleteUserAsAdmin(userTest.username);
         });
       });
@@ -185,49 +163,45 @@ describe('[institutions]: Test institutions features', () => {
 
     describe('Without token', () => {
       describe('POST /institutions - Create new institution', () => {
-        let id;
-        let token;
+        let institutionId;
+        let adminToken;
+
         beforeAll(async () => {
-          token = await getAdminToken();
-          id = await createInstitutionAsAdmin({ name: 'Test', namespace: 'test' });
+          adminToken = await getAdminToken();
+          const institution = {
+            name: 'Test',
+            namespace: 'test',
+          };
+
+          institutionId = await createInstitutionAsAdmin(institution);
         });
 
         it('Should get HTTP status 401', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/institutions',
-              data: {
-                name: 'Test2',
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/institutions',
+            data: {
+              name: 'Test2',
+            },
+          });
 
           expect(res).toHaveProperty('status', 401);
         });
 
         it('Should get institution [Test]', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${id}`,
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/institutions/${institutionId}`,
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
         });
 
         afterAll(async () => {
-          await deleteInstitutionAsAdmin(id);
+          await deleteInstitutionAsAdmin(institutionId);
         });
       });
     });

@@ -2,69 +2,86 @@ const ezmesure = require('./ezmesure');
 const { getToken, getAdminToken } = require('./login');
 
 async function createInstitution(data, user) {
-  let res;
-
   const token = await getToken(user.username, user.password);
 
-  try {
-    res = await ezmesure({
-      method: 'POST',
-      url: '/institutions',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data,
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
+  const res = await ezmesure({
+    method: 'POST',
+    url: '/institutions',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data,
+  });
+
   return res?.data?.id;
 }
 
 async function createInstitutionAsAdmin(data) {
-  let res;
-
   const token = await getAdminToken();
 
-  try {
-    res = await ezmesure({
-      method: 'POST',
-      url: '/institutions',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data,
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
+  const res = await ezmesure({
+    method: 'POST',
+    url: '/institutions',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data,
+  });
+
   return res?.data?.id;
 }
 
 async function deleteInstitutionAsAdmin(id) {
-  let res;
-
   const token = await getAdminToken();
 
+  return ezmesure({
+    method: 'DELETE',
+    url: `/institutions/${id}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+async function addMemberShipsAsAdmin(institutionId, username, roles) {
+  const adminToken = await getAdminToken();
+  let res;
   try {
     res = await ezmesure({
-      method: 'DELETE',
-      url: `/institutions/${id}`,
+      method: 'PUT',
+      url: `/institutions/${institutionId}/memberships/${username}`,
+      data: {
+        roles,
+      },
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     });
   } catch (err) {
     res = err?.response;
-    return;
   }
-  return res?.status;
+  return res.status;
+}
+
+async function addPermissionsToUserAsAdmin(institutionId, username, permissions) {
+  const adminToken = await getAdminToken();
+
+  return ezmesure({
+    method: 'PUT',
+    url: `/institutions/${institutionId}/memberships/${username}`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    data: {
+      permissions,
+    },
+  });
 }
 
 module.exports = {
   createInstitution,
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
+  addMemberShipsAsAdmin,
+  addPermissionsToUserAsAdmin,
 };

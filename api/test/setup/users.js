@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const { addHours } = require('date-fns');
@@ -19,23 +20,19 @@ const defaultUser = {
 async function createUserAsAdmin(username, email, fullName, isAdmin) {
   const token = await getAdminToken();
 
-  try {
-    await ezmesure({
-      method: 'PUT',
-      url: `/users/${username}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: {
-        username,
-        email,
-        fullName,
-        isAdmin,
-      },
-    });
-  } catch (err) {
-    return;
-  }
+  await ezmesure({
+    method: 'PUT',
+    url: `/users/${username}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      username,
+      email,
+      fullName,
+      isAdmin,
+    },
+  });
   return defaultUser;
 }
 
@@ -48,49 +45,35 @@ async function activateUser(username, password) {
     expiresAt,
   }, secret);
 
-  let res;
-  try {
-    res = await ezmesure({
-      method: 'POST',
-      url: '/profile/_activate',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: {
-        password,
-        acceptTerms: true,
-      },
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
-  return res?.status;
+  return ezmesure({
+    method: 'POST',
+    url: '/profile/_activate',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      password,
+      acceptTerms: true,
+    },
+  });
 }
 
 async function deleteUserAsAdmin(username) {
   const token = await getAdminToken();
 
-  let res;
-
-  try {
-    res = await ezmesure({
-      method: 'DELETE',
-      url: `/users/${username}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    res = err?.response;
-    return;
-  }
-  return res?.status;
+  return ezmesure({
+    method: 'DELETE',
+    url: `/users/${username}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 }
 
 async function createActivatedUserAsAdmin(user) {
-  await createUserAsAdmin(user.username, user.email, user.fullName, user.isAdmin);
+  const createdUser = await createUserAsAdmin(user.username, user.email, user.fullName, user.isAdmin);
   await activateUser(user.username, user.password);
+  return createdUser;
 }
 
 async function createDefaultActivatedUserAsAdmin() {

@@ -10,6 +10,7 @@ describe('[indices]: Test indices features', () => {
       describe('PUT /indices/<id> - Create new index', () => {
         let adminToken;
         const indexName = 'test';
+
         beforeAll(async () => {
           adminToken = await getAdminToken();
         });

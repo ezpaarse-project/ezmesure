@@ -6,7 +6,7 @@ const { getAdminToken, getUserTokenForActivate } = require('../../setup/login');
 describe('[users]: Test users features', () => {
   describe('Activate', () => {
     describe('As user', () => {
-      describe('POST /profile/_activate - activate new user "user.test" with user-test token', () => {
+      describe('POST /profile/_activate - activate new user [user.test] with user-test token', () => {
         let userToken;
         let adminToken;
         let userTest;
@@ -17,45 +17,34 @@ describe('[users]: Test users features', () => {
           adminToken = await getAdminToken();
         });
 
-        it('Should activate user "user.test"', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'POST',
-              url: '/profile/_activate',
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-              data: {
-                password: 'changeme',
-                acceptTerms: true,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+        it('Should activate user [user.test]', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/profile/_activate',
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+            data: {
+              password: 'changeme',
+              acceptTerms: true,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
         });
 
-        it('Should get user "user.test"', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: '/users/user.test',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+        it('Should get user [user.test]', async () => {
+          const res = await ezmesure({
+            method: 'GET',
+            url: '/users/user.test',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
           const user = res?.data;
-
           expect(user).toHaveProperty('username', 'user.test');
           expect(user).toHaveProperty('fullName', 'User test');
           expect(user).toHaveProperty('email', 'user.test@test.fr');

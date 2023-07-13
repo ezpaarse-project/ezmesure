@@ -6,50 +6,40 @@ const { getAdminToken } = require('../../setup/login');
 describe('[users]: Test users features', () => {
   describe('Update', () => {
     describe('As admin', () => {
-      describe('PUT /users/user.test - Update user "user.test"', () => {
-        let token;
+      describe('PUT /users/user.test - Update user [user.test]', () => {
+        let adminToken;
         let userTest;
         beforeAll(async () => {
-          token = await getAdminToken();
+          adminToken = await getAdminToken();
           userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
         });
 
-        it('Should create new user "user.test"', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'PUT',
-              url: '/users/user.test',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              data: {
-                username: 'user.test',
-                email: 'user2.test@test.fr',
-                fullName: 'User2 test',
-                isAdmin: false,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+        it('Should create new user [user.test]', async () => {
+          const res = await ezmesure({
+            method: 'PUT',
+            url: '/users/user.test',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+            data: {
+              username: 'user.test',
+              email: 'user2.test@test.fr',
+              fullName: 'User2 test',
+              isAdmin: false,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
         });
 
-        it('Should get user "user.test"', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: '/users/user.test',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+        it('Should get user [user.test]', async () => {
+          const res = await ezmesure({
+            method: 'GET',
+            url: '/users/user.test',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
@@ -69,46 +59,36 @@ describe('[users]: Test users features', () => {
       });
     });
     describe('Without token', () => {
-      describe('PUT /users/user.test - Update user "user.test"', () => {
-        let token;
+      describe('PUT /users/user.test - Update user [user.test]', () => {
+        let adminToken;
         let userTest;
         beforeAll(async () => {
-          token = await getAdminToken();
+          adminToken = await getAdminToken();
           userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
         });
 
         it('Should get HTTP status 401', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'PUT',
-              url: '/users/user.test',
-              data: {
-                email: 'user2.test@test.fr',
-                fullName: 'User2 test',
-                isAdmin: false,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+          const res = await ezmesure({
+            method: 'PUT',
+            url: '/users/user.test',
+            data: {
+              email: 'user2.test@test.fr',
+              fullName: 'User2 test',
+              isAdmin: false,
+            },
+          });
 
           expect(res).toHaveProperty('status', 401);
         });
 
-        it('Should get user "user.test" with any change', async () => {
-          let res;
-          try {
-            res = await ezmesure({
-              method: 'GET',
-              url: '/users/user.test',
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } catch (err) {
-            res = err?.response;
-          }
+        it('Should get user [user.test] with any change', async () => {
+          const res = await ezmesure({
+            method: 'GET',
+            url: '/users/user.test',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
 
           expect(res).toHaveProperty('status', 200);
 
