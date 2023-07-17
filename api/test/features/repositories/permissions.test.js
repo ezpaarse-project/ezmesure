@@ -46,7 +46,6 @@ describe('[institutions]: Test repository-permission features', () => {
             });
 
             // TODO
-            // console.log
             expect(res).toHaveProperty('status', 400);
           });
 

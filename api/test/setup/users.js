@@ -20,7 +20,7 @@ const defaultUser = {
 async function createUserAsAdmin(username, email, fullName, isAdmin) {
   const token = await getAdminToken();
 
-  await ezmesure({
+  const res = await ezmesure({
     method: 'PUT',
     url: `/users/${username}`,
     headers: {
@@ -33,7 +33,8 @@ async function createUserAsAdmin(username, email, fullName, isAdmin) {
       isAdmin,
     },
   });
-  return defaultUser;
+
+  return res?.data;
 }
 
 async function activateUser(username, password) {

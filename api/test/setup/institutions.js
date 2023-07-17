@@ -78,10 +78,23 @@ async function addPermissionsToUserAsAdmin(institutionId, username, permissions)
   });
 }
 
+async function deletePermissionsToUserAsAdmin(institutionId, username) {
+  const adminToken = await getAdminToken();
+
+  return ezmesure({
+    method: 'DELETE',
+    url: `/institutions/${institutionId}/memberships/${username}`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  });
+}
+
 module.exports = {
   createInstitution,
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
   addMemberShipsAsAdmin,
   addPermissionsToUserAsAdmin,
+  deletePermissionsToUserAsAdmin,
 };
