@@ -2,17 +2,32 @@ const ezmesure = require('./ezmesure');
 const { getAdminToken } = require('./login');
 
 async function createRepositoryAsAdmin(data) {
-  const token = await getAdminToken();
+  const adminToken = await getAdminToken();
 
   const res = await ezmesure({
     method: 'POST',
     url: '/repositories',
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${adminToken}`,
     },
     data,
   });
   return res?.data?.id;
 }
 
-module.exports = createRepositoryAsAdmin;
+async function deleteRepositoryAsAdmin(repositoryId) {
+  const adminToken = await getAdminToken();
+
+  return ezmesure({
+    method: 'DELETE',
+    url: `/repositories/${repositoryId}`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  });
+}
+
+module.exports = {
+  createRepositoryAsAdmin,
+  deleteRepositoryAsAdmin,
+};
