@@ -73,5 +73,12 @@
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
   },
+  "logs": {
+    "app": {
+      "Console": {
+        "level": "EZMESURE_LOG_LEVEL"
+      }
+    }
+  },
   "appName": "EZMESURE_APP_NAME"
 }
