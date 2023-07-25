@@ -17,19 +17,20 @@ const { getToken, getAdminToken } = require('../../../setup/login');
 const {
   createRepositoryAsAdmin,
   deleteRepositoryAsAdmin,
+  addPermissionToRepositoryAsAdmin,
   deletePermissionToRepositoryAsAdmin,
 } = require('../../../setup/repositories');
 
-describe('[repository permission]: Test create features', () => {
+describe('[repository permission]: Test delete features', () => {
   const institutionTest = {
     name: 'Test',
     namespace: 'test',
   };
+  let adminToken;
+  beforeAll(async () => {
+    adminToken = await getAdminToken();
+  });
   describe('As admin', () => {
-    let adminToken;
-    beforeAll(async () => {
-      adminToken = await getAdminToken();
-    });
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
@@ -48,9 +49,14 @@ describe('[repository permission]: Test create features', () => {
           repositoryId = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
+        describe('PUT /repositories/<id>/permissions/<username> - update permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
+            readonly: true,
+            locked: true,
+          };
+
+          const newPermissionTest = {
             readonly: true,
             locked: true,
           };
@@ -58,16 +64,17 @@ describe('[repository permission]: Test create features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
+            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
           });
 
-          it('Should create permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
+          it('Should update permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
             const res = await ezmesure({
               method: 'PUT',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
-              data: permissionTest,
+              data: newPermissionTest,
             });
 
             expect(res).toHaveProperty('status', 200);
@@ -76,63 +83,8 @@ describe('[repository permission]: Test create features', () => {
             expect(permission).toHaveProperty('username', userTest.username);
             expect(permission).toHaveProperty('institutionId', institutionId);
             expect(permission).toHaveProperty('repositoryId', repositoryId);
-            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
-            expect(permission).toHaveProperty('locked', permissionTest.locked);
-          });
-
-          afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      describe('Repository ezPAARSE', () => {
-        let repositoryConfig;
-        let repositoryId;
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
-          beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-          });
-
-          it('Should create permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: permissionTest,
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const permission = res?.data;
-            expect(permission).toHaveProperty('username', userTest.username);
-            expect(permission).toHaveProperty('institutionId', institutionId);
-            expect(permission).toHaveProperty('repositoryId', repositoryId);
-            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
-            expect(permission).toHaveProperty('locked', permissionTest.locked);
+            expect(permission).toHaveProperty('readonly', newPermissionTest.readonly);
+            expect(permission).toHaveProperty('locked', newPermissionTest.locked);
           });
 
           afterAll(async () => {
@@ -192,9 +144,14 @@ describe('[repository permission]: Test create features', () => {
           repositoryId = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
+        describe('PUT /repositories/<id>/permissions/<username> - update permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
+            readonly: true,
+            locked: true,
+          };
+
+          const newPermissionTest = {
             readonly: true,
             locked: true,
           };
@@ -202,16 +159,17 @@ describe('[repository permission]: Test create features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
+            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
           });
 
-          it('Should create permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
+          it('Should update permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
             const res = await ezmesure({
               method: 'PUT',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
-              data: permissionTest,
+              data: newPermissionTest,
             });
 
             expect(res).toHaveProperty('status', 200);
@@ -220,63 +178,8 @@ describe('[repository permission]: Test create features', () => {
             expect(permission).toHaveProperty('username', userTest.username);
             expect(permission).toHaveProperty('institutionId', institutionId);
             expect(permission).toHaveProperty('repositoryId', repositoryId);
-            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
-            expect(permission).toHaveProperty('locked', permissionTest.locked);
-          });
-
-          afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      describe('Repository ezPAARSE', () => {
-        let repositoryConfig;
-        let repositoryId;
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
-          beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-          });
-
-          it('Should create permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-              data: permissionTest,
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const permission = res?.data;
-            expect(permission).toHaveProperty('username', userTest.username);
-            expect(permission).toHaveProperty('institutionId', institutionId);
-            expect(permission).toHaveProperty('repositoryId', repositoryId);
-            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
-            expect(permission).toHaveProperty('locked', permissionTest.locked);
+            expect(permission).toHaveProperty('readonly', newPermissionTest.readonly);
+            expect(permission).toHaveProperty('locked', newPermissionTest.locked);
           });
 
           afterAll(async () => {
@@ -311,9 +214,14 @@ describe('[repository permission]: Test create features', () => {
           repositoryId = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
+        describe('PUT /repositories/<id>/permissions/<username> - update permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
+            readonly: true,
+            locked: true,
+          };
+
+          const newPermissionTest = {
             readonly: true,
             locked: true,
           };
@@ -321,6 +229,7 @@ describe('[repository permission]: Test create features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
+            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 403', async () => {
@@ -330,55 +239,7 @@ describe('[repository permission]: Test create features', () => {
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
-              data: permissionTest,
-            });
-
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      describe('Repository ezPAARSE', () => {
-        let repositoryConfig;
-        let repositoryId;
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
-          beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-          });
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-              data: permissionTest,
+              data: newPermissionTest,
             });
 
             expect(res).toHaveProperty('status', 403);
@@ -408,7 +269,6 @@ describe('[repository permission]: Test create features', () => {
         password: 'changeme',
         permissions: ['memberships:write', 'memberships:read'],
       };
-
       beforeAll(async () => {
         await createUserAsAdmin(
           anotherUserTest.username,
@@ -435,9 +295,14 @@ describe('[repository permission]: Test create features', () => {
           repositoryId = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
+        describe('PUT /repositories/<id>/permissions/<username> - update permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
+            readonly: true,
+            locked: true,
+          };
+
+          const newPermissionTest = {
             readonly: true,
             locked: true,
           };
@@ -445,6 +310,7 @@ describe('[repository permission]: Test create features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
+            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 403', async () => {
@@ -454,56 +320,7 @@ describe('[repository permission]: Test create features', () => {
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
-              data: permissionTest,
-            });
-
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-          await deleteUserAsAdmin(anotherUserTest.username);
-        });
-      });
-      describe('Repository ezPAARSE', () => {
-        let repositoryConfig;
-        let repositoryId;
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
-          beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-          });
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-              data: permissionTest,
+              data: newPermissionTest,
             });
 
             expect(res).toHaveProperty('status', 403);
@@ -521,10 +338,8 @@ describe('[repository permission]: Test create features', () => {
       });
       afterAll(async () => {
         await deleteInstitutionAsAdmin(institutionId);
+        await deleteUserAsAdmin(anotherUserTest.username);
       });
-    });
-    afterAll(async () => {
-      await deleteUserAsAdmin(userManagerTest.username);
     });
   });
   describe('Without token', () => {
@@ -546,9 +361,14 @@ describe('[repository permission]: Test create features', () => {
           repositoryId = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
+        describe('PUT /repositories/<id>/permissions/<username> - update permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
+            readonly: true,
+            locked: true,
+          };
+
+          const newPermissionTest = {
             readonly: true,
             locked: true,
           };
@@ -556,58 +376,14 @@ describe('[repository permission]: Test create features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
+            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 401', async () => {
             const res = await ezmesure({
               method: 'PUT',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              data: permissionTest,
-            });
-
-            expect(res).toHaveProperty('status', 401);
-          });
-
-          afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      describe('Repository ezPAARSE', () => {
-        let repositoryConfig;
-        let repositoryId;
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        describe('PUT /repositories/<id>/permissions/<username> - Set permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
-          beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-          });
-
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
-              data: permissionTest,
+              data: newPermissionTest,
             });
 
             expect(res).toHaveProperty('status', 401);

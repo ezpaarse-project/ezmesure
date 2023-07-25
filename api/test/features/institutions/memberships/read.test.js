@@ -3,8 +3,8 @@ const ezmesure = require('../../../setup/ezmesure');
 const {
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
-  addPermissionsToUserAsAdmin,
-  deletePermissionsToUserAsAdmin,
+  addMembershipsToUserAsAdmin,
+  deleteMembershipsToUserAsAdmin,
 } = require('../../../setup/institutions');
 const { deleteUserAsAdmin, createUserAsAdmin, activateUser } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
@@ -41,7 +41,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
     describe('GET /institutions/<id>/memberships/<username> - Get membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
       const userTestPermissions = ['memberships:read'];
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
@@ -79,7 +79,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -87,7 +87,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = ['memberships:write', 'memberships:read'];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
@@ -125,7 +125,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });
@@ -152,7 +152,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         userManagerTest.username,
         userManagerTest.password,
       );
-      await addPermissionsToUserAsAdmin(
+      await addMembershipsToUserAsAdmin(
         institutionId,
         userManagerTest.username,
         userManagerTest.permissions,
@@ -163,7 +163,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = [];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions []', async () => {
@@ -201,14 +201,14 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
     describe('GET /institutions/<id>/memberships/<username> - Get membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
       const userTestPermissions = ['memberships:read'];
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
@@ -247,7 +247,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -255,7 +255,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = ['memberships:write', 'memberships:read'];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
@@ -294,7 +294,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
     afterAll(async () => {
@@ -324,7 +324,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         userManagerTest.username,
         userManagerTest.password,
       );
-      await addPermissionsToUserAsAdmin(
+      await addMembershipsToUserAsAdmin(
         institutionId,
         userManagerTest.username,
         userManagerTest.permissions,
@@ -335,7 +335,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = [];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions []', async () => {
@@ -373,7 +373,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -381,7 +381,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = ['memberships:read'];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
@@ -419,7 +419,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -427,7 +427,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = ['memberships:write', 'memberships:read'];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
@@ -465,7 +465,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
     afterAll(async () => {
@@ -477,7 +477,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       const userTestPermissions = ['memberships:read'];
 
       beforeAll(async () => {
-        await addPermissionsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
+        await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
       it('Should get HTTP status 401', async () => {
@@ -513,7 +513,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });

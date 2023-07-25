@@ -27,7 +27,34 @@ async function deleteRepositoryAsAdmin(repositoryId) {
   });
 }
 
+async function addPermissionToRepositoryAsAdmin(repositoryId, username, permissions) {
+  const adminToken = await getAdminToken();
+
+  return ezmesure({
+    method: 'PUT',
+    url: `/repositories/${repositoryId}/permissions/${username}`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    data: permissions,
+  });
+}
+
+async function deletePermissionToRepositoryAsAdmin(repositoryId, username) {
+  const adminToken = await getAdminToken();
+
+  return ezmesure({
+    method: 'DELETE',
+    url: `/repositories/${repositoryId}/permissions/${username}`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  });
+}
+
 module.exports = {
   createRepositoryAsAdmin,
   deleteRepositoryAsAdmin,
+  addPermissionToRepositoryAsAdmin,
+  deletePermissionToRepositoryAsAdmin,
 };

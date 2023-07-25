@@ -63,7 +63,7 @@ async function addMemberShipsAsAdmin(institutionId, username, roles) {
   return res.status;
 }
 
-async function addPermissionsToUserAsAdmin(institutionId, username, permissions) {
+async function addMembershipsToUserAsAdmin(institutionId, username, permissions) {
   const adminToken = await getAdminToken();
 
   return ezmesure({
@@ -78,7 +78,7 @@ async function addPermissionsToUserAsAdmin(institutionId, username, permissions)
   });
 }
 
-async function deletePermissionsToUserAsAdmin(institutionId, username) {
+async function deleteMembershipsToUserAsAdmin(institutionId, username) {
   const adminToken = await getAdminToken();
 
   return ezmesure({
@@ -95,6 +95,6 @@ module.exports = {
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
   addMemberShipsAsAdmin,
-  addPermissionsToUserAsAdmin,
-  deletePermissionsToUserAsAdmin,
+  addMembershipsToUserAsAdmin,
+  deleteMembershipsToUserAsAdmin,
 };

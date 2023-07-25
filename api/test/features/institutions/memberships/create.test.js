@@ -3,8 +3,8 @@ const ezmesure = require('../../../setup/ezmesure');
 const {
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
-  addPermissionsToUserAsAdmin,
-  deletePermissionsToUserAsAdmin,
+  addMembershipsToUserAsAdmin,
+  deleteMembershipsToUserAsAdmin,
 } = require('../../../setup/institutions');
 const { deleteUserAsAdmin, createUserAsAdmin, activateUser } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
@@ -88,7 +88,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -133,7 +133,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });
@@ -160,7 +160,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
         userManagerTest.username,
         userManagerTest.password,
       );
-      await addPermissionsToUserAsAdmin(
+      await addMembershipsToUserAsAdmin(
         institutionId,
         userManagerTest.username,
         userManagerTest.permissions,
@@ -211,7 +211,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
 
@@ -257,7 +257,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
     afterAll(async () => {
@@ -287,7 +287,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
         userManagerTest.username,
         userManagerTest.password,
       );
-      await addPermissionsToUserAsAdmin(
+      await addMembershipsToUserAsAdmin(
         institutionId,
         userManagerTest.username,
         userManagerTest.permissions,
@@ -331,7 +331,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
     afterAll(async () => {
@@ -373,7 +373,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       afterAll(async () => {
-        await deletePermissionsToUserAsAdmin(institutionId, userTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });
