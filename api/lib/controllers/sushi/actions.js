@@ -345,17 +345,6 @@ exports.harvestSushi = async (ctx) => {
     reportType,
   };
 
-  const currentTask = await Task.findOne({
-    filters: [
-      Task.filterBy('params.sushiId', sushi.getId()),
-      Task.filterBy('status', ['waiting', 'running']),
-    ],
-  });
-
-  if (currentTask) {
-    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.getId(), currentTask.get('status')));
-  }
-
   const { body: perm } = await elastic.security.hasPrivileges({
     username: user.username,
     body: {
