@@ -59,6 +59,18 @@
       item-key="id"
       show-select
     >
+      <template #top>
+        <v-toolbar flat dense>
+          <v-spacer />
+
+          <DropdownSelector
+            v-model="selectedTableHeaders"
+            :items="availableTableHeaders"
+            icon="mdi-table-eye"
+          />
+        </v-toolbar>
+      </template>
+
       <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/institutions/${item.id}`">
           {{ item.name }}
@@ -224,6 +236,7 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
+import DropdownSelector from '~/components/DropdownSelector.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
@@ -235,6 +248,7 @@ export default {
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
+    DropdownSelector,
     InstitutionForm,
     InstitutionsDeleteDialog,
     RepositoriesDialog,
@@ -250,6 +264,17 @@ export default {
       logo: null,
       logoPreview: null,
       institutions: [],
+      selectedTableHeaders: [
+        'name',
+        'acronym',
+        'namespace',
+        'memberships',
+        'childInstitutions',
+        'repositories',
+        'spaces',
+        'status',
+        'actions',
+      ],
     };
   },
   mounted() {
@@ -265,7 +290,7 @@ export default {
       }
       return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
     },
-    tableHeaders() {
+    availableTableHeaders() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
@@ -293,7 +318,7 @@ export default {
         {
           text: this.$t('institutions.institution.status'),
           value: 'status',
-          width: '150px',
+          width: '120px',
         },
         {
           text: this.$t('actions'),
@@ -303,6 +328,11 @@ export default {
           align: 'center',
         },
       ];
+    },
+    tableHeaders() {
+      return this.availableTableHeaders.filter((header) => (
+        this.selectedTableHeaders?.includes?.(header?.value)
+      ));
     },
   },
   methods: {
