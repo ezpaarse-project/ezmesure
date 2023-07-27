@@ -54,7 +54,11 @@ router.route({
   handler: getInstitutions,
   validate: {
     query: Joi.object({
-      q: Joi.string(),
+      q: Joi.string().min(0),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
       include: Joi.array().single().items(Joi.string().valid(...includableFields)),
     }).rename('include[]', 'include'),
   },
