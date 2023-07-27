@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
+const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   listRoles,
   getRole,
@@ -11,7 +11,7 @@ const {
 
 const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
 
-router.use(requireJwt, requireUser, requireAnyRole(['admin', 'superuser']));
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

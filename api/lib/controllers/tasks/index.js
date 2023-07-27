@@ -6,6 +6,7 @@ const {
   requireUser,
   requireTermsOfUse,
   requireAnyRole,
+  requireAdmin,
 } = require('../../services/auth');
 
 const {
@@ -20,7 +21,7 @@ const stringOrArray = Joi.alternatives().try(
   Joi.array().items(Joi.string().trim().min(1)).min(1),
 );
 
-router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form', 'admin', 'superuser']));
+router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form']), requireAdmin);
 
 router.route({
   method: 'GET',
@@ -33,7 +34,7 @@ router.route({
   },
 });
 
-router.use(requireAnyRole(['admin', 'superuser']));
+router.use(requireAdmin);
 
 router.route({
   method: 'GET',

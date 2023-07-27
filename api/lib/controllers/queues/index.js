@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const {
   requireJwt,
   requireUser,
-  requireAnyRole,
+  requireAdmin,
 } = require('../../services/auth');
 
 const {
@@ -14,7 +14,7 @@ const {
   resumeOne,
 } = require('./actions');
 
-router.use(requireJwt, requireUser, requireAnyRole(['admin', 'superuser']));
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',

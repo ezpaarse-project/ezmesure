@@ -1,7 +1,7 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
+const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 
 const {
   getOpenData,
@@ -21,7 +21,7 @@ router.route({
   },
 });
 
-router.use(requireAnyRole(['admin', 'superuser']));
+router.use(requireAdmin);
 
 router.route({
   method: 'POST',
