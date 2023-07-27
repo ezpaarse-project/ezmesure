@@ -389,6 +389,11 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "subinstitutions": {
+    "subinstitutions": "Sub-institutions",
+    "count": "{count} sub-inst.",
+    "noSubInstitutions": "No sub-institution"
+  },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
@@ -645,6 +650,7 @@
   "deselect": "Deselect",
   "requiredFields": "* required fields",
   "formSendingFailed": "Sending the form failed",
+  "searchFailed": "Oops! The search failed.",
   "add": "Add",
   "cannotDeleteItems": "Cannot delete {count} item(s)",
   "cannotDeleteItem": "Cannot remove the element {id}",

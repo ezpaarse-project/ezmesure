@@ -65,6 +65,21 @@
         </nuxt-link>
       </template>
 
+      <template #[`item.childInstitutions`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.childInstitutions)"
+          small
+          class="elevation-1"
+          @click="$refs.subInstitutionsDialog?.display?.(item)"
+        >
+          {{ $tc('subinstitutions.count', item.childInstitutions.length) }}
+
+          <v-icon right small>
+            mdi-family-tree
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.memberships`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.memberships)"
@@ -203,6 +218,7 @@
     <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
     <RepositoriesDialog ref="repositoriesDialog" />
     <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
+    <SubInstitutionsDialog ref="subInstitutionsDialog" @updated="refreshInstitutions" />
   </section>
 </template>
 
@@ -212,6 +228,7 @@ import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
+import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 
 export default {
   layout: 'space',
@@ -222,6 +239,7 @@ export default {
     InstitutionsDeleteDialog,
     RepositoriesDialog,
     SpacesDialog,
+    SubInstitutionsDialog,
   },
   data() {
     return {
@@ -258,6 +276,11 @@ export default {
           value: 'memberships',
         },
         {
+          text: this.$t('subinstitutions.subinstitutions'),
+          width: '170px',
+          value: 'childInstitutions',
+        },
+        {
           text: this.$t('repositories.repositories'),
           width: '150px',
           value: 'repositories',
@@ -289,7 +312,7 @@ export default {
       try {
         this.institutions = await this.$axios.$get('/institutions', {
           params: {
-            include: ['repositories', 'memberships', 'spaces'],
+            include: ['repositories', 'memberships', 'spaces', 'childInstitutions'],
           },
         });
       } catch (e) {

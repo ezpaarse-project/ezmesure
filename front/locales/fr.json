@@ -390,6 +390,11 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
+  "subinstitutions": {
+    "subinstitutions": "Sous-établissements",
+    "count": "{count} sous-étab.",
+    "noSubInstitutions": "Aucun sous-établissement"
+  },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
@@ -645,6 +650,7 @@
   "deselect": "Désélectionner",
   "requiredFields": "* champs obligatoires",
   "formSendingFailed": "L'envoi du formulaire a échoué",
+  "searchFailed": "Oups! La recherche a échoué.",
   "add": "Ajouter",
   "cannotDeleteItems": "Impossible de supprimer {count} élément(s)",
   "cannotDeleteItem": "Impossible de supprimer l'élément {id}",
