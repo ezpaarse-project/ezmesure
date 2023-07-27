@@ -4,6 +4,12 @@ const { deleteUserAsAdmin } = require('../../setup/users');
 const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test create users features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
   describe('As admin', () => {
     describe('PUT /users/user.test - Create new user [user.test]', () => {
       let adminToken;
@@ -20,12 +26,7 @@ describe('[users]: Test create users features', () => {
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: {
-            username: 'user.test',
-            email: 'user.test@test.fr',
-            fullName: 'User test',
-            isAdmin: false,
-          },
+          data: userTest,
         });
 
         expect(res).toHaveProperty('status', 201);
@@ -43,10 +44,10 @@ describe('[users]: Test create users features', () => {
         expect(res).toHaveProperty('status', 200);
 
         const user = res?.data;
-        expect(user).toHaveProperty('username', 'user.test');
-        expect(user).toHaveProperty('fullName', 'User test');
-        expect(user).toHaveProperty('email', 'user.test@test.fr');
-        expect(user).toHaveProperty('isAdmin', false);
+        expect(user).toHaveProperty('username', userTest.username);
+        expect(user).toHaveProperty('fullName', userTest.fullName);
+        expect(user).toHaveProperty('email', userTest.email);
+        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
         expect(user?.createdAt).not.toBeNull();
         expect(user?.updatedAt).not.toBeNull();
       });
@@ -62,12 +63,7 @@ describe('[users]: Test create users features', () => {
         const res = await ezmesure({
           method: 'PUT',
           url: '/users/user.test',
-          data: {
-            username: 'user.test',
-            email: 'user.test@test.fr',
-            fullName: 'User test',
-            isAdmin: false,
-          },
+          data: userTest,
         });
         expect(res).toHaveProperty('status', 401);
       });

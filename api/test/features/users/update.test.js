@@ -4,6 +4,12 @@ const { createUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
 const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test users features', () => {
+  const userTestUpdated = {
+    username: 'user.test',
+    email: 'user2.test@test.fr',
+    fullName: 'User2 test',
+    isAdmin: false,
+  };
   describe('Update', () => {
     describe('As admin', () => {
       describe('PUT /users/user.test - Update user [user.test]', () => {
@@ -14,7 +20,7 @@ describe('[users]: Test users features', () => {
           userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
         });
 
-        it('Should create new user [user.test]', async () => {
+        it('Should update user [user.test]', async () => {
           const res = await ezmesure({
             method: 'PUT',
             url: '/users/user.test',
@@ -45,10 +51,10 @@ describe('[users]: Test users features', () => {
 
           const user = res?.data;
 
-          expect(user).toHaveProperty('username', 'user.test');
-          expect(user).toHaveProperty('fullName', 'User2 test');
-          expect(user).toHaveProperty('email', 'user2.test@test.fr');
-          expect(user).toHaveProperty('isAdmin', false);
+          expect(user).toHaveProperty('username', userTestUpdated.username);
+          expect(user).toHaveProperty('fullName', userTestUpdated.fullName);
+          expect(user).toHaveProperty('email', userTestUpdated.email);
+          expect(user).toHaveProperty('isAdmin', userTestUpdated.isAdmin);
           expect(user?.createdAt).not.toBeNull();
           expect(user?.updatedAt).not.toBeNull();
         });
@@ -94,10 +100,10 @@ describe('[users]: Test users features', () => {
 
           const user = res?.data;
 
-          expect(user).toHaveProperty('username', 'user.test');
-          expect(user).toHaveProperty('fullName', 'User test');
-          expect(user).toHaveProperty('email', 'user.test@test.fr');
-          expect(user).toHaveProperty('isAdmin', false);
+          expect(user).toHaveProperty('username', userTest.username);
+          expect(user).toHaveProperty('fullName', userTest.fullName);
+          expect(user).toHaveProperty('email', userTest.email);
+          expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
           expect(user?.createdAt).not.toBeNull();
           expect(user?.updatedAt).not.toBeNull();
         });

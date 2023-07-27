@@ -61,10 +61,10 @@ describe('[users]: Test delete users features', () => {
         expect(res).toHaveProperty('status', 200);
 
         const user = res?.data;
-        expect(user).toHaveProperty('username', 'user.test');
-        expect(user).toHaveProperty('fullName', 'User test');
-        expect(user).toHaveProperty('email', 'user.test@test.fr');
-        expect(user).toHaveProperty('isAdmin', false);
+        expect(user).toHaveProperty('username', userTest.username);
+        expect(user).toHaveProperty('fullName', userTest.fullName);
+        expect(user).toHaveProperty('email', userTest.email);
+        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
         expect(user?.createdAt).not.toBeNull();
         expect(user?.updatedAt).not.toBeNull();
       });
