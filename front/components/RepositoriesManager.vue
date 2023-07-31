@@ -16,7 +16,7 @@
         <template #activator="{ on, attrs }">
           <v-btn
             color="primary"
-            dark
+            text
             :loading="creating"
             v-bind="attrs"
             v-on="on"

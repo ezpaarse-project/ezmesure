@@ -17,7 +17,7 @@
         <template #activator="{ on, attrs }">
           <v-btn
             color="primary"
-            dark
+            text
             :loading="savingSubInstitution"
             v-bind="attrs"
             v-on="on"
