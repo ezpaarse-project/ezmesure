@@ -1,10 +1,7 @@
 <template>
-  <v-card class="d-flex flex-column">
-    <v-responsive :aspect-ratio="3" class="shrink">
-      <v-sheet
-        color="grey lighten-4"
-        class="fill-height d-flex align-center justify-center"
-      >
+  <v-card class="d-flex flex-column" v-bind="$attrs">
+    <v-sheet color="grey lighten-4" class="shrink d-flex justify-center">
+      <v-responsive :aspect-ratio="3" max-width="400">
         <v-img
           v-if="logoSrc"
           :aspect-ratio="3"
@@ -14,12 +11,55 @@
         <span v-else class="font-weight-light text--secondary">
           {{ $t('institutions.noLogo') }}
         </span>
-      </v-sheet>
-    </v-responsive>
+      </v-responsive>
+    </v-sheet>
 
     <v-card-title>
       {{ institutionName }}
     </v-card-title>
+
+    <v-list>
+      <v-list-item v-for="field in fields" :key="field.name">
+        <v-list-item-icon>
+          <v-icon color="secondary">
+            {{ field.icon }}
+          </v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title>{{ field.value }}</v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t(`institutions.institution.${field.name}`) }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon color="secondary">
+            mdi-link-variant
+          </v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title>
+            <v-btn
+              v-for="link in links"
+              :key="link.icon"
+              :href="link.url"
+              :color="link.color"
+              :title="link.title"
+              icon
+            >
+              <v-icon>{{ link.icon }}</v-icon>
+            </v-btn>
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t(`institutions.institution.links`) }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
 
     <v-spacer />
 
@@ -72,23 +112,51 @@ export default {
       return name;
     },
     fields() {
-      let { name } = this.institution;
-
-      if (name && this.institution.acronym) {
-        name = `${name} (${this.institution.acronym})`;
-      }
-
       const fields = [
         { name: 'homepage', value: this.institution.homepage, icon: 'mdi-web' },
         { name: 'city', value: this.institution.city, icon: 'mdi-map-marker' },
         { name: 'type', value: this.institution.type, icon: 'mdi-tag' },
         { name: 'uai', value: this.institution.uai, icon: 'mdi-identifier' },
         { name: 'role', value: this.institution.role, icon: 'mdi-shield' },
-        { name: 'indexPrefix', value: this.institution.indexPrefix, icon: 'mdi-contain-start' },
-        { name: 'indexCount', value: this.institution.indexCount, icon: 'mdi-counter' },
       ];
 
       return fields.filter((f) => f.value);
+    },
+    links() {
+      const links = [
+        {
+          title: this.$t('social.website'),
+          icon: 'mdi-web',
+          color: '#616161',
+          url: this.institution?.websiteUrl,
+        },
+        {
+          title: this.$t('social.twitter'),
+          icon: 'mdi-twitter',
+          color: '#1da1f2',
+          url: this.institution?.social?.twitterUrl,
+        },
+        {
+          title: this.$t('social.linkedin'),
+          icon: 'mdi-linkedin',
+          color: '#0077b5',
+          url: this.institution?.social?.linkedinUrl,
+        },
+        {
+          title: this.$t('social.youtube'),
+          icon: 'mdi-youtube',
+          color: '#ff0000',
+          url: this.institution?.social?.youtubeUrl,
+        },
+        {
+          title: this.$t('social.facebook'),
+          icon: 'mdi-facebook',
+          color: '#1877f2',
+          url: this.institution?.social?.facebookUrl,
+        },
+      ];
+
+      return links.filter((f) => f.url);
     },
     logoSrc() {
       return this.institution?.logoId && `/api/assets/logos/${this.institution.logoId}`;

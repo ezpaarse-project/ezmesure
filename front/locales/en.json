@@ -237,6 +237,7 @@
       "domains": "Domains",
       "general": "General",
       "logo": "Logo",
+      "links": "Links",
       "localisation": "Localisation",
       "automations": "Automations",
       "dropImageHere": "Drop your image here",
@@ -611,6 +612,13 @@
     "none": "None",
     "read": "Read",
     "write": "Read / Write"
+  },
+  "social": {
+    "website": "Website",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "youtube": "Youtube",
+    "facebook": "Facebook"
   },
   "anErrorOccurred": "An error occurred",
   "url": "URL",

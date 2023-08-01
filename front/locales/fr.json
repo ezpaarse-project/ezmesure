@@ -237,6 +237,7 @@
       "domains": "Domaines",
       "general": "Général",
       "logo": "Logo",
+      "links": "Liens",
       "localisation": "Localisation",
       "automations": "Automatisations",
       "dropImageHere": "Déposez votre image ici",
@@ -611,6 +612,13 @@
     "none": "Aucun",
     "read": "Lecture",
     "write": "Lecture / Écriture"
+  },
+  "social": {
+    "website": "Site web",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "youtube": "Youtube",
+    "facebook": "Facebook"
   },
   "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",
