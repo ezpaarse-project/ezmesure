@@ -11,13 +11,15 @@
     "host": "EZMESURE_ELASTIC_HOST",
     "user": "EZMESURE_ELASTIC_USER",
     "password": "ELASTICSEARCH_PASSWORD",
-    "apiVersion": "EZMESURE_ELASTIC_VERSION"
+    "apiVersion": "EZMESURE_ELASTIC_VERSION",
+    "syncSchedule": "EZMESURE_ELASTIC_SYNC_SCHEDULE"
   },
   "kibana": {
     "username": "KIBANA_USERNAME",
     "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
-    "host": "EZMESURE_KIBANA_HOST"
+    "host": "EZMESURE_KIBANA_HOST",
+    "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },
   "redis": {
     "host": "EZMESURE_REDIS_HOST",
@@ -72,6 +74,13 @@
   "reportingIndex": "REPORTING_INDEX",
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
+  },
+  "logs": {
+    "app": {
+      "Console": {
+        "level": "EZMESURE_LOG_LEVEL"
+      }
+    }
   },
   "appName": "EZMESURE_APP_NAME"
 }

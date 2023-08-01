@@ -7,6 +7,7 @@ const hooks = require('../hooks');
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
+/** @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
@@ -37,6 +38,14 @@ module.exports = class RepositoriesService {
    */
   static findUnique(params) {
     return prisma.repository.findUnique(params);
+  }
+
+  /**
+   * @param {RepositoryFindFirstArgs} params
+   * @returns {Promise<Repository | null>}
+   */
+  static findFirst(params) {
+    return prisma.repository.findFirst(params);
   }
 
   /**

@@ -12,6 +12,8 @@ errors:
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
     taskExists: "L'item SUSHI [%s] a déjà une tâche associée (statut: [%s])"
+    invalidDate: La date [%s] est invalide
+    invalidPeriod: La période [de %s à %s] est invalide
 
   queue:
     notFound: File d'attente introuvable

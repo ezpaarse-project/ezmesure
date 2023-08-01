@@ -235,6 +235,10 @@
         </td>
       </template>
 
+      <template #[`item.updatedAt`]="{ item }">
+        <LocalDate :date="item.updatedAt" />
+      </template>
+
       <template #[`item.tags`]="{ item }">
         <v-chip
           v-for="(tag, index) in item.tags"
@@ -313,6 +317,7 @@ import SushiHistory from '~/components/SushiHistory.vue';
 import SushiFiles from '~/components/SushiFiles.vue';
 import ReportsDialog from '~/components/ReportsDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import LocalDate from '~/components/LocalDate.vue';
 
 export default {
   layout: 'space',
@@ -325,6 +330,7 @@ export default {
     SushiFiles,
     ReportsDialog,
     ConfirmDialog,
+    LocalDate,
   },
   async asyncData({
     $axios,
@@ -425,6 +431,12 @@ export default {
           value: 'tags',
           align: 'right',
           width: 'auto',
+        },
+        {
+          text: this.$t('institutions.sushi.updatedAt'),
+          value: 'updatedAt',
+          align: 'right',
+          width: '230px',
         },
         {
           text: this.$t('actions'),

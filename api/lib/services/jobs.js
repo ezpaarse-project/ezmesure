@@ -3,7 +3,7 @@ const path = require('path');
 const Queue = require('bull');
 
 const { appLogger } = require('./logger');
-const Task = require('../models/Task');
+const harvestJobService = require('../entities/harvest-job.service');
 
 const harvestConcurrency = Number.parseInt(config.get('jobs.harvest.concurrency'), 10);
 const redisConfig = config.get('redis');
@@ -15,15 +15,23 @@ harvestQueue.process(harvestConcurrency, path.resolve(__dirname, 'processors', '
 async function checkTask(taskId, jobId) {
   if (!taskId) { return; }
 
-  const task = await Task.findById(taskId);
+  const task = await harvestJobService.findUnique({ where: { id: taskId } });
 
-  if (!task || task.isDone()) { return; }
+  if (!task || harvestJobService.isDone(task)) { return; }
 
-  appLogger.verbose(`${logPrefix} Job [${jobId}] stopped unexpectedly, setting task status to [failed]...`);
-  task.fail(['The task stopped unexpectedly']);
+  appLogger.verbose(`${logPrefix} Job [${jobId}] stopped unexpectedly, setting task from status [${task.status}] to [failed]...`);
 
   try {
-    await task.save();
+    await harvestJobService.update(
+      {
+        where: { id: taskId },
+        data: {
+          status: 'failed',
+          runningTime: task.startedAt ? Date.now() - task.startedAt.getTime() : 0,
+          logs: { create: { level: 'error', message: 'The task stopped unexpectedly' } },
+        },
+      },
+    );
   } catch (e) {
     appLogger.error(`${logPrefix} Task [${taskId}] could not be saved`);
   }

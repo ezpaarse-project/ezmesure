@@ -118,27 +118,27 @@
 
 ### HarvestJob
 
-| Property    | Type             | Description | Attributes | Default  |
-|-------------|------------------|-------------|------------|----------|
-| id          | `String`         |             | Id         | `cuid()` |
-| requests    | `HarvestRequest` |             |            |          |
-| createdAt   | `DateTime`       |             |            | `now()`  |
-| updatedAt   | `DateTime`       |             |            |          |
-| status      | `String`         |             |            |          |
-| params      | `Json`           |             |            |          |
-| runningTime | `Int`            |             |            |          |
-| result      | `Json`           |             |            |          |
-| logs        | `Log[]`          |             |            |          |
-| steps       | `Step[]`         |             |            |          |
-
-### HarvestRequest
-
-| Property    | Type               | Description | Attributes | Default  |
-|-------------|--------------------|-------------|------------|----------|
-| id          | `String`           |             | Id         | `cuid()` |
-| credentials | `SushiCredentials` |             |            |          |
-| reportId    | `String`           |             |            |          |
-| HarvestJob  | `HarvestJob[]`     |             |            |          |
+| Property         | Type               | Description | Attributes | Default  |
+|------------------|--------------------|-------------|------------|----------|
+| id               | `String`           |             | Id         | `cuid()` |
+| credentials      | `SushiCredentials` |             |            |          |
+| createdAt        | `DateTime`         |             |            | `now()`  |
+| updatedAt        | `DateTime`         |             |            |          |
+| startedAt        | `DateTime?`        |             |            |          |
+| beginDate        | `String`           |             |            |          |
+| endDate          | `String`           |             |            |          |
+| status           | `String`           |             |            |          |
+| reportType       | `String`           |             |            |          |
+| harvestId        | `String`           |             |            |          |
+| index            | `String`           |             |            |          |
+| runningTime      | `Int?`             |             |            |          |
+| timeout          | `Int`              |             |            |          |
+| forceDownload    | `Boolean`          |             |            |          |
+| ignoreValidation | `Boolean`          |             |            |          |
+| params           | `Json?`            |             |            | `{}`     |
+| result           | `Json?`            |             |            |          |
+| logs             | `Log[]`            |             |            |          |
+| steps            | `Step[]`           |             |            |          |
 
 ### Log
 
@@ -191,17 +191,17 @@
 
 ### SushiCredentials
 
-| Property        | Type               | Description | Attributes | Default  |
-|-----------------|--------------------|-------------|------------|----------|
-| id              | `String`           |             | Id         | `cuid()` |
-| createdAt       | `DateTime`         |             |            | `now()`  |
-| updatedAt       | `DateTime`         |             |            |          |
-| customerId      | `String?`          |             |            |          |
-| requestorId     | `String?`          |             |            |          |
-| apiKey          | `String?`          |             |            |          |
-| comment         | `String?`          |             |            |          |
-| tags            | `String[]`         |             |            |          |
-| params          | `Json[]`           |             |            |          |
-| institution     | `Institution`      |             |            |          |
-| endpoint        | `SushiEndpoint`    |             |            |          |
-| harvestRequests | `HarvestRequest[]` |             |            |          |
+| Property    | Type            | Description | Attributes | Default  |
+|-------------|-----------------|-------------|------------|----------|
+| id          | `String`        |             | Id         | `cuid()` |
+| createdAt   | `DateTime`      |             |            | `now()`  |
+| updatedAt   | `DateTime`      |             |            |          |
+| customerId  | `String?`       |             |            |          |
+| requestorId | `String?`       |             |            |          |
+| apiKey      | `String?`       |             |            |          |
+| comment     | `String?`       |             |            |          |
+| tags        | `String[]`      |             |            |          |
+| params      | `Json[]`        |             |            |          |
+| institution | `Institution`   |             |            |          |
+| endpoint    | `SushiEndpoint` |             |            |          |
+| harvestJobs | `HarvestJob[]`  |             |            |          |

@@ -633,12 +633,10 @@
           "createdAt": {
             "$ref": "#/components/schemas/ItemCreationDate"
           },
-          "requests": {
-            "$ref": "#/components/schemas/HarvestRequest"
-          },
           "status": {
             "description": "Status of the job",
             "type": "string",
+            "readOnly": true,
             "enum": [
               "waiting",
               "running",
@@ -651,10 +649,55 @@
           },
           "runningTime": {
             "description": "Running time of the job in milliseconds",
-            "type": "integer"
+            "type": "integer",
+            "readOnly": true
+          },
+          "beginDate": {
+            "description": "Begin date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "endDate": {
+            "description": "End date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "reportType": {
+            "description": "The report type that should be harvested",
+            "type": "string",
+            "example": "TR"
+          },
+          "harvestId": {
+            "description": "Arbitrary identifier, used to group jobs from a same harvest batch",
+            "type": "string"
+          },
+          "index": {
+            "description": "Target index where report will be inserted",
+            "type": "string"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Maximum job duration in seconds"
+          },
+          "forceDownload": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to download the report even if a local copy exists"
+          },
+          "ignoreValidation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Try to import the report even if validation fails"
+          },
+          "params": {
+            "description": "Additionnal job parameters",
+            "type": "object"
           },
           "result": {
             "description": "Result of the job",
+            "readOnly": true,
             "type": [
               "number",
               "string",
@@ -666,6 +709,7 @@
           },
           "logs": {
             "description": "Job logs",
+            "readOnly": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Log"
@@ -673,33 +717,10 @@
           },
           "steps": {
             "description": "Steps of the job",
+            "readOnly": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Step"
-            }
-          }
-        }
-      },
-      "HarvestRequest": {
-        "description": "A SUSHI harvest request",
-        "type": "object",
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/ItemID"
-          },
-          "credentials": {
-            "description": "SUSHI credentials associated to the request",
-            "$ref": "#/components/schemas/SushiCredentials"
-          },
-          "reportId": {
-            "description": "The SUSHI report to harvest",
-            "type": "string"
-          },
-          "HarvestJob": {
-            "description": "The harvest jobs associated to the request",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HarvestJob"
             }
           }
         }
@@ -1637,209 +1658,6 @@
         },
         "required": [
           "kibana"
-        ]
-      },
-      "Task": {
-        "description": "Object representing a processing task",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1,
-            "description": "ID of the task",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Creation date of the task",
-            "format": "date"
-          },
-          "updatedAt": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Last date of modification",
-            "format": "date"
-          },
-          "startedAt": {
-            "type": "string",
-            "minLength": 1,
-            "format": "date",
-            "description": "Start date of the task"
-          },
-          "status": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Status of the task"
-          },
-          "type": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Type of the task",
-            "example": "sushi-harvest"
-          },
-          "runningTime": {
-            "type": "number",
-            "description": "How many milliseconds the task has been running"
-          },
-          "logs": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "description": "Log messages generated during the process",
-            "items": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "Date of the log message",
-                  "format": "date"
-                },
-                "type": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "Type of message"
-                },
-                "message": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "Message content"
-                }
-              }
-            }
-          },
-          "params": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "description": "Parameters associated to the task",
-            "items": {
-              "type": "object",
-              "properties": {
-                "sushiId": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "ID of the sushi item related to the task",
-                  "format": "uuid"
-                },
-                "institutionId": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "ID of the institution related to the task",
-                  "format": "uuid"
-                },
-                "username": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "ID of the institution related to the task",
-                  "format": "uuid"
-                },
-                "reportType": {
-                  "type": "string",
-                  "example": "tr",
-                  "description": "Type of COUNTER report"
-                },
-                "index": {
-                  "type": "string",
-                  "description": "Target index"
-                },
-                "beginDate": {
-                  "type": "string"
-                },
-                "endDate": {
-                  "type": "string"
-                },
-                "forceDownload": {
-                  "type": "string"
-                },
-                "endpointVendor": {
-                  "type": "string"
-                },
-                "sushiLabel": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "steps": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "description": "Task steps",
-            "items": {
-              "type": "object",
-              "properties": {
-                "label": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "Label of the step",
-                  "example": "download"
-                },
-                "status": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "ID of the institution related to the task",
-                  "enum": [
-                    "running",
-                    "finished",
-                    "failed"
-                  ]
-                },
-                "startTime": {
-                  "type": "string",
-                  "format": "date",
-                  "description": "Start time of the step"
-                },
-                "took": {
-                  "type": "number",
-                  "description": "How many milliseconds the step has been running"
-                },
-                "data": {
-                  "type": "object",
-                  "description": "Arbitrary data associated to the step"
-                }
-              }
-            },
-            "readOnly": true
-          },
-          "result": {
-            "type": "object",
-            "properties": {
-              "inserted": {
-                "type": "number",
-                "description": "Number of inserted documents"
-              },
-              "updated": {
-                "type": "number",
-                "description": "Number of updated documents"
-              },
-              "failed": {
-                "type": "number",
-                "description": "Number of documents that failed to be inserted"
-              },
-              "coveredPeriods": {
-                "type": "array",
-                "description": "Performance periods found in the report",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "errors": {
-                "type": "array",
-                "description": "A list of errors, if any",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "readOnly": true
-          }
-        },
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt"
         ]
       },
       "ElasticsearchIndex": {
@@ -3106,6 +2924,154 @@
           }
         ],
         "description": "Remove a member from an institution"
+      }
+    },
+    "/institutions/{id}/subinstitutions": {
+      "get": {
+        "summary": "Get institution sub-institutions",
+        "tags": [
+          "Institutions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Institution"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-institutions-:id-subinstitutions",
+        "description": "Get the sub-institutions of an institution. Must be admin."
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ]
+    },
+    "/institutions/{id}/subinstitutions/{subid}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "subid",
+          "in": "path",
+          "required": true,
+          "description": "ID of the sub-institution"
+        }
+      ],
+      "put": {
+        "summary": "Add a sub-institution to an institution",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "put-institutions-id-subinstitutions-subid",
+        "description": "Add a sub-institution to an institution. Must be admin.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Remove a sub-institution",
+        "tags": [
+          "Institutions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        },
+        "operationId": "delete-institutions-id-subinstitutions-subid",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Remove a sub-institution from an institution. Must be admin."
       }
     },
     "/institutions/{id}/repositories": {
@@ -6024,7 +5990,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/HarvestJob"
                 }
               }
             }
@@ -6260,7 +6226,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Task"
+                    "$ref": "#/components/schemas/HarvestJob"
                   }
                 }
               }
@@ -6651,7 +6617,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Task"
+                    "$ref": "#/components/schemas/HarvestJob"
                   }
                 }
               }
@@ -6710,8 +6676,8 @@
               "type": "array"
             },
             "in": "query",
-            "name": "sushiId",
-            "description": "filter tasks by SUSHI ID"
+            "name": "credentialsId",
+            "description": "filter tasks by ID of SUSHI credentials"
           },
           {
             "schema": {
@@ -6728,6 +6694,14 @@
             "in": "query",
             "name": "harvestId",
             "description": "filter tasks by harvest ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "distinct",
+            "description": "a combination of fields that should be distinct"
           },
           {
             "schema": {
@@ -6763,7 +6737,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/HarvestJob"
                 }
               }
             }
@@ -6828,7 +6802,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/HarvestJob"
                 }
               }
             }
@@ -7028,7 +7002,7 @@
                           "type": "string",
                           "example": "john.doo"
                         },
-                        "memberships": {
+                        "subinstitutions": {
                           "$ref": "#/components/schemas/Membership"
                         }
                       }

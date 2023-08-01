@@ -31,7 +31,7 @@
                 <v-col cols="12" sm="6">
                   <v-text-field
                     v-model="institution.name"
-                    :label="`${$t('institutions.institution.title')} *`"
+                    :label="`${$t('name')} *`"
                     :rules="[v => !!v || $t('fieldIsRequired')]"
                     hide-details
                     outlined

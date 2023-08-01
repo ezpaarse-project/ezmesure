@@ -59,10 +59,37 @@
       item-key="id"
       show-select
     >
+      <template #top>
+        <v-toolbar flat dense>
+          <v-spacer />
+
+          <DropdownSelector
+            v-model="selectedTableHeaders"
+            :items="availableTableHeaders"
+            icon="mdi-table-eye"
+          />
+        </v-toolbar>
+      </template>
+
       <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/institutions/${item.id}`">
           {{ item.name }}
         </nuxt-link>
+      </template>
+
+      <template #[`item.childInstitutions`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.childInstitutions)"
+          small
+          class="elevation-1"
+          @click="$refs.subInstitutionsDialog?.display?.(item)"
+        >
+          {{ $tc('subinstitutions.count', item.childInstitutions.length) }}
+
+          <v-icon right small>
+            mdi-family-tree
+          </v-icon>
+        </v-chip>
       </template>
 
       <template #[`item.memberships`]="{ item }">
@@ -203,25 +230,30 @@
     <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
     <RepositoriesDialog ref="repositoriesDialog" />
     <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
+    <SubInstitutionsDialog ref="subInstitutionsDialog" @updated="refreshInstitutions" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
+import DropdownSelector from '~/components/DropdownSelector.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
+import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
+    DropdownSelector,
     InstitutionForm,
     InstitutionsDeleteDialog,
     RepositoriesDialog,
     SpacesDialog,
+    SubInstitutionsDialog,
   },
   data() {
     return {
@@ -232,6 +264,17 @@ export default {
       logo: null,
       logoPreview: null,
       institutions: [],
+      selectedTableHeaders: [
+        'name',
+        'acronym',
+        'namespace',
+        'memberships',
+        'childInstitutions',
+        'repositories',
+        'spaces',
+        'status',
+        'actions',
+      ],
     };
   },
   mounted() {
@@ -247,7 +290,7 @@ export default {
       }
       return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
     },
-    tableHeaders() {
+    availableTableHeaders() {
       return [
         { text: this.$t('institutions.title'), value: 'name' },
         { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
@@ -256,6 +299,11 @@ export default {
           text: this.$t('institutions.institution.members'),
           width: '150px',
           value: 'memberships',
+        },
+        {
+          text: this.$t('subinstitutions.subinstitutions'),
+          width: '170px',
+          value: 'childInstitutions',
         },
         {
           text: this.$t('repositories.repositories'),
@@ -270,7 +318,7 @@ export default {
         {
           text: this.$t('institutions.institution.status'),
           value: 'status',
-          width: '150px',
+          width: '120px',
         },
         {
           text: this.$t('actions'),
@@ -281,6 +329,11 @@ export default {
         },
       ];
     },
+    tableHeaders() {
+      return this.availableTableHeaders.filter((header) => (
+        this.selectedTableHeaders?.includes?.(header?.value)
+      ));
+    },
   },
   methods: {
     async refreshInstitutions() {
@@ -289,7 +342,7 @@ export default {
       try {
         this.institutions = await this.$axios.$get('/institutions', {
           params: {
-            include: ['repositories', 'memberships', 'spaces'],
+            include: ['repositories', 'memberships', 'spaces', 'childInstitutions'],
           },
         });
       } catch (e) {

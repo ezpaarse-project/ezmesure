@@ -3,7 +3,6 @@ const { Joi } = require('koa-joi-router');
 
 const {
   includableFields,
-  adminImportSchema,
 } = require('../../entities/institutions.dto');
 const {
   includableFields: membershipIncludableFields,
@@ -42,6 +41,12 @@ const {
 } = require('./actions');
 
 const {
+  getSubInstitutions,
+  addSubInstitution,
+  removeSubInstitution,
+} = require('./subinstitutions');
+
+const {
   getInstitutionState,
   validateInstitution,
 } = require('./admin');
@@ -54,7 +59,11 @@ router.route({
   handler: getInstitutions,
   validate: {
     query: Joi.object({
-      q: Joi.string(),
+      q: Joi.string().min(0),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
       include: Joi.array().single().items(Joi.string().valid(...includableFields)),
     }).rename('include[]', 'include'),
   },
@@ -295,6 +304,50 @@ router.route({
     },
     body: {
       value: Joi.boolean().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:institutionId/subinstitutions',
+  handler: [
+    fetchInstitution(),
+    getSubInstitutions,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/subinstitutions/:subInstitutionId',
+  handler: [
+    fetchInstitution(),
+    addSubInstitution,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      subInstitutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId/subinstitutions/:subInstitutionId',
+  handler: [
+    fetchInstitution(),
+    removeSubInstitution,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      subInstitutionId: Joi.string().trim().required(),
     },
   },
 });

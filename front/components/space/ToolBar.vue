@@ -1,17 +1,20 @@
 <template>
-  <v-toolbar flat :dark="dark">
+  <v-toolbar flat v-bind="$attrs">
     <slot name="nav-icon">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
     </slot>
 
-    <v-toolbar-title>
+    <v-toolbar-title v-if="title">
       {{ title }}
     </v-toolbar-title>
-
     <slot />
 
-    <template v-if="$slots.extension" #extension>
-      <slot name="extension" />
+    <template v-if="$scopedSlots.extension" #extension="scope">
+      <slot name="extension" v-bind="scope" />
+    </template>
+
+    <template v-if="$scopedSlots.img" #img="scope">
+      <slot name="img" v-bind="scope" />
     </template>
   </v-toolbar>
 </template>
@@ -22,10 +25,6 @@ export default {
     title: {
       type: String,
       default: () => '',
-    },
-    dark: {
-      type: Boolean,
-      default: () => false,
     },
   },
   computed: {

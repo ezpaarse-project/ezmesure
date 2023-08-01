@@ -5,6 +5,7 @@ const usersService = require('../../entities/users.service');
 
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
+ * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
  */
 
 const {
@@ -63,6 +64,11 @@ function sendNewContact(receiver) {
 exports.getInstitutions = async (ctx) => {
   const {
     include: propsToInclude,
+    q: query,
+    size,
+    sort,
+    order = 'asc',
+    page = 1,
   } = ctx.query;
 
   let include;
@@ -71,9 +77,24 @@ exports.getInstitutions = async (ctx) => {
     include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
   }
 
-  const institution = await institutionsService.findMany({
+  /** @type {InstitutionFindManyArgs} */
+  const options = {
     include,
-  });
+    take: Number.isInteger(size) ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+  };
+
+  if (sort) {
+    options.orderBy = { [sort]: order };
+  }
+
+  if (query) {
+    options.where = {
+      name: { contains: query, mode: 'insensitive' },
+    };
+  }
+
+  const institution = await institutionsService.findMany(options);
 
   ctx.type = 'json';
   ctx.body = institution;

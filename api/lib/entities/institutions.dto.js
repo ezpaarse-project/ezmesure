@@ -17,12 +17,12 @@ const schema = {
   createdAt: Joi.date(),
 
   name: Joi.string().trim().min(1),
-  namespace: Joi.string().trim().allow(''),
-  type: Joi.string().allow(''),
-  acronym: Joi.string().allow(''),
-  websiteUrl: Joi.string().allow(''),
-  city: Joi.string().allow(''),
-  uai: Joi.string().allow(''),
+  namespace: Joi.string().trim().allow('').empty(null),
+  type: Joi.string().allow('').empty(null),
+  acronym: Joi.string().allow('').empty(null),
+  websiteUrl: Joi.string().allow('').empty(null),
+  city: Joi.string().allow('').empty(null),
+  uai: Joi.string().allow('').empty(null),
 
   social: Joi.object().pattern(Joi.string(), Joi.string().allow('')),
   auto: Joi.object().pattern(Joi.string(), Joi.boolean()),

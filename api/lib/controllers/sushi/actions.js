@@ -1,17 +1,20 @@
 const fs = require('fs-extra');
 const path = require('path');
 const format = require('date-fns/format');
+const isBefore = require('date-fns/isBefore');
 const subMonths = require('date-fns/subMonths');
+const parseISO = require('date-fns/parseISO');
+const isValidDate = require('date-fns/isValid');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 
-const Task = require('../../models/Task');
-const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
+const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
+const harvestJobsService = require('../../entities/harvest-job.service');
 
 exports.getAll = async (ctx) => {
   const where = {};
@@ -54,7 +57,7 @@ exports.getTasks = async (ctx) => {
   const { sushi } = ctx.state;
 
   ctx.status = 200;
-  ctx.body = await Task.findBySushiId(sushi.getId());
+  ctx.body = await harvestJobsService.findMany({ where: { credentialsId: sushi.id } });
 };
 
 exports.addSushi = async (ctx) => {
@@ -209,10 +212,10 @@ exports.downloadReport = async (ctx) => {
   let { beginDate, endDate } = query;
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
   if (!beginDate && !endDate) {
@@ -284,7 +287,7 @@ exports.getFileList = async (ctx) => {
         type: 'file',
         size: stat.size,
         mtime: stat.mtime,
-        href: `/api/sushi/${sushi.getId()}/files/${parentDirPath}/${filename}`,
+        href: `/api/sushi/${sushi.id}/files/${parentDirPath}/${filename}`,
       };
     }
 
@@ -332,61 +335,61 @@ exports.harvestSushi = async (ctx) => {
     harvestId,
     timeout,
   } = body;
-  let { beginDate, endDate } = body;
-  const {
-    endpoint,
-    sushi,
-    user,
-    institution,
-  } = ctx.state;
+
+  const { sushi } = ctx.state;
+  const { endpoint, institution } = sushi;
 
   let index = target;
 
   if (!index) {
-    const prefix = institution.get('indexPrefix');
+    const repository = await repositoriesService.findFirst({
+      where: {
+        institutionId: institution.id,
+        type: 'counter5',
+      },
+    });
 
-    if (!prefix) {
-      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.getId()));
+    if (!repository?.pattern) {
+      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.id));
     }
 
-    index = `${prefix}-publisher`;
+    index = repository.pattern.replace(/[*]/g, '');
   }
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
     reportType,
   };
 
-  const currentTask = await Task.findOne({
-    filters: [
-      Task.filterBy('params.sushiId', sushi.getId()),
-      Task.filterBy('status', ['waiting', 'running']),
-    ],
+  const currentTask = await harvestJobsService.findFirst({
+    where: {
+      credentialsId: sushi.id,
+      status: { in: ['waiting', 'running'] },
+    },
   });
 
   if (currentTask) {
-    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.getId(), currentTask.get('status')));
+    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.id, currentTask.status));
   }
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username: user.username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': user.username },
-  });
-  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
+  let beginDate = body.beginDate && parseISO(body.beginDate, 'yyyy-MM');
+  let endDate = body.endDate && parseISO(body.endDate, 'yyyy-MM');
 
-  if (!canWrite) {
-    ctx.throw(403, `you don't have permission to write in ${index}`);
+  if (beginDate && !isValidDate(beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.beginDate));
+  }
+  if (endDate && !isValidDate(endDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.endDate));
+  }
+  if (beginDate && endDate && isBefore(endDate, beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidPeriod', body.beginDate, body.endDate));
   }
 
   if (!beginDate && !endDate) {
-    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    const prevMonth = subMonths(new Date(), 1);
     beginDate = prevMonth;
     endDate = prevMonth;
   } else if (!beginDate) {
@@ -395,33 +398,26 @@ exports.harvestSushi = async (ctx) => {
     endDate = beginDate;
   }
 
-  const task = new Task({
-    type: 'sushi-harvest',
-    status: 'waiting',
-    params: {
-      sushiId: sushi.getId(),
-      endpointId: sushi.get('endpointId'),
-      institutionId: institution.getId(),
+  const task = await harvestJobsService.create({
+    data: {
+      credentials: {
+        connect: { id: sushi.id },
+      },
+      status: 'waiting',
       harvestId: harvestId || uuidv4(),
-      username: user.username,
       timeout,
       reportType,
       index,
-      beginDate,
-      endDate,
+      beginDate: format(beginDate, 'yyyy-MM'),
+      endDate: format(endDate, 'yyyy-MM'),
       forceDownload,
       ignoreValidation,
-      endpointVendor: endpoint.get('vendor'),
-      sushiLabel: sushi.get('vendor'),
-      sushiPackage: sushi.get('package'),
-      institutionName: institution.get('name'),
     },
   });
 
-  await task.save();
   await harvestQueue.add(
-    { taskId: task.getId(), timeout },
-    { jobId: task.getId() },
+    { taskId: task.id, timeout },
+    { jobId: task.id },
   );
 
   ctx.type = 'json';

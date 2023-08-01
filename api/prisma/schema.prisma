@@ -130,25 +130,26 @@ model HistoryEntry {
 }
 
 model HarvestJob {
-  id          String         @id @default(cuid())
-  requestId   String
-  requests    HarvestRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  status      String
-  params      Json
-  runningTime Int
-  result      Json
-  logs        Log[]
-  steps       Step[]
-}
-
-model HarvestRequest {
-  id            String           @id @default(cuid())
-  credentialsId String
-  credentials   SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
-  reportId      String
-  HarvestJob    HarvestJob[]
+  id               String           @id @default(cuid())
+  credentialsId    String
+  credentials      SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  startedAt        DateTime?
+  beginDate        String
+  endDate          String
+  status           String
+  reportType       String
+  harvestId        String
+  index            String
+  runningTime      Int?
+  timeout          Int
+  forceDownload    Boolean          @default(false)
+  ignoreValidation Boolean          @default(false)
+  params           Json?            @default("{}")
+  result           Json?
+  logs             Log[]
+  steps            Step[]
 }
 
 model Log {
@@ -197,18 +198,18 @@ model SushiEndpoint {
 }
 
 model SushiCredentials {
-  id              String           @id @default(cuid())
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  institutionId   String
-  endpointId      String
-  customerId      String?
-  requestorId     String?
-  apiKey          String?
-  comment         String?
-  tags            String[]
-  params          Json[]
-  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
-  harvestRequests HarvestRequest[]
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  institutionId String
+  endpointId    String
+  customerId    String?
+  requestorId   String?
+  apiKey        String?
+  comment       String?
+  tags          String[]
+  params        Json[]
+  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  endpoint      SushiEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  harvestJobs   HarvestJob[]
 }

@@ -4,8 +4,6 @@ const { Joi } = require('koa-joi-router');
 const {
   requireJwt,
   requireUser,
-  requireTermsOfUse,
-  requireAnyRole,
   requireAdmin,
 } = require('../../services/auth');
 
@@ -21,7 +19,7 @@ const stringOrArray = Joi.alternatives().try(
   Joi.array().items(Joi.string().trim().min(1)).min(1),
 );
 
-router.use(requireJwt, requireUser, requireTermsOfUse, requireAnyRole(['sushi_form']), requireAdmin);
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.route({
   method: 'GET',
@@ -34,8 +32,6 @@ router.route({
   },
 });
 
-router.use(requireAdmin);
-
 router.route({
   method: 'GET',
   path: '/',
@@ -47,10 +43,10 @@ router.route({
       status: stringOrArray,
       type: stringOrArray,
       harvestId: stringOrArray,
-      sushiId: stringOrArray,
+      credentialsId: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,
-      collapse: Joi.string().trim(),
+      distinct: stringOrArray,
     },
   },
 });

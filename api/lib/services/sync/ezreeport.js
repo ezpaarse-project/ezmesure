@@ -1,7 +1,7 @@
 const config = require('config');
 const { CronJob } = require('cron');
-const ezrAxios = require('./axios');
-const reportingUsers = require('./reportingUsers');
+const ezrAxios = require('../ezreeport/axios');
+const reportingUsers = require('../ezreeport/reportingUsers');
 
 const { appLogger } = require('../logger');
 

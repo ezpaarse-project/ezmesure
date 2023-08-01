@@ -4,7 +4,7 @@
     scrollable
     width="600"
   >
-    <RepositoriesManager :institution-id="institution?.id" @change="hasChanged = true">
+    <SubInstitutionsManager :institution-id="institution?.id" @change="hasChanged = true">
       <template #actions>
         <v-card-actions>
           <v-spacer />
@@ -14,16 +14,16 @@
           </v-btn>
         </v-card-actions>
       </template>
-    </RepositoriesManager>
+    </SubInstitutionsManager>
   </v-dialog>
 </template>
 
 <script>
-import RepositoriesManager from '~/components/RepositoriesManager.vue';
+import SubInstitutionsManager from '~/components/SubInstitutionsManager.vue';
 
 export default {
   components: {
-    RepositoriesManager,
+    SubInstitutionsManager,
   },
   data() {
     return {

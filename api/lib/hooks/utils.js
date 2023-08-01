@@ -15,7 +15,7 @@ const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${spac
  * @param {Repository} repository
  * @param {string} modifier
  */
-const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}.${repository.id}`;
+const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}.${repository.institutionId}`;
 
 const generateRolesOfMembership = async (username, institutionId) => {
   const membership = await prisma.membership.findUnique({
