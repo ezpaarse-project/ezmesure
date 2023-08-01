@@ -9,11 +9,11 @@
     </v-toolbar-title>
     <slot />
 
-    <template #extension="scope">
+    <template v-if="$scopedSlots.extension" #extension="scope">
       <slot name="extension" v-bind="scope" />
     </template>
 
-    <template #img="scope">
+    <template v-if="$scopedSlots.img" #img="scope">
       <slot name="img" v-bind="scope" />
     </template>
   </v-toolbar>
