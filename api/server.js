@@ -18,6 +18,7 @@ const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
 
 const ezreeportSync = require('./lib/services/sync/ezreeport');
+const elasticSync = require('./lib/services/sync/elastic');
 
 const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');

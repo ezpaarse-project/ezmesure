@@ -11,7 +11,8 @@
     "host": "EZMESURE_ELASTIC_HOST",
     "user": "EZMESURE_ELASTIC_USER",
     "password": "ELASTICSEARCH_PASSWORD",
-    "apiVersion": "EZMESURE_ELASTIC_VERSION"
+    "apiVersion": "EZMESURE_ELASTIC_VERSION",
+    "syncSchedule": "EZMESURE_ELASTIC_SYNC_SCHEDULE"
   },
   "kibana": {
     "username": "KIBANA_USERNAME",
