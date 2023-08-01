@@ -514,6 +514,11 @@ exports.addInstitutionMember = async (ctx) => {
     where: {
       username_institutionId: { username, institutionId },
     },
+    include: {
+      repositoryPermissions: true,
+      spacePermissions: true,
+      user: true,
+    },
     create: membershipData,
     update: membershipData,
   });

@@ -1,8 +1,9 @@
 <template>
   <v-menu
-    v-model="showMemberMenu"
+    :value="value"
     :close-on-content-click="false"
     :nudge-width="250"
+    @input="$emit('input', $event)"
   >
     <template #activator="{ on, attrs }">
       <v-btn
@@ -59,13 +60,7 @@
             </v-list-item-title>
           </v-list-item-content>
 
-          <v-list-item-action>
-            <v-btn small color="primary" @click="select(user)">
-              <v-icon>
-                mdi-account-plus
-              </v-icon>
-            </v-btn>
-          </v-list-item-action>
+          <slot name="action" :user="user" :close-menu="closeMenu" />
         </v-list-item>
       </v-list>
 
@@ -87,6 +82,10 @@ import debounce from 'lodash.debounce';
 
 export default {
   props: {
+    value: {
+      type: Boolean,
+      default: () => false,
+    },
     institutionId: {
       type: String,
       default: () => '',
@@ -94,7 +93,6 @@ export default {
   },
   data() {
     return {
-      showMemberMenu: false,
       loading: false,
       failedToSearch: false,
       hasSearched: false,
@@ -119,7 +117,7 @@ export default {
         this.doSearch(value);
       }
     },
-    showMemberMenu(isVisible, wasVisible) {
+    value(isVisible, wasVisible) {
       if (isVisible && !wasVisible) {
         this.resetForm();
       }
@@ -127,12 +125,7 @@ export default {
   },
   methods: {
     closeMenu() {
-      this.showMemberMenu = false;
-    },
-
-    select(user) {
-      this.$emit('select', user);
-      this.closeMenu();
+      this.$emit('input', false);
     },
 
     resetForm() {
