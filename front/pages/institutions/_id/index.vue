@@ -1,35 +1,74 @@
 <template>
   <section>
-    <ToolBar :title="$t('institutions.institution.title')">
+    <ToolBar :title="institution?.name">
       <v-spacer />
 
-      <template v-if="institution && canEdit">
-        <template v-if="isAdmin">
-          <v-btn color="primary" text :to="`/institutions/${institutionId}/sushi`">
-            <v-icon left>
-              mdi-key
-            </v-icon>
-            {{ $t('institutions.sushi.credentials') }}
-          </v-btn>
-          <v-btn color="primary" text :to="`/institutions/${institutionId}/members`">
-            <v-icon left>
-              mdi-account-multiple
-            </v-icon>
-            {{ $t('institutions.members.members') }}
-          </v-btn>
-        </template>
+      <v-btn
+        v-if="canReadSushi"
+        color="primary"
+        text
+        :to="`/institutions/${institutionId}/sushi`"
+      >
+        <v-icon left>
+          mdi-key
+        </v-icon>
+        {{ $t('institutions.sushi.credentials') }}
+      </v-btn>
 
-        <v-btn color="primary" text @click="editInstitution">
-          <v-icon left>
-            mdi-pencil
-          </v-icon>
-          {{ $t('modify') }}
-        </v-btn>
-      </template>
+      <v-btn
+        v-if="canReadMembers"
+        color="primary"
+        text
+        :to="`/institutions/${institutionId}/members`"
+      >
+        <v-icon left>
+          mdi-account-multiple
+        </v-icon>
+        {{ $t('institutions.members.members') }}
+      </v-btn>
+
+      <v-btn
+        v-if="canEditInstitution"
+        color="primary"
+        text
+        @click="editInstitution"
+      >
+        <v-icon left>
+          mdi-pencil
+        </v-icon>
+        {{ $t('modify') }}
+      </v-btn>
     </ToolBar>
 
     <v-card-text v-if="institution">
-      <InstitutionCard :institution="institution" />
+      <v-container style="max-width: 1400px;">
+        <v-row>
+          <v-col cols="12" md="6" lg="5">
+            <InstitutionCard :institution="institution" />
+          </v-col>
+          <v-col cols="12" md="6" lg="7">
+            <v-card>
+              <SubInstitutionsManager
+                :institution-id="institution?.id"
+                flat
+                @change="hasChanged = true"
+              />
+              <v-divider />
+              <RepositoriesManager
+                :institution-id="institution?.id"
+                flat
+                @change="hasChanged = true"
+              />
+              <v-divider />
+              <SpacesManager
+                :institution-id="institution?.id"
+                flat
+                @change="hasChanged = true"
+              />
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-text>
 
     <v-card-text v-else-if="failedToFetch">
@@ -39,23 +78,6 @@
       >
         {{ $t('institutions.unableToRetriveInformations') }}
       </v-alert>
-    </v-card-text>
-
-    <v-card-text v-else-if="selfInstitution">
-      <v-card class="mx-auto w-600">
-        <v-card-text class="text-center">
-          <p class="body-1">
-            {{ $t('institutions.notMember') }}
-          </p>
-
-          <v-btn
-            color="primary"
-            @click="createInstitution"
-          >
-            {{ $t('institutions.declareMyInstitution') }}
-          </v-btn>
-        </v-card-text>
-      </v-card>
     </v-card-text>
 
     <v-card-text v-else>
@@ -80,6 +102,9 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionCard from '~/components/InstitutionCard.vue';
+import SubInstitutionsManager from '~/components/SubInstitutionsManager.vue';
+import RepositoriesManager from '~/components/RepositoriesManager.vue';
+import SpacesManager from '~/components/SpacesManager.vue';
 
 const defaultLogo = require('@/static/images/logo-etab.png');
 
@@ -90,6 +115,9 @@ export default {
     ToolBar,
     InstitutionForm,
     InstitutionCard,
+    SubInstitutionsManager,
+    RepositoriesManager,
+    SpacesManager,
   },
   async asyncData({
     $axios,
@@ -116,7 +144,6 @@ export default {
       loading: false,
       institution,
       failedToFetch,
-      selfInstitution: params.id === 'self',
     };
   },
   computed: {
@@ -125,23 +152,25 @@ export default {
       return Array.isArray(roles) ? roles : [];
     },
     isAdmin() {
-      return this.userRoles.some((role) => ['admin', 'superuser'].includes(role));
+      return this.$auth?.user?.isAdmin;
+    },
+    membership() {
+      return this.$auth?.user?.memberships?.find((m) => (m.institutionId === this.institution?.id));
     },
     isMember() {
-      if (!this.institution?.role) { return false; }
-
-      const roles = new Set([this.institution.role, `${this.institution.role}_read_only`]);
-      return this.userRoles.some((role) => roles.has(role));
+      return !!this.membership;
     },
-    isContact() {
-      return this.isMember && this.userRoles.some((role) => ['doc_contact', 'tech_contact'].includes(role));
+    permissions() {
+      return new Set(this.membership?.permissions || []);
     },
-    isCreator() {
-      const creator = this.institution?.creator;
-      return creator && (creator === this.$auth?.user?.username);
+    canEditInstitution() {
+      return this.isAdmin || this.permissions.has('institution:write');
     },
-    canEdit() {
-      return this.isAdmin || this.isContact || this.isCreator;
+    canReadSushi() {
+      return this.isAdmin || this.permissions.has('sushi:read');
+    },
+    canReadMembers() {
+      return this.isAdmin || this.permissions.has('memberships:read');
     },
   },
   methods: {
@@ -149,9 +178,6 @@ export default {
       if (this.institution) {
         this.$refs.institutionForm.editInstitution(this.institution);
       }
-    },
-    createInstitution() {
-      this.$refs.institutionForm.createInstitution();
     },
     async refreshInstitution() {
       try {
