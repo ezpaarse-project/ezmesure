@@ -71,7 +71,7 @@ exports.createUser = async function createUser(user) {
 exports.upsertUser = async function upsertUser(user) {
   let { password } = user;
 
-  const userExist = await this.getUser(user.username);
+  const userExist = await exports.getUserByUsername(user.username);
   if (!userExist) {
     password = await randomString();
   }
