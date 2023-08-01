@@ -60,6 +60,7 @@ exports.createUser = async function createUser(user) {
 /**
  * Upsert a user.
  *
+ * @param {Object} user - The user.
  * @param {string} user.username - Username of user.
  * @param {string | undefined} user.email - Email of user.
  * @param {string | undefined} user.fullName - Fullname of user.
