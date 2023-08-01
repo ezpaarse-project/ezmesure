@@ -31,6 +31,19 @@ async function createInstitutionAsAdmin(data) {
   return res?.data?.id;
 }
 
+async function validateInstitutionAsAdmin(id) {
+  const token = await getAdminToken();
+
+  return ezmesure({
+    method: 'PUT',
+    url: `/institutions/${id}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: true,
+  });
+}
+
 async function deleteInstitutionAsAdmin(id) {
   const token = await getAdminToken();
 
@@ -94,6 +107,7 @@ module.exports = {
   createInstitution,
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
+  validateInstitutionAsAdmin,
   addMemberShipsAsAdmin,
   addMembershipsToUserAsAdmin,
   deleteMembershipsToUserAsAdmin,
