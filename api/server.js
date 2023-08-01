@@ -19,6 +19,7 @@ const elastic = require('./lib/services/elastic');
 
 const ezreeportSync = require('./lib/services/sync/ezreeport');
 const elasticSync = require('./lib/services/sync/elastic');
+const kibanaSync = require('./lib/services/sync/kibana');
 
 const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
@@ -134,7 +135,9 @@ app.use(mount('/', controller));
 function start() {
   notifications.start(appLogger);
   opendata.startCron(appLogger);
-  ezreeport.startCron();
+  elasticSync.startCron();
+  kibanaSync.startCron();
+  ezreeportSync.startCron();
   cronMetrics.start();
 
   // Change the status of tasks that was running when the server went down

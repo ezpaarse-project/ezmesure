@@ -18,7 +18,8 @@
     "username": "KIBANA_USERNAME",
     "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
-    "host": "EZMESURE_KIBANA_HOST"
+    "host": "EZMESURE_KIBANA_HOST",
+    "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },
   "redis": {
     "host": "EZMESURE_REDIS_HOST",

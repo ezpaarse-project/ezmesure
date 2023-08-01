@@ -21,6 +21,7 @@ module.exports = {
     password: 'changeme',
     port: 5601,
     host: 'localhost',
+    syncSchedule: '0 0 0 * * *',
   },
   redis: {
     host: 'localhost',
