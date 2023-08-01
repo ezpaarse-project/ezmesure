@@ -14,12 +14,14 @@ module.exports = {
     host: 'localhost',
     user: 'elastic',
     password: 'changeme',
+    syncSchedule: '0 0 0 * * *',
   },
   kibana: {
     username: 'kibana_system',
     password: 'changeme',
     port: 5601,
     host: 'localhost',
+    syncSchedule: '0 0 0 * * *',
   },
   redis: {
     host: 'localhost',
