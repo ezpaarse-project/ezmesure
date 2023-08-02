@@ -68,6 +68,9 @@ errors:
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
+  member:
+    notFound: Membre introuvable
+
   members:
     alreadyMember: "L'utilisateur appartient à un autre établissement : %s"
     cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
