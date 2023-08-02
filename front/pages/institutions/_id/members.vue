@@ -198,11 +198,8 @@ export default {
     canEditMemberships() {
       return this.isAdmin || this.userPermissions.has('memberships:write');
     },
-    canRevokeMemberships() {
-      return this.isAdmin || this.userPermissions.has('memberships:revoke');
-    },
     isReadonly() {
-      return !this.isAdmin && !this.canEditMemberships && !this.canRevokeMemberships;
+      return !this.isAdmin && !this.canEditMemberships;
     },
     actions() {
       return [
@@ -216,7 +213,7 @@ export default {
           icon: 'mdi-account-off',
           label: this.$t('revoke'),
           callback: this.removeMember,
-          disabled: !this.canRevokeMemberships,
+          disabled: !this.canEditMemberships,
         },
       ];
     },

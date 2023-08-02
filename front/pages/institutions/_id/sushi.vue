@@ -98,7 +98,7 @@
       </template>
 
       <v-list>
-        <v-list-item :disabled="deleting || locked || !canDelete" @click="deleteSushiItems">
+        <v-list-item :disabled="deleting || locked || !canEdit" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
@@ -393,9 +393,6 @@ export default {
     canEdit() {
       return this.isAdmin || this.userPermissions.has('sushi:write');
     },
-    canDelete() {
-      return this.isAdmin || this.userPermissions.has('sushi:delete');
-    },
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
       return Array.isArray(messages) && messages.length >= 1;
@@ -474,7 +471,7 @@ export default {
           icon: 'mdi-delete',
           label: this.$t('delete'),
           callback: this.deleteSushiItem,
-          disabled: this.deleting || !this.canDelete,
+          disabled: this.deleting || !this.canEdit,
         },
         {
           divider: true,

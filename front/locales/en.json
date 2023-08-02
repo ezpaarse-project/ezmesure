@@ -325,18 +325,6 @@
         "institution": "Institution card",
         "memberships": "Members",
         "sushi": "SUSHI credentials"
-      },
-      "permissionLabels": {
-        "institution:read": "Read",
-        "institution:write": "Update",
-        "memberships:read": "Read",
-        "memberships:write": "Add and manage permissions",
-        "memberships:revoke": "Revocation",
-        "sushi:read": "Read",
-        "sushi:write": "Add and update",
-        "sushi:delete": "Delete",
-        "reporting:read": "View reports",
-        "reporting:write": "Create and update reports"
       }
     },
     "sushi": {
