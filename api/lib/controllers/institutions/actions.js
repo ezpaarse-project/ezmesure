@@ -422,6 +422,10 @@ exports.getInstitutionMember = async (ctx) => {
     include,
   });
 
+  if (!membership) {
+    ctx.throw(404, ctx.$t('errors.member.notFound'));
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
 
@@ -513,6 +517,11 @@ exports.addInstitutionMember = async (ctx) => {
   const newMembership = await membershipsService.upsert({
     where: {
       username_institutionId: { username, institutionId },
+    },
+    include: {
+      repositoryPermissions: true,
+      spacePermissions: true,
+      user: true,
     },
     create: membershipData,
     update: membershipData,

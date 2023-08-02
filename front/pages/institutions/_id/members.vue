@@ -12,9 +12,25 @@
 
       <MemberSearch
         v-if="canEditMemberships"
+        v-model="showMemberSearch"
         :institution-id="institutionId"
-        @select="(user) => updateMember({ user })"
-      />
+      >
+        <template #action="{ user }">
+          <v-list-item-action>
+            <v-btn
+              :loading="addingUser === user?.username"
+              :disabled="addingUser && addingUser !== user?.username"
+              small
+              color="primary"
+              @click="addMember(user)"
+            >
+              <v-icon>
+                mdi-account-plus
+              </v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </template>
+      </MemberSearch>
     </ToolBar>
 
     <v-data-table
@@ -153,9 +169,11 @@ export default {
     }
 
     return {
+      showMemberSearch: false,
       refreshing: false,
       institution,
       members: [],
+      addingUser: null,
     };
   },
   computed: {
@@ -180,11 +198,8 @@ export default {
     canEditMemberships() {
       return this.isAdmin || this.userPermissions.has('memberships:write');
     },
-    canRevokeMemberships() {
-      return this.isAdmin || this.userPermissions.has('memberships:revoke');
-    },
     isReadonly() {
-      return !this.isAdmin && !this.canEditMemberships && !this.canRevokeMemberships;
+      return !this.isAdmin && !this.canEditMemberships;
     },
     actions() {
       return [
@@ -198,7 +213,7 @@ export default {
           icon: 'mdi-account-off',
           label: this.$t('revoke'),
           callback: this.removeMember,
-          disabled: !this.canRevokeMemberships,
+          disabled: !this.canEditMemberships,
         },
       ];
     },
@@ -255,6 +270,27 @@ export default {
       this.refreshing = false;
     },
 
+    async addMember(user) {
+      if (!user?.username) { return; }
+
+      let member = this.members.find((m) => m?.username === user?.username);
+
+      if (!member) {
+        this.addingUser = user.username;
+        try {
+          member = await this.$axios.$put(`/institutions/${this.institution.id}/memberships/${user.username}`, {});
+          this.members.push(member);
+        } catch (e) {
+          this.$store.dispatch('snacks/error', this.$t('institutions.members.cannotAddMember'));
+        }
+        this.addingUser = null;
+      }
+
+      if (member) {
+        this.showMemberSearch = false;
+        this.updateMember(member);
+      }
+    },
     updateMember(member) {
       this.$refs.updateDialog.updateMember(member);
     },

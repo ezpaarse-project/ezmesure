@@ -287,6 +287,7 @@
       "documentaryCorrespondent": "Correspondant documentaire",
       "creator": "Créateur",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
+      "cannotAddMember": "Impossible d'ajouter le membre",
       "name": "Nom",
       "username": "Identifiant",
       "correspondent": "Correspondant",
@@ -325,18 +326,6 @@
         "memberships": "Membres",
         "sushi": "Identifiants SUSHI",
         "reporting": "Reporting"
-      },
-      "permissionLabels": {
-        "institution:read": "Lecture",
-        "institution:write": "Modification",
-        "memberships:read": "Lecture",
-        "memberships:write": "Ajout et gestion des permissions",
-        "memberships:revoke": "Révocation",
-        "sushi:read": "Lecture",
-        "sushi:write": "Ajout et modification",
-        "sushi:delete": "Suppression",
-        "reporting:read": "Consultation des rapports",
-        "reporting:write": "Création et modification de rapports"
       }
     },
     "sushi": {
