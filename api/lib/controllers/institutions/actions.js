@@ -422,6 +422,10 @@ exports.getInstitutionMember = async (ctx) => {
     include,
   });
 
+  if (!membership) {
+    ctx.throw(404, ctx.$t('errors.member.notFound'));
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
 
