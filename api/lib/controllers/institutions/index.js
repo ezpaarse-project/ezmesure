@@ -179,6 +179,9 @@ router.route({
       institutionId: Joi.string().trim().required(),
       username: Joi.string().trim().required(),
     },
+    query: Joi.object({
+      include: Joi.array().single().items(Joi.string().valid(...membershipIncludableFields)),
+    }).rename('include[]', 'include'),
   },
 });
 
