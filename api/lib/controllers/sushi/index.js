@@ -51,6 +51,7 @@ const blockIfLocked = (ctx, next) => {
   if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.sushi.managementLocked'), { detail: lockReason });
   }
+
   return next();
 };
 
@@ -306,7 +307,7 @@ router.route({
   method: 'DELETE',
   path: '/:sushiId',
   handler: [
-    commonHandlers(FEATURES.sushi.delete),
+    commonHandlers(FEATURES.sushi.write),
     deleteOne,
   ],
   validate: {

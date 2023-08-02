@@ -157,7 +157,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
-      it('Should get HTTP status 403', async () => {
+      it('Should delete membership', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -166,26 +166,19 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        expect(res).toHaveProperty('status', 200);
       });
 
-      it('Should get institution [Test] with its members with no change', async () => {
+      it('Should get HTTP status 404', async () => {
         const res = await ezmesure({
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships`,
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 200);
-
-        const [membership] = res.data.filter((user) => user.username === userTest.username);
-        expect(membership).toHaveProperty('username', userTest.username);
-        expect(membership).toHaveProperty('institutionId', institutionId);
-        expect(membership).toHaveProperty('roles', []);
-        expect(membership).toHaveProperty('permissions', userTestPermissions);
-        expect(membership).toHaveProperty('locked', false);
+        expect(res).toHaveProperty('status', 404);
       });
 
       it('Should get user [user.test] with its institutions', async () => {
@@ -204,7 +197,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
-      it('Should get HTTP status 403', async () => {
+      it('Should delete membership', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -213,26 +206,19 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        expect(res).toHaveProperty('status', 200);
       });
 
-      it('Should get institution [Test] with its members with no change', async () => {
+      it('Should get HTTP status 404', async () => {
         const res = await ezmesure({
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships`,
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 200);
-
-        const [membership] = res.data.filter((user) => user.username === userTest.username);
-        expect(membership).toHaveProperty('username', userTest.username);
-        expect(membership).toHaveProperty('institutionId', institutionId);
-        expect(membership).toHaveProperty('roles', []);
-        expect(membership).toHaveProperty('permissions', userTestPermissions);
-        expect(membership).toHaveProperty('locked', false);
+        expect(res).toHaveProperty('status', 404);
       });
 
       it('Should get user [user.test] with its institutions', async () => {
@@ -250,7 +236,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         await addMembershipsToUserAsAdmin(institutionId, userTest.username, userTestPermissions);
       });
 
-      it('Should get HTTP status 403', async () => {
+      it('Should delete membership', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -259,26 +245,19 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        expect(res).toHaveProperty('status', 200);
       });
 
-      it('Should get institution [Test] with its members with no change', async () => {
+      it('Should get HTTP status 404', async () => {
         const res = await ezmesure({
           method: 'GET',
-          url: `/institutions/${institutionId}/memberships`,
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 200);
-
-        const [membership] = res.data.filter((user) => user.username === userTest.username);
-        expect(membership).toHaveProperty('username', userTest.username);
-        expect(membership).toHaveProperty('institutionId', institutionId);
-        expect(membership).toHaveProperty('roles', []);
-        expect(membership).toHaveProperty('permissions', userTestPermissions);
-        expect(membership).toHaveProperty('locked', false);
+        expect(res).toHaveProperty('status', 404);
       });
 
       it('Should get user [user.test] with its institutions', async () => {

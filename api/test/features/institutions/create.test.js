@@ -139,7 +139,6 @@ describe('[institutions]: Test create features', () => {
           'institution:write',
           'memberships:read',
           'memberships:write',
-          'memberships:revoke',
           'sushi:read',
           'sushi:write',
           'sushi:delete',

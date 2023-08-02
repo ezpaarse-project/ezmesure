@@ -36,11 +36,11 @@ async function validateInstitutionAsAdmin(id) {
 
   return ezmesure({
     method: 'PUT',
-    url: `/institutions/${id}`,
+    url: `/institutions/${id}/validated`,
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    data: true,
+    data: { value: true },
   });
 }
 
