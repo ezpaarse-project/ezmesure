@@ -2838,6 +2838,67 @@
           "description": "Username of the member"
         }
       ],
+      "get": {
+        "summary": "Get the membership of a user for an institution",
+        "tags": [
+          "Institutions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "spacePermissions",
+                  "repositoryPermissions"
+                ]
+              }
+            },
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "Username of the member"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id-members-username",
+        "description": "Get the membership of a user for an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "put": {
         "summary": "Create or a update a user membership for an institution",
         "tags": [
