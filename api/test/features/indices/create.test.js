@@ -67,7 +67,31 @@ describe('[indices]: Test create features', () => {
       });
     });
   });
+  describe('With random token', () => {
+    describe('PUT /indices/<id> - Create new index', () => {
+      const indexName = 'test';
 
+      it('Should get HTTP status 401', async () => {
+        let res;
+        try {
+          res = await ezmesure({
+            method: 'PUT',
+            url: `/indices/${indexName}`,
+            headers: {
+              Authorization: 'Bearer: random',
+            },
+          });
+        } catch (err) {
+          res = err?.response;
+        }
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteIndexAsAdmin(indexName);
+      });
+    });
+  });
   describe('Without token', () => {
     describe('PUT /indices/<id> - Create new index', () => {
       const indexName = 'test';

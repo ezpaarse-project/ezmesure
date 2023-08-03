@@ -12,7 +12,6 @@ async function createInstitution(data, user) {
     },
     data,
   });
-
   return res?.data?.id;
 }
 

@@ -1,6 +1,6 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createInstitutionAsAdmin, createInstitution, deleteInstitutionAsAdmin } = require('../../setup/institutions');
+const { createInstitutionAsAdmin, createInstitution, validateInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
 const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 const { createRepositoryAsAdmin } = require('../../setup/repositories');
@@ -19,7 +19,6 @@ describe('[repositories]: Test delete features', () => {
 
     describe('Institution created by admin', () => {
       let institutionId;
-      let repositoryId;
       let repositoryConfig;
 
       beforeAll(async () => {
@@ -29,19 +28,47 @@ describe('[repositories]: Test delete features', () => {
           institutionId,
           pattern: 'publisher-*',
         };
-        repositoryId = await createRepositoryAsAdmin(repositoryConfig);
       });
-      describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
-        it('Should delete repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
+      describe('Unvalidated institution', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+        });
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          it('Should delete repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+            });
 
-          expect(res).toHaveProperty('status', 204);
+            expect(res).toHaveProperty('status', 204);
+          });
+        });
+      });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+          it('Should delete repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+            });
+
+            expect(res).toHaveProperty('status', 204);
+          });
         });
       });
       afterAll(async () => {
@@ -63,30 +90,64 @@ describe('[repositories]: Test delete features', () => {
       beforeAll(async () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
-      describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
-        const repositoryConfig = {
-          type: 'COUNTER 5',
-          institutionId,
-          pattern: 'publisher-*',
-        };
-        let repositoryId;
 
-        beforeAll(async () => {
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+          let repositoryId;
 
-        it('Should get HTTP status 403', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
           });
 
-          expect(res).toHaveProperty('status', 403);
+          it('Should get HTTP status 403', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(res).toHaveProperty('status', 403);
+          });
         });
       });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+          let repositoryId;
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 403', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(res).toHaveProperty('status', 403);
+          });
+        });
+      });
+
       afterAll(async () => {
         await deleteInstitutionAsAdmin(institutionId);
       });
@@ -98,28 +159,61 @@ describe('[repositories]: Test delete features', () => {
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
       });
-      describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryId;
-        const repositoryConfig = {
-          type: 'COUNTER 5',
-          institutionId,
-          pattern: 'publisher-*',
-        };
 
-        beforeAll(async () => {
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
 
-        it('Should get HTTP status 403', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
           });
 
-          expect(res).toHaveProperty('status', 403);
+          it('Should get HTTP status 403', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(res).toHaveProperty('status', 403);
+          });
+        });
+      });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Delete repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 403', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(res).toHaveProperty('status', 403);
+          });
         });
       });
       afterAll(async () => {
@@ -130,7 +224,7 @@ describe('[repositories]: Test delete features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
-  describe('Without user', () => {
+  describe('With random token', () => {
     describe('Institution created by user', () => {
       let institutionId;
       let userTest;
@@ -139,27 +233,64 @@ describe('[repositories]: Test delete features', () => {
         userTest = await createDefaultActivatedUserAsAdmin();
         institutionId = await createInstitution(institutionTest, userTest);
       });
-      describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryId;
-        const repositoryConfig = {
-          type: 'COUNTER 5',
-          institutionId,
-          pattern: 'publisher-*',
-        };
 
-        beforeAll(async () => {
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
           });
 
-          expect(res).toHaveProperty('status', 401);
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
         });
       });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
       afterAll(async () => {
         await deleteInstitutionAsAdmin(institutionId);
         await deleteUserAsAdmin(userTest.username);
@@ -172,27 +303,194 @@ describe('[repositories]: Test delete features', () => {
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
       });
-      describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryId;
-        const repositoryConfig = {
-          type: 'COUNTER 5',
-          institutionId,
-          pattern: 'publisher-*',
-        };
 
-        beforeAll(async () => {
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+  
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
           });
-
-          expect(res).toHaveProperty('status', 401);
+  
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+  
+            expect(res).toHaveProperty('status', 401);
+          });
         });
       });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+  
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+  
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+  
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+      });
+    });
+  });
+  describe('Without user', () => {
+    describe('Institution created by user', () => {
+      let institutionId;
+      let userTest;
+
+      beforeAll(async () => {
+        userTest = await createDefaultActivatedUserAsAdmin();
+        institutionId = await createInstitution(institutionTest, userTest);
+      });
+
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+        await deleteUserAsAdmin(userTest.username);
+      });
+    });
+
+    describe('Institution created by admin', () => {
+      let institutionId;
+
+      beforeAll(async () => {
+        institutionId = await createInstitutionAsAdmin(institutionTest);
+      });
+
+      describe('Unvalidated institution', () => {
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('DELETE /repositories/<id> - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+          let repositoryId;
+          const repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
+
+          beforeAll(async () => {
+            repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}`,
+            });
+
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+      });
+
       afterAll(async () => {
         await deleteInstitutionAsAdmin(institutionId);
       });

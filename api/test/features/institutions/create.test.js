@@ -70,7 +70,6 @@ describe('[institutions]: Test create features', () => {
       });
     });
   });
-
   describe('As user', () => {
     let userTest;
     let userToken;
@@ -86,10 +85,10 @@ describe('[institutions]: Test create features', () => {
         const res = await ezmesure({
           method: 'POST',
           url: '/institutions',
+          data: institutionTest,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: institutionTest,
         });
 
         institutionId = res?.data?.id;
@@ -141,7 +140,6 @@ describe('[institutions]: Test create features', () => {
           'memberships:write',
           'sushi:read',
           'sushi:write',
-          'sushi:delete',
           'reporting:read',
           'reporting:write',
         ];
@@ -160,7 +158,40 @@ describe('[institutions]: Test create features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
+  describe('With random token', () => {
+    describe('POST /institutions - Create new institution', () => {
+      let institutionId;
 
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'POST',
+          url: '/institutions',
+          data: institutionTest,
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      it('Should get HTTP status 404', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+
+        expect(res).toHaveProperty('status', 404);
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+      });
+    });
+  });
   describe('Without token', () => {
     describe('POST /institutions - Create new institution', () => {
       let institutionId;

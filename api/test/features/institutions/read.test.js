@@ -112,7 +112,6 @@ describe('[institutions]: Test read features', () => {
       });
     });
   });
-
   describe('As user', () => {
     let userToken;
     let userTest;
@@ -258,7 +257,51 @@ describe('[institutions]: Test read features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
+  describe('With random token', () => {
+    describe('GET /institutions - Get institutions', () => {
+      let institutionId;
+      beforeAll(async () => {
+        institutionId = await createInstitutionAsAdmin(institutionTest);
+      });
 
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: '/institutions',
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+      });
+    });
+
+    describe('GET /institutions/<id> - Get institution [Test]', () => {
+      let institutionId;
+
+      beforeAll(async () => {
+        institutionId = await createInstitutionAsAdmin(institutionTest);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}`,
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+      });
+    });
+  });
   describe('Without token', () => {
     describe('GET /institutions - Get institutions', () => {
       let institutionId;

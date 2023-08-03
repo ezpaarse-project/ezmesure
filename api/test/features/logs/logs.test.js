@@ -112,4 +112,108 @@ describe('[logs]: Test insert features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
+  describe('With random token', () => {
+    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
+      const indexName = 'index-test';
+
+      beforeAll(async () => {
+        await createIndexAsAdmin(indexName);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+
+        const res = await ezmesure({
+          method: 'POST',
+          url: '/logs/index-test',
+          data: await fs.readFile(pathFile, 'utf-8'),
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteIndexAsAdmin('index-test');
+      });
+    });
+
+    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
+      const indexName = 'index-test';
+
+      beforeAll(async () => {
+        await createIndexAsAdmin(indexName);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+
+        const res = await ezmesure({
+          method: 'POST',
+          url: '/logs/index-test',
+          data: await fs.readFile(pathFile, 'utf-8'),
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteIndexAsAdmin('index-test');
+      });
+    });
+  });
+  describe('Without token', () => {
+    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
+      const indexName = 'index-test';
+
+      beforeAll(async () => {
+        await createIndexAsAdmin(indexName);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+
+        const res = await ezmesure({
+          method: 'POST',
+          url: '/logs/index-test',
+          data: await fs.readFile(pathFile, 'utf-8'),
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteIndexAsAdmin('index-test');
+      });
+    });
+
+    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
+      const indexName = 'index-test';
+
+      beforeAll(async () => {
+        await createIndexAsAdmin(indexName);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+
+        const res = await ezmesure({
+          method: 'POST',
+          url: '/logs/index-test',
+          data: await fs.readFile(pathFile, 'utf-8'),
+        });
+
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      afterAll(async () => {
+        await deleteIndexAsAdmin('index-test');
+      });
+    });
+  });
 });

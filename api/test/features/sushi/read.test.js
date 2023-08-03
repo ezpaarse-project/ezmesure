@@ -14,11 +14,14 @@ const {
   deleteUserAsAdmin,
   activateUser,
 } = require('../../setup/users');
+const {
+  createSushiAsAdmin,
+  deleteSushiAsAdmin,
+} = require('../../setup/sushi');
 const { getToken, getAdminToken } = require('../../setup/login');
 const { createSushiEndpointAsAdmin, deleteSushiEndpointAsAdmin } = require('../../setup/sushi-endpoint');
-const { deleteSushiAsAdmin } = require('../../setup/sushi');
 
-describe('[sushi]: Test create sushi features', () => {
+describe('[sushi]: Test read sushi features', () => {
   const institutionTest = {
     name: 'Test',
     namespace: 'test',
@@ -52,14 +55,13 @@ describe('[sushi]: Test create sushi features', () => {
     params: [],
   };
 
-  let adminToken;
   let endpointId;
+  let adminToken;
 
   beforeAll(async () => {
     adminToken = await getAdminToken();
     endpointId = await createSushiEndpointAsAdmin(sushiEndpointTest);
   });
-
   describe('As admin', () => {
     describe('Institution created by admin', () => {
       let institutionId;
@@ -68,24 +70,12 @@ describe('[sushi]: Test create sushi features', () => {
       });
 
       describe('Unvalidated institution', () => {
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
-          });
-
-          it('Should create sushi', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: sushiTest,
-            });
-            expect(res).toHaveProperty('status', 201);
-            sushiId = res?.data?.id;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
           it('Should get sushi', async () => {
@@ -101,7 +91,7 @@ describe('[sushi]: Test create sushi features', () => {
             const sushi = res?.data;
             expect(sushi).toHaveProperty('id', sushiId);
             expect(sushi?.createdAt).not.toBeNull();
-            expect(sushi?.updatedAt).not.toBeNull();
+            expect(sushi?.GetdAt).not.toBeNull();
             expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
             expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
             expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -123,24 +113,12 @@ describe('[sushi]: Test create sushi features', () => {
         beforeAll(async () => {
           await validateInstitutionAsAdmin(institutionId);
         });
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
-          });
-
-          it('Should create sushi', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: sushiTest,
-            });
-            expect(res).toHaveProperty('status', 201);
-            sushiId = res?.data?.id;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
           it('Should get sushi', async () => {
@@ -156,7 +134,7 @@ describe('[sushi]: Test create sushi features', () => {
             const sushi = res?.data;
             expect(sushi).toHaveProperty('id', sushiId);
             expect(sushi?.createdAt).not.toBeNull();
-            expect(sushi?.updatedAt).not.toBeNull();
+            expect(sushi?.GetdAt).not.toBeNull();
             expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
             expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
             expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -187,24 +165,12 @@ describe('[sushi]: Test create sushi features', () => {
       });
 
       describe('Unvalidated institution', () => {
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
-          });
-
-          it('Should create sushi', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: sushiTest,
-            });
-            expect(res).toHaveProperty('status', 201);
-            sushiId = res?.data?.id;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
           it('Should get sushi', async () => {
@@ -220,7 +186,7 @@ describe('[sushi]: Test create sushi features', () => {
             const sushi = res?.data;
             expect(sushi).toHaveProperty('id', sushiId);
             expect(sushi?.createdAt).not.toBeNull();
-            expect(sushi?.updatedAt).not.toBeNull();
+            expect(sushi?.GetdAt).not.toBeNull();
             expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
             expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
             expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -242,24 +208,12 @@ describe('[sushi]: Test create sushi features', () => {
         beforeAll(async () => {
           await validateInstitutionAsAdmin(institutionId);
         });
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
-          });
-
-          it('Should create sushi', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: sushiTest,
-            });
-            expect(res).toHaveProperty('status', 201);
-            sushiId = res?.data?.id;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
           it('Should get sushi', async () => {
@@ -275,7 +229,7 @@ describe('[sushi]: Test create sushi features', () => {
             const sushi = res?.data;
             expect(sushi).toHaveProperty('id', sushiId);
             expect(sushi?.createdAt).not.toBeNull();
-            expect(sushi?.updatedAt).not.toBeNull();
+            expect(sushi?.GetdAt).not.toBeNull();
             expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
             expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
             expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -314,20 +268,21 @@ describe('[sushi]: Test create sushi features', () => {
       });
 
       describe('Unvalidated institution', () => {
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
-          it('Should HTTP status 403', async () => {
+          it('Should get HTTP status 403', async () => {
             const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
             });
             expect(res).toHaveProperty('status', 403);
           });
@@ -338,20 +293,21 @@ describe('[sushi]: Test create sushi features', () => {
         beforeAll(async () => {
           await validateInstitutionAsAdmin(institutionId);
         });
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
           });
 
-          it('Should HTTP status 403', async () => {
+          it('Should get HTTP status 403', async () => {
             const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
               headers: {
                 Authorization: `Bearer ${userToken}`,
               },
-              data: sushiTest,
             });
             expect(res).toHaveProperty('status', 403);
           });
@@ -374,24 +330,14 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['sushi:write', 'sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
             let sushiId;
             beforeAll(async () => {
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = institutionId;
-            });
-
-            it('Should create sushi', async () => {
-              const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-                data: sushiTest,
-              });
-              expect(res).toHaveProperty('status', 201);
-              sushiId = res?.data?.id;
+              sushiId = await createSushiAsAdmin(sushiTest);
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
             });
 
             it('Should get sushi', async () => {
@@ -407,7 +353,7 @@ describe('[sushi]: Test create sushi features', () => {
               const sushi = res?.data;
               expect(sushi).toHaveProperty('id', sushiId);
               expect(sushi?.createdAt).not.toBeNull();
-              expect(sushi?.updatedAt).not.toBeNull();
+              expect(sushi?.GetdAt).not.toBeNull();
               expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
               expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
               expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -432,20 +378,69 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+            });
+
+            it('Should get sushi', async () => {
+              const res = await ezmesure({
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              });
+              expect(res).toHaveProperty('status', 200);
+
+              const sushi = res?.data;
+              expect(sushi).toHaveProperty('id', sushiId);
+              expect(sushi?.createdAt).not.toBeNull();
+              expect(sushi?.GetdAt).not.toBeNull();
+              expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
+              expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
+              expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
+              expect(sushi).toHaveProperty('requestorId', sushiTest?.requestorId);
+              expect(sushi).toHaveProperty('apiKey', sushiTest?.apiKey);
+              expect(sushi).toHaveProperty('comment', sushiTest?.comment);
+              expect(sushi).toHaveProperty('tags', sushiTest?.tags);
+              expect(sushi).toHaveProperty('params', sushiTest?.params);
+              expect(sushi?.endpoint).not.toBeNull();
+            });
+          });
+
+          afterAll(async () => {
+            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+          });
+        });
+
+        describe('User with memberships []', () => {
+          beforeAll(async () => {
+            await addMembershipsToUserAsAdmin(institutionId, userTest.username, []);
+          });
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
+            beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = institutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -465,24 +460,14 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['sushi:write', 'sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
             let sushiId;
             beforeAll(async () => {
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = institutionId;
-            });
-
-            it('Should create sushi', async () => {
-              const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-                data: sushiTest,
-              });
-              expect(res).toHaveProperty('status', 201);
-              sushiId = res?.data?.id;
+              sushiId = await createSushiAsAdmin(sushiTest);
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
             });
 
             it('Should get sushi', async () => {
@@ -498,7 +483,7 @@ describe('[sushi]: Test create sushi features', () => {
               const sushi = res?.data;
               expect(sushi).toHaveProperty('id', sushiId);
               expect(sushi?.createdAt).not.toBeNull();
-              expect(sushi?.updatedAt).not.toBeNull();
+              expect(sushi?.GetdAt).not.toBeNull();
               expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
               expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
               expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
@@ -523,20 +508,69 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+            });
+
+            it('Should get sushi', async () => {
+              const res = await ezmesure({
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
+                headers: {
+                  Authorization: `Bearer ${userToken}`,
+                },
+              });
+              expect(res).toHaveProperty('status', 200);
+
+              const sushi = res?.data;
+              expect(sushi).toHaveProperty('id', sushiId);
+              expect(sushi?.createdAt).not.toBeNull();
+              expect(sushi?.GetdAt).not.toBeNull();
+              expect(sushi).toHaveProperty('institutionId', sushiTest?.institutionId);
+              expect(sushi).toHaveProperty('endpointId', sushiTest?.endpointId);
+              expect(sushi).toHaveProperty('customerId', sushiTest?.customerId);
+              expect(sushi).toHaveProperty('requestorId', sushiTest?.requestorId);
+              expect(sushi).toHaveProperty('apiKey', sushiTest?.apiKey);
+              expect(sushi).toHaveProperty('comment', sushiTest?.comment);
+              expect(sushi).toHaveProperty('tags', sushiTest?.tags);
+              expect(sushi).toHaveProperty('params', sushiTest?.params);
+              expect(sushi?.endpoint).not.toBeNull();
+            });
+          });
+
+          afterAll(async () => {
+            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+          });
+        });
+
+        describe('User with memberships []', () => {
+          beforeAll(async () => {
+            await addMembershipsToUserAsAdmin(institutionId, userTest.username, []);
+          });
+
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
+            beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = institutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = institutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -552,6 +586,7 @@ describe('[sushi]: Test create sushi features', () => {
         await deleteInstitutionAsAdmin(institutionId);
       });
     });
+
     describe('Institution created by another user', () => {
       let anotherUserTestInstitutionId;
       let userTestInstitutionId;
@@ -587,20 +622,24 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(userTestInstitutionId, userTest.username, ['sushi:write', 'sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = anotherUserTestInstitutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = anotherUserTestInstitutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
+
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -614,20 +653,24 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(userTestInstitutionId, userTest.username, ['sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = anotherUserTestInstitutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = anotherUserTestInstitutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
+
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -648,20 +691,24 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(userTestInstitutionId, userTest.username, ['sushi:write', 'sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = anotherUserTestInstitutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = anotherUserTestInstitutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
+
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -675,20 +722,24 @@ describe('[sushi]: Test create sushi features', () => {
           beforeAll(async () => {
             await addMembershipsToUserAsAdmin(userTestInstitutionId, userTest.username, ['sushi:read']);
           });
-          describe('POST /sushi - Create new sushi', () => {
+          describe('GET /sushi/<id> - Get sushi', () => {
+            let sushiId;
             beforeAll(async () => {
+              sushiTest.endpointId = endpointId;
+              sushiTest.institutionId = anotherUserTestInstitutionId;
+              sushiId = await createSushiAsAdmin(sushiTest);
               sushiTest.endpointId = endpointId;
               sushiTest.institutionId = anotherUserTestInstitutionId;
             });
 
             it('Should get HTTP status 403', async () => {
               const res = await ezmesure({
-                method: 'POST',
-                url: '/sushi',
+                method: 'GET',
+                url: `/sushi/${sushiId}`,
                 headers: {
                   Authorization: `Bearer ${userToken}`,
                 },
-                data: sushiTest,
+
               });
               expect(res).toHaveProperty('status', 403);
             });
@@ -699,6 +750,7 @@ describe('[sushi]: Test create sushi features', () => {
           });
         });
       });
+
 
       afterAll(async () => {
         await deleteUserAsAdmin(anotherUserTest.username);
@@ -711,7 +763,7 @@ describe('[sushi]: Test create sushi features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
-  describe('Without token', () => {
+  describe('With random token', () => {
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
@@ -719,17 +771,23 @@ describe('[sushi]: Test create sushi features', () => {
       });
 
       describe('Unvalidated institution', () => {
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
           beforeAll(async () => {
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
           });
 
-          it('Should HTTP status 401', async () => {
+          it('Should get HTTP status 401', async () => {
             const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              data: sushiTest,
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
             });
             expect(res).toHaveProperty('status', 401);
           });
@@ -743,17 +801,82 @@ describe('[sushi]: Test create sushi features', () => {
         beforeAll(async () => {
           await validateInstitutionAsAdmin(institutionId);
         });
-        describe('POST /sushi - Create sushi', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
           beforeAll(async () => {
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
             sushiTest.endpointId = endpointId;
             sushiTest.institutionId = institutionId;
           });
 
-          it('Should HTTP status 401', async () => {
+          it('Should get HTTP status 401', async () => {
             const res = await ezmesure({
-              method: 'POST',
-              url: '/sushi',
-              data: sushiTest,
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+        afterAll(async () => {
+          await deleteInstitutionAsAdmin(institutionId);
+        });
+      });
+    });
+  });
+  describe('Without token', () => {
+    describe('Institution created by admin', () => {
+      let institutionId;
+      beforeAll(async () => {
+        institutionId = await createInstitutionAsAdmin(institutionTest);
+      });
+
+      describe('Unvalidated institution', () => {
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
+          beforeAll(async () => {
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
+            });
+            expect(res).toHaveProperty('status', 401);
+          });
+        });
+        afterAll(async () => {
+          await deleteInstitutionAsAdmin(institutionId);
+        });
+      });
+
+      describe('Validated institution', () => {
+        beforeAll(async () => {
+          await validateInstitutionAsAdmin(institutionId);
+        });
+        describe('GET /sushi/<id> - Get sushi', () => {
+          let sushiId;
+          beforeAll(async () => {
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+            sushiId = await createSushiAsAdmin(sushiTest);
+            sushiTest.endpointId = endpointId;
+            sushiTest.institutionId = institutionId;
+          });
+
+          it('Should get HTTP status 401', async () => {
+            const res = await ezmesure({
+              method: 'GET',
+              url: `/sushi/${sushiId}`,
             });
             expect(res).toHaveProperty('status', 401);
           });

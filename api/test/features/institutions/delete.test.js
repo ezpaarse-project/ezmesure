@@ -100,6 +100,41 @@ describe('[institutions]: Test delete features', () => {
       await deleteUserAsAdmin(userTest.username);
     });
   });
+  describe('With random token', () => {
+    describe('DELETE /institutions/<id> - Delete institution', () => {
+      let institutionId;
+
+      beforeAll(async () => {
+        institutionId = await createInstitutionAsAdmin(institutionTest);
+      });
+
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'DELETE',
+          url: `/institutions/${institutionId}`,
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+        expect(res).toHaveProperty('status', 401);
+      });
+
+      it('Should get institution [Test]', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+        expect(res).toHaveProperty('status', 200);
+      });
+
+      afterAll(async () => {
+        await deleteInstitutionAsAdmin(institutionId);
+      });
+    });
+  });
   describe('Without token', () => {
     describe('DELETE /institutions/<id> - Delete institution', () => {
       let institutionId;
