@@ -3,15 +3,16 @@
 const {
   createInstitution,
   createInstitutionAsAdmin,
+  createSubInstitution,
   validateInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
 } = require('../../../setup/institutions');
 const { createUserAsAdmin, activateUser, deleteUserAsAdmin } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
 
-const { testCreateSubInstitution } = require('./utils');
+const { testGetSubInstitution } = require('./utils');
 
-describe('[institutions - subinstitution]: Test create features', () => {
+describe('[institutions - subinstitution]: Test read features', () => {
   const masterInstitutionTest = {
     name: 'Master Test',
     namespace: 'master-test',
@@ -73,9 +74,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -83,7 +87,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -91,9 +95,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -101,7 +108,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -115,9 +122,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -125,7 +135,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -133,9 +143,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -143,7 +156,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -162,9 +175,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -172,7 +188,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -180,9 +196,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -190,7 +209,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -204,9 +223,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -214,7 +236,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -222,9 +244,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -232,7 +257,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -257,9 +282,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -267,7 +295,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -275,9 +303,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -285,7 +316,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -299,9 +330,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -309,7 +343,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -317,9 +351,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -327,7 +364,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -341,9 +378,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -351,7 +391,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -359,9 +399,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -369,7 +412,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -388,9 +431,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -398,7 +444,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -406,9 +452,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -416,7 +465,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -430,9 +479,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -440,7 +492,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -448,9 +500,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -458,7 +513,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -472,9 +527,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -482,7 +540,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -490,9 +548,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -500,7 +561,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -525,9 +586,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -535,7 +599,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -543,9 +607,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -553,7 +620,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -567,9 +634,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -577,7 +647,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -585,9 +655,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -595,7 +668,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -609,9 +682,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -619,7 +695,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -627,9 +703,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -637,7 +716,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -656,9 +735,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -666,7 +748,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -674,9 +756,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub instutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -684,7 +769,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -698,9 +783,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -708,7 +796,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -716,9 +804,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -726,7 +817,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -740,9 +831,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -750,7 +844,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -758,9 +852,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-              it('Should create subinstitution', async () => {
-                const testConfig = {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
+              it('Should get empty array of sub institutions', async () => {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: adminToken,
@@ -768,7 +865,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 200,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -794,9 +891,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -804,7 +904,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -812,9 +912,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -822,7 +925,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -836,9 +939,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -846,7 +952,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -854,9 +960,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -864,7 +973,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -883,9 +992,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -893,7 +1005,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -901,9 +1013,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -911,7 +1026,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -925,9 +1040,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -935,7 +1053,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -943,9 +1061,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -953,7 +1074,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -978,9 +1099,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -988,7 +1112,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -996,9 +1120,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1006,7 +1133,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1020,9 +1147,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1030,7 +1160,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1038,9 +1168,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1048,7 +1181,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1062,9 +1195,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1072,7 +1208,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1080,9 +1216,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1090,7 +1229,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1109,9 +1248,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1119,7 +1261,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1127,9 +1269,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1137,7 +1282,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1151,9 +1296,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1161,7 +1309,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1169,9 +1317,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1179,7 +1330,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1193,9 +1344,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1203,7 +1357,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1211,9 +1365,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1221,7 +1378,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1246,9 +1403,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1256,7 +1416,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1264,9 +1424,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1274,7 +1437,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1288,9 +1451,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1298,7 +1464,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1306,9 +1472,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1316,7 +1485,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1330,9 +1499,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1340,7 +1512,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1348,9 +1520,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1358,7 +1533,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1377,9 +1552,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1387,7 +1565,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1395,9 +1573,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1405,7 +1586,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1419,9 +1600,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1429,7 +1613,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1437,9 +1621,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1447,7 +1634,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1461,9 +1648,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1471,7 +1661,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1479,9 +1669,12 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 403', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
                   token: userToken,
@@ -1489,7 +1682,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 403,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1515,17 +1708,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1533,17 +1729,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1557,17 +1756,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1575,17 +1777,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1604,17 +1809,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1622,17 +1830,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1646,17 +1857,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1664,17 +1878,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1699,17 +1916,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1717,17 +1937,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1741,17 +1964,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1759,17 +1985,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1783,17 +2012,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1801,17 +2033,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1830,17 +2065,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1848,17 +2086,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1872,17 +2113,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1890,17 +2134,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1914,17 +2161,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1932,17 +2182,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1967,17 +2220,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -1985,17 +2241,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2009,17 +2268,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2027,17 +2289,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2051,17 +2316,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2069,17 +2337,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2098,17 +2369,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2116,17 +2390,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2140,17 +2417,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2158,17 +2438,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2182,17 +2465,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2200,17 +2486,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: undefined,
+                  token: 'Bearer: random',
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2236,17 +2525,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2254,17 +2546,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2278,17 +2573,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2296,17 +2594,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2325,17 +2626,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2343,17 +2647,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2367,17 +2674,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2385,17 +2695,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2420,17 +2733,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2438,17 +2754,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2462,17 +2781,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2480,17 +2802,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2504,17 +2829,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2522,17 +2850,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2551,17 +2882,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2569,17 +2903,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2593,17 +2930,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2611,17 +2951,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2635,17 +2978,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2653,17 +2999,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2688,17 +3037,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2706,17 +3058,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2730,17 +3085,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2748,17 +3106,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2772,17 +3133,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2790,17 +3154,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2819,17 +3186,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2837,17 +3207,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: true,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2861,17 +3234,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, userTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2879,17 +3255,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2903,17 +3282,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
           });
           describe('Unvalidated sub institution', () => {
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: false,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });
@@ -2921,17 +3303,20 @@ describe('[institutions - subinstitution]: Test create features', () => {
             beforeAll(async () => {
               await validateInstitutionAsAdmin(subInstitutionId);
             });
-            describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+            describe('GET /institutions/<id>/subinstitution/<subid> - Get subinstitution [Sub Test] for [Master Test] institution', () => {
+              beforeAll(async () => {
+                await createSubInstitution(masterInstitutionId, subInstitutionId);
+              });
               it('Should get HTTP status 401', async () => {
-                const testConfig = {
+                const testGetConfig = {
                   masterInstitutionId,
                   subInstitutionId,
-                  token: 'Bearer: random',
+                  token: undefined,
                   subInstitutionIsValidated: true,
                   subInstitutionCreatedByAdmin: false,
                   expectedHTTPStatus: 401,
                 };
-                await testCreateSubInstitution(testConfig);
+                await testGetSubInstitution(testGetConfig);
               });
             });
           });

@@ -43,6 +43,30 @@ async function validateInstitutionAsAdmin(id) {
   });
 }
 
+async function createSubInstitution(id, subid) {
+  const token = await getAdminToken();
+
+  return ezmesure({
+    method: 'PUT',
+    url: `/institutions/${id}/subinstitutions/${subid}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+async function deleteSubInstitution(id, subid) {
+  const token = await getAdminToken();
+
+  return ezmesure({
+    method: 'DELETE',
+    url: `/institutions/${id}/subinstitutions/${subid}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
 async function deleteInstitutionAsAdmin(id) {
   const token = await getAdminToken();
 
@@ -107,6 +131,8 @@ module.exports = {
   createInstitutionAsAdmin,
   deleteInstitutionAsAdmin,
   validateInstitutionAsAdmin,
+  createSubInstitution,
+  deleteSubInstitution,
   addMemberShipsAsAdmin,
   addMembershipsToUserAsAdmin,
   deleteMembershipsToUserAsAdmin,
