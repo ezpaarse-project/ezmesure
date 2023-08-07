@@ -15,6 +15,11 @@ const { harvestQueue } = require('../../services/jobs');
 const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
+const harvestsService = require('../../entities/harvest.service');
+
+/**
+ * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ */
 
 exports.getAll = async (ctx) => {
   const where = {};
@@ -160,6 +165,40 @@ exports.deleteSushiData = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = response;
+};
+
+exports.getHarvests = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const {
+    from,
+    to,
+    reportId,
+    size,
+    sort,
+    order = 'asc',
+    page = 1,
+  } = ctx.request.query;
+
+  /** @type HarvestFindManyArgs */
+  const options = {
+    take: Number.isInteger(size) ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+    orderBy: sort ? { [sort]: order } : undefined,
+    where: {
+      credentialsId: sushiId,
+      reportId,
+    },
+  };
+
+  if (from || to) {
+    options.where.period = { gte: from, lte: to };
+  }
+
+  const harvests = await harvestsService.findMany(options);
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = harvests;
 };
 
 exports.getAvailableReports = async (ctx) => {

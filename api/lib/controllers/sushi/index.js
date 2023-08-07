@@ -35,6 +35,7 @@ const {
   getTasks,
   getAvailableReports,
   deleteOne,
+  getHarvests,
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -282,6 +283,29 @@ router.route({
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/harvests',
+  handler: [
+    commonHandlers(FEATURES.sushi.read),
+    getHarvests,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      from: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      to: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      reportId: Joi.string().trim(),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
     },
   },
 });
