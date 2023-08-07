@@ -6047,11 +6047,14 @@
         "operationId": "post-sushi-id-_harvest",
         "responses": {
           "200": {
-            "description": "Harvest initiated. Returns a task object that can be requested in order to follow the status of the process.",
+            "description": "Harvest initiated. Returns an array of task objects (one per month of the requested period) that can be requested in order to follow the status of the processes.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HarvestJob"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestJob"
+                  }
                 }
               }
             }
