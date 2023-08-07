@@ -12,8 +12,8 @@
 | updatedAt         | `DateTime`           |             |            |          |
 | name              | `String`             |             |            |          |
 | namespace         | `String?`            |             |            |          |
-| validated         | `Boolean`            |             |            |          |
-| hidePartner       | `Boolean`            |             |            |          |
+| validated         | `Boolean`            |             |            | `false`  |
+| hidePartner       | `Boolean`            |             |            | `false`  |
 | tags              | `String[]`           |             |            |          |
 | logoId            | `String?`            |             |            |          |
 | type              | `String?`            |             |            |          |
@@ -40,7 +40,7 @@
 | email          | `String`         |             |            |         |
 | createdAt      | `DateTime`       |             |            | `now()` |
 | updatedAt      | `DateTime`       |             |            |         |
-| isAdmin        | `Boolean`        |             |            |         |
+| isAdmin        | `Boolean`        |             |            | `false` |
 | metadata       | `Json`           |             |            | `{}`    |
 | memberships    | `Membership[]`   |             |            |         |
 | historyEntries | `HistoryEntry[]` |             |            |         |
@@ -55,7 +55,7 @@
 | permissions           | `String[]`               |             |            |         |
 | spacePermissions      | `SpacePermission[]`      |             |            |         |
 | repositoryPermissions | `RepositoryPermission[]` |             |            |         |
-| locked                | `Boolean`                |             |            |         |
+| locked                | `Boolean`                |             |            | `false` |
 
 ### Space
 
@@ -79,8 +79,8 @@
 |------------|--------------|-------------|------------|---------|
 | membership | `Membership` |             |            |         |
 | space      | `Space`      |             |            |         |
-| readonly   | `Boolean`    |             |            |         |
-| locked     | `Boolean`    |             |            |         |
+| readonly   | `Boolean`    |             |            | `false` |
+| locked     | `Boolean`    |             |            | `false` |
 
 ### Repository
 
@@ -100,8 +100,8 @@
 |------------|--------------|-------------|------------|---------|
 | membership | `Membership` |             |            |         |
 | repository | `Repository` |             |            |         |
-| readonly   | `Boolean`    |             |            |         |
-| locked     | `Boolean`    |             |            |         |
+| readonly   | `Boolean`    |             |            | `false` |
+| locked     | `Boolean`    |             |            | `false` |
 
 ### HistoryEntry
 
@@ -133,12 +133,27 @@
 | index            | `String`           |             |            |          |
 | runningTime      | `Int?`             |             |            |          |
 | timeout          | `Int`              |             |            |          |
-| forceDownload    | `Boolean`          |             |            |          |
-| ignoreValidation | `Boolean`          |             |            |          |
+| forceDownload    | `Boolean`          |             |            | `false`  |
+| ignoreValidation | `Boolean`          |             |            | `false`  |
 | params           | `Json?`            |             |            | `{}`     |
 | result           | `Json?`            |             |            |          |
 | logs             | `Log[]`            |             |            |          |
 | steps            | `Step[]`           |             |            |          |
+
+### Harvest
+
+| Property      | Type               | Description | Attributes | Default |
+|---------------|--------------------|-------------|------------|---------|
+| harvestedAt   | `DateTime`         |             |            | `now()` |
+| credentials   | `SushiCredentials` |             |            |         |
+| reportId      | `String`           |             |            |         |
+| period        | `String`           |             |            |         |
+| status        | `String`           |             |            |         |
+| errorCode     | `String?`          |             |            |         |
+| errorMessage  | `String?`          |             |            |         |
+| insertedItems | `Int`              |             |            | `0`     |
+| updatedItems  | `Int`              |             |            | `0`     |
+| failedItems   | `Int`              |             |            | `0`     |
 
 ### Log
 
@@ -177,10 +192,10 @@
 | description            | `String?`            |             |            |          |
 | counterVersion         | `String?`            |             |            |          |
 | technicalProvider      | `String?`            |             |            |          |
-| requireCustomerId      | `Boolean`            |             |            |          |
-| requireRequestorId     | `Boolean`            |             |            |          |
-| requireApiKey          | `Boolean`            |             |            |          |
-| ignoreReportValidation | `Boolean`            |             |            |          |
+| requireCustomerId      | `Boolean`            |             |            | `false`  |
+| requireRequestorId     | `Boolean`            |             |            | `false`  |
+| requireApiKey          | `Boolean`            |             |            | `false`  |
+| ignoreReportValidation | `Boolean`            |             |            | `false`  |
 | defaultCustomerId      | `String?`            |             |            |          |
 | defaultRequestorId     | `String?`            |             |            |          |
 | defaultApiKey          | `String?`            |             |            |          |
@@ -205,3 +220,4 @@
 | institution | `Institution`   |             |            |          |
 | endpoint    | `SushiEndpoint` |             |            |          |
 | harvestJobs | `HarvestJob[]`  |             |            |          |
+| harvests    | `Harvest[]`     |             |            |          |
