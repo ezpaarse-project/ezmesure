@@ -73,6 +73,7 @@
     <SushiFiles v-if="isAdmin" ref="sushiFiles" />
     <ReportsDialog ref="reportsDialog" @editItem="editSushiItem" />
     <ConfirmDialog ref="confirm" />
+    <HarvestMatrixDialog ref="harvestMatrixDialog" />
 
     <v-menu nudge-width="100" style="z-index:100" top offset-y>
       <template #activator="{ on, attrs }">
@@ -316,6 +317,7 @@ import SushiForm from '~/components/SushiForm.vue';
 import SushiHistory from '~/components/SushiHistory.vue';
 import SushiFiles from '~/components/SushiFiles.vue';
 import ReportsDialog from '~/components/ReportsDialog.vue';
+import HarvestMatrixDialog from '~/components/HarvestMatrixDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import LocalDate from '~/components/LocalDate.vue';
 
@@ -329,6 +331,7 @@ export default {
     SushiHistory,
     SushiFiles,
     ReportsDialog,
+    HarvestMatrixDialog,
     ConfirmDialog,
     LocalDate,
   },
@@ -477,6 +480,11 @@ export default {
           divider: true,
         },
         {
+          icon: 'mdi-table-headers-eye',
+          label: this.$t('sushi.harvestState'),
+          callback: this.showHarvestMatrix,
+        },
+        {
           icon: 'mdi-file-search',
           label: this.$t('reports.availableReports'),
           callback: this.showAvailableReports,
@@ -523,6 +531,9 @@ export default {
     },
     showAvailableReports(item) {
       this.$refs.reportsDialog.showReports(item);
+    },
+    showHarvestMatrix(item) {
+      this.$refs.harvestMatrixDialog.display(item);
     },
     createSushiItem() {
       this.$refs.sushiForm.createSushiItem(this.institution);
