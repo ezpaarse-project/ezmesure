@@ -152,6 +152,22 @@ model HarvestJob {
   steps            Step[]
 }
 
+model Harvest {
+  harvestedAt   DateTime         @default(now())
+  credentialsId String
+  credentials   SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  reportId      String
+  period        String
+  status        String
+  errorCode     String?
+  errorMessage  String?
+  insertedItems Int              @default(0)
+  updatedItems  Int              @default(0)
+  failedItems   Int              @default(0)
+
+  @@id([credentialsId, reportId, period])
+}
+
 model Log {
   id      String     @id @default(cuid())
   jobId   String
@@ -212,4 +228,5 @@ model SushiCredentials {
   institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   endpoint      SushiEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   harvestJobs   HarvestJob[]
+  harvests      Harvest[]
 }
