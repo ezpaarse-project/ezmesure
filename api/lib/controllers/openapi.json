@@ -725,6 +725,103 @@
           }
         }
       },
+      "Harvest": {
+        "description": "Represent the harvest state for a period and a set of credentials",
+        "type": "object",
+        "properties": {
+          "harvestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "The date of the harvest",
+            "readOnly": true
+          },
+          "credentialsId": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SushiCredentials"
+            }
+          },
+          "status": {
+            "description": "Status of the harvest (which is the same as the associated harvest job)",
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "waiting",
+              "running",
+              "delayed",
+              "finished",
+              "failed",
+              "cancelled",
+              "interrupted"
+            ]
+          },
+          "period": {
+            "description": "The requested period",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM",
+            "readOnly": true
+          },
+          "reportId": {
+            "description": "The requested report ID",
+            "type": "string",
+            "example": "TR",
+            "readOnly": true
+          },
+          "sushiCode": {
+            "description": "The SUSHI error code, if a fatal exception was encountered",
+            "type": "integer",
+            "readOnly": true
+          },
+          "sushiExceptions": {
+            "description": "The SUSHI exceptions returned by the endpoint",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type" : "object",
+              "properties": {
+                "code": {
+                  "description": "The exception code",
+                  "type": "string",
+                  "example": "3030"
+                },
+                "severity": {
+                  "description": "The exception severity",
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "warning",
+                    "error"
+                  ]
+                },
+                "message": {
+                  "description": "The exception message",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "insertedItems": {
+            "description": "Number of report items that were successfuly inserted into Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          },
+          "updatedItems": {
+            "description": "Number of report items that were updated in Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          },
+          "failedItems": {
+            "description": "Number of report items that failed to be inserted into Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          }
+        }
+      },
       "Log": {
         "description": "A log message",
         "type": "object",
@@ -6170,6 +6267,117 @@
         },
         "operationId": "get-sushi-id-files",
         "description": "List files in the directory of a SUSHI item.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi/{id}/harvests": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get harvests of a SUSHI item",
+        "tags": [
+          "Sushi"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "Start date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "reportId",
+            "description": "Filter by report ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "tr"
+            }
+          },
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Harvest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-sushi-id-harvests",
+        "description": "Get harvests of a SUSHI item",
         "security": [
           {
             "bearerAuth": []
