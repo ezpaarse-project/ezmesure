@@ -129,8 +129,26 @@ CREATE TABLE "HarvestJob" (
     "ignoreValidation" BOOLEAN NOT NULL DEFAULT false,
     "params" JSONB DEFAULT '{}',
     "result" JSONB,
+    "sushiCode" INTEGER,
+    "sushiExceptions" JSONB[],
 
     CONSTRAINT "HarvestJob_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Harvest" (
+    "harvestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "credentialsId" TEXT NOT NULL,
+    "reportId" TEXT NOT NULL,
+    "period" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "sushiCode" INTEGER,
+    "sushiExceptions" JSONB[],
+    "insertedItems" INTEGER NOT NULL DEFAULT 0,
+    "updatedItems" INTEGER NOT NULL DEFAULT 0,
+    "failedItems" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "Harvest_pkey" PRIMARY KEY ("credentialsId","reportId","period")
 );
 
 -- CreateTable
@@ -239,6 +257,9 @@ ALTER TABLE "HistoryEntry" ADD CONSTRAINT "HistoryEntry_authorId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "HarvestJob" ADD CONSTRAINT "HarvestJob_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Harvest" ADD CONSTRAINT "Harvest_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Log" ADD CONSTRAINT "Log_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "HarvestJob"("id") ON DELETE CASCADE ON UPDATE CASCADE;

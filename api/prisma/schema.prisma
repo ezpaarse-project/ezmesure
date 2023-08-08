@@ -148,22 +148,37 @@ model HarvestJob {
   ignoreValidation Boolean          @default(false)
   params           Json?            @default("{}")
   result           Json?
+  /// SUSHI error code, if a fatal exception was encountered
+  sushiCode        Int?
+  /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
+  sushiExceptions  Json[]
   logs             Log[]
   steps            Step[]
 }
 
 model Harvest {
-  harvestedAt   DateTime         @default(now())
-  credentialsId String
-  credentials   SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
-  reportId      String
-  period        String
-  status        String
-  errorCode     String?
-  errorMessage  String?
-  insertedItems Int              @default(0)
-  updatedItems  Int              @default(0)
-  failedItems   Int              @default(0)
+  /// Date of the harvest
+  harvestedAt     DateTime         @default(now())
+  /// Identifier of the SUSHI credentials
+  credentialsId   String
+  /// SUSHI credentials
+  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  /// Report ID (TR, PR, DR...)
+  reportId        String
+  /// Report period (format: yyyy-MM)
+  period          String
+  /// Status of the harvest (waiting, running, finished, failed...)
+  status          String
+  /// SUSHI error code, if a fatal exception was encountered
+  sushiCode       Int?
+  /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
+  sushiExceptions Json[]
+  /// Number of report items that were successfuly inserted into Elasticsearch
+  insertedItems   Int              @default(0)
+  /// Number of report items that were updated in Elasticsearch
+  updatedItems    Int              @default(0)
+  /// Number of report items that failed to be inserted into Elasticsearch
+  failedItems     Int              @default(0)
 
   @@id([credentialsId, reportId, period])
 }

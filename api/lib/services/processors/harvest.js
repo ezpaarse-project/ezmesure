@@ -236,12 +236,17 @@ async function importSushiReport(options = {}) {
     let hasError = false;
     let isDelayed = false;
 
+    task.sushiExceptions = [];
+
     exceptions.forEach((e) => {
       const prefix = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
       const message = `${prefix} ${e?.Message}`;
       const severity = sushiService.getExceptionSeverity(e);
+      const code = Number.parseInt(e?.Code, 10);
 
-      if (Number.parseInt(e?.Code, 10) === 1011) {
+      task.sushiExceptions.push({ code, severity, message: e?.Message });
+
+      if (code === 1011) {
         isDelayed = true;
       }
 
@@ -249,7 +254,8 @@ async function importSushiReport(options = {}) {
         case 'fatal':
         case 'error':
           hasError = true;
-          downloadStep.data.sushiErrorCode = Number.parseInt(e?.Code, 10);
+          downloadStep.data.sushiErrorCode = code;
+          task.sushiCode = code;
           addLog('error', message);
           break;
         case 'debug':
@@ -274,6 +280,7 @@ async function importSushiReport(options = {}) {
       return;
     }
     if (hasError) {
+      await saveTask();
       throw new HarvestError('The report contains exceptions');
     }
   }

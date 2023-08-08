@@ -27,8 +27,8 @@ const onHarvestJobUpdate = async (harvestJob) => {
     insertedItems: harvestJob.result?.inserted || 0,
     updatedItems: harvestJob.result?.updated || 0,
     failedItems: harvestJob.result?.failed || 0,
-    errorCode: '',
-    errorMessage: '',
+    sushiCode: harvestJob.sushiCode,
+    sushiExceptions: harvestJob.sushiExceptions,
   };
 
   const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${harvestJob.beginDate}`;
