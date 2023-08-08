@@ -18,7 +18,7 @@
       </v-avatar>
     </template>
 
-    <v-card width="300px">
+    <v-card min-width="350px" max-width="500px">
       <v-card-title primary-title>
         {{ statusText }}
       </v-card-title>
@@ -49,24 +49,28 @@
         </i18n>
 
         <template v-if="status === 'failed'">
-          <template v-if="hasError">
-            <div v-if="sushiException">
-              {{ sushiException }}
-            </div>
-            <div v-if="harvest?.errorMessage">
-              {{ harvest?.errorMessage }}
-            </div>
-          </template>
-          <div v-else>
-            La raison de l'échec du moissonnage n'est pas connue.
+          <div class="subtitle-2">
+            {{ $t('reason', { reason: sushiFatalException || $t('indeterminate') }) }}
           </div>
+          <div>{{ sushiExceptionMeaning }}</div>
         </template>
       </v-card-text>
+
+      <template v-if="hasExceptions">
+        <v-divider />
+
+        <v-card-text>
+          <p>{{ $t('sushi.messagesFromEndpoint') }}</p>
+          <LogsPreview :logs="sushiExceptions" log-type="severity" />
+        </v-card-text>
+      </template>
     </v-card>
   </v-menu>
 </template>
 
 <script>
+import LogsPreview from '~/components/LogsPreview.vue';
+
 const colors = new Map([
   ['waiting', 'grey'],
   ['running', 'blue'],
@@ -88,6 +92,9 @@ const icons = new Map([
 ]);
 
 export default {
+  components: {
+    LogsPreview,
+  },
   props: {
     harvest: {
       type: Object,
@@ -101,7 +108,9 @@ export default {
     insertedItems() { return this.harvest?.insertedItems || 0; },
     updatedItems() { return this.harvest?.updatedItems || 0; },
     failedItems() { return this.harvest?.failedItems || 0; },
-    hasError() { return this.sushiException || this.harvest?.errorMessage; },
+    hasExceptions() {
+      return Array.isArray(this.sushiExceptions) && this.sushiExceptions.length > 0;
+    },
     harvestedAt() {
       const localDate = new Date(this.harvest?.harvestedAt);
 
@@ -111,11 +120,19 @@ export default {
 
       return this.$dateFunctions.format(localDate, 'PPPp');
     },
-    sushiException() {
-      const sushiCode = this.harvest?.errorCode;
+    sushiFatalException() {
+      const sushiCode = this.harvest?.sushiCode;
       const key = `tasks.status.exceptions.${sushiCode}`;
 
       return (sushiCode && this.$te(key)) ? this.$t(key) : undefined;
+    },
+    sushiExceptionMeaning() {
+      const sushiCode = this.harvest?.sushiCode;
+      const key = `tasks.status.exceptionMeaning.${sushiCode}`;
+      return (sushiCode && this.$te(key)) ? this.$t(key) : undefined;
+    },
+    sushiExceptions() {
+      return this.harvest?.sushiExceptions;
     },
     statusText() {
       const key = `tasks.status.${this.status}`;

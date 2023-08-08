@@ -2,16 +2,16 @@
   <v-card color="black" :tile="flat" :max-height="maxHeight" class="scrolling">
     <v-card-text class="white--text">
       <div v-for="(log, index) in coloredLogs" :key="index">
-        <span v-if="log.date" class="grey--text">
-          {{ log.date }}
+        <span v-if="log[logDate]" class="grey--text">
+          {{ log[logDate] }}
         </span>
 
-        <span v-if="log.type" :class="log.color">
-          {{ log.type }} :
+        <span v-if="log[logType]" :class="log.color">
+          {{ log[logType] }} :
         </span>
 
-        <span v-if="log.message" class="message">
-          {{ log.message }}
+        <span v-if="log[logMessage]" class="message">
+          {{ log[logMessage] }}
         </span>
       </div>
     </v-card-text>
@@ -41,12 +41,24 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    logDate: {
+      type: String,
+      default: () => 'date',
+    },
+    logType: {
+      type: String,
+      default: () => 'type',
+    },
+    logMessage: {
+      type: String,
+      default: () => 'message',
+    },
   },
   computed: {
     coloredLogs() {
       return this.logs.map((log) => ({
         ...log,
-        color: logColors.get(log.type) || 'white--text',
+        color: logColors.get(log[this.logType]) || 'white--text',
       }));
     },
   },

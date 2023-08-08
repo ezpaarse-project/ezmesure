@@ -421,6 +421,20 @@
         "3010": "Version non supportée",
         "3020": "Dates invalides",
         "3030": "Période indisponible"
+      },
+      "exceptionMeaning": {
+        "1000": "La rapport n'a pas pu être moissonné car le point d'accès n'est pas accessible.",
+        "1010": "Le point d'accès est dans l'incapacité de fournir le rapport en raison d'une forte charge.",
+        "1020": "Le point d'accès refuse de fournir le rapport en raison d'un nombre de requêtes trop élevé.",
+        "1030": "Le point d'accès n'a pas pu fournir le rapport en raison d'un manque d'informations lors de la demande.",
+        "2000": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "2010": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "2020": "Le point d'accès refuse de fournir le rapport car la clé d'API fournie n'est pas valide. Vérifiez que vos identifiants sont correctement saisis.",
+        "2030": "Le point d'accès refuse de fournir le rapport car l'adresse IP n'est pas autorisée. Assurez-vous que l'IP d'ezMESURE est bien déclarée auprès du point d'accès.",
+        "3000": "Le point d'accès est dans l'incapacité de fournir le rapport, car ce dernier n'est pas supporté.",
+        "3010": "Le point d'accès est dans l'incapacité de fournir le rapport, car la version demandée n'est pas supportée.",
+        "3020": "La période demandée au point d'accès n'est pas valide. Il est possible que le rapport ne soit pas encore disponible pour cette période.",
+        "3030": "Le rapport n'est pas disponible pour la période demandée."
       }
     },
     "failedStep": {
@@ -466,6 +480,7 @@
     "insertedItems": "{count} éléments ont été insérés.",
     "updatedItems": "{count} éléments ont été mis à jour.",
     "failedItems": "{count} éléments n'ont pas pu être récupérés.",
+    "messagesFromEndpoint": "Messages du point d'accès :",
     "paramScopes": {
       "all": "Toutes les requêtes au point d'accès",
       "report_list": "Listing des rapports",
@@ -685,5 +700,6 @@
   "no": "Non",
   "validate": "Valider",
   "invalidate": "Invalider",
-  "reason": "Raison : {reason}"
+  "reason": "Raison : {reason}",
+  "indeterminate": "indéterminée"
 }

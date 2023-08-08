@@ -420,6 +420,20 @@
         "3010": "Unsupported report version",
         "3020": "Invalide dates",
         "3030": "Unavailable period"
+      },
+      "exceptionMeaning": {
+        "1000": "The report could not be harvested because the endpoint is unreachable.",
+        "1010": "The endpoint is unable to provide the report because it's under heavy load.",
+        "1020": "The endpoint refuses to provide the report because the number of requests is too high.",
+        "1030": "The endpoint was unable to provide the report due to a lack of information provided with the request.",
+        "2000": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "2010": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "2020": "The endpoint refuses to provide the report because the provided API key is not valid. Check that your credentials are entered correctly.",
+        "2030": "The endpoint refuses to provide the report because the IP address is not authorized. Make sure that the IP address of ezMESURE is correctly declared to the endpoint.",
+        "3000": "The endpoint is unable to provide the report because it's not supported.",
+        "3010": "The endpoint is unable to provide the report because the requested version is not supported.",
+        "3020": "The period requested from the endpoint is invalid. The report may not be available yet.",
+        "3030": "The report is not available yet for the requested period."
       }
     },
     "failedStep": {
@@ -465,6 +479,7 @@
     "insertedItems": "{count} items have been inserted.",
     "updatedItems": "{count} items have been updated.",
     "failedItems": "{count} items could not be retrieved.",
+    "messagesFromEndpoint": "Messages from the endpoint:",
     "paramScopes": {
       "all": "All requests to the endpoint",
       "report_list": "Report list",
@@ -685,5 +700,6 @@
   "no": "No",
   "validate": "Validate",
   "invalidate": "Invalidate",
-  "reason": "Reason: {reason}"
+  "reason": "Reason: {reason}",
+  "indeterminate": "indeterminate"
 }
