@@ -118,42 +118,44 @@
 
 ### HarvestJob
 
-| Property         | Type               | Description | Attributes | Default  |
-|------------------|--------------------|-------------|------------|----------|
-| id               | `String`           |             | Id         | `cuid()` |
-| credentials      | `SushiCredentials` |             |            |          |
-| createdAt        | `DateTime`         |             |            | `now()`  |
-| updatedAt        | `DateTime`         |             |            |          |
-| startedAt        | `DateTime?`        |             |            |          |
-| beginDate        | `String`           |             |            |          |
-| endDate          | `String`           |             |            |          |
-| status           | `String`           |             |            |          |
-| reportType       | `String`           |             |            |          |
-| harvestId        | `String`           |             |            |          |
-| index            | `String`           |             |            |          |
-| runningTime      | `Int?`             |             |            |          |
-| timeout          | `Int`              |             |            |          |
-| forceDownload    | `Boolean`          |             |            | `false`  |
-| ignoreValidation | `Boolean`          |             |            | `false`  |
-| params           | `Json?`            |             |            | `{}`     |
-| result           | `Json?`            |             |            |          |
-| logs             | `Log[]`            |             |            |          |
-| steps            | `Step[]`           |             |            |          |
+| Property         | Type               | Description                                                                                             | Attributes | Default  |
+|------------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|----------|
+| id               | `String`           |                                                                                                         | Id         | `cuid()` |
+| credentials      | `SushiCredentials` |                                                                                                         |            |          |
+| createdAt        | `DateTime`         |                                                                                                         |            | `now()`  |
+| updatedAt        | `DateTime`         |                                                                                                         |            |          |
+| startedAt        | `DateTime?`        |                                                                                                         |            |          |
+| beginDate        | `String`           |                                                                                                         |            |          |
+| endDate          | `String`           |                                                                                                         |            |          |
+| status           | `String`           |                                                                                                         |            |          |
+| reportType       | `String`           |                                                                                                         |            |          |
+| harvestId        | `String`           |                                                                                                         |            |          |
+| index            | `String`           |                                                                                                         |            |          |
+| runningTime      | `Int?`             |                                                                                                         |            |          |
+| timeout          | `Int`              |                                                                                                         |            |          |
+| forceDownload    | `Boolean`          |                                                                                                         |            | `false`  |
+| ignoreValidation | `Boolean`          |                                                                                                         |            | `false`  |
+| params           | `Json?`            |                                                                                                         |            | `{}`     |
+| result           | `Json?`            |                                                                                                         |            |          |
+| sushiCode        | `Int?`             | SUSHI error code, if a fatal exception was encountered                                                  |            |          |
+| sushiExceptions  | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
+| logs             | `Log[]`            |                                                                                                         |            |          |
+| steps            | `Step[]`           |                                                                                                         |            |          |
 
 ### Harvest
 
-| Property      | Type               | Description | Attributes | Default |
-|---------------|--------------------|-------------|------------|---------|
-| harvestedAt   | `DateTime`         |             |            | `now()` |
-| credentials   | `SushiCredentials` |             |            |         |
-| reportId      | `String`           |             |            |         |
-| period        | `String`           |             |            |         |
-| status        | `String`           |             |            |         |
-| errorCode     | `String?`          |             |            |         |
-| errorMessage  | `String?`          |             |            |         |
-| insertedItems | `Int`              |             |            | `0`     |
-| updatedItems  | `Int`              |             |            | `0`     |
-| failedItems   | `Int`              |             |            | `0`     |
+| Property        | Type               | Description                                                                                             | Attributes | Default |
+|-----------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|---------|
+| harvestedAt     | `DateTime`         | Date of the harvest                                                                                     |            | `now()` |
+| credentials     | `SushiCredentials` | SUSHI credentials                                                                                       |            |         |
+| reportId        | `String`           | Report ID (TR, PR, DR...)                                                                               |            |         |
+| period          | `String`           | Report period (format: yyyy-MM)                                                                         |            |         |
+| status          | `String`           | Status of the harvest (waiting, running, finished, failed...)                                           |            |         |
+| sushiCode       | `Int?`             | SUSHI error code, if a fatal exception was encountered                                                  |            |         |
+| sushiExceptions | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |         |
+| insertedItems   | `Int`              | Number of report items that were successfuly inserted into Elasticsearch                                |            | `0`     |
+| updatedItems    | `Int`              | Number of report items that were updated in Elasticsearch                                               |            | `0`     |
+| failedItems     | `Int`              | Number of report items that failed to be inserted into Elasticsearch                                    |            | `0`     |
 
 ### Log
 
