@@ -404,17 +404,6 @@ exports.harvestSushi = async (ctx) => {
     reportType,
   };
 
-  const currentTask = await harvestJobsService.findFirst({
-    where: {
-      credentialsId: sushi.id,
-      status: { in: ['waiting', 'running'] },
-    },
-  });
-
-  if (currentTask) {
-    ctx.throw(409, ctx.$t('errors.harvest.taskExists', sushi.id, currentTask.status));
-  }
-
   /** @type {Date} */
   let beginDate = body.beginDate && parseISO(body.beginDate, 'yyyy-MM');
   /** @type {Date} */
