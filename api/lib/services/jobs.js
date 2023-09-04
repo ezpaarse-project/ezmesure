@@ -1,6 +1,6 @@
 const config = require('config');
 const path = require('path');
-const Queue = require('bull');
+const { Queue, Worker } = require('bullmq');
 
 const { appLogger } = require('./logger');
 const harvestJobService = require('../entities/harvest-job.service');
@@ -9,8 +9,13 @@ const harvestConcurrency = Number.parseInt(config.get('jobs.harvest.concurrency'
 const redisConfig = config.get('redis');
 const logPrefix = '[Harvest Queue]';
 
-const harvestQueue = new Queue('sushi-harvest', { redis: redisConfig });
-harvestQueue.process(harvestConcurrency, path.resolve(__dirname, 'processors', 'harvest.js'));
+const workerFile = path.resolve(__dirname, 'processors', 'harvest.js');
+
+const harvestQueue = new Queue('sushi-harvest', { connection: redisConfig });
+const harvestWorker = new Worker('sushi-harvest', workerFile, {
+  connection: redisConfig,
+  concurrency: harvestConcurrency,
+});
 
 async function checkTask(taskId, jobId) {
   if (!taskId) { return; }
@@ -60,10 +65,10 @@ async function handleFinishedJob(job) {
   }
 }
 
-harvestQueue
-  .on('waiting', (jobId) => { appLogger.verbose(`${logPrefix} Job [${jobId}] is pending`); })
+harvestWorker
   .on('active', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] has started`); })
-  .on('stalled', (job) => { appLogger.error(`${logPrefix} Job [${job?.id}] stalled`); })
+  .on('stalled', (jobId) => { appLogger.error(`${logPrefix} Job [${jobId}] stalled`); })
+  .on('drained', () => { appLogger.verbose(`${logPrefix} Queue has no more waiting jobs`); })
   .on('completed', (job) => {
     appLogger.verbose(`${logPrefix} Job [${job?.id}] completed`);
     handleFinishedJob(job);
@@ -78,14 +83,9 @@ harvestQueue
     }
 
     handleFinishedJob(job);
-  })
-  .on('lock-extension-failed', (job, err) => {
-    // A job failed to extend lock. This will be useful to debug redis
-    // connection issues and jobs getting restarted because workers
-    // are not able to extend locks.
-    appLogger.verbose(`${logPrefix} Job [${job?.id}] failed to extend lock`);
-    appLogger.verbose(err);
-  })
+  });
+
+harvestQueue
   .on('error', (error) => {
     appLogger.error(`${logPrefix} An error occurred in the job queue`);
     appLogger.error(error.message);
@@ -93,8 +93,8 @@ harvestQueue
   })
   .on('paused', () => { appLogger.verbose(`${logPrefix} Queue has been paused`); })
   .on('resumed', () => { appLogger.verbose(`${logPrefix} Queue has been resumed`); })
+  .on('waiting', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] is waiting`); })
   .on('cleaned', (jobs, type) => { appLogger.verbose(`${logPrefix} ${jobs.length} old jobs of type [${type}] have been cleaned`); })
-  .on('drained', () => { appLogger.verbose(`${logPrefix} Queue has no more pending jobs`); })
   .on('removed', (job) => { appLogger.verbose(`${logPrefix} Job [${job?.id}] removed`); });
 
 module.exports = {

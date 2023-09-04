@@ -463,6 +463,7 @@ exports.harvestSushi = async (ctx) => {
     });
 
     await harvestQueue.add(
+      'harvest',
       { taskId: task.id, timeout },
       { jobId: task.id },
     );

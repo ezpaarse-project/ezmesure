@@ -604,9 +604,9 @@ async function importSushiReport(options = {}) {
 async function processJob(job, taskData) {
   const task = taskData;
 
-  if (job.attemptsMade > 0) {
-    appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade + 1})`);
-    await logService.log(job.id, 'info', `New attempt (total: ${job.attemptsMade + 1})`);
+  if (job.attemptsMade > 1) {
+    appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade})`);
+    await logService.log(job.id, 'info', `New attempt (total: ${job.attemptsMade})`);
   }
 
   const {
@@ -675,7 +675,7 @@ async function processJob(job, taskData) {
 }
 
 module.exports = async function handle(job) {
-  await job.update({ ...job.data, pid: process.pid });
+  await job.updateData({ ...job.data, pid: process.pid });
 
   const jobTimeout = Number.isInteger(job?.data?.timeout) ? job.data.timeout : 600;
   let task;
