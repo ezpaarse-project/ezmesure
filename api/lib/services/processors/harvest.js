@@ -21,10 +21,27 @@ const logService = require('../../entities/log.service');
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
 
+const SUSHI_CODES = {
+  serviceUnavailable: 1000,
+  serviceBusy: 1010,
+  queuedForProcessing: 1011,
+  tooManyRequests: 1020,
+  insufficientInformation: 1030,
+  unauthorizedRequestor: 2000,
+  unauthorizedRequestorAlt: 2010,
+  invalidAPIKey: 2020,
+  unauthorizedIPAddress: 2030,
+  unsupportedReport: 3000,
+  unsupportedReportVersion: 3010,
+  invalidDates: 3020,
+  unavailablePeriod: 3030,
+};
+
 class HarvestError extends Error {
-  constructor(message, cause) {
+  constructor(message, options) {
     super(message);
-    this.cause = cause;
+    this.type = options?.type;
+    this.cause = options?.cause;
   }
 }
 
@@ -137,7 +154,7 @@ async function importSushiReport(options = {}) {
     reportContent = await fs.readFile(reportPath, 'utf8');
   } catch (e) {
     if (e.code !== 'ENOENT') {
-      throw new HarvestError('Failed to read report file', e);
+      throw new HarvestError('Failed to read report file', { cause: e });
     }
   }
 
@@ -166,7 +183,7 @@ async function importSushiReport(options = {}) {
     try {
       await fs.remove(reportPath);
     } catch (e) {
-      throw new HarvestError('Failed to delete the local copy of the report', e);
+      throw new HarvestError('Failed to delete the local copy of the report', { cause: e });
     }
 
     try {
@@ -211,12 +228,12 @@ async function importSushiReport(options = {}) {
         }),
       ]);
     } catch (e) {
-      throw new HarvestError('Failed to download the COUNTER report', e);
+      throw new HarvestError('Failed to download the COUNTER report', { cause: e });
     }
 
     if (task.status === 'delayed') {
       await saveTask();
-      return;
+      throw new HarvestError('Report download has been delayed', { type: 'delayed' });
     }
 
     try {
@@ -225,7 +242,7 @@ async function importSushiReport(options = {}) {
       if (e instanceof SyntaxError) {
         throw new HarvestError('The report is not a valid JSON');
       } else {
-        throw new HarvestError('Fail to read downloaded report file', e);
+        throw new HarvestError('Fail to read downloaded report file', { cause: e });
       }
     }
   }
@@ -277,7 +294,7 @@ async function importSushiReport(options = {}) {
       addLog('warning', 'Endpoint has queued report for processing');
       task.status = 'delayed';
       await saveTask();
-      return;
+      throw new HarvestError('Report download has been delayed', { type: 'delayed' });
     }
     if (hasError) {
       await saveTask();
@@ -328,7 +345,7 @@ async function importSushiReport(options = {}) {
     const { body: response } = await elastic.indices.exists({ index });
     indexExists = response;
   } catch (e) {
-    throw new HarvestError(`Failed to check that index [${index}] exists`, e);
+    throw new HarvestError(`Failed to check that index [${index}] exists`, { cause: e });
   }
 
   if (!indexExists) {
@@ -338,7 +355,7 @@ async function importSushiReport(options = {}) {
         body: publisherIndexTemplate,
       });
     } catch (e) {
-      throw new HarvestError(`Failed to create index [${index}]`, e);
+      throw new HarvestError(`Failed to create index [${index}]`, { cause: e });
     }
   }
 
@@ -601,7 +618,7 @@ async function importSushiReport(options = {}) {
  * @param {HarvestJob} taskData - the job data stored in the database
  * @returns {Promise<any>}
  */
-async function processJob(job, taskData) {
+async function processJob(job, taskData, lockToken) {
   const task = taskData;
 
   if (job.attemptsMade > 1) {
@@ -650,6 +667,12 @@ async function processJob(job, taskData) {
     appLogger.error(`Failed to import sushi report [${credentials.id}]`);
     await logService.log(job.id, 'error', err.message);
 
+    if (err.type === 'delayed') {
+      await job.moveToDelayed(add(Date.now(), { minutes: 5 }).getTime(), lockToken);
+      return;
+    }
+
+
     if (err instanceof HarvestError) {
       if (err.cause instanceof Error) {
         await logService.log(job.id, 'error', err.cause.message);
@@ -674,7 +697,7 @@ async function processJob(job, taskData) {
   return task.result;
 }
 
-module.exports = async function handle(job) {
+module.exports = async function handle(job, lockToken) {
   await job.updateData({ ...job.data, pid: process.pid });
 
   const jobTimeout = Number.isInteger(job?.data?.timeout) ? job.data.timeout : 600;
@@ -748,7 +771,7 @@ module.exports = async function handle(job) {
   let result;
 
   try {
-    result = await processJob(job, task);
+    result = await processJob(job, task, lockToken);
   } finally {
     clearTimeout(timeoutId);
     process.removeListener('SIGTERM', exitHandler);
