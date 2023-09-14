@@ -101,7 +101,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob>}
    */
   static finish(job, options = {}) {
-    const { status = 'finished' } = options;
+    const { status = 'finished', errorCode } = options;
     const { startedAt, createdAt } = job;
 
     let runningTime;
@@ -114,7 +114,7 @@ module.exports = class HarvestJobsService {
 
     return HarvestJobsService.update({
       where: { id: job.id },
-      data: { status, runningTime },
+      data: { status, runningTime, errorCode },
     });
   }
 

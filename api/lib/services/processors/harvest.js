@@ -1,6 +1,13 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
+const config = require('config');
 
+const deferralBackoffDuration = parseInt(config.get('jobs.harvest.deferralBackoffDuration'), 10);
+const maxDeferrals = parseInt(config.get('jobs.harvest.maxDeferrals'), 10);
+
+const { DelayedError } = require('bullmq');
+
+const addSeconds = require('date-fns/addSeconds');
 const format = require('date-fns/format');
 const isSameMonth = require('date-fns/isSameMonth');
 const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
@@ -15,11 +22,20 @@ const stepService = require('../../entities/step.service');
 const logService = require('../../entities/log.service');
 
 /* eslint-disable max-len */
-/** @typedef {import('../../entities/sushi-credentials.service').SushiCredentials} SushiCredentials */
-/** @typedef {import('../../entities/harvest-job.service').HarvestJob} HarvestJob */
+/**
+ * @typedef {import('../../entities/sushi-credentials.service').SushiCredentials} SushiCredentials
+ * @typedef {import('../../entities/harvest-job.service').HarvestJob} HarvestJob
+ * @typedef {import('bullmq').Job} Job
+ * @typedef {import('bullmq').Processor} Processor
+ */
 /* eslint-enable max-len */
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
+
+const ERROR_CODES = {
+  maxDeferralsExceeded: 'max_defferals_exceeded',
+  unreachableService: 'unreachable_service',
+};
 
 const SUSHI_CODES = {
   serviceUnavailable: 1000,
@@ -50,6 +66,31 @@ class HarvestError extends Error {
  * @property {SushiCredentials} sushi - The SUSHI item to be harvested
  * @property {HarvestJob} task - The harvest job data
  */
+
+/**
+ * Defer job by a given number of seconds
+ * @param {Job} job - The BullMQ job
+ * @param {HarvestJob} task - The HarvestJob associated to the BullMQ job
+ * @param {Integer} delay - The delay to apply, in seconds
+ * @param {string} lockToken - The job lock token
+ */
+async function deferJob(job, task, delay, lockToken) {
+  const timesDelayed = job?.data?.timesDelayed || 1;
+
+  if (timesDelayed >= maxDeferrals) {
+    await Promise.all([
+      harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
+      logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
+    ]);
+    throw new HarvestError('Maximum number of download defferal exceeded');
+  } else {
+    await harvestJobService.finish(task, { status: 'delayed' });
+  }
+
+  await job.updateData({ ...job.data, timesDelayed: timesDelayed + 1 });
+  await job.moveToDelayed(addSeconds(Date.now(), delay).getTime(), lockToken);
+  throw new DelayedError();
+}
 
 /**
  *
@@ -177,6 +218,18 @@ async function importSushiReport(options = {}) {
       addLog('warning', 'The report contains fatal exceptions, it will be re-downloaded');
       report = null;
     }
+
+    const wasDelayed = exceptions.some((e) => e?.Code === SUSHI_CODES.queuedForProcessing);
+
+    if (wasDelayed) {
+      addLog('info', 'The report was delayed, it will be re-downloaded');
+      report = null;
+    }
+
+    if (!sushiService.hasReportItems(report)) {
+      addLog('info', 'The report does not contain items, it will be re-downloaded');
+      report = null;
+    }
   }
 
   if (!report || forceDownload) {
@@ -185,6 +238,8 @@ async function importSushiReport(options = {}) {
     } catch (e) {
       throw new HarvestError('Failed to delete the local copy of the report', { cause: e });
     }
+
+    let deferred = false;
 
     try {
       let download = sushiService.getOngoingDownload(sushiData);
@@ -198,42 +253,42 @@ async function importSushiReport(options = {}) {
 
       downloadStep.data.url = download?.getUri?.({ obfuscate: true });
 
-      await Promise.all([
-        saveTask(),
+      await saveTask();
 
-        new Promise((resolve, reject) => {
-          download.on('error', reject);
-          download.on('finish', (response) => {
-            addLog('info', 'Download complete');
+      await new Promise((resolve, reject) => {
+        download.on('error', reject);
+        download.on('finish', (response) => {
+          addLog('info', 'Download complete');
 
-            const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
+          const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
 
-            downloadStep.data.statusCode = response?.status;
+          downloadStep.data.statusCode = response?.status;
 
-            if (response?.status === 202) {
-              addLog('warning', `Endpoint responded with status [${response?.status}]`);
-              task.status = 'delayed';
-              resolve();
-              return;
-            }
-            if (response?.status !== 200) {
-              addLog('error', `Endpoint responded with status [${response?.status}]`);
-            }
-            if (contentType !== 'application/json') {
-              addLog('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
-            }
-
+          if (response?.status === 202) {
+            addLog('warning', `Endpoint responded with status [${response?.status}]`);
+            deferred = true;
             resolve();
-          });
-        }),
-      ]);
+            return;
+          }
+
+          if (response?.status !== 200) {
+            addLog('error', `Endpoint responded with status [${response?.status}]`);
+          }
+
+          if (contentType !== 'application/json') {
+            addLog('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
+          }
+
+          resolve();
+        });
+      });
     } catch (e) {
       throw new HarvestError('Failed to download the COUNTER report', { cause: e });
     }
 
-    if (task.status === 'delayed') {
+    if (deferred) {
       await saveTask();
-      throw new HarvestError('Report download has been delayed', { type: 'delayed' });
+      throw new HarvestError('Report download has been deferred', { type: 'delayed' });
     }
 
     try {
@@ -263,7 +318,7 @@ async function importSushiReport(options = {}) {
 
       task.sushiExceptions.push({ code, severity, message: e?.Message });
 
-      if (code === 1011) {
+      if (code === SUSHI_CODES.queuedForProcessing) {
         isDelayed = true;
       }
 
@@ -272,7 +327,7 @@ async function importSushiReport(options = {}) {
         case 'error':
           hasError = true;
           downloadStep.data.sushiErrorCode = code;
-          task.sushiCode = code;
+          task.errorCode = code;
           addLog('error', message);
           break;
         case 'debug':
@@ -292,8 +347,6 @@ async function importSushiReport(options = {}) {
 
     if (isDelayed) {
       addLog('warning', 'Endpoint has queued report for processing');
-      task.status = 'delayed';
-      await saveTask();
       throw new HarvestError('Report download has been delayed', { type: 'delayed' });
     }
     if (hasError) {
@@ -614,11 +667,11 @@ async function importSushiReport(options = {}) {
 
 /**
  * Entrypoint of the harvest processor
- * @param {object} job - the Bull job
+ * @param {Job} job - the Bull job
  * @param {HarvestJob} taskData - the job data stored in the database
  * @returns {Promise<any>}
  */
-async function processJob(job, taskData, lockToken) {
+async function processJob(job, taskData) {
   const task = taskData;
 
   if (job.attemptsMade > 1) {
@@ -658,45 +711,15 @@ async function processJob(job, taskData, lockToken) {
     },
   });
 
-  try {
-    await importSushiReport({
-      sushi: credentials,
-      task,
-    });
-  } catch (err) {
-    appLogger.error(`Failed to import sushi report [${credentials.id}]`);
-    await logService.log(job.id, 'error', err.message);
-
-    if (err.type === 'delayed') {
-      await job.moveToDelayed(add(Date.now(), { minutes: 5 }).getTime(), lockToken);
-      return;
-    }
-
-
-    if (err instanceof HarvestError) {
-      if (err.cause instanceof Error) {
-        await logService.log(job.id, 'error', err.cause.message);
-        appLogger.error(err.cause.message);
-        appLogger.error(err.cause.stack);
-      }
-    } else {
-      appLogger.error(err.message);
-      appLogger.error(err.stack);
-    }
-
-    try {
-      await harvestJobService.finish(task, { status: 'failed' });
-    } catch (e) {
-      appLogger.error(`Failed to save sushi task ${task.id}`);
-      appLogger.error(e.message);
-    }
-
-    throw err;
-  }
+  await importSushiReport({
+    sushi: credentials,
+    task,
+  });
 
   return task.result;
 }
 
+/** @type {Processor} */
 module.exports = async function handle(job, lockToken) {
   await job.updateData({ ...job.data, pid: process.pid });
 
@@ -771,11 +794,43 @@ module.exports = async function handle(job, lockToken) {
   let result;
 
   try {
-    result = await processJob(job, task, lockToken);
-  } finally {
+    result = await processJob(job, task);
+  } catch (err) {
     clearTimeout(timeoutId);
     process.removeListener('SIGTERM', exitHandler);
+
+    if (err.type === 'delayed') {
+      appLogger.verbose(`[Harvest Job #${job?.id}] Deferring task [${taskId}]`);
+      await deferJob(job, task, deferralBackoffDuration, lockToken);
+      return;
+    }
+
+    appLogger.error(`Failed to import sushi report [${task.credentials?.id}]`);
+    await logService.log(job.id, 'error', err.message);
+
+    if (err instanceof HarvestError) {
+      if (err.cause instanceof Error) {
+        await logService.log(job.id, 'error', err.cause.message);
+        appLogger.error(err.cause.message);
+        appLogger.error(err.cause.stack);
+      }
+    } else {
+      appLogger.error(err.message);
+      appLogger.error(err.stack);
+    }
+
+    try {
+      await harvestJobService.finish(task, { status: 'failed' });
+    } catch (e) {
+      appLogger.error(`Failed to save sushi task ${task.id}`);
+      appLogger.error(e.message);
+    }
+
+    throw err;
   }
+
+  clearTimeout(timeoutId);
+  process.removeListener('SIGTERM', exitHandler);
 
   return result;
 };

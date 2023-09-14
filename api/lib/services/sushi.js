@@ -386,6 +386,15 @@ function validateReport(report) {
 }
 
 /**
+ * Check whether the given report has a Report_Item section or not
+ * @param {Object} report - The report to check
+ * @returns {boolean} whether the report contains a Report_Items section
+ */
+function hasReportItems(report) {
+  return Array.isArray(report?.Report_Items);
+}
+
+/**
  * Change an exception code into a severity string
  * @param {Integer} code the code of the exception
  * @returns a string representing the error severity (info, warning or error)
@@ -463,5 +472,6 @@ module.exports = {
   getExceptions,
   getExceptionSeverity,
   stringifyException,
+  hasReportItems,
   DEFAULT_REPORT_TYPE,
 };
