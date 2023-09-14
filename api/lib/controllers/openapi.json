@@ -695,6 +695,11 @@
             "description": "Additionnal job parameters",
             "type": "object"
           },
+          "errorCode": {
+            "description": "The error code, if a fatal exception was encountered",
+            "type": "string",
+            "readOnly": true
+          },
           "result": {
             "description": "Result of the job",
             "readOnly": true,
@@ -772,9 +777,9 @@
             "example": "TR",
             "readOnly": true
           },
-          "sushiCode": {
-            "description": "The SUSHI error code, if a fatal exception was encountered",
-            "type": "integer",
+          "errorCode": {
+            "description": "The error code, if a fatal exception was encountered",
+            "type": "string",
             "readOnly": true
           },
           "sushiExceptions": {

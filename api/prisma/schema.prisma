@@ -148,8 +148,8 @@ model HarvestJob {
   ignoreValidation Boolean          @default(false)
   params           Json?            @default("{}")
   result           Json?
-  /// SUSHI error code, if a fatal exception was encountered
-  sushiCode        Int?
+  /// Error code, if a fatal exception was encountered
+  errorCode        String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
   sushiExceptions  Json[]
   logs             Log[]
@@ -169,8 +169,8 @@ model Harvest {
   period          String
   /// Status of the harvest (waiting, running, finished, failed...)
   status          String
-  /// SUSHI error code, if a fatal exception was encountered
-  sushiCode       Int?
+  /// Error code, if a fatal exception was encountered
+  errorCode       String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
   sushiExceptions Json[]
   /// Number of report items that were successfuly inserted into Elasticsearch

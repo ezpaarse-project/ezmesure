@@ -129,7 +129,7 @@ CREATE TABLE "HarvestJob" (
     "ignoreValidation" BOOLEAN NOT NULL DEFAULT false,
     "params" JSONB DEFAULT '{}',
     "result" JSONB,
-    "sushiCode" INTEGER,
+    "errorCode" TEXT,
     "sushiExceptions" JSONB[],
 
     CONSTRAINT "HarvestJob_pkey" PRIMARY KEY ("id")
@@ -142,7 +142,7 @@ CREATE TABLE "Harvest" (
     "reportId" TEXT NOT NULL,
     "period" TEXT NOT NULL,
     "status" TEXT NOT NULL,
-    "sushiCode" INTEGER,
+    "errorCode" TEXT,
     "sushiExceptions" JSONB[],
     "insertedItems" INTEGER NOT NULL DEFAULT 0,
     "updatedItems" INTEGER NOT NULL DEFAULT 0,
