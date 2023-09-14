@@ -50,9 +50,9 @@
 
         <template v-if="status === 'failed'">
           <div class="subtitle-2">
-            {{ $t('reason', { reason: sushiFatalException || $t('indeterminate') }) }}
+            {{ $t('reason', { reason: error || $t('indeterminate') }) }}
           </div>
-          <div>{{ sushiExceptionMeaning }}</div>
+          <div>{{ errorMeaning }}</div>
         </template>
       </v-card-text>
 
@@ -120,16 +120,16 @@ export default {
 
       return this.$dateFunctions.format(localDate, 'PPPp');
     },
-    sushiFatalException() {
-      const sushiCode = this.harvest?.sushiCode;
-      const key = `tasks.status.exceptions.${sushiCode}`;
+    error() {
+      const errorCode = this.harvest?.errorCode;
+      const key = `tasks.status.exceptions.${errorCode}`;
 
-      return (sushiCode && this.$te(key)) ? this.$t(key) : undefined;
+      return (errorCode && this.$te(key)) ? this.$t(key) : undefined;
     },
-    sushiExceptionMeaning() {
-      const sushiCode = this.harvest?.sushiCode;
-      const key = `tasks.status.exceptionMeaning.${sushiCode}`;
-      return (sushiCode && this.$te(key)) ? this.$t(key) : undefined;
+    errorMeaning() {
+      const errorCode = this.harvest?.errorCode;
+      const key = `tasks.status.exceptionMeaning.${errorCode}`;
+      return (errorCode && this.$te(key)) ? this.$t(key) : undefined;
     },
     sushiExceptions() {
       return this.harvest?.sushiExceptions;
