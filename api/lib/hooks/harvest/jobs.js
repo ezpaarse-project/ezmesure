@@ -27,7 +27,7 @@ const onHarvestJobUpdate = async (harvestJob) => {
     insertedItems: harvestJob.result?.inserted || 0,
     updatedItems: harvestJob.result?.updated || 0,
     failedItems: harvestJob.result?.failed || 0,
-    sushiCode: harvestJob.sushiCode,
+    errorCode: harvestJob.errorCode,
     sushiExceptions: harvestJob.sushiExceptions,
   };
 
