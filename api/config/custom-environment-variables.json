@@ -62,7 +62,9 @@
   },
   "jobs": {
     "harvest": {
-      "concurrency": "EZMESURE_HARVEST_CONCURRENCY"
+      "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
+      "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
+      "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION"
     }
   },
   "depositors": {
