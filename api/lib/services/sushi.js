@@ -291,7 +291,6 @@ async function downloadReport(options = {}) {
   await fs.ensureDir(path.dirname(reportPath));
   await fs.ensureFile(tmpPath);
   const response = await axios(requestConfig);
-  // TODO: handle "try again later" and timeouts
 
   if (!response) {
     throw new Error('sushi endpoint didn\'t respond');
