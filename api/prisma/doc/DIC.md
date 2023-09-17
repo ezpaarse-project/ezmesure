@@ -137,7 +137,7 @@
 | ignoreValidation | `Boolean`          |                                                                                                         |            | `false`  |
 | params           | `Json?`            |                                                                                                         |            | `{}`     |
 | result           | `Json?`            |                                                                                                         |            |          |
-| sushiCode        | `Int?`             | SUSHI error code, if a fatal exception was encountered                                                  |            |          |
+| errorCode        | `String?`          | Error code, if a fatal exception was encountered                                                        |            |          |
 | sushiExceptions  | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
 | logs             | `Log[]`            |                                                                                                         |            |          |
 | steps            | `Step[]`           |                                                                                                         |            |          |
@@ -151,7 +151,7 @@
 | reportId        | `String`           | Report ID (TR, PR, DR...)                                                                               |            |         |
 | period          | `String`           | Report period (format: yyyy-MM)                                                                         |            |         |
 | status          | `String`           | Status of the harvest (waiting, running, finished, failed...)                                           |            |         |
-| sushiCode       | `Int?`             | SUSHI error code, if a fatal exception was encountered                                                  |            |         |
+| errorCode       | `String?`          | Error code, if a fatal exception was encountered                                                        |            |         |
 | sushiExceptions | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |         |
 | insertedItems   | `Int`              | Number of report items that were successfuly inserted into Elasticsearch                                |            | `0`     |
 | updatedItems    | `Int`              | Number of report items that were updated in Elasticsearch                                               |            | `0`     |
