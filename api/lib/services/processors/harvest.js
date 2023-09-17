@@ -291,7 +291,6 @@ async function importSushiReport(options = {}) {
     }
 
     if (deferred) {
-      await saveTask();
       throw new HarvestError('Report download has been deferred', { type: 'delayed' });
     }
 
@@ -354,7 +353,6 @@ async function importSushiReport(options = {}) {
       throw new HarvestError('Report download has been delayed', { type: 'delayed' });
     }
     if (hasError) {
-      await saveTask();
       throw new HarvestError('The report contains exceptions');
     }
   }
