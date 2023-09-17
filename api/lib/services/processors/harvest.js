@@ -77,7 +77,7 @@ class HarvestError extends Error {
 async function deferJob(job, task, delay, lockToken) {
   const timesDelayed = job?.data?.timesDelayed || 1;
 
-  if (timesDelayed >= maxDeferrals) {
+  if (timesDelayed > maxDeferrals) {
     await Promise.all([
       harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
       logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
