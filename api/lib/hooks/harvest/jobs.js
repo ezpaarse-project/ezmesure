@@ -1,9 +1,12 @@
 // @ts-check
 const hookEmitter = require('../hookEmitter');
+const { createQueue } = require('../utils');
 
 const { appLogger } = require('../../services/logger');
 
 const harvestService = require('../../entities/harvest.service');
+
+const queued = createQueue();
 
 /* eslint-disable max-len */
 /**
@@ -16,7 +19,7 @@ const harvestService = require('../../entities/harvest.service');
 /**
  * @param { HarvestJob } harvestJob
  */
-const onHarvestJobUpdate = async (harvestJob) => {
+const onHarvestJobUpdate = queued(async (harvestJob) => {
   /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
   const harvestData = {
     harvestedAt: new Date(),
@@ -49,7 +52,7 @@ const onHarvestJobUpdate = async (harvestJob) => {
   } catch (error) {
     appLogger.error(`[harvest][hooks] Harvest state [${harvestStateId}] cannot be updated: ${error.message}`);
   }
-};
+});
 
 hookEmitter.on('harvest-job:create', onHarvestJobUpdate);
 hookEmitter.on('harvest-job:update', onHarvestJobUpdate);
