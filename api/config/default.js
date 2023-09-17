@@ -1,6 +1,8 @@
 const path = require('path');
 const { format } = require('winston');
 
+const oneMinute = 60;
+
 module.exports = {
   port: 3000,
   mongo: {
@@ -76,7 +78,7 @@ module.exports = {
   jobs: {
     harvest: {
       maxDeferrals: 5,
-      deferralBackoffDuration: 10,
+      deferralBackoffDuration: 10 * oneMinute,
     },
   },
   notifications: {
