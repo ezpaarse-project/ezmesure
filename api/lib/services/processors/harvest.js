@@ -253,9 +253,12 @@ async function importSushiReport(options = {}) {
 
       downloadStep.data.url = download?.getUri?.({ obfuscate: true });
 
-      await saveTask();
+      // We must not wait for the task to be saved, otherwise the download
+      // may be finished before we register listeners.
+      await Promise.all([
+        saveTask(),
 
-      await new Promise((resolve, reject) => {
+        new Promise((resolve, reject) => {
         download.on('error', reject);
         download.on('finish', (response) => {
           addLog('info', 'Download complete');
@@ -281,7 +284,8 @@ async function importSushiReport(options = {}) {
 
           resolve();
         });
-      });
+        }),
+      ]);
     } catch (e) {
       throw new HarvestError('Failed to download the COUNTER report', { cause: e });
     }
