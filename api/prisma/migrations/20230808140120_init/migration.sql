@@ -192,6 +192,7 @@ CREATE TABLE "SushiEndpoint" (
     "requireRequestorId" BOOLEAN NOT NULL DEFAULT false,
     "requireApiKey" BOOLEAN NOT NULL DEFAULT false,
     "ignoreReportValidation" BOOLEAN NOT NULL DEFAULT false,
+    "disabledUntil" TIMESTAMP(3),
     "defaultCustomerId" TEXT,
     "defaultRequestorId" TEXT,
     "defaultApiKey" TEXT,

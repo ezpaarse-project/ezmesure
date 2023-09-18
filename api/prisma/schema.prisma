@@ -219,6 +219,7 @@ model SushiEndpoint {
   requireRequestorId     Boolean            @default(false)
   requireApiKey          Boolean            @default(false)
   ignoreReportValidation Boolean            @default(false)
+  disabledUntil          DateTime?
   defaultCustomerId      String?
   defaultRequestorId     String?
   defaultApiKey          String?

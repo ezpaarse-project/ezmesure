@@ -64,7 +64,8 @@
     "harvest": {
       "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
       "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
-      "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION"
+      "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION",
+      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION"
     }
   },
   "depositors": {

@@ -77,8 +77,10 @@ module.exports = {
   },
   jobs: {
     harvest: {
+      concurrency: 1,
       maxDeferrals: 5,
       deferralBackoffDuration: 10 * oneMinute,
+      busyBackoffDuration: 10 * oneMinute,
     },
   },
   notifications: {

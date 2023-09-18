@@ -2,12 +2,15 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const config = require('config');
 
+const busyBackoffDuration = parseInt(config.get('jobs.harvest.busyBackoffDuration'), 10);
 const deferralBackoffDuration = parseInt(config.get('jobs.harvest.deferralBackoffDuration'), 10);
 const maxDeferrals = parseInt(config.get('jobs.harvest.maxDeferrals'), 10);
 
 const { DelayedError } = require('bullmq');
 
 const addSeconds = require('date-fns/addSeconds');
+const dateIsValid = require('date-fns/isValid');
+const isFuture = require('date-fns/isFuture');
 const format = require('date-fns/format');
 const isSameMonth = require('date-fns/isSameMonth');
 const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
@@ -20,6 +23,7 @@ const elastic = require('../elastic');
 const harvestJobService = require('../../entities/harvest-job.service');
 const stepService = require('../../entities/step.service');
 const logService = require('../../entities/log.service');
+const sushiEndpointService = require('../../entities/sushi-endpoint.service');
 
 /* eslint-disable max-len */
 /**
@@ -71,11 +75,18 @@ class HarvestError extends Error {
  * Defer job by a given number of seconds
  * @param {Job} job - The BullMQ job
  * @param {HarvestJob} task - The HarvestJob associated to the BullMQ job
- * @param {Integer} delay - The delay to apply, in seconds
+ * @param {number} timestamp - Timestamp where the job should be moved back to the waiting list
  * @param {string} lockToken - The job lock token
  */
-async function deferJob(job, task, delay, lockToken) {
-  const timesDelayed = job?.data?.timesDelayed || 1;
+async function deferJob(job, task, timestamp, lockToken, options = {}) {
+  const {
+    incrementCounter = true,
+  } = options;
+  let timesDelayed = job?.data?.timesDelayed || 0;
+
+  if (incrementCounter) {
+    timesDelayed += 1;
+  }
 
   if (timesDelayed > maxDeferrals) {
     await Promise.all([
@@ -87,8 +98,8 @@ async function deferJob(job, task, delay, lockToken) {
     await harvestJobService.finish(task, { status: 'delayed' });
   }
 
-  await job.updateData({ ...job.data, timesDelayed: timesDelayed + 1 });
-  await job.moveToDelayed(addSeconds(Date.now(), delay).getTime(), lockToken);
+  await job.updateData({ ...job.data, timesDelayed });
+  await job.moveToDelayed(timestamp, lockToken);
   throw new DelayedError();
 }
 
@@ -259,31 +270,31 @@ async function importSushiReport(options = {}) {
         saveTask(),
 
         new Promise((resolve, reject) => {
-        download.on('error', reject);
-        download.on('finish', (response) => {
-          addLog('info', 'Download complete');
+          download.on('error', reject);
+          download.on('finish', (response) => {
+            addLog('info', 'Download complete');
 
-          const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
+            const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
 
-          downloadStep.data.statusCode = response?.status;
+            downloadStep.data.statusCode = response?.status;
 
-          if (response?.status === 202) {
-            addLog('warning', `Endpoint responded with status [${response?.status}]`);
-            deferred = true;
+            if (response?.status === 202) {
+              addLog('warning', `Endpoint responded with status [${response?.status}]`);
+              deferred = true;
+              resolve();
+              return;
+            }
+
+            if (response?.status !== 200) {
+              addLog('error', `Endpoint responded with status [${response?.status}]`);
+            }
+
+            if (contentType !== 'application/json') {
+              addLog('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
+            }
+
             resolve();
-            return;
-          }
-
-          if (response?.status !== 200) {
-            addLog('error', `Endpoint responded with status [${response?.status}]`);
-          }
-
-          if (contentType !== 'application/json') {
-            addLog('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
-          }
-
-          resolve();
-        });
+          });
         }),
       ]);
     } catch (e) {
@@ -310,6 +321,7 @@ async function importSushiReport(options = {}) {
   if (exceptions.length > 0) {
     let hasError = false;
     let isDelayed = false;
+    let endpointIsBusy = false;
 
     task.sushiExceptions = [];
 
@@ -321,8 +333,24 @@ async function importSushiReport(options = {}) {
 
       task.sushiExceptions.push({ code, severity, message: e?.Message });
 
-      if (code === SUSHI_CODES.queuedForProcessing) {
-        isDelayed = true;
+      switch (code) {
+        case SUSHI_CODES.serviceBusy:
+          addLog('warning', 'Endpoint is too busy to respond');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.tooManyRequests:
+          addLog('warning', 'Too many requests to the endpoint');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.serviceUnavailable:
+          addLog('warning', 'Endpoint is unavailable');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.queuedForProcessing:
+          addLog('info', 'Report has been queued for processing');
+          isDelayed = true;
+          break;
+        default:
       }
 
       switch (severity) {
@@ -348,6 +376,9 @@ async function importSushiReport(options = {}) {
       if (e?.Help_URL) { addLog('info', `[Help URL] ${e.Help_URL}`); }
     });
 
+    if (endpointIsBusy) {
+      throw new HarvestError('Endpoint is busy', { type: 'busy' });
+    }
     if (isDelayed) {
       addLog('warning', 'Endpoint has queued report for processing');
       throw new HarvestError('Report download has been delayed', { type: 'delayed' });
@@ -793,6 +824,22 @@ module.exports = async function handle(job, lockToken) {
     return job.remove();
   }
 
+  const endpoint = task.credentials?.endpoint;
+
+  if (endpoint?.id && endpoint?.disabledUntil) {
+    const disabledUntil = new Date(endpoint?.disabledUntil);
+
+    if (dateIsValid(disabledUntil) && isFuture(disabledUntil)) {
+      appLogger.info(`[Harvest Job #${job?.id}] Endpoint [${endpoint?.name || endpoint?.id}] is currently disabled, job will be postponed`);
+      await deferJob(job, task, disabledUntil.getTime(), lockToken, { incrementCounter: false });
+    } else {
+      await sushiEndpointService.update({
+        where: { id: endpoint.id },
+        data: { disabledUntil: null },
+      });
+    }
+  }
+
   let result;
 
   try {
@@ -802,9 +849,23 @@ module.exports = async function handle(job, lockToken) {
     process.removeListener('SIGTERM', exitHandler);
 
     if (err.type === 'delayed') {
-      appLogger.verbose(`[Harvest Job #${job?.id}] Deferring task [${taskId}]`);
-      await deferJob(job, task, deferralBackoffDuration, lockToken);
+      appLogger.verbose(`[Harvest Job #${job?.id}] Deferring task [${taskId}] by ${deferralBackoffDuration} seconds`);
+
+      const deferredDate = addSeconds(Date.now(), deferralBackoffDuration);
+      await deferJob(job, task, deferredDate.getTime(), lockToken);
       return;
+    }
+
+    if (err.type === 'busy') {
+      appLogger.verbose(`[Harvest Job #${job?.id}] Disabling endpoint [${endpoint?.name || endpoint?.id}] for ${busyBackoffDuration} seconds`);
+      const disabledUntil = addSeconds(Date.now(), busyBackoffDuration);
+
+      await sushiEndpointService.update({
+        where: { id: endpoint?.id },
+        data: { disabledUntil },
+      });
+
+      await deferJob(job, task, disabledUntil.getTime(), lockToken);
     }
 
     appLogger.error(`Failed to import sushi report [${task.credentials?.id}]`);
