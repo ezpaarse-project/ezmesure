@@ -198,6 +198,7 @@
 | requireRequestorId     | `Boolean`            |             |            | `false`  |
 | requireApiKey          | `Boolean`            |             |            | `false`  |
 | ignoreReportValidation | `Boolean`            |             |            | `false`  |
+| disabledUntil          | `DateTime?`          |             |            |          |
 | defaultCustomerId      | `String?`            |             |            |          |
 | defaultRequestorId     | `String?`            |             |            |          |
 | defaultApiKey          | `String?`            |             |            |          |
