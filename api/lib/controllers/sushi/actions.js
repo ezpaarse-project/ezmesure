@@ -469,6 +469,13 @@ exports.harvestSushi = async (ctx) => {
   ctx.type = 'json';
   ctx.body = await Promise.all(periods.map(async (period) => {
     const task = await harvestJobsService.create({
+      include: {
+        credentials: {
+          include: {
+            endpoint: true,
+          },
+        },
+      },
       data: {
         credentials: {
           connect: { id: sushi.id },
