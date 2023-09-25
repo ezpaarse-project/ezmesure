@@ -48,6 +48,14 @@ const immutableFields = [
   'endpoint',
   'harvests',
 ];
+
+/**
+ * Fields that can be populated with related items
+ */
+const includableFields = [
+  'endpoint',
+  'institution',
+  'harvests',
 ];
 
 /**
@@ -80,4 +88,5 @@ module.exports = {
   createSchema: Joi.object(createSchema).required(),
   updateSchema: Joi.object(updateSchema).required(),
   importSchema,
+  includableFields,
 };
