@@ -39,7 +39,7 @@ exports.getAll = async (ctx) => {
   }
   if (endpointId) {
     where.credentials = {
-      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) }
+      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) },
     };
   }
   if (harvestId) {
