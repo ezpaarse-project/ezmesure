@@ -18,38 +18,72 @@ const sushiCredentialsService = require('../../entities/sushi-credentials.servic
 const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
 
+/* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
  */
+/* eslint-enable max-len */
 
 exports.getAll = async (ctx) => {
-  const where = {};
-  const { query = {} } = ctx.request;
   const {
     id: sushiIds,
     institutionId,
     endpointId,
-  } = query;
+    include: propsToInclude,
+    q: query,
+    size,
+    sort,
+    order = 'asc',
+    page = 1,
+  } = ctx.query;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
+  /** @type {SushiCredentialsFindManyArgs} */
+  const options = {
+    include,
+    take: Number.isInteger(size) ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+    where: {},
+  };
+
+  if (sort) {
+    options.orderBy = { [sort]: order };
+  }
+
+  if (query) {
+    options.where = {
+      OR: [
+        { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
+        { institution: { name: { contains: query, mode: 'insensitive' } } },
+      ],
+    };
+  }
 
   if (sushiIds) {
-    where.id = Array.isArray(sushiIds)
+    options.where.id = Array.isArray(sushiIds)
       ? { in: sushiIds }
       : { equals: sushiIds };
   }
   if (institutionId) {
-    where.institutionId = Array.isArray(institutionId)
+    options.where.institutionId = Array.isArray(institutionId)
       ? { in: institutionId }
       : { equals: institutionId };
   }
   if (endpointId) {
-    where.endpointId = Array.isArray(endpointId)
+    options.where.endpointId = Array.isArray(endpointId)
       ? { in: endpointId }
       : { equals: endpointId };
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiCredentialsService.findMany({ where });
+  ctx.body = await sushiCredentialsService.findMany(options);
 };
 
 exports.getOne = async (ctx) => {

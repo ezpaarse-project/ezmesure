@@ -6,6 +6,7 @@ const {
   createSchema,
   importSchema,
   updateSchema,
+  includableFields,
 } = require('../../entities/sushi-credentials.dto');
 
 const { stringifyException } = require('../../services/sushi');
@@ -104,12 +105,22 @@ router.route({
     getAll,
   ],
   validate: {
-    query: {
+    query: Joi.object({
       id: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       connection: Joi.string().valid('working', 'faulty', 'untested'),
-    },
+      q: Joi.string().min(0),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    })
+      .rename('include[]', 'include')
+      .rename('id[]', 'id')
+      .rename('endpointId[]', 'endpointId')
+      .rename('institutionId[]', 'institutionId'),
   },
 });
 
