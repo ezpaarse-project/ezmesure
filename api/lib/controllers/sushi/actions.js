@@ -467,7 +467,7 @@ exports.harvestSushi = async (ctx) => {
   const periods = eachMonthOfInterval({ start: beginDate, end: endDate });
 
   ctx.type = 'json';
-  ctx.body = await periods.map(async (period) => {
+  ctx.body = await Promise.all(periods.map(async (period) => {
     const task = await harvestJobsService.create({
       data: {
         credentials: {
@@ -492,7 +492,7 @@ exports.harvestSushi = async (ctx) => {
     );
 
     return task;
-  });
+  }));
 };
 
 exports.importSushiItems = async (ctx) => {
