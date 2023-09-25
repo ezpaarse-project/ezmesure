@@ -43,7 +43,7 @@ exports.getAll = async (ctx) => {
     };
   }
   if (harvestId) {
-    where.params = { path: 'harvestId', in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
+    where.harvestId = { in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
   }
 
   let distinct;
