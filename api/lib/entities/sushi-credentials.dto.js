@@ -34,7 +34,7 @@ const schema = {
     scope: Joi.string().trim().lowercase(),
   })),
 
-  harvestRequests: Joi.array().items(Joi.object()),
+  harvests: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -46,7 +46,8 @@ const immutableFields = [
   'createdAt',
   'institution',
   'endpoint',
-  'harvestRequests',
+  'harvests',
+];
 ];
 
 /**

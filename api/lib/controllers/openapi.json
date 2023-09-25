@@ -1058,11 +1058,11 @@
               "$ref": "#/components/schemas/SushiParameter"
             }
           },
-          "harvestRequests": {
+          "harvests": {
             "description": "Harvest requests associated with the credentials",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HarvestRequest"
+              "$ref": "#/components/schemas/Harvest"
             }
           }
         }
