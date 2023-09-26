@@ -361,7 +361,13 @@ class Reporter {
     );
 
     await insertStyles(page, styles);
-    await waitForCompleteRender(page, visCount);
+
+    await Promise.race([
+      waitForCompleteRender(page, visCount),
+      new Promise((resolve, reject) => {
+        setTimeout(() => { reject(new Error('Dashboard render timed out')); }, 30000);
+      }),
+    ]);
 
     if (print) {
       await positionElements(page, viewport);
