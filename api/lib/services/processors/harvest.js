@@ -66,12 +66,6 @@ class HarvestError extends Error {
 }
 
 /**
- * @typedef {object} ImportOptions
- * @property {SushiCredentials} sushi - The SUSHI item to be harvested
- * @property {HarvestJob} task - The harvest job data
- */
-
-/**
  * Defer job by a given number of seconds
  * @param {Job} job - The BullMQ job
  * @param {HarvestJob} task - The HarvestJob associated to the BullMQ job
@@ -105,7 +99,10 @@ async function deferJob(job, task, timestamp, lockToken, options = {}) {
 
 /**
  *
- * @param {ImportOptions} options
+ * @param {object} options
+ * @param {SushiCredentials} options.sushi - The SUSHI item to be harvested
+ * @param {HarvestJob} options.job - The harvest job data
+ * @param {boolean} options.ignoreValidation - Whether validation errors should be ignored
  * @returns {Promise<void>}
  */
 async function importSushiReport(options = {}) {
