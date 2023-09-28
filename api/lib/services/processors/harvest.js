@@ -830,7 +830,7 @@ module.exports = async function handle(job, lockToken) {
     const disabledUntil = new Date(endpoint?.disabledUntil);
 
     if (dateIsValid(disabledUntil) && isFuture(disabledUntil)) {
-      appLogger.info(`[Harvest Job #${job?.id}] Endpoint [${endpoint?.name || endpoint?.id}] is currently disabled, job will be postponed`);
+      appLogger.info(`[Harvest Job #${job?.id}] Endpoint [${endpoint?.vendor || endpoint?.id}] is currently disabled, job will be postponed`);
       await deferJob(job, task, disabledUntil.getTime(), lockToken, { incrementCounter: false });
     } else {
       await sushiEndpointService.update({
@@ -857,7 +857,7 @@ module.exports = async function handle(job, lockToken) {
     }
 
     if (err.type === 'busy') {
-      appLogger.verbose(`[Harvest Job #${job?.id}] Disabling endpoint [${endpoint?.name || endpoint?.id}] for ${busyBackoffDuration} seconds`);
+      appLogger.verbose(`[Harvest Job #${job?.id}] Disabling endpoint [${endpoint?.vendor || endpoint?.id}] for ${busyBackoffDuration} seconds`);
       const disabledUntil = addSeconds(Date.now(), busyBackoffDuration);
 
       await sushiEndpointService.update({
