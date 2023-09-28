@@ -237,14 +237,14 @@ exports.getHarvests = async (ctx) => {
 };
 
 exports.getAvailableReports = async (ctx) => {
-  const { sushi, endpoint } = ctx.state;
+  const { sushi } = ctx.state;
 
   let data;
   let headers;
   let exceptions;
 
   try {
-    ({ data, headers } = await sushiService.getAvailableReports(endpoint, sushi));
+    ({ data, headers } = await sushiService.getAvailableReports(sushi));
   } catch (e) {
     exceptions = sushiService.getExceptions(e?.response?.data);
 

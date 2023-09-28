@@ -25,6 +25,10 @@ const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 const ajv = new Ajv({ schemas: [definitions], strict: false });
 addFormats(ajv);
 
+/**
+ * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
+ */
+
 const reportValidators = new Map([
   ['pr', ajv.getSchema('#/definitions/COUNTER_platform_report')],
   ['dr', ajv.getSchema('#/definitions/COUNTER_database_report')],
@@ -95,47 +99,47 @@ const DEFAULT_REPORT_TYPE = 'tr';
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
 /**
- * Download a report, if not found locally or currently being downloaded
- * @param {Object} options sushi
- *                         beginDate
- *                         endDate
+ * Get query parameters of a given SUSHI item
+ * @param {SushiCredentials} sushiItem - The SUSHI item
+ * @param {Array<string>} scopes - The scopes of the request
+ * @returns {object} The query parameters
  */
-async function getAvailableReports(endpoint = {}, sushi = {}) {
+function getSushiParams(sushiItem, scopes = []) {
+  const allowedScopes = new Set(scopes);
+  const queryParams = {};
+
+  sushiItem?.endpoint?.params?.forEach?.((param) => {
+    if (param?.name && allowedScopes.has(param.scope)) {
+      queryParams[param.name] = param.value;
+    }
+  });
+
+  sushiItem?.params?.forEach?.((param) => {
+    if (param?.name && allowedScopes.has(param.scope)) {
+      queryParams[param.name] = param.value;
+    }
+  });
+
+  if (sushiItem?.requestorId) { queryParams.requestor_id = sushiItem.requestorId; }
+  if (sushiItem?.customerId) { queryParams.customer_id = sushiItem.customerId; }
+  if (sushiItem?.apiKey) { queryParams.api_key = sushiItem.apiKey; }
+
+  return queryParams;
+}
+
+/**
+ * Get the list of available reports for a given SUSHI item
+ * @param {SushiCredentials} sushi - The SUSHI item
+ * @returns {Promise<any>} The endpoint response
+ */
+async function getAvailableReports(sushi) {
   const {
     sushiUrl,
-    params: endpointParams,
-  } = endpoint;
-
-  const {
-    requestorId,
-    customerId,
-    apiKey,
-    params: sushiParams,
-  } = sushi;
+  } = sushi?.endpoint || {};
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
-  const params = {};
-
-  const allowedScopes = new Set([
-    undefined,
-    'all',
-    'report_list',
-  ]);
-
-  endpointParams?.forEach?.((param) => {
-    if (param?.name && allowedScopes.has(param.scope)) {
-      params[param.name] = param.value;
-    }
-  });
-  sushiParams?.forEach?.((param) => {
-    if (param?.name && allowedScopes.has(param.scope)) {
-      params[param.name] = param.value;
-    }
-  });
-
-  if (requestorId) { params.requestor_id = requestorId; }
-  if (customerId) { params.customer_id = customerId; }
-  if (apiKey) { params.api_key = apiKey; }
+  const allowedScopes = [undefined, 'all', 'report_list'];
+  const params = getSushiParams(sushi, allowedScopes);
 
   const response = await axios({
     method: 'get',
@@ -164,17 +168,9 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
 
   const {
     sushiUrl,
-    params: endpointParams,
   } = endpoint;
 
   const paramSeparator = endpoint.paramSeparator || '|';
-
-  const {
-    requestorId,
-    customerId,
-    apiKey,
-    params: sushiParams,
-  } = sushi;
 
   const {
     reportType = DEFAULT_REPORT_TYPE,
@@ -188,35 +184,21 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   }
 
   const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
-  const params = {};
 
-  const allowedScopes = new Set([
+  const allowedScopes = [
     undefined,
     'all',
     'report_download',
     `report_download_${reportType}`,
-  ]);
+  ];
 
-  endpointParams?.forEach?.((param) => {
-    if (param?.name && allowedScopes.has(param.scope)) {
-      params[param.name] = param.value;
-    }
-  });
-  sushiParams?.forEach?.((param) => {
-    if (param?.name && allowedScopes.has(param.scope)) {
-      params[param.name] = param.value;
-    }
-  });
+  const params = getSushiParams(sushi, allowedScopes);
 
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
 
   if (!paramNames.has('attributes_to_show')) {
     params.attributes_to_show = optionalAttributes.get(reportType)?.join?.(paramSeparator);
   }
-
-  if (requestorId) { params.requestor_id = requestorId; }
-  if (customerId) { params.customer_id = customerId; }
-  if (apiKey) { params.api_key = apiKey; }
 
   const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
 
