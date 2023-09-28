@@ -225,14 +225,13 @@ router.route({
   path: '/:sushiId/connection',
   handler: [
     commonHandlers(FEATURES.sushi.read),
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     async (ctx) => {
       const { sushi, institution } = ctx.state;
 
       ctx.action = 'sushi/check-connection';
       ctx.metadata = {
         sushiId: sushi.id,
-        vendor: sushi.vendor,
+        vendor: sushi.endpoint?.vendor,
         institutionId: institution.id,
         institutionName: institution.name,
       };
