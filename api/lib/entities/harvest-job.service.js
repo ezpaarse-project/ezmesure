@@ -98,6 +98,8 @@ module.exports = class HarvestJobsService {
   /**
    * @param {HarvestJob} job
    * @param {object} options
+   * @param {string} [options.status=finished] - The status of the task
+   * @param {string} [options.errorCode] - An error code
    * @returns {Promise<HarvestJob>}
    */
   static finish(job, options = {}) {
