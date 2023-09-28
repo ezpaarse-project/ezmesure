@@ -358,7 +358,7 @@ async function importSushiReport(options = {}) {
         case 'error':
           hasError = true;
           downloadStep.data.sushiErrorCode = code;
-          task.errorCode = code;
+          task.errorCode = `sushi:${code}`;
           addLog('error', message);
           break;
         case 'debug':
