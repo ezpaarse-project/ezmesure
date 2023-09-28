@@ -376,6 +376,8 @@ async function importSushiReport(options = {}) {
       if (e?.Help_URL) { addLog('info', `[Help URL] ${e.Help_URL}`); }
     });
 
+    await saveTask();
+
     if (endpointIsBusy) {
       throw new HarvestError('Endpoint is busy', { type: 'busy' });
     }
