@@ -183,29 +183,30 @@
 
 ### SushiEndpoint
 
-| Property               | Type                 | Description | Attributes | Default  |
-|------------------------|----------------------|-------------|------------|----------|
-| id                     | `String`             |             | Id         | `cuid()` |
-| createdAt              | `DateTime`           |             |            | `now()`  |
-| updatedAt              | `DateTime`           |             |            |          |
-| sushiUrl               | `String`             |             |            |          |
-| vendor                 | `String`             |             |            |          |
-| tags                   | `String[]`           |             |            |          |
-| description            | `String?`            |             |            |          |
-| counterVersion         | `String?`            |             |            |          |
-| technicalProvider      | `String?`            |             |            |          |
-| requireCustomerId      | `Boolean`            |             |            | `false`  |
-| requireRequestorId     | `Boolean`            |             |            | `false`  |
-| requireApiKey          | `Boolean`            |             |            | `false`  |
-| ignoreReportValidation | `Boolean`            |             |            | `false`  |
-| disabledUntil          | `DateTime?`          |             |            |          |
-| defaultCustomerId      | `String?`            |             |            |          |
-| defaultRequestorId     | `String?`            |             |            |          |
-| defaultApiKey          | `String?`            |             |            |          |
-| paramSeparator         | `String?`            |             |            |          |
-| supportedReports       | `String[]`           |             |            |          |
-| credentials            | `SushiCredentials[]` |             |            |          |
-| params                 | `Json[]`             |             |            |          |
+| Property                  | Type                 | Description | Attributes | Default  |
+|---------------------------|----------------------|-------------|------------|----------|
+| id                        | `String`             |             | Id         | `cuid()` |
+| createdAt                 | `DateTime`           |             |            | `now()`  |
+| updatedAt                 | `DateTime`           |             |            |          |
+| sushiUrl                  | `String`             |             |            |          |
+| vendor                    | `String`             |             |            |          |
+| tags                      | `String[]`           |             |            |          |
+| description               | `String?`            |             |            |          |
+| counterVersion            | `String?`            |             |            |          |
+| technicalProvider         | `String?`            |             |            |          |
+| requireCustomerId         | `Boolean`            |             |            | `false`  |
+| requireRequestorId        | `Boolean`            |             |            | `false`  |
+| requireApiKey             | `Boolean`            |             |            | `false`  |
+| ignoreReportValidation    | `Boolean`            |             |            | `false`  |
+| disabledUntil             | `DateTime?`          |             |            |          |
+| defaultCustomerId         | `String?`            |             |            |          |
+| defaultRequestorId        | `String?`            |             |            |          |
+| defaultApiKey             | `String?`            |             |            |          |
+| paramSeparator            | `String?`            |             |            |          |
+| supportedReports          | `String[]`           |             |            |          |
+| supportedReportsUpdatedAt | `DateTime?`          |             |            |          |
+| credentials               | `SushiCredentials[]` |             |            |          |
+| params                    | `Json[]`             |             |            |          |
 
 ### SushiCredentials
 
