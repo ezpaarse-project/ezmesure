@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const config = require('config');
+const { setTimeout } = require('timers/promises');
 
 const busyBackoffDuration = parseInt(config.get('jobs.harvest.busyBackoffDuration'), 10);
 const deferralBackoffDuration = parseInt(config.get('jobs.harvest.deferralBackoffDuration'), 10);
@@ -194,6 +195,7 @@ async function importSushiReport(options = {}) {
   }
 
   function addLog(level, message) {
+    appLogger[level === 'warning' ? 'warn' : level]?.(message);
     logs.push({ level, message });
   }
 
@@ -840,6 +842,9 @@ module.exports = async function handle(job, lockToken) {
   }
 
   let result;
+
+  // Just a little delay to avoid spamming too fast when harvesting a single platform
+  await setTimeout(500);
 
   try {
     result = await processJob(job, task);
