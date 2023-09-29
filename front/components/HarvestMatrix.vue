@@ -23,6 +23,7 @@
       :items="harvestsByType"
       :items-per-page="-1"
       :loading="loading"
+      :options="{ sortBy: ['reportId'], sortDesc: [false] }"
       hide-default-footer
     >
       <template #top>
