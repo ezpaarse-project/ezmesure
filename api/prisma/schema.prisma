@@ -206,27 +206,28 @@ model Step {
 }
 
 model SushiEndpoint {
-  id                     String             @id @default(cuid())
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
-  sushiUrl               String
-  vendor                 String
-  tags                   String[]
-  description            String?
-  counterVersion         String?
-  technicalProvider      String?
-  requireCustomerId      Boolean            @default(false)
-  requireRequestorId     Boolean            @default(false)
-  requireApiKey          Boolean            @default(false)
-  ignoreReportValidation Boolean            @default(false)
-  disabledUntil          DateTime?
-  defaultCustomerId      String?
-  defaultRequestorId     String?
-  defaultApiKey          String?
-  paramSeparator         String?
-  supportedReports       String[]
-  credentials            SushiCredentials[]
-  params                 Json[]
+  id                        String             @id @default(cuid())
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  sushiUrl                  String
+  vendor                    String
+  tags                      String[]
+  description               String?
+  counterVersion            String?
+  technicalProvider         String?
+  requireCustomerId         Boolean            @default(false)
+  requireRequestorId        Boolean            @default(false)
+  requireApiKey             Boolean            @default(false)
+  ignoreReportValidation    Boolean            @default(false)
+  disabledUntil             DateTime?
+  defaultCustomerId         String?
+  defaultRequestorId        String?
+  defaultApiKey             String?
+  paramSeparator            String?
+  supportedReports          String[]
+  supportedReportsUpdatedAt DateTime?
+  credentials               SushiCredentials[]
+  params                    Json[]
 }
 
 model SushiCredentials {

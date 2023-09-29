@@ -17,6 +17,7 @@ const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
+const SushiEndpointsService = require('../../entities/sushi-endpoint.service');
 
 /* eslint-disable max-len */
 /**
@@ -437,6 +438,28 @@ exports.harvestSushi = async (ctx) => {
     institutionName: institution.name,
     reportType,
   };
+
+  const supportedReportsUpdatedAt = parseISO(endpoint?.supportedReportsUpdatedAt);
+  const oneMonthAgo = subMonths(new Date(), 1);
+
+  if (!isValidDate(supportedReportsUpdatedAt) || isBefore(supportedReportsUpdatedAt, oneMonthAgo)) {
+    appLogger.verbose(`Updating supported SUSHI reports of [${endpoint?.vendor}]`);
+    const { data } = await sushiService.getAvailableReports(sushi);
+
+    const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+
+    if (!Array.isArray(data) || !data.every(isValidReport)) {
+      ctx.throw(502, ctx.$t('errors.harvest.failedToUpdateSupportedReports'), { expose: true });
+    }
+
+    sushi.endpoint = await SushiEndpointsService.update({
+      where: { id: sushi?.endpoint?.id },
+      data: {
+        supportedReports: data.map((report) => report.Report_ID.toLowerCase()),
+        supportedReportsUpdatedAt: new Date(),
+      },
+    });
+  }
 
   /** @type {Date} */
   let beginDate = body.beginDate && parseISO(body.beginDate, 'yyyy-MM');

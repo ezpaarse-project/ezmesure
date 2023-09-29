@@ -198,6 +198,7 @@ CREATE TABLE "SushiEndpoint" (
     "defaultApiKey" TEXT,
     "paramSeparator" TEXT,
     "supportedReports" TEXT[],
+    "supportedReportsUpdatedAt" TIMESTAMP(3),
     "params" JSONB[],
 
     CONSTRAINT "SushiEndpoint_pkey" PRIMARY KEY ("id")
