@@ -405,10 +405,13 @@ exports.harvestSushi = async (ctx) => {
   const {
     target,
     forceDownload,
-    reportType,
     ignoreValidation,
     harvestId = uuidv4(),
     timeout,
+  } = body;
+
+  let {
+    reportType: reportTypes,
   } = body;
 
   const { sushi } = ctx.state;
@@ -436,7 +439,7 @@ exports.harvestSushi = async (ctx) => {
     vendor: endpoint.vendor,
     institutionId: institution.id,
     institutionName: institution.name,
-    reportType,
+    reportTypes,
   };
 
   const supportedReportsUpdatedAt = parseISO(endpoint?.supportedReportsUpdatedAt);
@@ -459,6 +462,10 @@ exports.harvestSushi = async (ctx) => {
         supportedReportsUpdatedAt: new Date(),
       },
     });
+  }
+
+  if (reportTypes.includes('all')) {
+    reportTypes = sushi.endpoint.supportedReports.slice();
   }
 
   /** @type {Date} */
@@ -490,7 +497,7 @@ exports.harvestSushi = async (ctx) => {
   const periods = eachMonthOfInterval({ start: beginDate, end: endDate });
 
   ctx.type = 'json';
-  ctx.body = await Promise.all(periods.map(async (period) => {
+  ctx.body = await Promise.all(reportTypes.flatMap((reportType) => periods.map(async (period) => {
     const task = await harvestJobsService.create({
       include: {
         credentials: {
@@ -522,7 +529,7 @@ exports.harvestSushi = async (ctx) => {
     );
 
     return task;
-  }));
+  })));
 };
 
 exports.importSushiItems = async (ctx) => {
