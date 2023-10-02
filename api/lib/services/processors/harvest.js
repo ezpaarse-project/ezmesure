@@ -195,7 +195,6 @@ async function importSushiReport(options = {}) {
   }
 
   function addLog(level, message) {
-    appLogger[level === 'warning' ? 'warn' : level]?.(message);
     logs.push({ level, message });
   }
 
