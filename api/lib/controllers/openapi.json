@@ -6188,10 +6188,13 @@
                     "description": "The index where the report should be imported"
                   },
                   "reportType": {
-                    "type": "string",
-                    "description": "The report type that should be harvested",
-                    "example": "tr",
-                    "default": "tr"
+                    "type": "array",
+                    "description": "The report types that should be harvested. If it contains 'all', every available reports will be harvested.",
+                    "items": {
+                      "type": "string",
+                      "example": "tr",
+                      "default": "tr"
+                    }
                   },
                   "beginDate": {
                     "type": "string",
