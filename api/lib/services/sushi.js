@@ -36,6 +36,25 @@ const reportValidators = new Map([
   ['ir', ajv.getSchema('#/definitions/COUNTER_item_report')],
 ]);
 
+const REPORT_IDS = [
+  'dr',
+  'dr_d1',
+  'dr_d2',
+  'ir',
+  'ir_a1',
+  'ir_m1',
+  'pr',
+  'pr_p1',
+  'tr',
+  'tr_b1',
+  'tr_b2',
+  'tr_b3',
+  'tr_j1',
+  'tr_j2',
+  'tr_j3',
+  'tr_j4',
+];
+
 const optionalAttributes = new Map([
   [
     'pr', [
@@ -455,4 +474,5 @@ module.exports = {
   stringifyException,
   hasReportItems,
   DEFAULT_REPORT_TYPE,
+  REPORT_IDS,
 };
