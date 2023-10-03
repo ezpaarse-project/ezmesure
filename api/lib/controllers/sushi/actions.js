@@ -442,7 +442,7 @@ exports.harvestSushi = async (ctx) => {
     reportTypes,
   };
 
-  const supportedReportsUpdatedAt = parseISO(endpoint?.supportedReportsUpdatedAt);
+  const supportedReportsUpdatedAt = endpoint?.supportedReportsUpdatedAt;
   const oneMonthAgo = subMonths(new Date(), 1);
 
   if (!isValidDate(supportedReportsUpdatedAt) || isBefore(supportedReportsUpdatedAt, oneMonthAgo)) {
