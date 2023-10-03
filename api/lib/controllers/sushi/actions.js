@@ -447,18 +447,26 @@ exports.harvestSushi = async (ctx) => {
 
   if (!isValidDate(supportedReportsUpdatedAt) || isBefore(supportedReportsUpdatedAt, oneMonthAgo)) {
     appLogger.verbose(`Updating supported SUSHI reports of [${endpoint?.vendor}]`);
-    const { data } = await sushiService.getAvailableReports(sushi);
 
     const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+    let supportedReports;
 
-    if (!Array.isArray(data) || !data.every(isValidReport)) {
-      ctx.throw(502, ctx.$t('errors.harvest.failedToUpdateSupportedReports'), { expose: true });
+    try {
+      const { data } = await sushiService.getAvailableReports(sushi);
+
+      if (!Array.isArray(data) || !data.every(isValidReport)) {
+        throw new Error('invalid response body');
+      }
+
+      supportedReports = data.map((report) => report.Report_ID.toLowerCase());
+    } catch (e) {
+      appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
     }
 
     sushi.endpoint = await SushiEndpointsService.update({
       where: { id: sushi?.endpoint?.id },
       data: {
-        supportedReports: data.map((report) => report.Report_ID.toLowerCase()),
+        supportedReports,
         supportedReportsUpdatedAt: new Date(),
       },
     });
