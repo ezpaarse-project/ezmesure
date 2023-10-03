@@ -19,6 +19,8 @@ const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoint.service');
 
+const REPORT_IDS = new Set(sushiService.REPORT_IDS);
+
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
@@ -473,7 +475,15 @@ exports.harvestSushi = async (ctx) => {
   }
 
   if (reportTypes.includes('all')) {
-    reportTypes = sushi.endpoint.supportedReports.slice();
+    const { supportedReports = [] } = sushi.endpoint;
+
+    if (supportedReports.length === 0) {
+      reportTypes = Array.from(REPORT_IDS);
+    } else {
+      reportTypes = Array.from(
+        new Set(supportedReports.filter((reportId) => REPORT_IDS.has(reportId))),
+      );
+    }
   }
 
   /** @type {Date} */
