@@ -36,7 +36,7 @@
 
         <!-- activity tab -->
         <v-tab-item class="pa-1">
-          <ezr-history-table />
+          <ezr-tasks-activity-table />
         </v-tab-item>
 
         <!-- "admin" tab -->
