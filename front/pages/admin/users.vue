@@ -78,9 +78,7 @@
       v-model="selected"
       :headers="tableHeaders"
       :items="users"
-      :search="search"
       :loading="refreshing"
-      :custom-filter="basicFilter"
       sort-by="username"
       item-key="username"
       show-select
@@ -203,22 +201,22 @@ export default {
         {
           text: this.$t('users.user.fullName'),
           value: 'fullName',
-          filter: (value) => this.basicStringFilter('fullName', value),
+          filter: (_value, _search, item) => this.columnStringFilter('fullName', item),
         },
         {
           text: this.$t('users.user.username'),
           value: 'username',
-          filter: (value) => this.basicStringFilter('username', value),
+          filter: (_value, _search, item) => this.columnStringFilter('username', item),
         },
         {
           text: this.$t('users.user.email'),
           value: 'email',
-          filter: (value) => this.basicStringFilter('email', value),
+          filter: (_value, _search, item) => this.columnStringFilter('email', item),
         },
         {
           text: this.$t('users.user.isAdmin'),
           value: 'isAdmin',
-          filter: (value) => this.filters.isAdmin === undefined || this.filters.isAdmin === value,
+          filter: (value) => this.basicBoolFilter('isAdmin', value),
         },
         {
           text: this.$t('users.user.memberships'),
@@ -281,17 +279,19 @@ export default {
     /**
      * Basic filter applied by default to v-data-table
      *
-     * @param {*} value The item's value
-     * @param {*} search The value searched
+     * @param {string} value The item's value
+     * @param {string} search The value searched
      */
     basicFilter(value, search) {
       return value.toLowerCase().includes(search.toLowerCase());
     },
     /**
-     * Basic filter applied to fields using filter popups
+     * Basic filter applied to string fields using filter popups
      *
      * @param {string} field The filter's field
-     * @param {*} value The item's value
+     * @param {string} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
      */
     basicStringFilter(field, value) {
       if (!this.filters[field]) {
@@ -300,7 +300,42 @@ export default {
       return this.basicFilter(value, this.filters[field]);
     },
     /**
+     * Basic filter applied to fields using filter popups
+     *
+     * @param {string} field The filter's field
+     * @param {boolean} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    basicBoolFilter(field, value) {
+      if (this.filters[field] == null) {
+        return true;
+      }
+      return this.filters[field] === value;
+    },
+    /**
+     * Filter for string column using search, fallbacks to filters
+     *
+     * @param {string} field The item's field
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnStringFilter(field, item) {
+      if (this.search) {
+        const isFullName = this.basicFilter(item.fullName, this.search);
+        const isUsername = this.basicFilter(item.username, this.search);
+        const isEmail = this.basicFilter(item.email, this.search);
+        return isFullName || isUsername || isEmail;
+      }
+      return this.basicStringFilter(field, item[field]);
+    },
+    /**
      * Filter applied to memberships
+     *
+     * @param {any[]} value
+     *
+     * @return {boolean} If the item must be showed or not
      */
     membershipsFilter(value) {
       const data = this.extractMembershipsData(value);
@@ -343,7 +378,12 @@ export default {
      *
      * @param {any[]} memberships The user's memberships
      *
-     * @returns user's permissions, roles, institutions
+     * @typedef {Object} MembershipData
+     * @property {Set} permissions
+     * @property {Set} roles
+     * @property {Map<string, *>} institutions
+     *
+     * @returns {MembershipData} user's permissions, roles, institutions
      */
     extractMembershipsData(memberships) {
       const permissions = [];
