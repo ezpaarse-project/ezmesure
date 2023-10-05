@@ -49,9 +49,16 @@
           color="black"
           @click="showUsersFiltersDrawer = true"
         >
-          <v-icon left>
-            mdi-filter
-          </v-icon>
+          <v-badge
+            :value="filtersCount > 0"
+            :content="filtersCount"
+            overlap
+            left
+          >
+            <v-icon>
+              mdi-filter
+            </v-icon>
+          </v-badge>
           {{ $t('filter') }}
         </v-btn>
 
@@ -77,6 +84,7 @@
       sort-by="username"
       item-key="username"
       show-select
+      @current-items="currentItemCount = $event.length"
     >
       <template #[`item.isAdmin`]="{ item }">
         <v-icon v-if="item.isAdmin">
@@ -168,6 +176,7 @@ export default {
       refreshing: false,
       users: [],
       filters: {},
+      currentItemCount: 0,
     };
   },
   mounted() {
@@ -181,7 +190,13 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('users.toolbarTitle', { count: this.users?.length ?? '?' });
+
+      let count = this.users?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('users.toolbarTitle', { count: count ?? '?' });
     },
     tableHeaders() {
       return [
@@ -242,6 +257,24 @@ export default {
     userListMailLink() {
       const addresses = this.selected.map((user) => user.email).join(',');
       return `mailto:${addresses}`;
+    },
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
+
+            return prev + 1;
+          },
+          0,
+        );
     },
   },
   methods: {
