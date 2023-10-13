@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn :href="userListMailLink" text>
+        <v-btn :href="userListMailLink" target="_blank" rel="noopener noreferrer" text>
           <v-icon left>
             mdi-email-multiple
           </v-icon>
@@ -254,7 +254,8 @@ export default {
     },
     userListMailLink() {
       const addresses = this.selected.map((user) => user.email).join(',');
-      return `mailto:${addresses}`;
+      const teamMail = this.$config.supportMail;
+      return `mailto:${teamMail}?bcc=${addresses}`;
     },
     filtersCount() {
       return Object.values(this.filters)

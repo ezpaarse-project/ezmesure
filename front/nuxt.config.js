@@ -27,6 +27,7 @@ module.exports = {
   telemetry: false,
   publicRuntimeConfig: {
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
+    supportMail: process.env.EZMESURE_SUPPORT_MAIL || 'ezteam@couperin.org',
   },
   modules: [
     ['@nuxtjs/proxy', {
