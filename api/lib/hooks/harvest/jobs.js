@@ -42,14 +42,23 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
 
   const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${harvestJob.beginDate}`;
 
+  let coveredPeriods;
   const periods = eachMonthOfInterval({
     start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
     end: parse(harvestJob.endDate, HARVEST_FORMAT, now),
   });
+  if (harvestJob.result?.coveredPeriods) {
+    coveredPeriods = new Set(harvestJob.result.coveredPeriods);
+  }
 
   await Promise.all(
     periods.map(async (period) => {
       try {
+        const data = {
+          ...harvestData,
+          status: !coveredPeriods || coveredPeriods.has(period) ? harvestData.status : 'no usage',
+        };
+
         await harvestService.upsert({
           where: {
             credentialsId_reportId_period: {
@@ -58,8 +67,8 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
               period: format(period, HARVEST_FORMAT),
             },
           },
-          create: harvestData,
-          update: harvestData,
+          create: data,
+          update: data,
         });
         appLogger.verbose(`[harvest][hooks] Harvest state [${harvestStateId}] has been updated`);
       } catch (error) {
