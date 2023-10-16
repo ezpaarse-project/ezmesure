@@ -5,7 +5,6 @@ const isBefore = require('date-fns/isBefore');
 const subMonths = require('date-fns/subMonths');
 const parseISO = require('date-fns/parseISO');
 const isValidDate = require('date-fns/isValid');
-const eachMonthOfInterval = require('date-fns/eachMonthOfInterval');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 
@@ -512,42 +511,44 @@ exports.harvestSushi = async (ctx) => {
     endDate = beginDate;
   }
 
-  const periods = eachMonthOfInterval({ start: beginDate, end: endDate });
-
   ctx.type = 'json';
-  ctx.body = await Promise.all(reportTypes.flatMap((reportType) => periods.map(async (period) => {
-    const task = await harvestJobsService.create({
-      include: {
-        credentials: {
+  ctx.body = await Promise.all(
+    reportTypes.flatMap(
+      async (reportType) => {
+        const task = await harvestJobsService.create({
           include: {
-            endpoint: true,
+            credentials: {
+              include: {
+                endpoint: true,
+              },
+            },
           },
-        },
-      },
-      data: {
-        credentials: {
-          connect: { id: sushi.id },
-        },
-        status: 'waiting',
-        harvestId,
-        timeout,
-        reportType,
-        index,
-        beginDate: format(period, 'yyyy-MM'),
-        endDate: format(period, 'yyyy-MM'),
-        forceDownload,
-        ignoreValidation,
-      },
-    });
+          data: {
+            credentials: {
+              connect: { id: sushi.id },
+            },
+            status: 'waiting',
+            harvestId,
+            timeout,
+            reportType,
+            index,
+            beginDate: format(beginDate, 'yyyy-MM'),
+            endDate: format(endDate, 'yyyy-MM'),
+            forceDownload,
+            ignoreValidation,
+          },
+        });
 
-    await harvestQueue.add(
-      'harvest',
-      { taskId: task.id, timeout },
-      { jobId: task.id },
-    );
+        await harvestQueue.add(
+          'harvest',
+          { taskId: task.id, timeout },
+          { jobId: task.id },
+        );
 
-    return task;
-  })));
+        return task;
+      },
+    ),
+  );
 };
 
 exports.importSushiItems = async (ctx) => {

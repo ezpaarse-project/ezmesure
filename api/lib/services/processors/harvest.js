@@ -88,7 +88,7 @@ async function deferJob(job, task, timestamp, lockToken, options = {}) {
       harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
       logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
     ]);
-    throw new HarvestError('Maximum number of download defferal exceeded');
+    throw new HarvestError('Maximum number of download deferral exceeded');
   } else {
     await harvestJobService.finish(task, { status: 'delayed' });
   }
