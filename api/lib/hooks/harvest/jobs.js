@@ -54,10 +54,12 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
   await Promise.all(
     periods.map(async (period) => {
       try {
-        const data = {
-          ...harvestData,
-          status: !coveredPeriods || coveredPeriods.has(period) ? harvestData.status : 'no usage',
-        };
+        const data = { ...harvestData };
+        if (!coveredPeriods || coveredPeriods.has(period)) {
+          data.status = 'failed';
+          // SUSHI_CODES.unavailablePeriod
+          data.errorCode = 'sushi:3030';
+        }
 
         await harvestService.upsert({
           where: {
