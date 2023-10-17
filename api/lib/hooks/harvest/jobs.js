@@ -40,8 +40,6 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
     sushiExceptions: harvestJob.sushiExceptions,
   };
 
-  const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${harvestJob.beginDate}`;
-
   let coveredPeriods;
   const periods = eachMonthOfInterval({
     start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
@@ -53,8 +51,11 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
 
   await Promise.all(
     periods.map(async (period) => {
+      const periodStr = format(period, HARVEST_FORMAT);
+      const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${periodStr}`;
+
       try {
-        const data = { ...harvestData };
+        const data = { ...harvestData, period: periodStr };
         if (
           data.status !== 'failed'
           && (!coveredPeriods || coveredPeriods.has(period))
@@ -69,7 +70,7 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
             credentialsId_reportId_period: {
               credentialsId: harvestJob.credentialsId,
               reportId: harvestJob.reportType,
-              period: format(period, HARVEST_FORMAT),
+              period: periodStr,
             },
           },
           create: data,
