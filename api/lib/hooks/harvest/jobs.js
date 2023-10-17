@@ -56,10 +56,7 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
 
       try {
         const data = { ...harvestData, period: periodStr };
-        if (
-          data.status !== 'failed'
-          && (!coveredPeriods || coveredPeriods.has(period))
-        ) {
+        if (data.status === 'finished' && !coveredPeriods?.has(period)) {
           data.status = 'failed';
           // SUSHI_CODES.unavailablePeriod
           data.errorCode = 'sushi:3030';
