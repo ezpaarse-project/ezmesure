@@ -212,9 +212,10 @@
     "reports": {
       "reports": "Reports"
     },
+    "filtersTitle": "Filter institutions",
     "institution": {
       "title": "My institution",
-      "name": "Institution name *",
+      "name": "Institution name",
       "members": "Members",
       "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",

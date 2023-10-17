@@ -212,9 +212,10 @@
     "reports": {
       "reports": "Rapports"
     },
+    "filtersTitle": "Filtrer les établissements",
     "institution": {
       "title": "Mon établissement",
-      "name": "Nom établissement *",
+      "name": "Nom établissement",
       "members": "Membres",
       "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
