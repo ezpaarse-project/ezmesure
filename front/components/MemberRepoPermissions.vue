@@ -44,6 +44,7 @@
             :key="permission.value"
             :value="permission.value"
             :loading="loadingPerms[repository.id]"
+            :disabled="readonly"
             small
             outlined
           >
@@ -76,6 +77,10 @@ export default {
     username: {
       type: String,
       default: () => '',
+    },
+    readonly: {
+      type: Boolean,
+      default: () => false,
     },
   },
   data() {
@@ -151,7 +156,7 @@ export default {
     },
 
     async savePermission(repositoryId) {
-      if (!this.username) {
+      if (!this.username || this.readonly) {
         return;
       }
 

@@ -47,6 +47,7 @@
             :key="permissionLevel.value"
             :value="permissionLevel.value"
             :loading="saving"
+            :disabled="readonly"
             small
             outlined
           >
@@ -75,6 +76,10 @@ export default {
     username: {
       type: String,
       default: () => '',
+    },
+    readonly: {
+      type: Boolean,
+      default: () => false,
     },
   },
   data() {
@@ -149,7 +154,9 @@ export default {
     },
 
     async savePermissions() {
-      if (!this.username || !this.institutionId) { return; }
+      if (!this.username || !this.institutionId || this.readonly) {
+        return;
+      }
 
       this.saving = true;
       this.saveError = null;
