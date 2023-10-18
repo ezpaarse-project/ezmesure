@@ -301,7 +301,7 @@ export default {
       return this.basicFilter(value, this.filters[field]);
     },
     /**
-     * Basic filter applied to fields using filter popups
+     * Basic filter applied to bool fields using filter popups
      *
      * @param {string} field The filter's field
      * @param {boolean} value The item's value

@@ -88,12 +88,12 @@
           </v-label>
 
           <v-range-slider
-            :value="membersRange"
+            :value="membershipsRange"
             :min="0"
-            :max="maxMembersCount"
+            :max="maxMembershipsCount"
             hide-details
             thumb-label
-            @end="membersRange = $event"
+            @end="membershipsRange = $event"
           >
             <template #prepend>
               <v-icon class="mr-2">
@@ -101,25 +101,27 @@
               </v-icon>
 
               <v-text-field
-                :value="membersRange[0]"
+                :value="membershipsRange[0]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
                 type="number"
                 style="width: 60px"
-                @change="membersRange = [+$event, membersRange[1]]"
+                @change="membershipsRange = [+$event, membershipsRange[1]]"
               />
             </template>
 
             <template #append>
               <v-text-field
-                :value="membersRange[1]"
+                :value="membershipsRange[1]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
                 type="number"
                 style="width: 60px"
-                @change="membersRange = [membersRange[0], +$event]"
+                @change="membershipsRange = [membershipsRange[0], +$event]"
               />
             </template>
           </v-range-slider>
@@ -146,6 +148,7 @@
               </v-icon>
               <v-text-field
                 :value="childInstitutionsRange[0]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -158,6 +161,7 @@
             <template #append>
               <v-text-field
                 :value="childInstitutionsRange[1]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -190,6 +194,7 @@
               </v-icon>
               <v-text-field
                 :value="repositoriesRange[0]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -202,6 +207,7 @@
             <template #append>
               <v-text-field
                 :value="repositoriesRange[1]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -234,6 +240,7 @@
               </v-icon>
               <v-text-field
                 :value="spacesRange[0]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -246,6 +253,7 @@
             <template #append>
               <v-text-field
                 :value="spacesRange[1]"
+                :min="0"
                 class="mt-0 pt-0"
                 hide-details
                 single-line
@@ -272,7 +280,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    maxMembersCount: {
+    maxMembershipsCount: {
       type: Number,
       default: 0,
     },
@@ -291,12 +299,12 @@ export default {
   },
   emits: ['input', 'update:show'],
   computed: {
-    membersRange: {
+    membershipsRange: {
       get() {
-        return this.partialToRange(this.value.members, this.maxMembersCount);
+        return this.partialToRange(this.value.memberships, this.maxMembershipsCount);
       },
       set(val) {
-        this.updateFilterWithPartial('members', val, this.maxMembersCount);
+        this.updateFilterWithPartial('memberships', val, this.maxMembershipsCount);
       },
     },
     childInstitutionsRange: {
