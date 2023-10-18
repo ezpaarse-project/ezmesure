@@ -373,7 +373,7 @@ export default {
           text: this.$t('institutions.institution.status'),
           value: 'status',
           width: '120px',
-          filter: (value) => this.basicBoolFilter('status', value),
+          filter: (_value, _search, item) => this.basicBoolFilter('validated', item.validated),
         },
         {
           text: this.$t('actions'),
@@ -465,6 +465,7 @@ export default {
       if (this.filters[field] == null) {
         return true;
       }
+      console.log(this.filters[field], value);
       return this.filters[field] === value;
     },
     /**

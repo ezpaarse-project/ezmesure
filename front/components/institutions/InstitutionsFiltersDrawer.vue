@@ -63,11 +63,11 @@
             </v-label>
 
             <v-btn-toggle
-              :value="value.status"
+              :value="value.validated"
               dense
               rounded
               color="primary"
-              @change="onFilterUpdate('status', $event)"
+              @change="onFilterUpdate('validated', $event)"
             >
               <v-btn :value="true" small outlined>
                 {{ $t('institutions.institution.validated') }}
