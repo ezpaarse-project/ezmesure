@@ -77,6 +77,7 @@
       sort-by="name"
       item-key="id"
       show-select
+      @current-items="currentItemCount = $event.length"
     >
       <template #top>
         <v-toolbar flat dense>
@@ -320,7 +321,13 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
+
+      let count = this.institutions?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('institutions.toolbarTitle', { count: count ?? '?' });
     },
     availableTableHeaders() {
       return [
