@@ -36,7 +36,7 @@
             :label="$t('users.user.fullName')"
             prepend-icon="mdi-account"
             hide-details
-            @input="onFilterUpdate('fullName', $event)"
+            @change="onFilterUpdate('fullName', $event)"
           />
         </v-col>
 
@@ -46,7 +46,7 @@
             :label="$t('users.user.username')"
             prepend-icon="mdi-account-outline"
             hide-details
-            @input="onFilterUpdate('username', $event)"
+            @change="onFilterUpdate('username', $event)"
           />
         </v-col>
       </v-row>
@@ -58,7 +58,7 @@
             :label="$t('users.user.email')"
             prepend-icon="mdi-email"
             hide-details
-            @input="onFilterUpdate('email', $event)"
+            @change="onFilterUpdate('email', $event)"
           />
         </v-col>
 
