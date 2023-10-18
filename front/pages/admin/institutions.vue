@@ -30,11 +30,30 @@
           </v-icon>
           {{ $t('add') }}
         </v-btn>
+
         <v-btn text :loading="refreshing" @click="refreshInstitutions">
           <v-icon left>
             mdi-refresh
           </v-icon>
           {{ $t('refresh') }}
+        </v-btn>
+
+        <v-btn
+          text
+          color="black"
+          @click="showInstitutionsFiltersDrawer = true"
+        >
+          <v-badge
+            :value="filtersCount > 0"
+            :content="filtersCount"
+            overlap
+            left
+          >
+            <v-icon>
+              mdi-filter
+            </v-icon>
+          </v-badge>
+          {{ $t('filter') }}
         </v-btn>
 
         <v-text-field
@@ -53,11 +72,11 @@
       v-model="selected"
       :headers="tableHeaders"
       :items="institutions"
-      :search="search"
       :loading="refreshing"
       sort-by="name"
       item-key="id"
       show-select
+      @current-items="currentItemCount = $event.length"
     >
       <template #top>
         <v-toolbar flat dense>
@@ -231,6 +250,14 @@
     <RepositoriesDialog ref="repositoriesDialog" />
     <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
     <SubInstitutionsDialog ref="subInstitutionsDialog" @updated="refreshInstitutions" />
+    <InstitutionsFiltersDrawer
+      v-model="filters"
+      :show.sync="showInstitutionsFiltersDrawer"
+      :max-memberships-count="maxCounts.memberships"
+      :max-child-institutions-count="maxCounts.childInstitutions"
+      :max-repositories-count="maxCounts.repositories"
+      :max-spaces-count="maxCounts.spaces"
+    />
   </section>
 </template>
 
@@ -242,6 +269,7 @@ import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue'
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
 import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
+import InstitutionsFiltersDrawer from '~/components/institutions/InstitutionsFiltersDrawer.vue';
 
 export default {
   layout: 'space',
@@ -254,6 +282,7 @@ export default {
     RepositoriesDialog,
     SpacesDialog,
     SubInstitutionsDialog,
+    InstitutionsFiltersDrawer,
   },
   data() {
     return {
@@ -275,6 +304,9 @@ export default {
         'status',
         'actions',
       ],
+      showInstitutionsFiltersDrawer: false,
+      filters: {},
+      currentItemCount: 0,
     };
   },
   mounted() {
@@ -288,41 +320,65 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('institutions.toolbarTitle', { count: this.institutions?.length ?? '?' });
+
+      let count = this.institutions?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('institutions.toolbarTitle', { count: count ?? '?' });
     },
     availableTableHeaders() {
       return [
-        { text: this.$t('institutions.title'), value: 'name' },
-        { text: this.$t('institutions.institution.acronym'), value: 'acronym' },
-        { text: this.$t('institutions.institution.namespace'), value: 'namespace' },
+        {
+          text: this.$t('institutions.title'),
+          value: 'name',
+          filter: (_value, _search, item) => this.columnStringFilter('name', item),
+        },
+        {
+          text: this.$t('institutions.institution.acronym'),
+          value: 'acronym',
+          filter: (_value, _search, item) => this.columnStringFilter('acronym', item),
+        },
+        {
+          text: this.$t('institutions.institution.namespace'),
+          value: 'namespace',
+          filterable: false,
+        },
         {
           text: this.$t('institutions.institution.members'),
           width: '150px',
           value: 'memberships',
+          filter: (_value, _search, item) => this.columnArrayFilter('memberships', item),
         },
         {
           text: this.$t('subinstitutions.subinstitutions'),
           width: '170px',
           value: 'childInstitutions',
+          filter: (_value, _search, item) => this.columnArrayFilter('childInstitutions', item),
         },
         {
           text: this.$t('repositories.repositories'),
           width: '150px',
           value: 'repositories',
+          filter: (_value, _search, item) => this.columnArrayFilter('repositories', item),
         },
         {
           text: this.$t('spaces.spaces'),
           width: '150px',
           value: 'spaces',
+          filter: (_value, _search, item) => this.columnArrayFilter('spaces', item),
         },
         {
           text: this.$t('institutions.institution.status'),
           value: 'status',
           width: '120px',
+          filter: (_value, _search, item) => this.basicBoolFilter('validated', item.validated),
         },
         {
           text: this.$t('actions'),
           value: 'actions',
+          filterable: false,
           sortable: false,
           width: '85px',
           align: 'center',
@@ -334,8 +390,117 @@ export default {
         this.selectedTableHeaders?.includes?.(header?.value)
       ));
     },
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
+
+            return prev + 1;
+          },
+          0,
+        );
+    },
+    maxCounts() {
+      const counters = {
+        memberships: 0,
+        childInstitutions: 0,
+        repositories: 0,
+        spaces: 0,
+      };
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const institution of this.institutions) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const property of Object.keys(counters)) {
+          if (Array.isArray(institution[property])) {
+            counters[property] = Math.max(counters[property], institution[property].length);
+          }
+        }
+      }
+
+      return counters;
+    },
   },
   methods: {
+    /**
+     * Basic filter applied by default to v-data-table
+     *
+     * @param {string} value The item's value
+     * @param {string} search The value searched
+     */
+    basicFilter(value, search) {
+      return value.toLowerCase().includes(search.toLowerCase());
+    },
+    /**
+     * Basic filter applied to string fields using filter popups
+     *
+     * @param {string} field The filter's field
+     * @param {string} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    basicStringFilter(field, value) {
+      if (!this.filters[field]) {
+        return true;
+      }
+      return this.basicFilter(value, this.filters[field]);
+    },
+    /**
+     * Basic filter applied to bool fields using filter popups
+     *
+     * @param {string} field The filter's field
+     * @param {boolean} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    basicBoolFilter(field, value) {
+      if (this.filters[field] == null) {
+        return true;
+      }
+      console.log(this.filters[field], value);
+      return this.filters[field] === value;
+    },
+    /**
+     * Filter for array column using filters
+     *
+     * @param {string} field The filter's field
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnArrayFilter(field, item) {
+      const range = this.filters[field];
+      if (range == null || !Array.isArray(item[field])) {
+        return true;
+      }
+
+      const value = item[field].length;
+      return range[0] <= value && value <= range[1];
+    },
+    /**
+     * Filter for string column using search, fallbacks to filters
+     *
+     * @param {string} field The item's field
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnStringFilter(field, item) {
+      if (this.search) {
+        const isName = this.basicFilter(item.name, this.search);
+        const isAcronym = this.basicFilter(item.acronym, this.search);
+        return isName || isAcronym;
+      }
+      return this.basicStringFilter(field, item[field]);
+    },
     async refreshInstitutions() {
       this.refreshing = true;
 
