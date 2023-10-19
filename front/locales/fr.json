@@ -104,6 +104,8 @@
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
+      "ezcounter": "ezCOUNTER",
+      "ezreeport": "ezREEPORT",
       "report": "Reporting",
       "sushi": "SUSHI"
     }
