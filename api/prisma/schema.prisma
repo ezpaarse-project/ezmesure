@@ -205,13 +205,13 @@ model Action {
   /// ID of the action
   id            String      @id @default(cuid())
   // ID of the institution concerned by the action
-  institutionId String
+  institutionId String?
   // The institution concerned by the action
-  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// ID of the user that triggered the action
-  authorId      String
+  authorId      String?
   /// The user that triggered the action
-  author        User        @relation(fields: [authorId], references: [username])
+  author        User?        @relation(fields: [authorId], references: [username])
   /// When the action occurred
   date          DateTime    @default(now())
   /// The action type (ex: commentInstitution, createSpace)
