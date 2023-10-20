@@ -54,8 +54,8 @@ model Institution {
   memberships         Membership[]
   /// Institution spaces
   spaces              Space[]
-  /// Institution activity
-  historyEntries      HistoryEntry[]
+  /// Actions that were triggered in the scope of the institution
+  actions             Action[]
   /// Institution SUSHI credentials
   sushiCredentials    SushiCredentials[]
   /// Child institutions
@@ -67,23 +67,23 @@ model Institution {
 /// A user
 model User {
   /// The username
-  username       String         @id
+  username    String       @id
   /// Full name
-  fullName       String
+  fullName    String
   /// Email
-  email          String
+  email       String
   /// Creation date
-  createdAt      DateTime       @default(now())
+  createdAt   DateTime     @default(now())
   /// Latest update date
-  updatedAt      DateTime       @updatedAt
+  updatedAt   DateTime     @updatedAt
   /// Whether the user has admin access or not
-  isAdmin        Boolean        @default(false)
+  isAdmin     Boolean      @default(false)
   /// Arbitrary metadata
-  metadata       Json           @default("{}")
+  metadata    Json         @default("{}")
   /// User memberships
-  memberships    Membership[]
-  /// User activity
-  historyEntries HistoryEntry[]
+  memberships Membership[]
+  /// Actions that were triggered by the user
+  actions     Action[]
 }
 
 /// A membership (a user belonging to an institution)
@@ -200,15 +200,24 @@ model RepositoryPermission {
   @@id([username, repositoryId])
 }
 
-model HistoryEntry {
+/// Represent the actions that are triggered
+model Action {
+  /// ID of the action
   id            String      @id @default(cuid())
+  // ID of the institution concerned by the action
   institutionId String
+  // The institution concerned by the action
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  /// ID of the user that triggered the action
   authorId      String
+  /// The user that triggered the action
   author        User        @relation(fields: [authorId], references: [username])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  /// When the action occurred
+  date          DateTime    @default(now())
+  /// The action type (ex: commentInstitution, createSpace)
   type          String      @db.VarChar(50)
+  /// Arbitrary data associated with the action (comment message, old/new state...)
+  data          Json        @default("{}")
 }
 
 /// Possible statuses of a harvest job
