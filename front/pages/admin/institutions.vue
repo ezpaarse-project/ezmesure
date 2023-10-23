@@ -253,6 +253,7 @@
     <InstitutionsFiltersDrawer
       v-model="filters"
       :show.sync="showInstitutionsFiltersDrawer"
+      :search="search"
       :max-memberships-count="maxCounts.memberships"
       :max-child-institutions-count="maxCounts.childInstitutions"
       :max-repositories-count="maxCounts.repositories"

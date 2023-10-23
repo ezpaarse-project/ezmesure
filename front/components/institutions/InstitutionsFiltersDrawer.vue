@@ -9,7 +9,7 @@
   >
     <v-toolbar flat>
       <v-toolbar-title>
-        {{ $t('institutions.filtersTitle') }}
+        {{ $t('institutions.filters.title') }}
       </v-toolbar-title>
 
       <v-spacer />
@@ -32,10 +32,13 @@
       <v-row>
         <v-col>
           <v-text-field
-            :value="value.name"
+            :value="search || value.name"
+            :disabled="!!search"
+            :messages="search ? [$t('institutions.filters.searchHint')] : []"
             :label="$t('institutions.institution.name')"
             prepend-icon="mdi-domain"
-            hide-details
+            hide-details="auto"
+
             @change="onFilterUpdate('name', $event)"
           />
         </v-col>
@@ -44,10 +47,13 @@
       <v-row>
         <v-col>
           <v-text-field
-            :value="value.acronym"
+            :value="search || value.acronym"
+            :disabled="!!search"
+            :messages="search ? [$t('institutions.filters.searchHint')] : []"
             :label="$t('institutions.institution.acronym')"
-            hide-details
             prepend-icon="mdi-alphabetical-variant"
+            hide-details="auto"
+
             @change="onFilterUpdate('acronym', $event)"
           />
         </v-col>
@@ -279,6 +285,10 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    search: {
+      type: String,
+      default: '',
     },
     maxMembershipsCount: {
       type: Number,

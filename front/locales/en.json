@@ -212,7 +212,10 @@
     "reports": {
       "reports": "Reports"
     },
-    "filtersTitle": "Filter institutions",
+    "filters": {
+      "title": "Filter institutions",
+      "searchHint": "This field is overrode by search bar"
+    },
     "institution": {
       "title": "My institution",
       "name": "Institution name",

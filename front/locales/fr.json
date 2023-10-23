@@ -212,7 +212,10 @@
     "reports": {
       "reports": "Rapports"
     },
-    "filtersTitle": "Filtrer les établissements",
+    "filters": {
+      "title": "Filtrer les établissements",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement",
