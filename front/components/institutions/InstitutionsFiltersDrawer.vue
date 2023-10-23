@@ -131,7 +131,7 @@
       <v-row class="px-0">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
-            {{ $t('subinstitutions.subinstitutions') }}
+            {{ $t('components.components') }}
           </v-label>
 
           <v-range-slider

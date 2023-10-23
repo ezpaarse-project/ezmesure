@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading" v-bind="$attrs">
     <v-card-title class="headline">
-      {{ $t('subinstitutions.subinstitutions') }}
+      {{ $t('components.components') }}
 
       <v-spacer />
 
@@ -173,7 +173,7 @@
         width="2"
       />
       <div v-else class="text-grey">
-        {{ $t('subinstitutions.noSubInstitutions') }}
+        {{ $t('components.noSubInstitutions') }}
       </div>
     </v-card-text>
 

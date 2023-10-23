@@ -380,10 +380,10 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
-  "subinstitutions": {
-    "subinstitutions": "Sub-institutions",
-    "count": "{count} sub-inst.",
-    "noSubInstitutions": "No sub-institution"
+  "components": {
+    "components": "Components",
+    "count": "{count} components",
+    "noComponent": "No components"
   },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",

@@ -103,7 +103,7 @@
           class="elevation-1"
           @click="$refs.subInstitutionsDialog?.display?.(item)"
         >
-          {{ $tc('subinstitutions.count', item.childInstitutions.length) }}
+          {{ $tc('components.count', item.childInstitutions.length) }}
 
           <v-icon right small>
             mdi-family-tree
@@ -352,7 +352,7 @@ export default {
           filter: (_value, _search, item) => this.columnArrayFilter('memberships', item),
         },
         {
-          text: this.$t('subinstitutions.subinstitutions'),
+          text: this.$t('components.components'),
           width: '170px',
           value: 'childInstitutions',
           filter: (_value, _search, item) => this.columnArrayFilter('childInstitutions', item),
