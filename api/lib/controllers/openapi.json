@@ -246,22 +246,44 @@
           },
           "social": {
             "description": "Social links of the institution",
-            "type": ["object", "null"],
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
-              "twitterUrl": { "type": "string" },
-              "linkedinUrl": { "type": "string" },
-              "youtubeUrl": { "type": "string" },
-              "facebookUrl": { "type": "string" }
+              "twitterUrl": {
+                "type": "string"
+              },
+              "linkedinUrl": {
+                "type": "string"
+              },
+              "youtubeUrl": {
+                "type": "string"
+              },
+              "facebookUrl": {
+                "type": "string"
+              }
             }
           },
           "auto": {
             "description": "Automated services of the institution",
-            "type": ["object", "null"],
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
-              "ezpaarse": { "type": "boolean" },
-              "ezmesure": { "type": "boolean" },
-              "report": { "type": "boolean" },
-              "sushi": { "type": "boolean" }
+              "ezpaarse": {
+                "type": "boolean"
+              },
+              "ezmesure": {
+                "type": "boolean"
+              },
+              "report": {
+                "type": "boolean"
+              },
+              "sushi": {
+                "type": "boolean"
+              }
             }
           },
           "sushiReadySince": {
@@ -434,15 +456,23 @@
           "institution": {
             "description": "The institution associated to this space",
             "allOf": [
-              { "$ref": "#/components/schemas/Institution" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/Institution"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "institutionId": {
             "description": "ID of the institution associated to this space",
             "allOf": [
-              { "$ref": "#/components/schemas/ItemID" },
-              { "readOnly": false }
+              {
+                "$ref": "#/components/schemas/ItemID"
+              },
+              {
+                "readOnly": false
+              }
             ]
           },
           "type": {
@@ -485,15 +515,23 @@
           "user": {
             "description": "The user associated to this permission",
             "allOf": [
-              { "$ref": "#/components/schemas/User" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "space": {
             "description": "The space associated to this permission",
             "allOf": [
-              { "$ref": "#/components/schemas/Space" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/Space"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "readonly": {
@@ -787,7 +825,7 @@
             "type": "array",
             "readOnly": true,
             "items": {
-              "type" : "object",
+              "type": "object",
               "properties": {
                 "code": {
                   "description": "The exception code",
@@ -4144,7 +4182,102 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Institution"
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "acronym": {
+                        "type": "string"
+                      },
+                      "social": {
+                        "type": "object",
+                        "properties": {
+                          "twitterUrl": {
+                            "type": "string"
+                          },
+                          "youtubeUrl": {
+                            "type": "string"
+                          },
+                          "facebookUrl": {
+                            "type": "string"
+                          },
+                          "linkedinUrl": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "servicesEnabled": {
+                        "type": "object",
+                        "properties": {
+                          "ezpaarse": {
+                            "type": "boolean"
+                          },
+                          "ezcounter": {
+                            "type": "boolean"
+                          },
+                          "ezreeport": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "contacts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "fullName": {
+                              "type": "string"
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": [
+                      {
+                        "name": "Centre national de la recherche scientifique",
+                        "acronym": "CNRS",
+                        "social": {
+                          "twitterUrl": "",
+                          "youtubeUrl": "",
+                          "facebookUrl": "",
+                          "linkedinUrl": ""
+                        },
+                        "servicesEnabled": {
+                          "ezpaarse": true,
+                          "ezcounter": true,
+                          "ezreeport": true
+                        },
+                        "contacts": [
+                          {
+                            "fullName": "Tom SUBLET",
+                            "roles": [
+                              "contact:tech"
+                            ]
+                          },
+                          {
+                            "fullName": "ezMESURE Administrator",
+                            "roles": [
+                              "contact:doc"
+                            ]
+                          },
+                          {
+                            "fullName": "Yannick SCHURTER",
+                            "roles": [
+                              "contact:tech"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
                   }
                 }
               }
@@ -4553,10 +4686,14 @@
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/Repository" },
+                  {
+                    "$ref": "#/components/schemas/Repository"
+                  },
                   {
                     "properties": {
-                      "institutionId": { "readOnly": false }
+                      "institutionId": {
+                        "readOnly": false
+                      }
                     }
                   }
                 ]
@@ -5721,7 +5858,7 @@
       }
     },
     "/sushi/batch_delete": {
-    "post": {
+      "post": {
         "summary": "Delete multiple Sushi items",
         "operationId": "post-sushi-batch_delete",
         "responses": {
@@ -6358,7 +6495,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "default": "asc"
             }
           }
@@ -7273,7 +7413,9 @@
                 "type": "array",
                 "items": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/User" },
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
                     {
                       "type": "object",
                       "properties": {
@@ -7287,7 +7429,6 @@
                         }
                       }
                     }
-
                   ]
                 }
               }
