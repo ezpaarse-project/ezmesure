@@ -433,11 +433,11 @@ export default {
     /**
      * Basic filter applied by default to v-data-table
      *
-     * @param {string} value The item's value
-     * @param {string} search The value searched
+     * @param {string | undefined} value The item's value
+     * @param {string | undefined} search The value searched
      */
     basicFilter(value, search) {
-      return value.toLowerCase().includes(search.toLowerCase());
+      return value?.toLowerCase()?.includes(search?.toLowerCase() ?? '');
     },
     /**
      * Basic filter applied to string fields using filter popups
@@ -465,7 +465,6 @@ export default {
       if (this.filters[field] == null) {
         return true;
       }
-      console.log(this.filters[field], value);
       return this.filters[field] === value;
     },
     /**
