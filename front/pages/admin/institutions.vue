@@ -171,31 +171,29 @@
         </v-chip>
       </template>
 
-      <template #[`item.infos`]="{ item }">
-        <div class="d-flex flex-wrap">
-          <template v-for="icon in (servicesIconMap.get(item.id) ?? [])">
-            <v-divider v-if="icon.spacer" :key="icon.key" vertical class="mx-1" />
+      <template #[`item.monitor`]="{ item }">
+        <template v-for="icon in (servicesIconMap.get(item.id) ?? [])">
+          <v-divider v-if="icon.spacer" :key="icon.key" vertical class="mx-1" />
 
-            <v-tooltip
-              v-else
-              :key="icon.key"
-              top
-            >
-              <template #activator="{ attrs, on }">
-                <v-icon
-                  :color="icon.color"
-                  small
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  {{ icon.icon }}
-                </v-icon>
-              </template>
+          <v-tooltip
+            v-else
+            :key="icon.key"
+            top
+          >
+            <template #activator="{ attrs, on }">
+              <v-icon
+                :color="icon.color"
+                small
+                v-bind="attrs"
+                v-on="on"
+              >
+                {{ icon.icon }}
+              </v-icon>
+            </template>
 
-              {{ icon.label }}
-            </v-tooltip>
-          </template>
-        </div>
+            {{ icon.label }}
+          </v-tooltip>
+        </template>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -281,6 +279,7 @@
       v-model="filters"
       :show.sync="showInstitutionsFiltersDrawer"
       :search="search"
+      :selected-table-headers="selectedTableHeaders"
       :max-memberships-count="maxCounts.memberships"
       :max-child-institutions-count="maxCounts.childInstitutions"
       :max-repositories-count="maxCounts.repositories"
@@ -362,7 +361,6 @@ export default {
         'repositories',
         'spaces',
         'status',
-        'contacts',
         'actions',
       ],
       showInstitutionsFiltersDrawer: false,
@@ -444,8 +442,7 @@ export default {
         },
         {
           text: this.$t('institutions.institution.monitor'),
-          value: 'infos',
-          width: '120px',
+          value: 'monitor',
           align: 'center',
           filter: (_value, _search, item) => this.columnServiceFilter(item),
         },

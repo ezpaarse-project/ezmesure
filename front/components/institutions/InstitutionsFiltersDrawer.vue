@@ -29,7 +29,7 @@
     </v-toolbar>
 
     <v-container>
-      <v-row>
+      <v-row v-if="possibleFiltersSet.has('name')">
         <v-col>
           <v-text-field
             :value="search || value.name"
@@ -44,7 +44,7 @@
       </v-row>
 
       <v-row>
-        <v-col>
+        <v-col v-if="possibleFiltersSet.has('acronym')">
           <v-text-field
             :value="search || value.acronym"
             :disabled="!!search"
@@ -56,7 +56,7 @@
           />
         </v-col>
 
-        <v-col>
+        <v-col v-if="possibleFiltersSet.has('status')">
           <v-input
             prepend-icon="mdi-check-all"
             hide-details
@@ -85,7 +85,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0 mt-8">
+      <v-row v-if="possibleFiltersSet.has('memberships')" class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('institutions.institution.members') }}
@@ -132,7 +132,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="mt-0">
+      <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
           <v-select
             :value="contactServices"
@@ -146,7 +146,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0 mt-8">
+      <v-row v-if="possibleFiltersSet.has('childInstitutions')" class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('subinstitutions.subinstitutions') }}
@@ -192,7 +192,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0 mt-8">
+      <v-row v-if="possibleFiltersSet.has('repositories')" class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('repositories.repositories') }}
@@ -238,7 +238,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="mt-0">
+      <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
           <v-select
             :value="repositoriesServices"
@@ -252,7 +252,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0 mt-8">
+      <v-row v-if="possibleFiltersSet.has('spaces')" class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('spaces.spaces') }}
@@ -298,7 +298,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="mt-0">
+      <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
           <v-select
             :value="spacesServices"
@@ -329,6 +329,10 @@ export default {
     search: {
       type: String,
       default: '',
+    },
+    selectedTableHeaders: {
+      type: Array,
+      default: () => [],
     },
     maxMembershipsCount: {
       type: Number,
@@ -363,6 +367,9 @@ export default {
     ],
   }),
   computed: {
+    possibleFiltersSet() {
+      return new Set(this.selectedTableHeaders);
+    },
     membershipsRange: {
       get() {
         return this.partialToRange(this.value.memberships, this.maxMembershipsCount);
