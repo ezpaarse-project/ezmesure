@@ -87,6 +87,8 @@
               <v-list-item
                 v-for="({ institution }) in user.memberships"
                 :key="`${user.username}:member:${institution.id}`"
+                :href="isAdmin ? `/institutions/${institution.id}` : undefined"
+                nuxt
               >
                 <v-list-item-avatar>
                   <v-img
