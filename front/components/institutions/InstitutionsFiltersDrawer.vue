@@ -38,7 +38,6 @@
             :label="$t('institutions.institution.name')"
             prepend-icon="mdi-domain"
             hide-details="auto"
-
             @change="onFilterUpdate('name', $event)"
           />
         </v-col>
@@ -53,7 +52,6 @@
             :label="$t('institutions.institution.acronym')"
             prepend-icon="mdi-alphabetical-variant"
             hide-details="auto"
-
             @change="onFilterUpdate('acronym', $event)"
           />
         </v-col>
@@ -87,7 +85,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0">
+      <v-row class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('institutions.institution.members') }}
@@ -134,7 +132,21 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0">
+      <v-row class="mt-0">
+        <v-col class="pt-0">
+          <v-select
+            :value="contactServices"
+            :items="contactItems"
+            :label="$t('institutions.members.roles')"
+            prepend-icon="mdi-tag"
+            multiple
+            hide-details
+            @change="contactServices = $event"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('subinstitutions.subinstitutions') }}
@@ -180,7 +192,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0">
+      <v-row class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('repositories.repositories') }}
@@ -226,7 +238,21 @@
         </v-col>
       </v-row>
 
-      <v-row class="px-0">
+      <v-row class="mt-0">
+        <v-col class="pt-0">
+          <v-select
+            :value="repositoriesServices"
+            :items="repositoryItems"
+            :label="$t('repositories.repositories')"
+            prepend-icon="mdi-tray-arrow-down"
+            multiple
+            hide-details
+            @change="repositoriesServices = $event"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
             {{ $t('spaces.spaces') }}
@@ -271,6 +297,20 @@
           </v-range-slider>
         </v-col>
       </v-row>
+
+      <v-row class="mt-0">
+        <v-col class="pt-0">
+          <v-select
+            :value="spacesServices"
+            :items="spaceItems"
+            :label="$t('spaces.spaces')"
+            prepend-icon="mdi-tab"
+            multiple
+            hide-details
+            @change="spacesServices = $event"
+          />
+        </v-col>
+      </v-row>
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -308,6 +348,20 @@ export default {
     },
   },
   emits: ['input', 'update:show'],
+  data: () => ({
+    contactItems: [
+      { value: 'contact:tech', text: 'tech' },
+      { value: 'contact:doc', text: 'doc' },
+    ],
+    repositoryItems: [
+      { value: 'repository:ezpaarse', text: 'ezpaarse' },
+      { value: 'repository:counter5', text: 'counter5' },
+    ],
+    spaceItems: [
+      { value: 'space:ezpaarse', text: 'ezpaarse' },
+      { value: 'space:counter5', text: 'counter5' },
+    ],
+  }),
   computed: {
     membershipsRange: {
       get() {
@@ -315,6 +369,25 @@ export default {
       },
       set(val) {
         this.updateFilterWithPartial('memberships', val, this.maxMembershipsCount);
+      },
+    },
+    contactServices: {
+      get() {
+        if (!this.value.services) {
+          return [];
+        }
+
+        const typeSet = new Set(this.contactItems.map((i) => i.value));
+        return this.value.services.filter((s) => typeSet.has(s));
+      },
+      set(val) {
+        const services = [
+          ...val,
+          ...this.repositoriesServices,
+          ...this.spacesServices,
+        ];
+
+        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
       },
     },
     childInstitutionsRange: {
@@ -333,12 +406,50 @@ export default {
         this.updateFilterWithPartial('repositories', val, this.maxRepositoriesCount);
       },
     },
+    repositoriesServices: {
+      get() {
+        if (!this.value.services) {
+          return [];
+        }
+
+        const typeSet = new Set(this.repositoryItems.map((i) => i.value));
+        return this.value.services.filter((s) => typeSet.has(s));
+      },
+      set(val) {
+        const services = [
+          ...this.contactServices,
+          ...val,
+          ...this.spacesServices,
+        ];
+
+        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
+      },
+    },
     spacesRange: {
       get() {
         return this.partialToRange(this.value.spaces, this.maxSpacesCount);
       },
       set(val) {
         this.updateFilterWithPartial('spaces', val, this.maxSpacesCount);
+      },
+    },
+    spacesServices: {
+      get() {
+        if (!this.value.services) {
+          return [];
+        }
+
+        const typeSet = new Set(this.spaceItems.map((i) => i.value));
+        return this.value.services.filter((s) => typeSet.has(s));
+      },
+      set(val) {
+        const services = [
+          ...this.contactServices,
+          ...this.repositoriesServices,
+          ...val,
+        ];
+
+        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
       },
     },
   },
