@@ -47,7 +47,8 @@
 
       <v-list v-if="hasUsers">
         <v-list-item
-          v-for="user in users" :key="user.username"
+          v-for="user in users"
+          :key="user.username"
           :disabled="!isAdmin && isConnectedUser(user)"
         >
           <v-list-item-avatar>
@@ -58,7 +59,49 @@
             <v-list-item-title>
               {{ user.fullName }}
             </v-list-item-title>
+
+            <v-list-item-subtitle v-if="user.email">
+              {{ user.email }}
+            </v-list-item-subtitle>
           </v-list-item-content>
+
+          <!-- Membership list -->
+          <v-menu
+            v-if="Array.isArray(user.memberships) && user.memberships.length"
+            :close-on-content-click="false"
+            open-on-hover
+            bottom
+            offset-y
+          >
+            <template #activator="{ on, attrs }">
+              <v-chip v-bind="attrs" v-on="on">
+                {{ user.memberships.length }}
+
+                <v-icon right>
+                  mdi-domain
+                </v-icon>
+              </v-chip>
+            </template>
+
+            <v-list>
+              <v-list-item
+                v-for="({ institution }) in user.memberships"
+                :key="`${user.username}:member:${institution.id}`"
+              >
+                <v-list-item-avatar>
+                  <v-img
+                    v-if="institution.logoId"
+                    :src="`/api/assets/logos/${institution.logoId}`"
+                  />
+                  <v-icon v-else>
+                    mdi-domain
+                  </v-icon>
+                </v-list-item-avatar>
+
+                <v-list-item-title>{{ institution.name }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
 
           <slot name="action" :user="user" :close-menu="closeMenu" />
         </v-list-item>
@@ -149,7 +192,16 @@ export default {
       this.failedToSearch = false;
 
       try {
-        const { data } = await this.$axios.get('/users', { params: { q: this.search } });
+        const { data } = await this.$axios.get(
+          '/users',
+          {
+            params: {
+              q: this.search,
+              source: this.isAdmin ? '*' : undefined,
+              include: this.isAdmin ? 'memberships.institution' : undefined,
+            },
+          },
+        );
         this.users = Array.isArray(data) ? data : [];
       } catch (e) {
         this.failedToSearch = true;
