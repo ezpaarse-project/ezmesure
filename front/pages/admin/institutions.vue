@@ -443,8 +443,7 @@ export default {
           filter: (_value, _search, item) => this.basicBoolFilter('validated', item.validated),
         },
         {
-          // TODO: I18n
-          text: 'Contrôle' || this.$t('institutions.institution.monitor'),
+          text: this.$t('institutions.institution.monitor'),
           value: 'infos',
           width: '120px',
           align: 'center',

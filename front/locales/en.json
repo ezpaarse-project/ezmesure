@@ -244,6 +244,7 @@
       "links": "Links",
       "localisation": "Localisation",
       "automations": "Automations",
+      "monitor": "Monitoring",
       "dropImageHere": "Drop your image here",
       "invalidImageFile": "Invalid image file. Accepted file types: JPEG, PNG, SVG",
       "imageTooLarge": "Image is too large. Maximum allowed size: 2mb",
