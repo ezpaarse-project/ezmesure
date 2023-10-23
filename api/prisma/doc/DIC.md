@@ -137,14 +137,14 @@ A repository permission (access rights of a member for a specific repository)
 
 Represent the actions that are triggered
 
-| Property    | Type          | Description                                                                   | Attributes | Default  |
-|-------------|---------------|-------------------------------------------------------------------------------|------------|----------|
-| id          | `String`      | ID of the action                                                              | Id         | `cuid()` |
-| institution | `Institution` |                                                                               |            |          |
-| author      | `User`        | The user that triggered the action                                            |            |          |
-| date        | `DateTime`    | When the action occurred                                                      |            | `now()`  |
-| type        | `String`      | The action type (ex: commentInstitution, createSpace)                         |            |          |
-| data        | `Json`        | Arbitrary data associated with the action (comment message, old/new state...) |            | `{}`     |
+| Property    | Type           | Description                                                                   | Attributes | Default  |
+|-------------|----------------|-------------------------------------------------------------------------------|------------|----------|
+| id          | `String`       | ID of the action                                                              | Id         | `cuid()` |
+| institution | `Institution?` |                                                                               |            |          |
+| author      | `User?`        | The user that triggered the action                                            |            |          |
+| date        | `DateTime`     | When the action occurred                                                      |            | `now()`  |
+| type        | `String`       | The action type (ex: commentInstitution, createSpace)                         |            |          |
+| data        | `Json`         | Arbitrary data associated with the action (comment message, old/new state...) |            | `{}`     |
 
 ### HarvestJob
 
