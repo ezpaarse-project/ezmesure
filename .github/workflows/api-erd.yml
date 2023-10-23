@@ -17,7 +17,7 @@ env:
   COMMIT_NAME: 'doc(api): updated database documentation[skip ci]'
   COMMIT_BODY: '${{ github.event.compare }}'
   COMMIT_FOOTER: 'Co-authored-by: @${{ github.event.sender.login }}'
-  ERD_WS: https://p-erd.oxypomme.fr/
+  ERD_WS: https://p-erd.oxypomme.fr
   ERD_WS_KEY: ${{ secrets.PRISMA_ERD_API_KEY }}
 
 jobs:

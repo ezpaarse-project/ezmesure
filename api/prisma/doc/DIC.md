@@ -1,148 +1,182 @@
 # ezMESURE
 
+## Enums
+
+### HarvestJobStatus
+
+Possible statuses of a harvest job
+
+| Value       |
+|-------------|
+| waiting     |
+| running     |
+| delayed     |
+| finished    |
+| failed      |
+| cancelled   |
+| interrupted |
+
 ## Models
 
 ### Institution
 
-| Property          | Type                 | Description | Attributes | Default  |
-|-------------------|----------------------|-------------|------------|----------|
-| id                | `String`             |             | Id         | `cuid()` |
-| parentInstitution | `Institution?`       |             |            |          |
-| createdAt         | `DateTime`           |             |            | `now()`  |
-| updatedAt         | `DateTime`           |             |            |          |
-| name              | `String`             |             |            |          |
-| namespace         | `String?`            |             |            |          |
-| validated         | `Boolean`            |             |            | `false`  |
-| hidePartner       | `Boolean`            |             |            | `false`  |
-| tags              | `String[]`           |             |            |          |
-| logoId            | `String?`            |             |            |          |
-| type              | `String?`            |             |            |          |
-| acronym           | `String?`            |             |            |          |
-| websiteUrl        | `String?`            |             |            |          |
-| city              | `String?`            |             |            |          |
-| uai               | `String?`            |             |            |          |
-| social            | `Json?`              |             |            |          |
-| auto              | `Json?`              |             |            |          |
-| sushiReadySince   | `DateTime?`          |             |            |          |
-| memberships       | `Membership[]`       |             |            |          |
-| spaces            | `Space[]`            |             |            |          |
-| historyEntries    | `HistoryEntry[]`     |             |            |          |
-| sushiCredentials  | `SushiCredentials[]` |             |            |          |
-| childInstitutions | `Institution[]`      |             |            |          |
-| repositories      | `Repository[]`       |             |            |          |
+An institution
+
+| Property          | Type                 | Description                                                       | Attributes | Default  |
+|-------------------|----------------------|-------------------------------------------------------------------|------------|----------|
+| id                | `String`             | ID of the institution                                             | Id         | `cuid()` |
+| parentInstitution | `Institution?`       | The parent institution                                            |            |          |
+| createdAt         | `DateTime`           | Creation date                                                     |            | `now()`  |
+| updatedAt         | `DateTime`           | Latest update date                                                |            |          |
+| name              | `String`             | Institution name                                                  |            |          |
+| namespace         | `String?`            | Institution namespace (ex: b-bibcnrs)                             |            |          |
+| validated         | `Boolean`            | Whether the institution has been validated or not                 |            | `false`  |
+| hidePartner       | `Boolean`            | Whether the institution should appear in the partner list or not  |            | `false`  |
+| tags              | `String[]`           | A list of tags associated to the institution                      |            |          |
+| logoId            | `String?`            | ID of the institution logo                                        |            |          |
+| type              | `String?`            | Institution type (ex: university)                                 |            |          |
+| acronym           | `String?`            | Institution acrynom                                               |            |          |
+| websiteUrl        | `String?`            | Institution website URL                                           |            |          |
+| city              | `String?`            | Institution city                                                  |            |          |
+| uai               | `String?`            | Institution UAI (Unité Administrative Immatriculée)               |            |          |
+| social            | `Json?`              | Social links of the institution                                   |            |          |
+| auto              | `Json?`              | Automated services of the institution                             |            |          |
+| sushiReadySince   | `DateTime?`          | Date when SUSHI credentials have been marked as ready for harvest |            |          |
+| memberships       | `Membership[]`       | Institution members                                               |            |          |
+| spaces            | `Space[]`            | Institution spaces                                                |            |          |
+| actions           | `Action[]`           | Actions that were triggered in the scope of the institution       |            |          |
+| sushiCredentials  | `SushiCredentials[]` | Institution SUSHI credentials                                     |            |          |
+| childInstitutions | `Institution[]`      | Child institutions                                                |            |          |
+| repositories      | `Repository[]`       | Institution repositories                                          |            |          |
 
 ### User
 
-| Property       | Type             | Description | Attributes | Default |
-|----------------|------------------|-------------|------------|---------|
-| username       | `String`         |             | Id         |         |
-| fullName       | `String`         |             |            |         |
-| email          | `String`         |             |            |         |
-| createdAt      | `DateTime`       |             |            | `now()` |
-| updatedAt      | `DateTime`       |             |            |         |
-| isAdmin        | `Boolean`        |             |            | `false` |
-| metadata       | `Json`           |             |            | `{}`    |
-| memberships    | `Membership[]`   |             |            |         |
-| historyEntries | `HistoryEntry[]` |             |            |         |
+A user
+
+| Property    | Type           | Description                              | Attributes | Default |
+|-------------|----------------|------------------------------------------|------------|---------|
+| username    | `String`       | The username                             | Id         |         |
+| fullName    | `String`       | Full name                                |            |         |
+| email       | `String`       | Email                                    |            |         |
+| createdAt   | `DateTime`     | Creation date                            |            | `now()` |
+| updatedAt   | `DateTime`     | Latest update date                       |            |         |
+| isAdmin     | `Boolean`      | Whether the user has admin access or not |            | `false` |
+| metadata    | `Json`         | Arbitrary metadata                       |            | `{}`    |
+| memberships | `Membership[]` | User memberships                         |            |         |
+| actions     | `Action[]`     | Actions that were triggered by the user  |            |         |
 
 ### Membership
 
-| Property              | Type                     | Description | Attributes | Default |
-|-----------------------|--------------------------|-------------|------------|---------|
-| user                  | `User`                   |             |            |         |
-| institution           | `Institution`            |             |            |         |
-| roles                 | `String[]`               |             |            |         |
-| permissions           | `String[]`               |             |            |         |
-| spacePermissions      | `SpacePermission[]`      |             |            |         |
-| repositoryPermissions | `RepositoryPermission[]` |             |            |         |
-| locked                | `Boolean`                |             |            | `false` |
+A membership (a user belonging to an institution)
+
+| Property              | Type                     | Description                                                                           | Attributes | Default |
+|-----------------------|--------------------------|---------------------------------------------------------------------------------------|------------|---------|
+| user                  | `User`                   | The member                                                                            |            |         |
+| institution           | `Institution`            | The institution                                                                       |            |         |
+| roles                 | `String[]`               | Roles of the member inside the institution                                            |            |         |
+| permissions           | `String[]`               | Permissions of the user for the institution (members management, SUSHI, ezREEPORT...) |            |         |
+| spacePermissions      | `SpacePermission[]`      | Permissions of the user for the institution spaces                                    |            |         |
+| repositoryPermissions | `RepositoryPermission[]` | Permissions of the user for the institution repositories                              |            |         |
+| locked                | `Boolean`                | Whether the membership can be modified or not by non-admins                           |            | `false` |
 
 ### Space
 
-| Property      | Type                | Description | Attributes | Default |
-|---------------|---------------------|-------------|------------|---------|
-| id            | `String`            |             | Id         |         |
-| institution   | `Institution?`      |             |            |         |
-| createdAt     | `DateTime`          |             |            | `now()` |
-| updatedAt     | `DateTime`          |             |            |         |
-| name          | `String`            |             |            |         |
-| description   | `String?`           |             |            |         |
-| initials      | `String?`           |             |            |         |
-| color         | `String?`           |             |            |         |
-| type          | `String`            |             |            |         |
-| indexPatterns | `Json[]`            |             |            |         |
-| permissions   | `SpacePermission[]` |             |            |         |
+A kibana space
+
+| Property      | Type                | Description                                                    | Attributes | Default |
+|---------------|---------------------|----------------------------------------------------------------|------------|---------|
+| id            | `String`            | ID of the space (as used in Kibana)                            | Id         |         |
+| institution   | `Institution?`      | The institution this space is associated to                    |            |         |
+| createdAt     | `DateTime`          | Creation date (in the DB, not in Kibana)                       |            | `now()` |
+| updatedAt     | `DateTime`          | Latest update date (in the DB, not in Kibana)                  |            |         |
+| name          | `String`            | Space name                                                     |            |         |
+| description   | `String?`           | Space description                                              |            |         |
+| initials      | `String?`           | Space initials                                                 |            |         |
+| color         | `String?`           | Space color                                                    |            |         |
+| type          | `String`            | Space type (ezpaarse, counter5)                                |            |         |
+| indexPatterns | `Json[]`            | A list of index patterns that should be available in the space |            |         |
+| permissions   | `SpacePermission[]` | Member permissions associated to this space                    |            |         |
 
 ### SpacePermission
 
-| Property   | Type         | Description | Attributes | Default |
-|------------|--------------|-------------|------------|---------|
-| membership | `Membership` |             |            |         |
-| space      | `Space`      |             |            |         |
-| readonly   | `Boolean`    |             |            | `false` |
-| locked     | `Boolean`    |             |            | `false` |
+A space permission (access rights of a member for a specific space)
+
+| Property   | Type         | Description                                           | Attributes | Default |
+|------------|--------------|-------------------------------------------------------|------------|---------|
+| membership | `Membership` | The member                                            |            |         |
+| space      | `Space`      | The space                                             |            |         |
+| readonly   | `Boolean`    | Whether the member has a readonly access to the space |            | `false` |
+| locked     | `Boolean`    | Whether the permission can be modified or not         |            | `false` |
 
 ### Repository
 
-| Property    | Type                     | Description | Attributes | Default  |
-|-------------|--------------------------|-------------|------------|----------|
-| id          | `String`                 |             | Id         | `cuid()` |
-| institution | `Institution?`           |             |            |          |
-| createdAt   | `DateTime`               |             |            | `now()`  |
-| updatedAt   | `DateTime`               |             |            |          |
-| pattern     | `String`                 |             |            |          |
-| type        | `String`                 |             |            |          |
-| permissions | `RepositoryPermission[]` |             |            |          |
+A repository (a section of elasticsearch allocated to an institution)
+
+| Property    | Type                     | Description                                      | Attributes | Default  |
+|-------------|--------------------------|--------------------------------------------------|------------|----------|
+| id          | `String`                 | ID of the repository                             | Id         | `cuid()` |
+| institution | `Institution?`           | The institution this repository is associated to |            |          |
+| createdAt   | `DateTime`               | Creation date                                    |            | `now()`  |
+| updatedAt   | `DateTime`               | Latest update date                               |            |          |
+| pattern     | `String`                 | The index pattern (ex: b-bibcnrs*)               |            |          |
+| type        | `String`                 | The repository type (ezpaarse, counter5)         |            |          |
+| permissions | `RepositoryPermission[]` | Member permissions associated to this repository |            |          |
 
 ### RepositoryPermission
 
-| Property   | Type         | Description | Attributes | Default |
-|------------|--------------|-------------|------------|---------|
-| membership | `Membership` |             |            |         |
-| repository | `Repository` |             |            |         |
-| readonly   | `Boolean`    |             |            | `false` |
-| locked     | `Boolean`    |             |            | `false` |
+A repository permission (access rights of a member for a specific repository)
 
-### HistoryEntry
+| Property   | Type         | Description                                                | Attributes | Default |
+|------------|--------------|------------------------------------------------------------|------------|---------|
+| membership | `Membership` | The member                                                 |            |         |
+| repository | `Repository` | The repository                                             |            |         |
+| readonly   | `Boolean`    | Whether the member has a readonly access to the repository |            | `false` |
+| locked     | `Boolean`    | Whether the permission can be modified or not              |            | `false` |
 
-| Property    | Type          | Description | Attributes | Default  |
-|-------------|---------------|-------------|------------|----------|
-| id          | `String`      |             | Id         | `cuid()` |
-| institution | `Institution` |             |            |          |
-| author      | `User`        |             |            |          |
-| createdAt   | `DateTime`    |             |            | `now()`  |
-| updatedAt   | `DateTime`    |             |            |          |
-| type        | `String`      |             |            |          |
-| message     | `String?`     |             |            |          |
-| data        | `Json`        |             |            |          |
+### Action
+
+Represent the actions that are triggered
+
+| Property    | Type          | Description                                                                   | Attributes | Default  |
+|-------------|---------------|-------------------------------------------------------------------------------|------------|----------|
+| id          | `String`      | ID of the action                                                              | Id         | `cuid()` |
+| institution | `Institution` |                                                                               |            |          |
+| author      | `User`        | The user that triggered the action                                            |            |          |
+| date        | `DateTime`    | When the action occurred                                                      |            | `now()`  |
+| type        | `String`      | The action type (ex: commentInstitution, createSpace)                         |            |          |
+| data        | `Json`        | Arbitrary data associated with the action (comment message, old/new state...) |            | `{}`     |
 
 ### HarvestJob
 
+Represent the execution of a harvest job
+
 | Property         | Type               | Description                                                                                             | Attributes | Default  |
 |------------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|----------|
-| id               | `String`           |                                                                                                         | Id         | `cuid()` |
-| credentials      | `SushiCredentials` |                                                                                                         |            |          |
-| createdAt        | `DateTime`         |                                                                                                         |            | `now()`  |
-| updatedAt        | `DateTime`         |                                                                                                         |            |          |
-| startedAt        | `DateTime?`        |                                                                                                         |            |          |
-| beginDate        | `String`           |                                                                                                         |            |          |
-| endDate          | `String`           |                                                                                                         |            |          |
-| status           | `String`           |                                                                                                         |            |          |
-| reportType       | `String`           |                                                                                                         |            |          |
-| harvestId        | `String`           |                                                                                                         |            |          |
-| index            | `String`           |                                                                                                         |            |          |
-| runningTime      | `Int?`             |                                                                                                         |            |          |
-| timeout          | `Int`              |                                                                                                         |            |          |
-| forceDownload    | `Boolean`          |                                                                                                         |            | `false`  |
-| ignoreValidation | `Boolean`          |                                                                                                         |            | `false`  |
-| params           | `Json?`            |                                                                                                         |            | `{}`     |
-| result           | `Json?`            |                                                                                                         |            |          |
+| id               | `String`           | ID of the job                                                                                           | Id         | `cuid()` |
+| credentials      | `SushiCredentials` | SUSHI credentials used to harvest                                                                       |            |          |
+| createdAt        | `DateTime`         | Creation date                                                                                           |            | `now()`  |
+| updatedAt        | `DateTime`         | Latest update date                                                                                      |            |          |
+| startedAt        | `DateTime?`        | Start date (when the job moved from waiting to running)                                                 |            |          |
+| beginDate        | `String`           | Beginning of the harvested period                                                                       |            |          |
+| endDate          | `String`           | End of the harvested period                                                                             |            |          |
+| status           | `HarvestJobStatus` | Job status                                                                                              |            |          |
+| reportType       | `String`           | ID of the harvested report (ex: tr_j1)                                                                  |            |          |
+| harvestId        | `String`           | ID of the harvest session                                                                               |            |          |
+| index            | `String`           | Index where the harvested data should be inserted                                                       |            |          |
+| runningTime      | `Int?`             | Job running time                                                                                        |            |          |
+| timeout          | `Int`              | Maximum execution time of the job                                                                       |            |          |
+| forceDownload    | `Boolean`          | Whether the report should be downloaded even if a local copy already exists                             |            | `false`  |
+| ignoreValidation | `Boolean`          | Whether the report should be inserted even if it does not pass the validation step                      |            | `false`  |
+| params           | `Json?`            | Job parameters                                                                                          |            | `{}`     |
+| result           | `Json?`            | Job result                                                                                              |            |          |
 | errorCode        | `String?`          | Error code, if a fatal exception was encountered                                                        |            |          |
 | sushiExceptions  | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
-| logs             | `Log[]`            |                                                                                                         |            |          |
-| steps            | `Step[]`           |                                                                                                         |            |          |
+| logs             | `Log[]`            | Job logs                                                                                                |            |          |
+| steps            | `Step[]`           | Job steps                                                                                               |            |          |
 
 ### Harvest
+
+Harvest state of a SUSHI item, for a specific month and report ID
 
 | Property        | Type               | Description                                                                                             | Attributes | Default |
 |-----------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|---------|
@@ -159,69 +193,77 @@
 
 ### Log
 
-| Property | Type         | Description | Attributes | Default  |
-|----------|--------------|-------------|------------|----------|
-| id       | `String`     |             | Id         | `cuid()` |
-| job      | `HarvestJob` |             |            |          |
-| date     | `DateTime`   |             |            | `now()`  |
-| level    | `String`     |             |            |          |
-| message  | `String`     |             |            |          |
+A job log
+
+| Property | Type         | Description                   | Attributes | Default  |
+|----------|--------------|-------------------------------|------------|----------|
+| id       | `String`     | ID of the log                 | Id         | `cuid()` |
+| job      | `HarvestJob` | The job that produced the log |            |          |
+| date     | `DateTime`   | Date of the log               |            | `now()`  |
+| level    | `String`     | Level of the log              |            |          |
+| message  | `String`     | Message of the log            |            |          |
 
 ### Step
 
-| Property    | Type         | Description | Attributes | Default  |
-|-------------|--------------|-------------|------------|----------|
-| id          | `String`     |             | Id         | `cuid()` |
-| job         | `HarvestJob` |             |            |          |
-| createdAt   | `DateTime`   |             |            | `now()`  |
-| updatedAt   | `DateTime`   |             |            |          |
-| startedAt   | `DateTime`   |             |            |          |
-| label       | `String`     |             |            |          |
-| status      | `String`     |             |            |          |
-| runningTime | `Int`        |             |            |          |
-| data        | `Json`       |             |            |          |
+A job step
+
+| Property    | Type         | Description                         | Attributes | Default  |
+|-------------|--------------|-------------------------------------|------------|----------|
+| id          | `String`     | ID of the step                      | Id         | `cuid()` |
+| job         | `HarvestJob` | The job that the step is part of    |            |          |
+| createdAt   | `DateTime`   | Creation date                       |            | `now()`  |
+| updatedAt   | `DateTime`   | Latest update date                  |            |          |
+| startedAt   | `DateTime`   | Start date                          |            |          |
+| label       | `String`     | Step label                          |            |          |
+| status      | `String`     | Step status                         |            |          |
+| runningTime | `Int`        | Running time                        |            |          |
+| data        | `Json`       | Arbitrary data produced by the step |            |          |
 
 ### SushiEndpoint
 
-| Property                  | Type                 | Description | Attributes | Default  |
-|---------------------------|----------------------|-------------|------------|----------|
-| id                        | `String`             |             | Id         | `cuid()` |
-| createdAt                 | `DateTime`           |             |            | `now()`  |
-| updatedAt                 | `DateTime`           |             |            |          |
-| sushiUrl                  | `String`             |             |            |          |
-| vendor                    | `String`             |             |            |          |
-| tags                      | `String[]`           |             |            |          |
-| description               | `String?`            |             |            |          |
-| counterVersion            | `String?`            |             |            |          |
-| technicalProvider         | `String?`            |             |            |          |
-| requireCustomerId         | `Boolean`            |             |            | `false`  |
-| requireRequestorId        | `Boolean`            |             |            | `false`  |
-| requireApiKey             | `Boolean`            |             |            | `false`  |
-| ignoreReportValidation    | `Boolean`            |             |            | `false`  |
-| disabledUntil             | `DateTime?`          |             |            |          |
-| defaultCustomerId         | `String?`            |             |            |          |
-| defaultRequestorId        | `String?`            |             |            |          |
-| defaultApiKey             | `String?`            |             |            |          |
-| paramSeparator            | `String?`            |             |            |          |
-| supportedReports          | `String[]`           |             |            |          |
-| supportedReportsUpdatedAt | `DateTime?`          |             |            |          |
-| credentials               | `SushiCredentials[]` |             |            |          |
-| params                    | `Json[]`             |             |            |          |
+A SUSHI endpoint
+
+| Property                  | Type                 | Description                                                                             | Attributes | Default  |
+|---------------------------|----------------------|-----------------------------------------------------------------------------------------|------------|----------|
+| id                        | `String`             | ID of the endpoint                                                                      | Id         | `cuid()` |
+| createdAt                 | `DateTime`           | Creation date                                                                           |            | `now()`  |
+| updatedAt                 | `DateTime`           | Latest update date                                                                      |            |          |
+| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                           |            |          |
+| vendor                    | `String`             | Vendor name of the endpoint                                                             |            |          |
+| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                           |            |          |
+| description               | `String?`            | Description of the endpoint                                                             |            |          |
+| counterVersion            | `String?`            | Counter version of the SUSHI service                                                    |            |          |
+| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                         |            |          |
+| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                             |            | `false`  |
+| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                            |            | `false`  |
+| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                |            | `false`  |
+| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                      |            | `false`  |
+| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                          |            |          |
+| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                             |            |          |
+| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                            |            |          |
+| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                 |            |          |
+| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|") |            |          |
+| supportedReports          | `String[]`           | List report IDs that are supported by the endpoint                                      |            |          |
+| supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                            |            |          |
+| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                          |            |          |
+| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.            |            |          |
 
 ### SushiCredentials
 
-| Property    | Type            | Description | Attributes | Default  |
-|-------------|-----------------|-------------|------------|----------|
-| id          | `String`        |             | Id         | `cuid()` |
-| createdAt   | `DateTime`      |             |            | `now()`  |
-| updatedAt   | `DateTime`      |             |            |          |
-| customerId  | `String?`       |             |            |          |
-| requestorId | `String?`       |             |            |          |
-| apiKey      | `String?`       |             |            |          |
-| comment     | `String?`       |             |            |          |
-| tags        | `String[]`      |             |            |          |
-| params      | `Json[]`        |             |            |          |
-| institution | `Institution`   |             |            |          |
-| endpoint    | `SushiEndpoint` |             |            |          |
-| harvestJobs | `HarvestJob[]`  |             |            |          |
-| harvests    | `Harvest[]`     |             |            |          |
+A set of SUSHI credentials, associated to a SUSHI endpoint
+
+| Property    | Type            | Description                                                          | Attributes | Default  |
+|-------------|-----------------|----------------------------------------------------------------------|------------|----------|
+| id          | `String`        | ID of the SUSHI credentials                                          | Id         | `cuid()` |
+| createdAt   | `DateTime`      | Creation date                                                        |            | `now()`  |
+| updatedAt   | `DateTime`      | Latest update date                                                   |            |          |
+| customerId  | `String?`       | Value of the customer_id parameter                                   |            |          |
+| requestorId | `String?`       | Value of the requestor_id parameter                                  |            |          |
+| apiKey      | `String?`       | Value of the api_key parameter                                       |            |          |
+| comment     | `String?`       | Abritrary comment about the credentials                              |            |          |
+| tags        | `String[]`      | Abritrary tag list associated to the credentials                     |            |          |
+| params      | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope. |            |          |
+| institution | `Institution`   | Institution that owns the credentials                                |            |          |
+| endpoint    | `SushiEndpoint` | The SUSHI endpoint                                                   |            |          |
+| harvestJobs | `HarvestJob[]`  | The harvest jobs associated to the credentials                       |            |          |
+| harvests    | `Harvest[]`     | The harvest states associated to the credentials                     |            |          |
