@@ -136,7 +136,7 @@
           {{ $tc('repositories.xRepositories', item.repositories.length) }}
 
           <v-icon right small>
-            mdi-cog
+            mdi-tray-arrow-down
           </v-icon>
         </v-chip>
       </template>
@@ -151,7 +151,7 @@
           {{ $tc('spaces.xSpaces', item.spaces.length) }}
 
           <v-icon right small>
-            mdi-cog
+            mdi-tab
           </v-icon>
         </v-chip>
       </template>
@@ -169,6 +169,31 @@
               : $t('institutions.institution.notValidated')
           }}
         </v-chip>
+      </template>
+
+      <template #[`item.monitor`]="{ item }">
+        <template v-for="icon in (servicesIconMap.get(item.id) ?? [])">
+          <v-divider v-if="icon.spacer" :key="icon.key" vertical class="mx-1" />
+
+          <v-tooltip
+            v-else
+            :key="icon.key"
+            top
+          >
+            <template #activator="{ attrs, on }">
+              <v-icon
+                :color="icon.color"
+                small
+                v-bind="attrs"
+                v-on="on"
+              >
+                {{ icon.icon }}
+              </v-icon>
+            </template>
+
+            {{ icon.label }}
+          </v-tooltip>
+        </template>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -253,6 +278,8 @@
     <InstitutionsFiltersDrawer
       v-model="filters"
       :show.sync="showInstitutionsFiltersDrawer"
+      :search="search"
+      :selected-table-headers="selectedTableHeaders"
       :max-memberships-count="maxCounts.memberships"
       :max-child-institutions-count="maxCounts.childInstitutions"
       :max-repositories-count="maxCounts.repositories"
@@ -270,6 +297,39 @@ import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
 import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 import InstitutionsFiltersDrawer from '~/components/institutions/InstitutionsFiltersDrawer.vue';
+
+const iconDefMap = new Map([
+  [
+    'doc',
+    {
+      color: 'green',
+      i18n: 'partners.documentary',
+      icon: 'mdi-book',
+    },
+  ],
+  [
+    'tech',
+    {
+      color: 'blue',
+      i18n: 'partners.technical',
+      icon: 'mdi-wrench',
+    },
+  ],
+  [
+    'ezpaarse',
+    {
+      color: 'teal',
+      i18n: 'partners.auto.ezpaarse',
+    },
+  ],
+  [
+    'counter5',
+    {
+      color: 'red',
+      i18n: 'partners.auto.ezcounter',
+    },
+  ],
+]);
 
 export default {
   layout: 'space',
@@ -296,7 +356,6 @@ export default {
       selectedTableHeaders: [
         'name',
         'acronym',
-        'namespace',
         'memberships',
         'childInstitutions',
         'repositories',
@@ -338,6 +397,7 @@ export default {
         {
           text: this.$t('institutions.institution.acronym'),
           value: 'acronym',
+          align: 'center',
           filter: (_value, _search, item) => this.columnStringFilter('acronym', item),
         },
         {
@@ -349,31 +409,42 @@ export default {
           text: this.$t('institutions.institution.members'),
           width: '150px',
           value: 'memberships',
+          align: 'center',
           filter: (_value, _search, item) => this.columnArrayFilter('memberships', item),
         },
         {
           text: this.$t('subinstitutions.subinstitutions'),
           width: '170px',
           value: 'childInstitutions',
+          align: 'center',
           filter: (_value, _search, item) => this.columnArrayFilter('childInstitutions', item),
         },
         {
           text: this.$t('repositories.repositories'),
           width: '150px',
           value: 'repositories',
+          align: 'center',
           filter: (_value, _search, item) => this.columnArrayFilter('repositories', item),
         },
         {
           text: this.$t('spaces.spaces'),
           width: '150px',
           value: 'spaces',
+          align: 'center',
           filter: (_value, _search, item) => this.columnArrayFilter('spaces', item),
         },
         {
           text: this.$t('institutions.institution.status'),
           value: 'status',
           width: '120px',
+          align: 'center',
           filter: (_value, _search, item) => this.basicBoolFilter('validated', item.validated),
+        },
+        {
+          text: this.$t('institutions.institution.monitor'),
+          value: 'monitor',
+          align: 'center',
+          filter: (_value, _search, item) => this.columnServiceFilter(item),
         },
         {
           text: this.$t('actions'),
@@ -428,16 +499,110 @@ export default {
 
       return counters;
     },
+    servicesIconMap() {
+      if (!this.institutions) {
+        return new Map();
+      }
+
+      const entries = this.institutions.map(
+        (i) => {
+          const services = new Set();
+
+          return [
+            i.id,
+            [
+              // search for contacts
+              ...i.memberships.map(
+                ({ roles }) => {
+                  const icons = [];
+                  const roleSet = new Set(roles);
+
+                  // eslint-disable-next-line no-restricted-syntax
+                  for (const roleSuffix of this.types) {
+                    const def = iconDefMap.get(roleSuffix);
+                    const role = `contact:${roleSuffix}`;
+
+                    // skip if no chip definition, or if already found or if member doesnt have role
+                    if (!def || services.has(role) || !roleSet.has(role)) {
+                      // eslint-disable-next-line no-continue
+                      continue;
+                    }
+
+                    services.add(role);
+                    icons.push({
+                      key: role,
+                      icon: def.icon,
+                      color: def.color,
+                      label: this.$t(def.i18n),
+                    });
+                  }
+
+                  return icons;
+                },
+              ),
+
+              // search for repositories
+              ...i.repositories.map(
+                ({ type }) => {
+                  const def = iconDefMap.get(type);
+
+                  // skip if no chip definition, or if already found or if member doesnt have role
+                  if (!def || services.has(`repository:${type}`)) {
+                    // eslint-disable-next-line no-continue
+                    return [];
+                  }
+
+                  services.add(`repository:${type}`);
+                  return [
+                    {
+                      key: `repository:${type}`,
+                      icon: 'mdi-tray-arrow-down',
+                      color: def.color,
+                      label: this.$t(def.i18n),
+                    },
+                  ];
+                },
+              ),
+
+              // search for spaces
+              ...i.spaces.map(
+                ({ type }) => {
+                  const def = iconDefMap.get(type);
+
+                  // skip if no chip definition, or if already found or if member doesnt have role
+                  if (!def || services.has(`space:${type}`)) {
+                    // eslint-disable-next-line no-continue
+                    return [];
+                  }
+
+                  services.add(`space:${type}`);
+                  return [
+                    {
+                      key: `space:${type}`,
+                      icon: 'mdi-tab',
+                      color: def.color,
+                      label: this.$t(def.i18n),
+                    },
+                  ];
+                },
+              ),
+            ].flat(),
+          ];
+        },
+      );
+
+      return new Map(entries);
+    },
   },
   methods: {
     /**
      * Basic filter applied by default to v-data-table
      *
-     * @param {string} value The item's value
-     * @param {string} search The value searched
+     * @param {string | undefined} value The item's value
+     * @param {string | undefined} search The value searched
      */
     basicFilter(value, search) {
-      return value.toLowerCase().includes(search.toLowerCase());
+      return value?.toLowerCase()?.includes(search?.toLowerCase() ?? '');
     },
     /**
      * Basic filter applied to string fields using filter popups
@@ -465,7 +630,6 @@ export default {
       if (this.filters[field] == null) {
         return true;
       }
-      console.log(this.filters[field], value);
       return this.filters[field] === value;
     },
     /**
@@ -500,6 +664,26 @@ export default {
         return isName || isAcronym;
       }
       return this.basicStringFilter(field, item[field]);
+    },
+    /**
+     * Filter for service column
+     *
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnServiceFilter(item) {
+      if (this.filters.services == null) {
+        return true;
+      }
+
+      const icons = this.servicesIconMap.get(item.id);
+      if (!icons) {
+        return false;
+      }
+
+      const services = new Set(icons.map((i) => i.key));
+      return this.filters.services.some((s) => services.has(s));
     },
     async refreshInstitutions() {
       this.refreshing = true;

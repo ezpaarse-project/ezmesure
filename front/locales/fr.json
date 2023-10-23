@@ -214,7 +214,10 @@
     "reports": {
       "reports": "Rapports"
     },
-    "filtersTitle": "Filtrer les établissements",
+    "filters": {
+      "title": "Filtrer les établissements",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement",
@@ -243,6 +246,7 @@
       "links": "Liens",
       "localisation": "Localisation",
       "automations": "Automatisations",
+      "monitor": "Contrôle",
       "dropImageHere": "Déposez votre image ici",
       "invalidImageFile": "Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG",
       "imageTooLarge": "L'image est trop volumineuse. Taille maximale autorisée : 2mb",
