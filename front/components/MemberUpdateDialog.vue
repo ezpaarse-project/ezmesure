@@ -29,6 +29,7 @@
         <MemberInstitutionPermissions
           :institution-id="institutionId"
           :username="username"
+          :readonly="readonly"
           class="px-0"
           @change="hasChanged = true"
         />
@@ -44,6 +45,7 @@
         <MemberRepoPermissions
           :institution-id="institutionId"
           :username="username"
+          :readonly="readonly"
           class="px-0"
           @change="hasChanged = true"
         />
@@ -59,6 +61,7 @@
         <MemberSpacePermissions
           :institution-id="institutionId"
           :username="username"
+          :readonly="readonly"
           class="px-0"
           @change="hasChanged = true"
         />
