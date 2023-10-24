@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "HarvestJobStatus" AS ENUM ('waiting', 'running', 'delayed', 'finished', 'failed', 'cancelled', 'interrupted');
+
 -- CreateTable
 CREATE TABLE "Institution" (
     "id" TEXT NOT NULL,
@@ -97,17 +100,15 @@ CREATE TABLE "RepositoryPermission" (
 );
 
 -- CreateTable
-CREATE TABLE "HistoryEntry" (
+CREATE TABLE "Action" (
     "id" TEXT NOT NULL,
-    "institutionId" TEXT NOT NULL,
-    "authorId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "institutionId" TEXT,
+    "authorId" TEXT,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" VARCHAR(50) NOT NULL,
-    "message" TEXT,
-    "data" JSONB NOT NULL,
+    "data" JSONB NOT NULL DEFAULT '{}',
 
-    CONSTRAINT "HistoryEntry_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Action_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -119,7 +120,7 @@ CREATE TABLE "HarvestJob" (
     "startedAt" TIMESTAMP(3),
     "beginDate" TEXT NOT NULL,
     "endDate" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
+    "status" "HarvestJobStatus" NOT NULL,
     "reportType" TEXT NOT NULL,
     "harvestId" TEXT NOT NULL,
     "index" TEXT NOT NULL,
@@ -217,6 +218,7 @@ CREATE TABLE "SushiCredentials" (
     "comment" TEXT,
     "tags" TEXT[],
     "params" JSONB[],
+    "connection" JSONB,
 
     CONSTRAINT "SushiCredentials_pkey" PRIMARY KEY ("id")
 );
@@ -252,10 +254,10 @@ ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_username
 ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_repositoryId_fkey" FOREIGN KEY ("repositoryId") REFERENCES "Repository"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HistoryEntry" ADD CONSTRAINT "HistoryEntry_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Action" ADD CONSTRAINT "Action_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HistoryEntry" ADD CONSTRAINT "HistoryEntry_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Action" ADD CONSTRAINT "Action_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("username") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "HarvestJob" ADD CONSTRAINT "HarvestJob_credentialsId_fkey" FOREIGN KEY ("credentialsId") REFERENCES "SushiCredentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
