@@ -83,6 +83,18 @@ module.exports = {
       busyBackoffDuration: 10 * oneMinute,
     },
   },
+  counter: {
+    defaultHarvestedReports: [
+      'dr',
+      'dr_d1',
+      'ir',
+      'pr',
+      'pr_p1',
+      'tr',
+      'tr_b1',
+      'tr_j1',
+    ],
+  },
   notifications: {
     sender: 'ezMESURE',
     cron: '0 0 0 * * *',

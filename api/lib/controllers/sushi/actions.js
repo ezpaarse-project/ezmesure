@@ -7,6 +7,7 @@ const parseISO = require('date-fns/parseISO');
 const isValidDate = require('date-fns/isValid');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
+const config = require('config');
 
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
@@ -20,7 +21,7 @@ const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoint.service');
 
-const REPORT_IDS = new Set(sushiService.REPORT_IDS);
+const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 
 /* eslint-disable max-len */
 /**
@@ -438,10 +439,10 @@ exports.harvestSushi = async (ctx) => {
     const { supportedReports = [] } = sushi.endpoint;
 
     if (supportedReports.length === 0) {
-      reportTypes = Array.from(REPORT_IDS);
+      reportTypes = Array.from(DEFAULT_HARVESTED_REPORTS);
     } else {
       reportTypes = Array.from(
-        new Set(supportedReports.filter((reportId) => REPORT_IDS.has(reportId))),
+        new Set(supportedReports.filter((reportId) => DEFAULT_HARVESTED_REPORTS.has(reportId))),
       );
     }
   }
