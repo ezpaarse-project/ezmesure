@@ -865,6 +865,17 @@
           }
         }
       },
+      "SushiException": {
+        "description": "A SUSHI exception",
+        "type": "object",
+        "properties": {
+          "Code": { "type": "integer" },
+          "Severity": { "type": "string" },
+          "Message": { "type": "string" },
+          "Data": { "type": "string" },
+          "Help_URL": { "type": "string" }
+        }
+      },
       "Log": {
         "description": "A log message",
         "type": "object",
@@ -1491,8 +1502,13 @@
                 "type": "array",
                 "description": "Exceptions that was thrown by the latest connection test",
                 "items": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/SushiException"
                 }
+              },
+              "errorCode": {
+                "description": "The error code, if a fatal exception was encountered",
+                "type": "string",
+                "readOnly": true
               }
             }
           },
@@ -6373,6 +6389,49 @@
             }
           },
           "description": ""
+        }
+      }
+    },
+    "/sushi/{id}/_check_connection": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sushi"
+        ],
+        "summary": "Check SUSHI connection",
+        "operationId": "post-sushi-id-check-connection",
+        "description": "Check the connection to the SUSHI endpoint and update the connection state of the SUSHI credentials",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiCredentials"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
         }
       }
     },
