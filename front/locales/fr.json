@@ -588,7 +588,10 @@
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
     "createMailUserList": "Nouveau mail groupé",
-    "filtersTitle": "Filtrer les utilisateurs",
+    "filters": {
+      "title": "Filtrer les établissements",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
     "user": {
       "saved": "Utilisateur sauvegardé",
       "general": "Général",

@@ -588,7 +588,10 @@
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
     "createMailUserList": "New grouped mail",
-    "filtersTitle": "Filter users",
+    "filters": {
+      "title": "Filter users",
+      "searchHint": "This field is overrode by search bar"
+    },
     "user": {
       "saved": "User saved",
       "general": "General",
