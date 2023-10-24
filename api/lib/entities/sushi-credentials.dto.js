@@ -35,6 +35,13 @@ const schema = {
   })),
 
   harvests: Joi.array().items(Joi.object()),
+
+  connection: Joi.object({
+    date: Joi.date(),
+    success: Joi.boolean(),
+    exceptions: Joi.array().items(Joi.object()),
+    errorCode: Joi.string(),
+  }),
 };
 
 /**
@@ -47,6 +54,7 @@ const immutableFields = [
   'institution',
   'endpoint',
   'harvests',
+  'connection',
 ];
 
 /**
@@ -56,6 +64,7 @@ const includableFields = [
   'endpoint',
   'institution',
   'harvests',
+  'connection',
 ];
 
 /**
