@@ -199,8 +199,8 @@ export default {
           {
             params: {
               q: this.search,
-              source: this.isAdmin ? '*' : undefined,
-              include: this.isAdmin ? 'memberships.institution' : undefined,
+              source: '*',
+              include: 'memberships.institution',
             },
           },
         );
