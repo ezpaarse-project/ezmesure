@@ -252,18 +252,19 @@ A SUSHI endpoint
 
 A set of SUSHI credentials, associated to a SUSHI endpoint
 
-| Property    | Type            | Description                                                          | Attributes | Default  |
-|-------------|-----------------|----------------------------------------------------------------------|------------|----------|
-| id          | `String`        | ID of the SUSHI credentials                                          | Id         | `cuid()` |
-| createdAt   | `DateTime`      | Creation date                                                        |            | `now()`  |
-| updatedAt   | `DateTime`      | Latest update date                                                   |            |          |
-| customerId  | `String?`       | Value of the customer_id parameter                                   |            |          |
-| requestorId | `String?`       | Value of the requestor_id parameter                                  |            |          |
-| apiKey      | `String?`       | Value of the api_key parameter                                       |            |          |
-| comment     | `String?`       | Abritrary comment about the credentials                              |            |          |
-| tags        | `String[]`      | Abritrary tag list associated to the credentials                     |            |          |
-| params      | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope. |            |          |
-| institution | `Institution`   | Institution that owns the credentials                                |            |          |
-| endpoint    | `SushiEndpoint` | The SUSHI endpoint                                                   |            |          |
-| harvestJobs | `HarvestJob[]`  | The harvest jobs associated to the credentials                       |            |          |
-| harvests    | `Harvest[]`     | The harvest states associated to the credentials                     |            |          |
+| Property    | Type            | Description                                                                                                | Attributes | Default  |
+|-------------|-----------------|------------------------------------------------------------------------------------------------------------|------------|----------|
+| id          | `String`        | ID of the SUSHI credentials                                                                                | Id         | `cuid()` |
+| createdAt   | `DateTime`      | Creation date                                                                                              |            | `now()`  |
+| updatedAt   | `DateTime`      | Latest update date                                                                                         |            |          |
+| customerId  | `String?`       | Value of the customer_id parameter                                                                         |            |          |
+| requestorId | `String?`       | Value of the requestor_id parameter                                                                        |            |          |
+| apiKey      | `String?`       | Value of the api_key parameter                                                                             |            |          |
+| comment     | `String?`       | Abritrary comment about the credentials                                                                    |            |          |
+| tags        | `String[]`      | Abritrary tag list associated to the credentials                                                           |            |          |
+| params      | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope.                                       |            |          |
+| institution | `Institution`   | Institution that owns the credentials                                                                      |            |          |
+| endpoint    | `SushiEndpoint` | The SUSHI endpoint                                                                                         |            |          |
+| harvestJobs | `HarvestJob[]`  | The harvest jobs associated to the credentials                                                             |            |          |
+| harvests    | `Harvest[]`     | The harvest states associated to the credentials                                                           |            |          |
+| connection  | `Json?`         | Last connection test. Format: { date: DateTime, success: Boolean, exceptions: Json[], errorCode: String? } |            |          |
