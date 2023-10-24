@@ -22,7 +22,6 @@ exports.getUser = async (ctx) => {
 };
 
 exports.list = async (ctx) => {
-  const { user } = ctx.state;
   const {
     include: propsToInclude,
   } = ctx.query;
@@ -32,10 +31,6 @@ exports.list = async (ctx) => {
     size = 10,
     source = 'fullName,username',
   } = ctx.query;
-
-  if (source !== 'fullName,username' && !user.isAdmin) {
-    ctx.throw(403, ctx.$t('errors.perms.feature'));
-  }
 
   let select = Object.assign(
     {},
