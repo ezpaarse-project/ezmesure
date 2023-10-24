@@ -149,7 +149,7 @@
       <v-row v-if="possibleFiltersSet.has('childInstitutions')" class="px-0 mt-8">
         <v-col style="position: relative;">
           <v-label class="slider-label slider-label-withicon">
-            {{ $t('subinstitutions.subinstitutions') }}
+            {{ $t('components.components') }}
           </v-label>
 
           <v-range-slider

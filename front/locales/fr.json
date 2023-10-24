@@ -387,10 +387,10 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
-  "subinstitutions": {
-    "subinstitutions": "Sous-établissements",
-    "count": "{count} sous-étab.",
-    "noSubInstitutions": "Aucun sous-établissement"
+  "components": {
+    "components": "Composantes",
+    "count": "{count} composante|{count} composantes",
+    "noComponent": "Aucune composante"
   },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
