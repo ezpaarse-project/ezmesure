@@ -21,6 +21,8 @@ const { appLogger } = require('../logger');
 const sushiService = require('../sushi');
 const elastic = require('../elastic');
 
+const { SUSHI_CODES, ERROR_CODES } = sushiService;
+
 const harvestJobService = require('../../entities/harvest-job.service');
 const stepService = require('../../entities/step.service');
 const logService = require('../../entities/log.service');
@@ -36,27 +38,6 @@ const sushiEndpointService = require('../../entities/sushi-endpoint.service');
 /* eslint-enable max-len */
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
-
-const ERROR_CODES = {
-  maxDeferralsExceeded: 'max_defferals_exceeded',
-  unreachableService: 'unreachable_service',
-};
-
-const SUSHI_CODES = {
-  serviceUnavailable: 1000,
-  serviceBusy: 1010,
-  queuedForProcessing: 1011,
-  tooManyRequests: 1020,
-  insufficientInformation: 1030,
-  unauthorizedRequestor: 2000,
-  unauthorizedRequestorAlt: 2010,
-  invalidAPIKey: 2020,
-  unauthorizedIPAddress: 2030,
-  unsupportedReport: 3000,
-  unsupportedReportVersion: 3010,
-  invalidDates: 3020,
-  unavailablePeriod: 3030,
-};
 
 class HarvestError extends Error {
   constructor(message, options) {

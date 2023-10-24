@@ -55,6 +55,30 @@ const REPORT_IDS = [
   'tr_j4',
 ];
 
+const ERROR_CODES = {
+  networkError: 'network_error',
+  unreadableReport: 'unreadable_report',
+  invalidJson: 'invalid_json',
+  maxDeferralsExceeded: 'max_defferals_exceeded',
+  unreachableService: 'unreachable_service',
+};
+
+const SUSHI_CODES = {
+  serviceUnavailable: 1000,
+  serviceBusy: 1010,
+  queuedForProcessing: 1011,
+  tooManyRequests: 1020,
+  insufficientInformation: 1030,
+  unauthorizedRequestor: 2000,
+  unauthorizedRequestorAlt: 2010,
+  invalidAPIKey: 2020,
+  unauthorizedIPAddress: 2030,
+  unsupportedReport: 3000,
+  unsupportedReportVersion: 3010,
+  invalidDates: 3020,
+  unavailablePeriod: 3030,
+};
+
 const optionalAttributes = new Map([
   [
     'pr', [
@@ -408,9 +432,18 @@ function getExceptionSeverity(exception) {
   }
 
   const errorCodes = new Set([
-    1000, 1010, 1020, 1030,
-    2000, 2010, 2020, 2030,
-    3000, 3010, 3020, 3030,
+    SUSHI_CODES.serviceUnavailable,
+    SUSHI_CODES.serviceBusy,
+    SUSHI_CODES.tooManyRequests,
+    SUSHI_CODES.insufficientInformation,
+    SUSHI_CODES.unauthorizedRequestor,
+    SUSHI_CODES.unauthorizedRequestorAlt,
+    SUSHI_CODES.invalidAPIKey,
+    SUSHI_CODES.unauthorizedIPAddress,
+    SUSHI_CODES.unsupportedReport,
+    SUSHI_CODES.unsupportedReportVersion,
+    SUSHI_CODES.invalidDates,
+    SUSHI_CODES.unavailablePeriod,
   ]);
 
   if (code === 0) { return 'info'; }
@@ -475,4 +508,6 @@ module.exports = {
   hasReportItems,
   DEFAULT_REPORT_TYPE,
   REPORT_IDS,
+  SUSHI_CODES,
+  ERROR_CODES,
 };
