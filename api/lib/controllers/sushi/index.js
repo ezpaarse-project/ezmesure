@@ -127,27 +127,6 @@ router.route({
 
 router.route({
   method: 'POST',
-  path: '/batch_delete',
-  handler: [
-    async (ctx, next) => {
-      const { user } = ctx.state;
-      ctx.state.institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
-      return next();
-    },
-    requireMemberPermissions(FEATURES.sushi.delete),
-    requireValidatedInstitution({ ignoreIfAdmin: true }),
-    deleteSushiData,
-  ],
-  validate: {
-    type: 'json',
-    body: {
-      ids: Joi.array().items(Joi.string().trim()),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
   path: '/',
   handler: [
     fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),

@@ -165,47 +165,6 @@ exports.deleteOne = async (ctx) => {
   ctx.status = 204;
 };
 
-exports.deleteSushiData = async (ctx) => {
-  ctx.action = 'sushi/delete-many';
-  const { body } = ctx.request;
-  const { userIsAdmin, institution } = ctx.state;
-
-  const sushiItems = await sushiCredentialsService.findMany({
-    where: { id: { in: body.ids } },
-    include: {
-      endpoint: {
-        select: { vendor: true },
-      },
-    },
-  });
-
-  const response = await Promise.all(sushiItems.map(async (sushiItem) => {
-    const result = {
-      id: sushiItem.id,
-      vendor: sushiItem.endpoint?.vendor,
-    };
-
-    if (!userIsAdmin && (sushiItem.institutionId !== institution.id)) {
-      return { ...result, status: 'failed' };
-    }
-
-    try {
-      await sushiCredentialsService.delete({ where: { id: sushiItem.id } });
-      return { ...result, status: 'deleted' };
-    } catch (error) {
-      appLogger.error(`Failed to delete sushi data: ${error}`);
-      return { ...result, status: 'failed' };
-    }
-  }));
-
-  ctx.metadata = {
-    sushiDeleteResult: response,
-  };
-
-  ctx.status = 200;
-  ctx.body = response;
-};
-
 exports.getHarvests = async (ctx) => {
   const { sushiId } = ctx.params;
   const {
