@@ -590,7 +590,7 @@
     "createMailUserList": "New grouped mail",
     "filters": {
       "title": "Filter users",
-      "searchHint": "This field is overrode by search bar"
+      "searchHint": "This field is overridden by the search bar"
     },
     "user": {
       "saved": "User saved",
