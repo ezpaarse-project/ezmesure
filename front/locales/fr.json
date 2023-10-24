@@ -589,7 +589,7 @@
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
     "createMailUserList": "Nouveau mail groupé",
     "filters": {
-      "title": "Filtrer les établissements",
+      "title": "Filtrer les utilisateurs",
       "searchHint": "Ce champ est remplacé par la barre de recherche"
     },
     "user": {
