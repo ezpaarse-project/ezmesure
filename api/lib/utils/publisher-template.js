@@ -67,10 +67,16 @@ module.exports = {
       Platform: { type: 'keyword' },
       Publisher: { type: 'keyword' },
       Data_Type: { type: 'keyword' },
-      YOP: { type: 'keyword' },
       Section_Type: { type: 'keyword' },
       Access_Type: { type: 'keyword' },
       Access_Method: { type: 'keyword' },
+
+      YOP: {
+        type: 'keyword',
+        fields: {
+          date: { type: 'date' },
+        },
+      },
 
       Item_ID: itemId,
       Item_Dates: itemDates,
