@@ -216,7 +216,7 @@
     },
     "filters": {
       "title": "Filter institutions",
-      "searchHint": "This field is overrode by search bar"
+      "searchHint": "This field is overridden by the search bar"
     },
     "institution": {
       "title": "My institution",
