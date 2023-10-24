@@ -27,6 +27,13 @@ addFormats(ajv);
 
 /**
  * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
+ *
+ * @typedef {object} SushiException
+ * @property {number} Code
+ * @property {string} Severity
+ * @property {string} Message
+ * @property {string} Data
+ * @property {string} Help_URL
  */
 
 const reportValidators = new Map([
@@ -452,15 +459,49 @@ function getExceptionSeverity(exception) {
   return 'warning';
 }
 
+/**
+ * Normalize a SUSHI exception object
+ * Some endpoints return exceptions with different character cases
+ * @param {object} obj - the base exception object
+ * @returns {SushiException} the normalized exception object
+ */
+function normalizeException(obj) {
+  if (typeof obj !== 'object') { return {}; }
+
+  const lowerized = Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [key.toLowerCase(), value]),
+  );
+
+  const exception = {
+    Code: Number.parseInt(lowerized.code, 10),
+    Severity: lowerized.severity,
+    Message: lowerized.message,
+    Data: lowerized.data,
+    Help_URL: lowerized.help_url,
+  };
+
+  return {
+    ...exception,
+    Severity: getExceptionSeverity(exception),
+  };
+}
+
+/**
+ * Extract exceptions from the body of a SUSHI response
+ * @param {any} sushiResponse - The response body we got from the SUSHI endpoint
+ * @returns {Array<SushiException>}
+ */
 function getExceptions(sushiResponse) {
   if (!sushiResponse) { return []; }
 
-  if (sushiResponse.Message) {
-    return [sushiResponse];
+  if (sushiResponse.Message || sushiResponse.message) {
+    return [normalizeException(sushiResponse)];
   }
 
-  if (Array.isArray(sushiResponse) && sushiResponse.some((item) => (item && item.Message))) {
-    return sushiResponse;
+  if (
+    Array.isArray(sushiResponse) && sushiResponse.some((item) => (item?.Message || item?.message))
+  ) {
+    return sushiResponse.map((item) => normalizeException(item));
   }
 
   const header = sushiResponse.Report_Header || {};
@@ -473,7 +514,7 @@ function getExceptions(sushiResponse) {
     exceptions.push(sushiResponse.Exception);
   }
 
-  return exceptions;
+  return exceptions.map((e) => normalizeException(e));
 }
 
 function stringifyException(exception) {
