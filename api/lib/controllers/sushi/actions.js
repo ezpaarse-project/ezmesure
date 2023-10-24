@@ -12,6 +12,8 @@ const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
+const { SUSHI_CODES, ERROR_CODES } = sushiService;
+
 const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
@@ -549,6 +551,98 @@ exports.harvestSushi = async (ctx) => {
       },
     ),
   );
+};
+
+exports.checkSushiConnection = async (ctx) => {
+  ctx.action = 'sushi/checkConnection';
+  ctx.type = 'json';
+
+  const { sushi } = ctx.state;
+  const { endpoint, institution } = sushi;
+
+  ctx.metadata = {
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
+  };
+
+  const twoMonthAgo = subMonths(new Date(), 2);
+
+  /** @type {Date} */
+  const endDate = twoMonthAgo;
+  /** @type {Date} */
+  const beginDate = subMonths(endDate, 1);
+
+  const sushiData = {
+    sushi,
+    institution,
+    endpoint,
+    beginDate,
+    endDate,
+    reportType: 'pr',
+  };
+
+  const reportPath = sushiService.getReportPath(sushiData);
+
+  const download = (
+    sushiService.getOngoingDownload(sushiData) || sushiService.initiateDownload(sushiData)
+  );
+
+  /** @type {import('axios').AxiosResponse} */
+  let response;
+  let report;
+  let errorCode;
+
+  try {
+    response = await new Promise((resolve, reject) => {
+      download.on('error', reject);
+      download.on('finish', (res) => { resolve(res); });
+    });
+  } catch (e) {
+    errorCode = ERROR_CODES.networkError;
+  }
+
+  try {
+    report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      errorCode = ERROR_CODES.invalidJson;
+    } else {
+      errorCode = ERROR_CODES.unreadableReport;
+    }
+  }
+
+  if (response?.status === 401) {
+    errorCode = ERROR_CODES.unauthorized;
+  }
+
+  const exceptions = sushiService.getExceptions(report);
+
+  exceptions?.forEach?.((e) => {
+    switch (e.Code) {
+      case SUSHI_CODES.insufficientInformation:
+      case SUSHI_CODES.unauthorizedRequestor:
+      case SUSHI_CODES.unauthorizedRequestorAlt:
+      case SUSHI_CODES.invalidAPIKey:
+      case SUSHI_CODES.unauthorizedIPAddress:
+        errorCode = `sushi:${e.Code}`;
+        break;
+      default:
+    }
+  });
+
+  ctx.body = await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: {
+      connection: {
+        date: Date.now(),
+        success: !errorCode,
+        exceptions: exceptions || null,
+        errorCode: errorCode || null,
+      },
+    },
+  });
 };
 
 exports.importSushiItems = async (ctx) => {

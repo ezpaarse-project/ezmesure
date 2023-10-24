@@ -1,5 +1,6 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
+
 const Institution = require('../../models/Institution');
 
 const {
@@ -9,7 +10,6 @@ const {
   includableFields,
 } = require('../../entities/sushi-credentials.dto');
 
-const { stringifyException } = require('../../services/sushi');
 const {
   requireJwt,
   requireUser,
@@ -37,6 +37,7 @@ const {
   getAvailableReports,
   deleteOne,
   getHarvests,
+  checkSushiConnection,
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -186,7 +187,7 @@ router.route({
  * Check that the institution is validated
  */
 const commonHandlers = (requiredPermission) => [
-  fetchSushi({ include: { endpoint: true } }),
+  fetchSushi({ include: { endpoint: true, institution: true } }),
   fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
   requireMemberPermissions(requiredPermission),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
@@ -221,59 +222,11 @@ router.route({
 });
 
 router.route({
-  method: 'GET',
-  path: '/:sushiId/connection',
+  method: 'POST',
+  path: '/:sushiId/_check_connection',
   handler: [
-    commonHandlers(FEATURES.sushi.read),
-    async (ctx) => {
-      const { sushi, institution } = ctx.state;
-
-      ctx.action = 'sushi/check-connection';
-      ctx.metadata = {
-        sushiId: sushi.id,
-        vendor: sushi.endpoint?.vendor,
-        institutionId: institution.id,
-        institutionName: institution.name,
-      };
-
-      let error;
-      try {
-        await getAvailableReports(ctx);
-      } catch (e) {
-        error = e;
-      }
-
-      const exceptions = Array.isArray(ctx?.body?.exceptions)
-        ? ctx.body.exceptions.map(stringifyException)
-        : [];
-
-      if (exceptions.length === 0 && error) {
-        if (error?.expose && error?.message) {
-          exceptions.push(error?.message);
-        } else if (error?.response) {
-          const status = error?.response?.status;
-          const statusText = error?.response?.statusText;
-          exceptions.push(ctx.$t('errors.sushi.badStatus', status, statusText));
-        } else {
-          exceptions.push(ctx.$t('errors.sushi.requestFailed'));
-        }
-      }
-
-      sushi.set('connection', {
-        success: !error && ctx.status === 200,
-        date: new Date(),
-        exceptions,
-      });
-
-      try {
-        await sushi.save();
-      } catch (e) {
-        throw new Error(e);
-      }
-
-      ctx.status = 200;
-      ctx.body = sushi.connection;
-    },
+    commonHandlers(FEATURES.sushi.write),
+    checkSushiConnection,
   ],
   validate: {
     params: {

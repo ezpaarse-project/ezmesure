@@ -68,6 +68,7 @@ const ERROR_CODES = {
   invalidJson: 'invalid_json',
   maxDeferralsExceeded: 'max_defferals_exceeded',
   unreachableService: 'unreachable_service',
+  unauthorized: 'unauthorized',
 };
 
 const SUSHI_CODES = {
