@@ -306,10 +306,10 @@
               "$ref": "#/components/schemas/Space"
             }
           },
-          "historyEntries": {
+          "actions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HistoryEntry"
+              "$ref": "#/components/schemas/Action"
             }
           },
           "sushiCredentials": {
@@ -380,12 +380,12 @@
               "$ref": "#/components/schemas/Membership"
             }
           },
-          "historyEntries": {
-            "description": "History entries written by this user",
+          "actions": {
+            "description": "Actions triggered by this user",
             "type": "array",
             "readOnly": true,
             "items": {
-              "$ref": "#/components/schemas/HistoryEntry"
+              "$ref": "#/components/schemas/Action"
             }
           }
         }
@@ -612,49 +612,41 @@
           }
         }
       },
-      "HistoryEntry": {
+      "Action": {
         "description": "Represent an activity associated to an institution",
         "type": "object",
         "properties": {
           "id": {
             "$ref": "#/components/schemas/ItemID"
           },
-          "updatedAt": {
-            "$ref": "#/components/schemas/ItemUpdateDate"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/ItemCreationDate"
+          "institutionId": {
+            "description": "ID of the institution concerned by the action",
+            "$ref": "#/components/schemas/ItemID"
           },
           "institution": {
-            "description": "The institution associated to the entry",
+            "description": "The institution concerned by the action",
             "$ref": "#/components/schemas/Institution"
           },
-          "author": {
-            "description": "The author of the message",
-            "$ref": "#/components/schemas/User"
-          },
-          "type": {
-            "description": "The activity type",
-            "example": "space:rename",
+          "authorId": {
+            "description": "Username of the user that triggered the action",
             "type": "string"
           },
-          "message": {
-            "description": "A message describing the entry",
-            "type": [
-              "string",
-              "null"
-            ]
+          "author": {
+            "description": "The user that triggered the action",
+            "$ref": "#/components/schemas/User"
+          },
+          "date": {
+            "description": "When the action occurred",
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "type": {
+            "description": "The action type",
+            "example": "commentInstitution",
+            "type": "string"
           },
           "data": {
-            "description": "Arbitrary data associated to the entry",
-            "type": [
-              "number",
-              "string",
-              "boolean",
-              "object",
-              "array",
-              "null"
-            ]
+            "description": "Arbitrary data associated with the action (comment message, old/new state...)",
+            "type": "object"
           }
         }
       },
