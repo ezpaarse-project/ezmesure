@@ -140,6 +140,7 @@
     <UsersFiltersDrawer
       v-model="filters"
       :show.sync="showUsersFiltersDrawer"
+      :search="search"
       :institutions="availableMembershipsData.institutions"
       :roles="availableMembershipsData.roles"
       :permissions="availableMembershipsData.permissions"
