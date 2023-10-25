@@ -76,7 +76,7 @@
       sort-by="name"
       item-key="id"
       show-select
-      @current-items="currentItemCount = $event.length"
+      @pagination="currentItemCount = $event.itemsLength"
     >
       <template #top>
         <v-toolbar flat dense>
