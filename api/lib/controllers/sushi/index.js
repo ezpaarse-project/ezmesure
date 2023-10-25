@@ -1,8 +1,6 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const Institution = require('../../models/Institution');
-
 const {
   createSchema,
   importSchema,
@@ -25,7 +23,6 @@ const {
 const {
   getAll,
   getOne,
-  deleteSushiData,
   updateSushi,
   addSushi,
   harvestSushi,
