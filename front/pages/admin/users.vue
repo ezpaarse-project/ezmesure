@@ -82,7 +82,7 @@
       sort-by="username"
       item-key="username"
       show-select
-      @current-items="currentItemCount = $event.length"
+      @pagination="currentItemCount = $event.itemsLength"
     >
       <template #[`item.isAdmin`]="{ item }">
         <v-icon v-if="item.isAdmin">
