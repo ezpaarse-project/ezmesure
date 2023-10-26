@@ -41,6 +41,9 @@
       "name": "Files"
     },
     {
+      "name": "Harvests"
+    },
+    {
       "name": "Indices"
     },
     {
@@ -861,11 +864,21 @@
         "description": "A SUSHI exception",
         "type": "object",
         "properties": {
-          "Code": { "type": "integer" },
-          "Severity": { "type": "string" },
-          "Message": { "type": "string" },
-          "Data": { "type": "string" },
-          "Help_URL": { "type": "string" }
+          "Code": {
+            "type": "integer"
+          },
+          "Severity": {
+            "type": "string"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "Data": {
+            "type": "string"
+          },
+          "Help_URL": {
+            "type": "string"
+          }
         }
       },
       "Log": {
@@ -5804,6 +5817,111 @@
             }
           }
         }
+      }
+    },
+    "/harvests": {
+      "parameters": [],
+      "get": {
+        "summary": "Get harvests",
+        "tags": [
+          "Harvests"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "Start date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "reportId",
+            "description": "Filter by report ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "tr"
+            }
+          },
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Harvest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests",
+        "description": "Get harvests",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/sushi": {

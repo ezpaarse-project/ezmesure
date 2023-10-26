@@ -178,7 +178,7 @@ exports.getHarvests = async (ctx) => {
     page = 1,
   } = ctx.request.query;
 
-  /** @type HarvestFindManyArgs */
+  /** @type {HarvestFindManyArgs} */
   const options = {
     take: Number.isInteger(size) ? size : undefined,
     skip: Number.isInteger(size) ? size * (page - 1) : undefined,

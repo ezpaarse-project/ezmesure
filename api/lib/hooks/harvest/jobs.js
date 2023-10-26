@@ -5,6 +5,7 @@ const hookEmitter = require('../hookEmitter');
 const { createQueue } = require('../utils');
 
 const { appLogger } = require('../../services/logger');
+const { SUSHI_CODES } = require('../../services/sushi');
 
 const harvestService = require('../../entities/harvest.service');
 
@@ -58,8 +59,7 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
         const data = { ...harvestData, period: periodStr };
         if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
           data.status = 'failed';
-          // SUSHI_CODES.unavailablePeriod
-          data.errorCode = 'sushi:3030';
+          data.errorCode = `sushi:${SUSHI_CODES.unavailablePeriod}`;
         }
 
         await harvestService.upsert({
