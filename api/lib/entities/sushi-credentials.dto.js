@@ -38,7 +38,7 @@ const schema = {
 
   connection: Joi.object({
     date: Joi.date(),
-    success: Joi.boolean(),
+    status: Joi.string(),
     exceptions: Joi.array().items(Joi.object()),
     errorCode: Joi.string(),
   }),

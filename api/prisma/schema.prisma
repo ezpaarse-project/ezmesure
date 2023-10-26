@@ -434,6 +434,6 @@ model SushiCredentials {
   harvestJobs   HarvestJob[]
   /// The harvest states associated to the credentials
   harvests      Harvest[]
-  /// Last connection test. Format: { date: DateTime, success: Boolean, exceptions: Json[], errorCode: String? }
+  /// Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? }
   connection    Json?
 }

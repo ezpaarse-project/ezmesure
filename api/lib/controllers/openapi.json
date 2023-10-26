@@ -1092,11 +1092,73 @@
             "description": "The SUSHI endpoint associated with the credentials",
             "$ref": "#/components/schemas/SushiEndpoint"
           },
+          "customerId": {
+            "description": "Customer ID to be used for the endpoint",
+            "type": "string"
+          },
+          "requestorId": {
+            "description": "Requestor ID to be used for the endpoint",
+            "type": "string"
+          },
+          "apiKey": {
+            "description": "API key to be used for the endpoint",
+            "type": "string"
+          },
+          "comment": {
+            "description": "Arbitrary comment about the credentials",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Arbitrary list of tags associated to the credentials",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "params": {
             "description": "SUSHI parameters that should be added when requesting the endpoint",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SushiParameter"
+            }
+          },
+          "connection": {
+            "type": "object",
+            "description": "State of the latest connection test",
+            "readOnly": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "Status of the connection. Success if the harvest test succeeded, or if exceptions are not related to authentication. Failed if an authentication error is thrown. Indeterminate otherwise.",
+                "enum": ["success", "failed", "indeterminate"],
+                "readOnly": true
+              },
+              "date": {
+                "type": "string",
+                "format": "date",
+                "description": "Date of the latest connection test",
+                "readOnly": true
+              },
+              "exceptions": {
+                "type": "array",
+                "description": "Exceptions that was thrown by the latest connection test",
+                "readOnly": true,
+                "items": {
+                  "$ref": "#/components/schemas/SushiException"
+                }
+              },
+              "errorCode": {
+                "description": "The error code, if an exception was encountered",
+                "type": "string",
+                "readOnly": true
+              }
+            }
+          },
+          "harvestJobs": {
+            "description": "Harvest jobs associated with the credentials",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HarvestJob"
             }
           },
           "harvests": {

@@ -528,18 +528,14 @@ exports.checkSushiConnection = async (ctx) => {
   };
 
   const twoMonthAgo = subMonths(new Date(), 2);
-
-  /** @type {Date} */
-  const endDate = twoMonthAgo;
-  /** @type {Date} */
-  const beginDate = subMonths(endDate, 1);
+  const threeMonthAgo = subMonths(new Date(), 3);
 
   const sushiData = {
     sushi,
     institution,
     endpoint,
-    beginDate,
-    endDate,
+    beginDate: format(threeMonthAgo, 'yyyy-MM'),
+    endDate: format(twoMonthAgo, 'yyyy-MM'),
     reportType: 'pr',
   };
 
@@ -551,6 +547,8 @@ exports.checkSushiConnection = async (ctx) => {
 
   /** @type {import('axios').AxiosResponse} */
   let response;
+  /** @type {'indeterminate'|'failed'|'success'} */
+  let status;
   let report;
   let errorCode;
 
@@ -574,30 +572,50 @@ exports.checkSushiConnection = async (ctx) => {
   }
 
   if (response?.status === 401) {
+    status = 'failed';
     errorCode = ERROR_CODES.unauthorized;
   }
 
   const exceptions = sushiService.getExceptions(report);
 
-  exceptions?.forEach?.((e) => {
+  exceptions.forEach((e) => {
     switch (e.Code) {
       case SUSHI_CODES.insufficientInformation:
       case SUSHI_CODES.unauthorizedRequestor:
       case SUSHI_CODES.unauthorizedRequestorAlt:
       case SUSHI_CODES.invalidAPIKey:
       case SUSHI_CODES.unauthorizedIPAddress:
+        status = 'failed';
+        errorCode = `sushi:${e.Code}`;
+        break;
+      case SUSHI_CODES.serviceUnavailable:
+      case SUSHI_CODES.serviceBusy:
+      case SUSHI_CODES.tooManyRequests:
+        status = 'indeterminate';
         errorCode = `sushi:${e.Code}`;
         break;
       default:
     }
   });
 
+  if (report && exceptions?.length === 0) {
+    const { valid } = sushiService.validateReport(report);
+
+    if (!valid) {
+      errorCode = ERROR_CODES.invalidReport;
+    }
+  }
+
+  if (!status && !errorCode) {
+    status = 'success';
+  }
+
   ctx.body = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
       connection: {
         date: Date.now(),
-        success: !errorCode,
+        status: status || 'indeterminate',
         exceptions: exceptions || null,
         errorCode: errorCode || null,
       },

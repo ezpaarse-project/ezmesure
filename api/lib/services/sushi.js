@@ -69,9 +69,11 @@ const ERROR_CODES = {
   maxDeferralsExceeded: 'max_defferals_exceeded',
   unreachableService: 'unreachable_service',
   unauthorized: 'unauthorized',
+  invalidReport: 'invalid_report',
 };
 
 const SUSHI_CODES = {
+  infoOrDebug: 0,
   serviceUnavailable: 1000,
   serviceBusy: 1010,
   queuedForProcessing: 1011,
@@ -79,12 +81,22 @@ const SUSHI_CODES = {
   insufficientInformation: 1030,
   unauthorizedRequestor: 2000,
   unauthorizedRequestorAlt: 2010,
+  globalReportsNotSupported: 2011,
   invalidAPIKey: 2020,
   unauthorizedIPAddress: 2030,
   unsupportedReport: 3000,
   unsupportedReportVersion: 3010,
   invalidDates: 3020,
   unavailablePeriod: 3030,
+  usageNotReadyForRequestedDates: 3031,
+  usageNotAvailable: 3032,
+  partialData: 3040,
+  paramNotRecognizedInContext: 3050,
+  invalidReportFilterValue: 3060,
+  incongruousReportFilterValue: 3061,
+  unsupportedReportAttributeValues: 3062,
+  componentDetailsNotSupported: 3063,
+  requiredFilterMissing: 3070,
 };
 
 const optionalAttributes = new Map([
