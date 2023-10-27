@@ -241,8 +241,8 @@ Before launching ezmesure, you have to create the elastic container and launch t
 
 ```bash
 docker compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
-dco -f docker-compose.migrate.yml up
-dco -f docker-compose.migrate.yml down
+docker compose -f docker-compose.migrate.yml up
+docker compose -f docker-compose.migrate.yml down
 ```
 ### 7. Start
 

@@ -173,6 +173,7 @@ function requireMemberPermissions(...permissions) {
     if (user?.isAdmin) { return next(); }
 
     const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
+
     const memberPermissions = new Set(
       Array.isArray(membership?.permissions) ? membership?.permissions : [],
     );

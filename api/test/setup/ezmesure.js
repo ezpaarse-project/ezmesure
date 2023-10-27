@@ -6,6 +6,7 @@ const ezmesure = axios.create({
   baseURL: 'http://localhost:3000/',
   maxContentLength: Infinity,
   maxBodyLength: Infinity,
+  validateStatus: (status) => status < 500,
 });
 
 ezmesure.baseURL = 'http://localhost:3000/';
