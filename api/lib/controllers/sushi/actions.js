@@ -561,13 +561,15 @@ exports.checkSushiConnection = async (ctx) => {
     errorCode = ERROR_CODES.networkError;
   }
 
-  try {
-    report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      errorCode = ERROR_CODES.invalidJson;
-    } else {
-      errorCode = ERROR_CODES.unreadableReport;
+  if (!errorCode) {
+    try {
+      report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        errorCode = ERROR_CODES.invalidJson;
+      } else {
+        errorCode = ERROR_CODES.unreadableReport;
+      }
     }
   }
 
