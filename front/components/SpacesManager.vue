@@ -175,7 +175,13 @@ export default {
       this.errorMessage = '';
 
       try {
-        this.spaces = await this.$axios.$get('/kibana-spaces', { params: { institutionId: this.institutionId } });
+        const [institution, spaces] = await Promise.all([
+          this.$axios.$get(`/institutions/${this.institutionId}`),
+          this.$axios.$get('/kibana-spaces', { params: { institutionId: this.institutionId } }),
+        ]);
+
+        this.institution = institution;
+        this.spaces = spaces;
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }

@@ -34,7 +34,14 @@ const schema = {
     scope: Joi.string().trim().lowercase(),
   })),
 
-  harvestRequests: Joi.array().items(Joi.object()),
+  harvests: Joi.array().items(Joi.object()),
+
+  connection: Joi.object({
+    date: Joi.date(),
+    status: Joi.string(),
+    exceptions: Joi.array().items(Joi.object()),
+    errorCode: Joi.string(),
+  }),
 };
 
 /**
@@ -46,7 +53,18 @@ const immutableFields = [
   'createdAt',
   'institution',
   'endpoint',
-  'harvestRequests',
+  'harvests',
+  'connection',
+];
+
+/**
+ * Fields that can be populated with related items
+ */
+const includableFields = [
+  'endpoint',
+  'institution',
+  'harvests',
+  'connection',
 ];
 
 /**
@@ -79,4 +97,5 @@ module.exports = {
   createSchema: Joi.object(createSchema).required(),
   updateSchema: Joi.object(updateSchema).required(),
   importSchema,
+  includableFields,
 };

@@ -31,31 +31,6 @@
           hide-details
         />
       </v-col>
-      <v-col cols="12" sm="6" md="5" lg="4">
-        <v-select
-          v-model="selectedAutomations"
-          :items="automations"
-          :item-text="item => $t(`partners.auto.${item.label}`)"
-          item-value="label"
-          :label="$t('partners.automated')"
-          solo
-          multiple
-          hide-details
-          max-width="200"
-        >
-          <template #selection="{ item }">
-            <v-chip
-              :color="item.color"
-              label
-              dark
-              close
-              @click:close="deselectAutomation(item.label)"
-            >
-              {{ $t(`partners.auto.${item.label}`) }}
-            </v-chip>
-          </template>
-        </v-select>
-      </v-col>
     </v-row>
 
     <v-layout row wrap justify-center>

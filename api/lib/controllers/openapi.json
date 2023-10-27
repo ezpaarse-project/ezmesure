@@ -41,6 +41,9 @@
       "name": "Files"
     },
     {
+      "name": "Harvests"
+    },
+    {
       "name": "Indices"
     },
     {
@@ -245,22 +248,44 @@
           },
           "social": {
             "description": "Social links of the institution",
-            "type": ["object", "null"],
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
-              "twitterUrl": { "type": "string" },
-              "linkedinUrl": { "type": "string" },
-              "youtubeUrl": { "type": "string" },
-              "facebookUrl": { "type": "string" }
+              "twitterUrl": {
+                "type": "string"
+              },
+              "linkedinUrl": {
+                "type": "string"
+              },
+              "youtubeUrl": {
+                "type": "string"
+              },
+              "facebookUrl": {
+                "type": "string"
+              }
             }
           },
           "auto": {
             "description": "Automated services of the institution",
-            "type": ["object", "null"],
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
-              "ezpaarse": { "type": "boolean" },
-              "ezmesure": { "type": "boolean" },
-              "report": { "type": "boolean" },
-              "sushi": { "type": "boolean" }
+              "ezpaarse": {
+                "type": "boolean"
+              },
+              "ezmesure": {
+                "type": "boolean"
+              },
+              "report": {
+                "type": "boolean"
+              },
+              "sushi": {
+                "type": "boolean"
+              }
             }
           },
           "sushiReadySince": {
@@ -283,10 +308,10 @@
               "$ref": "#/components/schemas/Space"
             }
           },
-          "historyEntries": {
+          "actions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HistoryEntry"
+              "$ref": "#/components/schemas/Action"
             }
           },
           "sushiCredentials": {
@@ -357,12 +382,12 @@
               "$ref": "#/components/schemas/Membership"
             }
           },
-          "historyEntries": {
-            "description": "History entries written by this user",
+          "actions": {
+            "description": "Actions triggered by this user",
             "type": "array",
             "readOnly": true,
             "items": {
-              "$ref": "#/components/schemas/HistoryEntry"
+              "$ref": "#/components/schemas/Action"
             }
           }
         }
@@ -433,15 +458,23 @@
           "institution": {
             "description": "The institution associated to this space",
             "allOf": [
-              { "$ref": "#/components/schemas/Institution" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/Institution"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "institutionId": {
             "description": "ID of the institution associated to this space",
             "allOf": [
-              { "$ref": "#/components/schemas/ItemID" },
-              { "readOnly": false }
+              {
+                "$ref": "#/components/schemas/ItemID"
+              },
+              {
+                "readOnly": false
+              }
             ]
           },
           "type": {
@@ -484,15 +517,23 @@
           "user": {
             "description": "The user associated to this permission",
             "allOf": [
-              { "$ref": "#/components/schemas/User" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "space": {
             "description": "The space associated to this permission",
             "allOf": [
-              { "$ref": "#/components/schemas/Space" },
-              { "readOnly": true }
+              {
+                "$ref": "#/components/schemas/Space"
+              },
+              {
+                "readOnly": true
+              }
             ]
           },
           "readonly": {
@@ -573,49 +614,41 @@
           }
         }
       },
-      "HistoryEntry": {
+      "Action": {
         "description": "Represent an activity associated to an institution",
         "type": "object",
         "properties": {
           "id": {
             "$ref": "#/components/schemas/ItemID"
           },
-          "updatedAt": {
-            "$ref": "#/components/schemas/ItemUpdateDate"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/ItemCreationDate"
+          "institutionId": {
+            "description": "ID of the institution concerned by the action",
+            "$ref": "#/components/schemas/ItemID"
           },
           "institution": {
-            "description": "The institution associated to the entry",
+            "description": "The institution concerned by the action",
             "$ref": "#/components/schemas/Institution"
           },
-          "author": {
-            "description": "The author of the message",
-            "$ref": "#/components/schemas/User"
-          },
-          "type": {
-            "description": "The activity type",
-            "example": "space:rename",
+          "authorId": {
+            "description": "Username of the user that triggered the action",
             "type": "string"
           },
-          "message": {
-            "description": "A message describing the entry",
-            "type": [
-              "string",
-              "null"
-            ]
+          "author": {
+            "description": "The user that triggered the action",
+            "$ref": "#/components/schemas/User"
+          },
+          "date": {
+            "description": "When the action occurred",
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "type": {
+            "description": "The action type",
+            "example": "commentInstitution",
+            "type": "string"
           },
           "data": {
-            "description": "Arbitrary data associated to the entry",
-            "type": [
-              "number",
-              "string",
-              "boolean",
-              "object",
-              "array",
-              "null"
-            ]
+            "description": "Arbitrary data associated with the action (comment message, old/new state...)",
+            "type": "object"
           }
         }
       },
@@ -694,6 +727,11 @@
             "description": "Additionnal job parameters",
             "type": "object"
           },
+          "errorCode": {
+            "description": "The error code, if a fatal exception was encountered",
+            "type": "string",
+            "readOnly": true
+          },
           "result": {
             "description": "Result of the job",
             "readOnly": true,
@@ -721,6 +759,124 @@
             "items": {
               "$ref": "#/components/schemas/Step"
             }
+          }
+        }
+      },
+      "Harvest": {
+        "description": "Represent the harvest state for a period and a set of credentials",
+        "type": "object",
+        "properties": {
+          "harvestedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "The date of the harvest",
+            "readOnly": true
+          },
+          "credentialsId": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SushiCredentials"
+            }
+          },
+          "status": {
+            "description": "Status of the harvest (which is the same as the associated harvest job)",
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "waiting",
+              "running",
+              "delayed",
+              "finished",
+              "failed",
+              "cancelled",
+              "interrupted"
+            ]
+          },
+          "period": {
+            "description": "The requested period",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM",
+            "readOnly": true
+          },
+          "reportId": {
+            "description": "The requested report ID",
+            "type": "string",
+            "example": "TR",
+            "readOnly": true
+          },
+          "errorCode": {
+            "description": "The error code, if a fatal exception was encountered",
+            "type": "string",
+            "readOnly": true
+          },
+          "sushiExceptions": {
+            "description": "The SUSHI exceptions returned by the endpoint",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "description": "The exception code",
+                  "type": "string",
+                  "example": "3030"
+                },
+                "severity": {
+                  "description": "The exception severity",
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "warning",
+                    "error"
+                  ]
+                },
+                "message": {
+                  "description": "The exception message",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "insertedItems": {
+            "description": "Number of report items that were successfuly inserted into Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          },
+          "updatedItems": {
+            "description": "Number of report items that were updated in Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          },
+          "failedItems": {
+            "description": "Number of report items that failed to be inserted into Elasticsearch",
+            "type": "integer",
+            "readOnly": true
+          }
+        }
+      },
+      "SushiException": {
+        "description": "A SUSHI exception",
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer"
+          },
+          "Severity": {
+            "type": "string"
+          },
+          "Message": {
+            "type": "string"
+          },
+          "Data": {
+            "type": "string"
+          },
+          "Help_URL": {
+            "type": "string"
           }
         }
       },
@@ -948,6 +1104,29 @@
             "description": "The SUSHI endpoint associated with the credentials",
             "$ref": "#/components/schemas/SushiEndpoint"
           },
+          "customerId": {
+            "description": "Customer ID to be used for the endpoint",
+            "type": "string"
+          },
+          "requestorId": {
+            "description": "Requestor ID to be used for the endpoint",
+            "type": "string"
+          },
+          "apiKey": {
+            "description": "API key to be used for the endpoint",
+            "type": "string"
+          },
+          "comment": {
+            "description": "Arbitrary comment about the credentials",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Arbitrary list of tags associated to the credentials",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "params": {
             "description": "SUSHI parameters that should be added when requesting the endpoint",
             "type": "array",
@@ -955,11 +1134,50 @@
               "$ref": "#/components/schemas/SushiParameter"
             }
           },
-          "harvestRequests": {
+          "connection": {
+            "type": "object",
+            "description": "State of the latest connection test",
+            "readOnly": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "Status of the connection. Success if the harvest test succeeded, or if exceptions are not related to authentication. Failed if an authentication error is thrown. Indeterminate otherwise.",
+                "enum": ["success", "failed", "indeterminate"],
+                "readOnly": true
+              },
+              "date": {
+                "type": "string",
+                "format": "date",
+                "description": "Date of the latest connection test",
+                "readOnly": true
+              },
+              "exceptions": {
+                "type": "array",
+                "description": "Exceptions that was thrown by the latest connection test",
+                "readOnly": true,
+                "items": {
+                  "$ref": "#/components/schemas/SushiException"
+                }
+              },
+              "errorCode": {
+                "description": "The error code, if an exception was encountered",
+                "type": "string",
+                "readOnly": true
+              }
+            }
+          },
+          "harvestJobs": {
+            "description": "Harvest jobs associated with the credentials",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HarvestJob"
+            }
+          },
+          "harvests": {
             "description": "Harvest requests associated with the credentials",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/HarvestRequest"
+              "$ref": "#/components/schemas/Harvest"
             }
           }
         }
@@ -1350,8 +1568,13 @@
                 "type": "array",
                 "description": "Exceptions that was thrown by the latest connection test",
                 "items": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/SushiException"
                 }
+              },
+              "errorCode": {
+                "description": "The error code, if a fatal exception was encountered",
+                "type": "string",
+                "readOnly": true
               }
             }
           },
@@ -2837,6 +3060,67 @@
           "description": "Username of the member"
         }
       ],
+      "get": {
+        "summary": "Get the membership of a user for an institution",
+        "tags": [
+          "Institutions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institution",
+                  "spacePermissions",
+                  "repositoryPermissions"
+                ]
+              }
+            },
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "Username of the member"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "get-institutions-id-members-username",
+        "description": "Get the membership of a user for an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "put": {
         "summary": "Create or a update a user membership for an institution",
         "tags": [
@@ -3980,7 +4264,102 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Institution"
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "acronym": {
+                        "type": "string"
+                      },
+                      "social": {
+                        "type": "object",
+                        "properties": {
+                          "twitterUrl": {
+                            "type": "string"
+                          },
+                          "youtubeUrl": {
+                            "type": "string"
+                          },
+                          "facebookUrl": {
+                            "type": "string"
+                          },
+                          "linkedinUrl": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "servicesEnabled": {
+                        "type": "object",
+                        "properties": {
+                          "ezpaarse": {
+                            "type": "boolean"
+                          },
+                          "ezcounter": {
+                            "type": "boolean"
+                          },
+                          "ezreeport": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "contacts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "fullName": {
+                              "type": "string"
+                            },
+                            "roles": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "x-examples": {
+                    "Example 1": [
+                      {
+                        "name": "Centre national de la recherche scientifique",
+                        "acronym": "CNRS",
+                        "social": {
+                          "twitterUrl": "",
+                          "youtubeUrl": "",
+                          "facebookUrl": "",
+                          "linkedinUrl": ""
+                        },
+                        "servicesEnabled": {
+                          "ezpaarse": true,
+                          "ezcounter": true,
+                          "ezreeport": true
+                        },
+                        "contacts": [
+                          {
+                            "fullName": "Tom SUBLET",
+                            "roles": [
+                              "contact:tech"
+                            ]
+                          },
+                          {
+                            "fullName": "ezMESURE Administrator",
+                            "roles": [
+                              "contact:doc"
+                            ]
+                          },
+                          {
+                            "fullName": "Yannick SCHURTER",
+                            "roles": [
+                              "contact:tech"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
                   }
                 }
               }
@@ -4389,10 +4768,14 @@
             "application/json": {
               "schema": {
                 "allOf": [
-                  { "$ref": "#/components/schemas/Repository" },
+                  {
+                    "$ref": "#/components/schemas/Repository"
+                  },
                   {
                     "properties": {
-                      "institutionId": { "readOnly": false }
+                      "institutionId": {
+                        "readOnly": false
+                      }
                     }
                   }
                 ]
@@ -5435,6 +5818,111 @@
         }
       }
     },
+    "/harvests": {
+      "parameters": [],
+      "get": {
+        "summary": "Get harvests",
+        "tags": [
+          "Harvests"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "Start date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "reportId",
+            "description": "Filter by report ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "tr"
+            }
+          },
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Harvest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests",
+        "description": "Get harvests",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/sushi": {
       "get": {
         "summary": "Get all Sushi items",
@@ -5550,76 +6038,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/Sushi"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/sushi/batch_delete": {
-    "post": {
-        "summary": "Delete multiple Sushi items",
-        "operationId": "post-sushi-batch_delete",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid"
-                      },
-                      "status": {
-                        "type": "string",
-                        "enum": [
-                          "failed",
-                          "deleted"
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Sushi"
-        ],
-        "description": "Delete multiple Sushi items at once",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
-                  }
-                }
               }
             }
           }
@@ -5985,11 +6403,14 @@
         "operationId": "post-sushi-id-_harvest",
         "responses": {
           "200": {
-            "description": "Harvest initiated. Returns a task object that can be requested in order to follow the status of the process.",
+            "description": "Harvest initiated. Returns an array of task objects (one per month of the requested period) that can be requested in order to follow the status of the processes.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HarvestJob"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestJob"
+                  }
                 }
               }
             }
@@ -6021,10 +6442,13 @@
                     "description": "The index where the report should be imported"
                   },
                   "reportType": {
-                    "type": "string",
-                    "description": "The report type that should be harvested",
-                    "example": "tr",
-                    "default": "tr"
+                    "type": "array",
+                    "description": "The report types that should be harvested. If it contains 'all', every available reports will be harvested.",
+                    "items": {
+                      "type": "string",
+                      "example": "tr",
+                      "default": "tr"
+                    }
                   },
                   "beginDate": {
                     "type": "string",
@@ -6069,6 +6493,49 @@
         }
       }
     },
+    "/sushi/{id}/_check_connection": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "tags": [
+          "Sushi"
+        ],
+        "summary": "Check SUSHI connection",
+        "operationId": "post-sushi-id-check-connection",
+        "description": "Check the connection to the SUSHI endpoint and update the connection state of the SUSHI credentials",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SushiCredentials"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/sushi/{id}/files": {
       "parameters": [
         {
@@ -6105,6 +6572,120 @@
         },
         "operationId": "get-sushi-id-files",
         "description": "List files in the directory of a SUSHI item.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sushi/{id}/harvests": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get harvests of a SUSHI item",
+        "tags": [
+          "Sushi"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "Start date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "reportId",
+            "description": "Filter by report ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "tr"
+            }
+          },
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Harvest"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-sushi-id-harvests",
+        "description": "Get harvests of a SUSHI item",
         "security": [
           {
             "bearerAuth": []
@@ -6992,7 +7573,9 @@
                 "type": "array",
                 "items": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/User" },
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
                     {
                       "type": "object",
                       "properties": {
@@ -7006,7 +7589,6 @@
                         }
                       }
                     }
-
                   ]
                 }
               }

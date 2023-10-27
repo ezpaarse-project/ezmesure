@@ -39,11 +39,11 @@ exports.getAll = async (ctx) => {
   }
   if (endpointId) {
     where.credentials = {
-      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) }
+      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) },
     };
   }
   if (harvestId) {
-    where.params = { path: 'harvestId', in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
+    where.harvestId = { in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
   }
 
   let distinct;
@@ -52,6 +52,13 @@ exports.getAll = async (ctx) => {
   }
 
   ctx.body = await harvestJobService.findMany({
+    include: {
+      credentials: {
+        include: {
+          endpoint: true,
+        },
+      },
+    },
     where,
     distinct,
     take: size,
@@ -61,7 +68,16 @@ exports.getAll = async (ctx) => {
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
 
-  const task = await harvestJobService.findUnique({ where: { id: taskId } });
+  const task = await harvestJobService.findUnique({
+    where: { id: taskId },
+    include: {
+      credentials: {
+        include: {
+          endpoint: true,
+        },
+      },
+    },
+  });
 
   if (!task) {
     ctx.throw(404, ctx.$t('errors.task.notFound'));

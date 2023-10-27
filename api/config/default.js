@@ -1,6 +1,8 @@
 const path = require('path');
 const { format } = require('winston');
 
+const oneMinute = 60;
+
 module.exports = {
   port: 3000,
   mongo: {
@@ -75,8 +77,23 @@ module.exports = {
   },
   jobs: {
     harvest: {
-      concurrency: 3,
+      concurrency: 1,
+      maxDeferrals: 5,
+      deferralBackoffDuration: 10 * oneMinute,
+      busyBackoffDuration: 10 * oneMinute,
     },
+  },
+  counter: {
+    defaultHarvestedReports: [
+      'dr',
+      'dr_d1',
+      'ir',
+      'pr',
+      'pr_p1',
+      'tr',
+      'tr_b1',
+      'tr_j1',
+    ],
   },
   notifications: {
     sender: 'ezMESURE',

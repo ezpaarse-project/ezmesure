@@ -9,7 +9,7 @@
   >
     <v-toolbar flat>
       <v-toolbar-title>
-        {{ $t('users.filtersTitle') }}
+        {{ $t('users.filters.title') }}
       </v-toolbar-title>
 
       <v-spacer />
@@ -32,21 +32,25 @@
       <v-row>
         <v-col>
           <v-text-field
-            :value="value.fullName"
+            :value="search || value.fullName"
             :label="$t('users.user.fullName')"
+            :disabled="!!search"
+            :messages="search ? [$t('users.filters.searchHint')] : []"
             prepend-icon="mdi-account"
-            hide-details
-            @input="onFilterUpdate('fullName', $event)"
+            hide-details="auto"
+            @change="onFilterUpdate('fullName', $event)"
           />
         </v-col>
 
         <v-col>
           <v-text-field
-            :value="value.username"
+            :value="search || value.username"
             :label="$t('users.user.username')"
+            :disabled="!!search"
+            :messages="search ? [$t('users.filters.searchHint')] : []"
             prepend-icon="mdi-account-outline"
-            hide-details
-            @input="onFilterUpdate('username', $event)"
+            hide-details="auto"
+            @change="onFilterUpdate('username', $event)"
           />
         </v-col>
       </v-row>
@@ -54,11 +58,13 @@
       <v-row>
         <v-col>
           <v-text-field
-            :value="value.email"
+            :value="search || value.email"
             :label="$t('users.user.email')"
+            :disabled="!!search"
+            :messages="search ? [$t('users.filters.searchHint')] : []"
             prepend-icon="mdi-email"
-            hide-details
-            @input="onFilterUpdate('email', $event)"
+            hide-details="auto"
+            @change="onFilterUpdate('email', $event)"
           />
         </v-col>
 
@@ -174,6 +180,10 @@ export default {
     show: {
       type: Boolean,
       required: true,
+    },
+    search: {
+      type: String,
+      default: '',
     },
     institutions: {
       type: Array,

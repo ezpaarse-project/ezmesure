@@ -104,6 +104,8 @@
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
+      "ezcounter": "ezCOUNTER",
+      "ezreeport": "ezREEPORT",
       "report": "Reporting",
       "sushi": "SUSHI"
     }
@@ -212,9 +214,13 @@
     "reports": {
       "reports": "Rapports"
     },
+    "filters": {
+      "title": "Filtrer les établissements",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
     "institution": {
       "title": "Mon établissement",
-      "name": "Nom établissement *",
+      "name": "Nom établissement",
       "members": "Membres",
       "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
@@ -240,6 +246,7 @@
       "links": "Liens",
       "localisation": "Localisation",
       "automations": "Automatisations",
+      "monitor": "Contrôle",
       "dropImageHere": "Déposez votre image ici",
       "invalidImageFile": "Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG",
       "imageTooLarge": "L'image est trop volumineuse. Taille maximale autorisée : 2mb",
@@ -380,37 +387,63 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
-  "subinstitutions": {
-    "subinstitutions": "Sous-établissements",
-    "count": "{count} sous-étab.",
-    "noSubInstitutions": "Aucun sous-établissement"
+  "components": {
+    "components": "Composantes",
+    "count": "{count} composante|{count} composantes",
+    "noComponent": "Aucune composante"
   },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
     "history": "Historique des tâches",
     "parameters": "Paramètres",
+    "statusDescriptions": {
+      "waiting": "Un moissonnage a été programmé. Il sera lancé dès que possible.",
+      "running": "Le moissonnage est en cours.",
+      "finished": "Le moissonnage est terminé.",
+      "failed": "Le moissonnage a échoué.",
+      "interrupted": "Le moissonnage a été interrompu.",
+      "cancelled": "Le moissonnage a été annulé.",
+      "delayed": "Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu."
+    },
     "status": {
       "notLaunchedYet": "Pas encore lancé",
       "waiting": "En attente",
       "running": "En cours",
       "finished": "Terminé",
+      "failed": "Erreur",
       "error": "Erreur",
       "cancelled": "Annulé",
       "delayed": "Reporté",
       "exceptions": {
-        "1000": "Service indisponible",
-        "1010": "Service surchargé",
-        "1020": "Trop de requêtes",
-        "1030": "Informations insuffisantes",
-        "2000": "Demandeur non autorisé",
-        "2010": "Demandeur non autorisé",
-        "2020": "Clé d'API invalide",
-        "2030": "Adresse IP non autorisée",
-        "3000": "Rapport non supporté",
-        "3010": "Version non supportée",
-        "3020": "Dates invalides",
-        "3030": "Période indisponible"
+        "max_defferals_exceeded": "Trop de reports",
+        "sushi:1000": "Service indisponible",
+        "sushi:1010": "Service surchargé",
+        "sushi:1020": "Trop de requêtes",
+        "sushi:1030": "Informations insuffisantes",
+        "sushi:2000": "Demandeur non autorisé",
+        "sushi:2010": "Demandeur non autorisé",
+        "sushi:2020": "Clé d'API invalide",
+        "sushi:2030": "Adresse IP non autorisée",
+        "sushi:3000": "Rapport non supporté",
+        "sushi:3010": "Version non supportée",
+        "sushi:3020": "Dates invalides",
+        "sushi:3030": "Période indisponible"
+      },
+      "exceptionMeaning": {
+        "max_defferals_exceeded": "Après plusieurs tentatives, le rapport n'était toujours pas prêt.",
+        "sushi:1000": "La rapport n'a pas pu être moissonné car le point d'accès n'est pas accessible.",
+        "sushi:1010": "Le point d'accès est dans l'incapacité de fournir le rapport en raison d'une forte charge.",
+        "sushi:1020": "Le point d'accès refuse de fournir le rapport en raison d'un nombre de requêtes trop élevé.",
+        "sushi:1030": "Le point d'accès n'a pas pu fournir le rapport en raison d'un manque d'informations lors de la demande.",
+        "sushi:2000": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2010": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2020": "Le point d'accès refuse de fournir le rapport car la clé d'API fournie n'est pas valide. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2030": "Le point d'accès refuse de fournir le rapport car l'adresse IP n'est pas autorisée. Assurez-vous que l'IP d'ezMESURE est bien déclarée auprès du point d'accès.",
+        "sushi:3000": "Le point d'accès est dans l'incapacité de fournir le rapport, car ce dernier n'est pas supporté.",
+        "sushi:3010": "Le point d'accès est dans l'incapacité de fournir le rapport, car la version demandée n'est pas supportée.",
+        "sushi:3020": "La période demandée au point d'accès n'est pas valide. Il est possible que le rapport ne soit pas encore disponible pour cette période.",
+        "sushi:3030": "Le rapport n'est pas disponible pour la période demandée."
       }
     },
     "failedStep": {
@@ -450,6 +483,13 @@
     "deleteNbCredentials": "Vous allez supprimer {number} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
+    "harvestState": "État du moissonnage",
+    "harvestedAt": "Moissonné le {date}",
+    "report": "Rapport",
+    "insertedItems": "{count} éléments du rapport ont été insérés.",
+    "updatedItems": "{count} éléments du rapport ont été mis à jour.",
+    "failedItems": "{count} éléments du rapport n'ont pas pu être récupérés.",
+    "messagesFromEndpoint": "Messages du point d'accès :",
     "paramScopes": {
       "all": "Toutes les requêtes au point d'accès",
       "report_list": "Listing des rapports",
@@ -548,7 +588,10 @@
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
     "createMailUserList": "Nouveau mail groupé",
-    "filtersTitle": "Filtrer les utilisateurs",
+    "filters": {
+      "title": "Filtrer les utilisateurs",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
     "user": {
       "saved": "Utilisateur sauvegardé",
       "general": "Général",
@@ -669,5 +712,6 @@
   "no": "Non",
   "validate": "Valider",
   "invalidate": "Invalider",
-  "reason": "Raison : {reason}"
+  "reason": "Raison : {reason}",
+  "indeterminate": "indéterminée"
 }

@@ -104,6 +104,8 @@
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
+      "ezcounter": "ezCOUNTER",
+      "ezreeport": "ezREEPORT",
       "report": "Reporting",
       "sushi": "SUSHI"
     }
@@ -212,9 +214,13 @@
     "reports": {
       "reports": "Reports"
     },
+    "filters": {
+      "title": "Filter institutions",
+      "searchHint": "This field is overriden by the search bar"
+    },
     "institution": {
       "title": "My institution",
-      "name": "Institution name *",
+      "name": "Institution name",
       "members": "Members",
       "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
@@ -240,6 +246,7 @@
       "links": "Links",
       "localisation": "Localisation",
       "automations": "Automations",
+      "monitor": "Monitoring",
       "dropImageHere": "Drop your image here",
       "invalidImageFile": "Invalid image file. Accepted file types: JPEG, PNG, SVG",
       "imageTooLarge": "Image is too large. Maximum allowed size: 2mb",
@@ -379,37 +386,63 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
-  "subinstitutions": {
-    "subinstitutions": "Sub-institutions",
-    "count": "{count} sub-inst.",
-    "noSubInstitutions": "No sub-institution"
+  "components": {
+    "components": "Components",
+    "count": "{count} components",
+    "noComponent": "No components"
   },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
     "history": "Tasks history",
     "parameters": "Parameters",
+    "statusDescriptions": {
+      "waiting": "A harvest has been scheduled. It will be launched as soon as possible.",
+      "running": "The harvest is on progress.",
+      "finished": "The harvest is terminated.",
+      "failed": "The harvest has failed.",
+      "interrupted": "The harvest has been interrupted.",
+      "cancelled": "The harvest has been cancelled.",
+      "delayed": "The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon."
+    },
     "status": {
       "notLaunchedYet": "Not launched yet",
       "waiting": "Waiting",
       "running": "Running",
       "finished": "Finished",
+      "failed": "Error",
       "error": "Error",
       "cancelled": "Cancelled",
       "delayed": "Delayed",
       "exceptions": {
-        "1000": "Service not available",
-        "1010": "Service busy",
-        "1020": "Too many requests",
-        "1030": "Insufficient Information",
-        "2000": "Unauthorized requestor",
-        "2010": "Unauthorized requestor",
-        "2020": "Invalid API key",
-        "2030": "Unauthorized IP address",
-        "3000": "Unsupported report",
-        "3010": "Unsupported report version",
-        "3020": "Invalide dates",
-        "3030": "Unavailable period"
+        "max_defferals_exceeded": "Too much deferrals",
+        "sushi:1000": "Service not available",
+        "sushi:1010": "Service busy",
+        "sushi:1020": "Too many requests",
+        "sushi:1030": "Insufficient Information",
+        "sushi:2000": "Unauthorized requestor",
+        "sushi:2010": "Unauthorized requestor",
+        "sushi:2020": "Invalid API key",
+        "sushi:2030": "Unauthorized IP address",
+        "sushi:3000": "Unsupported report",
+        "sushi:3010": "Unsupported report version",
+        "sushi:3020": "Invalide dates",
+        "sushi:3030": "Unavailable period"
+      },
+      "exceptionMeaning": {
+        "max_defferals_exceeded": "After several attempts, the report was still not ready.",
+        "sushi:1000": "The report could not be harvested because the endpoint is unreachable.",
+        "sushi:1010": "The endpoint is unable to provide the report because it's under heavy load.",
+        "sushi:1020": "The endpoint refuses to provide the report because the number of requests is too high.",
+        "sushi:1030": "The endpoint was unable to provide the report due to a lack of information provided with the request.",
+        "sushi:2000": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "sushi:2010": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "sushi:2020": "The endpoint refuses to provide the report because the provided API key is not valid. Check that your credentials are entered correctly.",
+        "sushi:2030": "The endpoint refuses to provide the report because the IP address is not authorized. Make sure that the IP address of ezMESURE is correctly declared to the endpoint.",
+        "sushi:3000": "The endpoint is unable to provide the report because it's not supported.",
+        "sushi:3010": "The endpoint is unable to provide the report because the requested version is not supported.",
+        "sushi:3020": "The period requested from the endpoint is invalid. The report may not be available yet.",
+        "sushi:3030": "The report is not available yet for the requested period."
       }
     },
     "failedStep": {
@@ -449,6 +482,13 @@
     "deleteNbCredentials": "You are about to delete {number} SUSHI credentials.",
     "scope": "Scope",
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",
+    "harvestState": "Harvest state",
+    "harvestedAt": "Harvested on {date}",
+    "report": "Report",
+    "insertedItems": "{count} report items have been inserted.",
+    "updatedItems": "{count} report items have been updated.",
+    "failedItems": "{count} report items could not be retrieved.",
+    "messagesFromEndpoint": "Messages from the endpoint:",
     "paramScopes": {
       "all": "All requests to the endpoint",
       "report_list": "Report list",
@@ -548,7 +588,10 @@
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
     "createMailUserList": "New grouped mail",
-    "filtersTitle": "Filter users",
+    "filters": {
+      "title": "Filter users",
+      "searchHint": "This field is overriden by the search bar"
+    },
     "user": {
       "saved": "User saved",
       "general": "General",
@@ -669,5 +712,6 @@
   "no": "No",
   "validate": "Validate",
   "invalidate": "Invalidate",
-  "reason": "Reason: {reason}"
+  "reason": "Reason: {reason}",
+  "indeterminate": "indeterminate"
 }

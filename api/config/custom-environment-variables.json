@@ -62,7 +62,16 @@
   },
   "jobs": {
     "harvest": {
-      "concurrency": "EZMESURE_HARVEST_CONCURRENCY"
+      "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
+      "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
+      "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION",
+      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION"
+    }
+  },
+  "counter": {
+    "defaultHarvestedReports": {
+      "__name": "EZMESURE_DEFAULT_HARVESTED_REPORTS",
+      "__format": "json"
     }
   },
   "depositors": {

@@ -1,14 +1,13 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const Institution = require('../../models/Institution');
 
 const {
   createSchema,
   importSchema,
   updateSchema,
+  includableFields,
 } = require('../../entities/sushi-credentials.dto');
 
-const { stringifyException } = require('../../services/sushi');
 const {
   requireJwt,
   requireUser,
@@ -24,7 +23,6 @@ const {
 const {
   getAll,
   getOne,
-  deleteSushiData,
   updateSushi,
   addSushi,
   harvestSushi,
@@ -35,6 +33,8 @@ const {
   getTasks,
   getAvailableReports,
   deleteOne,
+  getHarvests,
+  checkSushiConnection,
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -104,33 +104,22 @@ router.route({
     getAll,
   ],
   validate: {
-    query: {
+    query: Joi.object({
       id: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       connection: Joi.string().valid('working', 'faulty', 'untested'),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
-  path: '/batch_delete',
-  handler: [
-    async (ctx, next) => {
-      const { user } = ctx.state;
-      ctx.state.institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
-      return next();
-    },
-    requireMemberPermissions(FEATURES.sushi.delete),
-    requireValidatedInstitution({ ignoreIfAdmin: true }),
-    deleteSushiData,
-  ],
-  validate: {
-    type: 'json',
-    body: {
-      ids: Joi.array().items(Joi.string().trim()),
-    },
+      q: Joi.string().min(0),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    })
+      .rename('include[]', 'include')
+      .rename('id[]', 'id')
+      .rename('endpointId[]', 'endpointId')
+      .rename('institutionId[]', 'institutionId'),
   },
 });
 
@@ -175,7 +164,7 @@ router.route({
  * Check that the institution is validated
  */
 const commonHandlers = (requiredPermission) => [
-  fetchSushi({ include: { endpoint: true } }),
+  fetchSushi({ include: { endpoint: true, institution: true } }),
   fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
   requireMemberPermissions(requiredPermission),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
@@ -210,60 +199,11 @@ router.route({
 });
 
 router.route({
-  method: 'GET',
-  path: '/:sushiId/connection',
+  method: 'POST',
+  path: '/:sushiId/_check_connection',
   handler: [
-    commonHandlers(FEATURES.sushi.read),
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
-    async (ctx) => {
-      const { sushi, institution } = ctx.state;
-
-      ctx.action = 'sushi/check-connection';
-      ctx.metadata = {
-        sushiId: sushi.id,
-        vendor: sushi.vendor,
-        institutionId: institution.id,
-        institutionName: institution.name,
-      };
-
-      let error;
-      try {
-        await getAvailableReports(ctx);
-      } catch (e) {
-        error = e;
-      }
-
-      const exceptions = Array.isArray(ctx?.body?.exceptions)
-        ? ctx.body.exceptions.map(stringifyException)
-        : [];
-
-      if (exceptions.length === 0 && error) {
-        if (error?.expose && error?.message) {
-          exceptions.push(error?.message);
-        } else if (error?.response) {
-          const status = error?.response?.status;
-          const statusText = error?.response?.statusText;
-          exceptions.push(ctx.$t('errors.sushi.badStatus', status, statusText));
-        } else {
-          exceptions.push(ctx.$t('errors.sushi.requestFailed'));
-        }
-      }
-
-      sushi.set('connection', {
-        success: !error && ctx.status === 200,
-        date: new Date(),
-        exceptions,
-      });
-
-      try {
-        await sushi.save();
-      } catch (e) {
-        throw new Error(e);
-      }
-
-      ctx.status = 200;
-      ctx.body = sushi.connection;
-    },
+    commonHandlers(FEATURES.sushi.write),
+    checkSushiConnection,
   ],
   validate: {
     params: {
@@ -283,6 +223,29 @@ router.route({
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:sushiId/harvests',
+  handler: [
+    commonHandlers(FEATURES.sushi.read),
+    getHarvests,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      from: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      to: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      reportId: Joi.string().trim(),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
     },
   },
 });
@@ -356,7 +319,7 @@ router.route({
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
-      reportType: Joi.string().trim().lowercase().default('tr'),
+      reportType: Joi.array().min(1).single().items(Joi.string().trim().lowercase()),
       ignoreValidation: Joi.boolean(),
       timeout: Joi.number().integer().min(10).default(600),
     },

@@ -18,7 +18,7 @@ const onRepositoryUpsert = async (repository) => {
   const readOnlyRole = generateRoleNameFromRepository(repository, 'readonly');
   const allRole = generateRoleNameFromRepository(repository, 'all');
   try {
-    await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read']);
+    await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read', 'view_index_metadata']);
     appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is upserted`);
   } catch (error) {
     appLogger.error(`[elastic][hooks] Role [${readOnlyRole}] cannot be upserted:\n${error}`);

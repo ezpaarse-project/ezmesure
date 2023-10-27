@@ -1,5 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
+const hooks = require('../hooks');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
@@ -17,8 +18,12 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJobCreateArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static create(params) {
-    return prisma.harvestJob.create(params);
+  static async create(params) {
+    const job = await prisma.harvestJob.create(params);
+
+    hooks.emit('harvest-job:create', job);
+
+    return job;
   }
 
   /**
@@ -49,16 +54,24 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJobUpdateArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static update(params) {
-    return prisma.harvestJob.update(params);
+  static async update(params) {
+    const job = await prisma.harvestJob.update(params);
+
+    hooks.emit('harvest-job:update', job);
+
+    return job;
   }
 
   /**
    * @param {HarvestJobUpsertArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static upsert(params) {
-    return prisma.harvestJob.upsert(params);
+  static async upsert(params) {
+    const job = await prisma.harvestJob.upsert(params);
+
+    hooks.emit('harvest-job:upsert', job);
+
+    return job;
   }
 
   /**
@@ -77,16 +90,20 @@ module.exports = class HarvestJobsService {
       throw error;
     }
 
+    hooks.emit('harvest-job:delete', job);
+
     return job;
   }
 
   /**
    * @param {HarvestJob} job
    * @param {object} options
+   * @param {string} [options.status=finished] - The status of the task
+   * @param {string} [options.errorCode] - An error code
    * @returns {Promise<HarvestJob>}
    */
   static finish(job, options = {}) {
-    const { status = 'finished' } = options;
+    const { status = 'finished', errorCode } = options;
     const { startedAt, createdAt } = job;
 
     let runningTime;
@@ -97,9 +114,9 @@ module.exports = class HarvestJobsService {
       runningTime = Date.now() - createdAt.getTime();
     }
 
-    return prisma.harvestJob.update({
+    return HarvestJobsService.update({
       where: { id: job.id },
-      data: { status, runningTime },
+      data: { status, runningTime, errorCode },
     });
   }
 
@@ -116,7 +133,7 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJob} job - The job to cancel
    */
   static cancel(job) {
-    return prisma.harvestJob.update({
+    return HarvestJobsService.update({
       where: { id: job.id },
       data: { status: 'cancelled' },
     });

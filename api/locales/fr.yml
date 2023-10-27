@@ -14,6 +14,7 @@ errors:
     taskExists: "L'item SUSHI [%s] a déjà une tâche associée (statut: [%s])"
     invalidDate: La date [%s] est invalide
     invalidPeriod: La période [de %s à %s] est invalide
+    failedToUpdateSupportedReports: La mise à jour de la liste des rapports disponibles a échoué
 
   queue:
     notFound: File d'attente introuvable
@@ -67,6 +68,9 @@ errors:
     noBaseIndex: L'index de base [%s] de l'établissement [%s] n'existe pas
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
+
+  member:
+    notFound: Membre introuvable
 
   members:
     alreadyMember: "L'utilisateur appartient à un autre établissement : %s"

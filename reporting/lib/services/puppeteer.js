@@ -209,7 +209,9 @@ class Reporter {
     this.busy = true;
 
     try {
+      logger.info('[Reporter] Launching browser');
       await this.launchBrowser();
+      logger.info('[Reporter] Browser launched');
     } catch (e) {
       logger.error('Failed to launch browser');
       logger.error(e);
@@ -219,6 +221,7 @@ class Reporter {
     }
 
     while (this.tasks.length > 0) {
+      logger.info(`[Reporter] ${this.tasks.length} task(s) remaining`);
       const [task, emitter] = this.tasks.shift();
       let page;
 
@@ -243,7 +246,9 @@ class Reporter {
     }
 
     try {
+      logger.info('[Reporter] Closing browser');
       await this.closeBrowser();
+      logger.info('[Reporter] Browser closed');
     } catch (e) {
       logger.error('Failed to close browser');
       logger.error(e);
@@ -356,7 +361,13 @@ class Reporter {
     );
 
     await insertStyles(page, styles);
-    await waitForCompleteRender(page, visCount);
+
+    await Promise.race([
+      waitForCompleteRender(page, visCount),
+      new Promise((resolve, reject) => {
+        setTimeout(() => { reject(new Error('Dashboard render timed out')); }, 30000);
+      }),
+    ]);
 
     if (print) {
       await positionElements(page, viewport);

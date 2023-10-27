@@ -4,5 +4,6 @@ const hookEmitter = require('./hookEmitter');
 require('./ezreeport');
 require('./elastic');
 require('./kibana');
+require('./harvest');
 
 module.exports = hookEmitter;

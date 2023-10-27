@@ -51,7 +51,7 @@ async function syncNamespaces() {
     name: i.name,
     logoId: i.logoId || undefined,
     fetchLogin: { elastic: { username: reportingUsers.getReportUserFromInstitution(i).username } },
-    fetchOptions: {},
+    fetchOptions: { elastic: {} },
     members: i?.memberships
       // Only keeping users which have access to reporting
       .filter((m) => m.permissions.some((p) => /^reporting:/.test(p)))

@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn :href="userListMailLink" text>
+        <v-btn :href="userListMailLink" target="_blank" rel="noopener noreferrer" text>
           <v-icon left>
             mdi-email-multiple
           </v-icon>
@@ -49,9 +49,16 @@
           color="black"
           @click="showUsersFiltersDrawer = true"
         >
-          <v-icon left>
-            mdi-filter
-          </v-icon>
+          <v-badge
+            :value="filtersCount > 0"
+            :content="filtersCount"
+            overlap
+            left
+          >
+            <v-icon>
+              mdi-filter
+            </v-icon>
+          </v-badge>
           {{ $t('filter') }}
         </v-btn>
 
@@ -71,12 +78,11 @@
       v-model="selected"
       :headers="tableHeaders"
       :items="users"
-      :search="search"
       :loading="refreshing"
-      :custom-filter="basicFilter"
       sort-by="username"
       item-key="username"
       show-select
+      @pagination="currentItemCount = $event.itemsLength"
     >
       <template #[`item.isAdmin`]="{ item }">
         <v-icon v-if="item.isAdmin">
@@ -134,6 +140,7 @@
     <UsersFiltersDrawer
       v-model="filters"
       :show.sync="showUsersFiltersDrawer"
+      :search="search"
       :institutions="availableMembershipsData.institutions"
       :roles="availableMembershipsData.roles"
       :permissions="availableMembershipsData.permissions"
@@ -168,6 +175,7 @@ export default {
       refreshing: false,
       users: [],
       filters: {},
+      currentItemCount: 0,
     };
   },
   mounted() {
@@ -181,29 +189,35 @@ export default {
       if (this.hasSelection) {
         return this.$t('nSelected', { count: this.selected.length });
       }
-      return this.$t('users.toolbarTitle', { count: this.users?.length ?? '?' });
+
+      let count = this.users?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('users.toolbarTitle', { count: count ?? '?' });
     },
     tableHeaders() {
       return [
         {
           text: this.$t('users.user.fullName'),
           value: 'fullName',
-          filter: (value) => this.basicStringFilter('fullName', value),
+          filter: (_value, _search, item) => this.columnStringFilter('fullName', item),
         },
         {
           text: this.$t('users.user.username'),
           value: 'username',
-          filter: (value) => this.basicStringFilter('username', value),
+          filter: (_value, _search, item) => this.columnStringFilter('username', item),
         },
         {
           text: this.$t('users.user.email'),
           value: 'email',
-          filter: (value) => this.basicStringFilter('email', value),
+          filter: (_value, _search, item) => this.columnStringFilter('email', item),
         },
         {
           text: this.$t('users.user.isAdmin'),
           value: 'isAdmin',
-          filter: (value) => this.filters.isAdmin === undefined || this.filters.isAdmin === value,
+          filter: (value) => this.basicBoolFilter('isAdmin', value),
         },
         {
           text: this.$t('users.user.memberships'),
@@ -241,24 +255,45 @@ export default {
     },
     userListMailLink() {
       const addresses = this.selected.map((user) => user.email).join(',');
-      return `mailto:${addresses}`;
+      const teamMail = this.$config.supportMail;
+      return `mailto:${teamMail}?bcc=${addresses}`;
+    },
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
+
+            return prev + 1;
+          },
+          0,
+        );
     },
   },
   methods: {
     /**
      * Basic filter applied by default to v-data-table
      *
-     * @param {*} value The item's value
-     * @param {*} search The value searched
+     * @param {string} value The item's value
+     * @param {string} search The value searched
      */
     basicFilter(value, search) {
       return value.toLowerCase().includes(search.toLowerCase());
     },
     /**
-     * Basic filter applied to fields using filter popups
+     * Basic filter applied to string fields using filter popups
      *
      * @param {string} field The filter's field
-     * @param {*} value The item's value
+     * @param {string} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
      */
     basicStringFilter(field, value) {
       if (!this.filters[field]) {
@@ -267,7 +302,42 @@ export default {
       return this.basicFilter(value, this.filters[field]);
     },
     /**
+     * Basic filter applied to bool fields using filter popups
+     *
+     * @param {string} field The filter's field
+     * @param {boolean} value The item's value
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    basicBoolFilter(field, value) {
+      if (this.filters[field] == null) {
+        return true;
+      }
+      return this.filters[field] === value;
+    },
+    /**
+     * Filter for string column using search, fallbacks to filters
+     *
+     * @param {string} field The item's field
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnStringFilter(field, item) {
+      if (this.search) {
+        const isFullName = this.basicFilter(item.fullName, this.search);
+        const isUsername = this.basicFilter(item.username, this.search);
+        const isEmail = this.basicFilter(item.email, this.search);
+        return isFullName || isUsername || isEmail;
+      }
+      return this.basicStringFilter(field, item[field]);
+    },
+    /**
      * Filter applied to memberships
+     *
+     * @param {any[]} value
+     *
+     * @return {boolean} If the item must be showed or not
      */
     membershipsFilter(value) {
       const data = this.extractMembershipsData(value);
@@ -310,7 +380,12 @@ export default {
      *
      * @param {any[]} memberships The user's memberships
      *
-     * @returns user's permissions, roles, institutions
+     * @typedef {Object} MembershipData
+     * @property {Set} permissions
+     * @property {Set} roles
+     * @property {Map<string, *>} institutions
+     *
+     * @returns {MembershipData} user's permissions, roles, institutions
      */
     extractMembershipsData(memberships) {
       const permissions = [];

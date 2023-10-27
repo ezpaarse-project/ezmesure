@@ -14,6 +14,7 @@ errors:
     taskExists: "SUSHI item [%s] already have an associated task (status: [%s])"
     invalidDate: The date [%s] is invalid
     invalidPeriod: The period [from %s to %s] is invalid
+    failedToUpdateSupportedReports: Failed to update the list of supported reports
 
   queue:
     notFound: Queue not found
@@ -67,6 +68,9 @@ errors:
     noBaseIndex: The base index [%s] of the institution [%s] does not exist
     noSpace: The space [%s] of the institution [%s] does not exist
     forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
+
+  member:
+    notFound: Member not found
 
   members:
     alreadyMember: "The user belongs to another institution: %s"
