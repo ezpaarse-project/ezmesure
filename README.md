@@ -154,10 +154,10 @@ The ezMESURE API is documented here : https://localhost/api-reference
 
 ### Prerequisites
 
-* [Docker](https://www.docker.com/) 
-* [docker-compose](https://docs.docker.com/compose/)
+* [docker](https://www.docker.com/) 
+* [docker compose](https://docs.docker.com/compose/)
 * [npm](https://docs.npmjs.com/about-npm)
-* [node 14](https://nodejs.org/en/)
+* [node 18](https://nodejs.org/en/)
 
 ### 1. Install local dependencies
 
@@ -206,9 +206,7 @@ Instance added to ./tools/../certs/instances.yml
 Add another instance (Y/n) ? n
 ```
 
-// TODO Add elastic in dns
-
-Once the file is created, you can generate the certificates.
+Once the file is created, you need to add elastic in dns and you can generate the certificates.
 
 ```bash
 ezmesure/certs docker-compose -f create-certs.yml run --rm create_certs
@@ -250,4 +248,15 @@ dco -f docker-compose.migrate.yml down
 
 ```bash
 docker-compose -f docker-compose.debug.yml up -d
+```
+
+### 8. Database update
+
+If you have updated the database schema, you need to migrate your database :
+
+```bash
+# node
+npx prisma db push
+# docker
+docker compose -f docker-compose.debug.yml run --rm api npx prisma db push
 ```
