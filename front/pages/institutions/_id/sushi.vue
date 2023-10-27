@@ -236,6 +236,23 @@
         </td>
       </template>
 
+      <template #[`header.tags`]>
+        {{ $t('institutions.sushi.tags') }}
+
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-icon
+              small
+              v-bind="attrs"
+              v-on="on"
+            >
+              mdi-help-circle
+            </v-icon>
+          </template>
+          <span>{{ $t('institutions.sushi.tagsHint') }}</span>
+        </v-tooltip>
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
