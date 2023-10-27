@@ -168,6 +168,14 @@ ezmesure/api npm i
 
 ezmesure/front npm i
 ```
+
+If you want to start ezmesure in docker mode, you need to install `sharp` in the container
+
+```bash
+$ rm -rf ./api/node_modules
+$ docker compose -f docker-compose.debug.yml run --rm api npm i
+```
+
 ### 2. Source environnement variable
 
 You should source ``ezmesure.env.sh`` for the following and before each start.
