@@ -4,20 +4,38 @@
     open-on-hover
     offset-x
     :close-on-content-click="false"
+    bottom
+    left
     nudge-width="300"
+    max-width="600"
   >
     <template #activator="{ on, attrs }">
-      <v-btn
-        icon
-        :loading="loading"
+      <v-chip
+        small
+        outlined
+        :color="color"
         v-bind="attrs"
         v-on="on"
-        @click="$emit('checkConnection')"
+        @click="() => !loading && !disabled && $emit('checkConnection')"
       >
-        <v-icon :color="color" small>
+        <v-avatar v-if="loading" left>
+          <v-progress-circular
+            indeterminate
+            size="14"
+            width="2"
+          />
+        </v-avatar>
+
+        <v-icon v-else small left>
           {{ icon }}
         </v-icon>
-      </v-btn>
+
+        {{ chipText }}
+
+        <v-icon small right>
+          mdi-chevron-down
+        </v-icon>
+      </v-chip>
     </template>
 
     <v-card>
@@ -31,17 +49,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              <span v-if="success === true">
-                {{ $t('institutions.sushi.connectionSuccessful') }}
-              </span>
-
-              <span v-else-if="success === false">
-                {{ $t('institutions.sushi.connectionFailed') }}
-              </span>
-
-              <span v-else>
-                {{ $t('institutions.sushi.connectionUntested') }}
-              </span>
+              {{ $t(`institutions.sushi.${titleKey}`) }}
             </v-list-item-title>
 
             <v-list-item-subtitle v-if="date">
@@ -51,14 +59,43 @@
         </v-list-item>
       </v-list>
 
-      <v-divider v-if="hasExceptions" />
+      <v-divider />
+
+      <v-card-text>
+        {{ $t(`institutions.sushi.${titleKey}Desc`) }}
+      </v-card-text>
+
+      <v-card-text v-if="error">
+        <div class="subtitle-2">
+          {{ $t('reason', { reason: error || $t('indeterminate') }) }}
+        </div>
+        <div>{{ errorMeaning }}</div>
+      </v-card-text>
 
       <v-card-text v-if="hasExceptions">
-        <ul>
-          <li v-for="(exception, index) in exceptions" :key="index">
-            {{ exception }}
-          </li>
-        </ul>
+        <p>{{ $t('sushi.messagesFromEndpoint') }}</p>
+        <LogsPreview
+          :logs="exceptions"
+          log-type="Severity"
+          log-message="Message"
+        >
+          <template #message="{ log }">
+            <span>{{ log.Message }}</span>
+            <span v-if="log.Data" class="grey--text">({{ log.Data }})</span>
+            <v-btn
+              v-if="log.Help_URL"
+              :href="log.Help_URL"
+              target="_blank"
+              color="accent"
+              x-small
+            >
+              {{ $t('sushi.openHelpPage') }}
+              <v-icon right>
+                mdi-open-in-new
+              </v-icon>
+            </v-btn>
+          </template>
+        </LogsPreview>
       </v-card-text>
 
       <v-card-actions>
@@ -67,7 +104,7 @@
           small
           color="primary"
           text
-          :disabled="locked"
+          :disabled="disabled"
           :loading="loading"
           @click="$emit('checkConnection')"
         >
@@ -82,6 +119,8 @@
 </template>
 
 <script>
+import LogsPreview from './LogsPreview.vue';
+
 export default {
   props: {
     connection: {
@@ -92,10 +131,13 @@ export default {
       type: Boolean,
       default: () => false,
     },
-    locked: {
+    disabled: {
       type: Boolean,
       default: () => false,
     },
+  },
+  components: {
+    LogsPreview,
   },
   data() {
     return {
@@ -103,7 +145,11 @@ export default {
     };
   },
   computed: {
-    success() { return this.connection?.success; },
+    untested() { return !this.connection; },
+    status() { return this.connection?.status; },
+    success() { return this.status === 'success'; },
+    failed() { return this.status === 'failed'; },
+    indeterminate() { return this.status === 'indeterminate'; },
     date() { return this.connection?.date; },
     exceptions() { return this.connection?.exceptions; },
     hasExceptions() { return Array.isArray(this.exceptions) && this.exceptions.length > 0; },
@@ -117,14 +163,39 @@ export default {
       return this.$dateFunctions.format(localDate, 'PPPpp');
     },
     icon() {
-      if (this.success === true) { return 'mdi-lan-connect'; }
-      if (this.success === false) { return 'mdi-lan-disconnect'; }
+      if (this.success) { return 'mdi-check'; }
+      if (this.failed) { return 'mdi-close'; }
+      if (this.indeterminate) { return 'mdi-help'; }
       return 'mdi-lan-pending';
     },
     color() {
-      if (this.success === true) { return 'green'; }
-      if (this.success === false) { return 'red'; }
+      if (this.success) { return 'green'; }
+      if (this.failed) { return 'red'; }
+      if (this.indeterminate) { return 'orange'; }
       return 'grey';
+    },
+    error() {
+      const errorCode = this.connection?.errorCode;
+      const key = `tasks.status.exceptions.${errorCode}`;
+
+      return (errorCode && this.$te(key)) ? this.$t(key) : undefined;
+    },
+    errorMeaning() {
+      const errorCode = this.connection?.errorCode;
+      const key = `tasks.status.exceptionMeaning.${errorCode}`;
+      return (errorCode && this.$te(key)) ? this.$t(key) : undefined;
+    },
+    chipText() {
+      if (this.untested) {
+        return this.$t('institutions.sushi.untested');
+      }
+      return this.$t(`institutions.sushi.${this.success ? 'connected' : 'disconnected'}`);
+    },
+    titleKey() {
+      if (this.success) { return 'connectionSuccessful'; }
+      if (this.failed) { return 'connectionFailed'; }
+      if (this.indeterminate) { return 'connectionIndeterminate'; }
+      return 'connectionUntested';
     },
   },
 };
