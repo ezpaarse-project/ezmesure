@@ -207,7 +207,7 @@ router.route({
   path: '/:institutionId/memberships/:username',
   handler: [
     fetchInstitution(),
-    requireMemberPermissions(FEATURES.memberships.revoke),
+    requireMemberPermissions(FEATURES.memberships.write),
     removeInstitutionMember,
   ],
   validate: {
