@@ -527,15 +527,14 @@ exports.checkSushiConnection = async (ctx) => {
     institutionName: institution.name,
   };
 
-  const twoMonthAgo = subMonths(new Date(), 2);
-  const threeMonthAgo = subMonths(new Date(), 3);
+  const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
 
   const sushiData = {
     sushi,
     institution,
     endpoint,
-    beginDate: format(threeMonthAgo, 'yyyy-MM'),
-    endDate: format(twoMonthAgo, 'yyyy-MM'),
+    beginDate: threeMonthAgo,
+    endDate: threeMonthAgo,
     reportType: 'pr',
   };
 
