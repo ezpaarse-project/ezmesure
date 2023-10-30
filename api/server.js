@@ -16,6 +16,7 @@ const notifications = require('./lib/services/notifications');
 const Task = require('./lib/models/Task');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
+const sushi = require('./lib/services/sushi');
 
 const ezreeportSync = require('./lib/services/sync/ezreeport');
 const elasticSync = require('./lib/services/sync/elastic');
@@ -138,6 +139,7 @@ function start() {
   elasticSync.startCron();
   kibanaSync.startCron();
   ezreeportSync.startCron();
+  sushi.startCleanCron();
   cronMetrics.start();
 
   // Change the status of tasks that was running when the server went down

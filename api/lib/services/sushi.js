@@ -1,11 +1,16 @@
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
+const { subDays, isBefore } = require('date-fns');
+
+const { CronJob } = require('cron');
+const { glob } = require('glob');
 
 const os = require('os');
 const config = require('config');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs-extra');
+const { stat: fsStats } = require('fs/promises');
 const EventEmitter = require('events');
 
 // Workaround because axios fails make HTTP requests over a HTTPS proxy
@@ -19,6 +24,7 @@ const addFormats = require('ajv-formats').default;
 const definitions = require('../utils/sushi-definitions-patched');
 const { appLogger } = require('./logger');
 
+const cleanConfig = config.get('counter.clean');
 const storageDir = path.resolve(config.get('storage.path'), 'sushi');
 const tmpDir = path.resolve(os.tmpdir(), 'sushi');
 
@@ -545,6 +551,65 @@ function stringifyException(exception) {
   return message;
 }
 
+async function cleanFiles() {
+  const limit = subDays(new Date(), cleanConfig.maxDayAge);
+
+  // TODO: clean temp files
+
+  const reportPaths = await glob(
+    // expression is based on who files are created
+    path.resolve(storageDir, '**/**/**/**/*.json'),
+  );
+
+  appLogger.verbose(`[counter-cleanup] Found ${reportPaths.length} reports`);
+  const reportRes = await Promise.allSettled(
+    reportPaths.map(async (filePath) => {
+      try {
+        // eslint-disable-next-line no-underscore-dangle
+        const stats = await fsStats(filePath, { bigint: false });
+
+        if (!stats.birthtimeMs) {
+          throw new Error('Cant get birthtime');
+        }
+
+        if (isBefore(stats.birthtime, limit)) {
+          await fs.remove(filePath);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        appLogger.error(`[counter-cleanup] Error when ${filePath}: ${error}`);
+        throw error;
+      }
+    }),
+  );
+
+  const reportErrors = reportRes.filter((v) => v.reason).length;
+  const reportSkipped = reportRes.filter((v) => v.value === false).length;
+  const reportDeleted = reportRes.length - reportErrors - reportSkipped;
+
+  appLogger.info(`[counter-cleanup] When cleaning reports : ${reportErrors} errors, ${reportSkipped} skipped, ${reportDeleted} deleted`);
+}
+
+async function startCleanCron() {
+  const job = new CronJob({
+    cronTime: cleanConfig.schedule,
+    runOnInit: true,
+    onTick: async () => {
+      appLogger.verbose('[counter-cleanup] Starting cleanup');
+      try {
+        await cleanFiles();
+        appLogger.info('[counter-cleanup] Cleaned');
+      } catch (e) {
+        const message = e?.response?.data?.content?.message || e.message;
+        appLogger.error(`[counter-cleanup] Failed to clean: ${message}`);
+      }
+    },
+  });
+
+  job.start();
+}
+
 module.exports = {
   getReportDownloadConfig,
   validateReport,
@@ -560,6 +625,7 @@ module.exports = {
   getExceptionSeverity,
   stringifyException,
   hasReportItems,
+  startCleanCron,
   DEFAULT_REPORT_TYPE,
   REPORT_IDS,
   SUSHI_CODES,

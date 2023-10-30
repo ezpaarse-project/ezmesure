@@ -72,6 +72,10 @@
     "defaultHarvestedReports": {
       "__name": "EZMESURE_DEFAULT_HARVESTED_REPORTS",
       "__format": "json"
+    },
+    "clean": {
+      "schedule": "EZMESURE_CLEAN_COUNTER_SCHEDULE",
+      "maxDayAge": "EZMESURE_COUNTER_MAX_AGE"
     }
   },
   "depositors": {
