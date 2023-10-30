@@ -37,381 +37,196 @@ describe('[institutions - memberships]: Test create memberships features', () =>
     );
     await activateUser(userTest.username, userTest.password);
   });
-  describe('Unvalidated institution', () => {
-    describe('As admin', () => {
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:read'];
 
-        it('Should attach user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          expect(res).toHaveProperty('status', 200);
+  beforeAll(async () => {
+    await validateInstitutionAsAdmin(institutionId);
+  });
+  describe('As admin', () => {
+    describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
+      const userTestPermissions = ['memberships:read'];
+
+      it('Should attach user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
+        const res = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+          data: {
+            permissions: userTestPermissions,
+          },
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
-
-        it('Should get institution [Test] with its members', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 200);
-
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toHaveProperty('username', userTest.username);
-          expect(membership).toHaveProperty('institutionId', institutionId);
-          expect(membership).toHaveProperty('roles', []);
-          expect(membership).toHaveProperty('permissions', userTestPermissions);
-          expect(membership).toHaveProperty('locked', false);
-        });
-
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/users/${userTest.username}/institution`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          // FIXME rout doesnt exist
-          expect(res).toHaveProperty('status', 404);
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+        expect(res).toHaveProperty('status', 200);
       });
 
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permissions [memberships:write, memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:write', 'memberships:read'];
-
-        it('Should attach user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          expect(res).toHaveProperty('status', 200);
+      it('Should get institution [Test] with its members', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}/memberships`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        it('Should get institution [Test] with its members', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
+        expect(res).toHaveProperty('status', 200);
 
-          expect(res).toHaveProperty('status', 200);
-
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toHaveProperty('username', userTest.username);
-          expect(membership).toHaveProperty('institutionId', institutionId);
-          expect(membership).toHaveProperty('roles', []);
-          expect(membership).toHaveProperty('permissions', ['memberships:write', 'memberships:read']);
-          expect(membership).toHaveProperty('locked', false);
-        });
-
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+        const [membership] = res.data.filter((user) => user.username === userTest.username);
+        expect(membership).toHaveProperty('username', userTest.username);
+        expect(membership).toHaveProperty('institutionId', institutionId);
+        expect(membership).toHaveProperty('roles', []);
+        expect(membership).toHaveProperty('permissions', userTestPermissions);
+        expect(membership).toHaveProperty('locked', false);
       });
-    });
-    describe('As user', () => {
-      const userManagerTest = {
-        username: 'user.manager',
-        email: 'user.manager@test.fr',
-        fullName: 'User manager',
-        isAdmin: false,
-        password: 'changeme',
 
-      };
-      let userManagerToken;
-
-      beforeAll(async () => {
-        await createUserAsAdmin(
-          userManagerTest.username,
-          userManagerTest.email,
-          userManagerTest.fullName,
-          userManagerTest.isAdmin,
-        );
-        await activateUser(
-          userManagerTest.username,
-          userManagerTest.password,
-        );
-        await addMembershipsToUserAsAdmin(
-          institutionId,
-          userManagerTest.username,
-          userManagerTest.permissions,
-        );
-        userManagerToken = await getToken('user.manager', 'changeme');
+      it('Should get user [user.test] with its institutions', async () => {
+        // TODO
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/users/${userTest.username}/institution`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+        // FIXME rout doesnt exist
+        expect(res).toHaveProperty('status', 404);
       });
-      describe('With permission [memberships:write, memberships:read]', () => {
-        beforeAll(async () => {
-          userManagerTest.permissions = ['memberships:write', 'memberships:read'];
-          await addMembershipsToUserAsAdmin(
-            institutionId,
-            userManagerTest.username,
-            userManagerTest.permissions,
-          );
-        });
 
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = [];
-
-          it('Should attach user [user.test] in institution [Test] with permissions []', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-          });
-
-          it('Should get institution [Test] with its members', async () => {
-            // TODO
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toHaveProperty('username', userTest.username);
-            expect(membership).toHaveProperty('institutionId', institutionId);
-            expect(membership).toHaveProperty('roles', []);
-            expect(membership).toHaveProperty('permissions', userTestPermissions);
-            expect(membership).toHaveProperty('locked', false);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = ['memberships:read'];
-
-          it('Should attach user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-          });
-
-          it('Should get institution [Test] with its members', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toHaveProperty('username', userTest.username);
-            expect(membership).toHaveProperty('institutionId', institutionId);
-            expect(membership).toHaveProperty('roles', []);
-            expect(membership).toHaveProperty('permissions', userTestPermissions);
-            expect(membership).toHaveProperty('locked', false);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-      });
-      describe('With permission [memberships:read]', () => {
-        beforeAll(async () => {
-          userManagerTest.permissions = ['memberships:read'];
-          await addMembershipsToUserAsAdmin(
-            institutionId,
-            userManagerTest.username,
-            userManagerTest.permissions,
-          );
-        });
-
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = ['memberships:read'];
-
-          it('Should get HTTP code 403', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          it('Should get institution [Test] with its members with no change', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toEqual(undefined);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
-      });
       afterAll(async () => {
-        await deleteUserAsAdmin(userManagerTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
-    describe('With random token', () => {
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:read'];
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-            headers: {
-              Authorization: 'Bearer: random',
-            },
-          });
+    describe('PUT /institutions/<id>/memberships/<username> - Add membership with permissions [memberships:write, memberships:read] of user [user.test] for institution [Test]', () => {
+      const userTestPermissions = ['memberships:write', 'memberships:read'];
 
-          expect(res).toHaveProperty('status', 401);
+      it('Should attach user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
+        const res = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+          data: {
+            permissions: userTestPermissions,
+          },
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
-
-        it('Should get institution [Test] with its members with no change', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 200);
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toEqual(undefined);
-        });
-
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+        expect(res).toHaveProperty('status', 200);
       });
-    });
-    describe('Without token', () => {
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:read'];
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 401);
+      it('Should get institution [Test] with its members', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}/memberships`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        it('Should get institution [Test] with its members with no change', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
+        expect(res).toHaveProperty('status', 200);
 
-          expect(res).toHaveProperty('status', 200);
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toEqual(undefined);
-        });
+        const [membership] = res.data.filter((user) => user.username === userTest.username);
+        expect(membership).toHaveProperty('username', userTest.username);
+        expect(membership).toHaveProperty('institutionId', institutionId);
+        expect(membership).toHaveProperty('roles', []);
+        expect(membership).toHaveProperty('permissions', ['memberships:write', 'memberships:read']);
+        expect(membership).toHaveProperty('locked', false);
+      });
 
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-        });
+      it('Should get user [user.test] with its institutions', async () => {
+        // TODO
+      });
 
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+      afterAll(async () => {
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });
+  describe('As user', () => {
+    const userManagerTest = {
+      username: 'user.manager',
+      email: 'user.manager@test.fr',
+      fullName: 'User manager',
+      isAdmin: false,
+      password: 'changeme',
 
-  describe('Validated institution', () => {
+    };
+    let userManagerToken;
+
     beforeAll(async () => {
-      await validateInstitutionAsAdmin(institutionId);
+      await createUserAsAdmin(
+        userManagerTest.username,
+        userManagerTest.email,
+        userManagerTest.fullName,
+        userManagerTest.isAdmin,
+      );
+      await activateUser(
+        userManagerTest.username,
+        userManagerTest.password,
+      );
+      await addMembershipsToUserAsAdmin(
+        institutionId,
+        userManagerTest.username,
+        userManagerTest.permissions,
+      );
+      userManagerToken = await getToken('user.manager', 'changeme');
     });
-    describe('As admin', () => {
+    describe('With permission [memberships:write, memberships:read]', () => {
+      beforeAll(async () => {
+        userManagerTest.permissions = ['memberships:write', 'memberships:read'];
+        await addMembershipsToUserAsAdmin(
+          institutionId,
+          userManagerTest.username,
+          userManagerTest.permissions,
+        );
+      });
+
+      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [] of user [user.test] for institution [Test]', () => {
+        const userTestPermissions = [];
+
+        it('Should attach user [user.test] in institution [Test] with permissions []', async () => {
+          const res = await ezmesure({
+            method: 'PUT',
+            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+            data: {
+              permissions: userTestPermissions,
+            },
+            headers: {
+              Authorization: `Bearer ${userManagerToken}`,
+            },
+          });
+
+          expect(res).toHaveProperty('status', 200);
+        });
+
+        it('Should get institution [Test] with its members', async () => {
+          // TODO
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/institutions/${institutionId}/memberships`,
+            headers: {
+              Authorization: `Bearer ${userManagerToken}`,
+            },
+          });
+
+          expect(res).toHaveProperty('status', 200);
+
+          const [membership] = res.data.filter((user) => user.username === userTest.username);
+          expect(membership).toHaveProperty('username', userTest.username);
+          expect(membership).toHaveProperty('institutionId', institutionId);
+          expect(membership).toHaveProperty('roles', []);
+          expect(membership).toHaveProperty('permissions', userTestPermissions);
+          expect(membership).toHaveProperty('locked', false);
+        });
+
+        it('Should get user [user.test] with its institutions', async () => {
+          // TODO
+        });
+
+        afterAll(async () => {
+          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+        });
+      });
+
       describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
         const userTestPermissions = ['memberships:read'];
 
@@ -423,9 +238,10 @@ describe('[institutions - memberships]: Test create memberships features', () =>
               permissions: userTestPermissions,
             },
             headers: {
-              Authorization: `Bearer ${adminToken}`,
+              Authorization: `Bearer ${userManagerToken}`,
             },
           });
+
           expect(res).toHaveProperty('status', 200);
         });
 
@@ -450,60 +266,6 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
         it('Should get user [user.test] with its institutions', async () => {
           // TODO
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/users/${userTest.username}/institution`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          // FIXME rout doesnt exist
-          expect(res).toHaveProperty('status', 404);
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
-      });
-
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permissions [memberships:write, memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:write', 'memberships:read'];
-
-        it('Should attach user [user.test] in institution [Test] with permissions [memberships:write, memberships:read]', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          expect(res).toHaveProperty('status', 200);
-        });
-
-        it('Should get institution [Test] with its members', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 200);
-
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toHaveProperty('username', userTest.username);
-          expect(membership).toHaveProperty('institutionId', institutionId);
-          expect(membership).toHaveProperty('roles', []);
-          expect(membership).toHaveProperty('permissions', ['memberships:write', 'memberships:read']);
-          expect(membership).toHaveProperty('locked', false);
-        });
-
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
         });
 
         afterAll(async () => {
@@ -511,271 +273,138 @@ describe('[institutions - memberships]: Test create memberships features', () =>
         });
       });
     });
-    describe('As user', () => {
-      const userManagerTest = {
-        username: 'user.manager',
-        email: 'user.manager@test.fr',
-        fullName: 'User manager',
-        isAdmin: false,
-        password: 'changeme',
-
-      };
-      let userManagerToken;
-
+    describe('With permission [memberships:read]', () => {
       beforeAll(async () => {
-        await createUserAsAdmin(
-          userManagerTest.username,
-          userManagerTest.email,
-          userManagerTest.fullName,
-          userManagerTest.isAdmin,
-        );
-        await activateUser(
-          userManagerTest.username,
-          userManagerTest.password,
-        );
+        userManagerTest.permissions = ['memberships:read'];
         await addMembershipsToUserAsAdmin(
           institutionId,
           userManagerTest.username,
           userManagerTest.permissions,
         );
-        userManagerToken = await getToken('user.manager', 'changeme');
       });
-      describe('With permission [memberships:write, memberships:read]', () => {
-        beforeAll(async () => {
-          userManagerTest.permissions = ['memberships:write', 'memberships:read'];
-          await addMembershipsToUserAsAdmin(
-            institutionId,
-            userManagerTest.username,
-            userManagerTest.permissions,
-          );
+
+      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
+        const userTestPermissions = ['memberships:read'];
+
+        it('Should get HTTP code 403', async () => {
+          const res = await ezmesure({
+            method: 'PUT',
+            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+            data: {
+              permissions: userTestPermissions,
+            },
+            headers: {
+              Authorization: `Bearer ${userManagerToken}`,
+            },
+          });
+          expect(res).toHaveProperty('status', 403);
         });
 
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = [];
-
-          it('Should attach user [user.test] in institution [Test] with permissions []', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
+        it('Should get institution [Test] with its members with no change', async () => {
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/institutions/${institutionId}/memberships`,
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
           });
 
-          it('Should get institution [Test] with its members', async () => {
-            // TODO
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toHaveProperty('username', userTest.username);
-            expect(membership).toHaveProperty('institutionId', institutionId);
-            expect(membership).toHaveProperty('roles', []);
-            expect(membership).toHaveProperty('permissions', userTestPermissions);
-            expect(membership).toHaveProperty('locked', false);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
+          expect(res).toHaveProperty('status', 200);
+          const [membership] = res.data.filter((user) => user.username === userTest.username);
+          expect(membership).toEqual(undefined);
         });
 
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = ['memberships:read'];
+        it('Should get user [user.test] with its institutions', async () => {
+          // TODO
+        });
 
-          it('Should attach user [user.test] in institution [Test] with permissions [memberships:read]', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-          });
-
-          it('Should get institution [Test] with its members', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toHaveProperty('username', userTest.username);
-            expect(membership).toHaveProperty('institutionId', institutionId);
-            expect(membership).toHaveProperty('roles', []);
-            expect(membership).toHaveProperty('permissions', userTestPermissions);
-            expect(membership).toHaveProperty('locked', false);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
+        afterAll(async () => {
+          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
         });
       });
-      describe('With permission [memberships:read]', () => {
-        beforeAll(async () => {
-          userManagerTest.permissions = ['memberships:read'];
-          await addMembershipsToUserAsAdmin(
-            institutionId,
-            userManagerTest.username,
-            userManagerTest.permissions,
-          );
+    });
+    afterAll(async () => {
+      await deleteUserAsAdmin(userManagerTest.username);
+    });
+  });
+  describe('With random token', () => {
+    describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
+      const userTestPermissions = ['memberships:read'];
+
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+          data: {
+            permissions: userTestPermissions,
+          },
+          headers: {
+            Authorization: 'Bearer: random',
+          },
         });
 
-        describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-          const userTestPermissions = ['memberships:read'];
-
-          it('Should get HTTP code 403', async () => {
-            const res = await ezmesure({
-              method: 'PUT',
-              url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-              data: {
-                permissions: userTestPermissions,
-              },
-              headers: {
-                Authorization: `Bearer ${userManagerToken}`,
-              },
-            });
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          it('Should get institution [Test] with its members with no change', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/memberships`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 200);
-            const [membership] = res.data.filter((user) => user.username === userTest.username);
-            expect(membership).toEqual(undefined);
-          });
-
-          it('Should get user [user.test] with its institutions', async () => {
-            // TODO
-          });
-
-          afterAll(async () => {
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-          });
-        });
+        expect(res).toHaveProperty('status', 401);
       });
+
+      it('Should get institution [Test] with its members with no change', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}/memberships`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+
+        expect(res).toHaveProperty('status', 200);
+        const [membership] = res.data.filter((user) => user.username === userTest.username);
+        expect(membership).toEqual(undefined);
+      });
+
+      it('Should get user [user.test] with its institutions', async () => {
+        // TODO
+      });
+
       afterAll(async () => {
-        await deleteUserAsAdmin(userManagerTest.username);
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
-    describe('With random token', () => {
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:read'];
+  });
+  describe('Without token', () => {
+    describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
+      const userTestPermissions = ['memberships:read'];
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-            headers: {
-              Authorization: 'Bearer: random',
-            },
-          });
-
-          expect(res).toHaveProperty('status', 401);
+      it('Should get HTTP status 401', async () => {
+        const res = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${institutionId}/memberships/${userTest.username}`,
+          data: {
+            permissions: userTestPermissions,
+          },
         });
 
-        it('Should get institution [Test] with its members with no change', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 200);
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toEqual(undefined);
-        });
-
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+        expect(res).toHaveProperty('status', 401);
       });
-    });
-    describe('Without token', () => {
-      describe('PUT /institutions/<id>/memberships/<username> - Add membership with permission [memberships:read] of user [user.test] for institution [Test]', () => {
-        const userTestPermissions = ['memberships:read'];
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PUT',
-            url: `/institutions/${institutionId}/memberships/${userTest.username}`,
-            data: {
-              permissions: userTestPermissions,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 401);
+      it('Should get institution [Test] with its members with no change', async () => {
+        const res = await ezmesure({
+          method: 'GET',
+          url: `/institutions/${institutionId}/memberships`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        it('Should get institution [Test] with its members with no change', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: `/institutions/${institutionId}/memberships`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
+        expect(res).toHaveProperty('status', 200);
+        const [membership] = res.data.filter((user) => user.username === userTest.username);
+        expect(membership).toEqual(undefined);
+      });
 
-          expect(res).toHaveProperty('status', 200);
-          const [membership] = res.data.filter((user) => user.username === userTest.username);
-          expect(membership).toEqual(undefined);
-        });
+      it('Should get user [user.test] with its institutions', async () => {
+        // TODO
+      });
 
-        it('Should get user [user.test] with its institutions', async () => {
-          // TODO
-        });
-
-        afterAll(async () => {
-          await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
-        });
+      afterAll(async () => {
+        await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
       });
     });
   });

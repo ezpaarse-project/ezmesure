@@ -260,3 +260,9 @@ npx prisma db push
 # docker
 docker compose -f docker-compose.debug.yml run --rm api npx prisma db push
 ```
+
+### 9. Test
+
+```bash
+docker compose exec api npm run test
+```

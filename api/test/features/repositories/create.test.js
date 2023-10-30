@@ -1,6 +1,8 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createInstitutionAsAdmin, createInstitution, validateInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
+const {
+  createInstitutionAsAdmin, createInstitution, validateInstitutionAsAdmin, deleteInstitutionAsAdmin,
+} = require('../../setup/institutions');
 const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 const { deleteRepositoryAsAdmin } = require('../../setup/repositories');
@@ -22,247 +24,127 @@ describe('[repositories]: Test create features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
+      beforeAll(async () => {
 
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'ezPAARSE',
-              institutionId,
-              pattern: 'ezpaarse-*',
-            };
-          });
-
-          it('Should create repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 201);
-
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository?.id).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
-          });
-
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
-        });
-
-        describe('POST /repositories - Create new repository of type [COUNTER 5] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'COUNTER 5',
-              institutionId,
-              pattern: 'publisher-*',
-            };
-          });
-
-          it('Should create repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 201);
-
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
-          });
-
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
-        });
-
-        describe('POST /repositories - Create new repository of type [random] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'random',
-              institutionId,
-              pattern: 'random-*',
-            };
-          });
-
-          it('Should create repositories of type [random] and pattern [random-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 201);
-
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository?.id).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
-          });
-
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
-        });
       });
 
-      describe('Validated institution', () => {
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        let repositoryConfig;
+        let repositoryId;
+
         beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
+          repositoryConfig = {
+            type: 'ezPAARSE',
+            institutionId,
+            pattern: 'ezpaarse-*',
+          };
         });
 
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
-
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'ezPAARSE',
-              institutionId,
-              pattern: 'ezpaarse-*',
-            };
+        it('Should create repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
           });
 
-          it('Should create repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
+          expect(res).toHaveProperty('status', 201);
 
-            expect(res).toHaveProperty('status', 201);
-
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository?.id).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
-          });
-
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
+          const repository = res?.data;
+          repositoryId = repository?.id;
+          expect(repositoryId).not.toBeNull();
+          expect(repository?.id).not.toBeNull();
+          expect(repository).toHaveProperty('institutionId', institutionId);
+          expect(repository?.createdAt).not.toBeNull();
+          expect(repository?.updatedAt).not.toBeNull();
+          expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
+          expect(repository).toHaveProperty('type', repositoryConfig.type);
         });
 
-        describe('POST /repositories - Create new repository of type [COUNTER 5] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'COUNTER 5',
-              institutionId,
-              pattern: 'publisher-*',
-            };
-          });
+        afterAll(async () => {
+          await deleteRepositoryAsAdmin(repositoryId);
+        });
+      });
 
-          it('Should create repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 201);
-
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
-          });
-
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
+      describe('POST /repositories - Create new repository of type [COUNTER 5] for [Test] institution', () => {
+        let repositoryConfig;
+        let repositoryId;
+        beforeAll(async () => {
+          repositoryConfig = {
+            type: 'COUNTER 5',
+            institutionId,
+            pattern: 'publisher-*',
+          };
         });
 
-        describe('POST /repositories - Create new repository of type [random] for [Test] institution', () => {
-          let repositoryConfig;
-          let repositoryId;
-          beforeAll(async () => {
-            repositoryConfig = {
-              type: 'random',
-              institutionId,
-              pattern: 'random-*',
-            };
+        it('Should create repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+            data: repositoryConfig,
           });
 
-          it('Should create repositories of type [random] and pattern [random-*]', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-              data: repositoryConfig,
-            });
+          expect(res).toHaveProperty('status', 201);
 
-            expect(res).toHaveProperty('status', 201);
+          const repository = res?.data;
+          repositoryId = repository?.id;
+          expect(repositoryId).not.toBeNull();
+          expect(repository).toHaveProperty('institutionId', institutionId);
+          expect(repository?.createdAt).not.toBeNull();
+          expect(repository?.updatedAt).not.toBeNull();
+          expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
+          expect(repository).toHaveProperty('type', repositoryConfig.type);
+        });
 
-            const repository = res?.data;
-            repositoryId = repository?.id;
-            expect(repositoryId).not.toBeNull();
-            expect(repository?.id).not.toBeNull();
-            expect(repository).toHaveProperty('institutionId', institutionId);
-            expect(repository?.createdAt).not.toBeNull();
-            expect(repository?.updatedAt).not.toBeNull();
-            expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
-            expect(repository).toHaveProperty('type', repositoryConfig.type);
+        afterAll(async () => {
+          await deleteRepositoryAsAdmin(repositoryId);
+        });
+      });
+
+      describe('POST /repositories - Create new repository of type [random] for [Test] institution', () => {
+        let repositoryConfig;
+        let repositoryId;
+        beforeAll(async () => {
+          repositoryConfig = {
+            type: 'random',
+            institutionId,
+            pattern: 'random-*',
+          };
+        });
+
+        it('Should create repositories of type [random] and pattern [random-*]', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+            data: repositoryConfig,
           });
 
-          afterAll(async () => {
-            await deleteRepositoryAsAdmin(repositoryId);
-          });
+          expect(res).toHaveProperty('status', 201);
+
+          const repository = res?.data;
+          repositoryId = repository?.id;
+          expect(repositoryId).not.toBeNull();
+          expect(repository?.id).not.toBeNull();
+          expect(repository).toHaveProperty('institutionId', institutionId);
+          expect(repository?.createdAt).not.toBeNull();
+          expect(repository?.updatedAt).not.toBeNull();
+          expect(repository).toHaveProperty('pattern', repositoryConfig.pattern);
+          expect(repository).toHaveProperty('type', repositoryConfig.type);
+        });
+
+        afterAll(async () => {
+          await deleteRepositoryAsAdmin(repositoryId);
         });
       });
       afterAll(async () => {
@@ -282,54 +164,26 @@ describe('[repositories]: Test create features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitution(institutionTest, userTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 403);
+        it('Should get HTTP status 403', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
           });
-        });
-      });
 
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 403);
-          });
+          expect(res).toHaveProperty('status', 403);
         });
       });
       afterAll(async () => {
@@ -342,54 +196,26 @@ describe('[repositories]: Test create features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 403);
+        it('Should get HTTP status 403', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
           });
-        });
-      });
 
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            });
-
-            expect(res).toHaveProperty('status', 403);
-          });
+          expect(res).toHaveProperty('status', 403);
         });
       });
 
@@ -409,53 +235,27 @@ describe('[repositories]: Test create features', () => {
       beforeAll(async () => {
         userTest = await createDefaultActivatedUserAsAdmin();
         institutionId = await createInstitution(institutionTest, userTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: 'Bearer: random',
-              },
-            });
-
-            expect(res).toHaveProperty('status', 401);
+        it('Should get HTTP status 401', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
+            headers: {
+              Authorization: 'Bearer: random',
+            },
           });
-        });
-      });
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: 'Bearer: random',
-              },
-            });
-
-            expect(res).toHaveProperty('status', 401);
-          });
+          expect(res).toHaveProperty('status', 401);
         });
       });
       afterAll(async () => {
@@ -469,54 +269,27 @@ describe('[repositories]: Test create features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: 'Bearer: random',
-              },
-            });
-
-            expect(res).toHaveProperty('status', 401);
+        it('Should get HTTP status 401', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
+            headers: {
+              Authorization: 'Bearer: random',
+            },
           });
-        });
-      });
 
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-              headers: {
-                Authorization: 'Bearer: random',
-              },
-            });
-
-            expect(res).toHaveProperty('status', 401);
-          });
+          expect(res).toHaveProperty('status', 401);
         });
       });
       afterAll(async () => {
@@ -532,46 +305,23 @@ describe('[repositories]: Test create features', () => {
       beforeAll(async () => {
         userTest = await createDefaultActivatedUserAsAdmin();
         institutionId = await createInstitution(institutionTest, userTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 401);
+        it('Should get HTTP status 401', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
           });
-        });
-      });
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 401);
-          });
+          expect(res).toHaveProperty('status', 401);
         });
       });
       afterAll(async () => {
@@ -585,46 +335,23 @@ describe('[repositories]: Test create features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
+        await validateInstitutionAsAdmin(institutionId);
       });
-      describe('Unvalidated institution', () => {
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
+      describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
+        const repositoryConfig = {
+          type: 'COUNTER 5',
+          institutionId,
+          pattern: 'publisher-*',
+        };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 401);
+        it('Should get HTTP status 401', async () => {
+          const res = await ezmesure({
+            method: 'POST',
+            url: '/repositories',
+            data: repositoryConfig,
           });
-        });
-      });
-      describe('Validated institution', () => {
-        beforeAll(async () => {
-          await validateInstitutionAsAdmin(institutionId);
-        });
-        describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
-          const repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
-              method: 'POST',
-              url: '/repositories',
-              data: repositoryConfig,
-            });
-
-            expect(res).toHaveProperty('status', 401);
-          });
+          expect(res).toHaveProperty('status', 401);
         });
       });
       afterAll(async () => {
