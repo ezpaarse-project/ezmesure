@@ -78,7 +78,6 @@
           <v-combobox
             v-model="sushiForm.tags"
             :items="[]"
-            :label="$t('institutions.sushi.tags')"
             :hint="$t('institutions.sushi.tagsDescription')"
             item-text="name"
             hide-selected
@@ -89,7 +88,24 @@
             deletable-chips
             persistent-hint
             outlined
-          />
+          >
+            <template #label>
+              {{ $t('institutions.sushi.tags') }}
+
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </template>
+                <span>{{ $t('institutions.sushi.tagsHint') }}</span>
+              </v-tooltip>
+            </template>
+          </v-combobox>
 
           <v-row>
             <v-col cols="6">

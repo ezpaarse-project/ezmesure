@@ -1,44 +1,30 @@
 const ezmesure = require('./ezmesure');
 
-const login = require('./login');
+const { getAdminToken } = require('./login');
 
-const createIndex = async (indexName) => {
-  const token = await login('ezmesure-admin', 'changeme');
-  let res;
-  try {
-    await ezmesure({
-      method: 'PUT',
-      url: `/indices/${indexName}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    console.error(err?.response?.data);
-    return;
-  }
-  return res?.data?.created;
+const createIndexAsAdmin = async (indexName) => {
+  const token = await getAdminToken();
+  return ezmesure({
+    method: 'PUT',
+    url: `/indices/${indexName}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
-const deleteIndex = async (indexName) => {
-  const token = await login('ezmesure-admin', 'changeme');
-  let res;
-  try {
-    res = await ezmesure({
-      method: 'DELETE',
-      url: `/indices/${indexName}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    // console.error(err?.response?.data);
-    return;
-  }
-  return res?.status === 204;
+const deleteIndexAsAdmin = async (indexName) => {
+  const token = await getAdminToken();
+  return ezmesure({
+    method: 'DELETE',
+    url: `/indices/${indexName}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 module.exports = {
-  createIndex,
-  deleteIndex,
+  createIndexAsAdmin,
+  deleteIndexAsAdmin,
 };

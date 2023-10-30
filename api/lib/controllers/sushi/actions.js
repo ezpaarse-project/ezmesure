@@ -527,15 +527,14 @@ exports.checkSushiConnection = async (ctx) => {
     institutionName: institution.name,
   };
 
-  const twoMonthAgo = subMonths(new Date(), 2);
-  const threeMonthAgo = subMonths(new Date(), 3);
+  const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
 
   const sushiData = {
     sushi,
     institution,
     endpoint,
-    beginDate: format(threeMonthAgo, 'yyyy-MM'),
-    endDate: format(twoMonthAgo, 'yyyy-MM'),
+    beginDate: threeMonthAgo,
+    endDate: threeMonthAgo,
     reportType: 'pr',
   };
 
@@ -561,13 +560,15 @@ exports.checkSushiConnection = async (ctx) => {
     errorCode = ERROR_CODES.networkError;
   }
 
-  try {
-    report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      errorCode = ERROR_CODES.invalidJson;
-    } else {
-      errorCode = ERROR_CODES.unreadableReport;
+  if (!errorCode) {
+    try {
+      report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        errorCode = ERROR_CODES.invalidJson;
+      } else {
+        errorCode = ERROR_CODES.unreadableReport;
+      }
     }
   }
 

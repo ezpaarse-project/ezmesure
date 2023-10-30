@@ -1,57 +1,102 @@
+/* eslint-disable max-len */
+const config = require('config');
+const jwt = require('jsonwebtoken');
+const { addHours } = require('date-fns');
+
+const passwordResetValidity = config.get('passwordResetValidity');
+const secret = config.get('auth.secret');
+
 const ezmesure = require('./ezmesure');
-const login = require('./login');
+const { getAdminToken } = require('./login');
 
-const createUser = async (username, password, roles) => {
-  let res;
-
-  const token = await login('ezmesure-admin', 'changeme');
-
-  try {
-    res = await ezmesure({
-      method: 'PUT',
-      url: `/users/${username}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: {
-        username,
-        enabled: true,
-        email: 'user@test.fr',
-        full_name: 'User test',
-        metadata: { acceptedTerms: true },
-        password,
-        roles,
-      },
-    });
-  } catch (err) {
-    console.error(err?.response?.data);
-    return;
-  }
-  return res?.data?.created;
+const defaultUser = {
+  username: 'user.test',
+  email: 'user.test@test.fr',
+  fullName: 'User test',
+  isAdmin: false,
+  password: 'changeme',
 };
 
-const deleteUser = async (username) => {
-  const token = await login('ezmesure-admin', 'changeme');
+async function createUserAsAdmin(username, email, fullName, isAdmin) {
+  const token = await getAdminToken();
 
-  let res;
+  const res = await ezmesure({
+    method: 'PUT',
+    url: `/users/${username}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      username,
+      email,
+      fullName,
+      isAdmin,
+    },
+  });
 
-  try {
-    res = await ezmesure({
-      method: 'DELETE',
-      url: `/users/${username}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (err) {
-    console.error(err?.response?.data);
-    return;
-  }
-  return res?.status === 204;
-};
+  return res?.data;
+}
+
+async function activateUser(username, password) {
+  const currentDate = new Date();
+  const expiresAt = addHours(currentDate, passwordResetValidity);
+  const token = jwt.sign({
+    username,
+    createdAt: currentDate,
+    expiresAt,
+  }, secret);
+
+  return ezmesure({
+    method: 'POST',
+    url: '/profile/_activate',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      password,
+      acceptTerms: true,
+    },
+  });
+}
+
+async function deleteUserAsAdmin(username) {
+  const token = await getAdminToken();
+
+  return ezmesure({
+    method: 'DELETE',
+    url: `/users/${username}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+async function createActivatedUserAsAdmin(user) {
+  const createdUser = await createUserAsAdmin(user.username, user.email, user.fullName, user.isAdmin);
+  await activateUser(user.username, user.password);
+  return createdUser;
+}
+
+async function createDefaultActivatedUserAsAdmin() {
+  await createActivatedUserAsAdmin(defaultUser);
+  return defaultUser;
+}
+
+async function createDefaultUserAsAdmin() {
+  await createUserAsAdmin(
+    defaultUser.username,
+    defaultUser.email,
+    defaultUser.fullName,
+    defaultUser.isAdmin,
+  );
+  return defaultUser;
+}
 
 module.exports = {
-  login,
-  createUser,
-  deleteUser,
+  createUserAsAdmin,
+  createDefaultUserAsAdmin,
+  activateUser,
+  deleteUserAsAdmin,
+  createActivatedUserAsAdmin,
+  createDefaultActivatedUserAsAdmin,
 };

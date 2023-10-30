@@ -2,17 +2,17 @@
   <v-card color="black" :tile="flat" :max-height="maxHeight" class="scrolling">
     <v-card-text class="white--text">
       <div v-for="(log, index) in coloredLogs" :key="index">
-        <span v-if="log[logDate]" class="grey--text">
-          {{ log[logDate] }}
-        </span>
+        <slot v-if="log[logDate]" name="date" :log="log" class="grey--text">
+          <span>{{ log[logDate] }}</span>
+        </slot>
 
-        <span v-if="log[logType]" :class="log.color">
-          {{ log[logType] }} :
-        </span>
+        <slot v-if="log[logType]" name="type" :log="log">
+          <span :class="log.color">{{ log[logType] }}:</span>
+        </slot>
 
-        <span v-if="log[logMessage]" class="message">
-          {{ log[logMessage] }}
-        </span>
+        <slot v-if="log[logMessage]" name="message" :log="log" class="message">
+          <span>{{ log[logMessage] }}</span>
+        </slot>
       </div>
     </v-card-text>
   </v-card>

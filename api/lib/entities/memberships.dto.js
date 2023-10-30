@@ -20,12 +20,10 @@ const FEATURES = {
   memberships: {
     read: 'memberships:read',
     write: 'memberships:write',
-    revoke: 'memberships:revoke',
   },
   sushi: {
     read: 'sushi:read',
     write: 'sushi:write',
-    delete: 'sushi:delete',
   },
   reporting: {
     read: 'reporting:read',

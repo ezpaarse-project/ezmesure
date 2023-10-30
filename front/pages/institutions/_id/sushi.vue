@@ -61,6 +61,40 @@
           </v-alert>
         </v-col>
       </v-row>
+
+      <v-row v-if="hasUntestedItems" justify="center" class="mt-2">
+        <v-col style="max-width: 1000px">
+          <v-alert
+            outlined
+            type="info"
+            prominent
+            icon="mdi-bell-alert"
+          >
+            <div v-if="lockReason">
+              {{ $t('reason', { reason: lockReason }) }}
+            </div>
+
+            <v-row align="center">
+              <v-col class="grow">
+                <div
+                  class="text-h6"
+                >
+                  {{ $tc('sushi.youHaveUntestedCredentials', untestedItems.length) }}
+                </div>
+              </v-col>
+              <v-col class="shrink">
+                <v-btn
+                  color="info"
+                  :loading="testingConnection"
+                  @click="checkUntestedItems"
+                >
+                  {{ $t('institutions.sushi.checkConnection') }}
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-alert>
+        </v-col>
+      </v-row>
     </v-container>
 
     <SushiForm
@@ -99,6 +133,17 @@
       </template>
 
       <v-list>
+        <v-list-item :disabled="testingConnection || locked" @click="checkMultipleConnections">
+          <v-list-item-icon>
+            <v-icon>mdi-connection</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $t('institutions.sushi.checkConnection') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item :disabled="deleting || locked || !canEdit" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
@@ -136,7 +181,7 @@
       show-expand
       single-expand
       item-key="id"
-      sort-by="vendor"
+      sort-by="endpoint.vendor"
     >
       <template #top="{ originalItemsLength }">
         <v-toolbar flat>
@@ -236,6 +281,23 @@
         </td>
       </template>
 
+      <template #[`header.tags`]>
+        {{ $t('institutions.sushi.tags') }}
+
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-icon
+              small
+              v-bind="attrs"
+              v-on="on"
+            >
+              mdi-help-circle
+            </v-icon>
+          </template>
+          <span>{{ $t('institutions.sushi.tagsHint') }}</span>
+        </v-tooltip>
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
@@ -251,6 +313,15 @@
         >
           {{ tag }}
         </v-chip>
+      </template>
+
+      <template #[`item.connection`]="{ item }">
+        <SushiConnectionIcon
+          :connection="item.connection"
+          :loading="loadingItems[item.id]"
+          :disabled="locked || testingConnection"
+          @checkConnection="() => checkSingleConnection(item)"
+        />
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -316,6 +387,7 @@ import SushiDetails from '~/components/SushiDetails.vue';
 import SushiForm from '~/components/SushiForm.vue';
 import SushiHistory from '~/components/SushiHistory.vue';
 import SushiFiles from '~/components/SushiFiles.vue';
+import SushiConnectionIcon from '~/components/SushiConnectionIcon.vue';
 import ReportsDialog from '~/components/ReportsDialog.vue';
 import HarvestMatrixDialog from '~/components/HarvestMatrixDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
@@ -330,6 +402,7 @@ export default {
     SushiForm,
     SushiHistory,
     SushiFiles,
+    SushiConnectionIcon,
     ReportsDialog,
     HarvestMatrixDialog,
     ConfirmDialog,
@@ -420,8 +493,8 @@ export default {
           text: this.$t('institutions.sushi.endpoint'),
           value: 'endpoint.vendor',
           sort: (a, b) => {
-            const vendor1 = a?.endpoint?.vendor?.toLowercase();
-            const vendor2 = b?.endpoint?.vendor?.toLowercase();
+            const vendor1 = a?.toLowerCase?.();
+            const vendor2 = b?.toLowerCase?.();
 
             return vendor1 > vendor2 ? 1 : -1;
           },
@@ -431,6 +504,12 @@ export default {
           value: 'tags',
           align: 'right',
           width: 'auto',
+        },
+        {
+          text: this.$t('institutions.sushi.connection'),
+          value: 'connection',
+          align: 'right',
+          width: '160px',
         },
         {
           text: this.$t('institutions.sushi.updatedAt'),
@@ -455,6 +534,17 @@ export default {
     },
     hasSelection() {
       return this.selected.length > 0;
+    },
+    hasUntestedItems() {
+      return this.untestedItems.length > 0;
+    },
+    untestedItems() {
+      return this.sushiItems.filter((item) => (
+        typeof item?.connection?.status !== 'string'
+      ));
+    },
+    testingConnection() {
+      return Object.keys(this.loadingItems).length > 0;
     },
     itemActions() {
       const actions = [
@@ -599,6 +689,39 @@ export default {
 
     clearSelection() {
       this.selected = [];
+    },
+
+    checkUntestedItems() {
+      if (this.hasUntestedItems) {
+        this.selected = this.untestedItems.slice();
+        this.checkMultipleConnections();
+      }
+    },
+
+    async checkSingleConnection(sushiItem) {
+      this.$set(this.loadingItems, sushiItem.id, true);
+
+      try {
+        const data = await this.$axios.$post(`/sushi/${sushiItem.id}/_check_connection`);
+        this.$set(sushiItem, 'connection', data?.connection);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem?.endpoint?.vendor }));
+      }
+
+      this.$delete(this.loadingItems, sushiItem.id);
+    },
+
+    async checkMultipleConnections() {
+      if (!this.hasSelection) { return; }
+
+      const selected = this.selected.slice();
+
+      this.clearSelection();
+
+      for (let i = 0; i < selected.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await this.checkSingleConnection(selected[i]);
+      }
     },
 
     async deleteSushiItem(item) {

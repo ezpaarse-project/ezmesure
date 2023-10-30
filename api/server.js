@@ -116,7 +116,7 @@ app.use(async (ctx, next) => {
     ctx.type = 'json';
     ctx.body = {
       status: ctx.status,
-      error: error.message,
+      error: error.originalError?.message || error.message,
       detail: error.detail,
       stack: error.stack,
       code: error.code,
