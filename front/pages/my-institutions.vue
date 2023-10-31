@@ -11,6 +11,46 @@
       </v-btn>
     </ToolBar>
 
+    <v-container cols="12" sm="12">
+      <v-row>
+        <v-col>
+          <v-autocomplete
+            v-model="value"
+            class="ma-4"
+            item-text="name"
+            :items="institutions"
+            :label="'Demander à rejoindre un établissement'"
+            solo
+            dense
+            clearable
+          >
+            <template slot="no-data">
+              <v-list-item link @click.stop="createInstitution">
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ $t('institutions.institutionFoundDeclareNewInstitution') }}
+                  </v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-icon>
+                  <v-icon> mdi-plus</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </template>
+
+            <template slot="item" slot-scope="{ item }">
+              <v-list-item link @click.stop="openDialog(item)">
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item.name }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+          <JoinInstitutionDialog v-model="dialogVisible" :institution="institutionSelected" />
+        </v-col>
+      </v-row>
+    </v-container>
     <v-container>
       <v-row>
         <v-col
@@ -105,26 +145,17 @@
             </template>
           </InstitutionCard>
         </v-col>
-
-        <v-col
-          cols="12"
-          sm="6"
-          xl="3"
-        >
-          <v-card
-            outlined
-            class="d-flex align-center justify-center grey lighten-4"
-            style="height: 100%; min-height: 250px;"
-          >
-            <v-card-text class="text-center">
-              <v-btn large fab depressed outlined @click="createInstitution">
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-              <p class="mt-3 font-weight-medium">
-                {{ $t('institutions.declareNewInstitution') }}
-              </p>
-            </v-card-text>
-          </v-card>
+      </v-row>
+    </v-container>
+    <v-container>
+      <v-row v-if="memberships?.length === 0" align="center" justify="center">
+        <v-col class="text-center" cols="12">
+          <v-icon x-large>
+            mdi-alert-box
+          </v-icon>
+        </v-col>
+        <v-col class="text-center" cols="12">
+          {{ $t('institutions.noInstitutions') }}
         </v-col>
       </v-row>
     </v-container>
@@ -137,6 +168,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionCard from '~/components/InstitutionCard.vue';
+import JoinInstitutionDialog from '~/components/institutions/JoinInstitutionDialog.vue';
 
 export default {
   layout: 'space',
@@ -145,6 +177,7 @@ export default {
     ToolBar,
     InstitutionForm,
     InstitutionCard,
+    JoinInstitutionDialog,
   },
   data() {
     return {
@@ -153,10 +186,15 @@ export default {
       logo: null,
       logoPreview: null,
       memberships: [],
+      value: '',
+      institutions: [],
+      institutionSelected: {},
+      dialogVisible: false,
     };
   },
-  mounted() {
-    return this.refreshMemberships();
+  async mounted() {
+    this.refreshMemberships();
+    this.institutions = await this.$axios.$get('/institutions');
   },
   computed: {
     toolbarTitle() {
@@ -164,6 +202,10 @@ export default {
     },
   },
   methods: {
+    openDialog(institution) {
+      this.institutionSelected = institution;
+      this.dialogVisible = true;
+    },
     async refreshMemberships() {
       this.refreshing = true;
 

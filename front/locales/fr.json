@@ -211,6 +211,11 @@
     "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
     "noLogo": "Pas de logo",
+    "noInstitutions": "Vous n'êtes pas attaché à un établissement.",
+    "institutionFoundDeclareNewInstitution": "Votre établissement n'est pas déclaré, déclarez un nouvel établissement.",
+    "sendMailToJoin": "Un email a été envoyé aux correspondant de l'établissement",
+    "joinInstitution": "Voulez-vous demander à rejoindre <b>{institution}</b> ?",
+    "joinInstitutionEmail": "Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.",
     "reports": {
       "reports": "Rapports"
     },

@@ -1,0 +1,79 @@
+<!-- eslint-disable vue/no-v-text-v-html-on-component -->
+<template>
+  <v-dialog
+    :value="value"
+    width="500"
+    persistent
+    @input="updateVisible($event)"
+  >
+    <v-card>
+      <v-toolbar
+        color="primary"
+        dark
+      >
+        <v-toolbar-title>
+          {{ institution?.name }}
+        </v-toolbar-title>
+      </v-toolbar>
+      <v-card-text
+        class="mt-4"
+        v-html="$t('institutions.joinInstitution', { institution: institution?.name })"
+      />
+      <v-card-text>
+        {{ $t('institutions.joinInstitutionEmail') }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn outlined @click.stop="updateVisible(false)">
+          {{ $t("cancel") }}
+        </v-btn>
+        <v-btn
+          text
+          :loading="loading"
+          color="primary"
+          @click="sendMail()"
+        >
+          {{ $t("yes") }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      dialog: '',
+      admin: true,
+      correspondents: true,
+      loading: false,
+    };
+  },
+  props: {
+    value: {
+      type: Boolean,
+      default: false,
+    },
+    institution: {
+      type: Object,
+      default: () => {},
+    },
+  },
+  methods: {
+    updateVisible(visible) {
+      this.$emit('input', visible);
+    },
+    async sendMail() {
+      // TODO
+      try {
+        await this.$axios.$post(`/institutions/${this.institution.id}/memberships/${this.$auth?.user?.username}/mail`);
+        this.updateVisible(false);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', e.response.data.error);
+      }
+      this.$store.dispatch('snacks/info', this.$t('institutions.sendMailToJoin'));
+    },
+  },
+};
+</script>
