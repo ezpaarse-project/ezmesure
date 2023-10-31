@@ -9,8 +9,6 @@
         {{ $t('institutions.members.permissionsOf', { name: fullName }) }}
       </v-card-title>
 
-      <v-divider />
-
       <v-alert
         type="info"
         dense
@@ -21,12 +19,57 @@
         {{ $t('institutions.members.notEditable') }}
       </v-alert>
 
+      <v-divider />
+
+      <template v-if="isAdmin">
+        <v-card-title>
+          {{ $t('institutions.members.roles') }}
+        </v-card-title>
+
+        <v-card-text>
+          <v-label>
+            {{ $t('institutions.members.correspondent') }}
+          </v-label>
+
+          <div class="pl-4">
+            <v-checkbox
+              v-for="item in correspondents"
+              :key="item.value"
+              :value="roles.includes(item.value)"
+              :disabled="saving"
+              hide-details
+              @click="changeRole(item.value)"
+            >
+              <template #label>
+                {{ item.text }}
+                <v-slide-x-transition mode="out-in">
+                  <v-icon v-if="successfulSave" key="icon-success" color="success" right>
+                    mdi-check
+                  </v-icon>
+                  <v-progress-circular
+                    v-else-if="saving"
+                    key="loader"
+                    class="ml-2"
+                    indeterminate
+                    size="18"
+                    width="2"
+                  />
+                </v-slide-x-transition>
+              </template>
+            </v-checkbox>
+          </div>
+        </v-card-text>
+
+        <v-divider />
+      </template>
+
       <v-card-title>
         {{ $t('institutions.members.institutionManagement') }}
       </v-card-title>
 
       <v-card-text>
         <MemberInstitutionPermissions
+          ref="institutionPermissions"
           :institution-id="institutionId"
           :username="username"
           :readonly="readonly"
@@ -43,6 +86,7 @@
 
       <v-card-text>
         <MemberRepoPermissions
+          ref="repoPermissions"
           :institution-id="institutionId"
           :username="username"
           :readonly="readonly"
@@ -59,6 +103,7 @@
 
       <v-card-text>
         <MemberSpacePermissions
+          ref="spacePermissions"
           :institution-id="institutionId"
           :username="username"
           :readonly="readonly"
@@ -68,64 +113,6 @@
       </v-card-text>
 
       <template v-if="isAdmin">
-        <v-divider />
-
-        <v-card-title>
-          {{ $t('institutions.members.roles') }}
-        </v-card-title>
-
-        <v-card-text>
-          <v-checkbox
-            v-model="roles"
-            value="contact:doc"
-            hide-details
-            :disabled="saving"
-            @click="save"
-          >
-            <template #label>
-              {{ $t('institutions.members.documentaryCorrespondent') }}
-              <v-slide-x-transition mode="out-in">
-                <v-icon v-if="successfulSave" key="icon-success" color="success" right>
-                  mdi-check
-                </v-icon>
-                <v-progress-circular
-                  v-else-if="saving"
-                  key="loader"
-                  class="ml-2"
-                  indeterminate
-                  size="18"
-                  width="2"
-                />
-              </v-slide-x-transition>
-            </template>
-          </v-checkbox>
-
-          <v-checkbox
-            v-model="roles"
-            value="contact:tech"
-            hide-details
-            :disabled="saving"
-            @click="save"
-          >
-            <template #label>
-              {{ $t('institutions.members.technicalCorrespondent') }}
-              <v-slide-x-transition mode="out-in">
-                <v-icon v-if="successfulSave" key="icon-success" color="success" right>
-                  mdi-check
-                </v-icon>
-                <v-progress-circular
-                  v-else-if="saving"
-                  key="loader"
-                  class="ml-2"
-                  indeterminate
-                  size="18"
-                  width="2"
-                />
-              </v-slide-x-transition>
-            </template>
-          </v-checkbox>
-        </v-card-text>
-
         <v-divider />
 
         <v-card-text>
@@ -212,6 +199,18 @@ export default {
     readonly() {
       return (this.locked === true) && !this.isAdmin;
     },
+    correspondents() {
+      return [
+        {
+          value: 'contact:doc',
+          text: this.$t('institutions.members.documentary'),
+        },
+        {
+          value: 'contact:tech',
+          text: this.$t('institutions.members.technical'),
+        },
+      ];
+    },
   },
   watch: {
     show(visible) {
@@ -234,6 +233,68 @@ export default {
       this.$nextTick().then(() => {
         this.$refs?.dialogTitle?.$el?.scrollIntoView?.();
       });
+    },
+
+    changeAllInstitutionPermissions(level) {
+      // using refs here to avoid rewriting all the component and move the fetch logic
+      const { features, savePermissions } = this.$refs.institutionPermissions;
+
+      const permissions = Object.fromEntries(
+        features.map((f) => [f.scope, level]),
+      );
+
+      this.$refs.institutionPermissions.permissions = permissions;
+      return savePermissions();
+    },
+
+    changeAllRepoPermissions(level) {
+      // using refs here to avoid rewriting all the component and move the fetch logic
+      const { repositories, savePermission } = this.$refs.repoPermissions;
+
+      const permissions = Object.fromEntries(
+        repositories.map((r) => [r.id, level]),
+      );
+
+      this.$refs.repoPermissions.repoPermissions = permissions;
+      return Promise.all(
+        repositories.map((r) => savePermission(r.id)),
+      );
+    },
+
+    changeAllSpacePermissions(level) {
+      // using refs here to avoid rewriting all the component and move the fetch logic
+      const { spaces, savePermission } = this.$refs.spacePermissions;
+
+      const permissions = Object.fromEntries(
+        spaces.map((s) => [s.id, level]),
+      );
+
+      this.$refs.spacePermissions.spacesPermissions = permissions;
+      return Promise.all(
+        spaces.map((s) => savePermission(s.id)),
+      );
+    },
+
+    async changeRole(role) {
+      const current = new Set(this.roles);
+
+      if (current.has(role)) {
+        current.delete(role);
+      } else {
+        current.add(role);
+      }
+
+      // If it's the first role added, add all perms to write
+      if (current.size === 1 && this.roles.length === 0) {
+        await Promise.all([
+          this.changeAllInstitutionPermissions('write'),
+          this.changeAllRepoPermissions('write'),
+          this.changeAllSpacePermissions('write'),
+        ]);
+      }
+
+      this.roles = [...current];
+      await this.save();
     },
 
     async save() {
