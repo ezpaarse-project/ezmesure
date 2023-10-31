@@ -1,0 +1,5 @@
+Un utilisateur souhaite rejoindre votre établissement
+L'utilisateur {{ user }} souhaite rejoindre votre établissement {{ institution }}, vous pouvez ajouter cette utilisateur depuis la page "Mon établissement"
+
+Cordialement,
+L'équipe ezMESURE.

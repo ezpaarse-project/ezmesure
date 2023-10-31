@@ -38,6 +38,7 @@ const {
   getInstitutionMember,
   getInstitutionRepositories,
   getInstitutionSpaces,
+  sendMailToJoinInstitution,
 } = require('./actions');
 
 const {
@@ -209,6 +210,22 @@ router.route({
     fetchInstitution(),
     requireMemberPermissions(FEATURES.memberships.write),
     removeInstitutionMember,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/memberships/:username/mail',
+  handler: [
+    requireUser,
+    fetchInstitution(),
+    sendMailToJoinInstitution,
   ],
   validate: {
     params: {

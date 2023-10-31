@@ -606,3 +606,26 @@ exports.getSushiData = async (ctx) => {
   ctx.status = 200;
   ctx.body = sushiItems;
 };
+
+exports.sendMailToJoinInstitution = async (ctx) => {
+  const members = await institutionsService.getContacts();
+  const emails = members.map((member) => member.user.email);
+  const link = `${ctx.request.header.origin}/institutions/${ctx.state.institution.id}/members`;
+
+  await sendMail({
+    from: sender,
+    to: emails || supportRecipients,
+    cc: supportRecipients,
+    subject: 'Un utilisateur souhaite rejoindre votre établissement',
+    ...generateMail('join-institution', {
+      user: ctx.state.user.username,
+      institution: ctx.state.institution.name,
+      linkInstitution: link,
+    }),
+  });
+
+  // TODO send mail
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = {};
+};

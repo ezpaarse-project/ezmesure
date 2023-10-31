@@ -1,0 +1,28 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Un utilisateur souhaite rejoindre votre établissement</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Un utilisateur souhaite rejoindre votre établissement</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      L'utilisateur <b>{{ user }}</b> souhaite rejoindre votre établissement <b>{{ institution }}</b>, vous pouvez ajouter cette utilisateur depuis la page <a target="_blank" href="{{ linkInstitution }}"> "Mon établissement"</a>
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}
