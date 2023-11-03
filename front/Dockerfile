@@ -1,5 +1,8 @@
-FROM node:14.17.1-alpine3.13
+FROM node:14-alpine3.13
 LABEL maintainer="ezTEAM <ezpaarse@couperin.org>"
+
+RUN \
+    apk add --no-cache python2 build-base
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
