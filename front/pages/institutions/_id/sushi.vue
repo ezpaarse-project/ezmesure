@@ -88,7 +88,7 @@
                   :loading="testingConnection"
                   @click="checkUntestedItems"
                 >
-                  {{ $t('institutions.sushi.checkConnection') }}
+                  {{ $t('institutions.sushi.checkCredentials') }}
                 </v-btn>
               </v-col>
             </v-row>
@@ -139,7 +139,7 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t('institutions.sushi.checkConnection') }}
+              {{ $t('institutions.sushi.checkCredentials') }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -506,7 +506,7 @@ export default {
           width: 'auto',
         },
         {
-          text: this.$t('institutions.sushi.connection'),
+          text: this.$t('status'),
           value: 'connection',
           align: 'right',
           width: '160px',
@@ -705,7 +705,7 @@ export default {
         const data = await this.$axios.$post(`/sushi/${sushiItem.id}/_check_connection`);
         this.$set(sushiItem, 'connection', data?.connection);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckConnection', { name: sushiItem?.endpoint?.vendor }));
+        this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotCheckCredentials', { name: sushiItem?.endpoint?.vendor }));
       }
 
       this.$delete(this.loadingItems, sushiItem.id);

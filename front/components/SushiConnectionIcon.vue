@@ -111,7 +111,7 @@
           <v-icon left>
             mdi-connection
           </v-icon>
-          {{ $t('institutions.sushi.checkConnection') }}
+          {{ $t('institutions.sushi.checkCredentials') }}
         </v-btn>
       </v-card-actions>
     </v-card>
