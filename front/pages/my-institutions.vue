@@ -213,6 +213,10 @@ export default {
       try {
         this.loading = true;
         this.institutions = await this.$axios.$get('/institutions', { params: { q: this.searchValue, size: 10 } });
+        const listOfInstitutionID = this.memberships.map((membership) => membership.institutionId);
+        this.institutions = this.institutions.filter(
+          (institution) => !listOfInstitutionID.includes(institution.id),
+        );
       } catch (err) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }
