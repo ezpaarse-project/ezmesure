@@ -149,7 +149,7 @@ export default {
     status() { return this.connection?.status; },
     success() { return this.status === 'success'; },
     failed() { return this.status === 'failed'; },
-    indeterminate() { return this.status === 'indeterminate'; },
+    unauthorized() { return this.status === 'unauthorized'; },
     date() { return this.connection?.date; },
     exceptions() { return this.connection?.exceptions; },
     hasExceptions() { return Array.isArray(this.exceptions) && this.exceptions.length > 0; },
@@ -165,13 +165,13 @@ export default {
     icon() {
       if (this.success) { return 'mdi-check'; }
       if (this.failed) { return 'mdi-close'; }
-      if (this.indeterminate) { return 'mdi-help'; }
+      if (this.unauthorized) { return 'mdi-key-alert-outline'; }
       return 'mdi-lan-pending';
     },
     color() {
       if (this.success) { return 'green'; }
       if (this.failed) { return 'red'; }
-      if (this.indeterminate) { return 'orange'; }
+      if (this.unauthorized) { return 'orange'; }
       return 'grey';
     },
     error() {
@@ -186,15 +186,15 @@ export default {
       return (errorCode && this.$te(key)) ? this.$t(key) : undefined;
     },
     chipText() {
-      if (this.untested) {
-        return this.$t('institutions.sushi.untested');
-      }
-      return this.$t(`institutions.sushi.${this.success ? 'connected' : 'disconnected'}`);
+      if (this.success) { return this.$t('institutions.sushi.operational'); }
+      if (this.failed) { return this.$t('error'); }
+      if (this.unauthorized) { return this.$t('institutions.sushi.invalidCredentials'); }
+      return this.$t('institutions.sushi.untested');
     },
     titleKey() {
       if (this.success) { return 'connectionSuccessful'; }
       if (this.failed) { return 'connectionFailed'; }
-      if (this.indeterminate) { return 'connectionIndeterminate'; }
+      if (this.unauthorized) { return 'connectionUnauthorized'; }
       return 'connectionUntested';
     },
   },
