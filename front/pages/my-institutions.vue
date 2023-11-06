@@ -37,7 +37,7 @@
               </v-list-item>
             </template>
 
-            <template slot="item" slot-scope="{ item }">
+            <template #item="{ item }">
               <v-list-item link @click.stop="openJoinInstitutionDialog(item)">
                 <v-list-item-content>
                   <v-list-item-title>
