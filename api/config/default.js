@@ -94,6 +94,10 @@ module.exports = {
       'tr_b1',
       'tr_j1',
     ],
+    clean: {
+      schedule: '0 0 0 * * *',
+      maxDayAge: 7,
+    },
   },
   notifications: {
     sender: 'ezMESURE',
