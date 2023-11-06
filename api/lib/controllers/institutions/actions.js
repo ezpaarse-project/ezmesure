@@ -625,6 +625,5 @@ exports.requestMembership = async (ctx) => {
   });
 
   ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = {};
+  ctx.status = 204;
 };
