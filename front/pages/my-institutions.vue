@@ -15,11 +15,11 @@
       <v-row>
         <v-col>
           <v-autocomplete
-            v-model="value"
+            v-model="searchValue"
             class="ma-4"
             item-text="name"
             :items="institutions"
-            :label="'Demander à rejoindre un établissement'"
+            :label="$t('institutions.askToJoinAnInstitution')"
             solo
             dense
             clearable
@@ -38,7 +38,7 @@
             </template>
 
             <template slot="item" slot-scope="{ item }">
-              <v-list-item link @click.stop="openDialog(item)">
+              <v-list-item link @click.stop="openJoinInstitutionDialog(item)">
                 <v-list-item-content>
                   <v-list-item-title>
                     {{ item.name }}
@@ -47,7 +47,10 @@
               </v-list-item>
             </template>
           </v-autocomplete>
-          <JoinInstitutionDialog v-model="dialogVisible" :institution="institutionSelected" />
+          <JoinInstitutionDialog
+            v-model="joinInstitutionDialogVisible"
+            :institution="institutionSelected"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -186,15 +189,15 @@ export default {
       logo: null,
       logoPreview: null,
       memberships: [],
-      value: '',
+      searchValue: '',
       institutions: [],
       institutionSelected: {},
-      dialogVisible: false,
+      joinInstitutionDialogVisible: false,
     };
   },
   async mounted() {
     this.refreshMemberships();
-    this.institutions = await this.$axios.$get('/institutions');
+    this.institutions = await this.$axios.$get('/institutions', { params: { q: this.searchValue, size: 10 } });
   },
   computed: {
     toolbarTitle() {
@@ -202,9 +205,9 @@ export default {
     },
   },
   methods: {
-    openDialog(institution) {
+    openJoinInstitutionDialog(institution) {
       this.institutionSelected = institution;
-      this.dialogVisible = true;
+      this.joinInstitutionDialogVisible = true;
     },
     async refreshMemberships() {
       this.refreshing = true;
