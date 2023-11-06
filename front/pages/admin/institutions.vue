@@ -463,6 +463,7 @@ export default {
           text: this.$t('institutions.institution.monitor'),
           value: 'monitor',
           align: 'center',
+          sortable: false,
           filter: (_value, _search, item) => this.columnServiceFilter(item),
         },
         {

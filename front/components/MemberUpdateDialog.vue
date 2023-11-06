@@ -35,7 +35,7 @@
             <v-checkbox
               v-for="item in correspondents"
               :key="item.value"
-              :value="roles.includes(item.value)"
+              :input-value="item.isActive"
               :disabled="saving"
               hide-details
               @click="changeRole(item.value)"
@@ -200,6 +200,8 @@ export default {
       return (this.locked === true) && !this.isAdmin;
     },
     correspondents() {
+      const roles = new Set(this.roles);
+
       return [
         {
           value: 'contact:doc',
@@ -209,7 +211,9 @@ export default {
           value: 'contact:tech',
           text: this.$t('institutions.members.technical'),
         },
-      ];
+      ].map(
+        (item) => ({ ...item, isActive: roles.has(item.value) }),
+      );
     },
   },
   watch: {
