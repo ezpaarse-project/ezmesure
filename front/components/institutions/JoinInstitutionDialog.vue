@@ -67,10 +67,12 @@ export default {
     async sendMail() {
       try {
         this.loading = true;
-        await this.$axios.$post(`/institutions/${this.institution.id}/memberships/${this.$auth?.user?.username}/mail`);
+        await this.$axios.$post(`/institutions/${this.institution.id}/_request_membership`);
         this.updateVisible(false);
       } catch (e) {
-        this.$store.dispatch('snacks/error', e.response.data.error);
+        this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));
+        this.loading = false;
+        return;
       }
       this.loading = false;
       this.$store.dispatch('snacks/info', this.$t('institutions.sendMailToJoin'));
