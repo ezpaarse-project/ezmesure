@@ -38,6 +38,7 @@ const {
   getInstitutionMember,
   getInstitutionRepositories,
   getInstitutionSpaces,
+  requestMembership,
 } = require('./actions');
 
 const {
@@ -214,6 +215,21 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
       username: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:institutionId/_request_membership',
+  handler: [
+    requireUser,
+    fetchInstitution(),
+    requestMembership,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
     },
   },
 });

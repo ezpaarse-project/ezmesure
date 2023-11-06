@@ -2,6 +2,13 @@
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const hooks = require('../hooks');
 
+const {
+  MEMBER_ROLES: {
+    docContact: DOC_CONTACT,
+    techContact: TECH_CONTACT,
+  },
+} = require('./memberships.dto');
+
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Institution} Institution
@@ -86,5 +93,19 @@ module.exports = class InstitutionsService {
     hooks.emit('institution:delete', institution);
 
     return institution;
+  }
+
+  static async getContacts(institutionId) {
+    return prisma.membership.findMany({
+      where: {
+        institutionId,
+        roles: {
+          hasSome: [DOC_CONTACT, TECH_CONTACT],
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
   }
 };
