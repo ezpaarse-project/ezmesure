@@ -349,7 +349,7 @@ export default {
       selected: [],
       search: '',
       refreshing: false,
-      types: ['tech', 'doc'],
+      membershipsTypes: ['tech', 'doc'],
       logo: null,
       logoPreview: null,
       institutions: [],
@@ -364,7 +364,26 @@ export default {
         'actions',
       ],
       showInstitutionsFiltersDrawer: false,
-      filters: {},
+      filters: {
+        name: { value: undefined },
+
+        acronym: { value: undefined },
+
+        membershipsRange: { value: undefined },
+
+        childInstitutions: { value: undefined },
+        childInstitutionsRange: { value: undefined },
+
+        contacts: { value: undefined, exclusive: false },
+
+        repositories: { value: undefined, exclusive: false },
+        repositoriesRange: { value: undefined },
+
+        spaces: { value: undefined, exclusive: false },
+        spacesRange: { value: undefined },
+
+        validated: { value: undefined },
+      },
       currentItemCount: 0,
     };
   },
@@ -461,10 +480,16 @@ export default {
         this.selectedTableHeaders?.includes?.(header?.value)
       ));
     },
+    /**
+     * Get the count of filters with value
+     * 
+     * @returns {number} The count of active filters
+     */
     filtersCount() {
       return Object.values(this.filters)
         .reduce(
-          (prev, filter) => {
+          (prev, filterDesc) => {
+            const filter = filterDesc?.value;
             // skipping if undefined or empty
             if (filter == null || filter === '') {
               return prev;
@@ -479,6 +504,11 @@ export default {
           0,
         );
     },
+    /**
+     * Compute maximum count of properties
+     * 
+     * @returns {Record<string, number>}
+     */
     maxCounts() {
       const counters = {
         memberships: 0,
@@ -499,6 +529,11 @@ export default {
 
       return counters;
     },
+    /**
+     * Compute icons used to monitor quickly institution
+     * 
+     * @returns {Object[]} Icon definitions
+     */
     servicesIconMap() {
       if (!this.institutions) {
         return new Map();
@@ -518,7 +553,7 @@ export default {
                   const roleSet = new Set(roles);
 
                   // eslint-disable-next-line no-restricted-syntax
-                  for (const roleSuffix of this.types) {
+                  for (const roleSuffix of this.membershipsTypes) {
                     const def = iconDefMap.get(roleSuffix);
                     const role = `contact:${roleSuffix}`;
 
@@ -613,10 +648,11 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     basicStringFilter(field, value) {
-      if (!this.filters[field]) {
+      const filter = this.filters[field]?.value;
+      if (!filter) {
         return true;
       }
-      return this.basicFilter(value, this.filters[field]);
+      return this.basicFilter(value, filter);
     },
     /**
      * Basic filter applied to bool fields using filter popups
@@ -627,10 +663,11 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     basicBoolFilter(field, value) {
-      if (this.filters[field] == null) {
+      const filter = this.filters[field]?.value;
+      if (filter == null) {
         return true;
       }
-      return this.filters[field] === value;
+      return filter === value;
     },
     /**
      * Filter for array column using filters
@@ -641,7 +678,7 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     columnArrayFilter(field, item) {
-      const range = this.filters[field];
+      const range = this.filters?.[`${field}Range`]?.value;
       if (range == null || !Array.isArray(item[field])) {
         return true;
       }
@@ -673,7 +710,11 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     columnServiceFilter(item) {
-      if (this.filters.services == null) {
+      if (
+        !this.filters.contacts?.value
+        && !this.filters.repositories?.value
+        && !this.filters.spaces?.value
+      ) {
         return true;
       }
 
@@ -682,9 +723,100 @@ export default {
         return false;
       }
 
-      const services = new Set(icons.map((i) => i.key));
-      return this.filters.services.some((s) => services.has(s));
+      const services = icons.map((i) => i.key);
+
+      let res = true;
+      if (res && (this.filters.contacts?.value?.length ?? 0) > 0) {
+        res = this.serviceContactsFilter(services);
+      }
+
+      if (res && (this.filters.repositories?.value?.length ?? 0) > 0) {
+        res = this.serviceReposFilter(services);
+      }
+
+      if (res && (this.filters.spaces?.value?.length ?? 0) > 0) {
+        res = this.serviceSpacesFilter(services);
+      }
+
+      return res;
     },
+    /**
+     * Apply contacts filters to given services
+     * 
+     * @param {*} services The item's service
+     * 
+     * @return {boolean} Should item be shown
+     */
+    serviceContactsFilter(services) {
+      const contactsServices = services?.filter((s) => /^contact:/i.test(s)) ?? [];
+      const contactsFilters = new Set(this.filters.contacts?.value);
+
+      if (contactsFilters.has('contact:')) {
+        return contactsServices.length === 0;
+      }
+      if (contactsServices.length === 0) {
+        return false;
+      }
+
+      if (this.filters.contacts?.exclusive) {
+        const servicesSet = new Set(contactsServices);
+
+        return contactsFilters.size === servicesSet.size
+          && [...contactsFilters].every((s) => servicesSet.has(s));
+      }
+
+      return contactsServices.some((s) => contactsFilters.has(s));
+    },
+    /**
+     * Apply repos filters to given services
+     * 
+     * @param {*} services The item's service
+     * 
+     * @return {boolean} Should item be shown
+     */
+    serviceReposFilter(services) {
+      const repositoriesServices = services?.filter((s) => /^repository:/i.test(s)) ?? [];
+      const contactFilters = new Set(this.filters.repositories?.value);
+
+      if (repositoriesServices.length === 0) {
+        return false;
+      }
+
+      if (this.filters.repositories?.exclusive) {
+        const servicesSet = new Set(repositoriesServices);
+
+        return contactFilters.size === servicesSet.size
+          && [...contactFilters].every((s) => servicesSet.has(s));
+      }
+
+      return repositoriesServices.some((s) => contactFilters.has(s));
+    },
+
+    /**
+     * Apply spaces filters to given services
+     * 
+     * @param {*} services The item's service
+     * 
+     * @return {boolean} Should item be shown
+     */
+    serviceSpacesFilter(services) {
+      const spacesServices = services?.filter((s) => /^space:/i.test(s)) ?? [];
+      const spacesFilters = new Set(this.filters.spaces?.value);
+
+      if (spacesServices.length === 0) {
+        return false;
+      }
+
+      if (this.filters.spaces?.exclusive) {
+        const servicesSet = new Set(spacesServices);
+
+        return spacesFilters.size === servicesSet.size
+          && [...spacesFilters].every((s) => servicesSet.has(s));
+      }
+
+      return spacesServices.some((s) => spacesFilters.has(s));
+    },
+
     async refreshInstitutions() {
       this.refreshing = true;
 
@@ -704,17 +836,22 @@ export default {
 
       this.refreshing = false;
     },
+
     editInstitution(item) {
       this.$refs.institutionForm.editInstitution(item);
     },
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ addAsMember: false });
     },
+    deleteInstitutions() {
+      this.$refs.deleteDialog.confirmDelete(this.selected);
+    },
     onInstitutionsRemove(removedIds) {
       const removeDeleted = (institution) => !removedIds.some((id) => institution.id === id);
       this.institutions = this.institutions.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },
+
     async copyInstitutionId(item) {
       if (!navigator.clipboard) {
         this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
@@ -728,9 +865,7 @@ export default {
       }
       this.$store.dispatch('snacks/info', this.$t('idCopied'));
     },
-    deleteInstitutions() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
-    },
+
     clearSelection() {
       this.selected = [];
     },

@@ -222,7 +222,9 @@
     },
     "filters": {
       "title": "Filtrer les établissements",
-      "searchHint": "Ce champ est remplacé par la barre de recherche"
+      "searchHint": "Ce champ est remplacé par la barre de recherche",
+      "exclusiveHint": "L'établissement doit correspondre exactement à ce filtre",
+      "inclusiveHint": "L'établissement peut correspondre partiellement à ce filtre"
     },
     "institution": {
       "title": "Mon établissement",
@@ -296,6 +298,7 @@
       "title": "Membres ({total})",
       "technical": "Technique",
       "documentary": "Documentaire",
+      "noCorrespondent": "Aucun correspondant",
       "technicalCorrespondent": "Correspondant technique",
       "documentaryCorrespondent": "Correspondant documentaire",
       "creator": "Créateur",
