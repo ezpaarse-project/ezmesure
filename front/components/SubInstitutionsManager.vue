@@ -173,7 +173,7 @@
         width="2"
       />
       <div v-else class="text-grey">
-        {{ $t('components.noSubInstitutions') }}
+        {{ $t('components.noComponent') }}
       </div>
     </v-card-text>
 
