@@ -216,7 +216,7 @@
     "sendMailToJoin": "An email has been sent to the institution's correspondents",
     "askToJoinAnInstitution": "Ask to join an institution",
     "joinInstitution": "Would you join <b>{institution}</b> ?",
-    "joinInstitutionEmail": "An email will be sent to the correspondents of this institution so that they can add you.",
+    "joinInstitutionEmail": "A message will be sent to the correspondents of this institution to let them know.",
     "reports": {
       "reports": "Reports"
     },

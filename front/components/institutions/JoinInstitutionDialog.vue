@@ -3,12 +3,12 @@
   <v-dialog
     :value="value"
     width="500"
-    persistent
     @input="updateVisible($event)"
   >
     <v-card>
       <v-toolbar
         color="primary"
+        flat
         dark
       >
         <v-toolbar-title>
@@ -24,11 +24,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn outlined @click.stop="updateVisible(false)">
+        <v-btn text outlined @click.stop="updateVisible(false)">
           {{ $t("cancel") }}
         </v-btn>
         <v-btn
-          text
           :loading="loading"
           color="primary"
           @click="sendMail()"
