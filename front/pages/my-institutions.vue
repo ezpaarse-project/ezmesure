@@ -15,11 +15,13 @@
       <v-row>
         <v-col>
           <v-autocomplete
-            v-model="searchValue"
+            :search-input.sync="searchValue"
             class="ma-4"
             item-text="name"
             :items="institutions"
+            :hide-no-data="!searchValue"
             :label="$t('institutions.askToJoinAnInstitution')"
+            :loading="loading"
             solo
             dense
             clearable
@@ -168,6 +170,8 @@
 </template>
 
 <script>
+import debounce from 'lodash.debounce';
+
 import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionCard from '~/components/InstitutionCard.vue';
@@ -193,11 +197,11 @@ export default {
       institutions: [],
       institutionSelected: {},
       joinInstitutionDialogVisible: false,
+      loading: false,
     };
   },
   async mounted() {
     this.refreshMemberships();
-    this.institutions = await this.$axios.$get('/institutions', { params: { q: this.searchValue, size: 10 } });
   },
   computed: {
     toolbarTitle() {
@@ -205,6 +209,15 @@ export default {
     },
   },
   methods: {
+    getInstitution: debounce(async function getInstitution() {
+      try {
+        this.loading = true;
+        this.institutions = await this.$axios.$get('/institutions', { params: { q: this.searchValue, size: 10 } });
+      } catch (err) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
+      }
+      this.loading = false;
+    }, 500),
     openJoinInstitutionDialog(institution) {
       this.institutionSelected = institution;
       this.joinInstitutionDialogVisible = true;
@@ -229,6 +242,13 @@ export default {
     },
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ addAsMember: true });
+    },
+  },
+  watch: {
+    searchValue(newValue) {
+      if (newValue) {
+        this.getInstitution();
+      }
     },
   },
 };
