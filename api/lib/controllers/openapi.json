@@ -1141,8 +1141,8 @@
             "properties": {
               "status": {
                 "type": "string",
-                "description": "Status of the connection. Success if the harvest test succeeded, or if exceptions are not related to authentication. Failed if an authentication error is thrown. Indeterminate otherwise.",
-                "enum": ["success", "failed", "indeterminate"],
+                "description": "Status of the connection. Success if the harvest test succeeded, or if exceptions are not related to authentication. Unauthorized if the credentials are invalid. Failed if an error occurred.",
+                "enum": ["success", "unauthorized", "failed"],
                 "readOnly": true
               },
               "date": {

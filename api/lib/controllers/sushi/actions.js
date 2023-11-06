@@ -546,7 +546,7 @@ exports.checkSushiConnection = async (ctx) => {
 
   /** @type {import('axios').AxiosResponse} */
   let response;
-  /** @type {'indeterminate'|'failed'|'success'} */
+  /** @type {'unauthorized'|'failed'|'success'} */
   let status;
   let report;
   let errorCode;
@@ -573,7 +573,7 @@ exports.checkSushiConnection = async (ctx) => {
   }
 
   if (response?.status === 401) {
-    status = 'failed';
+    status = 'unauthorized';
     errorCode = ERROR_CODES.unauthorized;
   }
 
@@ -586,13 +586,13 @@ exports.checkSushiConnection = async (ctx) => {
       case SUSHI_CODES.unauthorizedRequestorAlt:
       case SUSHI_CODES.invalidAPIKey:
       case SUSHI_CODES.unauthorizedIPAddress:
-        status = 'failed';
+        status = 'unauthorized';
         errorCode = `sushi:${e.Code}`;
         break;
       case SUSHI_CODES.serviceUnavailable:
       case SUSHI_CODES.serviceBusy:
       case SUSHI_CODES.tooManyRequests:
-        status = 'indeterminate';
+        status = 'failed';
         errorCode = `sushi:${e.Code}`;
         break;
       default:
@@ -616,7 +616,7 @@ exports.checkSushiConnection = async (ctx) => {
     data: {
       connection: {
         date: Date.now(),
-        status: status || 'indeterminate',
+        status: status || 'failed',
         exceptions: exceptions || null,
         errorCode: errorCode || null,
       },
