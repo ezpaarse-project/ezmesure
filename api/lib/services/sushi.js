@@ -558,7 +558,7 @@ async function cleanFiles() {
 
   const reportPaths = await glob(
     // expression is based on who files are created
-    path.resolve(storageDir, '**/**/**/**/*.json'),
+    path.resolve(storageDir, '*/*/*/*/*.json'),
   );
 
   appLogger.verbose(`[counter-cleanup] Found ${reportPaths.length} reports`);
@@ -584,7 +584,7 @@ async function cleanFiles() {
     }),
   );
 
-  const reportErrors = reportRes.filter((v) => v.reason).length;
+  const reportErrors = reportRes.filter((v) => v.status === 'rejected').length;
   const reportSkipped = reportRes.filter((v) => v.value === false).length;
   const reportDeleted = reportRes.length - reportErrors - reportSkipped;
 
