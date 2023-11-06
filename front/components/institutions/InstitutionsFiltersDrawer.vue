@@ -32,13 +32,13 @@
       <v-row v-if="possibleFiltersSet.has('name')">
         <v-col>
           <v-text-field
-            :value="search || value.name"
+            :value="search || value.name?.value"
             :disabled="!!search"
             :messages="search ? [$t('institutions.filters.searchHint')] : []"
             :label="$t('institutions.institution.name')"
             prepend-icon="mdi-domain"
             hide-details="auto"
-            @change="onFilterUpdate('name', $event)"
+            @change="onFilterUpdate('name', { value: $event })"
           />
         </v-col>
       </v-row>
@@ -46,13 +46,13 @@
       <v-row>
         <v-col v-if="possibleFiltersSet.has('acronym')">
           <v-text-field
-            :value="search || value.acronym"
+            :value="search || value.acronym?.value"
             :disabled="!!search"
             :messages="search ? [$t('institutions.filters.searchHint')] : []"
             :label="$t('institutions.institution.acronym')"
             prepend-icon="mdi-alphabetical-variant"
             hide-details="auto"
-            @change="onFilterUpdate('acronym', $event)"
+            @change="onFilterUpdate('acronym', { value: $event })"
           />
         </v-col>
 
@@ -67,11 +67,11 @@
             </v-label>
 
             <v-btn-toggle
-              :value="value.validated"
+              :value="value.validated?.value"
               dense
               rounded
               color="primary"
-              @change="onFilterUpdate('validated', $event)"
+              @change="onFilterUpdate('validated', {value: $event})"
             >
               <v-btn :value="true" small outlined>
                 {{ $t('institutions.institution.validated') }}
@@ -142,7 +142,30 @@
             multiple
             hide-details
             @change="contactServices = $event"
-          />
+          >
+            <template #append-outer>
+              <v-tooltip top>
+                <template #activator="{attrs, on}">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="onFilterUpdate('contacts', { exclusive: !value.contacts.exclusive })"
+                    v-on="on"
+                  >
+                    {{ value.contacts.exclusive ? '1' : '1..n' }}
+                  </v-btn>
+                </template>
+
+                {{
+                  $t(
+                    value.contacts.exclusive
+                      ? 'institutions.filters.exclusiveHint'
+                      : 'institutions.filters.inclusiveHint'
+                  )
+                }}
+              </v-tooltip>
+            </template>
+          </v-select>
         </v-col>
       </v-row>
 
@@ -248,7 +271,33 @@
             multiple
             hide-details
             @change="repositoriesServices = $event"
-          />
+          >
+            <template #append-outer>
+              <v-tooltip top>
+                <template #activator="{attrs, on}">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="onFilterUpdate(
+                      'repositories',
+                      { exclusive: !value.repositories.exclusive }
+                    )"
+                    v-on="on"
+                  >
+                    {{ value.repositories.exclusive ? '1' : '1..n' }}
+                  </v-btn>
+                </template>
+
+                {{
+                  $t(
+                    value.repositories.exclusive
+                      ? 'institutions.filters.exclusiveHint'
+                      : 'institutions.filters.inclusiveHint'
+                  )
+                }}
+              </v-tooltip>
+            </template>
+          </v-select>
         </v-col>
       </v-row>
 
@@ -308,7 +357,30 @@
             multiple
             hide-details
             @change="spacesServices = $event"
-          />
+          >
+            <template #append-outer>
+              <v-tooltip top>
+                <template #activator="{attrs, on}">
+                  <v-btn
+                    icon
+                    v-bind="attrs"
+                    @click="onFilterUpdate('spaces', { exclusive: !value.spaces.exclusive })"
+                    v-on="on"
+                  >
+                    {{ value.spaces.exclusive ? '1' : '1..n' }}
+                  </v-btn>
+                </template>
+
+                {{
+                  $t(
+                    value.spaces.exclusive
+                      ? 'institutions.filters.exclusiveHint'
+                      : 'institutions.filters.inclusiveHint'
+                  )
+                }}
+              </v-tooltip>
+            </template>
+          </v-select>
         </v-col>
       </v-row>
     </v-container>
@@ -353,10 +425,6 @@ export default {
   },
   emits: ['input', 'update:show'],
   data: () => ({
-    contactItems: [
-      { value: 'contact:tech', text: 'tech' },
-      { value: 'contact:doc', text: 'doc' },
-    ],
     repositoryItems: [
       { value: 'repository:ezpaarse', text: 'ezpaarse' },
       { value: 'repository:counter5', text: 'counter5' },
@@ -370,93 +438,77 @@ export default {
     possibleFiltersSet() {
       return new Set(this.selectedTableHeaders);
     },
+
     membershipsRange: {
       get() {
-        return this.partialToRange(this.value.memberships, this.maxMembershipsCount);
+        return this.partialToRange(this.value.membershipsRange?.value, this.maxMembershipsCount);
       },
       set(val) {
-        this.updateFilterWithPartial('memberships', val, this.maxMembershipsCount);
+        this.updateRangeWithPartial('membershipsRange', val, this.maxMembershipsCount);
       },
+    },
+
+    contactItems() {
+      const isDisabled = this.contactServices.includes('contact:') ?? false;
+
+      return [
+        { value: 'contact:', text: this.$t('institutions.members.noCorrespondent'), disabled: !isDisabled && this.contactServices.length > 0 },
+        { value: 'contact:tech', text: this.$t('institutions.members.technicalCorrespondent'), disabled: isDisabled },
+        { value: 'contact:doc', text: this.$t('institutions.members.documentaryCorrespondent'), disabled: isDisabled },
+      ];
     },
     contactServices: {
       get() {
-        if (!this.value.services) {
-          return [];
-        }
-
-        const typeSet = new Set(this.contactItems.map((i) => i.value));
-        return this.value.services.filter((s) => typeSet.has(s));
+        return this.value.contacts?.value ?? [];
       },
       set(val) {
-        const services = [
-          ...val,
-          ...this.repositoriesServices,
-          ...this.spacesServices,
-        ];
-
-        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
+        this.onFilterUpdate('contacts', { value: val.length > 0 ? val : undefined });
       },
     },
+
     childInstitutionsRange: {
       get() {
-        return this.partialToRange(this.value.childInstitutions, this.maxChildInstitutionsCount);
+        return this.partialToRange(
+          this.value.childInstitutionsRange?.value,
+          this.maxChildInstitutionsCount,
+        );
       },
       set(val) {
-        this.updateFilterWithPartial('childInstitutions', val, this.maxChildInstitutionsCount);
+        this.updateRangeWithPartial('childInstitutionsRange', val, this.maxChildInstitutionsCount);
       },
     },
+
     repositoriesRange: {
       get() {
-        return this.partialToRange(this.value.repositories, this.maxRepositoriesCount);
+        return this.partialToRange(this.value.repositoriesRange?.value, this.maxRepositoriesCount);
       },
       set(val) {
-        this.updateFilterWithPartial('repositories', val, this.maxRepositoriesCount);
+        this.updateRangeWithPartial('repositoriesRange', val, this.maxRepositoriesCount);
       },
     },
     repositoriesServices: {
       get() {
-        if (!this.value.services) {
-          return [];
-        }
-
-        const typeSet = new Set(this.repositoryItems.map((i) => i.value));
-        return this.value.services.filter((s) => typeSet.has(s));
+        return this.value.repositories?.value ?? [];
       },
       set(val) {
-        const services = [
-          ...this.contactServices,
-          ...val,
-          ...this.spacesServices,
-        ];
-
-        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
+        this.onFilterUpdate('repositories', { value: val.length > 0 ? val : undefined });
       },
     },
+
     spacesRange: {
       get() {
-        return this.partialToRange(this.value.spaces, this.maxSpacesCount);
+        return this.partialToRange(this.value.spacesRange?.value, this.maxSpacesCount);
       },
       set(val) {
-        this.updateFilterWithPartial('spaces', val, this.maxSpacesCount);
+        this.updateRangeWithPartial('spacesRange', val, this.maxSpacesCount);
       },
     },
     spacesServices: {
       get() {
-        if (!this.value.services) {
-          return [];
-        }
-
-        const typeSet = new Set(this.spaceItems.map((i) => i.value));
-        return this.value.services.filter((s) => typeSet.has(s));
+        return this.value.spaces?.value ?? [];
       },
       set(val) {
-        const services = [
-          ...this.contactServices,
-          ...this.repositoriesServices,
-          ...val,
-        ];
-
-        this.onFilterUpdate('services', services.length > 0 ? services : undefined);
+        this.onFilterUpdate('spaces', { value: val.length > 0 ? val : undefined });
       },
     },
   },
@@ -482,22 +534,31 @@ export default {
      * @param {[number | undefined, number | undefined] | undefined} val The partial range
      * @param {number} max The maximum value of the range
      */
-    updateFilterWithPartial(field, val, max) {
+    updateRangeWithPartial(field, val, max) {
       if (
         !val
         || (val[0] === 0 && val[1] === max)
       ) {
-        this.onFilterUpdate(field, undefined);
+        this.onFilterUpdate(field, { value: undefined });
         return;
       }
 
-      this.onFilterUpdate(field, this.partialToRange(val, max));
+      this.onFilterUpdate(field, { value: this.partialToRange(val, max) });
     },
-    onFilterUpdate(field, val) {
+    /**
+     * Update filter value and attributes
+     *
+     * @param {string} field The concerned filter
+     * @param {string} attrs The new attributes of the filter
+     */
+    onFilterUpdate(field, attrs) {
       const filters = { ...this.value };
-      filters[field] = val;
+      filters[field] = { ...(filters[field] ?? {}), ...attrs };
       this.$emit('input', filters);
     },
+    /**
+     * Reset all filters
+     */
     clearFilters() {
       this.$emit('input', {});
       this.$emit('update:show', false);

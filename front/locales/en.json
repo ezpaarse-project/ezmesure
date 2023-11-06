@@ -216,7 +216,9 @@
     },
     "filters": {
       "title": "Filter institutions",
-      "searchHint": "This field is overriden by the search bar"
+      "searchHint": "This field is override by the search bar",
+      "exclusiveHint": "Institution must match exactly this filter",
+      "inclusiveHint": "Institution can match partially this filter"
     },
     "institution": {
       "title": "My institution",
@@ -290,6 +292,7 @@
       "title": "Members ({total})",
       "technical": "Technical",
       "documentary": "Documentary",
+      "noCorrespondent": "No correspondent",
       "technicalCorrespondent": "Technical correspondent",
       "documentaryCorrespondent": "Documentary correspondent",
       "creator": "Creator",
