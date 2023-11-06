@@ -624,7 +624,6 @@ exports.requestMembership = async (ctx) => {
     }),
   });
 
-  // TODO send mail
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {};
