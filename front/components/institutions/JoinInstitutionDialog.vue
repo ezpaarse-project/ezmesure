@@ -65,13 +65,14 @@ export default {
       this.$emit('input', visible);
     },
     async sendMail() {
-      // TODO
       try {
+        this.loading = true;
         await this.$axios.$post(`/institutions/${this.institution.id}/memberships/${this.$auth?.user?.username}/mail`);
         this.updateVisible(false);
       } catch (e) {
         this.$store.dispatch('snacks/error', e.response.data.error);
       }
+      this.loading = false;
       this.$store.dispatch('snacks/info', this.$t('institutions.sendMailToJoin'));
     },
   },
