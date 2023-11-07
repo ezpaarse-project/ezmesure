@@ -298,6 +298,18 @@
         </v-tooltip>
       </template>
 
+      <template #[`header.connection`]="{ header }">
+        {{ header.text }}
+
+        <DropdownSelector
+          v-model="filters.sushiStatuses"
+          :items="availableSushiStatuses"
+          icon="mdi-filter"
+          icon-button
+          badge
+        />
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
@@ -392,6 +404,7 @@ import ReportsDialog from '~/components/ReportsDialog.vue';
 import HarvestMatrixDialog from '~/components/HarvestMatrixDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import LocalDate from '~/components/LocalDate.vue';
+import DropdownSelector from '~/components/DropdownSelector.vue';
 
 export default {
   layout: 'space',
@@ -407,6 +420,7 @@ export default {
     HarvestMatrixDialog,
     ConfirmDialog,
     LocalDate,
+    DropdownSelector,
   },
   async asyncData({
     $axios,
@@ -445,6 +459,9 @@ export default {
       institution,
       sushiItems: [],
       selected: [],
+      filters: {
+        sushiStatuses: [],
+      },
       refreshing: false,
       deleting: false,
       search: '',
@@ -487,6 +504,14 @@ export default {
 
       return this.$dateFunctions.format(localDate, 'P');
     },
+    availableSushiStatuses() {
+      return [
+        { text: this.$t('institutions.sushi.untested'), value: 'untested' },
+        { text: this.$t('institutions.sushi.operational'), value: 'success' },
+        { text: this.$t('institutions.sushi.invalidCredentials'), value: 'unauthorized' },
+        { text: this.$t('error'), value: 'failed' },
+      ];
+    },
     tableHeaders() {
       return [
         {
@@ -510,6 +535,13 @@ export default {
           value: 'connection',
           align: 'right',
           width: '160px',
+          filter: (value) => {
+            if (this.filters.sushiStatuses.length === 0) {
+              return true;
+            }
+
+            return this.filters.sushiStatuses.includes(value?.status || 'untested');
+          },
         },
         {
           text: this.$t('institutions.sushi.updatedAt'),
