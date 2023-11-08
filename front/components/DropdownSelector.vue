@@ -7,20 +7,31 @@
     left
     v-bind="$attrs"
   >
-    <template #activator="{ on, attrs }">
-      <v-btn
-        text
-        small
-        v-bind="attrs"
-        v-on="on"
-      >
-        <v-icon>
-          {{ icon }}
-        </v-icon>
-        <v-icon>
-          mdi-chevron-down
-        </v-icon>
-      </v-btn>
+    <template #activator="props">
+      <slot name="activator" v-bind="props">
+        <v-badge
+          color="primary"
+          :content="nbSelected"
+          :value="badge && nbSelected"
+          overlap
+          small
+        >
+          <v-btn
+            :text="!iconButton"
+            :icon="iconButton"
+            small
+            v-bind="props.attrs"
+            v-on="props.on"
+          >
+            <v-icon small>
+              {{ icon }}
+            </v-icon>
+            <v-icon v-if="!iconButton">
+              mdi-chevron-down
+            </v-icon>
+          </v-btn>
+        </v-badge>
+      </slot>
     </template>
 
     <v-card>
@@ -81,9 +92,22 @@ export default {
       type: String,
       default: () => 'mdi-form-select',
     },
+    iconButton: {
+      type: Boolean,
+      default: () => false,
+    },
+    badge: {
+      type: Boolean,
+      default: () => false,
+    },
   },
   data() {
     return {};
+  },
+  computed: {
+    nbSelected() {
+      return this.value?.length;
+    },
   },
 };
 </script>

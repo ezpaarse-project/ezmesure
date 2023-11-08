@@ -62,39 +62,73 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="hasUntestedItems" justify="center" class="mt-2">
-        <v-col style="max-width: 1000px">
-          <v-alert
-            outlined
-            type="info"
-            prominent
-            icon="mdi-bell-alert"
-          >
-            <div v-if="lockReason">
-              {{ $t('reason', { reason: lockReason }) }}
-            </div>
+      <div class="d-flex justify-center align-stretch pa-2" style="gap: 10px">
+        <SimpleMetric
+          width="250"
+          :text="$tc('sushi.nOperationalCredentials', operationalItems.length)"
+          icon="mdi-check"
+          color="success"
+        />
 
-            <v-row align="center">
-              <v-col class="grow">
-                <div
-                  class="text-h6"
-                >
-                  {{ $tc('sushi.youHaveUntestedCredentials', untestedItems.length) }}
-                </div>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                  color="info"
-                  :loading="testingConnection"
-                  @click="checkUntestedItems"
-                >
-                  {{ $t('institutions.sushi.checkCredentials') }}
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-        </v-col>
-      </v-row>
+        <SimpleMetric
+          width="250"
+          :text="$tc('sushi.nUntestedCredentials', untestedItems.length)"
+          icon="mdi-bell-alert"
+          color="info"
+        >
+          <template #actions>
+            <div>
+              <v-btn
+                small
+                outlined
+                :disabled="!hasUntestedItems"
+                :loading="testingConnection"
+                @click="checkUntestedItems"
+              >
+                {{ $t('institutions.sushi.checkCredentials') }}
+              </v-btn>
+            </div>
+          </template>
+        </SimpleMetric>
+
+        <SimpleMetric
+          width="250"
+          :text="$tc('sushi.nInvalidCredentials', unauthorizedItems.length)"
+          icon="mdi-key-alert-outline"
+          color="warning"
+        >
+          <template #actions>
+            <div>
+              <v-btn
+                small
+                outlined
+                @click="filterByStatus('unauthorized')"
+              >
+                {{ $t('show') }}
+              </v-btn>
+            </div>
+          </template>
+        </SimpleMetric>
+
+        <SimpleMetric
+          width="250"
+          :text="$tc('sushi.nProblematicEndpoints', failedItems.length)"
+          icon="mdi-alert-circle"
+          color="error"
+        >
+          <template #actions>
+            <div>
+              <v-btn
+                small
+                outlined
+                @click="filterByStatus('failed')"
+              >
+                {{ $t('show') }}
+              </v-btn>
+            </div>
+          </template>
+        </SimpleMetric>
+      </div>
     </v-container>
 
     <SushiForm
@@ -298,6 +332,18 @@
         </v-tooltip>
       </template>
 
+      <template #[`header.connection`]="{ header }">
+        {{ header.text }}
+
+        <DropdownSelector
+          v-model="filters.sushiStatuses"
+          :items="availableSushiStatuses"
+          icon="mdi-filter"
+          icon-button
+          badge
+        />
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
@@ -392,6 +438,8 @@ import ReportsDialog from '~/components/ReportsDialog.vue';
 import HarvestMatrixDialog from '~/components/HarvestMatrixDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import LocalDate from '~/components/LocalDate.vue';
+import DropdownSelector from '~/components/DropdownSelector.vue';
+import SimpleMetric from '~/components/SimpleMetric.vue';
 
 export default {
   layout: 'space',
@@ -407,6 +455,8 @@ export default {
     HarvestMatrixDialog,
     ConfirmDialog,
     LocalDate,
+    DropdownSelector,
+    SimpleMetric,
   },
   async asyncData({
     $axios,
@@ -445,6 +495,9 @@ export default {
       institution,
       sushiItems: [],
       selected: [],
+      filters: {
+        sushiStatuses: [],
+      },
       refreshing: false,
       deleting: false,
       search: '',
@@ -487,6 +540,14 @@ export default {
 
       return this.$dateFunctions.format(localDate, 'P');
     },
+    availableSushiStatuses() {
+      return [
+        { text: this.$t('institutions.sushi.untested'), value: 'untested' },
+        { text: this.$t('institutions.sushi.operational'), value: 'success' },
+        { text: this.$t('institutions.sushi.invalidCredentials'), value: 'unauthorized' },
+        { text: this.$t('error'), value: 'failed' },
+      ];
+    },
     tableHeaders() {
       return [
         {
@@ -510,6 +571,13 @@ export default {
           value: 'connection',
           align: 'right',
           width: '160px',
+          filter: (value) => {
+            if (this.filters.sushiStatuses.length === 0) {
+              return true;
+            }
+
+            return this.filters.sushiStatuses.includes(value?.status || 'untested');
+          },
         },
         {
           text: this.$t('institutions.sushi.updatedAt'),
@@ -538,10 +606,35 @@ export default {
     hasUntestedItems() {
       return this.untestedItems.length > 0;
     },
+    hasUnauthorizedItems() {
+      return this.unauthorizedItems.length > 0;
+    },
+    hasFailedItems() {
+      return this.failedItems.length > 0;
+    },
     untestedItems() {
-      return this.sushiItems.filter((item) => (
-        typeof item?.connection?.status !== 'string'
-      ));
+      return this.itemsByStatus.untested || [];
+    },
+    unauthorizedItems() {
+      return this.itemsByStatus.unauthorized || [];
+    },
+    failedItems() {
+      return this.itemsByStatus.failed || [];
+    },
+    operationalItems() {
+      return this.itemsByStatus.success || [];
+    },
+    itemsByStatus() {
+      return this.sushiItems.reduce((acc, item) => {
+        const status = item?.connection?.status || 'untested';
+
+        if (!Array.isArray(acc[status])) {
+          acc[status] = [];
+        }
+
+        acc[status].push(item);
+        return acc;
+      }, {});
     },
     testingConnection() {
       return Object.keys(this.loadingItems).length > 0;
@@ -639,6 +732,9 @@ export default {
     },
     showSushiItemFiles(item) {
       this.$refs.sushiFiles.showFiles(item);
+    },
+    filterByStatus(status) {
+      this.filters.sushiStatuses = [status];
     },
     async refreshSushiItems() {
       if (!this.hasInstitution) { return; }
