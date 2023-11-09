@@ -317,11 +317,42 @@ exports.importInstitutions = async (ctx) => {
         connectOrCreate: item.memberships?.map?.((membership) => ({
           where: {
             username_institutionId: {
-              institutionId: membership.institutionId,
-              username: membership.username,
+              institutionId: item.id,
+              username: membership?.username,
             },
+          },
+          create: {
+            ...(membership ?? {}),
+            username: undefined,
+
+            user: {
+              connect: { username: membership?.username },
             },
-          create: { ...membership, institutionId: undefined },
+
+            spacePermissions: {
+              connectOrCreate: membership?.spacePermissions?.map?.((perm) => ({
+                where: {
+                  username_spaceId: {
+                    username: membership?.username,
+                    spaceId: perm?.spaceId,
+                  },
+                },
+                create: perm,
+              })),
+            },
+
+            repositoryPermissions: {
+              connectOrCreate: membership?.repositoryPermissions?.map?.((perm) => ({
+                where: {
+                  username_repositoryPattern: {
+                    username: membership?.username,
+                    repositoryPattern: perm?.repositoryPattern,
+                  },
+                },
+                create: perm,
+              })),
+            },
+          },
         })),
       },
     };
