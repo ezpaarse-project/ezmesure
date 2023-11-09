@@ -149,6 +149,7 @@ exports.importUsers = async (ctx) => {
       email: item.email,
       isAdmin: !!item.isAdmin,
       metadata: item.metadata,
+
       memberships: {
         connectOrCreate: item.memberships?.map?.((membership) => ({
           where: {
@@ -156,7 +157,7 @@ exports.importUsers = async (ctx) => {
               institutionId: membership?.institutionId,
               username: membership?.username,
             },
-          },
+                },
           create: { ...membership, username: undefined },
         })),
       },

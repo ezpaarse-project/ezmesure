@@ -97,7 +97,7 @@
     </v-alert>
 
     <v-list v-if="hasRepositories">
-      <v-list-item v-for="repository in repositories" :key="repository.id">
+      <v-list-item v-for="repository in repositories" :key="repository.pattern">
         <v-list-item-content>
           <v-list-item-title>{{ repository.pattern }}</v-list-item-title>
           <v-list-item-subtitle>{{ repository.type }}</v-list-item-subtitle>
@@ -105,7 +105,7 @@
 
         <v-list-item-action>
           <v-progress-circular
-            v-if="deleting[repository.id]"
+            v-if="deleting[repository.pattern]"
             indeterminate
             size="24"
             width="2"
@@ -117,7 +117,7 @@
             bottom
             right
             offset-y
-            @agree="deleteRepository(repository.id)"
+            @agree="deleteRepository(repository.pattern)"
           >
             <template #activator="{ on, attrs }">
               <v-icon
@@ -228,19 +228,19 @@ export default {
       this.loading = false;
     },
 
-    async deleteRepository(repositoryId) {
-      this.$set(this.deleting, repositoryId, true);
+    async deleteRepository(pattern) {
+      this.$set(this.deleting, pattern, true);
       this.errorMessage = '';
 
       try {
-        await this.$axios.$delete(`/repositories/${repositoryId}`);
-        this.repositories = this.repositories.filter((r) => r?.id !== repositoryId);
+        await this.$axios.$delete(`/repositories/${pattern}`);
+        this.repositories = this.repositories.filter((r) => r?.id !== pattern);
         this.onChange();
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }
 
-      this.$set(this.deleting, repositoryId, false);
+      this.$set(this.deleting, pattern, false);
     },
 
     async createRepository() {

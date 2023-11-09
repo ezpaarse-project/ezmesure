@@ -160,8 +160,6 @@ model SpacePermission {
 
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
-  /// ID of the repository
-  id            String                 @id @default(cuid())
   /// ID of the institution
   institutionId String?
   /// The institution this repository is associated to
@@ -171,13 +169,11 @@ model Repository {
   /// Latest update date
   updatedAt     DateTime               @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern       String
+  pattern       String                 @id
   /// The repository type (ezpaarse, counter5)
   type          String                 @db.VarChar(50)
   /// Member permissions associated to this repository
   permissions   RepositoryPermission[]
-
-  @@unique([institutionId, pattern])
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -188,16 +184,16 @@ model RepositoryPermission {
   institutionId String
   /// The member
   membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
-  /// ID of the repository
-  repositoryId  String
+  /// Pattern of the repository
+  repositoryPattern  String
   /// The repository
-  repository    Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository    Repository @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
   /// Whether the member has a readonly access to the repository
   readonly      Boolean    @default(false)
   /// Whether the permission can be modified or not
   locked        Boolean    @default(false)
 
-  @@id([username, repositoryId])
+  @@id([username, repositoryPattern])
 }
 
 /// Represent the actions that are triggered

@@ -16,7 +16,7 @@ const schema = {
   institutionId: Joi.string().trim(),
   membership: Joi.object(),
 
-  repositoryId: Joi.string().trim(),
+  pattern: Joi.string().trim(),
   repository: Joi.object(),
 
   readonly: Joi.boolean(),
@@ -30,7 +30,7 @@ const immutableFields = [
   'username',
   'institutionId',
   'membership',
-  'repositoryId',
+  'pattern',
   'repository',
 ];
 
@@ -47,7 +47,7 @@ const includableFields = [
  */
 const upsertSchema = withModifiers(
   schema,
-  requireFields(['username', 'repositoryId', 'institutionId']),
+  requireFields(['username', 'pattern', 'institutionId']),
   ignoreFields(immutableFields),
   withDefaults({
     readonly: false,

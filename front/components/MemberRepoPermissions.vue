@@ -11,7 +11,7 @@
       {{ errorMessage }}
     </v-alert>
 
-    <v-row v-for="repository in repositories" :key="repository.id" align="center">
+    <v-row v-for="repository in repositories" :key="repository.pattern" align="center">
       <v-col>
         <div class="body-1">
           {{ repository.pattern }}
@@ -24,7 +24,7 @@
 
       <v-col class="shrink pr-0">
         <v-slide-x-reverse-transition>
-          <v-icon v-if="successfulSaves[repository.id]" color="success">
+          <v-icon v-if="successfulSaves[repository.pattern]" color="success">
             mdi-check
           </v-icon>
         </v-slide-x-reverse-transition>
@@ -32,18 +32,18 @@
 
       <v-col class="shrink">
         <v-btn-toggle
-          v-model="repoPermissions[repository.id]"
+          v-model="repoPermissions[repository.pattern]"
           color="primary"
           mandatory
           dense
           rounded
-          @change="savePermission(repository.id)"
+          @change="savePermission(repository.pattern)"
         >
           <v-btn
             v-for="permission in permissions"
             :key="permission.value"
             :value="permission.value"
-            :loading="loadingPerms[repository.id]"
+            :loading="loadingPerms[repository.pattern]"
             :disabled="readonly"
             small
             outlined
@@ -144,9 +144,9 @@ export default {
             (p) => p?.username === this.username,
           );
           if (typeof perm?.readonly === 'boolean') {
-            newPermissions[repository.id] = perm.readonly ? 'read' : 'write';
+            newPermissions[repository.pattern] = perm.readonly ? 'read' : 'write';
           } else {
-            newPermissions[repository.id] = 'none';
+            newPermissions[repository.pattern] = 'none';
           }
         });
       }
@@ -155,33 +155,33 @@ export default {
       this.loading = false;
     },
 
-    async savePermission(repositoryId) {
+    async savePermission(pattern) {
       if (!this.username || this.readonly) {
         return;
       }
 
-      this.$set(this.loadingPerms, repositoryId, true);
+      this.$set(this.loadingPerms, pattern, true);
       this.errorMessage = '';
 
-      const permission = this.repoPermissions[repositoryId];
+      const permission = this.repoPermissions[pattern];
 
       try {
         if (permission === 'read' || permission === 'write') {
-          await this.$axios.$put(`/repositories/${repositoryId}/permissions/${this.username}`, {
+          await this.$axios.$put(`/repositories/${pattern}/permissions/${this.username}`, {
             readonly: permission !== 'write',
           });
         } else {
-          await this.$axios.$delete(`/repositories/${repositoryId}/permissions/${this.username}`);
+          await this.$axios.$delete(`/repositories/${pattern}/permissions/${this.username}`);
         }
 
         this.$emit('change');
-        this.$set(this.successfulSaves, repositoryId, true);
-        setTimeout(() => { this.$set(this.successfulSaves, repositoryId, undefined); }, 1000);
+        this.$set(this.successfulSaves, pattern, true);
+        setTimeout(() => { this.$set(this.successfulSaves, pattern, undefined); }, 1000);
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }
 
-      this.$set(this.loadingPerms, repositoryId, false);
+      this.$set(this.loadingPerms, pattern, false);
     },
 
   },

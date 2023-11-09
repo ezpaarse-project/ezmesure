@@ -291,29 +291,28 @@ exports.importInstitutions = async (ctx) => {
       ...item,
       logo: undefined,
       logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
           where: { id: spaceData.id },
           create: spaceData,
         })),
       },
+
       repositories: {
         connectOrCreate: item.repositories?.map?.((repoData) => ({
-          where: {
-            institutionId_pattern: {
-              institutionId: item.id,
-              pattern: repoData?.pattern,
-            },
-          },
+          where: { pattern: repoData.pattern },
           create: repoData,
         })),
       },
+
       sushiCredentials: {
         connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
           where: { id: sushi.id },
           create: { ...sushi, institutionId: undefined },
         })),
       },
+
       memberships: {
         connectOrCreate: item.memberships?.map?.((membership) => ({
           where: {
@@ -321,7 +320,7 @@ exports.importInstitutions = async (ctx) => {
               institutionId: membership.institutionId,
               username: membership.username,
             },
-          },
+            },
           create: { ...membership, institutionId: undefined },
         })),
       },

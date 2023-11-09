@@ -78,7 +78,7 @@ exports.updateOne = async (ctx) => {
 
   try {
     updatedSushiCredentials = await repositoriesService.update({
-      where: { id: repository.id },
+      where: { pattern: repository.pattern },
       data: body,
     });
   } catch (e) {
@@ -97,9 +97,9 @@ exports.updateOne = async (ctx) => {
 };
 
 exports.deleteOne = async (ctx) => {
-  const { repositoryId } = ctx.params;
+  const { pattern } = ctx.params;
 
-  await repositoriesService.delete({ where: { id: repositoryId } });
+  await repositoriesService.delete({ where: { pattern } });
 
   ctx.status = 204;
 };
@@ -111,13 +111,13 @@ exports.upsertPermission = async (ctx) => {
   const { value: body } = permissionUpsertSchema.validate({
     ...ctx.request.body,
     institutionId: repository.institutionId,
-    repositoryId: repository.id,
+    pattern: repository.pattern,
     username,
   });
 
   const permissionData = {
     ...body,
-    repository: { connect: { id: repository.id } },
+    repository: { connect: { pattern: repository.pattern } },
     membership: {
       connect: {
         username_institutionId: {
@@ -130,9 +130,9 @@ exports.upsertPermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.upsert({
     where: {
-      username_repositoryId: {
+      username_pattern: {
         username,
-        repositoryId: repository.id,
+        pattern: repository.pattern,
       },
     },
     create: permissionData,
@@ -149,9 +149,9 @@ exports.deletePermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.delete({
     where: {
-      username_repositoryId: {
+      username_pattern: {
         username,
-        repositoryId: repository.id,
+        pattern: repository.pattern,
       },
     },
   });
