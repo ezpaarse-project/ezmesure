@@ -12,27 +12,27 @@ async function createRepositoryAsAdmin(data) {
     },
     data,
   });
-  return res?.data?.id;
+  return res?.data?.pattern;
 }
 
-async function deleteRepositoryAsAdmin(repositoryId) {
+async function deleteRepositoryAsAdmin(pattern) {
   const adminToken = await getAdminToken();
 
   return ezmesure({
     method: 'DELETE',
-    url: `/repositories/${repositoryId}`,
+    url: `/repositories/${pattern}`,
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
   });
 }
 
-async function addPermissionToRepositoryAsAdmin(repositoryId, username, permissions) {
+async function addPermissionToRepositoryAsAdmin(pattern, username, permissions) {
   const adminToken = await getAdminToken();
 
   return ezmesure({
     method: 'PUT',
-    url: `/repositories/${repositoryId}/permissions/${username}`,
+    url: `/repositories/${pattern}/permissions/${username}`,
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
@@ -40,12 +40,12 @@ async function addPermissionToRepositoryAsAdmin(repositoryId, username, permissi
   });
 }
 
-async function deletePermissionToRepositoryAsAdmin(repositoryId, username) {
+async function deletePermissionToRepositoryAsAdmin(pattern, username) {
   const adminToken = await getAdminToken();
 
   return ezmesure({
     method: 'DELETE',
-    url: `/repositories/${repositoryId}/permissions/${username}`,
+    url: `/repositories/${pattern}/permissions/${username}`,
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },

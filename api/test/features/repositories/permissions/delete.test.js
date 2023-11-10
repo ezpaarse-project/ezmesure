@@ -40,7 +40,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -48,10 +48,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -61,13 +61,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should delete permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -89,13 +89,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -135,7 +135,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -143,10 +143,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -156,13 +156,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should delete permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
@@ -174,7 +174,7 @@ describe('[repository permission]: Test delete features', () => {
           it('Should get HTTP status 404', async () => {
             const res = await ezmesure({
               method: 'GET',
-              url: `/repositories/${repositoryId}`,
+              url: `/repositories/${pattern}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -185,13 +185,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -207,7 +207,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -215,10 +215,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -228,13 +228,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 403', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
@@ -246,7 +246,7 @@ describe('[repository permission]: Test delete features', () => {
           it('Should get permission of repository', async () => {
             const res = await ezmesure({
               method: 'GET',
-              url: `/repositories/${repositoryId}`,
+              url: `/repositories/${pattern}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -257,13 +257,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -297,7 +297,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -305,10 +305,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -318,13 +318,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 403', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${userManagerToken}`,
               },
@@ -336,7 +336,7 @@ describe('[repository permission]: Test delete features', () => {
           it('Should get permission of repository', async () => {
             const res = await ezmesure({
               method: 'GET',
-              url: `/repositories/${repositoryId}`,
+              url: `/repositories/${pattern}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -347,13 +347,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -372,7 +372,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -380,10 +380,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -393,13 +393,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 401', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
               headers: {
                 Authorization: 'Bearer: random',
               },
@@ -411,7 +411,7 @@ describe('[repository permission]: Test delete features', () => {
           it('Should get permission of repository', async () => {
             const res = await ezmesure({
               method: 'GET',
-              url: `/repositories/${repositoryId}`,
+              url: `/repositories/${pattern}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -421,13 +421,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -445,7 +445,7 @@ describe('[repository permission]: Test delete features', () => {
       });
       describe('Repository publisher', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -453,10 +453,10 @@ describe('[repository permission]: Test delete features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
+        describe('DELETE /repositories/<pattern>/permissions/<username> - delete permission to [user.test] user', () => {
           let userTest;
           const permissionTest = {
             readonly: true,
@@ -466,13 +466,13 @@ describe('[repository permission]: Test delete features', () => {
           beforeAll(async () => {
             userTest = await createDefaultActivatedUserAsAdmin();
             await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await addPermissionToRepositoryAsAdmin(pattern, userTest.username, permissionTest);
           });
 
           it('Should get HTTP status 401', async () => {
             const res = await ezmesure({
               method: 'DELETE',
-              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              url: `/repositories/${pattern}/permissions/${userTest.username}`,
             });
 
             expect(res).toHaveProperty('status', 401);
@@ -481,7 +481,7 @@ describe('[repository permission]: Test delete features', () => {
           it('Should get permission of repository', async () => {
             const res = await ezmesure({
               method: 'GET',
-              url: `/repositories/${repositoryId}`,
+              url: `/repositories/${pattern}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
@@ -491,13 +491,13 @@ describe('[repository permission]: Test delete features', () => {
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
+            await deletePermissionToRepositoryAsAdmin(pattern, userTest.username);
             await deleteUserAsAdmin(userTest.username);
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 

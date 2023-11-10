@@ -25,8 +25,8 @@ describe('[repositories]: Test update features', () => {
         institutionId = await createInstitutionAsAdmin(institutionTest);
         await validateInstitutionAsAdmin(institutionId);
       });
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryId;
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+        let pattern;
         let repositoryConfig;
         const updateRepositoryConfig = {
           pattern: 'update-ezpaarse-*',
@@ -39,13 +39,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'ezpaarse-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should Update repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -65,13 +65,13 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(updateRepositoryConfig?.pattern);
         });
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [COUNTER 5] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [COUNTER 5] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         const updateRepositoryConfig = {
           pattern: 'update-ezpaarse-*',
           type: 'update-ezPAARSE',
@@ -84,13 +84,13 @@ describe('[repositories]: Test update features', () => {
             pattern: 'publisher-*',
           };
 
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should Update repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -110,13 +110,13 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(updateRepositoryConfig?.pattern);
         });
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [random] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [random] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         const updateRepositoryConfig = {
           pattern: 'update-ezpaarse-*',
           type: 'update-ezPAARSE',
@@ -128,13 +128,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'random-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should Update repository of type [random] and pattern [random-*]', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
@@ -154,7 +154,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(updateRepositoryConfig?.pattern);
         });
       });
 
@@ -179,9 +179,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           repositoryConfig = {
@@ -189,13 +189,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 403', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
@@ -209,7 +209,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {
@@ -224,9 +224,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           repositoryConfig = {
@@ -234,13 +234,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 403', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
@@ -254,7 +254,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
 
@@ -277,9 +277,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           userTest = await createDefaultActivatedUserAsAdmin();
@@ -288,13 +288,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 401', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             data: {
               type: 'update-ezPAARSE',
               pattern: 'update-publisher-*',
@@ -308,7 +308,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {
@@ -325,9 +325,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           repositoryConfig = {
@@ -335,13 +335,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 401', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             data: {
               type: 'update-ezPAARSE',
               pattern: 'update-publisher-*',
@@ -355,7 +355,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {
@@ -374,9 +374,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           userTest = await createDefaultActivatedUserAsAdmin();
@@ -385,13 +385,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 401', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             data: {
               type: 'update-ezPAARSE',
               pattern: 'update-publisher-*',
@@ -402,7 +402,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {
@@ -419,9 +419,9 @@ describe('[repositories]: Test update features', () => {
         await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe('PATCH /repositories/<pattern> - Update repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
 
         beforeAll(async () => {
           repositoryConfig = {
@@ -429,13 +429,13 @@ describe('[repositories]: Test update features', () => {
             institutionId,
             pattern: 'publisher-*',
           };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          pattern = await createRepositoryAsAdmin(repositoryConfig);
         });
 
         it('Should get HTTP status 401', async () => {
           const res = await ezmesure({
             method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
+            url: `/repositories/${pattern}`,
             data: {
               type: 'update-ezPAARSE',
               pattern: 'update-publisher-*',
@@ -446,7 +446,7 @@ describe('[repositories]: Test update features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {

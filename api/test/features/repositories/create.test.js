@@ -33,7 +33,7 @@ describe('[repositories]: Test create features', () => {
 
       describe('POST /repositories - Create new repository of type [ezPAARSE] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let repositoryPattern;
 
         beforeAll(async () => {
           repositoryConfig = {
@@ -56,9 +56,10 @@ describe('[repositories]: Test create features', () => {
           expect(res).toHaveProperty('status', 201);
 
           const repository = res?.data;
-          repositoryId = repository?.id;
-          expect(repositoryId).not.toBeNull();
-          expect(repository?.id).not.toBeNull();
+          expect(repository?.pattern).not.toBeNull();
+
+          repositoryPattern = repository?.pattern;
+
           expect(repository).toHaveProperty('institutionId', institutionId);
           expect(repository?.createdAt).not.toBeNull();
           expect(repository?.updatedAt).not.toBeNull();
@@ -66,14 +67,32 @@ describe('[repositories]: Test create features', () => {
           expect(repository).toHaveProperty('type', repositoryConfig.type);
         });
 
+        it('Should get repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
+          const res = await ezmesure({
+            method: 'GET',
+            url: `/repositories/${repositoryPattern}`,
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
+
+          expect(res).toHaveProperty('status', 200);
+
+          const repository = res?.data;
+          expect(repository).toHaveProperty('pattern', repositoryPattern);
+          expect(repository).toHaveProperty('institutionId', institutionId);
+          expect(repository?.createdAt).not.toBeNull();
+          expect(repository?.updatedAt).not.toBeNull();
+          expect(repository).toHaveProperty('type', repositoryConfig.type);
+        });
+
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(repositoryConfig.pattern);
         });
       });
 
       describe('POST /repositories - Create new repository of type [COUNTER 5] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'COUNTER 5',
@@ -95,8 +114,6 @@ describe('[repositories]: Test create features', () => {
           expect(res).toHaveProperty('status', 201);
 
           const repository = res?.data;
-          repositoryId = repository?.id;
-          expect(repositoryId).not.toBeNull();
           expect(repository).toHaveProperty('institutionId', institutionId);
           expect(repository?.createdAt).not.toBeNull();
           expect(repository?.updatedAt).not.toBeNull();
@@ -105,13 +122,13 @@ describe('[repositories]: Test create features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(repositoryConfig.pattern);
         });
       });
 
       describe('POST /repositories - Create new repository of type [random] for [Test] institution', () => {
         let repositoryConfig;
-        let repositoryId;
+        let pattern;
         beforeAll(async () => {
           repositoryConfig = {
             type: 'random',
@@ -133,8 +150,8 @@ describe('[repositories]: Test create features', () => {
           expect(res).toHaveProperty('status', 201);
 
           const repository = res?.data;
-          repositoryId = repository?.id;
-          expect(repositoryId).not.toBeNull();
+          pattern = repository?.id;
+          expect(pattern).not.toBeNull();
           expect(repository?.id).not.toBeNull();
           expect(repository).toHaveProperty('institutionId', institutionId);
           expect(repository?.createdAt).not.toBeNull();
@@ -144,7 +161,7 @@ describe('[repositories]: Test create features', () => {
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await deleteRepositoryAsAdmin(pattern);
         });
       });
       afterAll(async () => {
