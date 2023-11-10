@@ -1,5 +1,5 @@
 // @ts-check
-const hooks = require('../hooks');
+const hooks = require('../hooks/hookEmitter');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */

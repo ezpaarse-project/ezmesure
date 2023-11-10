@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const hooks = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SpacePermission} SpacePermission */
