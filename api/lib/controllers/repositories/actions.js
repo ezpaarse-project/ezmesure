@@ -74,11 +74,11 @@ exports.updateOne = async (ctx) => {
   const { repository } = ctx.state;
   const { body } = ctx.request;
 
-  let updatedSushiCredentials;
+  let updatedRepository;
 
   try {
-    updatedSushiCredentials = await repositoriesService.update({
-      where: { id: repository.id },
+    updatedRepository = await repositoriesService.update({
+      where: { pattern: repository.pattern },
       data: body,
     });
   } catch (e) {
@@ -89,17 +89,19 @@ exports.updateOne = async (ctx) => {
           break;
         default:
       }
+    } else {
+      throw e;
     }
   }
 
   ctx.status = 200;
-  ctx.body = updatedSushiCredentials;
+  ctx.body = updatedRepository;
 };
 
 exports.deleteOne = async (ctx) => {
-  const { repositoryId } = ctx.params;
+  const { pattern } = ctx.params;
 
-  await repositoriesService.delete({ where: { id: repositoryId } });
+  await repositoriesService.delete({ where: { pattern } });
 
   ctx.status = 204;
 };
@@ -111,13 +113,13 @@ exports.upsertPermission = async (ctx) => {
   const { value: body } = permissionUpsertSchema.validate({
     ...ctx.request.body,
     institutionId: repository.institutionId,
-    repositoryId: repository.id,
+    pattern: repository.pattern,
     username,
   });
 
   const permissionData = {
     ...body,
-    repository: { connect: { id: repository.id } },
+    repository: { connect: { pattern: repository.pattern } },
     membership: {
       connect: {
         username_institutionId: {
@@ -130,9 +132,9 @@ exports.upsertPermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.upsert({
     where: {
-      username_repositoryId: {
+      username_repositoryPattern: {
         username,
-        repositoryId: repository.id,
+        repositoryPattern: repository.pattern,
       },
     },
     create: permissionData,
@@ -149,9 +151,9 @@ exports.deletePermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.delete({
     where: {
-      username_repositoryId: {
+      username_repositoryPattern: {
         username,
-        repositoryId: repository.id,
+        repositoryPattern: repository.pattern,
       },
     },
   });

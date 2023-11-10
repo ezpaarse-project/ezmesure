@@ -291,38 +291,68 @@ exports.importInstitutions = async (ctx) => {
       ...item,
       logo: undefined,
       logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
           where: { id: spaceData.id },
           create: spaceData,
         })),
       },
+
       repositories: {
         connectOrCreate: item.repositories?.map?.((repoData) => ({
-          where: {
-            institutionId_pattern: {
-              institutionId: item.id,
-              pattern: repoData?.pattern,
-            },
-          },
+          where: { pattern: repoData.pattern },
           create: repoData,
         })),
       },
+
       sushiCredentials: {
         connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
           where: { id: sushi.id },
           create: { ...sushi, institutionId: undefined },
         })),
       },
+
       memberships: {
         connectOrCreate: item.memberships?.map?.((membership) => ({
           where: {
             username_institutionId: {
-              institutionId: membership.institutionId,
-              username: membership.username,
+              institutionId: item.id,
+              username: membership?.username,
             },
           },
-          create: { ...membership, institutionId: undefined },
+          create: {
+            ...(membership ?? {}),
+            username: undefined,
+
+            user: {
+              connect: { username: membership?.username },
+            },
+
+            spacePermissions: {
+              connectOrCreate: membership?.spacePermissions?.map?.((perm) => ({
+                where: {
+                  username_spaceId: {
+                    username: membership?.username,
+                    spaceId: perm?.spaceId,
+                  },
+                },
+                create: perm,
+              })),
+            },
+
+            repositoryPermissions: {
+              connectOrCreate: membership?.repositoryPermissions?.map?.((perm) => ({
+                where: {
+                  username_repositoryPattern: {
+                    username: membership?.username,
+                    repositoryPattern: perm?.repositoryPattern,
+                  },
+                },
+                create: perm,
+              })),
+            },
+          },
         })),
       },
     };

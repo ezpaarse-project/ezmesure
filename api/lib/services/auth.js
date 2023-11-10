@@ -123,6 +123,7 @@ function fetchModel(modelName, opts = {}) {
         break;
 
       case 'repository':
+        findOptions.where = { pattern: modelId };
         item = modelId && await RepositoriesService.findUnique(findOptions);
         break;
 
@@ -217,6 +218,6 @@ module.exports = {
   fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
-  fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'repositoryId', ...opts }),
+  fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'pattern', ...opts }),
   fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };
