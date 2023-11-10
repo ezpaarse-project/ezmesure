@@ -234,7 +234,7 @@ export default {
 
       try {
         await this.$axios.$delete(`/repositories/${pattern}`);
-        this.repositories = this.repositories.filter((r) => r?.id !== pattern);
+        this.repositories = this.repositories.filter((r) => r?.pattern !== pattern);
         this.onChange();
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
