@@ -112,15 +112,14 @@ A space permission (access rights of a member for a specific space)
 
 A repository (a section of elasticsearch allocated to an institution)
 
-| Property    | Type                     | Description                                      | Attributes | Default  |
-|-------------|--------------------------|--------------------------------------------------|------------|----------|
-| id          | `String`                 | ID of the repository                             | Id         | `cuid()` |
-| institution | `Institution?`           | The institution this repository is associated to |            |          |
-| createdAt   | `DateTime`               | Creation date                                    |            | `now()`  |
-| updatedAt   | `DateTime`               | Latest update date                               |            |          |
-| pattern     | `String`                 | The index pattern (ex: b-bibcnrs*)               |            |          |
-| type        | `String`                 | The repository type (ezpaarse, counter5)         |            |          |
-| permissions | `RepositoryPermission[]` | Member permissions associated to this repository |            |          |
+| Property    | Type                     | Description                                      | Attributes | Default |
+|-------------|--------------------------|--------------------------------------------------|------------|---------|
+| institution | `Institution?`           | The institution this repository is associated to |            |         |
+| createdAt   | `DateTime`               | Creation date                                    |            | `now()` |
+| updatedAt   | `DateTime`               | Latest update date                               |            |         |
+| pattern     | `String`                 | The index pattern (ex: b-bibcnrs*)               | Id         |         |
+| type        | `String`                 | The repository type (ezpaarse, counter5)         |            |         |
+| permissions | `RepositoryPermission[]` | Member permissions associated to this repository |            |         |
 
 ### RepositoryPermission
 
