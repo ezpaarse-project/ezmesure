@@ -74,10 +74,10 @@ exports.updateOne = async (ctx) => {
   const { repository } = ctx.state;
   const { body } = ctx.request;
 
-  let updatedSushiCredentials;
+  let updatedRepository;
 
   try {
-    updatedSushiCredentials = await repositoriesService.update({
+    updatedRepository = await repositoriesService.update({
       where: { pattern: repository.pattern },
       data: body,
     });
@@ -89,11 +89,13 @@ exports.updateOne = async (ctx) => {
           break;
         default:
       }
+    } else {
+      throw e;
     }
   }
 
   ctx.status = 200;
-  ctx.body = updatedSushiCredentials;
+  ctx.body = updatedRepository;
 };
 
 exports.deleteOne = async (ctx) => {
@@ -130,9 +132,9 @@ exports.upsertPermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.upsert({
     where: {
-      username_pattern: {
+      username_repositoryPattern: {
         username,
-        pattern: repository.pattern,
+        repositoryPattern: repository.pattern,
       },
     },
     create: permissionData,
@@ -149,9 +151,9 @@ exports.deletePermission = async (ctx) => {
 
   const updatedPermissions = await repoPermissionsService.delete({
     where: {
-      username_pattern: {
+      username_repositoryPattern: {
         username,
-        pattern: repository.pattern,
+        repositoryPattern: repository.pattern,
       },
     },
   });
