@@ -13,7 +13,7 @@ const {
 } = require('../../hooks/utils');
 const { execThrottledPromises } = require('../promises');
 
-const { upsertRole } = require('../elastic/roles');
+const { upsertRole, deleteRole } = require('../elastic/roles');
 const { getUserByUsername, upsertUser } = require('../elastic/users');
 
 const { syncSchedule } = config.get('elasticsearch');
@@ -21,29 +21,65 @@ const { syncSchedule } = config.get('elasticsearch');
 /**
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
+ * @typedef {import('@prisma/client').Repository} Repository
  */
 
 /**
+ * Remove roles associated to a repository
+ * @param {Repository} repo - The repository to unmount
+ * @returns {Promise<void>}
+ */
+const unmountRepository = async (repo) => {
+  const readOnlyRole = generateRoleNameFromRepository(repo, 'readonly');
+  const allRole = generateRoleNameFromRepository(repo, 'all');
+
+  try {
+    await deleteRole(readOnlyRole);
+    appLogger.verbose(`[elastic] Role [${readOnlyRole}] has been deleted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
+  }
+
+  try {
+    await deleteRole(allRole);
+    appLogger.verbose(`[elastic] Role [${allRole}] has been deleted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Role [${allRole}] cannot be deleted:\n${error}`);
+  }
+};
+
+/**
+ * Synchronize a repository with Elasticsearch, making sure that associated roles exists
+ * @param {Repository} repo - The repository to sync
+ * @returns {Promise<void>}
+ */
+const syncRepository = async (repo) => {
+  const readOnlyRole = generateRoleNameFromRepository(repo, 'readonly');
+  const allRole = generateRoleNameFromRepository(repo, 'all');
+
+  try {
+    await upsertRole(readOnlyRole, [repo.pattern], ['read', 'view_index_metadata']);
+    appLogger.verbose(`[elastic] Role [${readOnlyRole}] has been upserted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Role [${readOnlyRole}] cannot be upserted:\n${error}`);
+  }
+
+  try {
+    await upsertRole(allRole, [repo.pattern], ['all']);
+    appLogger.verbose(`[elastic] Role [${allRole}] has been upserted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Role [${allRole}] cannot be upserted:\n${error}`);
+  }
+};
+
+/**
  * Sync Elastic's roles to ezMESURE's repositories
+ * @returns {Promise<void>}
  */
 const syncRepositories = async () => {
   const repositories = await RepositoriesService.findMany({});
 
-  const executors = repositories.map(
-    (repo) => async () => {
-      await upsertRole(
-        generateRoleNameFromRepository(repo, 'readonly'),
-        [repo.pattern],
-        ['read'],
-      );
-
-      await upsertRole(
-        generateRoleNameFromRepository(repo, 'all'),
-        [repo.pattern],
-        ['all'],
-      );
-    },
-  );
+  const executors = repositories.map((repo) => () => syncRepository(repo));
 
   const res = await execThrottledPromises(
     executors,
@@ -118,4 +154,8 @@ const startCron = async () => {
 module.exports = {
   startCron,
   sync,
+  syncRepository,
+  syncRepositories,
+  syncMemberships,
+  unmountRepository,
 };
