@@ -9,7 +9,7 @@ const UsersService = require('../../entities/users.service');
 
 const {
   generateRoleNameFromRepository,
-  generateRolesOfMembership,
+  generateUserRoles,
 } = require('../../hooks/utils');
 const { execThrottledPromises } = require('../promises');
 
@@ -105,7 +105,7 @@ const syncMemberships = async () => {
         }
       }
 
-      const roles = await generateRolesOfMembership(member.username, member.institutionId);
+      const roles = await generateUserRoles(member.username);
 
       await upsertUser({
         username: user.username,

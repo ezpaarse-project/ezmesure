@@ -5,7 +5,7 @@ const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
 
-const { generateRolesOfMembership } = require('../utils');
+const { generateUserRoles } = require('../utils');
 
 /**
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
@@ -26,7 +26,7 @@ const onSpacePermissionModified = async (permission) => {
     return;
   }
 
-  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
+  const roles = await generateUserRoles(permission.username);
   try {
     await elasticUsers.updateUser({
       username: permission.username,
