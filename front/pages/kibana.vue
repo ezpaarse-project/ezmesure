@@ -16,7 +16,7 @@
       <i18n path="kibana.whatDoesUsername.text" tag="p">
         <template #accountLink>
           <!-- TODO: use logged user to generate url -->
-          <a href="/kibana/app/kibana#/account">{{ $t('kibana.whatDoesUsername.accountLink') }}</a>
+          <a :href="changePasswordUrl">{{ $t('kibana.whatDoesUsername.accountLink') }}</a>
         </template>
       </i18n>
 
@@ -119,6 +119,13 @@ export default {
   },
   computed: {
     user() { return this.$auth.user; },
+    changePasswordUrl() {
+      const firstSpace = this.user?.memberships?.at(0)?.spacePermissions?.at(0);
+      if (firstSpace) {
+        return `/kibana/s/${firstSpace.spaceId}/security/account`;
+      }
+      return '/kibana/';
+    },
     nbSelectedFiles() { return this.selectedFiles.length; },
   },
   methods: {
