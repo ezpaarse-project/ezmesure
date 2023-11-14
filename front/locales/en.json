@@ -410,6 +410,10 @@
     "count": "{count} components",
     "noComponent": "No components"
   },
+  "group": {
+    "group": "Grouped by",
+    "noGroup": "No group"
+  },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
