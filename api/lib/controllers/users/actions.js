@@ -138,7 +138,7 @@ exports.importUsers = async (ctx) => {
       });
 
       if (user && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.user.import.alreadyExists', user.id));
+        addResponseItem(item, 'conflict', ctx.$t('errors.user.import.alreadyExists', user.username));
         return;
       }
     }

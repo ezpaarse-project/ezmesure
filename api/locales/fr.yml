@@ -30,6 +30,9 @@ errors:
   sushi-endpoint:
     notFound: Point d'accès introuvable
 
+    import:
+      alreadyExists: Le point d'accès [%s] existe déjà
+
   sushi:
     unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
     institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
@@ -69,6 +72,9 @@ errors:
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
+    import:
+      alreadyExists: L'établissement [%s] existe déjà
+
   member:
     notFound: Membre introuvable
 
@@ -84,6 +90,9 @@ errors:
     noEmail: L'email obligatoire est absent du profil utilisateur
     failedToSave: Impossible de sauvegarder les données utilisateur
     failedToUpdateRoles: Impossible de mettre à jour les rôles de l'utilisateur
+
+    import:
+      alreadyExists: Ce compte [%s] existe déjà
 
   users:
     failedToQuery: Impossible de récupérer les utilisateurs
