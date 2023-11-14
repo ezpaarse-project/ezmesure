@@ -89,31 +89,37 @@ const syncRepositories = async () => {
 };
 
 /**
+ * Sync an Elasticsearch user with a given membership
+ */
+const syncMembership = async (membership) => {
+  /** @type {ElasticUser | User | null} */
+  let user = await getUserByUsername(membership.username);
+
+  if (!user) {
+    user = await UsersService.findUnique({ where: { username: membership.username } });
+    if (!user) {
+      throw new Error(`User [${membership.username}] doesn't exist, but have repository permissions`);
+    }
+  }
+
+  const roles = await generateUserRoles(membership.username);
+
+  await upsertUser({
+    username: user.username,
+    email: user.email,
+    fullName: 'fullName' in user ? user.fullName : user.full_name,
+    roles,
+  });
+};
+
+/**
  * Sync Elastic's users' roles to ezMESURE's memberships
  */
 const syncMemberships = async () => {
   const memberships = await MembershipsService.findMany({});
 
   const executors = memberships.map(
-    (member) => async () => {
-      /** @type {ElasticUser | User | null} */
-      let user = await getUserByUsername(member.username);
-      if (!user) {
-        user = await UsersService.findUnique({ where: { username: member.username } });
-        if (!user) {
-          throw new Error(`User [${member.username}] doesn't exist, but have repository permissions`);
-        }
-      }
-
-      const roles = await generateUserRoles(member.username);
-
-      await upsertUser({
-        username: user.username,
-        email: user.email,
-        fullName: 'fullName' in user ? user.fullName : user.full_name,
-        roles,
-      });
-    },
+    (membership) => async () => syncMembership(membership),
   );
 
   const res = await execThrottledPromises(
@@ -156,6 +162,7 @@ module.exports = {
   sync,
   syncRepository,
   syncRepositories,
+  syncMembership,
   syncMemberships,
   unmountRepository,
 };
