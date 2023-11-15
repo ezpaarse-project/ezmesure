@@ -40,7 +40,12 @@ const onSpacePermissionModified = async (permission) => {
   }
 };
 
-registerHook('space_permission:create', onSpacePermissionModified);
-registerHook('space_permission:update', onSpacePermissionModified);
-registerHook('space_permission:upsert', onSpacePermissionModified);
-registerHook('space_permission:delete', onSpacePermissionModified);
+/**
+ * @param { SpacePermission } permission
+ */
+const uniqueResolver = (permission) => `${permission.username}_${permission.spaceId}`;
+
+registerHook('space_permission:create', onSpacePermissionModified, { debounce: true, uniqueResolver });
+registerHook('space_permission:update', onSpacePermissionModified, { debounce: true, uniqueResolver });
+registerHook('space_permission:upsert', onSpacePermissionModified, { debounce: true, uniqueResolver });
+registerHook('space_permission:delete', onSpacePermissionModified, { debounce: true, uniqueResolver });

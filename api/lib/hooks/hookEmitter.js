@@ -1,6 +1,6 @@
 const EventEmitter = require('node:events');
 
-const { debounce } = require('lodash');
+const { memoize, debounce } = require('lodash');
 const { appLogger } = require('../services/logger');
 
 /**
@@ -43,6 +43,11 @@ const createQueue = () => {
   };
 };
 
+const memoizeDebounce = (func, wait = 0, options = {}) => {
+  const mem = memoize(() => debounce(func, wait, options));
+  return (key, payload) => mem(key)(payload);
+};
+
 const hookEmitter = new EventEmitter();
 
 /**
@@ -63,24 +68,35 @@ const triggerHooks = (event, payload) => {
  *
  * @param {string} event The event name
  * @param {(payload: any) => void} handler The handled of the hook
- * @param {{ debounce?: boolean, queue?: boolean }} opts Options of the hook
+ * @param {Object} opts Options of the hook
+ * @param {boolean} [opts.debounce] Should the hook be debounced
+ * @param {(payload) => string | number} [opts.uniqueResolver]
+ * @param {boolean} [opts.queue] Should the hook be queued
  *
  * @returns Returns a reference to the EventEmitter
  */
 const registerHook = (event, handler, opts = { debounce: true }) => {
-  let fnc = handler;
+  let fnc = (key, payload) => handler(payload);
 
   if (opts.debounce) {
-    fnc = debounce(handler);
+    fnc = memoizeDebounce(handler, 250, {});
   }
 
   if (opts.queue) {
     const queued = createQueue();
-    fnc = queued(handler);
+    fnc = (key, payload) => queued(handler)(payload);
   }
 
+  const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload.id);
+
   appLogger.verbose(`[hooks] "${event}" registered with options "${JSON.stringify(opts)}"`);
-  return hookEmitter.on(event, fnc);
+  return hookEmitter.on(
+    event,
+    (payload) => {
+      const key = uniqueResolver(payload);
+      return fnc(key, payload);
+    },
+  );
 };
 
 module.exports = {

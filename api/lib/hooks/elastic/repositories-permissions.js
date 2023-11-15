@@ -40,7 +40,12 @@ const onRepositoryPermissionModified = async (permission) => {
   }
 };
 
-registerHook('repository_permission:create', onRepositoryPermissionModified);
-registerHook('repository_permission:update', onRepositoryPermissionModified);
-registerHook('repository_permission:upsert', onRepositoryPermissionModified);
-registerHook('repository_permission:delete', onRepositoryPermissionModified);
+/**
+ * @param { RepositoryPermission } permission
+ */
+const uniqueResolver = (permission) => `${permission.username}_${permission.repositoryPattern}`;
+
+registerHook('repository_permission:create', onRepositoryPermissionModified, { debounce: true, uniqueResolver });
+registerHook('repository_permission:update', onRepositoryPermissionModified, { debounce: true, uniqueResolver });
+registerHook('repository_permission:upsert', onRepositoryPermissionModified, { debounce: true, uniqueResolver });
+registerHook('repository_permission:delete', onRepositoryPermissionModified, { debounce: true, uniqueResolver });

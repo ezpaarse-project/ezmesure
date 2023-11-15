@@ -41,12 +41,12 @@ const onMembershipUpsert = async (membership) => {
   }
 };
 
-registerHook('membership:create', onMembershipUpsert);
-registerHook('membership:update', onMembershipUpsert);
-registerHook('membership:upsert', onMembershipUpsert);
-registerHook('membership:delete', onMembershipDelete);
+/**
+ * @param { Membership } membership
+ */
+const uniqueResolver = (membership) => `${membership.username}_${membership.institutionId}`;
 
-module.exports = {
-  onMembershipUpsert,
-  onMembershipDelete,
-};
+registerHook('membership:create', onMembershipUpsert, { debounce: true, uniqueResolver });
+registerHook('membership:update', onMembershipUpsert, { debounce: true, uniqueResolver });
+registerHook('membership:upsert', onMembershipUpsert, { debounce: true, uniqueResolver });
+registerHook('membership:delete', onMembershipDelete, { debounce: true, uniqueResolver });

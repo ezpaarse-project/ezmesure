@@ -38,7 +38,12 @@ const onRepositoryDelete = async (repository) => {
   }
 };
 
-registerHook('repository:create', onRepositoryUpsert);
-registerHook('repository:update', onRepositoryUpsert);
-registerHook('repository:upsert', onRepositoryUpsert);
-registerHook('repository:delete', onRepositoryDelete);
+/**
+ * @param { Repository } repository
+ */
+const uniqueResolver = (repository) => repository.pattern;
+
+registerHook('repository:create', onRepositoryUpsert, { debounce: true, uniqueResolver });
+registerHook('repository:update', onRepositoryUpsert, { debounce: true, uniqueResolver });
+registerHook('repository:upsert', onRepositoryUpsert, { debounce: true, uniqueResolver });
+registerHook('repository:delete', onRepositoryDelete, { debounce: true, uniqueResolver });
