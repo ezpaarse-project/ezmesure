@@ -75,10 +75,10 @@ const triggerHooks = (event, payload) => {
  *
  * @returns Returns a reference to the EventEmitter
  */
-const registerHook = (event, handler, opts = { debounce: true }) => {
+const registerHook = (event, handler, opts = {}) => {
   let fnc = (key, payload) => handler(payload);
 
-  if (opts.debounce) {
+  if (opts.debounce !== false) {
     fnc = memoizeDebounce(handler, 250, {});
   }
 

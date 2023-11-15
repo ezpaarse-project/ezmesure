@@ -84,8 +84,3 @@ registerHook('institution:create', onInstitutionUpsert);
 registerHook('institution:update', onInstitutionUpsert);
 registerHook('institution:upsert', onInstitutionUpsert);
 registerHook('institution:delete', onInstitutionDelete);
-
-module.exports = {
-  onInstitutionUpsert,
-  onInstitutionDelete,
-};

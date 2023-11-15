@@ -94,16 +94,10 @@ const onUserUpsert = async (user) => {
   }
 };
 
-registerHook('user:create-admin', onAdminUserCreate);
-registerHook('user:create', onUserCreate);
-registerHook('user:update', onUserUpdate);
-registerHook('user:upsert', onUserUpsert);
-registerHook('user:delete', onUserDelete);
+const hookOptions = { uniqueResolver: (user) => user.username };
 
-module.exports = {
-  onAdminUserCreate,
-  onUserCreate,
-  onUserUpdate,
-  onUserUpsert,
-  onUserDelete,
-};
+registerHook('user:create-admin', onAdminUserCreate, hookOptions);
+registerHook('user:create', onUserCreate, hookOptions);
+registerHook('user:update', onUserUpdate, hookOptions);
+registerHook('user:upsert', onUserUpsert, hookOptions);
+registerHook('user:delete', onUserDelete, hookOptions);

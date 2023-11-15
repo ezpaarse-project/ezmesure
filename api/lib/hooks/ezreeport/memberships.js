@@ -41,12 +41,9 @@ const onMembershipUpsert = async (membership) => {
   }
 };
 
-/**
- * @param { Membership } membership
- */
-const uniqueResolver = (membership) => `${membership.username}_${membership.institutionId}`;
+const hookOptions = { uniqueResolver: (membership) => `${membership.username}_${membership.institutionId}` };
 
-registerHook('membership:create', onMembershipUpsert, { debounce: true, uniqueResolver });
-registerHook('membership:update', onMembershipUpsert, { debounce: true, uniqueResolver });
-registerHook('membership:upsert', onMembershipUpsert, { debounce: true, uniqueResolver });
-registerHook('membership:delete', onMembershipDelete, { debounce: true, uniqueResolver });
+registerHook('membership:create', onMembershipUpsert, hookOptions);
+registerHook('membership:update', onMembershipUpsert, hookOptions);
+registerHook('membership:upsert', onMembershipUpsert, hookOptions);
+registerHook('membership:delete', onMembershipDelete, hookOptions);

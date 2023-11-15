@@ -143,10 +143,3 @@ registerHook('space:create', onSpaceUpsert);
 registerHook('space:update', onSpaceUpsert);
 registerHook('space:upsert', onSpaceUpsert);
 registerHook('space:delete', onSpaceDelete);
-
-module.exports = {
-  onSpaceCreate,
-  onSpaceUpdate,
-  onSpaceUpsert,
-  onSpaceDelete,
-};

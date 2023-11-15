@@ -81,7 +81,3 @@ const onHarvestJobUpdate = async (harvestJob) => {
 registerHook('harvest-job:create', onHarvestJobUpdate);
 registerHook('harvest-job:update', onHarvestJobUpdate, { queue: true });
 registerHook('harvest-job:upsert', onHarvestJobUpdate);
-
-module.exports = {
-  onHarvestJobUpdate,
-};
