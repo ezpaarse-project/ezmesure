@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -139,10 +139,10 @@ const onSpaceDelete = async (space) => {
   // TODO: delete index pattern
 };
 
-hookEmitter.on('space:create', onSpaceUpsert);
-hookEmitter.on('space:update', onSpaceUpsert);
-hookEmitter.on('space:upsert', onSpaceUpsert);
-hookEmitter.on('space:delete', onSpaceDelete);
+registerHook('space:create', onSpaceUpsert);
+registerHook('space:update', onSpaceUpsert);
+registerHook('space:upsert', onSpaceUpsert);
+registerHook('space:delete', onSpaceDelete);
 
 module.exports = {
   onSpaceCreate,

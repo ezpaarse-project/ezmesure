@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma } = require('../services/prisma.service');
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /**
@@ -22,7 +22,7 @@ module.exports = class MembershipsService {
   static async create(params) {
     const membership = await prisma.membership.create(params);
 
-    hooks.emit('membership:upsert', membership);
+    triggerHooks('membership:upsert', membership);
 
     return membership;
   }
@@ -50,7 +50,7 @@ module.exports = class MembershipsService {
   static async update(params) {
     const membership = await prisma.membership.update(params);
 
-    hooks.emit('membership:upsert', membership);
+    triggerHooks('membership:upsert', membership);
 
     return membership;
   }
@@ -62,7 +62,7 @@ module.exports = class MembershipsService {
   static async upsert(params) {
     const membership = await prisma.membership.upsert(params);
 
-    hooks.emit('membership:upsert', membership);
+    triggerHooks('membership:upsert', membership);
 
     return membership;
   }
@@ -74,7 +74,7 @@ module.exports = class MembershipsService {
   static async delete(params) {
     const membership = await prisma.membership.delete(params);
 
-    hooks.emit('membership:delete', membership);
+    triggerHooks('membership:delete', membership);
 
     return membership;
   }

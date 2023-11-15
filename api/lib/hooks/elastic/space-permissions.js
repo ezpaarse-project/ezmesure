@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -40,7 +40,7 @@ const onSpacePermissionModified = async (permission) => {
   }
 };
 
-hookEmitter.on('space_permission:create', onSpacePermissionModified);
-hookEmitter.on('space_permission:update', onSpacePermissionModified);
-hookEmitter.on('space_permission:upsert', onSpacePermissionModified);
-hookEmitter.on('space_permission:delete', onSpacePermissionModified);
+registerHook('space_permission:create', onSpacePermissionModified);
+registerHook('space_permission:update', onSpacePermissionModified);
+registerHook('space_permission:upsert', onSpacePermissionModified);
+registerHook('space_permission:delete', onSpacePermissionModified);

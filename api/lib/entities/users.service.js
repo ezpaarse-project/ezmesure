@@ -2,7 +2,7 @@
 const config = require('config');
 const elasticUsers = require('../services/elastic/users');
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 const {
   MEMBER_ROLES: {
@@ -45,7 +45,7 @@ module.exports = class UsersService {
       create: adminData,
     });
 
-    hooks.emit('user:create-admin', admin);
+    triggerHooks('user:create-admin', admin);
 
     return admin;
   }
@@ -56,7 +56,7 @@ module.exports = class UsersService {
    */
   static async create(params) {
     const user = await prisma.user.create(params);
-    hooks.emit('user:create', user);
+    triggerHooks('user:create', user);
     return user;
   }
 
@@ -103,7 +103,7 @@ module.exports = class UsersService {
   static async update(params) {
     // TODO manage role
     const user = await prisma.user.update(params);
-    hooks.emit('user:update', user);
+    triggerHooks('user:update', user);
     return user;
   }
 
@@ -128,7 +128,7 @@ module.exports = class UsersService {
    */
   static async upsert(params) {
     const user = await prisma.user.upsert(params);
-    hooks.emit('user:upsert', user);
+    triggerHooks('user:upsert', user);
     return user;
   }
 
@@ -148,7 +148,7 @@ module.exports = class UsersService {
       throw error;
     }
 
-    hooks.emit('user:delete', user);
+    triggerHooks('user:delete', user);
 
     return user;
   }

@@ -1,5 +1,5 @@
 // @ts-check
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
@@ -20,7 +20,7 @@ module.exports = class RepositoryPermissionsService {
   static async create(params) {
     const permission = await prisma.repositoryPermission.create(params);
 
-    hooks.emit('repository_permission:create', permission);
+    triggerHooks('repository_permission:create', permission);
 
     return permission;
   }
@@ -48,7 +48,7 @@ module.exports = class RepositoryPermissionsService {
   static async update(params) {
     const permission = await prisma.repositoryPermission.update(params);
 
-    hooks.emit('repository_permission:update', permission);
+    triggerHooks('repository_permission:update', permission);
 
     return permission;
   }
@@ -60,7 +60,7 @@ module.exports = class RepositoryPermissionsService {
   static async upsert(params) {
     const permission = await prisma.repositoryPermission.upsert(params);
 
-    hooks.emit('repository_permission:upsert', permission);
+    triggerHooks('repository_permission:upsert', permission);
 
     return permission;
   }
@@ -79,7 +79,7 @@ module.exports = class RepositoryPermissionsService {
       }
       throw error;
     }
-    hooks.emit('repository_permission:delete', permission);
+    triggerHooks('repository_permission:delete', permission);
 
     return permission;
   }

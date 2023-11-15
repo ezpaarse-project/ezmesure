@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Space} Space */
@@ -20,7 +20,7 @@ module.exports = class SpacesService {
   static async create(params) {
     const space = await prisma.space.create(params);
 
-    hooks.emit('space:create', space);
+    triggerHooks('space:create', space);
 
     return space;
   }
@@ -48,7 +48,7 @@ module.exports = class SpacesService {
   static async update(params) {
     const space = await prisma.space.update(params);
 
-    hooks.emit('space:update', space);
+    triggerHooks('space:update', space);
 
     return space;
   }
@@ -60,7 +60,7 @@ module.exports = class SpacesService {
   static async upsert(params) {
     const space = await prisma.space.upsert(params);
 
-    hooks.emit('space:upsert', space);
+    triggerHooks('space:upsert', space);
 
     return space;
   }
@@ -81,7 +81,7 @@ module.exports = class SpacesService {
       throw error;
     }
 
-    hooks.emit('space:delete', space);
+    triggerHooks('space:delete', space);
 
     return space;
   }

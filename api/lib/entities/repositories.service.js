@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
@@ -20,7 +20,7 @@ module.exports = class RepositoriesService {
    */
   static async create(params) {
     const repository = await prisma.repository.create(params);
-    hooks.emit('repository:create', repository);
+    triggerHooks('repository:create', repository);
     return repository;
   }
 
@@ -54,7 +54,7 @@ module.exports = class RepositoriesService {
    */
   static async update(params) {
     const repository = await prisma.repository.update(params);
-    hooks.emit('repository:update', repository);
+    triggerHooks('repository:update', repository);
     return repository;
   }
 
@@ -64,7 +64,7 @@ module.exports = class RepositoriesService {
    */
   static async upsert(params) {
     const repository = await prisma.repository.upsert(params);
-    hooks.emit('repository:upsert', repository);
+    triggerHooks('repository:upsert', repository);
     return repository;
   }
 
@@ -82,7 +82,7 @@ module.exports = class RepositoriesService {
       }
       throw error;
     }
-    hooks.emit('repository:delete', repository);
+    triggerHooks('repository:delete', repository);
 
     return repository;
   }

@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -28,7 +28,7 @@ const onRepositoryModified = async (repository) => {
   }
 };
 
-hookEmitter.on('repository:create', onRepositoryModified);
-hookEmitter.on('repository:update', onRepositoryModified);
-hookEmitter.on('repository:upsert', onRepositoryModified);
-hookEmitter.on('repository:delete', onRepositoryModified);
+registerHook('repository:create', onRepositoryModified);
+registerHook('repository:update', onRepositoryModified);
+registerHook('repository:upsert', onRepositoryModified);
+registerHook('repository:delete', onRepositoryModified);

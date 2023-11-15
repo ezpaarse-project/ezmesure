@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -40,7 +40,7 @@ const onRepositoryPermissionModified = async (permission) => {
   }
 };
 
-hookEmitter.on('repository_permission:create', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:update', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:upsert', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:delete', onRepositoryPermissionModified);
+registerHook('repository_permission:create', onRepositoryPermissionModified);
+registerHook('repository_permission:update', onRepositoryPermissionModified);
+registerHook('repository_permission:upsert', onRepositoryPermissionModified);
+registerHook('repository_permission:delete', onRepositoryPermissionModified);

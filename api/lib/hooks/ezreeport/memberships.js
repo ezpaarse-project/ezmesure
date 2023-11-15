@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -41,10 +41,10 @@ const onMembershipUpsert = async (membership) => {
   }
 };
 
-hookEmitter.on('membership:create', onMembershipUpsert);
-hookEmitter.on('membership:update', onMembershipUpsert);
-hookEmitter.on('membership:upsert', onMembershipUpsert);
-hookEmitter.on('membership:delete', onMembershipDelete);
+registerHook('membership:create', onMembershipUpsert);
+registerHook('membership:update', onMembershipUpsert);
+registerHook('membership:upsert', onMembershipUpsert);
+registerHook('membership:delete', onMembershipDelete);
 
 module.exports = {
   onMembershipUpsert,

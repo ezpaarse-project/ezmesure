@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks/hookEmitter');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 const {
   MEMBER_ROLES: {
@@ -29,7 +29,7 @@ module.exports = class InstitutionsService {
   static async create(params) {
     const institution = await prisma.institution.create(params);
 
-    hooks.emit('institution:create', institution, institution);
+    triggerHooks('institution:create', institution, institution);
 
     return institution;
   }
@@ -57,7 +57,7 @@ module.exports = class InstitutionsService {
   static async update(params) {
     const institution = await prisma.institution.update(params);
 
-    hooks.emit('institution:update', institution);
+    triggerHooks('institution:update', institution);
 
     return institution;
   }
@@ -69,7 +69,7 @@ module.exports = class InstitutionsService {
   static async upsert(params) {
     const institution = await prisma.institution.upsert(params);
 
-    hooks.emit('institution:upsert', institution);
+    triggerHooks('institution:upsert', institution);
 
     return institution;
   }
@@ -90,7 +90,7 @@ module.exports = class InstitutionsService {
       throw error;
     }
 
-    hooks.emit('institution:delete', institution);
+    triggerHooks('institution:delete', institution);
 
     return institution;
   }
