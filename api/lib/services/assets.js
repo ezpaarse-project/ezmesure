@@ -18,15 +18,16 @@ const cacheMap = new Map();
 const loadAsset = async (filepath, opts = {}) => {
   const encoding = opts.encoding ?? 'base64';
   const shouldUseCache = opts.cache !== false;
+  const cacheKey = `${filepath}-${encoding}`;
 
-  const cached = cacheMap.get(filepath);
+  const cached = cacheMap.get(cacheKey);
   if (shouldUseCache && cached) {
     return cached;
   }
 
   const asset = await fsp.readFile(path.resolve('assets', filepath), { encoding });
   if (shouldUseCache) {
-    cacheMap.set(filepath, asset);
+    cacheMap.set(cacheKey, asset);
   }
   return asset;
 };
