@@ -48,6 +48,13 @@
           </v-col>
           <v-col cols="12" md="6" lg="7">
             <v-card>
+              <ParentManager
+                :parent-id="institution?.parentInstitutionId"
+                :institution-id="institution?.id"
+                flat
+                @change="hasChanged = true"
+              />
+              <v-divider />
               <SubInstitutionsManager
                 :institution-id="institution?.id"
                 flat
@@ -102,6 +109,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
 import InstitutionCard from '~/components/InstitutionCard.vue';
+import ParentManager from '~/components/ParentManager.vue';
 import SubInstitutionsManager from '~/components/SubInstitutionsManager.vue';
 import RepositoriesManager from '~/components/RepositoriesManager.vue';
 import SpacesManager from '~/components/SpacesManager.vue';
@@ -115,6 +123,7 @@ export default {
     ToolBar,
     InstitutionForm,
     InstitutionCard,
+    ParentManager,
     SubInstitutionsManager,
     RepositoriesManager,
     SpacesManager,

@@ -23,7 +23,7 @@
             <v-form v-model="validForm" @submit.prevent="submit">
               <PasswordForm @input="setPassword" />
               <i18n path="account.description.text" tag="p">
-                <template #bestPracticeLink>
+                <template #regulationLink>
                   <a href="https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2" target="_blank">{{ $t('account.description.regulationLink') }}</a>
                 </template>
               </i18n>

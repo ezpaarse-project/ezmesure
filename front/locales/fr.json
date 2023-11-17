@@ -424,6 +424,10 @@
     "count": "{count} composante|{count} composantes",
     "noComponent": "Aucune composante"
   },
+  "group": {
+    "group": "Groupé dans",
+    "noGroup": "Aucun groupe"
+  },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
