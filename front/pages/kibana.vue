@@ -13,8 +13,12 @@
       </slot>
     </ToolBar>
     <v-card-text class="w-800 mx-auto">
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <p v-html="$t('kibana.whatDoesUsername')" />
+      <i18n path="kibana.whatDoesUsername.text" tag="p">
+        <template #accountLink>
+          <!-- TODO: use logged user to generate url -->
+          <a href="/kibana/app/kibana#/account">{{ $t('kibana.whatDoesUsername.accountLink') }}</a>
+        </template>
+      </i18n>
 
       <v-text-field
         :value="user.username"
@@ -64,8 +68,11 @@
             {{ $t('kibana.newPasswordSentByEmail') }}
           </v-alert>
 
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <p class="mt-2" v-html="$t('kibana.resetPassword')" />
+          <i18n path="kibana.resetPassword.text" tag="p" class="mt-2">
+            <template #reset>
+              <code>{{ $t('kibana.resetPassword.reset') }}</code>
+            </template>
+          </i18n>
         </v-card-text>
 
         <v-divider />
