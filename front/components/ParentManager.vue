@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading" v-bind="$attrs">
     <v-card-title class="headline">
-      {{ $t('components.components') }}
+      {{ $t('group.group') }}
 
       <v-spacer />
 
@@ -18,14 +18,14 @@
           <v-btn
             color="primary"
             text
-            :loading="savingSubInstitution"
+            :loading="savingParentInstitution"
             v-bind="attrs"
             v-on="on"
           >
             <v-icon left>
-              mdi-plus
+              {{ hasParentInstitution ? 'mdi-pencil' : 'mdi-plus' }}
             </v-icon>
-            {{ $t('add') }}
+            {{ $t(hasParentInstitution ? 'modify' : 'add') }}
           </v-btn>
         </template>
 
@@ -41,13 +41,13 @@
             </v-alert>
 
             <v-form
-              id="subInstitutionForm"
-              ref="subInstitutionForm"
+              id="parentInstitutionForm"
+              ref="parentInstitutionForm"
               v-model="formIsValid"
-              @submit.prevent="saveSubInstitution"
+              @submit.prevent="saveParentInstitution"
             >
               <v-autocomplete
-                v-model="selectedSubInstitution"
+                v-model="selectedParentInstitution"
                 :items="availableInstitutions"
                 :label="`${$t('institutions.title')} *`"
                 :rules="[v => !!v || $t('fieldIsRequired')]"
@@ -98,9 +98,9 @@
             </v-btn>
             <v-btn
               type="submit"
-              form="subInstitutionForm"
+              form="parentInstitutionForm"
               color="primary"
-              :loading="savingSubInstitution"
+              :loading="savingParentInstitution"
               :disabled="!formIsValid"
             >
               {{ $t('add') }}
@@ -120,14 +120,12 @@
       {{ errorMessage }}
     </v-alert>
 
-    <v-list v-if="hasSubInstitutions">
+    <v-list v-if="hasParentInstitution">
       <v-list-item
-        v-for="subInstitution in sortedSubInstitutions"
-        :key="subInstitution.id"
-        :to="`/institutions/${subInstitution.id}`"
+        :to="`/institutions/${parentInstitution.id}`"
       >
-        <v-list-item-avatar v-if="subInstitution.logoId" rounded>
-          <v-img :src="`/api/assets/logos/${subInstitution.logoId}`" contain />
+        <v-list-item-avatar v-if="parentInstitution.logoId" rounded>
+          <v-img :src="`/api/assets/logos/${parentInstitution.logoId}`" contain />
         </v-list-item-avatar>
 
         <v-list-item-avatar v-else color="grey lighten-2" rounded>
@@ -137,13 +135,13 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title>{{ subInstitution.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ subInstitution.type }}</v-list-item-subtitle>
+          <v-list-item-title>{{ parentInstitution.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ parentInstitution.type }}</v-list-item-subtitle>
         </v-list-item-content>
 
         <v-list-item-action>
           <v-progress-circular
-            v-if="removing[subInstitution.id]"
+            v-if="removing[parentInstitution.id]"
             indeterminate
             size="24"
             width="2"
@@ -155,7 +153,7 @@
             bottom
             right
             offset-y
-            @agree="removeSubInstitution(subInstitution.id)"
+            @agree="removeParentInstitution(parentInstitution.id)"
           >
             <template #activator="{ on: { click, ...on }, attrs }">
               <v-icon
@@ -178,7 +176,7 @@
         width="2"
       />
       <div v-else class="text-grey">
-        {{ $t('components.noComponent') }}
+        {{ $t('group.noGroup') }}
       </div>
     </v-card-text>
 
@@ -195,6 +193,10 @@ export default {
     ConfirmPopover,
   },
   props: {
+    parentId: {
+      type: String,
+      default: () => '',
+    },
     institutionId: {
       type: String,
       default: () => '',
@@ -208,27 +210,20 @@ export default {
       errorMessage: '',
       saveErrorMessage: '',
 
-      subInstitutions: [],
+      parentInstitution: {},
 
       availableInstitutions: [],
       institutionSearch: '',
-      selectedSubInstitution: null,
+      selectedParentInstitution: null,
       loadingInstitutions: false,
-      savingSubInstitution: false,
+      savingParentInstitution: false,
       showSearchForm: false,
       formIsValid: false,
     };
   },
   computed: {
-    hasSubInstitutions() {
-      return Array.isArray(this.subInstitutions) && this.subInstitutions.length > 0;
-    },
-    sortedSubInstitutions() {
-      if (!Array.isArray(this.subInstitutions)) { return []; }
-
-      return this.subInstitutions.slice().sort(
-        (a, b) => (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1),
-      );
+    hasParentInstitution() {
+      return !!this.parentInstitution?.id;
     },
   },
   watch: {
@@ -244,30 +239,30 @@ export default {
   },
   methods: {
     reset() {
-      this.subInstitutions = [];
+      this.parentInstitution = {};
       this.removing = {};
       this.errorMessage = '';
-      this.refreshSubInstitutions();
+      this.refreshParentInstitution();
     },
     onChange() {
-      this.$emit('change', this.subInstitutions);
+      this.$emit('change', this.parentInstitution);
     },
 
     resetForm() {
-      this.$refs.subInstitutionForm?.resetValidation?.();
-      this.selectedSubInstitution = null;
+      this.$refs.parentInstitutionForm?.resetValidation?.();
+      this.selectedParentInstitution = null;
     },
 
-    async refreshSubInstitutions() {
-      if (!this.institutionId) { return; }
+    async refreshParentInstitution() {
+      if (!this.parentId) { return; }
 
       this.loading = true;
       this.errorMessage = '';
 
       try {
-        this.subInstitutions = await this.$axios.$get(
-          `/institutions/${this.institutionId}/subinstitutions`,
-          { params: { institutionId: this.institutionId } },
+        this.parentInstitution = await this.$axios.$get(
+          `/institutions/${this.parentId}`,
+          { params: { institutionId: this.parentId } },
         );
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
@@ -286,20 +281,18 @@ export default {
       this.loadingInstitutions = false;
     }, 500),
 
-    async saveSubInstitution() {
-      const selectedInstitition = this.selectedSubInstitution;
+    async saveParentInstitution() {
+      const selectedInstitution = this.selectedParentInstitution;
 
-      if (!selectedInstitition?.id) { return; }
+      if (!selectedInstitution?.id) { return; }
 
-      this.savingSubInstitution = true;
+      this.savingParentInstitution = true;
       this.saveErrorMessage = '';
 
       try {
-        await this.$axios.$put(`/institutions/${this.institutionId}/subinstitutions/${selectedInstitition.id}`);
+        const parent = await this.$axios.$put(`/institutions/${selectedInstitution.id}/subinstitutions/${this.institutionId}`);
 
-        if (!this.subInstitutions.some((i) => i?.id === selectedInstitition.id)) {
-          this.subInstitutions.push(selectedInstitition);
-        }
+        this.parentInstitution = parent;
         this.institutionSearch = '';
         this.showSearchForm = false;
         this.onChange();
@@ -307,16 +300,17 @@ export default {
         this.saveErrorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }
 
-      this.savingSubInstitution = false;
+      this.savingParentInstitution = false;
     },
 
-    async removeSubInstitution(institutionId) {
+    async removeParentInstitution(institutionId) {
       this.$set(this.removing, institutionId, true);
       this.errorMessage = '';
 
       try {
-        await this.$axios.$delete(`/institutions/${this.institutionId}/subinstitutions/${institutionId}`);
-        this.subInstitutions = this.subInstitutions.filter((i) => i?.id !== institutionId);
+        await this.$axios.$delete(`/institutions/${institutionId}/subinstitutions/${this.institutionId}`);
+
+        this.parentInstitution = {};
         this.onChange();
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');

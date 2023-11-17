@@ -30,6 +30,9 @@ errors:
   sushi-endpoint:
     notFound: Endpoint not found
 
+    import:
+      alreadyExists: Endpoint [%s] already exists
+
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
     institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"
@@ -70,6 +73,9 @@ errors:
     noSpace: The space [%s] of the institution [%s] does not exist
     forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
 
+    import:
+      alreadyExists: Institution [%s] already exists
+
   member:
     notFound: Member not found
 
@@ -86,6 +92,8 @@ errors:
     failedToSave: Failed to save user data
     failedToUpdateRoles: Failed to update user roles
 
+    import:
+      alreadyExists: User [%s] already exists
   users:
     failedToQuery: failed to query users
 

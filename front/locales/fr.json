@@ -70,19 +70,32 @@
     "missingField": "Le champ \"{missingField}\" est manquant",
     "fieldIsEmpty": "Ligne #{lineNumber}: champ \"{field}\" vide",
     "invalidField": "Ligne #{lineNumber}: champ \"{field}\" invalide, le fichier a-t-il été modifié ?",
-    "depositFiles": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est <strong>pas</strong> immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos <a href=\"http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/\">règles de bonnes pratiques</a> afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants."
+    "depositFiles": {
+      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est {not} immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
+      "not": "pas",
+      "bestPracticeLink": "règles de bonnes pratiques"
+    }
   },
   "kibana": {
     "title": "Identifiants kibana",
     "passwordLost": "Mot de passe oublié",
     "username": "Nom d'utilisateur",
     "newPasswordSentByEmail": "Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
-    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour recevoir un courriel de réinitialisation.",
-    "whatDoesUsername": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre <a href=\"/kibana/app/kibana#/account\">compte Kibana</a>."
+    "resetPassword": {
+      "text": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur {reset} pour recevoir un courriel de réinitialisation.",
+      "reset": "réinitialiser"
+    },
+    "whatDoesUsername": {
+      "text": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre {accountLink}.",
+      "accountLink": "compte Kibana"
+    }
   },
   "token": {
     "title": "Token d'autentification",
-    "whatDoesToken": "Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : <code>Authorization: Bearer {insérez le token ici}</code>",
+    "whatDoesToken": {
+      "text": "Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}",
+      "header": "Authorization: Bearer {insérez le token ici}"
+    },
     "token": "Token",
     "unableToRetriveToken": "Impossible de récupérer le token d'authentification",
     "copyFailed": "La copie du token a échoué",
@@ -193,7 +206,7 @@
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
     "ignoreReportValidation": "Ignorer la validation du rapport",
     "description": "Description",
-    "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres <code>Attributes_To_Show</code>, <code>Access_Type</code> et <code>Section_Type</code> lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard <code>|</code> pour ces champs multivalués, renseignez le séparateur ici.",
+    "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.",
     "paramSeparator": "Séparateur",
     "queryParameters": "Paramètres de la query",
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
@@ -216,7 +229,7 @@
     "institutionFoundDeclareNewInstitution": "Votre établissement n'est pas déclaré, déclarez un nouvel établissement.",
     "sendMailToJoin": "Un message sera envoyé aux correspondant de l'établissement pour les prévenir.",
     "askToJoinAnInstitution": "Demander à rejoindre un établissement",
-    "joinInstitution": "Vous souhaitez rejoindre <b>{institution}</b> ?",
+    "joinInstitution": "Vous souhaitez rejoindre {institution} ?",
     "joinInstitutionEmail": "Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.",
     "reports": {
       "reports": "Rapports"
@@ -412,6 +425,10 @@
     "count": "{count} composante|{count} composantes",
     "noComponent": "Aucune composante"
   },
+  "group": {
+    "group": "Groupé dans",
+    "noGroup": "Aucun groupe"
+  },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
@@ -569,7 +586,8 @@
     "repeatPassword": "Répéter le mot de passe",
     "passwordIsRequired": "Mot de passe requis",
     "enterUser": "Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.",
-    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.<br> S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
+    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.",
+    "waitFewMinutes": "S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
     "notEqual": "Les mots de passes ne correspondent pas",
     "updated": "Mot de passe mis à jour",
     "pattern": "Minimum 6 caractères",
@@ -604,7 +622,10 @@
   },
   "account": {
     "title": "Activation du compte",
-    "description": "Afin d'utiliser ce service, vous vous engagez à respecter le <a href=\"https://www.cnil.fr/fr/reglement-europeen-protection-donnees\" target=\"_blank\">règlement général sur la protection des données</a>.",
+    "description": {
+      "text": "Afin d'utiliser ce service, vous vous engagez à respecter le {regulationLink}.",
+      "regulationLink": "règlement général sur la protection des données"
+    },
     "acceptTerms": "Veuillez accepter les conditions d'utilisation.",
     "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
     "activate": "Activer mon compte"

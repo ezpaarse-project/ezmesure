@@ -297,7 +297,14 @@ exports.changePassword = async (ctx) => {
 exports.getUser = async (ctx) => {
   const user = await usersService.findUnique({
     where: { username: ctx.state.user.username },
-    include: { memberships: true },
+    include: {
+      memberships: {
+        include: {
+          repositoryPermissions: true,
+          spacePermissions: true,
+        },
+      },
+    },
   });
 
   if (!user) {

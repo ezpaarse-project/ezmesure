@@ -1,7 +1,14 @@
 <template>
   <v-container>
-    <!-- eslint-disable-next-line vue/no-v-html -->
-    <p v-html="$t('files.depositFiles')" />
+    <i18n path="files.depositFiles.text" tag="p">
+      <template #not>
+        <strong>{{ $t('files.depositFiles.not') }}</strong>
+      </template>
+
+      <template #bestPracticeLink>
+        <a href="http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/">{{ $t('files.depositFiles.bestPracticeLink') }}</a>
+      </template>
+    </i18n>
 
     <FileInput @change="addFilesToUpload" />
 
