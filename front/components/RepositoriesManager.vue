@@ -220,7 +220,7 @@ export default {
       this.errorMessage = '';
 
       try {
-        this.repositories = await this.$axios.$get('/repositories', { params: { institutionId: this.institutionId } });
+        this.repositories = await this.$axios.$get(`/institutions/${this.institutionId}/repositories`);
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }
@@ -233,7 +233,7 @@ export default {
       this.errorMessage = '';
 
       try {
-        await this.$axios.$delete(`/repositories/${pattern}`);
+        await this.$axios.$delete(`/institutions/${this.institutionId}/repositories/${pattern}`);
         this.repositories = this.repositories.filter((r) => r?.pattern !== pattern);
         this.onChange();
       } catch (e) {
@@ -248,11 +248,10 @@ export default {
       this.creationErrorMessage = '';
 
       try {
-        const newRepository = await this.$axios.$post('/repositories', {
-          pattern: this.repositoryPattern,
-          type: this.repositoryType,
-          institutionId: this.institutionId,
-        });
+        const newRepository = await this.$axios.$put(
+          `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
+          { type: this.repositoryType },
+        );
 
         this.repositories.push(newRepository);
         this.repositoryPattern = '';

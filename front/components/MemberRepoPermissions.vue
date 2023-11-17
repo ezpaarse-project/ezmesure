@@ -167,11 +167,11 @@ export default {
 
       try {
         if (permission === 'read' || permission === 'write') {
-          await this.$axios.$put(`/repositories/${pattern}/permissions/${this.username}`, {
+          await this.$axios.$put(`/institutions/${this.institutionId}/repositories/${pattern}/permissions/${this.username}`, {
             readonly: permission !== 'write',
           });
         } else {
-          await this.$axios.$delete(`/repositories/${pattern}/permissions/${this.username}`);
+          await this.$axios.$delete(`/institutions/${this.institutionId}/repositories/${pattern}/permissions/${this.username}`);
         }
 
         this.$emit('change');
