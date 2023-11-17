@@ -11,6 +11,8 @@ const { triggerHooks } = require('../hooks/hookEmitter');
  * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
+ * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  */
 /* eslint-enable max-len */
 
@@ -69,13 +71,47 @@ module.exports = class MembershipsService {
 
   /**
    * @param {MembershipDeleteArgs} params
-   * @returns {Promise<Membership>}
+   * @returns {Promise<Membership | null>}
    */
   static async delete(params) {
-    const membership = await prisma.membership.delete(params);
+    const [deleteResult, deletedMembership] = await prisma.$transaction(async (tx) => {
+      const membership = await tx.membership.findUnique({
+        where: params.where,
+        include: {
+          repositoryPermissions: true,
+          spacePermissions: true,
+        },
+      });
 
-    triggerHooks('membership:delete', membership);
+      if (!membership) {
+        return [null, null];
+      }
 
-    return membership;
+      /** @type {RepositoryPermissionDeleteManyArgs | SpacePermissionDeleteManyArgs} */
+      const findArgs = {
+        where: {
+          username: membership.username,
+          institutionId: membership.institutionId,
+        },
+      };
+
+      await tx.repositoryPermission.deleteMany(findArgs);
+      await tx.spacePermission.deleteMany(findArgs);
+
+      return [
+        await tx.membership.delete(params),
+        membership,
+      ];
+    });
+
+    if (!deletedMembership) {
+      return null;
+    }
+
+    triggerHooks('membership:delete', deletedMembership);
+    deletedMembership.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+    deletedMembership.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+
+    return deleteResult;
   }
 };

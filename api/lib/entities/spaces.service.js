@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
+const { client: prisma } = require('../services/prisma.service');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -10,6 +10,7 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 /** @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
+/** @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
 /* eslint-enable max-len */
 
 module.exports = class SpacesService {
@@ -70,19 +71,35 @@ module.exports = class SpacesService {
    * @returns {Promise<Space | null>}
    */
   static async delete(params) {
-    let space;
+    const [deleteResult, deletedSpace] = await prisma.$transaction(async (tx) => {
+      const space = await tx.space.findUnique({
+        where: params.where,
+        include: {
+          permissions: true,
+        },
+      });
 
-    try {
-      space = await prisma.space.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+      if (!space) {
+        return [null, null];
       }
-      throw error;
+
+      await tx.spacePermission.deleteMany({
+        where: { spaceId: space.id },
+      });
+
+      return [
+        await tx.space.delete(params),
+        space,
+      ];
+    });
+
+    if (!deletedSpace) {
+      return null;
     }
 
-    triggerHooks('space:delete', space);
+    triggerHooks('space:delete', deletedSpace);
+    deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
 
-    return space;
+    return deleteResult;
   }
 };

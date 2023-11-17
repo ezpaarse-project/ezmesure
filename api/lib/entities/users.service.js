@@ -1,7 +1,7 @@
 // @ts-check
 const config = require('config');
 const elasticUsers = require('../services/elastic/users');
-const { client: prisma, Prisma } = require('../services/prisma.service');
+const { client: prisma } = require('../services/prisma.service');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 const {
@@ -16,6 +16,7 @@ const {
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
  * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
  * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
@@ -74,6 +75,14 @@ module.exports = class UsersService {
    */
   static findUnique(params) {
     return prisma.user.findUnique(params);
+  }
+
+  /**
+   * @param {UserFindUniqueOrThrowArgs} params
+   * @returns {Promise<User>}
+   */
+  static findUniqueOrThrow(params) {
+    return prisma.user.findUniqueOrThrow(params);
   }
 
   /**
@@ -137,28 +146,57 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    let user;
+    const [deleteResult, deletedUser] = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: params.where,
+        include: {
+          memberships: {
+            include: {
+              repositoryPermissions: true,
+              spacePermissions: true,
+            },
+          },
+        },
+      });
 
-    try {
-      user = await prisma.user.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+      if (!user) {
+        return [null, null];
       }
-      throw error;
+
+      const findArgs = { where: { username: user.username } };
+
+      await tx.repositoryPermission.deleteMany(findArgs);
+      await tx.spacePermission.deleteMany(findArgs);
+      await tx.membership.deleteMany(findArgs);
+
+      return [
+        await tx.user.delete(params),
+        user,
+      ];
+    });
+
+    if (!deletedUser) {
+      return null;
     }
 
-    triggerHooks('user:delete', user);
+    triggerHooks('user:delete', deletedUser);
 
-    return user;
+    deletedUser?.memberships?.forEach((element) => {
+      triggerHooks('memberships:delete', element);
+
+      element.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+      element.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    });
+
+    return deleteResult;
   }
 
   /**
    * @param {string} username
    * @param {string} password
-   * @returns {Promise<User>}
+   * @returns {Promise<void>}
    */
   static async updatePassword(username, password) {
-    return elasticUsers.updatePassword(username, password);
+    await elasticUsers.updatePassword(username, password);
   }
 };
