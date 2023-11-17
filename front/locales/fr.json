@@ -23,7 +23,8 @@
     "logout": "Déconnexion",
     "contact": "Contact",
     "report": "Mes rapports",
-    "adminReport": "ezREEPORT"
+    "adminReport": "ezREEPORT",
+    "repositories": "Entrepôts"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -652,11 +653,15 @@
     }
   },
   "repositories": {
-    "repositories": "Dépôts",
-    "xRepositories": "aucun dépôt | 1 dépôt | {count} dépôts",
-    "noRepository": "Aucun dépôt n'est encore attribué",
+    "repositories": "Entrepôts",
+    "toolbarTitle": "Entrepôts ({count})",
+    "xRepositories": "aucun entrepôt | 1 entrepôt | {count} entrepôts",
+    "noRepository": "Aucun entrepôt n'est encore attribué",
     "pattern": "Pattern",
-    "type": "Type"
+    "type": "Type",
+    "institutions": "Établissements",
+    "institutionsCount": "{count} établissement|{count} établissements",
+    "deleteNbRepositories": "Vous allez supprimer {number} entrepôts."
   },
   "spaces": {
     "spaces": "Espaces",

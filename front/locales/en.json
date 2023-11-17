@@ -23,7 +23,8 @@
     "logout": "Logout",
     "contact": "Contact",
     "report": "My reports",
-    "adminReport": "ezREEPORT"
+    "adminReport": "ezREEPORT",
+    "repositories": "Repositories"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -653,10 +654,14 @@
   },
   "repositories": {
     "repositories": "Repositories",
+    "toolbarTitle": "Repositories ({count})",
     "xRepositories": "no repository | 1 repository | {count} repositories",
     "noRepository": "No repository has been assigned yet",
     "pattern": "Pattern",
-    "type": "Type"
+    "type": "Type",
+    "institutions": "Institutions",
+    "institutionsCount": "{count} institution|{count} institutions",
+    "deleteNbRepositories": "You are about to delete {number} repositories"
   },
   "spaces": {
     "spaces": "Spaces",
