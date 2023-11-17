@@ -15,7 +15,7 @@ const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${spac
  * @param {Repository} repository
  * @param {string} modifier
  */
-const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}.${repository.institutionId}`;
+const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}`;
 
 /**
  * Generate all Elasticsearch roles for a given username, based on the associated memberships

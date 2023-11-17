@@ -3,10 +3,18 @@ const institutionsService = require('../../entities/institutions.service');
 const membershipService = require('../../entities/memberships.service');
 const usersService = require('../../entities/users.service');
 
+/* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- */
+ * @typedef {import('@prisma/client').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
+ * @typedef {import('@prisma/client').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('@prisma/client').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
+*/
+/* eslint-enable max-len */
 
 const {
   adminCreateSchema,
@@ -295,65 +303,83 @@ exports.importInstitutions = async (ctx) => {
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
           where: { id: spaceData.id },
-          create: spaceData,
+          create: { ...spaceData, institutionId: undefined },
         })),
       },
 
       repositories: {
-        connectOrCreate: item.repositories?.map?.((repoData) => ({
-          where: { pattern: repoData.pattern },
-          create: repoData,
-        })),
+        connectOrCreate: item.repositories?.map?.(
+          /** @returns {RepositoryCreateOrConnectWithoutInstitutionsInput} */
+          (repoData) => ({
+            where: {
+              pattern: repoData.pattern,
+            },
+            create: repoData,
+          }),
+        ),
       },
 
       sushiCredentials: {
-        connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
-          where: { id: sushi.id },
-          create: { ...sushi, institutionId: undefined },
-        })),
+        connectOrCreate: item.sushiCredentials?.map?.(
+          /** @returns {SushiCredentialsCreateOrConnectWithoutInstitutionInput} */
+          (sushi) => ({
+            where: { id: sushi.id },
+            create: { ...sushi, institutionId: undefined },
+          }),
+        ),
       },
 
       memberships: {
-        connectOrCreate: item.memberships?.map?.((membership) => ({
-          where: {
-            username_institutionId: {
-              institutionId: item.id,
-              username: membership?.username,
+        connectOrCreate: item.memberships?.map?.(
+          /** @returns {MembershipCreateOrConnectWithoutInstitutionInput} */
+          (membership) => ({
+            where: {
+              username_institutionId: {
+                institutionId: item.id,
+                username: membership?.username,
+              },
             },
-          },
-          create: {
-            ...(membership ?? {}),
-            username: undefined,
+            create: {
+              ...(membership ?? {}),
+              username: undefined,
 
-            user: {
-              connect: { username: membership?.username },
-            },
+              user: {
+                connect: { username: membership?.username },
+              },
 
-            spacePermissions: {
-              connectOrCreate: membership?.spacePermissions?.map?.((perm) => ({
-                where: {
-                  username_spaceId: {
-                    username: membership?.username,
-                    spaceId: perm?.spaceId,
-                  },
-                },
-                create: perm,
-              })),
-            },
+              spacePermissions: {
+                connectOrCreate: membership?.spacePermissions?.map?.(
+                  /** @returns {SpacePermissionCreateOrConnectWithoutMembershipInput} */
+                  (perm) => ({
+                    where: {
+                      username_spaceId: {
+                        username: membership?.username,
+                        spaceId: perm?.spaceId,
+                      },
+                    },
+                    create: perm,
+                  }),
+                ),
+              },
 
-            repositoryPermissions: {
-              connectOrCreate: membership?.repositoryPermissions?.map?.((perm) => ({
-                where: {
-                  username_repositoryPattern: {
-                    username: membership?.username,
-                    repositoryPattern: perm?.repositoryPattern,
-                  },
-                },
-                create: perm,
-              })),
+              repositoryPermissions: {
+                connectOrCreate: membership?.repositoryPermissions?.map?.(
+                  /** @returns {RepositoryPermissionCreateOrConnectWithoutMembershipInput} */
+                  (perm) => ({
+                    where: {
+                      username_institutionId_repositoryPattern: {
+                        username: membership?.username,
+                        repositoryPattern: perm?.repositoryPattern,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: perm,
+                  }),
+                ),
+              },
             },
-          },
-        })),
+          }),
+        ),
       },
     };
 
@@ -407,7 +433,7 @@ exports.getInstitutionRepositories = async (ctx) => {
   }
 
   const repositories = await repositoriesService.findMany({
-    where: { institutionId: ctx.state.institution.id },
+    where: { institutions: { some: { id: ctx.state.institution.id } } },
     include,
   });
 

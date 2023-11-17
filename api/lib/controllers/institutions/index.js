@@ -10,6 +10,7 @@ const {
 } = require('../../entities/memberships.dto');
 const {
   includableFields: repositoryIncludableFields,
+  adminCreateOrConnectSchema,
 } = require('../../entities/repositories.dto');
 const {
   includableFields: spaceIncludableFields,
@@ -19,6 +20,7 @@ const {
   requireJwt,
   requireUser,
   fetchInstitution,
+  fetchRepository,
   requireAdmin,
   requireMemberPermissions,
 } = require('../../services/auth');
@@ -46,6 +48,13 @@ const {
   addSubInstitution,
   removeSubInstitution,
 } = require('./subinstitutions');
+
+const {
+  upsertRepositoryPermission,
+  deleteRepositoryPermission,
+  removeRepository,
+  addRepository,
+} = require('./repositories');
 
 const {
   getInstitutionState,
@@ -113,6 +122,43 @@ router.route({
     query: Joi.object({
       include: Joi.array().single().items(Joi.string().valid(...repositoryIncludableFields)),
     }).rename('include[]', 'include'),
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/repositories/:pattern/permissions/:username',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.write),
+    fetchRepository(),
+    upsertRepositoryPermission,
+  ],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId/repositories/:pattern/permissions/:username',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.write),
+    fetchRepository(),
+    deleteRepositoryPermission,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
+      username: Joi.string().trim().required(),
+    },
   },
 });
 
@@ -367,6 +413,40 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
       subInstitutionId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:institutionId/repositories/:pattern',
+  handler: [
+    fetchInstitution(),
+    fetchRepository({ include: { institutions: true } }),
+    removeRepository,
+  ],
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/repositories/:pattern',
+  handler: [
+    fetchInstitution(),
+    fetchRepository({ ignoreNotFound: true }),
+    addRepository,
+  ],
+  validate: {
+    type: 'json',
+    body: adminCreateOrConnectSchema,
+    params: {
+      institutionId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
     },
   },
 });

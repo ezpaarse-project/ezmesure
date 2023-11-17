@@ -5,8 +5,6 @@ const {
   requireUser,
   fetchRepository,
   requireAdmin,
-  requireMemberPermissions,
-  fetchInstitution,
 } = require('../../services/auth');
 
 const {
@@ -15,66 +13,27 @@ const {
   createOne,
   updateOne,
   deleteOne,
-  upsertPermission,
-  deletePermission,
 } = require('./actions');
 
 const {
   adminCreateSchema,
   adminUpdateSchema,
+  includableFields,
 } = require('../../entities/repositories.dto');
 
-const { FEATURES } = require('../../entities/memberships.dto');
-
-router.use(requireJwt, requireUser);
-
-router.route({
-  method: 'PUT',
-  path: '/:pattern/permissions/:username',
-  handler: [
-    fetchRepository(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.repository?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    upsertPermission,
-  ],
-  validate: {
-    type: 'json',
-    params: {
-      pattern: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'DELETE',
-  path: '/:pattern/permissions/:username',
-  handler: [
-    fetchRepository(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.repository?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    deletePermission,
-  ],
-  validate: {
-    params: {
-      pattern: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.use(requireAdmin);
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.get('/', {
   method: 'GET',
   path: '/',
   handler: getMany,
   validate: {
-    params: {
+    query: Joi.object({
       q: Joi.string(),
       type: Joi.string(),
       institutionId: Joi.string(),
-    },
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    }).rename('include[]', 'include'),
   },
 });
 

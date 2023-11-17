@@ -55,6 +55,7 @@ errors:
   repository:
     notFound: Repository not found
     alreadyExists: The repository [%s] is already associated to the institution
+    typeMismatch: A repository [%s] with a different type already exists
 
   institution:
     notFound: Institution not found

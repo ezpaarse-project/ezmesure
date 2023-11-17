@@ -1,25 +1,42 @@
 const repositoriesService = require('../../entities/repositories.service');
-const repoPermissionsService = require('../../entities/repository-permissions.service');
-const {
-  upsertSchema: permissionUpsertSchema,
-} = require('../../entities/repository-permissions.dto');
 
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma.service');
 
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.RepositoryWhereInput} RepositoryWhereInput
+*/
+/* eslint-enable max-len */
+
 exports.getMany = async (ctx) => {
   const {
+    include: propsToInclude,
     type,
     institutionId,
+    pattern,
     q: search,
   } = ctx.query;
 
+  let include;
+
+  if (Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
+  /** @type {RepositoryWhereInput} */
   const where = {
     type,
-    institutionId,
+    pattern,
   };
+
+  if (institutionId) {
+    where.institutions = {
+      some: { id: institutionId },
+    };
+  }
 
   if (search) {
     where.pattern = {
@@ -29,7 +46,7 @@ exports.getMany = async (ctx) => {
   }
 
   ctx.type = 'json';
-  ctx.body = await repositoriesService.findMany({ where });
+  ctx.body = await repositoriesService.findMany({ where, include });
 };
 
 exports.getOne = async (ctx) => {
@@ -44,10 +61,15 @@ exports.createOne = async (ctx) => {
   let repository;
 
   try {
-    repository = await repositoriesService.create({
-      data: {
+    repository = await repositoriesService.upsert({
+      where: { pattern: body.pattern },
+      create: {
         ...body,
-        institution: { connect: { id: body?.institutionId } },
+        institutions: { connect: { id: body?.institutionId } },
+        institutionId: undefined,
+      },
+      update: {
+        institutions: { connect: { id: body?.institutionId } },
         institutionId: undefined,
       },
     });
@@ -78,7 +100,9 @@ exports.updateOne = async (ctx) => {
 
   try {
     updatedRepository = await repositoriesService.update({
-      where: { pattern: repository.pattern },
+      where: {
+        pattern: repository.pattern,
+      },
       data: body,
     });
   } catch (e) {
@@ -101,63 +125,9 @@ exports.updateOne = async (ctx) => {
 exports.deleteOne = async (ctx) => {
   const { pattern } = ctx.params;
 
-  await repositoriesService.delete({ where: { pattern } });
+  await repositoriesService.delete({
+    where: { pattern },
+  });
 
   ctx.status = 204;
-};
-
-exports.upsertPermission = async (ctx) => {
-  const { repository } = ctx.state;
-  const { username } = ctx.params;
-
-  const { value: body } = permissionUpsertSchema.validate({
-    ...ctx.request.body,
-    institutionId: repository.institutionId,
-    pattern: repository.pattern,
-    username,
-  });
-
-  const permissionData = {
-    ...body,
-    repository: { connect: { pattern: repository.pattern } },
-    membership: {
-      connect: {
-        username_institutionId: {
-          username,
-          institutionId: repository.institutionId,
-        },
-      },
-    },
-  };
-
-  const updatedPermissions = await repoPermissionsService.upsert({
-    where: {
-      username_repositoryPattern: {
-        username,
-        repositoryPattern: repository.pattern,
-      },
-    },
-    create: permissionData,
-    update: permissionData,
-  });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
-};
-
-exports.deletePermission = async (ctx) => {
-  const { repository } = ctx.state;
-  const { username } = ctx.params;
-
-  const updatedPermissions = await repoPermissionsService.delete({
-    where: {
-      username_repositoryPattern: {
-        username,
-        repositoryPattern: repository.pattern,
-      },
-    },
-  });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
 };

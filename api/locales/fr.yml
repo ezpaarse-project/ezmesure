@@ -55,6 +55,7 @@ errors:
   repository:
     notFound: Dépôt introuvable
     alreadyExists: Le dépôt [%s] est déjà associé à l'établissement
+    typeMismatch: Un dépôt [%s] de type différent existe déjà
 
   institution:
     notFound: Établissement introuvable
