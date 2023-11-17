@@ -222,6 +222,19 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item @click="deleteInstitution(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('delete') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider />
+
             <v-list-item :to="`/institutions/${item.id}/sushi`">
               <v-list-item-icon>
                 <v-icon>mdi-key</v-icon>
@@ -483,7 +496,7 @@ export default {
     },
     /**
      * Get the count of filters with value
-     * 
+     *
      * @returns {number} The count of active filters
      */
     filtersCount() {
@@ -507,7 +520,7 @@ export default {
     },
     /**
      * Compute maximum count of properties
-     * 
+     *
      * @returns {Record<string, number>}
      */
     maxCounts() {
@@ -532,7 +545,7 @@ export default {
     },
     /**
      * Compute icons used to monitor quickly institution
-     * 
+     *
      * @returns {Object[]} Icon definitions
      */
     servicesIconMap() {
@@ -743,9 +756,9 @@ export default {
     },
     /**
      * Apply contacts filters to given services
-     * 
+     *
      * @param {*} services The item's service
-     * 
+     *
      * @return {boolean} Should item be shown
      */
     serviceContactsFilter(services) {
@@ -770,9 +783,9 @@ export default {
     },
     /**
      * Apply repos filters to given services
-     * 
+     *
      * @param {*} services The item's service
-     * 
+     *
      * @return {boolean} Should item be shown
      */
     serviceReposFilter(services) {
@@ -795,9 +808,9 @@ export default {
 
     /**
      * Apply spaces filters to given services
-     * 
+     *
      * @param {*} services The item's service
-     * 
+     *
      * @return {boolean} Should item be shown
      */
     serviceSpacesFilter(services) {
@@ -843,6 +856,9 @@ export default {
     },
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ addAsMember: false });
+    },
+    deleteInstitution(item) {
+      this.$refs.deleteDialog.confirmDelete([item]);
     },
     deleteInstitutions() {
       this.$refs.deleteDialog.confirmDelete(this.selected);
