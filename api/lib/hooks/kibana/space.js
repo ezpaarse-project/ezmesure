@@ -2,6 +2,7 @@
 const hookEmitter = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
+const assets = require('../../services/assets');
 
 const kibana = require('../../services/kibana');
 
@@ -10,6 +11,28 @@ const { generateRoleNameFromSpace } = require('../utils');
 /**
  * @typedef {import('@prisma/client').Space} Space
  */
+
+/**
+ * @param {Space} space
+ *
+ * @returns {Promise<string | undefined>}
+ */
+const getSpaceLogo = async (space) => {
+  let data;
+  switch (space.type) {
+    case 'counter5':
+      data = await assets.loadAsset('counter.png');
+      break;
+    case 'ezpaarse':
+      data = await assets.loadAsset('ezpaarse.png');
+      break;
+
+    default:
+      break;
+  }
+
+  return data && `data:image/png;base64,${data}`;
+};
 
 /**
  * @param { Space } space
@@ -22,6 +45,7 @@ const onSpaceCreate = async (space) => {
       description: space.description || undefined,
       initials: space.initials || undefined,
       color: space.color || undefined,
+      imageUrl: await getSpaceLogo(space),
     });
     appLogger.verbose(`[kibana][hooks] Space [${space.id}] is created`);
   } catch (error) {
@@ -77,6 +101,7 @@ const onSpaceUpdate = async (space) => {
       description: space.description || undefined,
       initials: space.initials || undefined,
       color: space.color || undefined,
+      imageUrl: await getSpaceLogo(space),
     });
     appLogger.verbose(`[kibana][hooks] Space [${space.id}] is updated`);
   } catch (error) {
