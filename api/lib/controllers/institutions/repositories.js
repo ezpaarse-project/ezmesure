@@ -78,20 +78,9 @@ exports.removeRepository = async (ctx) => {
   const { pattern, institutionId } = ctx.params;
 
   if (repository.institutions.length >= 2) {
-    await repositoriesService.update({
-      where: { pattern },
-      data: {
-        institutions: {
-          disconnect: {
-            id: institutionId,
-          },
-        },
-      },
-    });
+    await repositoriesService.disconnectInstitution(pattern, institutionId);
   } else {
-    await repositoriesService.delete({
-      where: { pattern },
-    });
+    await repositoriesService.delete({ where: { pattern } });
   }
 
   ctx.status = 204;
