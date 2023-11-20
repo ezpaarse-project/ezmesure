@@ -89,9 +89,6 @@ module.exports = class RepositoriesService {
       await tx.repositoryPermission.deleteMany({
         where: {
           repositoryPattern: repository.pattern,
-          institutionId: {
-            in: repository.institutions.map((i) => i.id),
-          },
         },
       });
 
