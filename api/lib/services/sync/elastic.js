@@ -3,7 +3,6 @@ const config = require('config');
 const { CronJob } = require('cron');
 const { appLogger } = require('../logger');
 
-const MembershipsService = require('../../entities/memberships.service');
 const RepositoriesService = require('../../entities/repositories.service');
 const UsersService = require('../../entities/users.service');
 
@@ -14,7 +13,7 @@ const {
 const { execThrottledPromises } = require('../promises');
 
 const { upsertRole, deleteRole } = require('../elastic/roles');
-const { getUserByUsername, upsertUser } = require('../elastic/users');
+const { upsertUser } = require('../elastic/users');
 
 const { syncSchedule } = config.get('elasticsearch');
 
@@ -90,24 +89,15 @@ const syncRepositories = async () => {
 
 /**
  * Sync an Elasticsearch user with a given membership
+ * @param {User} user - The user to synchronize
  */
-const syncMembership = async (membership) => {
-  /** @type {ElasticUser | User | null} */
-  let user = await getUserByUsername(membership.username);
-
-  if (!user) {
-    user = await UsersService.findUnique({ where: { username: membership.username } });
-    if (!user) {
-      throw new Error(`User [${membership.username}] doesn't exist, but have repository permissions`);
-    }
-  }
-
-  const roles = await generateUserRoles(membership.username);
+const syncUser = async (user) => {
+  const roles = await generateUserRoles(user.username);
 
   await upsertUser({
     username: user.username,
     email: user.email,
-    fullName: 'fullName' in user ? user.fullName : user.full_name,
+    fullName: user.fullName,
     roles,
   });
 };
@@ -115,11 +105,11 @@ const syncMembership = async (membership) => {
 /**
  * Sync Elastic's users' roles to ezMESURE's memberships
  */
-const syncMemberships = async () => {
-  const memberships = await MembershipsService.findMany({});
+const syncUsers = async () => {
+  const users = await UsersService.findMany({});
 
-  const executors = memberships.map(
-    (membership) => async () => syncMembership(membership),
+  const executors = users.map(
+    (user) => async () => syncUser(user),
   );
 
   const res = await execThrottledPromises(
@@ -132,7 +122,7 @@ const syncMemberships = async () => {
 
 const sync = async () => {
   await syncRepositories();
-  await syncMemberships();
+  await syncUsers();
 };
 
 /**
@@ -141,7 +131,7 @@ const sync = async () => {
 const startCron = async () => {
   const job = new CronJob({
     cronTime: syncSchedule,
-    runOnInit: true,
+    runOnInit: false,
     onTick: async () => {
       appLogger.verbose('[elastic] Starting synchronization');
       try {
@@ -162,7 +152,7 @@ module.exports = {
   sync,
   syncRepository,
   syncRepositories,
-  syncMembership,
-  syncMemberships,
+  syncUser,
+  syncUsers,
   unmountRepository,
 };
