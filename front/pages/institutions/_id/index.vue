@@ -136,7 +136,7 @@ export default {
     let failedToFetch = false;
 
     try {
-      institution = await $axios.$get(`/institutions/${params.id}`);
+      institution = await $axios.$get(`/institutions/${params.id}`, { params: { include: ['parentInstitution'] } });
     } catch (e) {
       if (e.response?.status !== 404) {
         failedToFetch = true;

@@ -259,6 +259,7 @@
       "homepageExample": "e.g. https://cnrs.fr/",
       "affectedIndex": "Affected index",
       "affectedIndexExample": "e.g. univ-blancherive",
+      "group": "Group",
       "city": "City",
       "acronym": "Acronym",
       "type": "Institution type",
