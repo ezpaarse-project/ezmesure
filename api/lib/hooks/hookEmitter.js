@@ -58,9 +58,9 @@ const hookEmitter = new EventEmitter();
  *
  * @returns Returns `true` if the event had listeners, `false` otherwise.
  */
-const triggerHooks = (event, payload) => {
+const triggerHooks = (event, ...payload) => {
   appLogger.verbose(`[hooks] "${event}" triggered`);
-  return hookEmitter.emit(event, payload);
+  return hookEmitter.emit(event, ...payload);
 };
 
 /**
