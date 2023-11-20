@@ -677,7 +677,7 @@
   "repositories": {
     "repositories": "Repositories",
     "toolbarTitle": "Repositories ({count})",
-    "xRepositories": "no repository | 1 repository | {count} repositories",
+    "xRepositories": "0 repository | 1 repository | {count} repositories",
     "noRepository": "No repository has been assigned yet",
     "pattern": "Pattern",
     "type": "Type",
@@ -687,7 +687,7 @@
   },
   "spaces": {
     "spaces": "Spaces",
-    "xSpaces": "no space | 1 space | {count} spaces",
+    "xSpaces": "0 space | 1 space | {count} spaces",
     "noSpace": "No space has been assigned yet",
     "id": "Identifier",
     "type": "Type",
