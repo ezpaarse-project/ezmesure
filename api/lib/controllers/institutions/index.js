@@ -101,10 +101,16 @@ router.route({
 router.route({
   method: 'GET',
   path: '/:institutionId',
-  handler: [
-    fetchInstitution(),
-    getInstitution,
-  ],
+  handler: getInstitution,
+  validate: {
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    query: Joi.object({
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    }).rename('include[]', 'include'),
+  },
+
 });
 
 router.route({

@@ -109,9 +109,23 @@ exports.getInstitutions = async (ctx) => {
 };
 
 exports.getInstitution = async (ctx) => {
+  const {
+    include: propsToInclude,
+  } = ctx.query;
+  const { institutionId } = ctx.params;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = ctx.state.institution;
+  ctx.body = await institutionsService.findUnique({
+    where: { id: institutionId },
+    include,
+  });
 };
 
 exports.createInstitution = async (ctx) => {
