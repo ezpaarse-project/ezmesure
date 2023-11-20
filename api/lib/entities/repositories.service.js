@@ -107,4 +107,58 @@ module.exports = class RepositoriesService {
 
     return deleteResult;
   }
+
+  /**
+   * Disconnect a repository from an institution and remove all associated permissions
+   * @param {string} pattern
+   * @param {string} institutionId
+   * @returns {Promise<Repository | null>}
+   */
+  static async disconnectInstitution(pattern, institutionId) {
+    const [newRepository, oldRepository] = await prisma.$transaction(async (tx) => {
+      const currentRepository = await tx.repository.findUnique({
+        where: { pattern },
+        include: {
+          permissions: { where: { institutionId } },
+          institutions: { where: { id: institutionId } },
+        },
+      });
+
+      if (!currentRepository) {
+        return [null, null];
+      }
+
+      await tx.repositoryPermission.deleteMany({
+        where: {
+          repositoryPattern: currentRepository.pattern,
+          institutionId,
+        },
+      });
+
+      const updatedRepository = await tx.repository.update({
+        where: { pattern },
+        data: {
+          institutions: {
+            disconnect: {
+              id: institutionId,
+            },
+          },
+        },
+      });
+
+      return [
+        updatedRepository,
+        currentRepository,
+      ];
+    });
+
+    if (!oldRepository) {
+      return null;
+    }
+
+    triggerHooks('repository:disconnected', oldRepository, institutionId);
+    oldRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+
+    return newRepository;
+  }
 };
