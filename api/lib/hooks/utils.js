@@ -23,23 +23,27 @@ const generateRoleNameFromRepository = (repository, modifier) => `repository.${r
  * @returns {string[]} all roles for the user
  */
 const generateUserRoles = async (username) => {
-  const memberships = await prisma.membership.findMany({
+  const user = await prisma.user.findUnique({
     where: { username },
     include: {
-      spacePermissions: {
+      memberships: {
         include: {
-          space: true,
-        },
-      },
-      repositoryPermissions: {
-        include: {
-          repository: true,
+          spacePermissions: {
+            include: {
+              space: true,
+            },
+          },
+          repositoryPermissions: {
+            include: {
+              repository: true,
+            },
+          },
         },
       },
     },
   });
 
-  const roles = memberships?.flatMap?.((membership) => {
+  const roles = new Set(user?.memberships?.flatMap?.((membership) => {
     const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
 
@@ -47,9 +51,13 @@ const generateUserRoles = async (username) => {
       ...repoRoles,
       ...spaceRoles,
     ];
-  });
+  }));
 
-  return Array.from(new Set(roles));
+  if (user.isAdmin) {
+    roles.add('superuser');
+  }
+
+  return Array.from(roles);
 };
 
 module.exports = {
