@@ -285,7 +285,7 @@
 
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
     <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
-    <RepositoriesDialog ref="repositoriesDialog" />
+    <RepositoriesDialog ref="repositoriesDialog" @updated="refreshInstitutions" />
     <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
     <SubInstitutionsDialog ref="subInstitutionsDialog" @updated="refreshInstitutions" />
     <InstitutionsFiltersDrawer
