@@ -319,6 +319,38 @@ const getIndexPatterns = async (opts) => {
 };
 
 /**
+ * Get the default index pattern of a space
+ *
+ * @param {string} spaceId - ID of the space
+ *
+ * @returns {Promise<string | null>} ID of the default index pattern
+ */
+const getDefaultIndexPattern = async (spaceId) => {
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+
+  const { data } = await axiosClient.get(`${spacePrefix}/api/index_patterns/default`);
+
+  return typeof data?.index_pattern_id === 'string' ? data.index_pattern_id : null;
+};
+
+/**
+ * Set the default index pattern of a space
+ *
+ * @param {string} spaceId - ID of the space
+ * @param {string | null} patternId - ID of the index pattern to set as default
+ *
+ * @returns {Promise<string | null>} ID of the default index pattern
+ */
+const setDefaultIndexPattern = async (spaceId, patternId, opts) => {
+  const spacePrefix = spaceId ? `/s/${spaceId}` : '';
+
+  return axiosClient.post(`${spacePrefix}/api/index_patterns/default`, {
+    index_pattern_id: patternId,
+    force: opts?.force !== false,
+  });
+};
+
+/**
  * Export a kibana dashboard
  *
  * @param {Object} opts
@@ -382,6 +414,8 @@ module.exports = {
   getRole,
   getRoles,
   createIndexPattern,
+  getDefaultIndexPattern,
+  setDefaultIndexPattern,
   getIndexPatterns,
   findObjects,
   getObject,
