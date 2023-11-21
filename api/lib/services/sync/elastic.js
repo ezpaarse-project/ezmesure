@@ -4,7 +4,10 @@ const { CronJob } = require('cron');
 const { appLogger } = require('../logger');
 
 const RepositoriesService = require('../../entities/repositories.service');
+const SpacesService = require('../../entities/spaces.service');
 const UsersService = require('../../entities/users.service');
+
+const { syncIndexPatterns } = require('./kibana');
 
 const {
   generateRoleNameFromRepository,
@@ -69,6 +72,21 @@ const syncRepository = async (repo) => {
   } catch (error) {
     appLogger.error(`[elastic] Role [${allRole}] cannot be upserted:\n${error}`);
   }
+
+  const spacesOfSameType = await SpacesService.findMany({
+    where: {
+      type: repo.type,
+      institution: {
+        repositories: {
+          some: {
+            pattern: repo.pattern,
+          },
+        },
+      },
+    },
+  });
+
+  await Promise.allSettled(spacesOfSameType.map((space) => syncIndexPatterns(space)));
 };
 
 /**
