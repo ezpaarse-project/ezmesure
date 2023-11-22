@@ -16,6 +16,7 @@ const { execThrottledPromises } = require('../promises');
 const { syncSchedule } = config.get('ezreeport');
 
 /**
+ * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
  * @typedef {import('@prisma/client').Space} Space
  * @typedef {import('@prisma/client').Repository} Repository
  */
@@ -151,6 +152,7 @@ const syncSpace = async (space) => {
 
 /**
  * Sync Kibana's spaces and roles to ezMESURE's spaces
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncSpaces = async () => {
   const spaces = await SpacesService.findMany({});
@@ -161,7 +163,10 @@ const syncSpaces = async () => {
     executors,
     (error) => appLogger.warn(`[kibana] Error on upserting spaces and spaces roles: ${error.message}`),
   );
+
   appLogger.verbose(`[kibana] Upserted ${res.fulfilled} spaces and ${res.fulfilled * 2} spaces roles (${res.errors} errors)`);
+
+  return res;
 };
 
 /**

@@ -1209,6 +1209,55 @@
           }
         }
       },
+      "SyncStatus": {
+        "type": "object",
+        "properties": {
+          "startedAt": {
+            "description": "Start date of the synchronization",
+            "type": "string",
+            "format": "date-time"
+          },
+          "runningTime": {
+            "description": "Running time of the synchronization, in milliseconds",
+            "type": "integer"
+          },
+          "status": {
+            "description": "Status of the synchonization process",
+            "type":"string",
+            "enum": ["idle", "synchronizing", "completed"]
+          },
+          "hasErrors": {
+            "description": "Whether errors occurred during the synchronization",
+            "type": "boolean"
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "spaces": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
+              },
+              "repositories": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
+              },
+              "users": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
+              }
+            }
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -7180,6 +7229,74 @@
         ],
         "tags": [
           "Sushi"
+        ]
+      }
+    },
+    "/sync/_start": {
+      "parameters": [],
+      "post": {
+        "summary": "Start a synchronization",
+        "description": "Start a global synchronization with Elasticsearch and Kibana",
+        "operationId": "post-sync-_start",
+        "responses": {
+          "202": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sync/_status": {
+      "parameters": [],
+      "get": {
+        "summary": "Get synchronization status",
+        "description": "Get the status of the current synchronization process",
+        "operationId": "get-sync-_status",
+        "responses": {
+          "202": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },

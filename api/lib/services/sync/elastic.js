@@ -21,6 +21,7 @@ const { upsertUser } = require('../elastic/users');
 const { syncSchedule } = config.get('elasticsearch');
 
 /**
+ * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
  * @typedef {import('@prisma/client').Repository} Repository
@@ -91,7 +92,7 @@ const syncRepository = async (repo) => {
 
 /**
  * Sync Elastic's roles to ezMESURE's repositories
- * @returns {Promise<void>}
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncRepositories = async () => {
   const repositories = await RepositoriesService.findMany({});
@@ -103,6 +104,8 @@ const syncRepositories = async () => {
     (error) => appLogger.warn(`[elastic] Error on upserting repositories roles: ${error.message}`),
   );
   appLogger.verbose(`[elastic] Upserted ${res.fulfilled} repositories roles (${res.errors} errors)`);
+
+  return res;
 };
 
 /**
@@ -122,6 +125,7 @@ const syncUser = async (user) => {
 
 /**
  * Sync Elastic's users' roles to ezMESURE's memberships
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncUsers = async () => {
   const users = await UsersService.findMany({});
