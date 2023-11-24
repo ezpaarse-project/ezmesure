@@ -12,21 +12,7 @@ const { syncUser } = require('../../services/sync/elastic');
  */
 
 /**
- * Update roles of the Elasticsearch user
- * @param {User} user
- * @returns {Promise<void>}
- */
-const syncUserRoles = async (user) => {
-  try {
-    await syncUser(user);
-    appLogger.verbose(`[memberships][hooks] Roles of user [${user?.username}] have been updated`);
-  } catch (error) {
-    appLogger.error(`[memberships][hooks] Roles of user [${user?.username}] could not be updated:\n${error}`);
-  }
-};
-
-/**
- *
+ * Synchronize the Elasticsearch user associated to a membership
  * @param {Membership} membership - The membership that was changed
  * @returns {Promise<void>}
  */
@@ -38,42 +24,13 @@ const onMembershipChange = async (membership) => {
   });
 
   if (user) {
-    syncUserRoles(user);
+    try {
+      await syncUser(user);
+      appLogger.verbose(`[memberships][hooks] Roles of user [${user?.username}] have been updated`);
+    } catch (error) {
+      appLogger.error(`[memberships][hooks] Roles of user [${user?.username}] could not be updated:\n${error}`);
+    }
   }
-};
-
-const onRepositoryChange = async (repository) => {
-  const users = await usersService.findMany({
-    where: {
-      memberships: {
-        some: {
-          repositoryPermissions: {
-            some: { repositoryPattern: repository.pattern },
-          },
-        },
-      },
-    },
-  });
-
-  await Promise.allSettled(users.map(syncUserRoles));
-  appLogger.verbose(`[memberships][hooks] Updated roles of ${users.length} users after change in repository [${repository.pattern}]`);
-};
-
-const onSpaceChange = async (space) => {
-  const users = await usersService.findMany({
-    where: {
-      memberships: {
-        some: {
-          spacePermissions: {
-            some: { spaceId: space.id },
-          },
-        },
-      },
-    },
-  });
-
-  await Promise.allSettled(users.map(syncUserRoles));
-  appLogger.verbose(`[memberships][hooks] Updated roles of ${users.length} users after change in space [${space.id}]`);
 };
 
 registerHook('membership:create', onMembershipChange);
