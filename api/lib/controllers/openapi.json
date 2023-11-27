@@ -1253,6 +1253,20 @@
                   "errors": { "type": "integer" },
                   "synchronized": { "type": "integer" }
                 }
+              },
+              "ezreeportUsers": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
+              },
+              "ezreeportNamespaces": {
+                "type": "object",
+                "properties": {
+                  "errors": { "type": "integer" },
+                  "synchronized": { "type": "integer" }
+                }
               }
             }
           }
@@ -7266,12 +7280,12 @@
         ]
       }
     },
-    "/sync/_status": {
+    "/sync": {
       "parameters": [],
       "get": {
         "summary": "Get synchronization status",
         "description": "Get the status of the current synchronization process",
-        "operationId": "get-sync-_status",
+        "operationId": "get-sync",
         "responses": {
           "202": {
             "description": "OK",
