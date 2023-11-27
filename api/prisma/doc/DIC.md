@@ -86,7 +86,7 @@ A kibana space
 | Property      | Type                | Description                                                    | Attributes | Default |
 |---------------|---------------------|----------------------------------------------------------------|------------|---------|
 | id            | `String`            | ID of the space (as used in Kibana)                            | Id         |         |
-| institution   | `Institution?`      | The institution this space is associated to                    |            |         |
+| institution   | `Institution`       | The institution this space is associated to                    |            |         |
 | createdAt     | `DateTime`          | Creation date (in the DB, not in Kibana)                       |            | `now()` |
 | updatedAt     | `DateTime`          | Latest update date (in the DB, not in Kibana)                  |            |         |
 | name          | `String`            | Space name                                                     |            |         |
@@ -112,14 +112,14 @@ A space permission (access rights of a member for a specific space)
 
 A repository (a section of elasticsearch allocated to an institution)
 
-| Property    | Type                     | Description                                      | Attributes | Default |
-|-------------|--------------------------|--------------------------------------------------|------------|---------|
-| institution | `Institution?`           | The institution this repository is associated to |            |         |
-| createdAt   | `DateTime`               | Creation date                                    |            | `now()` |
-| updatedAt   | `DateTime`               | Latest update date                               |            |         |
-| pattern     | `String`                 | The index pattern (ex: b-bibcnrs*)               | Id         |         |
-| type        | `String`                 | The repository type (ezpaarse, counter5)         |            |         |
-| permissions | `RepositoryPermission[]` | Member permissions associated to this repository |            |         |
+| Property     | Type                     | Description                                      | Attributes | Default |
+|--------------|--------------------------|--------------------------------------------------|------------|---------|
+| institutions | `Institution[]`          | The institution this repository is associated to |            |         |
+| createdAt    | `DateTime`               | Creation date                                    |            | `now()` |
+| updatedAt    | `DateTime`               | Latest update date                               |            |         |
+| pattern      | `String`                 | The index pattern (ex: b-bibcnrs*)               | Id         |         |
+| type         | `String`                 | The repository type (ezpaarse, counter5)         |            |         |
+| permissions  | `RepositoryPermission[]` | Member permissions associated to this repository |            |         |
 
 ### RepositoryPermission
 
