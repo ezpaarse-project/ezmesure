@@ -16,7 +16,7 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/_status',
+  path: '/',
   handler: getSyncStatus,
 });
 
