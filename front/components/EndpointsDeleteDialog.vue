@@ -9,7 +9,7 @@
       </v-card-title>
 
       <v-card-text>
-        {{ $t('endpoints.deleteNbEndpoints', { number: endpoints.length }) }}
+        {{ $tc('endpoints.deleteNbEndpoints', endpoints.length) }}
       </v-card-text>
 
       <v-card-actions>

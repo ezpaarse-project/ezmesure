@@ -9,7 +9,7 @@
       </v-card-title>
 
       <v-card-text>
-        {{ $t('repositories.deleteNbRepositories', { number: repositories.length }) }}
+        {{ $tc('repositories.deleteNbRepositories', repositories.length) }}
       </v-card-text>
 
       <v-card-actions>

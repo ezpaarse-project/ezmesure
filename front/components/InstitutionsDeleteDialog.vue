@@ -13,10 +13,12 @@
           {{ $tc('institutions.deleteNbInstitutions.text', institutions.length) }}
         </p>
 
-        <div>
+        <p>
           <b>{{ $t('institutions.deleteNbInstitutions.affected') }}</b>
           {{ $t('institutions.deleteNbInstitutions.unaffected') }}
-        </div>
+        </p>
+
+        {{ $t('irrevocableAction') }}
       </v-card-text>
 
       <v-card-actions>
