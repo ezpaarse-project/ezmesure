@@ -9,7 +9,14 @@
       </v-card-title>
 
       <v-card-text>
-        {{ $t('institutions.deleteNbInstitutions', { number: institutions.length }) }}
+        <p>
+          {{ $tc('institutions.deleteNbInstitutions.text', institutions.length) }}
+        </p>
+
+        <div>
+          <b>{{ $t('institutions.deleteNbInstitutions.affected') }}</b>
+          {{ $t('institutions.deleteNbInstitutions.unaffected') }}
+        </div>
       </v-card-text>
 
       <v-card-actions>

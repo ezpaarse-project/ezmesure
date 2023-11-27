@@ -218,7 +218,11 @@
     "toolbarTitle": "Institutions ({count})",
     "title": "Institution",
     "updateInstitution": "Update institution",
-    "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
+    "deleteNbInstitutions": {
+      "text": "You are about to delete {number} institutions.",
+      "affected": "The associated spaces and roles will be deleted.",
+      "unaffected": "The associated indices will stay unaffected."
+    },
     "newInstitution": "New institution",
     "notMember": "You don't belong to an institution yet.",
     "declareMyInstitution": "Declare my institution",
@@ -774,5 +778,6 @@
   "validate": "Validate",
   "invalidate": "Invalidate",
   "reason": "Reason: {reason}",
-  "indeterminate": "indeterminate"
+  "indeterminate": "indeterminate",
+  "irrevocableAction": "This action cannot be undone."
 }

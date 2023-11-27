@@ -218,7 +218,11 @@
     "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
-    "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "deleteNbInstitutions": {
+      "text": "Vous allez supprimer {count} établissement.|Vous allez supprimer {count} établissements.",
+      "affected": "Les espaces, et rôles associés seront aussi supprimés.",
+      "unaffected": "Les index, quant à eux, ne seront pas affectés."
+    },
     "newInstitution": "Nouvel établissement",
     "notMember": "Vous n'appartenez pas encore à un établissement.",
     "declareMyInstitution": "Déclarer mon établissement",
@@ -774,5 +778,6 @@
   "validate": "Valider",
   "invalidate": "Invalider",
   "reason": "Raison : {reason}",
-  "indeterminate": "indéterminée"
+  "indeterminate": "indéterminée",
+  "irrevocableAction": "Cette action est irrémédiable."
 }
