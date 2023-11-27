@@ -80,7 +80,7 @@ const syncIndexPatterns = async (space) => {
         timeFieldName: repo.type === 'counter5' ? 'X_Date_Month' : 'datetime',
       });
 
-      if (firstPatternId) { firstPatternId = data?.id; }
+      if (!firstPatternId) { firstPatternId = data?.id; }
 
       appLogger.verbose(`[kibana] Index pattern [${repo.pattern}] has been created in space [${space.id}]`);
     } catch (error) {
