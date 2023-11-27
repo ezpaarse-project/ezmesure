@@ -79,6 +79,29 @@ const onUserDelete = async (user) => {
 };
 
 /**
+ * @param {Array<string>} listOfUsername
+ */
+const onUserDeleteAll = async (listOfUsername) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  const usersRes = await Promise.allSettled(
+    listOfUsername.map(async (username) => {
+      try {
+        await elasticUsers.deleteUser(username);
+        appLogger.verbose(`[elastic][hooks] User [${username}] is deleted`);
+      } catch (error) {
+        appLogger.error(`[elastic][hooks] User [${username}] cannot be deleted: ${error.message}`);
+        throw error;
+      }
+    }),
+  );
+
+  const userErrors = usersRes.filter((v) => v.status === 'rejected').length;
+  const userDeleted = usersRes.length - userErrors;
+
+  appLogger.info(`[elastic][hooks] Delete all users : ${userErrors} errors, ${userDeleted} deleted`);
+};
+
+/**
  * @param {User} user
  */
 const onUserUpsert = async (user) => {
@@ -99,11 +122,4 @@ hookEmitter.on('user:create', onUserCreate);
 hookEmitter.on('user:update', onUserUpdate);
 hookEmitter.on('user:upsert', onUserUpsert);
 hookEmitter.on('user:delete', onUserDelete);
-
-module.exports = {
-  onAdminUserCreate,
-  onUserCreate,
-  onUserUpdate,
-  onUserUpsert,
-  onUserDelete,
-};
+hookEmitter.on('user:deleteAll', onUserDeleteAll);

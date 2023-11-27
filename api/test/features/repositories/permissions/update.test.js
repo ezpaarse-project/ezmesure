@@ -91,7 +91,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
@@ -189,7 +189,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
@@ -254,7 +254,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
@@ -337,7 +337,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
@@ -407,7 +407,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });
@@ -472,7 +472,7 @@ describe('[repository permission]: Test delete features', () => {
 
           afterAll(async () => {
             await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
+            await usersService.deleteAll();
             await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
           });
         });

@@ -1,16 +1,37 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const {
-  createInstitutionAsAdmin, createInstitution, validateInstitutionAsAdmin, deleteInstitutionAsAdmin,
-} = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const repositoriesService = require('../../../lib/entities/repositories.service');
+const institutionsService = require('../../../lib/entities/institutions.service');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createInstitution } = require('../../setup/institutions');
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
-const { createRepositoryAsAdmin, deleteRepositoryAsAdmin } = require('../../setup/repositories');
 
 describe('[repositories]: Test update features', () => {
   const institutionTest = {
     name: 'Test',
     namespace: 'test',
+  };
+
+  const ezpaarseRepositoryConfig = {
+    type: 'ezPAARSE',
+    pattern: 'ezpaarse-*',
+  };
+
+  const ezcounterRepositoryConfig = {
+    type: 'COUNTER 5',
+    pattern: 'publisher-*',
+  };
+
+  const randomRepositoryConfig = {
+    type: 'random',
+    pattern: 'random-*',
+  };
+
+  const updateRepositoryConfig = {
+    type: 'update-type',
+    pattern: 'update-pattern',
   };
   describe('As admin', () => {
     let adminToken;
@@ -22,27 +43,19 @@ describe('[repositories]: Test update features', () => {
       let institutionId;
 
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
+      describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
         let repositoryId;
-        let repositoryConfig;
-        const updateRepositoryConfig = {
-          pattern: 'update-ezpaarse-*',
-          type: 'update-ezPAARSE',
-        };
 
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'ezPAARSE',
-            institutionId,
-            pattern: 'ezpaarse-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        it('Should Update repository of type [ezPAARSE] and pattern [ezpaarse-*]', async () => {
+        it(`#01 Should Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
           const res = await ezmesure({
             method: 'PATCH',
             url: `/repositories/${repositoryId}`,
@@ -52,6 +65,7 @@ describe('[repositories]: Test update features', () => {
             data: updateRepositoryConfig,
           });
 
+          // Test API
           expect(res).toHaveProperty('status', 200);
 
           const repository = res?.data;
@@ -62,32 +76,32 @@ describe('[repositories]: Test update features', () => {
           expect(repository?.updatedAt).not.toBeNull();
           expect(repository).toHaveProperty('pattern', updateRepositoryConfig?.pattern);
           expect(repository).toHaveProperty('type', updateRepositoryConfig?.type);
+
+          // Test service
+          const repositoryFromService = await repositoriesService.findByID(repositoryId);
+
+          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+          expect(repositoryFromService?.createdAt).not.toBeNull();
+          expect(repositoryFromService?.updatedAt).not.toBeNull();
+          expect(repositoryFromService).toHaveProperty('pattern', updateRepositoryConfig.pattern);
+          expect(repositoryFromService).toHaveProperty('type', updateRepositoryConfig.type);
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [COUNTER 5] for [Test] institution', () => {
-        let repositoryConfig;
+      describe(`Update repository of type [${ezcounterRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
         let repositoryId;
-        const updateRepositoryConfig = {
-          pattern: 'update-ezpaarse-*',
-          type: 'update-ezPAARSE',
-        };
 
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        it('Should Update repository of type [COUNTER 5] and pattern [publisher-*]', async () => {
+        it(`#02 Should Update repository of type [${ezcounterRepositoryConfig.type}] with [${updateRepositoryConfig.type}] and pattern [${ezcounterRepositoryConfig.pattern}]`, async () => {
           const res = await ezmesure({
             method: 'PATCH',
             url: `/repositories/${repositoryId}`,
@@ -97,6 +111,7 @@ describe('[repositories]: Test update features', () => {
             data: updateRepositoryConfig,
           });
 
+          // Test API
           expect(res).toHaveProperty('status', 200);
 
           const repository = res?.data;
@@ -107,31 +122,32 @@ describe('[repositories]: Test update features', () => {
           expect(repository?.updatedAt).not.toBeNull();
           expect(repository).toHaveProperty('pattern', updateRepositoryConfig?.pattern);
           expect(repository).toHaveProperty('type', updateRepositoryConfig?.type);
+
+          // Test service
+          const repositoryFromService = await repositoriesService.findByID(repositoryId);
+
+          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+          expect(repositoryFromService?.createdAt).not.toBeNull();
+          expect(repositoryFromService?.updatedAt).not.toBeNull();
+          expect(repositoryFromService).toHaveProperty('pattern', updateRepositoryConfig.pattern);
+          expect(repositoryFromService).toHaveProperty('type', updateRepositoryConfig.type);
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [random] for [Test] institution', () => {
-        let repositoryConfig;
+      describe(`Update repository of type [${randomRepositoryConfig.pattern}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
         let repositoryId;
-        const updateRepositoryConfig = {
-          pattern: 'update-ezpaarse-*',
-          type: 'update-ezPAARSE',
-        };
 
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'random',
-            institutionId,
-            pattern: 'random-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        it('Should Update repository of type [random] and pattern [random-*]', async () => {
+        it(`#03 Should Update repository of type [${randomRepositoryConfig.pattern}] with [${updateRepositoryConfig.type}] and pattern [${randomRepositoryConfig.type}]`, async () => {
           const res = await ezmesure({
             method: 'PATCH',
             url: `/repositories/${repositoryId}`,
@@ -141,6 +157,7 @@ describe('[repositories]: Test update features', () => {
             data: updateRepositoryConfig,
           });
 
+          // Test API
           expect(res).toHaveProperty('status', 200);
 
           const repository = res?.data;
@@ -151,15 +168,24 @@ describe('[repositories]: Test update features', () => {
           expect(repository?.updatedAt).not.toBeNull();
           expect(repository).toHaveProperty('pattern', updateRepositoryConfig?.pattern);
           expect(repository).toHaveProperty('type', updateRepositoryConfig?.type);
+
+          // Test service
+          const repositoryFromService = await repositoriesService.findByID(repositoryId);
+
+          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+          expect(repositoryFromService?.createdAt).not.toBeNull();
+          expect(repositoryFromService?.updatedAt).not.toBeNull();
+          expect(repositoryFromService).toHaveProperty('pattern', updateRepositoryConfig.pattern);
+          expect(repositoryFromService).toHaveProperty('type', updateRepositoryConfig.type);
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
   });
@@ -176,282 +202,193 @@ describe('[repositories]: Test update features', () => {
 
       beforeAll(async () => {
         institutionId = await createInstitution(institutionTest, userTest);
-        await validateInstitutionAsAdmin(institutionId);
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
+      describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
         let repositoryId;
 
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        it('Should get HTTP status 403', async () => {
+        it('#04 Should not update repository', async () => {
           const res = await ezmesure({
             method: 'PATCH',
             url: `/repositories/${repositoryId}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
+            data: updateRepositoryConfig,
           });
 
+          // Test API
           expect(res).toHaveProperty('status', 403);
+
+          // Test service
+          const repositoryFromService = await repositoriesService.findByID(repositoryId);
+
+          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+          expect(repositoryFromService?.createdAt).not.toBeNull();
+          expect(repositoryFromService?.updatedAt).not.toBeNull();
+          expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
+          expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
     describe('Institution created by admin', () => {
       let institutionId;
 
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        ezpaarseRepositoryConfig.institutionId = institutionId;
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
+      describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
         let repositoryId;
 
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        it('Should get HTTP status 403', async () => {
+        it('#05 Should not update repository', async () => {
           const res = await ezmesure({
             method: 'PATCH',
             url: `/repositories/${repositoryId}`,
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
+            data: updateRepositoryConfig,
           });
 
+          // Test API
           expect(res).toHaveProperty('status', 403);
+
+          // Test service
+          const repositoryFromService = await repositoriesService.findByID(repositoryId);
+
+          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+          expect(repositoryFromService?.createdAt).not.toBeNull();
+          expect(repositoryFromService?.updatedAt).not.toBeNull();
+          expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
+          expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
         });
 
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('Institution created by user', () => {
-      let institutionId;
-      let userTest;
+    let institutionId;
 
-      beforeAll(async () => {
-        userTest = await createDefaultActivatedUserAsAdmin();
-        institutionId = await createInstitution(institutionTest, userTest);
-        await validateInstitutionAsAdmin(institutionId);
-      });
-
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
-        let repositoryId;
-
-        beforeAll(async () => {
-          userTest = await createDefaultActivatedUserAsAdmin();
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
-            headers: {
-              Authorization: 'Bearer: random',
-            },
-          });
-
-          expect(res).toHaveProperty('status', 401);
-        });
-
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-        await deleteUserAsAdmin(userTest.username);
-      });
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
     });
 
-    describe('Institution created by admin', () => {
-      let institutionId;
+    describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
+      let repositoryId;
 
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        ezpaarseRepositoryConfig.institutionId = institutionId;
+        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        repositoryId = repository.id;
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
-        let repositoryId;
-
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+      it('#06 Should not update repository', async () => {
+        const res = await ezmesure({
+          method: 'PATCH',
+          url: `/repositories/${repositoryId}`,
+          data: updateRepositoryConfig,
+          headers: {
+            Authorization: 'Bearer: random',
+          },
         });
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
-            headers: {
-              Authorization: 'Bearer: random',
-            },
-          });
+        // Test API
+        expect(res).toHaveProperty('status', 401);
 
-          expect(res).toHaveProperty('status', 401);
-        });
+        // Test service
+        const repositoryFromService = await repositoriesService.findByID(repositoryId);
 
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
+        expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+        expect(repositoryFromService?.createdAt).not.toBeNull();
+        expect(repositoryFromService?.updatedAt).not.toBeNull();
+        expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
+        expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
       });
+
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await repositoriesService.deleteAll();
       });
+    });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
-  describe('Without user', () => {
-    describe('Institution created by user', () => {
-      let institutionId;
-      let userTest;
+  describe('Without token', () => {
+    let institutionId;
 
-      beforeAll(async () => {
-        userTest = await createDefaultActivatedUserAsAdmin();
-        institutionId = await createInstitution(institutionTest, userTest);
-        await validateInstitutionAsAdmin(institutionId);
-      });
-
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
-        let repositoryId;
-
-        beforeAll(async () => {
-          userTest = await createDefaultActivatedUserAsAdmin();
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
-        });
-
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
-          });
-
-          expect(res).toHaveProperty('status', 401);
-        });
-
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
-      });
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-        await deleteUserAsAdmin(userTest.username);
-      });
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
     });
 
-    describe('Institution created by admin', () => {
-      let institutionId;
+    describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
+      let repositoryId;
 
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        ezpaarseRepositoryConfig.institutionId = institutionId;
+        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        repositoryId = repository.id;
       });
 
-      describe('PATCH /repositories/<id> - Update repository of type [ezPAARSE] for [Test] institution', () => {
-        let repositoryConfig;
-        let repositoryId;
-
-        beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+      it('#07 Should not update repository', async () => {
+        const res = await ezmesure({
+          method: 'PATCH',
+          url: `/repositories/${repositoryId}`,
+          data: updateRepositoryConfig,
         });
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'PATCH',
-            url: `/repositories/${repositoryId}`,
-            data: {
-              type: 'update-ezPAARSE',
-              pattern: 'update-publisher-*',
-            },
-          });
+        // Test API
+        expect(res).toHaveProperty('status', 401);
 
-          expect(res).toHaveProperty('status', 401);
-        });
+        // Test service
+        const repositoryFromService = await repositoriesService.findByID(repositoryId);
 
-        afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
-        });
+        expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
+        expect(repositoryFromService?.createdAt).not.toBeNull();
+        expect(repositoryFromService?.updatedAt).not.toBeNull();
+        expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
+        expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
       });
+
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await repositoriesService.deleteAll();
       });
+    });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
 });

@@ -22,6 +22,14 @@ const onUserDelete = async (user) => {
 };
 
 /**
+ * @param {Array<User>} users
+ */
+const onUserDeleteAll = async (users) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  Promise.all(users.map((user) => onUserDelete(user)));
+};
+
+/**
  * @param {User} user
  */
 const onUserUpsert = async (user) => {
@@ -38,8 +46,4 @@ hookEmitter.on('user:create', onUserUpsert);
 hookEmitter.on('user:update', onUserUpsert);
 hookEmitter.on('user:upsert', onUserUpsert);
 hookEmitter.on('user:delete', onUserDelete);
-
-module.exports = {
-  onUserUpsert,
-  onUserDelete,
-};
+hookEmitter.on('user:deleteAll', onUserDeleteAll);

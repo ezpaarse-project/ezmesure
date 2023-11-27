@@ -1,8 +1,10 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const usersService = require('../../../lib/entities/users.service');
+const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.service');
+
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
-const { createSushiEndpointAsAdmin, deleteSushiEndpointAsAdmin } = require('../../setup/sushi-endpoint');
 
 describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
   const sushiEndpointTest = {
@@ -27,13 +29,14 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
-    describe('DELETE /sushi-enpoints - Delete sushi-endpoint', () => {
+    describe('Delete sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        sushiEndpointId = await createSushiEndpointAsAdmin(sushiEndpointTest);
+        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        sushiEndpointId = sushiEndpoint.id;
       });
 
-      it('Should update sushi-endpoint', async () => {
+      it(`#01 DELETE /sushi-endpoints/${sushiEndpointId} - Should delete sushi-endpoint`, async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -43,22 +46,16 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
           data: sushiEndpointTest,
         });
 
+        // Test API
         expect(res).toHaveProperty('status', 204);
-      });
 
-      it('Should get HTTP status 404', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 404);
+        // Test service
+        const sushiEndpointsFromService = await sushiEndpointsService.findMany();
+        expect(sushiEndpointsFromService).toEqual([]);
       });
 
       afterAll(async () => {
-        await deleteSushiEndpointAsAdmin(sushiEndpointId);
+        await sushiEndpointsService.deleteAll();
       });
     });
   });
@@ -71,13 +68,14 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       userToken = await getToken(userTest.username, userTest.password);
     });
 
-    describe('DELETE /sushi-enpoints - Delete sushi-endpoint', () => {
+    describe('Delete sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        sushiEndpointId = await createSushiEndpointAsAdmin(sushiEndpointTest);
+        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        sushiEndpointId = sushiEndpoint.id;
       });
 
-      it('Should get HTTP status 403', async () => {
+      it(`#02 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -87,93 +85,126 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
           data: sushiEndpointTest,
         });
 
+        // Test API
         expect(res).toHaveProperty('status', 403);
-      });
 
-      it('Should get sushi-endpoint', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-        const sushiEndpoint = res?.data;
+        // Test sushi-endpoint service
+        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
 
-        expect(sushiEndpoint?.id).not.toBeNull();
-        expect(sushiEndpoint?.createdAt).not.toBeNull();
-        expect(sushiEndpoint?.updatedAt).not.toBeNull();
-        expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
-        expect(sushiEndpoint).toHaveProperty('vendor', sushiEndpointTest.vendor);
-        expect(sushiEndpoint).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpoint).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
-        expect(sushiEndpoint).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
-        expect(sushiEndpoint).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
-        expect(sushiEndpoint).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
-        expect(sushiEndpoint).toHaveProperty('requireApiKey', sushiEndpointTest.requireApiKey);
-        expect(sushiEndpoint).toHaveProperty('ignoreReportValidation', sushiEndpointTest.ignoreReportValidation);
-        expect(sushiEndpoint).toHaveProperty('defaultCustomerId', sushiEndpointTest.defaultCustomerId);
-        expect(sushiEndpoint).toHaveProperty('defaultRequestorId', sushiEndpointTest.defaultRequestorId);
-        expect(sushiEndpoint).toHaveProperty('defaultApiKey', sushiEndpointTest.defaultApiKey);
-        expect(sushiEndpoint).toHaveProperty('paramSeparator', sushiEndpointTest.paramSeparator);
+        expect(sushiEndpointFromService?.id).not.toBeNull();
+        expect(sushiEndpointFromService?.createdAt).not.toBeNull();
+        expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
+        expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
+        expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
+        expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
+        expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('requireApiKey', sushiEndpointTest.requireApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('ignoreReportValidation', sushiEndpointTest.ignoreReportValidation);
+        expect(sushiEndpointFromService).toHaveProperty('defaultCustomerId', sushiEndpointTest.defaultCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultRequestorId', sushiEndpointTest.defaultRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultApiKey', sushiEndpointTest.defaultApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('paramSeparator', sushiEndpointTest.paramSeparator);
       });
 
       afterAll(async () => {
-        await deleteSushiEndpointAsAdmin(sushiEndpointId);
+        await sushiEndpointsService.deleteAll();
       });
     });
 
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await usersService.deleteAll();
+    });
+  });
+
+  describe('Without random token', () => {
+    describe('Delete sushi-endpoint', () => {
+      let sushiEndpointId;
+      beforeAll(async () => {
+        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        sushiEndpointId = sushiEndpoint.id;
+      });
+      it(`#03 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
+        const res = await ezmesure({
+          method: 'DELETE',
+          url: `/sushi-endpoints/${sushiEndpointId}`,
+          data: sushiEndpointTest,
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        // Test API
+        expect(res).toHaveProperty('status', 401);
+
+        // Test sushi-endpoint service
+        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+
+        expect(sushiEndpointFromService?.id).not.toBeNull();
+        expect(sushiEndpointFromService?.createdAt).not.toBeNull();
+        expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
+        expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
+        expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
+        expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
+        expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('requireApiKey', sushiEndpointTest.requireApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('ignoreReportValidation', sushiEndpointTest.ignoreReportValidation);
+        expect(sushiEndpointFromService).toHaveProperty('defaultCustomerId', sushiEndpointTest.defaultCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultRequestorId', sushiEndpointTest.defaultRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultApiKey', sushiEndpointTest.defaultApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('paramSeparator', sushiEndpointTest.paramSeparator);
+      });
+
+      afterAll(async () => {
+        await sushiEndpointsService.deleteAll();
+      });
     });
   });
   describe('Without token', () => {
-    describe('DELETE /sushi-enpoints - Delete sushi-endpoint', () => {
+    describe('Delete sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        sushiEndpointId = await createSushiEndpointAsAdmin(sushiEndpointTest);
+        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        sushiEndpointId = sushiEndpoint.id;
       });
-      it('Should get HTTP status 401', async () => {
+      it(`#04 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
           data: sushiEndpointTest,
         });
 
+        // Test API
         expect(res).toHaveProperty('status', 401);
+
+        // Test sushi-endpoint service
+        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+
+        expect(sushiEndpointFromService?.id).not.toBeNull();
+        expect(sushiEndpointFromService?.createdAt).not.toBeNull();
+        expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
+        expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
+        expect(sushiEndpointFromService).toHaveProperty('vendor', sushiEndpointTest.vendor);
+        expect(sushiEndpointFromService).toHaveProperty('description', sushiEndpointTest.description);
+        expect(sushiEndpointFromService).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
+        expect(sushiEndpointFromService).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
+        expect(sushiEndpointFromService).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('requireApiKey', sushiEndpointTest.requireApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('ignoreReportValidation', sushiEndpointTest.ignoreReportValidation);
+        expect(sushiEndpointFromService).toHaveProperty('defaultCustomerId', sushiEndpointTest.defaultCustomerId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultRequestorId', sushiEndpointTest.defaultRequestorId);
+        expect(sushiEndpointFromService).toHaveProperty('defaultApiKey', sushiEndpointTest.defaultApiKey);
+        expect(sushiEndpointFromService).toHaveProperty('paramSeparator', sushiEndpointTest.paramSeparator);
       });
 
-      it('Should get sushi-endpoint', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/sushi-endpoints/${sushiEndpointId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-        const sushiEndpoint = res?.data;
-
-        expect(sushiEndpoint?.id).not.toBeNull();
-        expect(sushiEndpoint?.createdAt).not.toBeNull();
-        expect(sushiEndpoint?.updatedAt).not.toBeNull();
-        expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
-        expect(sushiEndpoint).toHaveProperty('vendor', sushiEndpointTest.vendor);
-        expect(sushiEndpoint).toHaveProperty('description', sushiEndpointTest.description);
-        expect(sushiEndpoint).toHaveProperty('counterVersion', sushiEndpointTest.counterVersion);
-        expect(sushiEndpoint).toHaveProperty('technicalProvider', sushiEndpointTest.technicalProvider);
-        expect(sushiEndpoint).toHaveProperty('requireCustomerId', sushiEndpointTest.requireCustomerId);
-        expect(sushiEndpoint).toHaveProperty('requireRequestorId', sushiEndpointTest.requireRequestorId);
-        expect(sushiEndpoint).toHaveProperty('requireApiKey', sushiEndpointTest.requireApiKey);
-        expect(sushiEndpoint).toHaveProperty('ignoreReportValidation', sushiEndpointTest.ignoreReportValidation);
-        expect(sushiEndpoint).toHaveProperty('defaultCustomerId', sushiEndpointTest.defaultCustomerId);
-        expect(sushiEndpoint).toHaveProperty('defaultRequestorId', sushiEndpointTest.defaultRequestorId);
-        expect(sushiEndpoint).toHaveProperty('defaultApiKey', sushiEndpointTest.defaultApiKey);
-        expect(sushiEndpoint).toHaveProperty('paramSeparator', sushiEndpointTest.paramSeparator);
-      });
       afterAll(async () => {
-        await deleteSushiEndpointAsAdmin(sushiEndpointId);
+        await sushiEndpointsService.deleteAll();
       });
     });
   });

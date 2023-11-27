@@ -83,4 +83,16 @@ module.exports = class RepositoryPermissionsService {
 
     return permission;
   }
+
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const permissions = await this.findMany({});
+
+    await prisma.repositoryPermission.deleteMany();
+
+    hooks.emit('repository_permission:deleteAll', permissions);
+
+    return permissions;
+  }
 };

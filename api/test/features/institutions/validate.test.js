@@ -1,10 +1,13 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createInstitution, createInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const institutionsService = require('../../../lib/entities/institutions.service');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createInstitution } = require('../../setup/institutions');
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[institutions]: Test validate features', () => {
+describe('[institutions]: Test validate institution features', () => {
   const institutionTest = {
     name: 'Test',
     namespace: 'test',
@@ -17,65 +20,75 @@ describe('[institutions]: Test validate features', () => {
   });
 
   describe('As admin', () => {
-    describe('PUT /institutions/<id>/validated - update validate institution [Test]', () => {
-      let institutionId;
+    let institutionId;
 
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
+    it(`#01 PUT /institutions/:institutionId/validated - Should validate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}/validated`,
+        data: { value: true },
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 200);
+
+      const institutionFromResponse = httpAppResponse?.data;
+      expect(institutionFromResponse).toHaveProperty('validated', true);
+
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', true);
+    });
+
+    // TODO start with invalidate institution
+    it(`#02 PUT /institutions/:institutionId/validated - Should invalidate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}/validated`,
+        data: { value: false },
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
 
-      it('Should validate institution [Test]', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: true },
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 200);
 
-        expect(res).toHaveProperty('status', 200);
+      const institutionFromResponse = httpAppResponse?.data;
+      expect(institutionFromResponse).toHaveProperty('validated', false);
 
-        const institution = res?.data;
-        expect(institution).toHaveProperty('validated', true);
-      });
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', false);
+    });
 
-      it('Should unvalidate institution [Test]', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}/validated`,
-          data: { value: false },
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution).toHaveProperty('validated', false);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
   describe('As user', () => {
     let userToken;
     let userTest;
     beforeAll(async () => {
+      // TODO use service to create user
       userTest = await createDefaultActivatedUserAsAdmin();
       userToken = await getToken(userTest.username, userTest.password);
     });
-    describe('PUT /institutions/<id>/validated - update validate institution created by user', () => {
-      let institutionId;
+    let institutionId;
+    describe('Institution created by user', () => {
       beforeAll(async () => {
+        // TODO use service to create institution
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+      it(`#03 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
           data: { value: true },
@@ -84,42 +97,18 @@ describe('[institutions]: Test validate features', () => {
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
+
+        // Test service
+        const institutionFromService = await institutionsService.findByID(institutionId);
+        expect(institutionFromService).toHaveProperty('validated', false);
       });
 
-      it('Should get institution [Test] with change', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
+      // TODO start with invalidate institution
 
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', null);
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+      it(`#04 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
           data: { value: true },
@@ -128,53 +117,18 @@ describe('[institutions]: Test validate features', () => {
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
 
-      it('Should get institution [Test] with change', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', null);
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        // Test service
+        const institutionFromService = await institutionsService.findByID(institutionId);
+        expect(institutionFromService).toHaveProperty('validated', false);
       });
     });
 
-    describe('PUT /institutions/<id>/validated - update validate institution created by admin', () => {
-      let institutionId;
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-      });
-
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+    describe('Institution created by other', () => {
+      it(`#05 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
           data: { value: true },
@@ -183,42 +137,18 @@ describe('[institutions]: Test validate features', () => {
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
+
+        // Test service
+        const institutionFromService = await institutionsService.findByID(institutionId);
+        expect(institutionFromService).toHaveProperty('validated', false);
       });
 
-      it('Should get institution [Test] with no change', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
+      // TODO start with invalidate institution
 
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+      it(`#06 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
           data: { value: false },
@@ -227,236 +157,108 @@ describe('[institutions]: Test validate features', () => {
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
 
-      it('Should get institution [Test] with no change', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        // Test service
+        const institutionFromService = await institutionsService.findByID(institutionId);
+        expect(institutionFromService).toHaveProperty('validated', false);
       });
     });
+
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await institutionsService.deleteAll();
+    });
+    afterAll(async () => {
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('PUT /institutions/<id>/validated - update validate institution', () => {
-      let institutionId;
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
+    let institutionId;
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
+    it(`#07 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}`,
+        data: { value: true },
+        headers: {
+          Authorization: 'Bearer: random',
+        },
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: { value: true },
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-        expect(res).toHaveProperty('status', 401);
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 401);
+
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', false);
+    });
+
+    // TODO start with invalidate institution
+    it(`#08 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}`,
+        data: { value: false },
+        headers: {
+          Authorization: 'Bearer: random',
+        },
       });
 
-      it('Should get institution with no changes', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 401);
 
-        expect(res).toHaveProperty('status', 200);
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', false);
+    });
 
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: { value: false },
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      it('Should get institution with no changes', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
   describe('Without token', () => {
-    describe('PUT /institutions/<id>/validated - update validate institution', () => {
-      let institutionId;
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
+    let institutionId;
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
+    it(`#09 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}`,
+        data: { value: true },
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: { value: true },
-        });
-        expect(res).toHaveProperty('status', 401);
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 401);
+
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', false);
+    });
+
+    // TODO start with invalidate institution
+    it(`#10 Should not invalidate institution [${institutionTest.name}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/institutions/${institutionId}`,
+        data: { value: false },
       });
 
-      it('Should get institution with no changes', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+      // Test API
+      expect(httpAppResponse).toHaveProperty('status', 401);
 
-        expect(res).toHaveProperty('status', 200);
+      // Test service
+      const institutionFromService = await institutionsService.findByID(institutionId);
+      expect(institutionFromService).toHaveProperty('validated', false);
+    });
 
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'PUT',
-          url: `/institutions/${institutionId}`,
-          data: { value: false },
-        });
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      it('Should get institution with no changes', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
-
-        const institution = res?.data;
-        expect(institution?.id).not.toBeNull();
-        expect(institution).toHaveProperty('parentInstitutionId', null);
-        expect(institution?.createdAt).not.toBeNull();
-        expect(institution?.updatedAt).not.toBeNull();
-        expect(institution).toHaveProperty('name', 'Test');
-        expect(institution).toHaveProperty('namespace', 'test');
-        expect(institution).toHaveProperty('validated', false);
-        expect(institution).toHaveProperty('hidePartner', false);
-        expect(institution).toHaveProperty('tags', []);
-        expect(institution).toHaveProperty('logoId', null);
-        expect(institution).toHaveProperty('type', null);
-        expect(institution).toHaveProperty('acronym', null);
-        expect(institution).toHaveProperty('websiteUrl', null);
-        expect(institution).toHaveProperty('city', null);
-        expect(institution).toHaveProperty('uai', null);
-        expect(institution).toHaveProperty('social', null);
-        expect(institution).toHaveProperty('sushiReadySince', null);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
 });

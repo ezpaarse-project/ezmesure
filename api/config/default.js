@@ -69,6 +69,7 @@ module.exports = {
   },
   admin: {
     username: 'ezmesure-admin',
+    fullName: 'ezMESURE Administrator',
     password: 'changeme',
     email: 'admin@admin.com',
   },

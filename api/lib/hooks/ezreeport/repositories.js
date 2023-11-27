@@ -28,7 +28,17 @@ const onRepositoryModified = async (repository) => {
   }
 };
 
+/**
+ * @param { Array<Repository> } repositories
+ */
+const onRepositoryDeleteAll = async (repositories) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  // TODO make custom log for delete
+  Promise.all(repositories.map((Repository) => onRepositoryModified(Repository)));
+};
+
 hookEmitter.on('repository:create', onRepositoryModified);
 hookEmitter.on('repository:update', onRepositoryModified);
 hookEmitter.on('repository:upsert', onRepositoryModified);
 hookEmitter.on('repository:delete', onRepositoryModified);
+hookEmitter.on('repository:deleteAll', onRepositoryDeleteAll);

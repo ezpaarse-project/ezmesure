@@ -1,100 +1,97 @@
 const config = require('config');
 const ezmesure = require('../../setup/ezmesure');
 
+const usersService = require('../../../lib/entities/users.service');
+
 const usernameAdmin = config.get('admin.username');
 const passwordAdmin = config.get('admin.password');
 
 const {
   createDefaultActivatedUserAsAdmin,
   createDefaultUserAsAdmin,
-  deleteUserAsAdmin,
 } = require('../../setup/users');
 
 describe('[users]: Test login users features', () => {
-  describe('As admin', () => {
-    describe('POST /login/local - Login with admin account', () => {
-      it('Should get auth token', async () => {
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/login/local',
-          data: {
-            username: usernameAdmin,
-            password: passwordAdmin,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 200);
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+    password: 'changeme',
+  };
+  describe('Login with admin account', () => {
+    it('#01 POST /login/local - Should get auth token', async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: '/login/local',
+        data: {
+          username: usernameAdmin,
+          password: passwordAdmin,
+        },
       });
+
+      expect(httpAppResponse).toHaveProperty('status', 200);
     });
   });
 
   describe('Activated user', () => {
-    describe('POST /login/local - Login with activate user [user.test] account', () => {
-      let userTest;
+    beforeAll(async () => {
+      await createDefaultActivatedUserAsAdmin();
+    });
 
-      beforeAll(async () => {
-        userTest = await createDefaultActivatedUserAsAdmin();
+    it('#02 POST /login/local - Should get auth token', async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: '/login/local',
+        data: {
+          username: userTest.username,
+          password: userTest.password,
+        },
       });
 
-      it('Should get auth token', async () => {
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/login/local',
-          data: {
-            username: userTest.username,
-            password: userTest.password,
-          },
-        });
+      expect(httpAppResponse).toHaveProperty('status', 200);
+    });
 
-        expect(res).toHaveProperty('status', 200);
-      });
-
-      afterAll(async () => {
-        await deleteUserAsAdmin(userTest.username);
-      });
+    afterAll(async () => {
+      await usersService.deleteAll();
     });
   });
 
   describe('Not activated user', () => {
-    describe('POST /login/local - Login with not activate user [user.test] account', () => {
-      let userTest;
-      beforeAll(async () => {
-        userTest = await createDefaultUserAsAdmin();
+    beforeAll(async () => {
+      await createDefaultUserAsAdmin();
+    });
+
+    it('#03 POST /login/local - Should get auth token', async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: '/login/local',
+        data: {
+          username: userTest.username,
+          password: userTest.password,
+        },
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/login/local',
-          data: {
-            username: userTest.username,
-            password: userTest.password,
-          },
-        });
+      expect(httpAppResponse).toHaveProperty('status', 200);
+    });
 
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      afterAll(async () => {
-        await deleteUserAsAdmin(userTest.username);
-      });
+    afterAll(async () => {
+      await usersService.deleteAll();
     });
   });
 
   describe('Someone not registered', () => {
-    describe('POST /login/local - Login with not activate user [user.test] account', () => {
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/login/local',
-          data: {
-            username: 'toto',
-            password: 'titi',
-          },
-        });
-
-        expect(res).toHaveProperty('status', 401);
+    it('#04 POST /login/local - Should not get auth token', async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: '/login/local',
+        data: {
+          username: 'toto',
+          password: 'titi',
+        },
       });
+
+      expect(httpAppResponse).toHaveProperty('status', 401);
     });
   });
 });

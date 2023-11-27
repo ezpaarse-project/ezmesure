@@ -44,6 +44,30 @@ module.exports = class MembershipsService {
   }
 
   /**
+   * @param {string} institutionId
+   * @param {string} username
+   * @param {Object | null} includes
+   * @returns {Promise<Membership | null>}
+   */
+  static findByID(institutionId, username, includes = null) {
+    let include;
+    if (includes) {
+      include = {
+        ...includes,
+      };
+    }
+    return prisma.membership.findUnique({
+      where: {
+        username_institutionId: {
+          institutionId,
+          username,
+        },
+      },
+      include,
+    });
+  }
+
+  /**
    * @param {MembershipUpdateArgs} params
    * @returns {Promise<Membership>}
    */
@@ -77,5 +101,19 @@ module.exports = class MembershipsService {
     hooks.emit('membership:delete', membership);
 
     return membership;
+  }
+
+  /**
+   * @returns {Promise<Array<Membership> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+    const memberships = await this.findMany({});
+
+    hooks.emit('membership:deleteAll', memberships);
+
+    await prisma.membership.deleteMany();
+
+    return memberships;
   }
 };

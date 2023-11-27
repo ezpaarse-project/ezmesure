@@ -1,71 +1,107 @@
 const ezmesure = require('../../../setup/ezmesure');
 
+const repositoriesService = require('../../../../lib/entities/repositories.service');
+const membershipsService = require('../../../../lib/entities/memberships.service');
+const institutionsService = require('../../../../lib/entities/institutions.service');
+const usersService = require('../../../../lib/entities/users.service');
+const repositoryPermissionsService = require('../../../../lib/entities/repository-permissions.service');
+
 const {
   createInstitution,
-  createInstitutionAsAdmin,
-  validateInstitutionAsAdmin,
-  deleteInstitutionAsAdmin,
-  addMembershipsToUserAsAdmin,
-  deleteMembershipsToUserAsAdmin,
 } = require('../../../setup/institutions');
+
 const {
   createDefaultActivatedUserAsAdmin,
-  deleteUserAsAdmin,
   createUserAsAdmin,
   activateUser,
 } = require('../../../setup/users');
-const { getToken, getAdminToken } = require('../../../setup/login');
-const {
-  createRepositoryAsAdmin,
-  deleteRepositoryAsAdmin,
-  addPermissionToRepositoryAsAdmin,
-  deletePermissionToRepositoryAsAdmin,
-} = require('../../../setup/repositories');
 
-describe('[repository permission]: Test delete features', () => {
+const { getToken, getAdminToken } = require('../../../setup/login');
+
+describe('[repository permission]: Test create features', () => {
+  const allPermission = ['memberships:write', 'memberships:read'];
+  const readPermission = ['memberships:read'];
+  const emptyPermission = [];
+
+  const anotherUserTest = {
+    username: 'another.user',
+    email: 'another.user@test.fr',
+    fullName: 'Another user',
+    isAdmin: false,
+    password: 'changeme',
+    permissions: allPermission,
+  };
+
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
+  const membershipUserTest = {
+    username: userTest.username,
+  };
+  const membershipTest = {
+    username: userTest.username,
+  };
+
   const institutionTest = {
     name: 'Test',
     namespace: 'test',
   };
-  let adminToken;
-  beforeAll(async () => {
-    adminToken = await getAdminToken();
-  });
+
+  const ezpaarseRepositoryConfig = {
+    type: 'ezPAARSE',
+    pattern: 'ezpaarse-*',
+  };
+
+  const ezcounterRepositoryConfig = {
+    type: 'COUNTER 5',
+    pattern: 'publisher-*',
+  };
+
+  const randomRepositoryConfig = {
+    type: 'random',
+    pattern: 'random-*',
+  };
+
+  const permissionTest = {
+    readonly: true,
+    locked: true,
+  };
   describe('As admin', () => {
+    let adminToken;
+    beforeAll(async () => {
+      adminToken = await getAdminToken();
+    });
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should delete permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
-            const res = await ezmesure({
+          it(`#01 DELETE /repositories/:repositoryId/permissions/:username - Should create permission of user [${userTest.username}] for the repository of type [${ezpaarseRepositoryConfig.type}]`, async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
@@ -73,214 +109,291 @@ describe('[repository permission]: Test delete features', () => {
               },
             });
 
-            expect(res).toHaveProperty('status', 200);
+            expect(httpAppResponse).toHaveProperty('status', 200);
+
+            const permission = httpAppResponse?.data;
+            expect(permission).toHaveProperty('username', userTest.username);
+            expect(permission).toHaveProperty('institutionId', institutionId);
+            expect(permission).toHaveProperty('repositoryId', repositoryId);
+            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
+            expect(permission).toHaveProperty('locked', permissionTest.locked);
           });
 
-          it('Should get HTTP status 404', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/institutions/${institutionId}/repositories`,
+          afterAll(async () => {
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
+          });
+        });
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
+        });
+      });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
+
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it(`#02 DELETE /repositories/:repositoryId/permissions/:username - Should create permission of user [${userTest.username}] for the repository of type [${ezpaarseRepositoryConfig.type}]`, async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
                 Authorization: `Bearer ${adminToken}`,
               },
             });
-              // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+
+            expect(httpAppResponse).toHaveProperty('status', 200);
+
+            const permission = httpAppResponse?.data;
+            expect(permission).toHaveProperty('username', userTest.username);
+            expect(permission).toHaveProperty('institutionId', institutionId);
+            expect(permission).toHaveProperty('repositoryId', repositoryId);
+            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
+            expect(permission).toHaveProperty('locked', permissionTest.locked);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
   });
   describe('As user of institution', () => {
-    const userManagerTest = {
-      username: 'user.manager',
-      email: 'user.manager@test.fr',
-      fullName: 'User manager',
-      isAdmin: false,
-      password: 'changeme',
-      permissions: ['memberships:write', 'memberships:read'],
-    };
-    let userManagerToken;
+    let userToken;
 
     beforeAll(async () => {
       await createUserAsAdmin(
-        userManagerTest.username,
-        userManagerTest.email,
-        userManagerTest.fullName,
-        userManagerTest.isAdmin,
+        userTest.username,
+        userTest.email,
+        userTest.fullName,
+        userTest.isAdmin,
       );
       await activateUser(
-        userManagerTest.username,
-        userManagerTest.password,
+        userTest.username,
+        userTest.password,
       );
-      userManagerToken = await getToken('user.manager', 'changeme');
+      userToken = await getToken(userTest.username, userTest.password);
     });
     describe('Institution created by user manager', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitution(institutionTest, userManagerTest);
+        institutionId = await createInstitution(institutionTest, userTest);
       });
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            membershipTest.permissions = allPermission;
+            membershipTest.institutionId = institutionId;
+            // FIXME membership create by function createInstitution
+            // await membershipsService.create({ data: membershipTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should delete permission of user [user.test] for the repository of type [ezPAARSE]', async () => {
-            const res = await ezmesure({
+          it(`#03 DELETE /repositories/:repositoryId/permissions/:username - Should create permission of user [${userTest.username}] for the repository of type [${ezpaarseRepositoryConfig.type}]`, async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
-                Authorization: `Bearer ${userManagerToken}`,
+                Authorization: `Bearer ${userToken}`,
               },
             });
 
-            expect(res).toHaveProperty('status', 200);
-          });
+            expect(httpAppResponse).toHaveProperty('status', 200);
 
-          it('Should get HTTP status 404', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/repositories/${repositoryId}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+            const permission = httpAppResponse?.data;
+            expect(permission).toHaveProperty('username', userTest.username);
+            expect(permission).toHaveProperty('institutionId', institutionId);
+            expect(permission).toHaveProperty('repositoryId', repositoryId);
+            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
+            expect(permission).toHaveProperty('locked', permissionTest.locked);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await repositoryPermissionsService.deleteAll();
+            await membershipsService.deleteAll();
           });
         });
+
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
+        });
+      });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
+
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            membershipTest.permissions = allPermission;
+            membershipTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it(`#04 DELETE /repositories/:repositoryId/permissions/:username - Should create permission of user [${userTest.username}] for the repository of type [${ezpaarseRepositoryConfig.type}]`, async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(httpAppResponse).toHaveProperty('status', 200);
+
+            const permission = httpAppResponse?.data;
+            expect(permission).toHaveProperty('username', userTest.username);
+            expect(permission).toHaveProperty('institutionId', institutionId);
+            expect(permission).toHaveProperty('repositoryId', repositoryId);
+            expect(permission).toHaveProperty('readonly', permissionTest.readonly);
+            expect(permission).toHaveProperty('locked', permissionTest.locked);
+          });
+
+          afterAll(async () => {
+            await repositoryPermissionsService.deleteAll();
+            await membershipsService.deleteAll();
+          });
+        });
+
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
+          it('#05 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
-                Authorization: `Bearer ${userManagerToken}`,
+                Authorization: `Bearer ${userToken}`,
               },
             });
 
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          it('Should get permission of repository', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/repositories/${repositoryId}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+            expect(httpAppResponse).toHaveProperty('status', 403);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await usersService.deleteAll();
+            await repositoryPermissionsService.deleteAll();
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
 
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it('#06 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(httpAppResponse).toHaveProperty('status', 403);
+          });
+
+          afterAll(async () => {
+            await usersService.deleteAll();
+            await repositoryPermissionsService.deleteAll();
+          });
+        });
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
+        });
+      });
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
     describe('Institution created by another user', () => {
       let institutionId;
-      const anotherUserTest = {
-        username: 'another.user',
-        email: 'another.user@test.fr',
-        fullName: 'Another user',
-        isAdmin: false,
-        password: 'changeme',
-        permissions: ['memberships:write', 'memberships:read'],
-      };
+
       beforeAll(async () => {
         await createUserAsAdmin(
           anotherUserTest.username,
@@ -293,111 +406,118 @@ describe('[repository permission]: Test delete features', () => {
           anotherUserTest.password,
         );
         institutionId = await createInstitution(institutionTest, anotherUserTest);
-        await validateInstitutionAsAdmin(institutionId);
       });
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should get HTTP status 403', async () => {
-            const res = await ezmesure({
+          it('#07 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
-                Authorization: `Bearer ${userManagerToken}`,
+                Authorization: `Bearer ${userToken}`,
               },
             });
 
-            expect(res).toHaveProperty('status', 403);
-          });
-
-          it('Should get permission of repository', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/repositories/${repositoryId}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-
-            // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+            expect(httpAppResponse).toHaveProperty('status', 403);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await usersService.deleteAll();
+            await repositoryPermissionsService.deleteAll();
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
         });
       });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
 
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-        await deleteUserAsAdmin(anotherUserTest.username);
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it('#08 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
+            expect(httpAppResponse).toHaveProperty('status', 403);
+          });
+
+          afterAll(async () => {
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+          });
+        });
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
+        });
       });
+      afterAll(async () => {
+        await institutionsService.deleteAll();
+      });
+    });
+    afterAll(async () => {
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
+
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
+          it('#09 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
               headers: {
@@ -405,34 +525,63 @@ describe('[repository permission]: Test delete features', () => {
               },
             });
 
-            expect(res).toHaveProperty('status', 401);
-          });
-
-          it('Should get permission of repository', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/repositories/${repositoryId}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-              // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+            expect(httpAppResponse).toHaveProperty('status', 401);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
+        });
+      });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
+
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it('#10 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+              headers: {
+                Authorization: 'Bearer: random',
+              },
+            });
+
+            expect(httpAppResponse).toHaveProperty('status', 401);
+          });
+
+          afterAll(async () => {
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
+          });
+        });
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
   });
@@ -440,69 +589,89 @@ describe('[repository permission]: Test delete features', () => {
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-        await validateInstitutionAsAdmin(institutionId);
+        const institution = await institutionsService.create({ data: institutionTest });
+        institutionId = institution.id;
       });
+
       describe('Repository publisher', () => {
-        let repositoryConfig;
         let repositoryId;
         beforeAll(async () => {
-          repositoryConfig = {
-            type: 'COUNTER 5',
-            institutionId,
-            pattern: 'publisher-*',
-          };
-
-          repositoryId = await createRepositoryAsAdmin(repositoryConfig);
+          ezcounterRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          repositoryId = repository.id;
         });
 
-        describe('DELETE /repositories/<id>/permissions/<username> - delete permission to [user.test] user', () => {
-          let userTest;
-          const permissionTest = {
-            readonly: true,
-            locked: true,
-          };
-
+        describe(`Set permission to [${userTest.username}] user`, () => {
           beforeAll(async () => {
-            userTest = await createDefaultActivatedUserAsAdmin();
-            await addMembershipsToUserAsAdmin(institutionId, userTest.username, ['memberships:write', 'memberships:read']);
-            await addPermissionToRepositoryAsAdmin(repositoryId, userTest.username, permissionTest);
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
           });
 
-          it('Should get HTTP status 401', async () => {
-            const res = await ezmesure({
+          it('#11 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
             });
 
-            expect(res).toHaveProperty('status', 401);
-          });
-
-          it('Should get permission of repository', async () => {
-            const res = await ezmesure({
-              method: 'GET',
-              url: `/repositories/${repositoryId}`,
-              headers: {
-                Authorization: `Bearer ${adminToken}`,
-              },
-            });
-              // TODO get permission of repository
-            expect(res).toHaveProperty('status', 200);
+            expect(httpAppResponse).toHaveProperty('status', 401);
           });
 
           afterAll(async () => {
-            await deletePermissionToRepositoryAsAdmin(repositoryId, userTest.username);
-            await deleteUserAsAdmin(userTest.username);
-            await deleteMembershipsToUserAsAdmin(institutionId, userTest.username);
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
           });
         });
         afterAll(async () => {
-          await deleteRepositoryAsAdmin(repositoryId);
+          await repositoriesService.deleteAll();
+        });
+      });
+      describe('Repository ezPAARSE', () => {
+        let repositoryId;
+        beforeAll(async () => {
+          ezpaarseRepositoryConfig.institutionId = institutionId;
+          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+          repositoryId = repository.id;
+        });
+
+        describe(`Set permission to [${userTest.username}] user`, () => {
+          beforeAll(async () => {
+            await createDefaultActivatedUserAsAdmin();
+            membershipUserTest.permissions = allPermission;
+            membershipUserTest.institutionId = institutionId;
+            await membershipsService.create({ data: membershipUserTest });
+            permissionTest.institutionId = institutionId;
+            permissionTest.username = userTest.username;
+            await repositoryPermissionsService.create({ data: permissionTest });
+          });
+
+          it('#12 DELETE /repositories/:repositoryId/permissions/:username - Should not create permission', async () => {
+            const httpAppResponse = await ezmesure({
+              method: 'DELETE',
+              url: `/repositories/${repositoryId}/permissions/${userTest.username}`,
+            });
+
+            expect(httpAppResponse).toHaveProperty('status', 401);
+          });
+
+          afterAll(async () => {
+            await repositoryPermissionsService.deleteAll();
+            await usersService.deleteAll();
+            await membershipsService.deleteAll();
+          });
+        });
+        afterAll(async () => {
+          await repositoriesService.deleteAll();
         });
       });
 
       afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
+        await institutionsService.deleteAll();
       });
     });
   });

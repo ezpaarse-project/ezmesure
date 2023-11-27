@@ -49,6 +49,14 @@ module.exports = class RepositoriesService {
   }
 
   /**
+   * @param {string} id
+   * @returns {Promise<Repository | null>}
+   */
+  static findByID(id) {
+    return prisma.repository.findUnique({ where: { id } });
+  }
+
+  /**
    * @param {RepositoryUpdateArgs} params
    * @returns {Promise<Repository>}
    */
@@ -85,5 +93,20 @@ module.exports = class RepositoriesService {
     hooks.emit('repository:delete', repository);
 
     return repository;
+  }
+
+  /**
+   * @returns {Promise<Array<Repository> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const repositories = await this.findMany({});
+
+    await prisma.repository.deleteMany();
+
+    hooks.emit('repository:deleteAll', repositories);
+
+    return repositories;
   }
 };

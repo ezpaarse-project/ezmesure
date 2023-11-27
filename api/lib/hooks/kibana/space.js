@@ -139,14 +139,16 @@ const onSpaceDelete = async (space) => {
   // TODO: delete index pattern
 };
 
+/**
+ * @param { Array<Space> } spaces
+ */
+const onSpaceDeleteAll = async (spaces) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  Promise.all(spaces.map((space) => onSpaceDelete(space)));
+};
+
 hookEmitter.on('space:create', onSpaceUpsert);
 hookEmitter.on('space:update', onSpaceUpsert);
 hookEmitter.on('space:upsert', onSpaceUpsert);
 hookEmitter.on('space:delete', onSpaceDelete);
-
-module.exports = {
-  onSpaceCreate,
-  onSpaceUpdate,
-  onSpaceUpsert,
-  onSpaceDelete,
-};
+hookEmitter.on('space:deleteAll', onSpaceDeleteAll);

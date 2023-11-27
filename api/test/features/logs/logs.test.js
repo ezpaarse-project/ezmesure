@@ -2,35 +2,39 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const ezmesure = require('../../setup/ezmesure');
-const { createIndexAsAdmin, deleteIndexAsAdmin } = require('../../setup/indices');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const indicesService = require('../../../lib/services/elastic/indices');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken } = require('../../setup/login');
 
 const { getAdminToken } = require('../../setup/login');
 
 describe('[logs]: Test insert features', () => {
+  const indexName = 'index-text';
   describe('As admin', () => {
     let adminToken;
     beforeAll(async () => {
       adminToken = await getAdminToken();
-      await createIndexAsAdmin('index-test');
+      await indicesService.create(indexName, null, { ignore: [404] });
     });
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index', () => {
-      it('Should upload ec in index "index-test"', async () => {
+    describe(`Add [wiley.csv] in [${indexName}] index`, () => {
+      // FIXME, test break after 2 times
+      it(`#01 POST /logs/:name - Should upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-        const res = await ezmesure({
+        const httpAppResponse = await ezmesure({
           method: 'POST',
-          url: '/logs/index-test',
+          url: `/logs/${indexName}`,
           data: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 200);
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const { data } = res;
+        const { data } = httpAppResponse;
 
         expect(data).toHaveProperty('total', 6);
         expect(data).toHaveProperty('inserted', 5);
@@ -42,7 +46,7 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
+        await indicesService.deleteAll();
       });
     });
   });
@@ -50,170 +54,108 @@ describe('[logs]: Test insert features', () => {
     let userTest;
     let userToken;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
+      // TODO use service to create user
       userTest = await createDefaultActivatedUserAsAdmin();
       userToken = await getToken(userTest.username, userTest.password);
     });
     // TODO create roles
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
-      const indexName = 'index-test';
-
+    describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {
       beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
+        await indicesService.create(indexName, null, { ignore: [404] });
       });
 
-      it('Should get HTTP status 403', async () => {
+      it(`#02 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-        const res = await ezmesure({
+        const httpAppResponse = await ezmesure({
           method: 'POST',
-          url: '/logs/index-test',
+          url: `/logs/${indexName}`,
           data: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        expect(httpAppResponse).toHaveProperty('status', 403);
       });
 
       afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
+        await indicesService.deleteAll();
       });
     });
 
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
-      const indexName = 'index-test';
-
+    describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {
       beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
+        await indicesService.create(indexName, null, { ignore: [404] });
       });
 
-      it('Should get HTTP status 403', async () => {
+      it(`#03 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-        const res = await ezmesure({
+        const httpAppResponse = await ezmesure({
           method: 'POST',
-          url: '/logs/index-test',
+          url: `/logs/${indexName}`,
           data: await fs.readFile(pathFile, 'utf-8'),
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 403);
+        expect(httpAppResponse).toHaveProperty('status', 403);
       });
 
       afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
+        await indicesService.deleteAll();
       });
     });
-    afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+    afterEach(async () => {
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
-      const indexName = 'index-test';
-
-      beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
-      });
-
-      it('Should get HTTP status 401', async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
-
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/logs/index-test',
-          data: await fs.readFile(pathFile, 'utf-8'),
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
-      });
+    beforeAll(async () => {
+      await indicesService.create(indexName, null, { ignore: [404] });
     });
 
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
-      const indexName = 'index-test';
+    it(`#04 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+      const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-      beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: `/logs/${indexName}`,
+        data: await fs.readFile(pathFile, 'utf-8'),
+        headers: {
+          Authorization: 'Bearer: random',
+        },
       });
 
-      it('Should get HTTP status 401', async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+      expect(httpAppResponse).toHaveProperty('status', 401);
+    });
 
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/logs/index-test',
-          data: await fs.readFile(pathFile, 'utf-8'),
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
-      });
+    afterAll(async () => {
+      await indicesService.deleteAll();
     });
   });
   describe('Without token', () => {
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has roles', () => {
-      const indexName = 'index-test';
-
-      beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
-      });
-
-      it('Should get HTTP status 401', async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
-
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/logs/index-test',
-          data: await fs.readFile(pathFile, 'utf-8'),
-        });
-
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
-      });
+    beforeAll(async () => {
+      await indicesService.create(indexName, null, { ignore: [404] });
     });
 
-    describe('POST /logs/index-test - Add [wiley.csv] in [index-test] index who has not roles', () => {
-      const indexName = 'index-test';
+    it(`#05 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+      const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
-      beforeAll(async () => {
-        await createIndexAsAdmin(indexName);
+      const httpAppResponse = await ezmesure({
+        method: 'POST',
+        url: `/logs/${indexName}`,
+        data: await fs.readFile(pathFile, 'utf-8'),
       });
 
-      it('Should get HTTP status 401', async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+      expect(httpAppResponse).toHaveProperty('status', 401);
+    });
 
-        const res = await ezmesure({
-          method: 'POST',
-          url: '/logs/index-test',
-          data: await fs.readFile(pathFile, 'utf-8'),
-        });
-
-        expect(res).toHaveProperty('status', 401);
-      });
-
-      afterAll(async () => {
-        await deleteIndexAsAdmin('index-test');
-      });
+    afterAll(async () => {
+      await indicesService.deleteAll();
     });
   });
 });

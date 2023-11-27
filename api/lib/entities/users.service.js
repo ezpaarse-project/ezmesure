@@ -1,8 +1,12 @@
 // @ts-check
 const config = require('config');
+const jwt = require('jsonwebtoken');
 const elasticUsers = require('../services/elastic/users');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 const hooks = require('../hooks');
+
+const secret = config.get('auth.secret');
+const adminUsername = config.get('admin.username');
 
 const {
   MEMBER_ROLES: {
@@ -30,7 +34,7 @@ module.exports = class UsersService {
   static async createAdmin() {
     const username = config.get('admin.username');
     const email = config.get('admin.email');
-    const fullName = 'ezMESURE Administrator';
+    const fullName = config.get('admin.fullName');
 
     const adminData = {
       username,
@@ -74,6 +78,14 @@ module.exports = class UsersService {
    */
   static findUnique(params) {
     return prisma.user.findUnique(params);
+  }
+
+  /**
+   * @param {string} username
+   * @returns {Promise<User | null>}
+   */
+  static findByUsername(username) {
+    return prisma.user.findUnique({ where: { username } });
   }
 
   /**
@@ -155,10 +167,46 @@ module.exports = class UsersService {
 
   /**
    * @param {string} username
+   * @returns {Promise<User | null>}
+   */
+  static deleteByUsername(username) {
+    return prisma.user.delete({ where: { username } });
+  }
+
+  /**
+   * @param {string} username
    * @param {string} password
-   * @returns {Promise<User>}
+   * @returns {Promise<{}>}
    */
   static async updatePassword(username, password) {
     return elasticUsers.updatePassword(username, password);
+  }
+
+  /**
+   * @param {string} username
+   * @returns {Promise<string | null>}
+   */
+  static async generateToken(username) {
+    const user = await UsersService.findByUsername(username);
+    if (!user) {
+      // TODO throw ?
+      return null;
+    }
+    return jwt.sign({ username: user.username, email: user.email }, secret);
+  }
+
+  /**
+   * @returns {Promise<Array<User> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+    const users = await this.findMany({
+      where: { NOT: { username: adminUsername } },
+    });
+
+    await prisma.user.deleteMany({ where: { NOT: { username: adminUsername } } });
+
+    hooks.emit('user:deleteAll', users);
+    return users;
   }
 };

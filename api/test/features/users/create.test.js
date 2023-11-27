@@ -1,6 +1,11 @@
+const config = require('config');
+
+const adminUsername = config.get('admin.username');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const { deleteUserAsAdmin } = require('../../setup/users');
+const usersService = require('../../../lib/entities/users.service');
+
 const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test create users features', () => {
@@ -11,61 +16,82 @@ describe('[users]: Test create users features', () => {
     isAdmin: false,
   };
   describe('As admin', () => {
-    describe('PUT /users/user.test - Create new user [user.test]', () => {
+    describe(`Create new user [${userTest.username}]`, () => {
       let adminToken;
-      const username = 'user.test';
 
       beforeAll(async () => {
         adminToken = await getAdminToken();
       });
 
-      it('Should create new user [user.test]', async () => {
-        const res = await ezmesure({
+      it(`#01 PUT /users/${userTest.username} - Should create new user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
-          url: `/users/${username}`,
+          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
           data: userTest,
         });
 
-        expect(res).toHaveProperty('status', 201);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 201);
 
-      it('Should get user [user.test]', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: '/users/user.test',
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const userFromService = await usersService.findByUsername(userTest.username);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const user = res?.data;
-        expect(user).toHaveProperty('username', userTest.username);
-        expect(user).toHaveProperty('fullName', userTest.fullName);
-        expect(user).toHaveProperty('email', userTest.email);
-        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
-        expect(user?.createdAt).not.toBeNull();
-        expect(user?.updatedAt).not.toBeNull();
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
       });
 
       afterAll(async () => {
-        await deleteUserAsAdmin(username);
+        await usersService.deleteAll();
+      });
+    });
+  });
+  describe('With random token', () => {
+    describe('Create new user', () => {
+      it(`#02 PUT /users/${userTest.username} - Should not create new user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'PUT',
+          url: `/users/${userTest.username}`,
+          data: userTest,
+          headers: {
+            Authorization: 'Bearer: random',
+          },
+        });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const usersFromService = await usersService.findMany(
+          { where: { NOT: { username: adminUsername } } },
+        );
+        expect(usersFromService).toEqual([]);
       });
     });
   });
   describe('Without token', () => {
-    describe('PUT /users/user.test - Create new user', () => {
-      it('Should create new user [user.test]', async () => {
-        const res = await ezmesure({
+    describe('Create new user', () => {
+      it(`#03 PUT /users/${userTest.username} - Should not create new user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PUT',
-          url: '/users/user.test',
+          url: `/users/${userTest.username}`,
           data: userTest,
         });
-        expect(res).toHaveProperty('status', 401);
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const usersFromService = await usersService.findMany(
+          { where: { NOT: { username: adminUsername } } },
+        );
+        expect(usersFromService).toEqual([]);
       });
     });
   });

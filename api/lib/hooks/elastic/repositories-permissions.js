@@ -40,7 +40,14 @@ const onRepositoryPermissionModified = async (permission) => {
   }
 };
 
+const onRepositoryPermissionDeleteAll = async (permissions) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  // TODO make custom log for delete
+  Promise.all(permissions.map((Repository) => onRepositoryPermissionModified(Repository)));
+};
+
 hookEmitter.on('repository_permission:create', onRepositoryPermissionModified);
 hookEmitter.on('repository_permission:update', onRepositoryPermissionModified);
 hookEmitter.on('repository_permission:upsert', onRepositoryPermissionModified);
 hookEmitter.on('repository_permission:delete', onRepositoryPermissionModified);
+hookEmitter.on('repository_permission:deleteAll', onRepositoryPermissionDeleteAll);

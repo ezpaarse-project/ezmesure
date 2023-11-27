@@ -36,6 +36,14 @@ const onInstitutionDelete = async (institution) => {
 };
 
 /**
+ * @param {Array<Institution>} institutions
+ */
+const onInstitutionDeleteAll = async (institutions) => {
+  if (process.env.NODE_ENV === 'production') { return null; }
+  Promise.all(institutions.map((institution) => onInstitutionDelete(institution)));
+};
+
+/**
  * @param {Institution} institution
  */
 const onInstitutionUpsert = async (institution) => {
@@ -84,8 +92,4 @@ hookEmitter.on('institution:create', onInstitutionUpsert);
 hookEmitter.on('institution:update', onInstitutionUpsert);
 hookEmitter.on('institution:upsert', onInstitutionUpsert);
 hookEmitter.on('institution:delete', onInstitutionDelete);
-
-module.exports = {
-  onInstitutionUpsert,
-  onInstitutionDelete,
-};
+hookEmitter.on('institution:deleteAll', onInstitutionDeleteAll);

@@ -1,76 +1,95 @@
+const config = require('config');
+
+const adminUsername = config.get('admin.username');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const { createUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createUserAsAdmin } = require('../../setup/users');
 const { getAdminToken } = require('../../setup/login');
 
 describe('[users]: Test delete users features', () => {
-  describe('As admin', () => {
-    describe('DELETE /users/user.test - Delete user [user.test]', () => {
-      let adminToken;
-      let userTest;
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
 
+  let adminToken;
+
+  beforeAll(async () => {
+    adminToken = await getAdminToken();
+  });
+  describe('As admin', () => {
+    describe(`Delete user [${userTest.username}]`, () => {
       beforeAll(async () => {
-        adminToken = await getAdminToken();
-        userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
       });
 
-      it('Should delete [user.test]', async () => {
-        const res = await ezmesure({
+      it(`#01 DELETE /users/${userTest.username} - Should delete [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
-          url: '/users/user-test',
+          url: `/users/${userTest.username}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
 
-        expect(res).toHaveProperty('status', 200);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
+
+        // Test users service
+        const usersFromService = await usersService.findMany(
+          { where: { NOT: { username: adminUsername } } },
+        );
+        expect(usersFromService).toEqual([]);
       });
 
       afterAll(async () => {
-        await deleteUserAsAdmin(userTest.username);
+        await usersService.deleteAll();
       });
     });
   });
   describe('Without token', () => {
-    describe('DELETE /users/user.test - Delete user [user.test]', () => {
-      let adminToken;
-      let userTest;
+    describe(`Delete user [${userTest.username}]`, () => {
       beforeAll(async () => {
-        adminToken = await getAdminToken();
-        userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
       });
 
-      it('Should delete [user.test]', async () => {
-        const res = await ezmesure({
+      it(`#02 DELETE /users/${userTest.username} - Should not delete [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
-          url: '/users/user-test',
+          url: `/users/${userTest.username}`,
         });
 
-        expect(res).toHaveProperty('status', 401);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
 
-      it('Should get user [user.test]', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: '/users/user.test',
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const userFromService = await usersService.findByUsername(userTest.username);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const user = res?.data;
-        expect(user).toHaveProperty('username', userTest.username);
-        expect(user).toHaveProperty('fullName', userTest.fullName);
-        expect(user).toHaveProperty('email', userTest.email);
-        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
-        expect(user?.createdAt).not.toBeNull();
-        expect(user?.updatedAt).not.toBeNull();
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
       });
 
       afterAll(async () => {
-        await deleteUserAsAdmin(userTest.username);
+        await usersService.deleteAll();
       });
     });
   });
