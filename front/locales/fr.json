@@ -677,7 +677,7 @@
   "repositories": {
     "repositories": "Entrepôts",
     "toolbarTitle": "Entrepôts ({count})",
-    "xRepositories": "0 entrepôt | 1 entrepôt | {count} entrepôts",
+    "xRepositories": "1 entrepôt | {count} entrepôts",
     "noRepository": "Aucun entrepôt n'est encore attribué",
     "pattern": "Pattern",
     "type": "Type",
@@ -687,7 +687,7 @@
   },
   "spaces": {
     "spaces": "Espaces",
-    "xSpaces": "0 espace | 1 espace | {count} espaces",
+    "xSpaces": "1 espace | {count} espaces",
     "noSpace": "Aucun espace n'est encore attribué",
     "id": "Identifiant",
     "type": "Type",
