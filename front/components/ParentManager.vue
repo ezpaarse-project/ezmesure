@@ -262,7 +262,6 @@ export default {
       try {
         this.parentInstitution = await this.$axios.$get(
           `/institutions/${this.parentId}`,
-          { params: { institutionId: this.parentId } },
         );
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');

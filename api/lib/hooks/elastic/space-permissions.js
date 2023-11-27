@@ -1,46 +1,40 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
-const elasticUsers = require('../../services/elastic/users');
-
-const { generateRolesOfMembership } = require('../utils');
+const usersService = require('../../entities/users.service');
+const { syncUser } = require('../../services/sync/elastic');
 
 /**
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
  */
 
 /**
- * @param { SpacePermission } permission
+ * Synchronize the Elasticsearch user associated to a space permission
+ * @param {SpacePermission} permission - The permission that was changed
+ * @returns {Promise<void>}
  */
 const onSpacePermissionModified = async (permission) => {
-  let user;
-  try {
-    user = await elasticUsers.getUserByUsername(permission.username);
-    if (!user) {
-      throw new Error('User not found');
-    }
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be getted: ${error.message}`);
-    return;
-  }
-
-  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
-  try {
-    await elasticUsers.updateUser({
+  const user = await usersService.findUnique({
+    where: {
       username: permission.username,
-      email: user.email,
-      fullName: user.full_name,
-      roles,
-    });
-    appLogger.verbose(`[elastic][hooks] User [${permission.username}] is updated`);
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] User [${permission.username}] cannot be updated: ${error.message}`);
+    },
+  });
+
+  if (user) {
+    try {
+      await syncUser(user);
+      appLogger.verbose(`[elastic][hooks] User [${user?.username}] has been updated`);
+    } catch (error) {
+      appLogger.error(`[elastic][hooks] User [${user?.username}] could not be updated:\n${error}`);
+    }
   }
 };
 
-hookEmitter.on('space_permission:create', onSpacePermissionModified);
-hookEmitter.on('space_permission:update', onSpacePermissionModified);
-hookEmitter.on('space_permission:upsert', onSpacePermissionModified);
-hookEmitter.on('space_permission:delete', onSpacePermissionModified);
+const hookOptions = { uniqueResolver: (permission) => `${permission.username}_${permission.spaceId}` };
+
+registerHook('space_permission:create', onSpacePermissionModified, hookOptions);
+registerHook('space_permission:update', onSpacePermissionModified, hookOptions);
+registerHook('space_permission:upsert', onSpacePermissionModified, hookOptions);
+registerHook('space_permission:delete', onSpacePermissionModified, hookOptions);

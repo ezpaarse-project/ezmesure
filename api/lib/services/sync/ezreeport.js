@@ -11,7 +11,12 @@ const usersService = require('../../entities/users.service');
 const { syncSchedule } = config.get('ezreeport');
 
 /**
+ * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
+ */
+
+/**
  * Sync ezREEPORT's users with current users
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 async function syncUsers() {
   const users = await usersService.findMany({});
@@ -33,10 +38,16 @@ async function syncUsers() {
   appLogger.verbose(`[ezreeport] ${results?.created} users created`);
   appLogger.verbose(`[ezreeport] ${results?.updated} users updated`);
   appLogger.verbose(`[ezreeport] ${results?.deleted} users deleted`);
+
+  return {
+    fulfilled: (results?.created ?? 0) + (results?.updated ?? 0),
+    errors: 0,
+  };
 }
 
 /**
  * Sync ezREEPORT's namespaces with current institutions
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
@@ -79,6 +90,7 @@ async function syncNamespaces() {
   appLogger.verbose(`[ezreeport] ${namespacesResults?.created} namespaces created`);
   appLogger.verbose(`[ezreeport] ${namespacesResults?.updated} namespaces updated`);
   appLogger.verbose(`[ezreeport] ${namespacesResults?.deleted} namespaces deleted`);
+
   appLogger.verbose(`[ezreeport] ${membershipsResults?.created} memberships created`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.updated} memberships updated`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.deleted} memberships deleted`);
@@ -95,6 +107,11 @@ async function syncNamespaces() {
     .catch((err) => {
       appLogger.info(`[ezreeport] Cannot synchronize reporting users: ${err}`);
     });
+
+  return {
+    fulfilled: (namespacesResults?.created ?? 0) + (namespacesResults?.updated ?? 0),
+    errors: 0,
+  };
 }
 
 async function sync() {
@@ -105,7 +122,7 @@ async function sync() {
 async function startCron() {
   const job = new CronJob({
     cronTime: syncSchedule,
-    runOnInit: true,
+    runOnInit: false,
     onTick: async () => {
       appLogger.verbose('[ezreeport] Starting synchronization');
       try {
@@ -122,6 +139,8 @@ async function startCron() {
 }
 
 module.exports = {
+  syncUsers,
+  syncNamespaces,
   startCron,
   sync,
 };

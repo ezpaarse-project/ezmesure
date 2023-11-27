@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -33,13 +33,10 @@ const onUserUpsert = async (user) => {
   }
 };
 
-hookEmitter.on('user:create-admin', onUserUpsert);
-hookEmitter.on('user:create', onUserUpsert);
-hookEmitter.on('user:update', onUserUpsert);
-hookEmitter.on('user:upsert', onUserUpsert);
-hookEmitter.on('user:delete', onUserDelete);
+const hookOptions = { uniqueResolver: (user) => user.username };
 
-module.exports = {
-  onUserUpsert,
-  onUserDelete,
-};
+registerHook('user:create-admin', onUserUpsert, hookOptions);
+registerHook('user:create', onUserUpsert, hookOptions);
+registerHook('user:update', onUserUpsert, hookOptions);
+registerHook('user:upsert', onUserUpsert, hookOptions);
+registerHook('user:delete', onUserDelete, hookOptions);

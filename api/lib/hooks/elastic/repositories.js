@@ -1,11 +1,12 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
-const elasticRoles = require('../../services/elastic/roles');
-
-const { generateRoleNameFromRepository } = require('../utils');
+const {
+  syncRepository,
+  unmountRepository,
+} = require('../../services/sync/elastic');
 
 /**
  * @typedef {import('@prisma/client').Repository} Repository
@@ -15,20 +16,12 @@ const { generateRoleNameFromRepository } = require('../utils');
  * @param { Repository } repository
  */
 const onRepositoryUpsert = async (repository) => {
-  const readOnlyRole = generateRoleNameFromRepository(repository, 'readonly');
-  const allRole = generateRoleNameFromRepository(repository, 'all');
   try {
-    await elasticRoles.upsertRole(readOnlyRole, [repository?.pattern], ['read', 'view_index_metadata']);
-    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is upserted`);
+    await syncRepository(repository);
   } catch (error) {
-    appLogger.error(`[elastic][hooks] Role [${readOnlyRole}] cannot be upserted:\n${error}`);
-  }
-
-  try {
-    await elasticRoles.upsertRole(allRole, [repository.pattern], ['all']);
-    appLogger.verbose(`[elastic][hooks] Role [${allRole}] is upserted`);
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] Role [${allRole}] cannot be upserted:\n${error}`);
+    appLogger.error(
+      `[elastic][hooks] Repository [${repository?.pattern}] could not be synchronized:\n${error}`,
+    );
   }
 };
 
@@ -36,24 +29,18 @@ const onRepositoryUpsert = async (repository) => {
  * @param { Repository } repository
  */
 const onRepositoryDelete = async (repository) => {
-  const readOnlyRole = generateRoleNameFromRepository(repository, 'readonly');
-  const allRole = generateRoleNameFromRepository(repository, 'all');
   try {
-    await elasticRoles.deleteRole(readOnlyRole);
-    appLogger.verbose(`[elastic][hooks] Role [${readOnlyRole}] is deleted`);
+    await unmountRepository(repository);
   } catch (error) {
-    appLogger.error(`[elastic][hooks] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
-  }
-
-  try {
-    await elasticRoles.deleteRole(allRole);
-    appLogger.verbose(`[elastic][hooks] Role [${allRole}] is deleted`);
-  } catch (error) {
-    appLogger.error(`[elastic][hooks] Role [${allRole}] cannot be deleted:\n${error}`);
+    appLogger.error(
+      `[elastic][hooks] Repository [${repository?.pattern}] could not be unmounted:\n${error}`,
+    );
   }
 };
 
-hookEmitter.on('repository:create', onRepositoryUpsert);
-hookEmitter.on('repository:update', onRepositoryUpsert);
-hookEmitter.on('repository:upsert', onRepositoryUpsert);
-hookEmitter.on('repository:delete', onRepositoryDelete);
+const hookOptions = { uniqueResolver: (repository) => repository.pattern };
+
+registerHook('repository:create', onRepositoryUpsert, hookOptions);
+registerHook('repository:update', onRepositoryUpsert, hookOptions);
+registerHook('repository:upsert', onRepositoryUpsert, hookOptions);
+registerHook('repository:delete', onRepositoryDelete, hookOptions);

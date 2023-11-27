@@ -1,6 +1,6 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const { client: prisma } = require('../services/prisma.service');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
@@ -20,7 +20,7 @@ module.exports = class RepositoriesService {
    */
   static async create(params) {
     const repository = await prisma.repository.create(params);
-    hooks.emit('repository:create', repository);
+    triggerHooks('repository:create', repository);
     return repository;
   }
 
@@ -54,7 +54,7 @@ module.exports = class RepositoriesService {
    */
   static async update(params) {
     const repository = await prisma.repository.update(params);
-    hooks.emit('repository:update', repository);
+    triggerHooks('repository:update', repository);
     return repository;
   }
 
@@ -64,7 +64,7 @@ module.exports = class RepositoriesService {
    */
   static async upsert(params) {
     const repository = await prisma.repository.upsert(params);
-    hooks.emit('repository:upsert', repository);
+    triggerHooks('repository:upsert', repository);
     return repository;
   }
 
@@ -73,17 +73,92 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static async delete(params) {
-    let repository;
-    try {
-      repository = await prisma.repository.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
-      }
-      throw error;
-    }
-    hooks.emit('repository:delete', repository);
+    const [deleteResult, deletedRepository] = await prisma.$transaction(async (tx) => {
+      const repository = await tx.repository.findUnique({
+        where: params.where,
+        include: {
+          permissions: true,
+          institutions: true,
+        },
+      });
 
-    return repository;
+      if (!repository) {
+        return [null, null];
+      }
+
+      await tx.repositoryPermission.deleteMany({
+        where: {
+          repositoryPattern: repository.pattern,
+        },
+      });
+
+      return [
+        await tx.repository.delete(params),
+        repository,
+      ];
+    });
+
+    if (!deletedRepository) {
+      return null;
+    }
+
+    triggerHooks('repository:delete', deletedRepository);
+    deletedRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+
+    return deleteResult;
+  }
+
+  /**
+   * Disconnect a repository from an institution and remove all associated permissions
+   * @param {string} pattern
+   * @param {string} institutionId
+   * @returns {Promise<Repository | null>}
+   */
+  static async disconnectInstitution(pattern, institutionId) {
+    const [newRepository, oldRepository] = await prisma.$transaction(async (tx) => {
+      const currentRepository = await tx.repository.findUnique({
+        where: { pattern },
+        include: {
+          permissions: { where: { institutionId } },
+          institutions: { where: { id: institutionId } },
+        },
+      });
+
+      if (!currentRepository) {
+        return [null, null];
+      }
+
+      await tx.repositoryPermission.deleteMany({
+        where: {
+          repositoryPattern: currentRepository.pattern,
+          institutionId,
+        },
+      });
+
+      const updatedRepository = await tx.repository.update({
+        where: { pattern },
+        data: {
+          institutions: {
+            disconnect: {
+              id: institutionId,
+            },
+          },
+        },
+      });
+
+      return [
+        updatedRepository,
+        currentRepository,
+      ];
+    });
+
+    if (!oldRepository) {
+      return null;
+    }
+
+    triggerHooks('repository:disconnected', oldRepository, institutionId);
+    oldRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+
+    return newRepository;
   }
 };

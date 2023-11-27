@@ -1,5 +1,6 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
+const { client: prisma } = require('../services/prisma.service');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
@@ -56,12 +57,36 @@ module.exports = class SushiEndpointsService {
    * @param {SushiEndpointDeleteArgs} params
    * @returns {Promise<SushiEndpoint | null>}
    */
-  static delete(params) {
-    return prisma.sushiEndpoint.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
-        return null;
+  static async delete(params) {
+    const [deleteResult, deletedEndpoint] = await prisma.$transaction(async (tx) => {
+      const endpoint = await tx.sushiEndpoint.findUnique({
+        where: params.where,
+        include: {
+          credentials: true,
+        },
+      });
+
+      if (!endpoint) {
+        return [null, null];
       }
-      throw e;
+
+      await tx.sushiCredentials.deleteMany({
+        where: { endpointId: endpoint.id },
+      });
+
+      return [
+        await tx.sushiEndpoint.delete(params),
+        endpoint,
+      ];
     });
+
+    if (!deletedEndpoint) {
+      return null;
+    }
+
+    triggerHooks('sushi_endpoint:delete', deletedEndpoint);
+    deletedEndpoint.credentials.forEach((credentials) => { triggerHooks('sushi_credentials:delete', credentials); });
+
+    return deleteResult;
   }
 };

@@ -91,11 +91,11 @@ model Membership {
   /// Username of the member
   username              String
   /// The member
-  user                  User                   @relation(fields: [username], references: [username], onDelete: Cascade)
+  user                  User                   @relation(fields: [username], references: [username])
   /// ID of the institution
   institutionId         String
   /// The institution
-  institution           Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution           Institution            @relation(fields: [institutionId], references: [id])
   /// Roles of the member inside the institution
   roles                 String[]
   /// Permissions of the user for the institution (members management, SUSHI, ezREEPORT...)
@@ -115,9 +115,9 @@ model Space {
   /// ID of the space (as used in Kibana)
   id            String            @id
   /// ID of the institution this space is associated to
-  institutionId String?
+  institutionId String
   /// The institution this space is associated to
-  institution   Institution?      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution   Institution      @relation(fields: [institutionId], references: [id])
   /// Creation date (in the DB, not in Kibana)
   createdAt     DateTime          @default(now())
   /// Latest update date (in the DB, not in Kibana)
@@ -145,11 +145,11 @@ model SpacePermission {
   /// Institution of the member
   institutionId String
   /// The member
-  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId])
   /// ID of the space
   spaceId       String
   /// The space
-  space         Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  space         Space      @relation(fields: [spaceId], references: [id])
   /// Whether the member has a readonly access to the space
   readonly      Boolean    @default(false)
   /// Whether the permission can be modified or not
@@ -160,10 +160,8 @@ model SpacePermission {
 
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
-  /// ID of the institution
-  institutionId String?
   /// The institution this repository is associated to
-  institution   Institution?           @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutions  Institution[]
   /// Creation date
   createdAt     DateTime               @default(now())
   /// Latest update date
@@ -183,17 +181,17 @@ model RepositoryPermission {
   /// Institution of the member
   institutionId String
   /// The member
-  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId])
   /// Pattern of the repository
   repositoryPattern  String
   /// The repository
-  repository    Repository @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  repository    Repository @relation(fields: [repositoryPattern], references: [pattern])
   /// Whether the member has a readonly access to the repository
   readonly      Boolean    @default(false)
   /// Whether the permission can be modified or not
   locked        Boolean    @default(false)
 
-  @@id([username, repositoryPattern])
+  @@id([username, institutionId, repositoryPattern])
 }
 
 /// Represent the actions that are triggered
@@ -203,7 +201,7 @@ model Action {
   // ID of the institution concerned by the action
   institutionId String?
   // The institution concerned by the action
-  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution   Institution? @relation(fields: [institutionId], references: [id])
   /// ID of the user that triggered the action
   authorId      String?
   /// The user that triggered the action
@@ -241,7 +239,7 @@ model HarvestJob {
   /// ID of the SUSHI credentials
   credentialsId    String
   /// SUSHI credentials used to harvest
-  credentials      SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials      SushiCredentials @relation(fields: [credentialsId], references: [id])
   /// Creation date
   createdAt        DateTime         @default(now())
   /// Latest update date
@@ -289,7 +287,7 @@ model Harvest {
   /// Identifier of the SUSHI credentials
   credentialsId   String
   /// SUSHI credentials
-  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id])
   /// Report ID (TR, PR, DR...)
   reportId        String
   /// Report period (format: yyyy-MM)
@@ -317,7 +315,7 @@ model Log {
   /// ID the job that produced the log
   jobId   String
   /// The job that produced the log
-  job     HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job     HarvestJob @relation(fields: [jobId], references: [id])
   /// Date of the log
   date    DateTime   @default(now())
   /// Level of the log
@@ -333,7 +331,7 @@ model Step {
   /// ID of the job that the step is part of
   jobId       String
   /// The job that the step is part of
-  job         HarvestJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job         HarvestJob @relation(fields: [jobId], references: [id])
   /// Creation date
   createdAt   DateTime   @default(now())
   /// Latest update date
@@ -423,9 +421,9 @@ model SushiCredentials {
   /// Additionnal parameters. Each param has a name, a value, and a scope.
   params        Json[]
   /// Institution that owns the credentials
-  institution   Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution   Institution      @relation(fields: [institutionId], references: [id])
   /// The SUSHI endpoint
-  endpoint      SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  endpoint      SushiEndpoint    @relation(fields: [endpointId], references: [id])
   /// The harvest jobs associated to the credentials
   harvestJobs   HarvestJob[]
   /// The harvest states associated to the credentials

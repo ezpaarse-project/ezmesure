@@ -15,79 +15,53 @@ const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${spac
  * @param {Repository} repository
  * @param {string} modifier
  */
-const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}.${repository.institutionId}`;
+const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}`;
 
-const generateRolesOfMembership = async (username, institutionId) => {
-  const membership = await prisma.membership.findUnique({
-    where: {
-      username_institutionId: {
-        username,
-        institutionId,
-      },
-    },
+/**
+ * Generate all Elasticsearch roles for a given username, based on the associated memberships
+ * @param {string} username - The username of the user we want to generate roles for
+ * @returns {string[]} all roles for the user
+ */
+const generateUserRoles = async (username) => {
+  const user = await prisma.user.findUnique({
+    where: { username },
     include: {
-      spacePermissions: {
+      memberships: {
         include: {
-          space: true,
-        },
-      },
-      repositoryPermissions: {
-        include: {
-          repository: true,
+          spacePermissions: {
+            include: {
+              space: true,
+            },
+          },
+          repositoryPermissions: {
+            include: {
+              repository: true,
+            },
+          },
         },
       },
     },
   });
 
-  const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
-  const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
+  const roles = new Set(user?.memberships?.flatMap?.((membership) => {
+    const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
+    const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
 
-  return [...repoRoles, ...spaceRoles];
-};
+    return [
+      ...repoRoles,
+      ...spaceRoles,
+    ];
+  }));
 
-/**
- * @callback AnyFunc
- * @param {...any} args
- * @returns {Promise<any>}
- */
+  if (user.isAdmin) {
+    roles.add('superuser');
+  }
 
-/**
- * @callback QueueFunction
- * @param {Function} fn - A function to be queued
- * @returns {AnyFunc} a new queued function
- */
-
-/**
- * Create a queue that can be used to enqueue the calls of one or more functions
- * @returns {QueueFunction} the queued function
- */
-const createQueue = () => {
-  const queue = [];
-
-  const callNext = async () => {
-    if (queue.length === 0) { return; }
-
-    const { fn, args } = queue[0];
-
-    await fn(...args);
-    queue.shift();
-    await callNext();
-  };
-
-  return (fn) => async (...args) => {
-    queue.push({ fn, args });
-
-    if (queue.length > 1) {
-      return;
-    }
-
-    await callNext();
-  };
+  return Array.from(roles);
 };
 
 module.exports = {
   generateRoleNameFromSpace,
   generateRoleNameFromRepository,
-  generateRolesOfMembership,
-  createQueue,
+  generateUserRoles,
 };

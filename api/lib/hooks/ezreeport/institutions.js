@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -80,12 +80,7 @@ const onInstitutionUpsert = async (institution) => {
   }
 };
 
-hookEmitter.on('institution:create', onInstitutionUpsert);
-hookEmitter.on('institution:update', onInstitutionUpsert);
-hookEmitter.on('institution:upsert', onInstitutionUpsert);
-hookEmitter.on('institution:delete', onInstitutionDelete);
-
-module.exports = {
-  onInstitutionUpsert,
-  onInstitutionDelete,
-};
+registerHook('institution:create', onInstitutionUpsert);
+registerHook('institution:update', onInstitutionUpsert);
+registerHook('institution:upsert', onInstitutionUpsert);
+registerHook('institution:delete', onInstitutionDelete);

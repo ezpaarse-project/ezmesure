@@ -1,6 +1,6 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const { client: prisma } = require('../services/prisma.service');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 const {
   MEMBER_ROLES: {
@@ -29,7 +29,7 @@ module.exports = class InstitutionsService {
   static async create(params) {
     const institution = await prisma.institution.create(params);
 
-    hooks.emit('institution:create', institution, institution);
+    triggerHooks('institution:create', institution);
 
     return institution;
   }
@@ -57,7 +57,7 @@ module.exports = class InstitutionsService {
   static async update(params) {
     const institution = await prisma.institution.update(params);
 
-    hooks.emit('institution:update', institution);
+    triggerHooks('institution:update', institution);
 
     return institution;
   }
@@ -69,7 +69,7 @@ module.exports = class InstitutionsService {
   static async upsert(params) {
     const institution = await prisma.institution.upsert(params);
 
-    hooks.emit('institution:upsert', institution);
+    triggerHooks('institution:upsert', institution);
 
     return institution;
   }
@@ -79,20 +79,86 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static async delete(params) {
-    let institution;
+    const transactionResult = await prisma.$transaction(async (tx) => {
+      const institution = await tx.institution.findUnique({
+        where: params.where,
+        include: {
+          memberships: {
+            include: {
+              repositoryPermissions: true,
+              spacePermissions: true,
+            },
+          },
+          spaces: true,
+          repositories: { include: { institutions: true } },
+          sushiCredentials: true,
+        },
+      });
 
-    try {
-      institution = await prisma.institution.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (!institution) {
         return null;
       }
-      throw error;
+
+      const deletedRepos = [];
+      const findArgs = { where: { institutionId: institution.id } };
+
+      await tx.repositoryPermission.deleteMany(findArgs);
+      await tx.spacePermission.deleteMany(findArgs);
+      await tx.membership.deleteMany(findArgs);
+
+      await Promise.all(
+        institution.repositories.map((r) => {
+          // If last institution, delete repo
+          if (r.institutions.length <= 1) {
+            deletedRepos.push(r);
+            return tx.repository.delete({ where: { pattern: r.pattern } });
+          }
+
+          // Otherwise disconnect institution from repo
+          return tx.repository.update({
+            where: { pattern: r.pattern },
+            data: {
+              institutions: {
+                disconnect: { id: institution.id },
+              },
+            },
+          });
+        }),
+      );
+      await tx.space.deleteMany(findArgs);
+
+      await tx.sushiCredentials.deleteMany(findArgs);
+
+      return {
+        deletedInstitution: await tx.institution.delete(params),
+        deletedRepos,
+        institution,
+      };
+    });
+
+    if (!transactionResult) {
+      return null;
     }
 
-    hooks.emit('institution:delete', institution);
+    const {
+      deletedInstitution,
+      deletedRepos,
+      institution,
+    } = transactionResult;
 
-    return institution;
+    triggerHooks('institution:delete', institution);
+
+    institution.memberships?.forEach((element) => {
+      triggerHooks('memberships:delete', element);
+
+      element.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+      element.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    });
+    institution.spaces?.forEach((element) => { triggerHooks('space:delete', element); });
+    deletedRepos.forEach((element) => { triggerHooks('repository:delete', element); });
+    institution.sushiCredentials?.forEach((element) => { triggerHooks('sushi_credentials:delete', element); });
+
+    return deletedInstitution;
   }
 
   static async getContacts(institutionId) {

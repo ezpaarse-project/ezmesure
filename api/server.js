@@ -19,8 +19,12 @@ const elastic = require('./lib/services/elastic');
 const sushi = require('./lib/services/sushi');
 
 const ezreeportSync = require('./lib/services/sync/ezreeport');
-const elasticSync = require('./lib/services/sync/elastic');
-const kibanaSync = require('./lib/services/sync/kibana');
+
+/**
+ * Register hooks. Must not be called elsewhere. Some services can both
+ * trigger hooks and be used by hook handlers, leading to circular dependencies.
+ */
+require('./lib/hooks');
 
 const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
@@ -136,8 +140,6 @@ app.use(mount('/', controller));
 function start() {
   notifications.start(appLogger);
   opendata.startCron(appLogger);
-  elasticSync.startCron();
-  kibanaSync.startCron();
   ezreeportSync.startCron();
   sushi.startCleanCron();
   cronMetrics.start();

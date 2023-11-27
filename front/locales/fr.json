@@ -23,7 +23,8 @@
     "logout": "Déconnexion",
     "contact": "Contact",
     "report": "Mes rapports",
-    "adminReport": "ezREEPORT"
+    "adminReport": "ezREEPORT",
+    "repositories": "Entrepôts"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -258,6 +259,7 @@
       "homepageExample": "ex: https://cnrs.fr/",
       "affectedIndex": "Index affecté",
       "affectedIndexExample": "ex: univ-blancherive",
+      "group": "Regroupement",
       "city": "Ville",
       "acronym": "Sigle",
       "type": "Type d'établissement",
@@ -425,7 +427,7 @@
     "noComponent": "Aucune composante"
   },
   "group": {
-    "group": "Groupé dans",
+    "group": "Regroupé dans",
     "noGroup": "Aucun groupe"
   },
   "tasks": {
@@ -673,15 +675,19 @@
     }
   },
   "repositories": {
-    "repositories": "Dépôts",
-    "xRepositories": "aucun dépôt | 1 dépôt | {count} dépôts",
-    "noRepository": "Aucun dépôt n'est encore attribué",
+    "repositories": "Entrepôts",
+    "toolbarTitle": "Entrepôts ({count})",
+    "xRepositories": "1 entrepôt | {count} entrepôts",
+    "noRepository": "Aucun entrepôt n'est encore attribué",
     "pattern": "Pattern",
-    "type": "Type"
+    "type": "Type",
+    "institutions": "Établissements",
+    "institutionsCount": "{count} établissement|{count} établissements",
+    "deleteNbRepositories": "Vous allez supprimer {number} entrepôts."
   },
   "spaces": {
     "spaces": "Espaces",
-    "xSpaces": "aucun espace | 1 espace | {count} espaces",
+    "xSpaces": "1 espace | {count} espaces",
     "noSpace": "Aucun espace n'est encore attribué",
     "id": "Identifiant",
     "type": "Type",

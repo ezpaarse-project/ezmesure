@@ -31,5 +31,5 @@ exports.upsertRole = async function upsertRole(name, indices, privileges) {
  * @returns {Promise<Object>}
  */
 exports.deleteRole = async function deleteRole(name) {
-  return elastic.security.deleteRole({ name });
+  return elastic.security.deleteRole({ name }, { ignore: [404] });
 };

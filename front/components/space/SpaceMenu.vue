@@ -107,6 +107,10 @@ export default {
             href: '/institutions',
           },
           {
+            title: this.$t('menu.repositories'),
+            href: '/repositories',
+          },
+          {
             title: this.$t('menu.users'),
             href: '/users',
           },

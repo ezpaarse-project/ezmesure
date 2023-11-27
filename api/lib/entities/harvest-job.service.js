@@ -1,6 +1,6 @@
 // @ts-check
 const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
@@ -21,7 +21,7 @@ module.exports = class HarvestJobsService {
   static async create(params) {
     const job = await prisma.harvestJob.create(params);
 
-    hooks.emit('harvest-job:create', job);
+    triggerHooks('harvest-job:create', job);
 
     return job;
   }
@@ -57,7 +57,7 @@ module.exports = class HarvestJobsService {
   static async update(params) {
     const job = await prisma.harvestJob.update(params);
 
-    hooks.emit('harvest-job:update', job);
+    triggerHooks('harvest-job:update', job);
 
     return job;
   }
@@ -69,7 +69,7 @@ module.exports = class HarvestJobsService {
   static async upsert(params) {
     const job = await prisma.harvestJob.upsert(params);
 
-    hooks.emit('harvest-job:upsert', job);
+    triggerHooks('harvest-job:upsert', job);
 
     return job;
   }
@@ -90,7 +90,7 @@ module.exports = class HarvestJobsService {
       throw error;
     }
 
-    hooks.emit('harvest-job:delete', job);
+    triggerHooks('harvest-job:delete', job);
 
     return job;
   }
