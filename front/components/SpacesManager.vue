@@ -181,10 +181,8 @@ export default {
     },
 
     async deleteSpace(spaceId) {
-      if (!this.$refs.confirmDialog) { return; }
-
       const spaceName = this.spaces.find((s) => s.id === spaceId)?.name || spaceId;
-      const confirmed = await this.$refs.confirmDialog.open({
+      const confirmed = await this.$refs.confirmDialog?.open({
         title: this.$t('areYouSure'),
         message: this.$t('spaces.deleteSpace', { spaceName }),
         agreeText: this.$t('delete'),

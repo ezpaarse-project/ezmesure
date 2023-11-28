@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn text @click="deleteInstitutions">
+        <v-btn text @click="deleteInstitutions()">
           <v-icon left>
             mdi-delete
           </v-icon>
@@ -222,7 +222,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item @click="deleteInstitution(item)">
+            <v-list-item @click="deleteInstitutions([item])">
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
@@ -283,8 +283,8 @@
       </template>
     </v-data-table>
 
+    <ConfirmDialog ref="confirmDialog" />
     <InstitutionForm ref="institutionForm" @update="refreshInstitutions" />
-    <InstitutionsDeleteDialog ref="deleteDialog" @removed="onInstitutionsRemove" />
     <RepositoriesDialog ref="repositoriesDialog" @updated="refreshInstitutions" />
     <SpacesDialog ref="spacesDialog" @updated="refreshInstitutions" />
     <SubInstitutionsDialog ref="subInstitutionsDialog" @updated="refreshInstitutions" />
@@ -305,11 +305,11 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import DropdownSelector from '~/components/DropdownSelector.vue';
 import InstitutionForm from '~/components/InstitutionForm.vue';
-import InstitutionsDeleteDialog from '~/components/InstitutionsDeleteDialog.vue';
 import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
 import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 import InstitutionsFiltersDrawer from '~/components/institutions/InstitutionsFiltersDrawer.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 const iconDefMap = new Map([
   [
@@ -351,11 +351,11 @@ export default {
     ToolBar,
     DropdownSelector,
     InstitutionForm,
-    InstitutionsDeleteDialog,
     RepositoriesDialog,
     SpacesDialog,
     SubInstitutionsDialog,
     InstitutionsFiltersDrawer,
+    ConfirmDialog,
   },
   data() {
     return {
@@ -857,13 +857,65 @@ export default {
     createInstitution() {
       this.$refs.institutionForm.createInstitution({ addAsMember: false });
     },
-    deleteInstitution(item) {
-      this.$refs.deleteDialog.confirmDelete([item]);
-    },
-    deleteInstitutions() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
-    },
-    onInstitutionsRemove(removedIds) {
+    async deleteInstitutions(items) {
+      const institutions = items || this.selected;
+      if (institutions.length === 0) {
+        return;
+      }
+
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc(
+          'institutions.deleteNbInstitutions.text',
+          institutions.length,
+          { affected: this.$t('institutions.deleteNbInstitutions.affected') }
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.removing = true;
+
+      const requests = institutions.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/institutions/${item.id}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
+        }
+        return { item, deleted };
+      });
+
+      const results = await Promise.all(requests);
+
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
+      }
+
+      this.removing = false;
+      this.show = false;
+      const removedIds = deleted.map((d) => d.id);
+
       const removeDeleted = (institution) => !removedIds.some((id) => institution.id === id);
       this.institutions = this.institutions.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);

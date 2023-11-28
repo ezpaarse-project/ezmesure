@@ -219,9 +219,8 @@
     "title": "Institution",
     "updateInstitution": "Update institution",
     "deleteNbInstitutions": {
-      "text": "You are about to delete {number} institutions.",
-      "affected": "The associated spaces and roles will be deleted.",
-      "unaffected": "The associated indices will stay unaffected."
+      "text": "You are about to delete {number} institutions. {affected}",
+      "affected": "The associated spaces and roles will be deleted. The associated indices will stay unaffected. This action cannot be undone."
     },
     "newInstitution": "New institution",
     "notMember": "You don't belong to an institution yet.",
@@ -779,6 +778,5 @@
   "validate": "Validate",
   "invalidate": "Invalidate",
   "reason": "Reason: {reason}",
-  "indeterminate": "indeterminate",
-  "irrevocableAction": "This action cannot be undone."
+  "indeterminate": "indeterminate"
 }
