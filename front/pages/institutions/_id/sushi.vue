@@ -831,9 +831,9 @@ export default {
 
       const selected = Array.isArray(selection) ? selection : this.selected;
 
-      const confirmDelete = await this.$refs.confirm.open({
+      const confirmDelete = await this.$refs.confirm?.open({
         title: this.$t('areYouSure'),
-        message: this.$t('sushi.deleteNbCredentials', { number: selected.length }),
+        message: this.$tc('sushi.deleteNbCredentials', selected.length),
         agreeText: this.$t('delete'),
         disagreeText: this.$t('cancel'),
       });
