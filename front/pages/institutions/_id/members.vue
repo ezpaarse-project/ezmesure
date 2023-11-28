@@ -122,15 +122,11 @@
       </a>
     </v-card-text>
 
+    <ConfirmDialog ref="confirmDialog" />
     <MemberUpdateDialog
       ref="updateDialog"
       :institution-id="institutionId"
       @updated="refreshMembers"
-    />
-    <MemberDeleteDialog
-      ref="deleteDialog"
-      :institution-id="institutionId"
-      @removed="refreshMembers"
     />
   </section>
 </template>
@@ -138,8 +134,8 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import MemberSearch from '~/components/MemberSearch.vue';
-import MemberDeleteDialog from '~/components/MemberDeleteDialog.vue';
 import MemberUpdateDialog from '~/components/MemberUpdateDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
   layout: 'space',
@@ -147,8 +143,8 @@ export default {
   components: {
     ToolBar,
     MemberSearch,
-    MemberDeleteDialog,
     MemberUpdateDialog,
+    ConfirmDialog,
   },
   async asyncData({
     $axios,
@@ -294,8 +290,35 @@ export default {
     updateMember(member) {
       this.$refs.updateDialog.updateMember(member);
     },
-    removeMember(member) {
-      this.$refs.deleteDialog.confirmRemove(member);
+    async removeMember(member) {
+      if (!member.username || !this.institutionId) { return; }
+
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$t(
+          'institutions.members.removeFromMember',
+          { name: member.user?.fullName || member.username },
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.removing = true;
+
+      try {
+        await this.$axios.$delete(`/institutions/${this.institutionId}/memberships/${member.username}`);
+        this.show = false;
+        this.refreshMembers();
+      } catch (e) {
+        const msg = e?.response?.data?.error;
+        this.$store.dispatch('snacks/error', msg || this.$t('institutions.members.failedToRemoveMember'));
+      }
+
+      this.removing = false;
     },
   },
 };
