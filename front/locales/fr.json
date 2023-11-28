@@ -702,7 +702,8 @@
     "descriptions": {
       "ezpaarse": "Espace ezPAARSE",
       "counter5": "Espace éditeurs"
-    }
+    },
+    "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
   },
   "permissions": {
     "none": "Aucun",
@@ -779,5 +780,5 @@
   "invalidate": "Invalider",
   "reason": "Raison : {reason}",
   "indeterminate": "indéterminée",
-  "irrevocableAction": "Cette action est irrémédiable."
+  "irrevocableAction": "Cette action est irréversible."
 }

@@ -702,7 +702,8 @@
     "descriptions": {
       "ezpaarse": "ezPAARSE space",
       "counter5": "Publisher space"
-    }
+    },
+    "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
   },
   "permissions": {
     "none": "None",
