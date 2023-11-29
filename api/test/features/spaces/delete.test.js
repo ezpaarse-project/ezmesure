@@ -38,7 +38,7 @@ describe('[space]: Test delete spaces features', () => {
         await spacesService.create({ data: spaceConfig });
       });
 
-      it(`#01 DELETE /kibana-spaces/${spaceConfig.id} - Should delete space`, async () => {
+      it('#01 Should delete space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
@@ -76,7 +76,7 @@ describe('[space]: Test delete spaces features', () => {
         spaceId = space.id;
       });
 
-      it(`#02 DELETE /kibana-spaces/${spaceConfig.id} - Should not delete space`, async () => {
+      it('#02 Should not delete space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
@@ -120,7 +120,7 @@ describe('[space]: Test delete spaces features', () => {
         spaceId = space.id;
       });
 
-      it(`#03 DELETE /kibana-spaces/${spaceConfig.id} - Should not delete space`, async () => {
+      it('#03 Should not delete space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
@@ -161,7 +161,7 @@ describe('[space]: Test delete spaces features', () => {
         spaceId = space.id;
       });
 
-      it(`#04 DELETE /kibana-spaces/${spaceConfig.id} - Should not delete space`, async () => {
+      it('#04 Should not delete space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,

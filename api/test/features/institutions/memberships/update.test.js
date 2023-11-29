@@ -69,7 +69,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#01 PUT /institutions/:institutionId/memberships/:username - Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+      it(`#01 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -113,7 +113,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#02 PUT/institutions/:institutionId/memberships/:username - Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [memberships:write, memberships:read]`, async () => {
+      it(`#02 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [memberships:write, memberships:read]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -177,7 +177,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#03 PUT /institutions/:institutionId/memberships/:username - Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
+        it(`#03 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -218,7 +218,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#04 PUT /institutions/:institutionId/memberships/:username - Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+        it(`#04 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -268,7 +268,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#05 PUT /institutions/:institutionId/memberships/:username - Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
+        it(`#05 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -304,7 +304,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#06 PUT/institutions/:institutionId/memberships/:username - Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
+      it(`#06 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -341,7 +341,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#07 PUT/institutions/:institutionId/memberships/:username - Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
+      it(`#07 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,

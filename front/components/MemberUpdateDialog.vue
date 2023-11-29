@@ -256,12 +256,12 @@ export default {
       const { repositories, savePermission } = this.$refs.repoPermissions;
 
       const permissions = Object.fromEntries(
-        repositories.map((r) => [r.id, level]),
+        repositories.map((r) => [r.pattern, level]),
       );
 
       this.$refs.repoPermissions.repoPermissions = permissions;
       return Promise.all(
-        repositories.map((r) => savePermission(r.id)),
+        repositories.map((r) => savePermission(r.pattern)),
       );
     },
 

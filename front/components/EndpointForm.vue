@@ -98,8 +98,24 @@
       </v-card-title>
 
       <v-card-text>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <p class="text-justify" v-html="$t('endpoints.paramSeparatorDesc')" />
+        <i18n path="endpoints.paramSeparatorDesc" tag="p" class="text-justify">
+          <template #0>
+            <code>Attributes_To_Show</code>
+          </template>
+
+          <template #1>
+            <code>Access_Type</code>
+          </template>
+
+          <template #2>
+            <code>Section_Type</code>
+          </template>
+
+          <template #separator>
+            <code>|</code>
+          </template>
+        </i18n>
+
         <v-text-field
           v-model="endpointForm.paramSeparator"
           :label="$t('endpoints.paramSeparator')"

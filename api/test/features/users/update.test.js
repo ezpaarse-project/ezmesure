@@ -5,7 +5,7 @@ const usersService = require('../../../lib/entities/users.service');
 const { createUserAsAdmin } = require('../../setup/users');
 const { getAdminToken } = require('../../setup/login');
 
-describe('[users]: Test users features', () => {
+describe('[users]: Test update users features', () => {
   const userTest = {
     username: 'user.test',
     email: 'user.test@test.fr',
@@ -37,7 +37,7 @@ describe('[users]: Test users features', () => {
           );
         });
 
-        it(`#01 PUT /users/${userTest.username} - Should update user [user.test]`, async () => {
+        it(`#01 Should update user [${userTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
@@ -77,7 +77,7 @@ describe('[users]: Test users features', () => {
           );
         });
 
-        it(`#02 PUT /users/${userTest.username} - Should not update user [${userTest.username}]`, async () => {
+        it(`#02 Should not update us${userTest.username}rTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
@@ -117,7 +117,7 @@ describe('[users]: Test users features', () => {
           );
         });
 
-        it(`#03 PUT /users/${userTest.username} - Should not update user [${userTest.username}]`, async () => {
+        it(`#03 Should not update us${userTest.username}rTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,

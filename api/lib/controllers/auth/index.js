@@ -68,7 +68,6 @@ router.get('/', getUser);
 router.get('/reporting_token', getReportingToken);
 router.get('/memberships', getMemberships);
 router.get('/token', getToken);
-
 router.route({
   method: 'PUT',
   path: '/password',

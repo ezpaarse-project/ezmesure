@@ -1,5 +1,5 @@
 // @ts-check
-const hooks = require('../hooks');
+const { triggerHooks } = require('../hooks/hookEmitter');
 const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
@@ -20,7 +20,7 @@ module.exports = class RepositoryPermissionsService {
   static async create(params) {
     const permission = await prisma.repositoryPermission.create(params);
 
-    hooks.emit('repository_permission:create', permission);
+    triggerHooks('repository_permission:create', permission);
 
     return permission;
   }
@@ -42,13 +42,31 @@ module.exports = class RepositoryPermissionsService {
   }
 
   /**
+   * @param {string} institutionId
+   * @param {string} pattern
+   * @param {string} username
+   * @returns {Promise<RepositoryPermission | null>}
+   */
+  static findById(institutionId, pattern, username) {
+    return prisma.repositoryPermission.findUnique({
+      where: {
+        username_institutionId_repositoryPattern: {
+          username,
+          institutionId,
+          repositoryPattern: pattern,
+        },
+      },
+    });
+  }
+
+  /**
    * @param {RepositoryPermissionUpdateArgs} params
    * @returns {Promise<RepositoryPermission>}
    */
   static async update(params) {
     const permission = await prisma.repositoryPermission.update(params);
 
-    hooks.emit('repository_permission:update', permission);
+    triggerHooks('repository_permission:update', permission);
 
     return permission;
   }
@@ -60,7 +78,7 @@ module.exports = class RepositoryPermissionsService {
   static async upsert(params) {
     const permission = await prisma.repositoryPermission.upsert(params);
 
-    hooks.emit('repository_permission:upsert', permission);
+    triggerHooks('repository_permission:upsert', permission);
 
     return permission;
   }
@@ -79,7 +97,7 @@ module.exports = class RepositoryPermissionsService {
       }
       throw error;
     }
-    hooks.emit('repository_permission:delete', permission);
+    triggerHooks('repository_permission:delete', permission);
 
     return permission;
   }
@@ -89,9 +107,17 @@ module.exports = class RepositoryPermissionsService {
 
     const permissions = await this.findMany({});
 
-    await prisma.repositoryPermission.deleteMany();
-
-    hooks.emit('repository_permission:deleteAll', permissions);
+    await Promise.all(permissions.map(async (permission) => {
+      await this.delete({
+        where: {
+          username_institutionId_repositoryPattern: {
+            username: permission.username,
+            institutionId: permission.institutionId,
+            repositoryPattern: permission.repositoryPattern,
+          },
+        },
+      });
+    }));
 
     return permissions;
   }

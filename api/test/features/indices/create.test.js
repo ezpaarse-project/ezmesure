@@ -13,7 +13,7 @@ describe('[indices]: Test create features', () => {
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
-    it(`#01 PUT /indices/:name - Should create new index [${indexName}]`, async () => {
+    it(`#01 Should create new index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/indices/${indexName}`,
@@ -42,7 +42,7 @@ describe('[indices]: Test create features', () => {
       userToken = await getToken(userTest.username, userTest.password);
     });
 
-    it(`#02 PUT /indices/:name - Should not create index [${indexName}]`, async () => {
+    it(`#02 Should not create index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/indices/${indexName}`,
@@ -62,7 +62,7 @@ describe('[indices]: Test create features', () => {
     });
   });
   describe('With random token', () => {
-    it(`#03 PUT /indices/:name - Should not create index [${indexName}]`, async () => {
+    it(`#03 Should not create index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/indices/${indexName}`,
@@ -82,7 +82,7 @@ describe('[indices]: Test create features', () => {
     });
   });
   describe('Without token', () => {
-    it(`#04 PUT /indices/:name - Should not create index [${indexName}]`, async () => {
+    it(`#04 Should not create index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/indices/${indexName}`,

@@ -1,4 +1,10 @@
 /**
+ * @typedef {object} ThrottledPromisesResult
+ * @property {number} fulfilled - The numbers of promises that resolved
+ * @property {number} errors - The number of promises that rejected
+ */
+
+/**
  * Exec given executor by batch of concurrence.
  * If any executor fails, it trigger a hook and continue.
  *
@@ -7,7 +13,7 @@
  * @param {(() => Promise<any>)[]} executors The executors
  * @param {((error: Error) => void)} errorHook Hook trigger when an executor fails.
  * @param {number} concurrence Count of "parallel" requests
- * @returns
+ * @returns {ThrottledPromisesResult}
  */
 exports.execThrottledPromises = async (
   executors,

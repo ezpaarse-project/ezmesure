@@ -10,7 +10,7 @@ const usersService = require('../../../lib/entities/users.service');
 const { createUserAsAdmin } = require('../../setup/users');
 const { getAdminToken, getToken } = require('../../setup/login');
 
-describe('[users]: Test users features', () => {
+describe('[users]: Test read users features', () => {
   const userTest = {
     username: 'user.test',
     email: 'user.test@test.fr',
@@ -25,7 +25,7 @@ describe('[users]: Test users features', () => {
   });
   describe('As admin', () => {
     describe('Get all users', () => {
-      it('#01 GET /users - Should get all users', async () => {
+      it('#01 Should get all users', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/users',
@@ -53,7 +53,7 @@ describe('[users]: Test users features', () => {
         );
       });
 
-      it(`#02 GET /users/${userTest.username} - Should get user [${userTest.username}]`, async () => {
+      it(`#02 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/users/${userTest.username}`,
@@ -113,7 +113,7 @@ describe('[users]: Test users features', () => {
     });
 
     describe('Get all users', () => {
-      it('#04 GET /users - Should get all users', async () => {
+      it('#04 Should get all users', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/users',
@@ -142,7 +142,7 @@ describe('[users]: Test users features', () => {
         );
       });
 
-      it(`#05 GET /users/${userTest.username} - Should get user [${userTest.username}]`, async () => {
+      it(`#05 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/users/${userTest.username}`,
@@ -168,7 +168,7 @@ describe('[users]: Test users features', () => {
 
   describe('With random token', () => {
     describe('Get all users', () => {
-      it('#06 GET /users - Should not get users', async () => {
+      it('#06 Should not get users', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/users',
@@ -202,7 +202,7 @@ describe('[users]: Test users features', () => {
         );
       });
 
-      it(`#07 GET /users/${userTest.username} - Should get user [${userTest.username}]`, async () => {
+      it(`#07 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/users/${userTest.username}`,
@@ -241,7 +241,7 @@ describe('[users]: Test users features', () => {
           userTest.isAdmin,
         );
       });
-      it('#08 GET /users - Should not get users', async () => {
+      it('#08 Should not get users', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/users',
@@ -272,7 +272,7 @@ describe('[users]: Test users features', () => {
         );
       });
 
-      it(`#09 GET /users/${userTest.username} - Should get user [${userTest.username}]`, async () => {
+      it(`#09 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/users/${userTest.username}`,

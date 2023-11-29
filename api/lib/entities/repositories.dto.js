@@ -11,12 +11,10 @@ const {
  * @type import('joi').SchemaLike
  */
 const schema = {
-  id: Joi.string().trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  institutionId: Joi.string().trim(),
-  institution: Joi.object(),
+  institutions: Joi.array().items(Joi.object()),
 
   pattern: Joi.string().trim().min(1),
   type: Joi.string().trim().min(1),
@@ -28,10 +26,9 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
-  'id',
   'updatedAt',
   'createdAt',
-  'institution',
+  'institutions',
   'permissions',
 ];
 
@@ -40,7 +37,7 @@ const immutableFields = [
  */
 const includableFields = [
   'permissions',
-  'institution',
+  'institutions',
 ];
 
 /**
@@ -49,7 +46,16 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['pattern', 'type', 'institutionId']),
+  requireFields(['pattern', 'type']),
+);
+
+/**
+ * Schema to be applied when an administrator connect a repository to an institution
+ */
+const adminCreateOrConnectSchema = withModifiers(
+  schema,
+  ignoreFields(immutableFields),
+  requireFields(['type']),
 );
 
 /**
@@ -63,15 +69,13 @@ const adminUpdateSchema = withModifiers(
 /**
  * Schema to be applied when an administrator imports multiple repositories
  */
-const adminImportSchema = Joi.array().required().items({
-  ...schema,
-  id: schema.id,
-});
+const adminImportSchema = Joi.array().required().items(adminCreateSchema);
 
 module.exports = {
   schema,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
+  adminCreateOrConnectSchema: Joi.object(adminCreateOrConnectSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
   adminImportSchema,
 };

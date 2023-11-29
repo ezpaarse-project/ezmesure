@@ -36,7 +36,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
 
-      it(`#01 DELETE /sushi-endpoints/${sushiEndpointId} - Should delete sushi-endpoint`, async () => {
+      it('#01 Should delete sushi-endpoint', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -75,7 +75,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         sushiEndpointId = sushiEndpoint.id;
       });
 
-      it(`#02 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
+      it('#02 Should not delete sushi-endpoint', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -91,7 +91,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         // Test sushi-endpoint service
         const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
 
-        expect(sushiEndpointFromService?.id).not.toBeNull();
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
@@ -126,7 +125,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
-      it(`#03 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
+      it('#03 Should not delete sushi-endpoint', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -142,7 +141,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         // Test sushi-endpoint service
         const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
 
-        expect(sushiEndpointFromService?.id).not.toBeNull();
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
@@ -172,7 +170,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
-      it(`#04 DELETE /sushi-endpoints/${sushiEndpointId} - Should not delete sushi-endpoint`, async () => {
+      it('#04 Should not delete sushi-endpoint', async () => {
         const res = await ezmesure({
           method: 'DELETE',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -185,7 +183,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         // Test sushi-endpoint service
         const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
 
-        expect(sushiEndpointFromService?.id).not.toBeNull();
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
         expect(sushiEndpointFromService).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);

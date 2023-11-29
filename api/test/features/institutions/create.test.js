@@ -20,7 +20,7 @@ describe('[institutions]: Test create features', () => {
 
   describe('As admin', () => {
     let institutionId;
-    it(`#01 POST /institutions - Should create new institution [${institutionTest.name}]`, async () => {
+    it(`#01 Should create new institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/institutions',
@@ -90,7 +90,7 @@ describe('[institutions]: Test create features', () => {
       userTest = await createDefaultActivatedUserAsAdmin();
       userToken = await getToken(userTest.username, userTest.password);
     });
-    it(`#02 POST /institutions - Should create new institution [${institutionTest.name}]`, async () => {
+    it(`#02 Should create new institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/institutions',
@@ -159,7 +159,7 @@ describe('[institutions]: Test create features', () => {
     });
   });
   describe('With random token', () => {
-    it(`#03 POST /institutions - Should no create institution [${institutionTest.name}]`, async () => {
+    it(`#03 Should no create institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/institutions',
@@ -182,7 +182,7 @@ describe('[institutions]: Test create features', () => {
     });
   });
   describe('Without token', () => {
-    it(`#04 POST /institutions - Should no create institution [${institutionTest.name}]`, async () => {
+    it(`#04 Should no create institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/institutions',

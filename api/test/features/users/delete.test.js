@@ -33,7 +33,7 @@ describe('[users]: Test delete users features', () => {
         );
       });
 
-      it(`#01 DELETE /users/${userTest.username} - Should delete [${userTest.username}]`, async () => {
+      it(`#01 Should delete [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/users/${userTest.username}`,
@@ -68,7 +68,7 @@ describe('[users]: Test delete users features', () => {
         );
       });
 
-      it(`#02 DELETE /users/${userTest.username} - Should not delete [${userTest.username}]`, async () => {
+      it(`#02 Should not delete [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/users/${userTest.username}`,

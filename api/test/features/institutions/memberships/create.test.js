@@ -62,7 +62,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
   describe('As admin', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-      it(`#01 PUT /institutions/:institutionId/memberships/:username - Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+      it(`#01 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -103,7 +103,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
     });
 
     describe(`Add membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-      it(`#02 PUT /institutions/:institutionId/memberships/:username - Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
+      it(`#02 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -165,7 +165,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       describe(`Add membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-        it(`#03 PUT /institutions/:institutionId/memberships/:username - Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
+        it(`#03 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -202,7 +202,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-        it(`#04 PUT /institutions/:institutionId/memberships/:username - Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+        it(`#04 Should attach user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -240,7 +240,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       });
 
       describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-        it(`#05 PUT /institutions/:institutionId/memberships/:username - Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
+        it(`#05 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -269,7 +269,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   });
   describe('With random token', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-      it(`#06 PUT /institutions/:institutionId/memberships/:username - Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
+      it(`#06 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -298,7 +298,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   });
   describe('Without token', () => {
     describe(`Add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
-      it(`#07 PUT /institutions/:institutionId/memberships/:username - Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
+      it(`#07 Should not add membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,

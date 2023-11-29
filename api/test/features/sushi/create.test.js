@@ -10,10 +10,11 @@ const { createInstitution } = require('../../setup/institutions');
 const { createDefaultActivatedUserAsAdmin, createUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[sushi]: Test create sushi features', () => {
+describe('[sushi]: Test create sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
   const readPermission = ['sushi:read'];
-  const emptyPermission = [];
+  // TODO test with emptyPermission
+  // const emptyPermission = [];
 
   const institutionTest = {
     name: 'Test',
@@ -86,7 +87,7 @@ describe('[sushi]: Test create sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('POST /sushi - Create sushi', () => {
+      describe('Create sushi', () => {
         let sushiId;
         beforeAll(() => {
           sushiTest.endpointId = sushiEndpointId;
@@ -153,7 +154,7 @@ describe('[sushi]: Test create sushi features', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      describe('POST /sushi - Create sushi', () => {
+      describe('Create sushi', () => {
         let sushiId;
         beforeAll(() => {
           sushiTest.endpointId = sushiEndpointId;
@@ -229,7 +230,7 @@ describe('[sushi]: Test create sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('POST /sushi - Create sushi', () => {
+      describe('Create sushi', () => {
         beforeAll(() => {
           sushiTest.endpointId = sushiEndpointId;
           sushiTest.institutionId = institutionId;
@@ -270,7 +271,7 @@ describe('[sushi]: Test create sushi features', () => {
           membershipUserTest.institutionId = institutionId;
           membershipUserTest.permissions = allPermission;
         });
-        describe('POST /sushi - Create new sushi credential', () => {
+        describe('Create new sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -336,7 +337,7 @@ describe('[sushi]: Test create sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('POST /sushi - Create new sushi credential', () => {
+        describe('Create new sushi credential', () => {
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
             sushiTest.institutionId = institutionId;
@@ -391,7 +392,7 @@ describe('[sushi]: Test create sushi features', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('POST /sushi - Create new sushi credential', () => {
+        describe('Create new sushi credential', () => {
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
             sushiTest.institutionId = anotherUserTestInstitutionId;
@@ -426,7 +427,7 @@ describe('[sushi]: Test create sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('POST /sushi - Create new sushi credential', () => {
+        describe('Create new sushi credential', () => {
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
             sushiTest.institutionId = anotherUserTestInstitutionId;
@@ -473,7 +474,7 @@ describe('[sushi]: Test create sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('POST /sushi - Create sushi', () => {
+      describe('Create sushi', () => {
         beforeAll(() => {
           sushiTest.endpointId = sushiEndpointId;
           sushiTest.institutionId = institutionId;

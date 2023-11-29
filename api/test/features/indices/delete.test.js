@@ -16,7 +16,7 @@ describe('[indices]: Test delete features', () => {
     beforeEach(async () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
-    it(`#01 DELETE /indices/:name - Should delete index [${indexName}]`, async () => {
+    it(`#01 Should delete index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'DELETE',
         url: `/indices/${indexName}`,
@@ -45,7 +45,7 @@ describe('[indices]: Test delete features', () => {
     beforeEach(async () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
-    it(`#02 DELETE /indices/:name - Should not delete index [${indexName}]`, async () => {
+    it(`#02 Should not delete index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'DELETE',
         url: `/indices/${indexName}`,
@@ -71,7 +71,7 @@ describe('[indices]: Test delete features', () => {
     beforeEach(async () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
-    it(`#03 DELETE /indices/:name - Should not delete index [${indexName}]`, async () => {
+    it(`#03 Should not delete index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'DELETE',
         url: `/indices/${indexName}`,
@@ -93,7 +93,7 @@ describe('[indices]: Test delete features', () => {
     beforeEach(async () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
-    it(`#04 DELETE /indices/:name - Should not delete index [${indexName}]`, async () => {
+    it(`#04 Should not delete index [${indexName}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'DELETE',
         url: `/indices/${indexName}`,

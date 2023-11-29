@@ -2,10 +2,18 @@ const config = require('config');
 const institutionsService = require('../../entities/institutions.service');
 const usersService = require('../../entities/users.service');
 
+/* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateInput} InstitutionCreateInput
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
- */
+ * @typedef {import('@prisma/client').Prisma.RepositoryCreateOrConnectWithoutInstitutionsInput} RepositoryCreateOrConnectWithoutInstitutionsInput
+ * @typedef {import('@prisma/client').Prisma.SpaceCreateOrConnectWithoutInstitutionInput} SpaceCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.MembershipCreateOrConnectWithoutInstitutionInput} MembershipCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateOrConnectWithoutInstitutionInput} SushiCredentialsCreateOrConnectWithoutInstitutionInput
+ * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateOrConnectWithoutMembershipInput} RepositoryPermissionCreateOrConnectWithoutMembershipInput
+ * @typedef {import('@prisma/client').Prisma.SpacePermissionCreateOrConnectWithoutMembershipInput} SpacePermissionCreateOrConnectWithoutMembershipInput
+*/
+/* eslint-enable max-len */
 
 const {
   adminCreateSchema,
@@ -100,9 +108,23 @@ exports.getInstitutions = async (ctx) => {
 };
 
 exports.getInstitution = async (ctx) => {
+  const {
+    include: propsToInclude,
+  } = ctx.query;
+  const { institutionId } = ctx.params;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
+    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = ctx.state.institution;
+  ctx.body = await institutionsService.findUnique({
+    where: { id: institutionId },
+    include,
+  });
 };
 
 exports.createInstitution = async (ctx) => {
@@ -290,39 +312,87 @@ exports.importInstitutions = async (ctx) => {
       ...item,
       logo: undefined,
       logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
           where: { id: spaceData.id },
-          create: spaceData,
+          create: { ...spaceData, institutionId: undefined },
         })),
       },
+
       repositories: {
-        connectOrCreate: item.repositories?.map?.((repoData) => ({
-          where: {
-            institutionId_pattern: {
-              institutionId: item.id,
-              pattern: repoData?.pattern,
+        connectOrCreate: item.repositories?.map?.(
+          /** @returns {RepositoryCreateOrConnectWithoutInstitutionsInput} */
+          (repoData) => ({
+            where: {
+              pattern: repoData.pattern,
             },
-          },
-          create: repoData,
-        })),
+            create: repoData,
+          }),
+        ),
       },
+
       sushiCredentials: {
-        connectOrCreate: item.sushiCredentials?.map?.((sushi) => ({
-          where: { id: sushi.id },
-          create: { ...sushi, institutionId: undefined },
-        })),
+        connectOrCreate: item.sushiCredentials?.map?.(
+          /** @returns {SushiCredentialsCreateOrConnectWithoutInstitutionInput} */
+          (sushi) => ({
+            where: { id: sushi.id },
+            create: { ...sushi, institutionId: undefined },
+          }),
+        ),
       },
+
       memberships: {
-        connectOrCreate: item.memberships?.map?.((membership) => ({
-          where: {
-            username_institutionId: {
-              institutionId: membership.institutionId,
-              username: membership.username,
+        connectOrCreate: item.memberships?.map?.(
+          /** @returns {MembershipCreateOrConnectWithoutInstitutionInput} */
+          (membership) => ({
+            where: {
+              username_institutionId: {
+                institutionId: item.id,
+                username: membership?.username,
+              },
             },
-          },
-          create: { ...membership, institutionId: undefined },
-        })),
+            create: {
+              ...(membership ?? {}),
+              username: undefined,
+
+              user: {
+                connect: { username: membership?.username },
+              },
+
+              spacePermissions: {
+                connectOrCreate: membership?.spacePermissions?.map?.(
+                  /** @returns {SpacePermissionCreateOrConnectWithoutMembershipInput} */
+                  (perm) => ({
+                    where: {
+                      username_spaceId: {
+                        username: membership?.username,
+                        spaceId: perm?.spaceId,
+                      },
+                    },
+                    create: perm,
+                  }),
+                ),
+              },
+
+              repositoryPermissions: {
+                connectOrCreate: membership?.repositoryPermissions?.map?.(
+                  /** @returns {RepositoryPermissionCreateOrConnectWithoutMembershipInput} */
+                  (perm) => ({
+                    where: {
+                      username_institutionId_repositoryPattern: {
+                        username: membership?.username,
+                        repositoryPattern: perm?.repositoryPattern,
+                        institutionId: item.id,
+                      },
+                    },
+                    create: perm,
+                  }),
+                ),
+              },
+            },
+          }),
+        ),
       },
     };
 
@@ -376,7 +446,7 @@ exports.getInstitutionRepositories = async (ctx) => {
   }
 
   const repositories = await repositoriesService.findMany({
-    where: { institutionId: ctx.state.institution.id },
+    where: { institutions: { some: { id: ctx.state.institution.id } } },
     include,
   });
 

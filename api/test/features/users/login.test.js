@@ -20,7 +20,7 @@ describe('[users]: Test login users features', () => {
     password: 'changeme',
   };
   describe('Login with admin account', () => {
-    it('#01 POST /login/local - Should get auth token', async () => {
+    it('#01 Should get auth token', async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/login/local',
@@ -39,7 +39,7 @@ describe('[users]: Test login users features', () => {
       await createDefaultActivatedUserAsAdmin();
     });
 
-    it('#02 POST /login/local - Should get auth token', async () => {
+    it('#02 Should get auth token', async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/login/local',
@@ -62,7 +62,7 @@ describe('[users]: Test login users features', () => {
       await createDefaultUserAsAdmin();
     });
 
-    it('#03 POST /login/local - Should get auth token', async () => {
+    it('#03 Should get auth token', async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/login/local',
@@ -81,7 +81,7 @@ describe('[users]: Test login users features', () => {
   });
 
   describe('Someone not registered', () => {
-    it('#04 POST /login/local - Should not get auth token', async () => {
+    it('#04 Should not get auth token', async () => {
       const httpAppResponse = await ezmesure({
         method: 'POST',
         url: '/login/local',

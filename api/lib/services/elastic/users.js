@@ -146,7 +146,7 @@ exports.deleteUser = function deleteUser(username) {
  * @param {string} username - Username of user.
  * @param {string} password - Password of user.
  *
- * @returns {Promise<{}>} Updated user.
+ * @returns {Promise<ElasticUser>} Updated user.
  */
 exports.updatePassword = function updatePassword(username, password) {
   return elastic.security.changePassword({

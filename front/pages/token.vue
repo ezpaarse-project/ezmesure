@@ -2,8 +2,11 @@
   <section>
     <ToolBar :title="$t('token.title')" />
     <v-card-text class="w-800 mx-auto">
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <p v-html="$t('token.whatDoesToken')" />
+      <i18n path="token.whatDoesToken.text" tag="p">
+        <template #header>
+          <code>{{ $t('token.whatDoesToken.header') }}</code>
+        </template>
+      </i18n>
 
       <v-container grid-list-md class="px-0">
         <v-layout row align-center>

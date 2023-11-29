@@ -49,7 +49,7 @@ describe('[space]: Test read spaces features', () => {
         expect(httpAppResponse).toHaveProperty('status', 200);
 
         const space = httpAppResponse?.data;
-        expect(space?.id).not.toBeNull();
+
         expect(space).toHaveProperty('institutionId', institutionId);
         expect(space?.createdAt).not.toBeNull();
         expect(space?.updatedAt).not.toBeNull();

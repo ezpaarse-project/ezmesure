@@ -20,7 +20,7 @@ describe('[logs]: Test insert features', () => {
     });
     describe(`Add [wiley.csv] in [${indexName}] index`, () => {
       // FIXME, test break after 2 times
-      it(`#01 POST /logs/:name - Should upload ec in index [${indexName}]`, async () => {
+      it(`#01 Should upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
@@ -65,7 +65,7 @@ describe('[logs]: Test insert features', () => {
         await indicesService.create(indexName, null, { ignore: [404] });
       });
 
-      it(`#02 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+      it(`#02 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
@@ -90,7 +90,7 @@ describe('[logs]: Test insert features', () => {
         await indicesService.create(indexName, null, { ignore: [404] });
       });
 
-      it(`#03 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+      it(`#03 Should not upload ec in index [${indexName}]`, async () => {
         const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
@@ -118,7 +118,7 @@ describe('[logs]: Test insert features', () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
 
-    it(`#04 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+    it(`#04 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
       const httpAppResponse = await ezmesure({
@@ -142,7 +142,7 @@ describe('[logs]: Test insert features', () => {
       await indicesService.create(indexName, null, { ignore: [404] });
     });
 
-    it(`#05 POST /logs/:name - Should not upload ec in index [${indexName}]`, async () => {
+    it(`#05 Should not upload ec in index [${indexName}]`, async () => {
       const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
 
       const httpAppResponse = await ezmesure({

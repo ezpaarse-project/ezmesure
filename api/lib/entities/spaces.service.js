@@ -1,6 +1,6 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const { client: prisma } = require('../services/prisma.service');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Space} Space */
@@ -10,6 +10,7 @@ const hooks = require('../hooks');
 /** @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
+/** @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
 /* eslint-enable max-len */
 
 module.exports = class SpacesService {
@@ -20,7 +21,7 @@ module.exports = class SpacesService {
   static async create(params) {
     const space = await prisma.space.create(params);
 
-    hooks.emit('space:create', space);
+    triggerHooks('space:create', space);
 
     return space;
   }
@@ -56,7 +57,7 @@ module.exports = class SpacesService {
   static async update(params) {
     const space = await prisma.space.update(params);
 
-    hooks.emit('space:update', space);
+    triggerHooks('space:update', space);
 
     return space;
   }
@@ -68,7 +69,7 @@ module.exports = class SpacesService {
   static async upsert(params) {
     const space = await prisma.space.upsert(params);
 
-    hooks.emit('space:upsert', space);
+    triggerHooks('space:upsert', space);
 
     return space;
   }
@@ -78,20 +79,36 @@ module.exports = class SpacesService {
    * @returns {Promise<Space | null>}
    */
   static async delete(params) {
-    let space;
+    const [deleteResult, deletedSpace] = await prisma.$transaction(async (tx) => {
+      const space = await tx.space.findUnique({
+        where: params.where,
+        include: {
+          permissions: true,
+        },
+      });
 
-    try {
-      space = await prisma.space.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+      if (!space) {
+        return [null, null];
       }
-      throw error;
+
+      await tx.spacePermission.deleteMany({
+        where: { spaceId: space.id },
+      });
+
+      return [
+        await tx.space.delete(params),
+        space,
+      ];
+    });
+
+    if (!deletedSpace) {
+      return null;
     }
 
-    hooks.emit('space:delete', space);
+    triggerHooks('space:delete', deletedSpace);
+    deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
 
-    return space;
+    return deleteResult;
   }
 
   /**
@@ -102,9 +119,13 @@ module.exports = class SpacesService {
 
     const spaces = await this.findMany({});
 
-    await prisma.space.deleteMany({});
-
-    hooks.emit('space:deleteAll', spaces);
+    await Promise.all(spaces.map(async (space) => {
+      await this.delete({
+        where: {
+          id: space.id,
+        },
+      });
+    }));
 
     return spaces;
   }

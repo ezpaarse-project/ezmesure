@@ -68,7 +68,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
 
-    describe('GET /institutions/<id>/subinstitution/<subid> - Read subinstitution [Sub Test] for [Master Test] institution', () => {
+    describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should get subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
@@ -101,8 +101,8 @@ describe('[institutions - subinstitution]: Test read features', () => {
       subInstitutionId = subInstitution.id;
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
-    describe('GET /institutions/<id>/subinstitution/<subid> - Read subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#02 Should get HTTP status 403', async () => {
+    describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#02 Should not get subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/institutions/${masterInstitutionId}/subinstitutions`,
@@ -127,8 +127,8 @@ describe('[institutions - subinstitution]: Test read features', () => {
       subInstitutionId = subInstitution.id;
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
-    describe('GET /institutions/<id>/subinstitution/<subid> - Read subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#03 Should get HTTP status 401', async () => {
+    describe('Read subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#03 Should not get subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/institutions/${masterInstitutionId}/subinstitutions`,

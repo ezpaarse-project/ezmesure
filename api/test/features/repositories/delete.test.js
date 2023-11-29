@@ -1,10 +1,8 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const institutionsService = require('../../../lib/entities/institutions.service');
 const usersService = require('../../../lib/entities/users.service');
 const repositoriesService = require('../../../lib/entities/repositories.service');
 
-const { createInstitution } = require('../../setup/institutions');
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
@@ -26,40 +24,31 @@ describe('[repositories]: Test delete features', () => {
       adminToken = await getAdminToken();
     });
 
-    describe('Institution created by admin', () => {
-      let institutionId;
-
+    describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
+      let pattern;
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
-        institutionId = institution.id;
+        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        pattern = repository.pattern;
+      });
+      it(`#01 Should delete repository of type [${ezpaarseRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
+        const res = await ezmesure({
+          method: 'DELETE',
+          url: `/repositories/${pattern}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+
+        // Test API
+        expect(res).toHaveProperty('status', 204);
+
+        // Test service
+        const repositoryFromService = await repositoriesService.findMany();
+        expect(repositoryFromService).toEqual([]);
       });
 
-      describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
-        let repositoryId;
-        beforeAll(async () => {
-          ezpaarseRepositoryConfig.institutionId = institutionId;
-          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
-          repositoryId = repository.id;
-        });
-        it(`#01 Should delete repository of type [${ezpaarseRepositoryConfig.type}] and pattern [${ezpaarseRepositoryConfig.pattern}]`, async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          // Test API
-          expect(res).toHaveProperty('status', 204);
-
-          // Test service
-          const repositoryFromService = await repositoriesService.findMany();
-          expect(repositoryFromService).toEqual([]);
-        });
-      });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await repositoriesService.deleteAll();
       });
     });
   });
@@ -72,90 +61,37 @@ describe('[repositories]: Test delete features', () => {
       userToken = await getToken(userTest.username, userTest.password);
     });
 
-    describe('Institution created by admin', () => {
-      let institutionId;
+    describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
+      let pattern;
 
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
-        institutionId = institution.id;
+        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        pattern = repository.pattern;
       });
 
-      describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
-        let repositoryId;
-
-        beforeAll(async () => {
-          ezpaarseRepositoryConfig.institutionId = institutionId;
-          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
-          repositoryId = repository.id;
+      it('#02 Should not delete repository', async () => {
+        const res = await ezmesure({
+          method: 'DELETE',
+          url: `/repositories/${pattern}`,
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         });
 
-        it('#02 Should get HTTP status 403', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
+        // Test API
+        expect(res).toHaveProperty('status', 403);
 
-          // Test API
-          expect(res).toHaveProperty('status', 403);
+        // Test service
+        const repositoryFromService = await repositoriesService.findByPattern(pattern);
 
-          // Test service
-          const repositoryFromService = await repositoriesService.findByID(repositoryId);
-
-          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
-          expect(repositoryFromService?.createdAt).not.toBeNull();
-          expect(repositoryFromService?.updatedAt).not.toBeNull();
-          expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
-          expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
-        });
-      });
-      afterAll(async () => {
-        await institutionsService.deleteAll();
-      });
-    });
-    describe('Institution created by user', () => {
-      let institutionId;
-
-      beforeAll(async () => {
-        institutionId = await createInstitution(institutionTest, userTest);
-      });
-
-      describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
-        let repositoryId;
-
-        beforeAll(async () => {
-          ezpaarseRepositoryConfig.institutionId = institutionId;
-          const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
-          repositoryId = repository.id;
-        });
-
-        it('#03 Should get HTTP status 403', async () => {
-          const res = await ezmesure({
-            method: 'DELETE',
-            url: `/repositories/${repositoryId}`,
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
-
-          // Test API
-          expect(res).toHaveProperty('status', 403);
-
-          // Test service
-          const repositoryFromService = await repositoriesService.findByID(repositoryId);
-
-          expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
-          expect(repositoryFromService?.createdAt).not.toBeNull();
-          expect(repositoryFromService?.updatedAt).not.toBeNull();
-          expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
-          expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
-        });
+        expect(repositoryFromService?.createdAt).not.toBeNull();
+        expect(repositoryFromService?.updatedAt).not.toBeNull();
+        expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
+        expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await repositoriesService.deleteAll();
       });
     });
 
@@ -163,89 +99,36 @@ describe('[repositories]: Test delete features', () => {
       await usersService.deleteAll();
     });
   });
-  describe('With random token', () => {
-    let institutionId;
-
-    beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
-      institutionId = institution.id;
-    });
-
-    describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
-      let repositoryId;
-
-      beforeAll(async () => {
-        ezpaarseRepositoryConfig.institutionId = institutionId;
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
-        repositoryId = repository.id;
-      });
-
-      it('#04 Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'DELETE',
-          url: `/repositories/${repositoryId}`,
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-
-        // Test API
-        expect(res).toHaveProperty('status', 401);
-
-        // Test service
-        const repositoryFromService = await repositoriesService.findByID(repositoryId);
-
-        expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
-        expect(repositoryFromService?.createdAt).not.toBeNull();
-        expect(repositoryFromService?.updatedAt).not.toBeNull();
-        expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
-        expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
-      });
-    });
-
-    afterAll(async () => {
-      await institutionsService.deleteAll();
-    });
-  });
   describe('Without token', () => {
-    let institutionId;
-
-    beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
-      institutionId = institution.id;
-    });
-
-    describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}] for [${institutionTest.name}] institution`, () => {
-      let repositoryId;
+    describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
+      let pattern;
 
       beforeAll(async () => {
-        ezpaarseRepositoryConfig.institutionId = institutionId;
         const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
-        repositoryId = repository.id;
+        pattern = repository.pattern;
       });
 
-      it('#05 Should get HTTP status 401', async () => {
+      it('#03 Should not delete repository', async () => {
         const res = await ezmesure({
           method: 'DELETE',
-          url: `/repositories/${repositoryId}`,
+          url: `/repositories/${pattern}`,
         });
 
         // Test API
         expect(res).toHaveProperty('status', 401);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByID(repositoryId);
+        const repositoryFromService = await repositoriesService.findByPattern(pattern);
 
-        expect(repositoryFromService).toHaveProperty('institutionId', institutionId);
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
         expect(repositoryFromService).toHaveProperty('pattern', ezpaarseRepositoryConfig.pattern);
         expect(repositoryFromService).toHaveProperty('type', ezpaarseRepositoryConfig.type);
       });
-    });
 
-    afterAll(async () => {
-      await institutionsService.deleteAll();
+      afterAll(async () => {
+        await repositoriesService.deleteAll();
+      });
     });
   });
 });

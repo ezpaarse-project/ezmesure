@@ -28,7 +28,7 @@ describe('[institutions]: Test read features', () => {
       institutionId = institution.id;
     });
 
-    it('#01 GET /institutions - Should get all institutions', async () => {
+    it('#01 Should get all institutions', async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: '/institutions',
@@ -59,7 +59,7 @@ describe('[institutions]: Test read features', () => {
       expect(institutions).toHaveProperty('sushiReadySince', null);
     });
 
-    it(`#02 GET /institutions/:institutionId - Should get institution [${institutionTest.name}]`, async () => {
+    it(`#02 Should get institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: `/institutions/${institutionId}`,
@@ -108,7 +108,7 @@ describe('[institutions]: Test read features', () => {
       institutionId = institution.id;
     });
 
-    it('#03 GET /institutions - Should get all institutions', async () => {
+    it('#03 Should get all institutions', async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: '/institutions',
@@ -140,7 +140,7 @@ describe('[institutions]: Test read features', () => {
       expect(institutions).toHaveProperty('sushiReadySince', null);
     });
 
-    it(`#04 GET /institutions/:institutionId - Should get institution [${institutionTest.name}]`, async () => {
+    it(`#04 GET Should get institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: `/institutions/${institutionId}`,
@@ -184,7 +184,7 @@ describe('[institutions]: Test read features', () => {
       institutionId = institution.id;
     });
 
-    it('#05 GET /institutions - Should not get all institutions', async () => {
+    it('#05 Should not get all institutions', async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: '/institutions',
@@ -196,7 +196,7 @@ describe('[institutions]: Test read features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
     });
 
-    it(`#06 GET /institutions/;institutionId - Should not get institution [${institutionTest.name}]`, async () => {
+    it(`#06 Should not get institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: `/institutions/${institutionId}`,
@@ -216,7 +216,7 @@ describe('[institutions]: Test read features', () => {
       institutionId = institution.id;
     });
 
-    it('#07 GET /institutions - Should not get all institutions', async () => {
+    it('#07 Should not get all institutions', async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: '/institutions',
@@ -225,7 +225,7 @@ describe('[institutions]: Test read features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
     });
 
-    it(`#08 GET /institutions/:institutionId - Should not get institution [${institutionTest.name}]`, async () => {
+    it(`#08 Should not get institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'GET',
         url: `/institutions/${institutionId}`,

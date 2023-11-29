@@ -81,7 +81,13 @@ module.exports = class SushiCredentialssService {
 
     const sushiCredentials = await this.findMany({});
 
-    await prisma.sushiCredentials.deleteMany({});
+    await Promise.all(sushiCredentials.map(async (sushiCredential) => {
+      await this.delete({
+        where: {
+          id: sushiCredential.id,
+        },
+      });
+    }));
 
     return sushiCredentials;
   }

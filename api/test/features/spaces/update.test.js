@@ -46,7 +46,7 @@ describe('[space]: Test update spaces features', () => {
         spaceId = space.id;
       });
 
-      it('Should update space', async () => {
+      it('#01 Should update space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'PATCH',
           url: `/kibana-spaces/${spaceConfig.id}`,

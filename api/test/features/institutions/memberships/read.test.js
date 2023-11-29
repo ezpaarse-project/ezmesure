@@ -68,7 +68,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#01 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+      it(`#01 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -102,7 +102,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#02 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
+      it(`#02 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -154,7 +154,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#03 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
+        it(`#03 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -186,7 +186,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#04 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+        it(`#04 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -214,7 +214,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#05 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
+        it(`#05 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -251,7 +251,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#06 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
+        it(`#06 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -279,7 +279,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#07 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
+        it(`#07 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -307,7 +307,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it(`#08 GET /institutions/:institutionId/memberships/:username - Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
+        it(`#08 Should get user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${allPermission}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -340,7 +340,7 @@ describe('[institutions - memberships]: Test read memberships features', () => {
         await membershipsService.create({ data: membershipUserTest });
       });
 
-      it(`#09 GET /institutions/:institutionId/memberships/:username - Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
+      it(`#09 Should not get membership of user [${userTest.username}] for institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,

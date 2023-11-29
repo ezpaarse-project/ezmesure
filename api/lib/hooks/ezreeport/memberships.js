@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -24,14 +24,6 @@ const onMembershipDelete = async (membership) => {
 };
 
 /**
- * @param {Array<Membership>} memberships
- */
-const onMembershipDeleteAll = async (memberships) => {
-  if (process.env.NODE_ENV === 'production') { return null; }
-  Promise.all(memberships.map((membership) => onMembershipDelete(membership)));
-};
-
-/**
  * @param {Membership} membership
 */
 const onMembershipUpsert = async (membership) => {
@@ -49,8 +41,9 @@ const onMembershipUpsert = async (membership) => {
   }
 };
 
-hookEmitter.on('membership:create', onMembershipUpsert);
-hookEmitter.on('membership:update', onMembershipUpsert);
-hookEmitter.on('membership:upsert', onMembershipUpsert);
-hookEmitter.on('membership:delete', onMembershipDelete);
-hookEmitter.on('membership:deleteAll', onMembershipDeleteAll);
+const hookOptions = { uniqueResolver: (membership) => `${membership.username}_${membership.institutionId}` };
+
+registerHook('membership:create', onMembershipUpsert, hookOptions);
+registerHook('membership:update', onMembershipUpsert, hookOptions);
+registerHook('membership:upsert', onMembershipUpsert, hookOptions);
+registerHook('membership:delete', onMembershipDelete, hookOptions);

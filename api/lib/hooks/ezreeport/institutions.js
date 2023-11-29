@@ -1,5 +1,5 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
@@ -33,14 +33,6 @@ const onInstitutionDelete = async (institution) => {
   } catch (error) {
     appLogger.error(`[ezreeport][hooks] Reporting user [${username}] cannot be deleted in elastic:\n${error}`);
   }
-};
-
-/**
- * @param {Array<Institution>} institutions
- */
-const onInstitutionDeleteAll = async (institutions) => {
-  if (process.env.NODE_ENV === 'production') { return null; }
-  Promise.all(institutions.map((institution) => onInstitutionDelete(institution)));
 };
 
 /**
@@ -88,8 +80,7 @@ const onInstitutionUpsert = async (institution) => {
   }
 };
 
-hookEmitter.on('institution:create', onInstitutionUpsert);
-hookEmitter.on('institution:update', onInstitutionUpsert);
-hookEmitter.on('institution:upsert', onInstitutionUpsert);
-hookEmitter.on('institution:delete', onInstitutionDelete);
-hookEmitter.on('institution:deleteAll', onInstitutionDeleteAll);
+registerHook('institution:create', onInstitutionUpsert);
+registerHook('institution:update', onInstitutionUpsert);
+registerHook('institution:upsert', onInstitutionUpsert);
+registerHook('institution:delete', onInstitutionDelete);

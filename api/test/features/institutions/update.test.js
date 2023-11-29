@@ -31,7 +31,7 @@ describe('[institutions]: Test update features', () => {
       institutionId = institution.id;
     });
 
-    it(`#01 PUT /institutions/:institutionId - Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
+    it(`#01 Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,
@@ -104,7 +104,7 @@ describe('[institutions]: Test update features', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      it(`#02 PUT /institutions/:institutionId - Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
+      it(`#02 Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}`,
@@ -170,7 +170,7 @@ describe('[institutions]: Test update features', () => {
         institutionId = institution.id;
       });
 
-      it(`#03 PUT /institutions/:institutionId - Should not update institution [${institutionTest.name}]`, async () => {
+      it(`#03 Should not update institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}`,
@@ -219,7 +219,7 @@ describe('[institutions]: Test update features', () => {
       institutionId = institution.id;
     });
 
-    it(`#04 PUT /institutions/:institutionId - Should not update institution [${institutionTest.name}]`, async () => {
+    it(`#04 Should not update institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,
@@ -266,7 +266,7 @@ describe('[institutions]: Test update features', () => {
       institutionId = institution.id;
     });
 
-    it(`#05 PUT /institutions/:institutionId - Should not update institution [${institutionTest.name}]`, async () => {
+    it(`#05 Should not update institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,

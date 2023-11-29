@@ -36,7 +36,7 @@ describe('[space]: Test create spaces features', () => {
   describe('As admin', () => {
     describe(`Create new space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       let spaceId;
-      it('#01 POST /kibana-spaces/ - Should create space', async () => {
+      it('#01 Should create space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'POST',
           url: '/kibana-spaces/',
@@ -85,7 +85,7 @@ describe('[space]: Test create spaces features', () => {
         userToken = await getToken(userTest.username, userTest.password);
       });
 
-      it('#02 POST /kibana-spaces/ - Should not create space', async () => {
+      it('#02 Should not create space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'POST',
           url: '/kibana-spaces/',
@@ -114,7 +114,7 @@ describe('[space]: Test create spaces features', () => {
         spaceConfig.institutionId = institutionId;
       });
 
-      it('#03 POST /kibana-spaces/ - Should not create space', async () => {
+      it('#03 Should not create space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'POST',
           url: '/kibana-spaces/',
@@ -143,7 +143,7 @@ describe('[space]: Test create spaces features', () => {
         spaceConfig.institutionId = institutionId;
       });
 
-      it('#04 POST /kibana-spaces/ - Should not create space', async () => {
+      it('#04 Should not create space', async () => {
         const httpAppResponse = await ezmesure({
           method: 'POST',
           url: '/kibana-spaces/',

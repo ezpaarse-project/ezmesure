@@ -128,7 +128,7 @@ exports.importEndpoints = async (ctx) => {
       const endpoint = await sushiEndpointService.findUnique({ where: { id: item.id } });
 
       if (endpoint && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.endpoint.import.alreadyExists', endpoint.id));
+        addResponseItem(item, 'conflict', ctx.$t('errors.sushi-endpoint.import.alreadyExists', endpoint.id));
         return;
       }
     }

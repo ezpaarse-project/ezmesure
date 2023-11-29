@@ -68,7 +68,7 @@ describe('[institutions - subinstitution]: Test delete features', () => {
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
 
-    describe('DELETE /institutions/<id>/subinstitution/<subid> - Delete subinstitution [Sub Test] for [Master Test] institution', () => {
+    describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should create subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
@@ -100,8 +100,8 @@ describe('[institutions - subinstitution]: Test delete features', () => {
       subInstitutionId = subInstitution.id;
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
-    describe('DELETE /institutions/<id>/subinstitution/<subid> - Delete subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#02 Should get HTTP status 403', async () => {
+    describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#02 Should not delete subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
@@ -126,8 +126,8 @@ describe('[institutions - subinstitution]: Test delete features', () => {
       subInstitutionId = subInstitution.id;
       await institutionsService.addSubInstitution(masterInstitutionId, subInstitutionId);
     });
-    describe('DELETE /institutions/<id>/subinstitution/<subid> - Delete subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#03 Should get HTTP status 401', async () => {
+    describe('Delete subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#03 Should not delete subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,

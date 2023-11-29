@@ -26,7 +26,7 @@ describe('[institutions]: Test validate institution features', () => {
       const institution = await institutionsService.create({ data: institutionTest });
       institutionId = institution.id;
     });
-    it(`#01 PUT /institutions/:institutionId/validated - Should validate institution [${institutionTest.name}]`, async () => {
+    it(`#01 Should validate institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}/validated`,
@@ -47,7 +47,7 @@ describe('[institutions]: Test validate institution features', () => {
     });
 
     // TODO start with invalidate institution
-    it(`#02 PUT /institutions/:institutionId/validated - Should invalidate institution [${institutionTest.name}]`, async () => {
+    it(`#02 Should invalidate institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}/validated`,
@@ -87,7 +87,7 @@ describe('[institutions]: Test validate institution features', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      it(`#03 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+      it(`#03 Should not validate institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
@@ -107,7 +107,7 @@ describe('[institutions]: Test validate institution features', () => {
 
       // TODO start with invalidate institution
 
-      it(`#04 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+      it(`#04 Should not invalidate institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
@@ -127,7 +127,7 @@ describe('[institutions]: Test validate institution features', () => {
     });
 
     describe('Institution created by other', () => {
-      it(`#05 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+      it(`#05 Should not validate institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
@@ -147,7 +147,7 @@ describe('[institutions]: Test validate institution features', () => {
 
       // TODO start with invalidate institution
 
-      it(`#06 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+      it(`#06 Should not invalidate institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${institutionId}/validated`,
@@ -168,8 +168,6 @@ describe('[institutions]: Test validate institution features', () => {
 
     afterAll(async () => {
       await institutionsService.deleteAll();
-    });
-    afterAll(async () => {
       await usersService.deleteAll();
     });
   });
@@ -179,7 +177,7 @@ describe('[institutions]: Test validate institution features', () => {
       const institution = await institutionsService.create({ data: institutionTest });
       institutionId = institution.id;
     });
-    it(`#07 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+    it(`#07 Should not validate institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,
@@ -198,7 +196,7 @@ describe('[institutions]: Test validate institution features', () => {
     });
 
     // TODO start with invalidate institution
-    it(`#08 PUT /institutions/:institutionId/validated - Should not invalidate institution [${institutionTest.name}]`, async () => {
+    it(`#08 Should not invalidate institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,
@@ -226,7 +224,7 @@ describe('[institutions]: Test validate institution features', () => {
       const institution = await institutionsService.create({ data: institutionTest });
       institutionId = institution.id;
     });
-    it(`#09 PUT /institutions/:institutionId/validated - Should not validate institution [${institutionTest.name}]`, async () => {
+    it(`#09 Should not validate institution [${institutionTest.name}]`, async () => {
       const httpAppResponse = await ezmesure({
         method: 'PUT',
         url: `/institutions/${institutionId}`,

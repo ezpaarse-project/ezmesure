@@ -1,11 +1,11 @@
 // @ts-check
-const hookEmitter = require('../hookEmitter');
+const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
 
-const { generateRolesOfMembership } = require('../utils');
+const { generateUserRoles } = require('../utils');
 
 /**
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
@@ -26,7 +26,7 @@ const onRepositoryPermissionModified = async (permission) => {
     return;
   }
 
-  const roles = await generateRolesOfMembership(permission.username, permission.institutionId);
+  const roles = await generateUserRoles(permission.username);
   try {
     await elasticUsers.updateUser({
       username: permission.username,
@@ -40,14 +40,9 @@ const onRepositoryPermissionModified = async (permission) => {
   }
 };
 
-const onRepositoryPermissionDeleteAll = async (permissions) => {
-  if (process.env.NODE_ENV === 'production') { return null; }
-  // TODO make custom log for delete
-  Promise.all(permissions.map((Repository) => onRepositoryPermissionModified(Repository)));
-};
+const hookOptions = { uniqueResolver: (permission) => `${permission.username}_${permission.repositoryPattern}` };
 
-hookEmitter.on('repository_permission:create', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:update', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:upsert', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:delete', onRepositoryPermissionModified);
-hookEmitter.on('repository_permission:deleteAll', onRepositoryPermissionDeleteAll);
+registerHook('repository_permission:create', onRepositoryPermissionModified, hookOptions);
+registerHook('repository_permission:update', onRepositoryPermissionModified, hookOptions);
+registerHook('repository_permission:upsert', onRepositoryPermissionModified, hookOptions);
+registerHook('repository_permission:delete', onRepositoryPermissionModified, hookOptions);

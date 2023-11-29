@@ -23,7 +23,7 @@ describe('[institutions]: Test delete features', () => {
       institutionId = institution.id;
     });
 
-    it(`#01 DELETE /institutions/:institutionId - Should delete institution [${institutionTest.name}]`, async () => {
+    it(`#01 Should delete institution [${institutionTest.name}]`, async () => {
       const res = await ezmesure({
         method: 'DELETE',
         url: `/institutions/${institutionId}`,
@@ -55,7 +55,7 @@ describe('[institutions]: Test delete features', () => {
       institutionId = institution.id;
     });
 
-    it(`#02 DELETE /institutions/:institutionId - Should delete institution [${institutionTest.name}]`, async () => {
+    it(`#02 Should delete institution [${institutionTest.name}]`, async () => {
       const res = await ezmesure({
         method: 'DELETE',
         url: `/institutions/${institutionId}`,
@@ -69,7 +69,6 @@ describe('[institutions]: Test delete features', () => {
       // Test service
       const institution = await institutionsService.findByID(institutionId);
 
-      expect(institution?.id).not.toBeNull();
       expect(institution).toHaveProperty('parentInstitutionId', null);
       expect(institution?.createdAt).not.toBeNull();
       expect(institution?.updatedAt).not.toBeNull();
@@ -101,7 +100,7 @@ describe('[institutions]: Test delete features', () => {
       institutionId = institution.id;
     });
 
-    it(`#03 DELETE /institutions/:institutionId - Should not delete institution [${institutionTest.name}]`, async () => {
+    it(`#03 Should not delete institution [${institutionTest.name}]`, async () => {
       const res = await ezmesure({
         method: 'DELETE',
         url: `/institutions/${institutionId}`,
@@ -129,7 +128,7 @@ describe('[institutions]: Test delete features', () => {
       institutionId = institution.id;
     });
 
-    it(`#04 DELETE /institutions/:institutionId - Should not delete institution [${institutionTest.name}]`, async () => {
+    it(`#04 Should not delete institution [${institutionTest.name}]`, async () => {
       const res = await ezmesure({
         method: 'DELETE',
         url: `/institutions/${institutionId}`,

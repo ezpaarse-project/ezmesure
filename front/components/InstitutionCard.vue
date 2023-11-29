@@ -113,6 +113,7 @@ export default {
     },
     fields() {
       const fields = [
+        { name: 'group', value: this.institution.parentInstitution?.name, icon: 'mdi-home-group' },
         { name: 'homepage', value: this.institution.homepage, icon: 'mdi-web' },
         { name: 'city', value: this.institution.city, icon: 'mdi-map-marker' },
         { name: 'type', value: this.institution.type, icon: 'mdi-tag' },

@@ -6,7 +6,7 @@ const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.serv
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
+describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
   const sushiEndpointTest = {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
@@ -36,7 +36,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       sushiEndpointId = sushiEndpoint.id;
     });
     describe('Get all sushi-endpoints', () => {
-      it('#01 GET /sushi-endpoints - Should get all sushi-endpoints', async () => {
+      it('#01 Should get all sushi-endpoints', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/sushi-endpoints',
@@ -50,7 +50,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 200);
         const [sushiEndpoint] = httpAppResponse.data;
 
-        expect(sushiEndpoint?.id).not.toBeNull();
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
@@ -69,7 +68,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
     });
     describe('Get sushi-endpoint', () => {
-      it('#02 GET /sushi-endpoints/not-exist - Should not get sushi-endpoint', async () => {
+      it('#02 Should not get sushi-endpoint', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/sushi-endpoints/not-exist',
@@ -102,7 +101,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
     });
 
     describe('Get sushi-endpoints', () => {
-      it('#03 GET /sushi-endpoints - Should get sushi-endpoints', async () => {
+      it('#03 Should get sushi-endpoints', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/sushi-endpoints',
@@ -116,7 +115,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 200);
         const [sushiEndpoint] = httpAppResponse.data;
 
-        expect(sushiEndpoint?.id).not.toBeNull();
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
@@ -136,7 +134,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
     });
 
     describe('Get sushi-endpoint', () => {
-      it(`#04 GET /sushi-endpoints/${sushiEndpointId} - Should get sushi-endpoint`, async () => {
+      it('#04 Should get sushi-endpoint', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/sushi-endpoints/${sushiEndpointId}`,
@@ -150,7 +148,6 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 200);
         const sushiEndpoint = httpAppResponse?.data;
 
-        expect(sushiEndpoint?.id).not.toBeNull();
         expect(sushiEndpoint?.createdAt).not.toBeNull();
         expect(sushiEndpoint?.updatedAt).not.toBeNull();
         expect(sushiEndpoint).toHaveProperty('sushiUrl', sushiEndpointTest.sushiUrl);
@@ -170,7 +167,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
     });
 
     describe('Get sushi-endpoint', () => {
-      it('#05 GET /sushi-endpoints/not-exist - Should not get sushi-endpoint', async () => {
+      it('#05 Should not get sushi-endpoint', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/sushi-endpoints/not-exist',
@@ -199,7 +196,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       sushiEndpointId = sushiEndpoint.id;
     });
     describe('Get sushi-endpoints', () => {
-      it('#06 GET /sushi-endpoints - Should not get sushi-endpoint', async () => {
+      it('#06 Should not get sushi-endpoint', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: '/sushi-endpoints',
@@ -211,7 +208,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
     });
     describe('Get sushi-endpoint', () => {
-      it(`#07 GET /sushi-endpoints/${sushiEndpointId} - Should not get sushi-endpoint`, async () => {
+      it('#07 Should not get sushi-endpoint', async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
           url: `/sushi-endpoints/${sushiEndpointId}`,

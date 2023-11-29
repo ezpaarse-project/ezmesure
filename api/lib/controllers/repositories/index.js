@@ -5,8 +5,6 @@ const {
   requireUser,
   fetchRepository,
   requireAdmin,
-  requireMemberPermissions,
-  fetchInstitution,
 } = require('../../services/auth');
 
 const {
@@ -15,72 +13,33 @@ const {
   createOne,
   updateOne,
   deleteOne,
-  upsertPermission,
-  deletePermission,
 } = require('./actions');
 
 const {
   adminCreateSchema,
   adminUpdateSchema,
+  includableFields,
 } = require('../../entities/repositories.dto');
 
-const { FEATURES } = require('../../entities/memberships.dto');
-
-router.use(requireJwt, requireUser);
-
-router.route({
-  method: 'PUT',
-  path: '/:repositoryId/permissions/:username',
-  handler: [
-    fetchRepository(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.repository?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    upsertPermission,
-  ],
-  validate: {
-    type: 'json',
-    params: {
-      repositoryId: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'DELETE',
-  path: '/:repositoryId/permissions/:username',
-  handler: [
-    fetchRepository(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.repository?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    deletePermission,
-  ],
-  validate: {
-    params: {
-      repositoryId: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.use(requireAdmin);
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.get('/', {
   method: 'GET',
   path: '/',
   handler: getMany,
   validate: {
-    params: {
+    query: Joi.object({
       q: Joi.string(),
       type: Joi.string(),
       institutionId: Joi.string(),
-    },
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    }).rename('include[]', 'include'),
   },
 });
 
 router.route({
   method: 'GET',
-  path: '/:repositoryId',
+  path: '/:pattern',
   handler: [
     fetchRepository(),
     getOne,
@@ -99,7 +58,7 @@ router.route({
 
 router.route({
   method: 'PATCH',
-  path: '/:repositoryId',
+  path: '/:pattern',
   handler: [
     fetchRepository(),
     updateOne,
@@ -108,21 +67,21 @@ router.route({
     type: 'json',
     body: adminUpdateSchema,
     params: {
-      repositoryId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
     },
   },
 });
 
 router.route({
   method: 'DELETE',
-  path: '/:repositoryId',
+  path: '/:pattern',
   handler: [
     fetchRepository(),
     deleteOne,
   ],
   validate: {
     params: {
-      repositoryId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
     },
   },
 });

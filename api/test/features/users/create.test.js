@@ -23,7 +23,7 @@ describe('[users]: Test create users features', () => {
         adminToken = await getAdminToken();
       });
 
-      it(`#01 PUT /users/${userTest.username} - Should create new user [${userTest.username}]`, async () => {
+      it(`#01 Should create new user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/users/${userTest.username}`,
@@ -54,7 +54,7 @@ describe('[users]: Test create users features', () => {
   });
   describe('With random token', () => {
     describe('Create new user', () => {
-      it(`#02 PUT /users/${userTest.username} - Should not create new user [${userTest.username}]`, async () => {
+      it(`#02 Should not create new user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/users/${userTest.username}`,
@@ -77,7 +77,7 @@ describe('[users]: Test create users features', () => {
   });
   describe('Without token', () => {
     describe('Create new user', () => {
-      it(`#03 PUT /users/${userTest.username} - Should not create new user [${userTest.username}]`, async () => {
+      it(`#03 Should not create new user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/users/${userTest.username}`,

@@ -71,7 +71,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         membershipUserTest.permissions = readPermission;
         await membershipsService.create({ data: membershipUserTest });
       });
-      it(`#01 DELETE /institutions/:institutionId/memberships/:username - Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
+      it(`#01 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -99,7 +99,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         membershipUserTest.permissions = ['memberships:write', 'memberships:read'];
         await membershipsService.create({ data: membershipUserTest });
       });
-      it(`#02 DELETE /institutions/:institutionId/memberships/:username - Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
+      it(`#02 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -148,7 +148,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it('#03 DELETE /institutions/:institutionId/memberships/:username - Should delete membership', async () => {
+        it('#03 Should delete membership', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -176,7 +176,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it('#04 DELETE /institutions/:institutionId/memberships/:username - Should delete membership', async () => {
+        it('#04 Should delete membership', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -196,13 +196,13 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
       });
 
-      describe(`#05 DELETE /institutions/:institutionId/memberships/:username - Delete membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
+      describe(`Delete membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = emptyPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it('#05 DELETE /institutions/:institutionId/memberships/:username - Should delete membership', async () => {
+        it('#05 Should delete membership', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -237,7 +237,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        it('#06 DELETE /institutions/:institutionId/memberships/:username - Should not delete membership', async () => {
+        it('#06 Should not delete membership', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -266,12 +266,12 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     });
   });
   describe('With random token', () => {
-    describe(`#07 DELETE /institutions/:institutionId/memberships/:username - Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
+    describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = allPermission;
         await membershipsService.create({ data: membershipUserTest });
       });
-      it('#07 DELETE /institutions/:institutionId/memberships/:username - Should not delete membership', async () => {
+      it('#07 Should not delete membership', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,
@@ -298,12 +298,12 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     });
   });
   describe('Without token', () => {
-    describe(`#08 DELETE /institutions/:institutionId/memberships/:username - Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
+    describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = allPermission;
         await membershipsService.create({ data: membershipUserTest });
       });
-      it('#08 DELETE /institutions/:institutionId/memberships/:username - Should not delete membership', async () => {
+      it('#08 Should not delete membership', async () => {
         const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/institutions/${institutionId}/memberships/${userTest.username}`,

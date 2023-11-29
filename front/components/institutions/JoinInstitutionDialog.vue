@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-v-text-v-html-on-component -->
 <template>
   <v-dialog
     :value="value"
@@ -15,10 +14,11 @@
           {{ institution?.name }}
         </v-toolbar-title>
       </v-toolbar>
-      <v-card-text
-        class="mt-4"
-        v-html="$t('institutions.joinInstitution', { institution: institution?.name })"
-      />
+      <i18n path="institutions.joinInstitution" tag="v-card-text" class="mt-4">
+        <template #institution>
+          <b>{{ institution?.name }}</b>
+        </template>
+      </i18n>
       <v-card-text>
         {{ $t('institutions.joinInstitutionEmail') }}
       </v-card-text>

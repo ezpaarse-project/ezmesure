@@ -7,8 +7,6 @@ const usersService = require('../../../../lib/entities/users.service');
 const { createUserAsAdmin, activateUser } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
 
-const { testCreateSubInstitution } = require('./utils');
-
 describe('[institutions - subinstitution]: Test create features', () => {
   const masterInstitutionTest = {
     name: 'Master Test',
@@ -69,7 +67,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
       subInstitutionId = subInstitution.id;
     });
 
-    describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
       it('#01 Should create subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
@@ -102,8 +100,8 @@ describe('[institutions - subinstitution]: Test create features', () => {
       const subInstitution = await institutionsService.create({ data: subInstitutionTest });
       subInstitutionId = subInstitution.id;
     });
-    describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#02 Should get HTTP status 403', async () => {
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#02 Should not create subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
@@ -127,8 +125,8 @@ describe('[institutions - subinstitution]: Test create features', () => {
       const subInstitution = await institutionsService.create({ data: subInstitutionTest });
       subInstitutionId = subInstitution.id;
     });
-    describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-      it('#03 Should get HTTP status 401', async () => {
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#03 Should not create subinstitution', async () => {
         const httpAppResponse = await ezmesure({
           method: 'PUT',
           url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,

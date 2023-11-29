@@ -2,8 +2,8 @@
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const elasticUsers = require('../services/elastic/users');
-const { client: prisma, Prisma } = require('../services/prisma.service');
-const hooks = require('../hooks');
+const { client: prisma } = require('../services/prisma.service');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 const secret = config.get('auth.secret');
 const adminUsername = config.get('admin.username');
@@ -20,6 +20,7 @@ const {
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
  * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
  * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
@@ -49,7 +50,7 @@ module.exports = class UsersService {
       create: adminData,
     });
 
-    hooks.emit('user:create-admin', admin);
+    triggerHooks('user:create-admin', admin);
 
     return admin;
   }
@@ -60,7 +61,7 @@ module.exports = class UsersService {
    */
   static async create(params) {
     const user = await prisma.user.create(params);
-    hooks.emit('user:create', user);
+    triggerHooks('user:create', user);
     return user;
   }
 
@@ -86,6 +87,14 @@ module.exports = class UsersService {
    */
   static findByUsername(username) {
     return prisma.user.findUnique({ where: { username } });
+  }
+
+  /*
+   * @param {UserFindUniqueOrThrowArgs} params
+   * @returns {Promise<User>}
+   */
+  static findUniqueOrThrow(params) {
+    return prisma.user.findUniqueOrThrow(params);
   }
 
   /**
@@ -115,7 +124,7 @@ module.exports = class UsersService {
   static async update(params) {
     // TODO manage role
     const user = await prisma.user.update(params);
-    hooks.emit('user:update', user);
+    triggerHooks('user:update', user);
     return user;
   }
 
@@ -140,7 +149,7 @@ module.exports = class UsersService {
    */
   static async upsert(params) {
     const user = await prisma.user.upsert(params);
-    hooks.emit('user:upsert', user);
+    triggerHooks('user:upsert', user);
     return user;
   }
 
@@ -149,20 +158,49 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    let user;
+    const [deleteResult, deletedUser] = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: params.where,
+        include: {
+          memberships: {
+            include: {
+              repositoryPermissions: true,
+              spacePermissions: true,
+            },
+          },
+        },
+      });
 
-    try {
-      user = await prisma.user.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+      if (!user) {
+        return [null, null];
       }
-      throw error;
+
+      const findArgs = { where: { username: user.username } };
+
+      await tx.repositoryPermission.deleteMany(findArgs);
+      await tx.spacePermission.deleteMany(findArgs);
+      await tx.membership.deleteMany(findArgs);
+
+      return [
+        await tx.user.delete(params),
+        user,
+      ];
+    });
+
+    if (!deletedUser) {
+      return null;
     }
 
-    hooks.emit('user:delete', user);
+    triggerHooks('user:delete', deletedUser);
 
-    return user;
+    deletedUser?.memberships?.forEach((element) => {
+      triggerHooks('memberships:delete', element);
+
+      element.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+      element.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    });
+
+    return deleteResult;
   }
 
   /**
@@ -176,10 +214,10 @@ module.exports = class UsersService {
   /**
    * @param {string} username
    * @param {string} password
-   * @returns {Promise<{}>}
+   * @returns {Promise<void>}
    */
   static async updatePassword(username, password) {
-    return elasticUsers.updatePassword(username, password);
+    await elasticUsers.updatePassword(username, password);
   }
 
   /**
@@ -204,9 +242,14 @@ module.exports = class UsersService {
       where: { NOT: { username: adminUsername } },
     });
 
-    await prisma.user.deleteMany({ where: { NOT: { username: adminUsername } } });
+    await Promise.all(users.map(async (user) => {
+      await this.delete({
+        where: {
+          username: user.username,
+        },
+      });
+    }));
 
-    hooks.emit('user:deleteAll', users);
     return users;
   }
 };

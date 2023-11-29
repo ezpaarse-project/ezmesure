@@ -36,8 +36,11 @@
               {{ resetErrorText }}
             </v-alert>
 
-            <!-- eslint-disable-next-line -->
-            <v-alert type="success" :value="reset" v-html="$t('password.checkYourEmail')"/>
+            <v-alert type="green" :value="reset">
+              <div>{{ $t('password.checkYourEmail') }}</div>
+              <div>{{ $t('password.waitFewMinutes') }}</div>
+            </v-alert>
+
             <v-btn
               v-if="reset"
               block

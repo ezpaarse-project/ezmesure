@@ -23,7 +23,8 @@
     "logout": "Logout",
     "contact": "Contact",
     "report": "My reports",
-    "adminReport": "ezREEPORT"
+    "adminReport": "ezREEPORT",
+    "repositories": "Repositories"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -69,19 +70,32 @@
     "missingField": "\"{missingField}\" is missing",
     "fieldIsEmpty": "Line #{lineNumber}: \"{field}\" is blank.",
     "invalidField": "Line #{lineNumber}: \"{field}\" is not valid, has the file been modified ?",
-    "depositFiles": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is <strong>not</strong> immediate, and will be done by us as soon as possible. We invite you to read our <a href=\"http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/\">best practice rules</a> in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers."
+    "depositFiles": {
+      "text": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is {not} immediate, and will be done by us as soon as possible. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
+      "not": "not",
+      "bestPracticeLink": "best practice rules"
+    }
   },
   "kibana": {
     "title": "Kibana identifiers",
     "passwordLost": "Password forgoten",
     "username": "Username",
     "newPasswordSentByEmail": "An email has been sent to you to reset your password.",
-    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a reset email.",
-    "whatDoesUsername": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your <a href=\"/kibana/app/kibana#/account\">Kibana account</a>."
+    "resetPassword": {
+      "text": "Don't remember your password? Click on {reset} to receive a reset email.",
+      "reset": "reset"
+    },
+    "whatDoesUsername": {
+      "text": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your {accountLink}.",
+      "accountLink": "Kibana account"
+    }
   },
   "token": {
     "title": "Authentication token",
-    "whatDoesToken": "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: <code>Authorization: Bearer {insert the token here}</code>.",
+    "whatDoesToken": {
+      "text": "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}",
+      "header": "Authorization: Bearer {insert the token here}"
+    },
     "token": "Token",
     "unableToRetriveToken": "Unable to retrieve authentication token",
     "copyFailed": "The copy of the token failed",
@@ -192,7 +206,7 @@
     "isSushiCompliant": "The endpoint is SUSHI compliant",
     "ignoreReportValidation": "Ignore report validation",
     "description": "Description",
-    "paramSeparatorDesc": "ezMESURE automatically adds <code>Attributes_To_Show</code>, <code>Access_Type</code> and <code>Section_Type</code> parameters while harvesting. If the endpoint does not accept the standard separator <code>|</code> for this multivalued fields, please enter the separator here.",
+    "paramSeparatorDesc": "ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.",
     "paramSeparator": "Separator",
     "queryParameters": "Query parameters",
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
@@ -215,7 +229,7 @@
     "institutionFoundDeclareNewInstitution": "Your institution is not declared, declare a new institution.",
     "sendMailToJoin": "An email has been sent to the institution's correspondents",
     "askToJoinAnInstitution": "Ask to join an institution",
-    "joinInstitution": "Would you join <b>{institution}</b> ?",
+    "joinInstitution": "Would you join {institution} ?",
     "joinInstitutionEmail": "A message will be sent to the correspondents of this institution to let them know.",
     "reports": {
       "reports": "Reports"
@@ -245,6 +259,7 @@
       "homepageExample": "e.g. https://cnrs.fr/",
       "affectedIndex": "Affected index",
       "affectedIndexExample": "e.g. univ-blancherive",
+      "group": "Group",
       "city": "City",
       "acronym": "Acronym",
       "type": "Institution type",
@@ -410,6 +425,10 @@
     "count": "{count} components",
     "noComponent": "No components"
   },
+  "group": {
+    "group": "Grouped in",
+    "noGroup": "No group"
+  },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
@@ -568,7 +587,8 @@
     "passwordIsRequired": "Password required",
     "backToLogin": "Back to login",
     "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
-    "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",
+    "checkYourEmail": "Check your email for a link to reset your password.",
+    "waitFewMinutes": "If it doesn’t appear within a few minutes, check your spam folder",
     "notEqual": "Passwords don't match",
     "updated": "Password updated",
     "pattern": "Minimum 6 characters",
@@ -603,7 +623,10 @@
   },
   "account": {
     "title": "Account activation",
-    "description": "In order to use this service, you agree to comply with the <a href=\"https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2\" target=\"_blank\">General Data Protection Regulation</a>.",
+    "description": {
+      "text": "In order to use this service, you agree to comply with the {regulationLink}.",
+      "regulationLink": "General Data Protection Regulation"
+    },
     "acceptTerms": "Please accept the terms of use.",
     "readAndAccept": "I have read and accept the terms of use",
     "activate": "Activate my account"
@@ -653,14 +676,18 @@
   },
   "repositories": {
     "repositories": "Repositories",
-    "xRepositories": "no repository | 1 repository | {count} repositories",
+    "toolbarTitle": "Repositories ({count})",
+    "xRepositories": "0 repository | 1 repository | {count} repositories",
     "noRepository": "No repository has been assigned yet",
     "pattern": "Pattern",
-    "type": "Type"
+    "type": "Type",
+    "institutions": "Institutions",
+    "institutionsCount": "{count} institution|{count} institutions",
+    "deleteNbRepositories": "You are about to delete {number} repositories"
   },
   "spaces": {
     "spaces": "Spaces",
-    "xSpaces": "no space | 1 space | {count} spaces",
+    "xSpaces": "0 space | 1 space | {count} spaces",
     "noSpace": "No space has been assigned yet",
     "id": "Identifier",
     "type": "Type",

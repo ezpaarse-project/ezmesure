@@ -18,7 +18,7 @@ const {
 
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[sushi]: Test read sushi features', () => {
+describe('[sushi]: Test read sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
   const readPermission = ['sushi:read'];
   const emptyPermission = [];
@@ -92,7 +92,7 @@ describe('[sushi]: Test read sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('GET /sushi/<id> - Get sushi', () => {
+      describe('Get sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -101,7 +101,7 @@ describe('[sushi]: Test read sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#01 Should get sushi', async () => {
+        it('#01 Should get sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/sushi/${sushiId}`,
@@ -144,7 +144,7 @@ describe('[sushi]: Test read sushi features', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      describe('GET /sushi/<id> - Get sushi', () => {
+      describe('Get sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -153,7 +153,7 @@ describe('[sushi]: Test read sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#02 Should get sushi', async () => {
+        it('#02 Should get sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/sushi/${sushiId}`,
@@ -204,7 +204,7 @@ describe('[sushi]: Test read sushi features', () => {
         const institution = await institutionsService.create({ data: institutionTest });
         institutionId = institution.id;
       });
-      describe('GET /sushi/<id> - Get sushi', () => {
+      describe('Get sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -213,7 +213,7 @@ describe('[sushi]: Test read sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#03 Should not get sushi', async () => {
+        it('#03 Should not get sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/sushi/${sushiId}`,
@@ -249,7 +249,7 @@ describe('[sushi]: Test read sushi features', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('GET /sushi/<id> - Get sushi', () => {
+        describe('Get sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -258,7 +258,7 @@ describe('[sushi]: Test read sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#04 Should get sushi', async () => {
+          it('#04 Should get sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'GET',
               url: `/sushi/${sushiId}`,
@@ -300,7 +300,7 @@ describe('[sushi]: Test read sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('GET /sushi/<id> - Get sushi', () => {
+        describe('Get sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -309,7 +309,7 @@ describe('[sushi]: Test read sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#05 Should get sushi', async () => {
+          it('#05 Should get sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'GET',
               url: `/sushi/${sushiId}`,
@@ -349,7 +349,7 @@ describe('[sushi]: Test read sushi features', () => {
           await membershipsService.create({ data: membershipUserTest });
         });
 
-        describe('GET /sushi/<id> - Get sushi', () => {
+        describe('Get sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -358,7 +358,7 @@ describe('[sushi]: Test read sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#06 Should not get sushi', async () => {
+          it('#06 Should not get sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'GET',
               url: `/sushi/${sushiId}`,
@@ -408,7 +408,7 @@ describe('[sushi]: Test read sushi features', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('GET /sushi/<id> - Get sushi', () => {
+        describe('Get sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -417,7 +417,7 @@ describe('[sushi]: Test read sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#07 Should not get sushi', async () => {
+          it('#07 Should not get sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'GET',
               url: `/sushi/${sushiId}`,
@@ -442,7 +442,7 @@ describe('[sushi]: Test read sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('GET /sushi/<id> - Get sushi', () => {
+        describe('Get sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -451,7 +451,7 @@ describe('[sushi]: Test read sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#08 Should not get sushi', async () => {
+          it('#08 Should not get sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'GET',
               url: `/sushi/${sushiId}`,
@@ -488,7 +488,7 @@ describe('[sushi]: Test read sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('GET /sushi/<id> - Get sushi', () => {
+      describe('Get sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -497,7 +497,7 @@ describe('[sushi]: Test read sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#09 Should not get sushi', async () => {
+        it('#09 Should not get sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/sushi/${sushiId}`,
@@ -523,7 +523,7 @@ describe('[sushi]: Test read sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('GET /sushi/<id> - Get sushi', () => {
+      describe('Get sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -532,7 +532,7 @@ describe('[sushi]: Test read sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#10 Should not get sushi', async () => {
+        it('#10 Should not get sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'GET',
             url: `/sushi/${sushiId}`,

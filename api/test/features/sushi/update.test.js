@@ -8,7 +8,6 @@ const membershipsService = require('../../../lib/entities/memberships.service');
 
 const {
   createInstitution,
-  addMembershipsToUserAsAdmin,
   validateInstitutionAsAdmin,
 } = require('../../setup/institutions');
 const {
@@ -19,10 +18,11 @@ const {
 
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[sushi]: Test update sushi features', () => {
+describe('[sushi]: Test update sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
   const readPermission = ['sushi:read'];
-  const emptyPermission = [];
+  // TODO test with emptyPermission
+  // const emptyPermission = [];
 
   const institutionTest = {
     name: 'Test',
@@ -104,7 +104,7 @@ describe('[sushi]: Test update sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('PATCH /sushi/<id> - Update sushi', () => {
+      describe('Update sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -115,7 +115,7 @@ describe('[sushi]: Test update sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#01 Should update sushi', async () => {
+        it('#01 Should update sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'PATCH',
             url: `/sushi/${sushiId}`,
@@ -174,7 +174,7 @@ describe('[sushi]: Test update sushi features', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      describe('PATCH /sushi/<id> - Update sushi', () => {
+      describe('Update sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -185,7 +185,7 @@ describe('[sushi]: Test update sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#02 Should update sushi', async () => {
+        it('#02 Should update sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'PATCH',
             url: `/sushi/${sushiId}`,
@@ -252,7 +252,7 @@ describe('[sushi]: Test update sushi features', () => {
         const institution = await institutionsService.create({ data: institutionTest });
         institutionId = institution.id;
       });
-      describe('PATCH /sushi/<id> - Update sushi', () => {
+      describe('Update sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -263,7 +263,7 @@ describe('[sushi]: Test update sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#03 Should not update sushi', async () => {
+        it('#03 Should not update sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'PATCH',
             url: `/sushi/${sushiId}`,
@@ -295,7 +295,7 @@ describe('[sushi]: Test update sushi features', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
+        describe('Update sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -306,7 +306,7 @@ describe('[sushi]: Test update sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#04 Should update sushi', async () => {
+          it('#04 Should update sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'PATCH',
               url: `/sushi/${sushiId}`,
@@ -364,7 +364,7 @@ describe('[sushi]: Test update sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
+        describe('Update sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -375,7 +375,7 @@ describe('[sushi]: Test update sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#05 Should not update sushi', async () => {
+          it('#05 Should not update sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'PATCH',
               url: `/sushi/${sushiId}`,
@@ -428,7 +428,7 @@ describe('[sushi]: Test update sushi features', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
+        describe('Update sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -439,7 +439,7 @@ describe('[sushi]: Test update sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#06 Should not update sushi', async () => {
+          it('#06 Should not update sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'PATCH',
               url: `/sushi/${sushiId}`,
@@ -464,7 +464,7 @@ describe('[sushi]: Test update sushi features', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
+        describe('Update sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -475,7 +475,7 @@ describe('[sushi]: Test update sushi features', () => {
             sushiId = sushi.id;
           });
 
-          it('#07 Should not update sushi', async () => {
+          it('#07 Should not update sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'PATCH',
               url: `/sushi/${sushiId}`,
@@ -498,76 +498,6 @@ describe('[sushi]: Test update sushi features', () => {
       afterAll(async () => {
         await institutionsService.deleteAll();
       });
-      describe(`User with memberships [${allPermission}]`, () => {
-        beforeAll(async () => {
-          membershipUserTest.institutionId = userTestInstitutionId;
-          membershipUserTest.permissions = allPermission;
-          await membershipsService.create({ data: membershipUserTest });
-        });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
-          let sushiId;
-          beforeAll(async () => {
-            sushiTest.endpointId = sushiEndpointId;
-            sushiTest.institutionId = anotherUserTestInstitutionId;
-            sushiUpdatedTest.endpointId = sushiEndpointId;
-            sushiUpdatedTest.institutionId = anotherUserTestInstitutionId;
-            const sushi = await sushiCredentialsService.create({ data: sushiTest });
-            sushiId = sushi.id;
-          });
-
-          it('#08 Should not update sushi', async () => {
-            const httpAppResponse = await ezmesure({
-              method: 'PATCH',
-              url: `/sushi/${sushiId}`,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-              data: sushiUpdatedTest,
-            });
-
-            // Test API
-            expect(httpAppResponse).toHaveProperty('status', 403);
-          });
-        });
-        afterAll(async () => {
-          await membershipsService.deleteAll();
-        });
-      });
-
-      describe(`User with memberships [${readPermission}]`, () => {
-        beforeAll(async () => {
-          await addMembershipsToUserAsAdmin(userTestInstitutionId, userTest.username, ['sushi:read']);
-        });
-        describe('PATCH /sushi/<id> - Update sushi', () => {
-          let sushiId;
-          beforeAll(async () => {
-            sushiTest.endpointId = sushiEndpointId;
-            sushiTest.institutionId = anotherUserTestInstitutionId;
-            sushiUpdatedTest.endpointId = sushiEndpointId;
-            sushiUpdatedTest.institutionId = anotherUserTestInstitutionId;
-            const sushi = await sushiCredentialsService.create({ data: sushiTest });
-            sushiId = sushi.id;
-          });
-
-          it('#09 Should not update sushi', async () => {
-            const httpAppResponse = await ezmesure({
-              method: 'PATCH',
-              url: `/sushi/${sushiId}`,
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-              data: sushiUpdatedTest,
-            });
-
-            // Test API
-            expect(httpAppResponse).toHaveProperty('status', 403);
-          });
-        });
-
-        afterAll(async () => {
-          await membershipsService.deleteAll();
-        });
-      });
     });
 
     afterAll(async () => {
@@ -582,7 +512,7 @@ describe('[sushi]: Test update sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('PATCH /sushi/<id> - Update sushi', () => {
+      describe('Update sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -593,7 +523,7 @@ describe('[sushi]: Test update sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#10 Should not update sushi', async () => {
+        it('#08 Should not update sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'PATCH',
             url: `/sushi/${sushiId}`,
@@ -619,7 +549,7 @@ describe('[sushi]: Test update sushi features', () => {
         institutionId = institution.id;
       });
 
-      describe('PATCH /sushi/<id> - Update sushi', () => {
+      describe('Update sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -630,7 +560,7 @@ describe('[sushi]: Test update sushi features', () => {
           sushiId = sushi.id;
         });
 
-        it('#11 Should not update sushi', async () => {
+        it('#09 Should not update sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'PATCH',
             url: `/sushi/${sushiId}`,

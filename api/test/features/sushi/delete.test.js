@@ -14,10 +14,11 @@ const {
 } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
-describe('[sushi]: Test delete sushi res', () => {
+describe('[sushi]: Test delete sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
   const readPermission = ['sushi:read'];
-  const emptyPermission = [];
+  // TODO test with emptyPermission
+  // const emptyPermission = [];
 
   const institutionTest = {
     name: 'Test',
@@ -88,7 +89,7 @@ describe('[sushi]: Test delete sushi res', () => {
         institutionId = institution.id;
       });
 
-      describe('DELETE /sushi/<id> - Delete sushi', () => {
+      describe('Delete sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -97,7 +98,7 @@ describe('[sushi]: Test delete sushi res', () => {
           sushiId = sushi.id;
         });
 
-        it('#01 Should delete sushi', async () => {
+        it('#01 Should delete sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
@@ -129,7 +130,7 @@ describe('[sushi]: Test delete sushi res', () => {
         institutionId = await createInstitution(institutionTest, userTest);
       });
 
-      describe('DELETE /sushi/<id> - Delete sushi', () => {
+      describe('Delete sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -138,7 +139,7 @@ describe('[sushi]: Test delete sushi res', () => {
           sushiId = sushi.id;
         });
 
-        it('#02 Should delete sushi', async () => {
+        it('#02 Should delete sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
@@ -180,7 +181,7 @@ describe('[sushi]: Test delete sushi res', () => {
         institutionId = institution.id;
       });
 
-      describe('DELETE /sushi/<id> - Delete sushi', () => {
+      describe('Delete sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -189,7 +190,7 @@ describe('[sushi]: Test delete sushi res', () => {
           sushiId = sushi.id;
         });
 
-        it('#03 Should not delete sushi', async () => {
+        it('#03 Should not delete sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,
@@ -239,7 +240,7 @@ describe('[sushi]: Test delete sushi res', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('DELETE /sushi/<id> - Delete sushi', () => {
+        describe('Delete sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -248,7 +249,7 @@ describe('[sushi]: Test delete sushi res', () => {
             sushiId = sushi.id;
           });
 
-          it('#04 Should delete sushi', async () => {
+          it('#04 Should delete sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
@@ -279,7 +280,7 @@ describe('[sushi]: Test delete sushi res', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('DELETE /sushi/<id> - Delete sushi', () => {
+        describe('Delete sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -288,7 +289,7 @@ describe('[sushi]: Test delete sushi res', () => {
             sushiId = sushi.id;
           });
 
-          it('#05 Should not delete sushi', async () => {
+          it('#05 Should not delete sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
@@ -357,7 +358,7 @@ describe('[sushi]: Test delete sushi res', () => {
           // FIXME membership create by function createInstitution
           // await membershipsService.create({ data: membershipUserTest });
         });
-        describe('DELETE /sushi/<id> - Delete sushi', () => {
+        describe('Delete sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -366,7 +367,7 @@ describe('[sushi]: Test delete sushi res', () => {
             sushiId = sushi.id;
           });
 
-          it('#06 Should not delete sushi', async () => {
+          it('#06 Should not delete sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
@@ -409,7 +410,7 @@ describe('[sushi]: Test delete sushi res', () => {
           membershipUserTest.permissions = readPermission;
           await membershipsService.create({ data: membershipUserTest });
         });
-        describe('DELETE /sushi/<id> - Delete sushi', () => {
+        describe('Delete sushi credential', () => {
           let sushiId;
           beforeAll(async () => {
             sushiTest.endpointId = sushiEndpointId;
@@ -418,7 +419,7 @@ describe('[sushi]: Test delete sushi res', () => {
             sushiId = sushi.id;
           });
 
-          it('#07 Should not delete sushi', async () => {
+          it('#07 Should not delete sushi credential', async () => {
             const httpAppResponse = await ezmesure({
               method: 'DELETE',
               url: `/sushi/${sushiId}`,
@@ -473,7 +474,7 @@ describe('[sushi]: Test delete sushi res', () => {
         institutionId = institution.id;
       });
 
-      describe('DELETE /sushi/<id> - Delete sushi', () => {
+      describe('Delete sushi credential', () => {
         let sushiId;
         beforeAll(async () => {
           sushiTest.endpointId = sushiEndpointId;
@@ -482,7 +483,7 @@ describe('[sushi]: Test delete sushi res', () => {
           sushiId = sushi.id;
         });
 
-        it('#08 Should not delete sushi', async () => {
+        it('#08 Should not delete sushi credential', async () => {
           const httpAppResponse = await ezmesure({
             method: 'DELETE',
             url: `/sushi/${sushiId}`,

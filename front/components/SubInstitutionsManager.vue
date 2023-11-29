@@ -121,7 +121,11 @@
     </v-alert>
 
     <v-list v-if="hasSubInstitutions">
-      <v-list-item v-for="subInstitution in sortedSubInstitutions" :key="subInstitution.id">
+      <v-list-item
+        v-for="subInstitution in sortedSubInstitutions"
+        :key="subInstitution.id"
+        :to="`/institutions/${subInstitution.id}`"
+      >
         <v-list-item-avatar v-if="subInstitution.logoId" rounded>
           <v-img :src="`/api/assets/logos/${subInstitution.logoId}`" contain />
         </v-list-item-avatar>
@@ -153,9 +157,10 @@
             offset-y
             @agree="removeSubInstitution(subInstitution.id)"
           >
-            <template #activator="{ on, attrs }">
+            <template #activator="{ on: { click, ...on }, attrs }">
               <v-icon
                 v-bind="attrs"
+                @click.prevent="click"
                 v-on="on"
               >
                 mdi-delete
