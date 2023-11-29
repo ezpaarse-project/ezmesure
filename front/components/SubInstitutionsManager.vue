@@ -287,18 +287,16 @@ export default {
     }, 500),
 
     async saveSubInstitution() {
-      const selectedInstitition = this.selectedSubInstitution;
-
-      if (!selectedInstitition?.id) { return; }
+      if (!this.selectedInstitution?.id) { return; }
 
       this.savingSubInstitution = true;
       this.saveErrorMessage = '';
 
       try {
-        await this.$axios.$put(`/institutions/${this.institutionId}/subinstitutions/${selectedInstitition.id}`);
+        await this.$axios.$put(`/institutions/${this.institutionId}/subinstitutions/${this.selectedInstitution.id}`);
 
-        if (!this.subInstitutions.some((i) => i?.id === selectedInstitition.id)) {
-          this.subInstitutions.push(selectedInstitition);
+        if (!this.subInstitutions.some((i) => i?.id === this.selectedInstitution.id)) {
+          this.subInstitutions.push(this.selectedInstitution);
         }
         this.institutionSearch = '';
         this.showSearchForm = false;
