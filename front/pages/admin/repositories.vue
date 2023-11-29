@@ -83,8 +83,8 @@
           v-if="Array.isArray(item.institutions)"
           small
           class="elevation-1"
+          @click="$refs.institutionsDialog?.display?.(item)"
         >
-          <!-- @click="$refs.institutionsDialog?.display?.(item)" -->
           {{ $tc('repositories.institutionsCount', item.institutions.length) }}
 
           <v-icon right small>
@@ -124,7 +124,7 @@
     </v-data-table>
 
     <RepositoriesDeleteDialog ref="deleteDialog" @removed="onReposRemove" />
-    <!-- <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" /> -->
+    <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" />
     <ReposFiltersDrawer
       v-model="filters"
       :show.sync="showReposFiltersDrawer"
@@ -136,7 +136,7 @@
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
-// import RepositoriesInstitutionsDialog from '~/components/repositories/InstitutionsDialog.vue';
+import RepositoriesInstitutionsDialog from '~/components/repositories/RepositoriesInstitutionsDialog.vue';
 import RepositoriesDeleteDialog from '~/components/repositories/DeleteDialog.vue';
 import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
 
@@ -145,7 +145,7 @@ export default {
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
-    // RepositoriesInstitutionsDialog,
+    RepositoriesInstitutionsDialog,
     ReposFiltersDrawer,
     RepositoriesDeleteDialog
   },
