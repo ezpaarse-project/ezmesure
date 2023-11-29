@@ -1,117 +1,100 @@
 const ezmesure = require('../../setup/ezmesure');
+const indicesService = require('../../../lib/services/elastic/indices');
+const usersService = require('../../../lib/entities/users.service');
 
 const { getAdminToken, getToken } = require('../../setup/login');
-const { deleteIndexAsAdmin } = require('../../setup/indices');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 
 describe('[indices]: Test create features', () => {
+  const indexName = 'test';
+
   let adminToken;
   beforeAll(async () => {
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
-    describe('PUT /indices/<id> - Create new index', () => {
-      const indexName = 'test';
-
-      it('Should create new index [test]', async () => {
-        let res;
-        try {
-          res = await ezmesure({
-            method: 'PUT',
-            url: `/indices/${indexName}`,
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-        } catch (err) {
-          res = err?.response;
-        }
-        expect(res).toHaveProperty('status', 200);
+    it(`#01 Should create new index [${indexName}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/indices/${indexName}`,
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
 
-      afterAll(async () => {
-        await deleteIndexAsAdmin(indexName);
-      });
+      expect(httpAppResponse).toHaveProperty('status', 200);
+
+      const httpElasticResponse = await indicesService.get(indexName, null, { ignore: [404] });
+      expect(httpElasticResponse).toHaveProperty('statusCode', 200);
+    });
+
+    afterAll(async () => {
+      await indicesService.deleteAll();
     });
   });
   describe('As user', () => {
-    describe('PUT /indices/<id> - Create new index', () => {
-      let userTest;
-      let userToken;
-      const indexName = 'test';
+    let userTest;
+    let userToken;
 
-      beforeAll(async () => {
-        userTest = await createDefaultActivatedUserAsAdmin();
-        userToken = await getToken(userTest.username, userTest.password);
-      });
+    beforeAll(async () => {
+      // TODO use service
+      userTest = await createDefaultActivatedUserAsAdmin();
+      userToken = await getToken(userTest.username, userTest.password);
+    });
 
-      it('Should get HTTP status 403', async () => {
-        let res;
-        try {
-          res = await ezmesure({
-            method: 'PUT',
-            url: `/indices/${indexName}`,
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
-        } catch (err) {
-          res = err?.response;
-        }
-        expect(res).toHaveProperty('status', 403);
+    it(`#02 Should not create index [${indexName}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/indices/${indexName}`,
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       });
+      expect(httpAppResponse).toHaveProperty('status', 403);
 
-      afterAll(async () => {
-        await deleteIndexAsAdmin(indexName);
-        await deleteUserAsAdmin(userTest.username);
-      });
+      const httpElasticResponse = await indicesService.get(indexName, null, { ignore: [404] });
+      expect(httpElasticResponse).toHaveProperty('statusCode', 404);
+    });
+
+    afterAll(async () => {
+      await indicesService.deleteAll();
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('PUT /indices/<id> - Create new index', () => {
-      const indexName = 'test';
-
-      it('Should get HTTP status 401', async () => {
-        let res;
-        try {
-          res = await ezmesure({
-            method: 'PUT',
-            url: `/indices/${indexName}`,
-            headers: {
-              Authorization: 'Bearer: random',
-            },
-          });
-        } catch (err) {
-          res = err?.response;
-        }
-        expect(res).toHaveProperty('status', 401);
+    it(`#03 Should not create index [${indexName}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/indices/${indexName}`,
+        headers: {
+          Authorization: 'Bearer: random',
+        },
       });
 
-      afterAll(async () => {
-        await deleteIndexAsAdmin(indexName);
-      });
+      expect(httpAppResponse).toHaveProperty('status', 401);
+
+      const httpElasticResponse = await indicesService.get(indexName, null, { ignore: [404] });
+      expect(httpElasticResponse).toHaveProperty('statusCode', 404);
+    });
+
+    afterAll(async () => {
+      await indicesService.deleteAll();
     });
   });
   describe('Without token', () => {
-    describe('PUT /indices/<id> - Create new index', () => {
-      const indexName = 'test';
-
-      it('Should get HTTP status 401', async () => {
-        let res;
-        try {
-          res = await ezmesure({
-            method: 'PUT',
-            url: `/indices/${indexName}`,
-          });
-        } catch (err) {
-          res = err?.response;
-        }
-        expect(res).toHaveProperty('status', 401);
+    it(`#04 Should not create index [${indexName}]`, async () => {
+      const httpAppResponse = await ezmesure({
+        method: 'PUT',
+        url: `/indices/${indexName}`,
       });
+      expect(httpAppResponse).toHaveProperty('status', 401);
 
-      afterAll(async () => {
-        await deleteIndexAsAdmin(indexName);
-      });
+      const httpElasticResponse = await indicesService.get(indexName, null, { ignore: [404] });
+      expect(httpElasticResponse).toHaveProperty('statusCode', 404);
+    });
+
+    afterAll(async () => {
+      await indicesService.deleteAll();
     });
   });
 });

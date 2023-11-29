@@ -42,6 +42,24 @@ module.exports = class RepositoryPermissionsService {
   }
 
   /**
+   * @param {string} institutionId
+   * @param {string} pattern
+   * @param {string} username
+   * @returns {Promise<RepositoryPermission | null>}
+   */
+  static findById(institutionId, pattern, username) {
+    return prisma.repositoryPermission.findUnique({
+      where: {
+        username_institutionId_repositoryPattern: {
+          username,
+          institutionId,
+          repositoryPattern: pattern,
+        },
+      },
+    });
+  }
+
+  /**
    * @param {RepositoryPermissionUpdateArgs} params
    * @returns {Promise<RepositoryPermission>}
    */
@@ -82,5 +100,25 @@ module.exports = class RepositoryPermissionsService {
     triggerHooks('repository_permission:delete', permission);
 
     return permission;
+  }
+
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const permissions = await this.findMany({});
+
+    await Promise.all(permissions.map(async (permission) => {
+      await this.delete({
+        where: {
+          username_institutionId_repositoryPattern: {
+            username: permission.username,
+            institutionId: permission.institutionId,
+            repositoryPattern: permission.repositoryPattern,
+          },
+        },
+      });
+    }));
+
+    return permissions;
   }
 };

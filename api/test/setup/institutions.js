@@ -1,4 +1,5 @@
 const ezmesure = require('./ezmesure');
+
 const { getToken, getAdminToken } = require('./login');
 
 async function createInstitution(data, user) {

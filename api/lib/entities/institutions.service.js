@@ -51,11 +51,65 @@ module.exports = class InstitutionsService {
   }
 
   /**
+   * @param {string} id
+   * @param {Object | null} includes
+   * @returns {Promise<Institution | null>}
+   */
+  static findByID(id, includes = null) {
+    let include;
+    if (includes) {
+      include = {
+        ...includes,
+      };
+    }
+    return prisma.institution.findUnique({
+      where: { id },
+      include,
+    });
+  }
+
+  /**
    * @param {InstitutionUpdateArgs} params
    * @returns {Promise<Institution>}
    */
   static async update(params) {
     const institution = await prisma.institution.update(params);
+
+    triggerHooks('institution:update', institution);
+
+    return institution;
+  }
+
+  /**
+   * @param {string} institutionId
+   * @param {string} subInstitutionId
+   * @returns {Promise<Institution>}
+   */
+  static async addSubInstitution(institutionId, subInstitutionId) {
+    const institution = await prisma.institution.update({
+      where: { id: institutionId },
+      include: { childInstitutions: true },
+      data: {
+        childInstitutions: {
+          connect: { id: subInstitutionId },
+        },
+      },
+    });
+
+    triggerHooks('institution:update', institution);
+
+    return institution;
+  }
+
+  /**
+   * @param {string} id
+   * @returns {Promise<Institution>}
+   */
+  static async validate(id) {
+    const institution = await prisma.institution.update({
+      where: { id },
+      data: { validated: true },
+    });
 
     triggerHooks('institution:update', institution);
 
@@ -159,6 +213,25 @@ module.exports = class InstitutionsService {
     institution.sushiCredentials?.forEach((element) => { triggerHooks('sushi_credentials:delete', element); });
 
     return deletedInstitution;
+  }
+
+  /**
+   * @returns {Promise<Object | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const institutions = await this.findMany({});
+
+    await Promise.all(institutions.map(async (institution) => {
+      await this.delete({
+        where: {
+          id: institution.id,
+        },
+      });
+    }));
+
+    return institutions;
   }
 
   static async getContacts(institutionId) {

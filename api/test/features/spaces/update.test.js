@@ -1,8 +1,10 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createInstitutionAsAdmin, validateInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
-const { createSpaceAsAdmin, deleteSpaceAsAdmin } = require('../../setup/spaces');
+const spacesService = require('../../../lib/entities/spaces.service');
+const institutionsService = require('../../../lib/entities/institutions.service');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[space]: Test update spaces features', () => {
@@ -15,82 +17,78 @@ describe('[space]: Test update spaces features', () => {
     initials: 'EZ',
   };
 
-  const institution = {
+  const institutionTest = {
     name: 'Test',
     namespace: 'test',
   };
 
+  const spaceConfigUpdate = {
+    name: 'test-ezpaarse-name-updated',
+    description: 'ezpaarse space for test institution updated',
+  };
+
   let adminToken;
   let institutionId;
+
   beforeAll(async () => {
     adminToken = await getAdminToken();
-    institutionId = await createInstitutionAsAdmin(institution);
-    await validateInstitutionAsAdmin(institutionId);
+    const institution = await institutionsService.create({ data: institutionTest });
+    institutionId = institution.id;
   });
 
   describe('As admin', () => {
-    describe('PATCH /kibana-spaces/<id> - Update space [ezPAARSE] for institution [Test]', () => {
+    describe(`Update space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should update space', async () => {
-        const res = await ezmesure({
+      it('#01 Should update space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PATCH',
           url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
-          data: {
-            name: 'test-ezpaarse-name-updated',
-            description: 'ezpaarse space for test institution updated',
-          },
+          data: spaceConfigUpdate,
         });
 
-        expect(res).toHaveProperty('status', 200);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-        const space = res?.data;
+        const spaceFromResponse = httpAppResponse?.data;
 
-        expect(space?.id).not.toBeNull();
-        expect(space).toHaveProperty('institutionId', institutionId);
-        expect(space?.createdAt).not.toBeNull();
-        expect(space?.updatedAt).not.toBeNull();
-        expect(space).toHaveProperty('name', 'test-ezpaarse-name-updated');
-        expect(space).toHaveProperty('description', 'ezpaarse space for test institution updated');
-        expect(space).toHaveProperty('initials', spaceConfig.initials);
-        expect(space).toHaveProperty('color', null);
-        expect(space).toHaveProperty('type', spaceConfig.type);
-        expect(space).toHaveProperty('indexPatterns', []);
-      });
+        expect(spaceFromResponse).toHaveProperty('id', spaceId);
+        expect(spaceFromResponse).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromResponse?.createdAt).not.toBeNull();
+        expect(spaceFromResponse?.updatedAt).not.toBeNull();
+        expect(spaceFromResponse).toHaveProperty('name', 'test-ezpaarse-name-updated');
+        expect(spaceFromResponse).toHaveProperty('description', 'ezpaarse space for test institution updated');
+        expect(spaceFromResponse).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromResponse).toHaveProperty('color', null);
+        expect(spaceFromResponse).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromResponse).toHaveProperty('indexPatterns', []);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const space = res?.data;
-
-        expect(space?.id).not.toBeNull();
-        expect(space).toHaveProperty('institutionId', institutionId);
-        expect(space?.createdAt).not.toBeNull();
-        expect(space?.updatedAt).not.toBeNull();
-        expect(space).toHaveProperty('name', 'test-ezpaarse-name-updated');
-        expect(space).toHaveProperty('description', 'ezpaarse space for test institution updated');
-        expect(space).toHaveProperty('initials', spaceConfig.initials);
-        expect(space).toHaveProperty('color', null);
-        expect(space).toHaveProperty('type', spaceConfig.type);
-        expect(space).toHaveProperty('indexPatterns', []);
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', 'test-ezpaarse-name-updated');
+        expect(spaceFromService).toHaveProperty('description', 'ezpaarse space for test institution updated');
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
@@ -101,166 +99,136 @@ describe('[space]: Test update spaces features', () => {
       userTest = await createDefaultActivatedUserAsAdmin();
       userToken = await getToken(userTest.username, userTest.password);
     });
-    describe('PATCH /kibana-spaces/<id> - Update space [ezPAARSE] for institution [Test]', () => {
+    describe(`Update space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+      it('#02 Should not update space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PATCH',
           url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: {
-            name: 'test-ezpaarse-name-updated',
-            description: 'ezpaarse space for test institution updated',
-          },
+          data: spaceConfigUpdate,
         });
 
-        expect(res).toHaveProperty('status', 403);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const space = res?.data;
-
-        expect(space?.id).not.toBeNull();
-        expect(space).toHaveProperty('institutionId', institutionId);
-        expect(space?.createdAt).not.toBeNull();
-        expect(space?.updatedAt).not.toBeNull();
-        expect(space).toHaveProperty('name', spaceConfig.name);
-        expect(space).toHaveProperty('description', spaceConfig.description);
-        expect(space).toHaveProperty('initials', spaceConfig.initials);
-        expect(space).toHaveProperty('color', null);
-        expect(space).toHaveProperty('type', spaceConfig.type);
-        expect(space).toHaveProperty('indexPatterns', []);
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('PATCH /kibana-spaces/<id> - Update space [ezPAARSE] for institution [Test]', () => {
+    describe(`Update space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
+      it('#03 Should not update space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PATCH',
           url: `/kibana-spaces/${spaceConfig.id}`,
-          data: {
-            name: 'test-ezpaarse-name-updated',
-            description: 'ezpaarse space for test institution updated',
-          },
+          data: spaceConfigUpdate,
           headers: {
             Authorization: 'Bearer: random',
           },
         });
 
-        expect(res).toHaveProperty('status', 401);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const space = res?.data;
-
-        expect(space?.id).not.toBeNull();
-        expect(space).toHaveProperty('institutionId', institutionId);
-        expect(space?.createdAt).not.toBeNull();
-        expect(space?.updatedAt).not.toBeNull();
-        expect(space).toHaveProperty('name', spaceConfig.name);
-        expect(space).toHaveProperty('description', spaceConfig.description);
-        expect(space).toHaveProperty('initials', spaceConfig.initials);
-        expect(space).toHaveProperty('color', null);
-        expect(space).toHaveProperty('type', spaceConfig.type);
-        expect(space).toHaveProperty('indexPatterns', []);
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
   describe('Without token', () => {
-    describe('PATCH /kibana-spaces/<id> - Update space [ezPAARSE] for institution [Test]', () => {
+    describe(`Update space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
+      it('#04 Should not update space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'PATCH',
           url: `/kibana-spaces/${spaceConfig.id}`,
-          data: {
-            name: 'test-ezpaarse-name-updated',
-            description: 'ezpaarse space for test institution updated',
-          },
+          data: spaceConfigUpdate,
         });
 
-        expect(res).toHaveProperty('status', 401);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
 
-        expect(res).toHaveProperty('status', 200);
-
-        const space = res?.data;
-
-        expect(space?.id).not.toBeNull();
-        expect(space).toHaveProperty('institutionId', institutionId);
-        expect(space?.createdAt).not.toBeNull();
-        expect(space?.updatedAt).not.toBeNull();
-        expect(space).toHaveProperty('name', spaceConfig.name);
-        expect(space).toHaveProperty('description', spaceConfig.description);
-        expect(space).toHaveProperty('initials', spaceConfig.initials);
-        expect(space).toHaveProperty('color', null);
-        expect(space).toHaveProperty('type', spaceConfig.type);
-        expect(space).toHaveProperty('indexPatterns', []);
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
 
   afterAll(async () => {
-    await deleteInstitutionAsAdmin(institutionId);
+    await institutionsService.deleteAll();
   });
 });

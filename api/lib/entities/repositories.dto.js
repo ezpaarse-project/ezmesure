@@ -26,7 +26,6 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
-  'pattern',
   'updatedAt',
   'createdAt',
   'institutions',

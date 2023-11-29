@@ -1,124 +1,299 @@
+const config = require('config');
+
+const adminFullName = config.get('admin.fullName');
+const adminUsername = config.get('admin.username');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const { createUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
-const { getAdminToken } = require('../../setup/login');
+const usersService = require('../../../lib/entities/users.service');
 
-describe('[users]: Test users features', () => {
-  describe('Read', () => {
-    describe('As admin', () => {
-      describe('GET /users - Get all users', () => {
-        let adminToken;
-        beforeAll(async () => {
-          adminToken = await getAdminToken();
+const { createUserAsAdmin } = require('../../setup/users');
+const { getAdminToken, getToken } = require('../../setup/login');
+
+describe('[users]: Test read users features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
+  let adminToken;
+
+  beforeAll(async () => {
+    adminToken = await getAdminToken();
+  });
+  describe('As admin', () => {
+    describe('Get all users', () => {
+      it('#01 Should get all users', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: '/users',
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        it('Should get all users', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users',
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          expect(res).toHaveProperty('status', 200);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-          expect(res?.data).toEqual([{ fullName: 'ezMESURE Administrator', username: 'ezmesure-admin' }]);
-        });
-      });
-
-      describe('GET /users/user.test - Get user with his username [user.test]', () => {
-        let adminToken;
-        let userTest;
-
-        beforeAll(async () => {
-          adminToken = await getAdminToken();
-          userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
-        });
-
-        it('Should get user [user.test]', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users/user.test',
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-
-          expect(res).toHaveProperty('status', 200);
-
-          const user = res?.data;
-
-          expect(user).toHaveProperty('username', userTest.username);
-          expect(user).toHaveProperty('fullName', userTest.fullName);
-          expect(user).toHaveProperty('email', userTest.email);
-          expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
-          expect(user?.createdAt).not.toBeNull();
-          expect(user?.updatedAt).not.toBeNull();
-        });
-
-        afterAll(async () => {
-          await deleteUserAsAdmin(userTest.username);
-        });
-      });
-
-      describe('GET /users/user-test - Get a user that doesn\'t exist', () => {
-        let adminToken;
-        beforeAll(async () => {
-          adminToken = await getAdminToken();
-        });
-
-        it('Should get HTTP status 404', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users/user-test',
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          });
-          expect(res).toHaveProperty('status', 404);
-        });
+        expect(httpAppResponse?.data).toEqual([
+          { fullName: adminFullName, username: adminUsername },
+        ]);
       });
     });
 
-    describe('Without token', () => {
-      describe('GET /users - Get all users', () => {
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users',
-          });
-          expect(res).toHaveProperty('status', 401);
-        });
+    describe(`Get user with username [${userTest.username}]`, () => {
+      beforeAll(async () => {
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
       });
 
-      describe('GET /users/user.test - Get user with his username [user.test]', () => {
-        let userTest;
-        beforeAll(async () => {
-          userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
+      it(`#02 Should get user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: `/users/${userTest.username}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users/user.test',
-          });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-          expect(res).toHaveProperty('status', 401);
+        const user = httpAppResponse?.data;
+
+        expect(user).toHaveProperty('username', userTest.username);
+        expect(user).toHaveProperty('fullName', userTest.fullName);
+        expect(user).toHaveProperty('email', userTest.email);
+        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(user?.createdAt).not.toBeNull();
+        expect(user?.updatedAt).not.toBeNull();
+      });
+    });
+
+    describe('Get user that does not exist', () => {
+      const usernameNotExist = 'random';
+      it(`#03 GET /users/random - Should get user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: '/users/random',
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
 
-        afterAll(async () => {
-          await deleteUserAsAdmin(userTest.username);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 404);
+
+        // Test users service
+        const usersFromService = await usersService.findByUsername(usernameNotExist);
+        expect(usersFromService).toEqual(null);
+      });
+    });
+    afterAll(async () => {
+      await usersService.deleteAll();
+    });
+  });
+
+  describe('As user', () => {
+    let userToken;
+    beforeAll(async () => {
+      await createUserAsAdmin(
+        userTest.username,
+        userTest.email,
+        userTest.fullName,
+        userTest.isAdmin,
+      );
+      userToken = await getToken(userTest.username, userTest.password);
+    });
+
+    describe('Get all users', () => {
+      it('#04 Should get all users', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: '/users',
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
+
+        expect(httpAppResponse?.data).toEqual([
+          { fullName: adminFullName, username: adminUsername },
+          { fullName: userTest.fullName, username: userTest.username },
+        ]);
+      });
+    });
+
+    describe(`Get user with username [${userTest.username}]`, () => {
+      beforeAll(async () => {
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
       });
 
-      describe('GET /users - Get all users with user-test token', () => {
-        it('Should get HTTP status 401', async () => {
-          const res = await ezmesure({
-            method: 'GET',
-            url: '/users',
-          });
-          expect(res).toHaveProperty('status', 401);
+      it(`#05 Should get user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: `/users/${userTest.username}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
+
+        const user = httpAppResponse?.data;
+
+        expect(user).toHaveProperty('username', userTest.username);
+        expect(user).toHaveProperty('fullName', userTest.fullName);
+        expect(user).toHaveProperty('email', userTest.email);
+        expect(user).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(user?.createdAt).not.toBeNull();
+        expect(user?.updatedAt).not.toBeNull();
+      });
+    });
+  });
+
+  describe('With random token', () => {
+    describe('Get all users', () => {
+      it('#06 Should not get users', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: '/users',
+          headers: {
+            Authorization: 'Bearer random',
+          },
+        });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const userFromService = await usersService.findByUsername(userTest.username);
+
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
+      });
+    });
+
+    describe(`Get user with username [${userTest.username}]`, () => {
+      beforeAll(async () => {
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
+      });
+
+      it(`#07 Should get user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: `/users/${userTest.username}`,
+          headers: {
+            Authorization: 'Bearer random',
+          },
+        });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const userFromService = await usersService.findByUsername(userTest.username);
+
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
+      });
+
+      afterAll(async () => {
+        await usersService.deleteAll();
+      });
+    });
+  });
+
+  describe('Without token', () => {
+    describe('Get all users', () => {
+      beforeAll(async () => {
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
+      });
+      it('#08 Should not get users', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: '/users',
+        });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const userFromService = await usersService.findByUsername(userTest.username);
+
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
+      });
+    });
+
+    describe(`Get user with username [${userTest.username}]`, () => {
+      beforeAll(async () => {
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
+      });
+
+      it(`#09 Should get user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'GET',
+          url: `/users/${userTest.username}`,
+        });
+
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
+
+        // Test users service
+        const userFromService = await usersService.findByUsername(userTest.username);
+
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
+      });
+
+      afterAll(async () => {
+        await usersService.deleteAll();
       });
     });
   });
