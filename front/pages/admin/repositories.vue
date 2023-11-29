@@ -38,7 +38,7 @@
           {{ $t('refresh') }}
         </v-btn>
 
-        <!-- <v-btn
+        <v-btn
           text
           color="black"
           @click="showReposFiltersDrawer = true"
@@ -54,7 +54,7 @@
             </v-icon>
           </v-badge>
           {{ $t('filter') }}
-        </v-btn> -->
+        </v-btn>
 
         <v-text-field
           v-model="search"
@@ -125,12 +125,12 @@
 
     <RepositoriesDeleteDialog ref="deleteDialog" @removed="onReposRemove" />
     <!-- <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" /> -->
-    <!-- <ReposFiltersDrawer
+    <ReposFiltersDrawer
       v-model="filters"
       :show.sync="showReposFiltersDrawer"
       :search="search"
-      :max-institution-count="maxCounts.childRepos"
-    /> -->
+      :max-institutions-count="maxCounts.institutions"
+    />
   </section>
 </template>
 
@@ -138,6 +138,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 // import RepositoriesInstitutionsDialog from '~/components/repositories/InstitutionsDialog.vue';
 import RepositoriesDeleteDialog from '~/components/repositories/DeleteDialog.vue';
+import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
 
 export default {
   layout: 'space',
@@ -145,6 +146,7 @@ export default {
   components: {
     ToolBar,
     // RepositoriesInstitutionsDialog,
+    ReposFiltersDrawer,
     RepositoriesDeleteDialog
   },
   data() {
@@ -205,24 +207,46 @@ export default {
         },
       ];
     },
-    // filtersCount() {
-    //   return Object.values(this.filters)
-    //     .reduce(
-    //       (prev, filter) => {
-    //         // skipping if undefined or empty
-    //         if (filter == null || filter === '') {
-    //           return prev;
-    //         }
-    //         // skipping if empty array
-    //         if (Array.isArray(filter) && filter.length <= 0) {
-    //           return prev;
-    //         }
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
 
-    //         return prev + 1;
-    //       },
-    //       0,
-    //     );
-    // },
+            return prev + 1;
+          },
+          0,
+        );
+    },
+    /**
+     * Compute maximum count of properties
+     *
+     * @returns {Record<string, number>}
+     */
+     maxCounts() {
+      const counters = {
+        institutions: 0,
+      };
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const institution of this.repos) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const property of Object.keys(counters)) {
+          if (Array.isArray(institution[property])) {
+            counters[property] = Math.max(counters[property], institution[property].length);
+          }
+        }
+      }
+
+      return counters;
+    },
   },
   methods: {
     /**
@@ -282,7 +306,12 @@ export default {
       return this.basicStringFilter(field, item[field]);
     },
     columnTypeFilter(field, item) {
-      return true;
+      const filter = this.filters[field]?.value;
+      if (!filter) {
+        return true;
+      }
+
+      return item[field] === filter;
     },
 
     async refreshRepos() {
