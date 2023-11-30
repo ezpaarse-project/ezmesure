@@ -172,13 +172,8 @@
     </v-list>
 
     <v-card-text v-else class="text-center py-5">
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        width="2"
-      />
-      <div v-else class="text-grey">
-        {{ $t('components.noComponent') }}
+      <div class="text-grey">
+        {{ $t('repositories.noInstitutions') }}
       </div>
     </v-card-text>
 
