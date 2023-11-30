@@ -16,21 +16,53 @@
         v-model="formIsValid"
         @submit.prevent="createRepository"
       >
-        <v-text-field
-          v-model="repositoryPattern"
-          :label="$t('repositories.pattern')"
-          :rules="[v => !!v || $t('fieldIsRequired')]"
-          outlined
-          autofocus
-          required
-        />
-        <v-select
-          v-model="repositoryType"
-          :items="repositoryTypes"
-          :label="$t('repositories.type')"
-          outlined
-          hide-details
-        />
+        <template v-if="institutionId">
+          <v-autocomplete
+            v-model="selectedRepository"
+            :items="availableRepositories"
+            :label="$t('repositories.repositories')"
+            :search-input.sync="repositoriesSearch"
+            :loading="loadingRepositories"
+            item-text="pattern"
+            hide-no-data
+            hide-details
+            clearable
+            outlined
+            return-object
+          >
+            <template #item="{ item }">
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ item.pattern }}
+                </v-list-item-title>
+
+                <v-list-item-subtitle>
+                  {{ item.type }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </template>
+          </v-autocomplete>
+
+          <v-divider v-if="!repositoriesSearch" class="my-4" />
+        </template>
+
+        <template v-if="!repositoriesSearch">
+          <v-text-field
+            v-model="repositoryPattern"
+            :label="`${$t('repositories.pattern')} *`"
+            :rules="[v => !!v || $t('fieldIsRequired')]"
+            outlined
+            autofocus
+            required
+          />
+          <v-select
+            v-model="repositoryType"
+            :items="repositoryTypes"
+            :label="$t('repositories.type')"
+            outlined
+            hide-details
+          />
+        </template>
       </v-form>
     </v-card-text>
 
@@ -58,6 +90,8 @@
 </template>
 
 <script>
+import debounce from 'lodash.debounce';
+
 export default {
   props: {
     institutionId: {
@@ -73,6 +107,11 @@ export default {
 
     repositoryPattern: '',
     repositoryType: 'ezpaarse',
+    selectedRepository: null,
+
+    repositoriesSearch: '',
+    loadingRepositories: false,
+    availableRepositories: [],
 
     repositoryTypes: [
       { text: 'ezPAARSE', value: 'ezpaarse' },
@@ -83,13 +122,30 @@ export default {
     loading(val) {
       this.$emit('loading', val);
     },
+    repositoriesSearch(newValue) {
+      if (newValue) {
+        this.queryRepositories(newValue);
+      }
+    },
   },
   methods: {
     resetForm() {
       this.$refs.creationForm?.resetValidation?.();
       this.repositoryPattern = '';
       this.repositoryType = 'ezpaarse';
+      this.repositoriesSearch = '';
+      this.selectedRepository = null;
     },
+
+    queryRepositories: debounce(async function queryRepositories() {
+      this.loadingRepositories = true;
+      try {
+        this.availableRepositories = await this.$axios.$get('/repositories', { params: { q: this.repositoriesSearch } });
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('searchFailed'));
+      }
+      this.loadingRepositories = false;
+    }, 500),
 
     async createRepository() {
       this.loading = true;
@@ -98,9 +154,14 @@ export default {
       try {
         let newRepository;
         if (this.institutionId) {
+          const repo = this.selectedRepository ?? {
+            pattern: this.repositoryPattern,
+            type: this.repositoryType,
+          };
+
           newRepository = await this.$axios.$put(
-            `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
-            { type: this.repositoryType },
+            `/institutions/${this.institutionId}/repositories/${repo.pattern}`,
+            { type: repo.type },
           );
         } else {
           newRepository = await this.$axios.$post(
