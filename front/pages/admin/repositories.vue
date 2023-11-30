@@ -24,12 +24,36 @@
       <template v-else #default>
         <v-spacer />
 
-        <!-- <v-btn text @click="createRepo">
-          <v-icon left>
-            mdi-plus
-          </v-icon>
-          {{ $t('add') }}
-        </v-btn> -->
+        <v-menu
+          v-model="showCreationForm"
+          :close-on-content-click="false"
+          :nudge-width="200"
+          offset-y
+          bottom
+          left
+          @input="$refs.repoCreateForm?.resetForm?.()"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            text
+            :loading="creating"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon left>
+              mdi-plus
+            </v-icon>
+            {{ $t('add') }}
+          </v-btn>
+        </template>
+
+        <RepositoriesCreateForm
+          ref="repoCreateForm"
+          @submit="onRepositoryCreate"
+          @cancel="showCreationForm = false"
+          @loading="creating = $event"
+        />
+      </v-menu>
 
         <v-btn text :loading="refreshing" @click="refreshRepos">
           <v-icon left>
@@ -137,6 +161,7 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import RepositoriesInstitutionsDialog from '~/components/repositories/RepositoriesInstitutionsDialog.vue';
+import RepositoriesCreateForm from '~/components/repositories/RepositoriesCreateForm.vue';
 import RepositoriesDeleteDialog from '~/components/repositories/DeleteDialog.vue';
 import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
 
@@ -146,6 +171,7 @@ export default {
   components: {
     ToolBar,
     RepositoriesInstitutionsDialog,
+    RepositoriesCreateForm,
     ReposFiltersDrawer,
     RepositoriesDeleteDialog
   },
@@ -153,6 +179,8 @@ export default {
     return {
       showReposFiltersDrawer: false,
 
+      showCreationForm: false,
+      creating: false,
       selected: [],
       search: '',
       refreshing: false,
@@ -334,9 +362,6 @@ export default {
       this.refreshing = false;
     },
 
-    // createRepo() {
-    //   this.$refs.repoForm.createRepo({ addAsMember: false });
-    // },
     deleteRepo(item) {
       this.$refs.deleteDialog.confirmDelete([item]);
     },
@@ -347,6 +372,10 @@ export default {
       const removeDeleted = (repo) => !removedIds.some((id) => repo.id === id);
       this.repos = this.repos.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
+    },
+    async onRepositoryCreate(newRepository) {
+      this.showCreationForm = false;
+      await this.refreshRepos();
     },
 
     clearSelection() {
