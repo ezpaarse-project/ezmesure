@@ -1,6 +1,6 @@
 // @ts-check
 const elasticUsers = require('../elastic/users');
-const { client: prisma } = require('../prisma.service');
+const { client: prisma } = require('../prisma');
 const { generateRoleNameFromRepository } = require('../../hooks/utils');
 
 /** @typedef {import('@prisma/client').Institution} Institution */

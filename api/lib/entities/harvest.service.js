@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const harvestPrisma = require('../services/prisma/harvest');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Harvest} Harvest */
@@ -16,7 +16,7 @@ module.exports = class HarvestsService {
    * @returns {Promise<Harvest>}
    */
   static create(params) {
-    return prisma.harvest.create(params);
+    return harvestPrisma.create(params);
   }
 
   /**
@@ -24,7 +24,7 @@ module.exports = class HarvestsService {
    * @returns {Promise<Harvest[]>}
    */
   static findMany(params) {
-    return prisma.harvest.findMany(params);
+    return harvestPrisma.findMany(params);
   }
 
   /**
@@ -32,7 +32,7 @@ module.exports = class HarvestsService {
    * @returns {Promise<Harvest | null>}
    */
   static findUnique(params) {
-    return prisma.harvest.findUnique(params);
+    return harvestPrisma.findUnique(params);
   }
 
   /**
@@ -40,7 +40,7 @@ module.exports = class HarvestsService {
    * @returns {Promise<Harvest>}
    */
   static update(params) {
-    return prisma.harvest.update(params);
+    return harvestPrisma.update(params);
   }
 
   /**
@@ -48,6 +48,6 @@ module.exports = class HarvestsService {
    * @returns {Promise<Harvest>}
    */
   static upsert(params) {
-    return prisma.harvest.upsert(params);
+    return harvestPrisma.upsert(params);
   }
 };

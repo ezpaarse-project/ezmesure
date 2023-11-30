@@ -1,5 +1,7 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const institutionsPrisma = require('../services/prisma/institutions');
+const membershipsPrisma = require('../services/prisma/memberships');
+
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 const {
@@ -27,7 +29,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async create(params) {
-    const institution = await prisma.institution.create(params);
+    const institution = await institutionsPrisma.create(params);
 
     triggerHooks('institution:create', institution);
 
@@ -39,7 +41,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution[]>}
    */
   static findMany(params) {
-    return prisma.institution.findMany(params);
+    return institutionsPrisma.findMany(params);
   }
 
   /**
@@ -47,7 +49,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static findUnique(params) {
-    return prisma.institution.findUnique(params);
+    return institutionsPrisma.findUnique(params);
   }
 
   /**
@@ -62,7 +64,7 @@ module.exports = class InstitutionsService {
         ...includes,
       };
     }
-    return prisma.institution.findUnique({
+    return institutionsPrisma.findUnique({
       where: { id },
       include,
     });
@@ -73,7 +75,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async update(params) {
-    const institution = await prisma.institution.update(params);
+    const institution = await institutionsPrisma.update(params);
 
     triggerHooks('institution:update', institution);
 
@@ -86,7 +88,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async addSubInstitution(institutionId, subInstitutionId) {
-    const institution = await prisma.institution.update({
+    const institution = await institutionsPrisma.update({
       where: { id: institutionId },
       include: { childInstitutions: true },
       data: {
@@ -106,7 +108,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async validate(id) {
-    const institution = await prisma.institution.update({
+    const institution = await institutionsPrisma.update({
       where: { id },
       data: { validated: true },
     });
@@ -121,7 +123,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async upsert(params) {
-    const institution = await prisma.institution.upsert(params);
+    const institution = await institutionsPrisma.upsert(params);
 
     triggerHooks('institution:upsert', institution);
 
@@ -133,72 +135,13 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static async delete(params) {
-    const transactionResult = await prisma.$transaction(async (tx) => {
-      const institution = await tx.institution.findUnique({
-        where: params.where,
-        include: {
-          memberships: {
-            include: {
-              repositoryPermissions: true,
-              spacePermissions: true,
-            },
-          },
-          spaces: true,
-          repositories: { include: { institutions: true } },
-          sushiCredentials: true,
-        },
-      });
-
-      if (!institution) {
-        return null;
-      }
-
-      const deletedRepos = [];
-      const findArgs = { where: { institutionId: institution.id } };
-
-      await tx.repositoryPermission.deleteMany(findArgs);
-      await tx.spacePermission.deleteMany(findArgs);
-      await tx.membership.deleteMany(findArgs);
-
-      await Promise.all(
-        institution.repositories.map((r) => {
-          // If last institution, delete repo
-          if (r.institutions.length <= 1) {
-            deletedRepos.push(r);
-            return tx.repository.delete({ where: { pattern: r.pattern } });
-          }
-
-          // Otherwise disconnect institution from repo
-          return tx.repository.update({
-            where: { pattern: r.pattern },
-            data: {
-              institutions: {
-                disconnect: { id: institution.id },
-              },
-            },
-          });
-        }),
-      );
-      await tx.space.deleteMany(findArgs);
-
-      await tx.sushiCredentials.deleteMany(findArgs);
-
-      return {
-        deletedInstitution: await tx.institution.delete(params),
-        deletedRepos,
-        institution,
-      };
-    });
-
-    if (!transactionResult) {
-      return null;
-    }
+    const data = institutionsPrisma.remove(params);
 
     const {
       deletedInstitution,
       deletedRepos,
       institution,
-    } = transactionResult;
+    } = data;
 
     triggerHooks('institution:delete', institution);
 
@@ -235,7 +178,7 @@ module.exports = class InstitutionsService {
   }
 
   static async getContacts(institutionId) {
-    return prisma.membership.findMany({
+    return membershipsPrisma.findMany({
       where: {
         institutionId,
         roles: {

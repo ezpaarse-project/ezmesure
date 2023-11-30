@@ -1,5 +1,6 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma } = require('../services/prisma');
+const repositoriesPrisma = require('../services/prisma/repositories');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -19,7 +20,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository>}
    */
   static async create(params) {
-    const repository = await prisma.repository.create(params);
+    const repository = await repositoriesPrisma.create(params);
     triggerHooks('repository:create', repository);
     return repository;
   }
@@ -29,7 +30,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository[]>}
    */
   static findMany(params) {
-    return prisma.repository.findMany(params);
+    return repositoriesPrisma.findMany(params);
   }
 
   /**
@@ -37,7 +38,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static findUnique(params) {
-    return prisma.repository.findUnique(params);
+    return repositoriesPrisma.findUnique(params);
   }
 
   /**
@@ -45,7 +46,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static findFirst(params) {
-    return prisma.repository.findFirst(params);
+    return repositoriesPrisma.findFirst(params);
   }
 
   /**
@@ -53,7 +54,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static findByPattern(pattern) {
-    return prisma.repository.findUnique({ where: { pattern } });
+    return repositoriesPrisma.findUnique({ where: { pattern } });
   }
 
   /**
@@ -61,7 +62,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository>}
    */
   static async update(params) {
-    const repository = await prisma.repository.update(params);
+    const repository = await repositoriesPrisma.update(params);
     triggerHooks('repository:update', repository);
     return repository;
   }
@@ -72,7 +73,7 @@ module.exports = class RepositoriesService {
    * @param {string} institutionId
    */
   static async connectInstitution(pattern, institutionId) {
-    const repository = await prisma.repository.update({
+    const repository = await repositoriesPrisma.update({
       where: { pattern },
       data: { institutions: { connect: { id: institutionId } } },
     });
@@ -87,7 +88,7 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository>}
    */
   static async upsert(params) {
-    const repository = await prisma.repository.upsert(params);
+    const repository = await repositoriesPrisma.upsert(params);
     triggerHooks('repository:upsert', repository);
     return repository;
   }
@@ -97,38 +98,9 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static async delete(params) {
-    const [deleteResult, deletedRepository] = await prisma.$transaction(async (tx) => {
-      const repository = await tx.repository.findUnique({
-        where: params.where,
-        include: {
-          permissions: true,
-          institutions: true,
-        },
-      });
-
-      if (!repository) {
-        return [null, null];
-      }
-
-      await tx.repositoryPermission.deleteMany({
-        where: {
-          repositoryPattern: repository.pattern,
-        },
-      });
-
-      return [
-        await tx.repository.delete(params),
-        repository,
-      ];
-    });
-
-    if (!deletedRepository) {
-      return null;
-    }
-
+    const { deleteResult, deletedRepository } = await repositoriesPrisma.remove(params);
     triggerHooks('repository:delete', deletedRepository);
     deletedRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
-
     return deleteResult;
   }
 
@@ -139,42 +111,8 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static async disconnectInstitution(pattern, institutionId) {
-    const [newRepository, oldRepository] = await prisma.$transaction(async (tx) => {
-      const currentRepository = await tx.repository.findUnique({
-        where: { pattern },
-        include: {
-          permissions: { where: { institutionId } },
-          institutions: { where: { id: institutionId } },
-        },
-      });
-
-      if (!currentRepository) {
-        return [null, null];
-      }
-
-      await tx.repositoryPermission.deleteMany({
-        where: {
-          repositoryPattern: currentRepository.pattern,
-          institutionId,
-        },
-      });
-
-      const updatedRepository = await tx.repository.update({
-        where: { pattern },
-        data: {
-          institutions: {
-            disconnect: {
-              id: institutionId,
-            },
-          },
-        },
-      });
-
-      return [
-        updatedRepository,
-        currentRepository,
-      ];
-    });
+    const { newRepository, oldRepository } = await repositoriesPrisma
+      .disconnectInstitution(pattern, institutionId);
 
     if (!oldRepository) {
       return null;

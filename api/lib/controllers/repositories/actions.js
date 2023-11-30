@@ -3,7 +3,7 @@ const repositoriesService = require('../../entities/repositories.service');
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
-} = require('../../services/prisma.service');
+} = require('../../services/prisma');
 
 /* eslint-disable max-len */
 /**

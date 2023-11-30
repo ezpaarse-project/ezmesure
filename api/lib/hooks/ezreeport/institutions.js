@@ -3,7 +3,7 @@ const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
-const { client: prisma } = require('../../services/prisma.service');
+const { client: prisma } = require('../../services/prisma');
 
 const ezrReportingUsers = require('../../services/ezreeport/reportingUsers');
 const ezrNamespaces = require('../../services/ezreeport/namespaces');

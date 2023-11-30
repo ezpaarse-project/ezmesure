@@ -1,6 +1,7 @@
 // @ts-check
+
+const repositoryPermissionsPrisma = require('../services/prisma/repository-permissions');
 const { triggerHooks } = require('../hooks/hookEmitter');
-const { client: prisma, Prisma } = require('../services/prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission */
@@ -18,7 +19,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission>}
    */
   static async create(params) {
-    const permission = await prisma.repositoryPermission.create(params);
+    const permission = await repositoryPermissionsPrisma.create(params);
 
     triggerHooks('repository_permission:create', permission);
 
@@ -30,7 +31,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission[]>}
    */
   static findMany(params) {
-    return prisma.repositoryPermission.findMany(params);
+    return repositoryPermissionsPrisma.findMany(params);
   }
 
   /**
@@ -38,7 +39,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission | null>}
    */
   static findUnique(params) {
-    return prisma.repositoryPermission.findUnique(params);
+    return repositoryPermissionsPrisma.findUnique(params);
   }
 
   /**
@@ -48,7 +49,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission | null>}
    */
   static findById(institutionId, pattern, username) {
-    return prisma.repositoryPermission.findUnique({
+    return repositoryPermissionsPrisma.findUnique({
       where: {
         username_institutionId_repositoryPattern: {
           username,
@@ -64,7 +65,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission>}
    */
   static async update(params) {
-    const permission = await prisma.repositoryPermission.update(params);
+    const permission = await repositoryPermissionsPrisma.update(params);
 
     triggerHooks('repository_permission:update', permission);
 
@@ -76,7 +77,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission>}
    */
   static async upsert(params) {
-    const permission = await prisma.repositoryPermission.upsert(params);
+    const permission = await repositoryPermissionsPrisma.upsert(params);
 
     triggerHooks('repository_permission:upsert', permission);
 
@@ -88,15 +89,8 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission | null>}
    */
   static async delete(params) {
-    let permission;
-    try {
-      permission = await prisma.repositoryPermission.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
-      }
-      throw error;
-    }
+    const permission = await repositoryPermissionsPrisma.remove(params);
+
     triggerHooks('repository_permission:delete', permission);
 
     return permission;
