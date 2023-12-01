@@ -4,7 +4,7 @@ const { Joi } = require('koa-joi-router');
 const {
   adminUpdateSchema,
   adminCreateSchema,
-} = require('../../entities/sushi-endpoint.dto');
+} = require('../../entities/sushi-endpoints.dto');
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),

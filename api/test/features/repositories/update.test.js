@@ -71,7 +71,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -114,11 +114,11 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -153,7 +153,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -186,7 +186,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });

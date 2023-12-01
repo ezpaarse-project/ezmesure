@@ -26,7 +26,7 @@ const { SUSHI_CODES, ERROR_CODES } = sushiService;
 const harvestJobService = require('../../entities/harvest-job.service');
 const stepService = require('../../entities/step.service');
 const logService = require('../../entities/log.service');
-const sushiEndpointService = require('../../entities/sushi-endpoint.service');
+const sushiEndpointService = require('../../entities/sushi-endpoints.service');
 
 /* eslint-disable max-len */
 /**

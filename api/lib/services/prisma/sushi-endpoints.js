@@ -2,13 +2,17 @@
 const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
+ * @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
+ * @typedef {{deleteResult: SushiEndpoint, deletedEndpoint: SushiEndpoint }} SushiEndpointRemoved
+ */
+
 /* eslint-enable max-len */
 
 /**
@@ -61,10 +65,10 @@ function upsert(params) {
 
 /**
  * @param {SushiEndpointDeleteArgs} params
- * @returns {Promise<SushiEndpoint | null>}
+ * @returns {Promise<SushiEndpointRemoved | null>}
  */
 async function remove(params) {
-  const [deleteResult, deletedEndpoint] = await prisma.$transaction(async (tx) => {
+  const { deleteResult, deletedEndpoint } = await prisma.$transaction(async (tx) => {
     const endpoint = await tx.sushiEndpoint.findUnique({
       where: params.where,
       include: {
@@ -80,10 +84,10 @@ async function remove(params) {
       where: { endpointId: endpoint.id },
     });
 
-    return [
-      await tx.sushiEndpoint.delete(params),
-      endpoint,
-    ];
+    return {
+      deleteResult: await tx.sushiEndpoint.delete(params),
+      deletedEndpoint: endpoint,
+    };
   });
 
   if (!deletedEndpoint) {
@@ -96,7 +100,7 @@ async function remove(params) {
 /**
  * @returns {Promise<Array<SushiEndpoint> | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const sushiEndpoints = await this.findMany({});
@@ -120,5 +124,5 @@ module.exports = {
   update,
   upsert,
   remove,
-  deleteAll,
+  removeAll,
 };

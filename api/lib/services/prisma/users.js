@@ -21,7 +21,7 @@ const {
  * @typedef {import('@prisma/client').Prisma.UserUpdateArgs} UserUpdateArgs
  * @typedef {import('@prisma/client').Prisma.UserCreateArgs} UserCreateArgs
  * @typedef {import('@prisma/client').Prisma.UserDeleteArgs} UserDeleteArgs
- * @typedef {{deleteResult: User, deletedUser: User}} as UserDeleteReturn
+ * @typedef {{deleteResult: User, deletedUser: User }} UserRemoved
  */
 /* eslint-enable max-len */
 
@@ -142,10 +142,10 @@ function upsert(params) {
 /**
  * @param {UserDeleteArgs} params
  *
- * @returns {Promise<UserDeleteReturn | null>}
+ * @returns {Promise<UserRemoved | null>}
  */
 async function remove(params) {
-  const [deleteResult, deletedUser] = await prisma.$transaction(async (tx) => {
+  const { deleteResult, deletedUser } = await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUnique({
       where: params.where,
       include: {
@@ -168,10 +168,10 @@ async function remove(params) {
     await tx.spacePermission.deleteMany(findArgs);
     await tx.membership.deleteMany(findArgs);
 
-    return [
-      await tx.user.delete(params),
-      user,
-    ];
+    return {
+      deleteResult: await tx.user.delete(params),
+      deletedUser: user,
+    };
   });
 
   if (!deletedUser) {
@@ -192,7 +192,7 @@ function removeByUsername(username) {
 /**
  * @returns {Promise<Array<User> | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
   const users = await this.findMany({
     where: { NOT: { username: adminUsername } },
@@ -218,5 +218,5 @@ module.exports = {
   upsert,
   remove,
   removeByUsername,
-  deleteAll,
+  removeAll,
 };

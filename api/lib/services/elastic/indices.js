@@ -53,7 +53,7 @@ exports.delete = async function deleteIndex(indexName, requestConfig) {
  *
  * @return {Promise<>} index.
  */
-exports.deleteAll = async function deleteAllIndices(requestConfig) {
+exports.removeAll = async function removeAllIndices(requestConfig) {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const res = await elastic.cat.indices({ format: 'json' });

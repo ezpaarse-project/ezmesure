@@ -90,7 +90,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
       });
     });
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
   describe('As User', () => {
@@ -116,7 +116,7 @@ describe('[institutions - subinstitution]: Test read features', () => {
       });
     });
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -140,11 +140,11 @@ describe('[institutions - subinstitution]: Test read features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
 
   afterAll(async () => {
-    await usersService.deleteAll();
+    await usersService.removeAll();
   });
 });

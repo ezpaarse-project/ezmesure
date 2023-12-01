@@ -75,7 +75,7 @@ function remove(params) {
 /**
  * @returns {Promise<Array<SushiCredentials> | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const sushiCredentials = await this.findMany({});
@@ -99,5 +99,5 @@ module.exports = {
   update,
   upsert,
   remove,
-  deleteAll,
+  removeAll,
 };

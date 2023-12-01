@@ -84,7 +84,7 @@ function upsert(params) {
  * @returns {Promise<Membership | null>}
  */
 async function remove(params) {
-  const [deleteResult, deletedMembership] = await prisma.$transaction(async (tx) => {
+  const { deleteResult, deletedMembership } = await prisma.$transaction(async (tx) => {
     const membership = await tx.membership.findUnique({
       where: params.where,
       include: {
@@ -108,10 +108,10 @@ async function remove(params) {
     await tx.repositoryPermission.deleteMany(findArgs);
     await tx.spacePermission.deleteMany(findArgs);
 
-    return [
-      await tx.membership.delete(params),
-      membership,
-    ];
+    return {
+      deleteResult: await tx.membership.delete(params),
+      deletedMembership: membership,
+    };
   });
 
   if (!deletedMembership) {
@@ -124,7 +124,7 @@ async function remove(params) {
 /**
  * @returns {Promise<Array<Membership> | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
   const memberships = await this.findMany({});
 
@@ -150,4 +150,5 @@ module.exports = {
   update,
   upsert,
   remove,
+  removeAll,
 };

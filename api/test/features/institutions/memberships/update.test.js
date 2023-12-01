@@ -103,7 +103,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
 
@@ -147,7 +147,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
   });
@@ -253,7 +253,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
       });
       afterEach(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
     describe(`With permission [${readPermission}]`, () => {
@@ -293,7 +293,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
       });
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
   });
@@ -330,7 +330,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
   });
@@ -364,12 +364,12 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsService.removeAll();
       });
     });
   });
   afterAll(async () => {
-    await usersService.deleteAll();
-    await institutionsService.deleteAll();
+    await usersService.removeAll();
+    await institutionsService.removeAll();
   });
 });

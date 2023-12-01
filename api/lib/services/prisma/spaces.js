@@ -2,14 +2,17 @@
 const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Space} Space */
-/** @typedef {import('@prisma/client').Prisma.SpaceUpdateArgs} SpaceUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.SpaceUpsertArgs} SpaceUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
-/** @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
+/**
+ * @typedef {import('@prisma/client').Space} Space
+ * @typedef {import('@prisma/client').Prisma.SpaceUpdateArgs} SpaceUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceUpsertArgs} SpaceUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceFindUniqueArgs} SpaceFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {{deleteResult: Space, deletedSpace: Space }} SpaceRemoved
+ */
 /* eslint-enable max-len */
 
 /**
@@ -62,10 +65,10 @@ function upsert(params) {
 
 /**
    * @param {SpaceDeleteArgs} params
-   * @returns {Promise<Space | null>}
+   * @returns {Promise<SpaceRemoved | null>}
    */
 async function remove(params) {
-  const [deleteResult, deletedSpace] = await prisma.$transaction(async (tx) => {
+  const { deleteResult, deletedSpace } = await prisma.$transaction(async (tx) => {
     const space = await tx.space.findUnique({
       where: params.where,
       include: {
@@ -81,10 +84,10 @@ async function remove(params) {
       where: { spaceId: space.id },
     });
 
-    return [
-      await tx.space.delete(params),
-      space,
-    ];
+    return {
+      deleteResult: await tx.space.delete(params),
+      deletedSpace: space,
+    };
   });
 
   if (!deletedSpace) {
@@ -97,7 +100,7 @@ async function remove(params) {
 /**
    * @returns {Promise<Array<Space> | null>}
    */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const spaces = await this.findMany({});
@@ -121,5 +124,5 @@ module.exports = {
   update,
   upsert,
   remove,
-  deleteAll,
+  removeAll,
 };

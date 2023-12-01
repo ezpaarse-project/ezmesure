@@ -32,7 +32,7 @@ describe('[indices]: Test delete features', () => {
     });
 
     afterEach(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
   describe('As user', () => {
@@ -60,11 +60,11 @@ describe('[indices]: Test delete features', () => {
     });
 
     afterEach(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -86,7 +86,7 @@ describe('[indices]: Test delete features', () => {
     });
 
     afterEach(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -108,7 +108,7 @@ describe('[indices]: Test delete features', () => {
     });
 
     afterEach(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
 });

@@ -57,7 +57,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -91,11 +91,11 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random user', () => {
@@ -121,7 +121,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -144,7 +144,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });

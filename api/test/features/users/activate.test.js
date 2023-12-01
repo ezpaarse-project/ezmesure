@@ -57,7 +57,7 @@ describe('[users]: Test activate users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });

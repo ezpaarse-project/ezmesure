@@ -87,7 +87,7 @@ async function remove(params) {
   return permission;
 }
 
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const permissions = await this.findMany({});
@@ -115,5 +115,5 @@ module.exports = {
   update,
   upsert,
   remove,
-  deleteAll,
+  removeAll,
 };

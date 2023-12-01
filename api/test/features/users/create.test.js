@@ -48,7 +48,7 @@ describe('[users]: Test create users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });

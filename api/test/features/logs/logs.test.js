@@ -46,7 +46,7 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.deleteAll();
+        await indicesService.removeAll();
       });
     });
   });
@@ -81,7 +81,7 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.deleteAll();
+        await indicesService.removeAll();
       });
     });
 
@@ -106,11 +106,11 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.deleteAll();
+        await indicesService.removeAll();
       });
     });
     afterEach(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -134,7 +134,7 @@ describe('[logs]: Test insert features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -155,7 +155,7 @@ describe('[logs]: Test insert features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
 });

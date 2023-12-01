@@ -135,7 +135,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static async delete(params) {
-    const data = institutionsPrisma.remove(params);
+    const data = await institutionsPrisma.remove(params);
 
     const {
       deletedInstitution,
@@ -161,7 +161,7 @@ module.exports = class InstitutionsService {
   /**
    * @returns {Promise<Object | null>}
    */
-  static async deleteAll() {
+  static async removeAll() {
     if (process.env.NODE_ENV === 'production') { return null; }
 
     const institutions = await this.findMany({});

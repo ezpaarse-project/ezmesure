@@ -29,7 +29,7 @@ describe('[indices]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
   describe('As user', () => {
@@ -57,8 +57,8 @@ describe('[indices]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
-      await usersService.deleteAll();
+      await indicesService.removeAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -78,7 +78,7 @@ describe('[indices]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -94,7 +94,7 @@ describe('[indices]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.deleteAll();
+      await indicesService.removeAll();
     });
   });
 });

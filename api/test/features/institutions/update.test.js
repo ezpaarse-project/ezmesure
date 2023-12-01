@@ -86,7 +86,7 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
   describe('As user', () => {
@@ -158,7 +158,7 @@ describe('[institutions]: Test update features', () => {
         expect(institutionFromService).toHaveProperty('sushiReadySince', null);
       });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
 
@@ -205,11 +205,11 @@ describe('[institutions]: Test update features', () => {
         expect(institution).toHaveProperty('sushiReadySince', null);
       });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -255,7 +255,7 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -299,7 +299,7 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
 });

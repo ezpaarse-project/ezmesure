@@ -96,7 +96,7 @@ describe('[users]: Test read users features', () => {
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
 
@@ -226,7 +226,7 @@ describe('[users]: Test read users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });
@@ -293,7 +293,7 @@ describe('[users]: Test read users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });

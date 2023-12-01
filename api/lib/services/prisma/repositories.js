@@ -2,14 +2,17 @@
 const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
-/** @typedef {import('@prisma/client').Repository} Repository */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs */
-/** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
+/**
+ * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryCreateArgs} RepositoryCreateArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs
+ * @typedef {{deleteResult: Repository, deletedRepository: Repository }} RepositoryRemoved
+ */
 /* eslint-enable max-len */
 
 /**
@@ -87,7 +90,7 @@ function connectInstitution(pattern, institutionId) {
  * @returns {Promise<Repository | null>}
  */
 async function disconnectInstitution(pattern, institutionId) {
-  const [newRepository, oldRepository] = await prisma.$transaction(async (tx) => {
+  const { newRepository, oldRepository } = await prisma.$transaction(async (tx) => {
     const currentRepository = await tx.repository.findUnique({
       where: { pattern },
       include: {
@@ -97,7 +100,7 @@ async function disconnectInstitution(pattern, institutionId) {
     });
 
     if (!currentRepository) {
-      return [null, null];
+      return null;
     }
 
     await tx.repositoryPermission.deleteMany({
@@ -118,10 +121,10 @@ async function disconnectInstitution(pattern, institutionId) {
       },
     });
 
-    return [
+    return {
       updatedRepository,
       currentRepository,
-    ];
+    };
   });
 
   if (!oldRepository) {
@@ -132,7 +135,7 @@ async function disconnectInstitution(pattern, institutionId) {
 
 /**
  * @param {RepositoryDeleteArgs} params
- * @returns {Promise<Repository | null>}
+ * @returns {Promise<RepositoryRemoved | null>}
  */
 async function remove(params) {
   const [deleteResult, deletedRepository] = await prisma.$transaction(async (tx) => {
@@ -145,7 +148,7 @@ async function remove(params) {
     });
 
     if (!repository) {
-      return [null, null];
+      return null;
     }
 
     await tx.repositoryPermission.deleteMany({
@@ -164,13 +167,13 @@ async function remove(params) {
     return null;
   }
 
-  return [deleteResult, deletedRepository];
+  return { deleteResult, deletedRepository };
 }
 
 /**
  * @returns {Promise<Array<Repository> | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const repositories = await this.findMany({});
@@ -197,5 +200,5 @@ module.exports = {
   connectInstitution,
   disconnectInstitution,
   remove,
-  deleteAll,
+  removeAll,
 };

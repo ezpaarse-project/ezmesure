@@ -53,7 +53,7 @@ describe('[users]: Test delete users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });
@@ -89,7 +89,7 @@ describe('[users]: Test delete users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersService.removeAll();
       });
     });
   });

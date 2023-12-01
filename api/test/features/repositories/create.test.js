@@ -62,7 +62,7 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
@@ -99,7 +99,7 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
 
@@ -137,7 +137,7 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -189,7 +189,7 @@ describe('[repositories]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
 

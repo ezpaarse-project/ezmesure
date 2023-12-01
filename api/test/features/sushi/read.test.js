@@ -2,7 +2,7 @@ const ezmesure = require('../../setup/ezmesure');
 
 const institutionsService = require('../../../lib/entities/institutions.service');
 const usersService = require('../../../lib/entities/users.service');
-const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.service');
+const sushiEndpointsService = require('../../../lib/entities/sushi-endpoints.service');
 const sushiCredentialsService = require('../../../lib/entities/sushi-credentials.service');
 const membershipsService = require('../../../lib/entities/memberships.service');
 
@@ -129,12 +129,12 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await sushiCredentialsService.deleteAll();
+          await sushiCredentialsService.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
     describe('Institution created by user', () => {
@@ -181,12 +181,12 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await sushiCredentialsService.deleteAll();
+          await sushiCredentialsService.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
   });
@@ -227,12 +227,12 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await sushiCredentialsService.deleteAll();
+          await sushiCredentialsService.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
     describe('Institution created by user', () => {
@@ -286,11 +286,11 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
 
           afterAll(async () => {
-            await sushiCredentialsService.deleteAll();
+            await sushiCredentialsService.removeAll();
           });
         });
         afterAll(async () => {
-          await membershipsService.deleteAll();
+          await membershipsService.removeAll();
         });
       });
 
@@ -338,7 +338,7 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await membershipsService.deleteAll();
+          await membershipsService.removeAll();
         });
       });
 
@@ -373,12 +373,12 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await membershipsService.deleteAll();
+          await membershipsService.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
 
@@ -432,7 +432,7 @@ describe('[sushi]: Test read sushi credential features', () => {
           });
         });
         afterAll(async () => {
-          await membershipsService.deleteAll();
+          await membershipsService.removeAll();
         });
       });
 
@@ -467,17 +467,17 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await membershipsService.deleteAll();
+          await membershipsService.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -511,7 +511,7 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
       });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
   });
@@ -543,11 +543,11 @@ describe('[sushi]: Test read sushi credential features', () => {
         });
       });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
   });
   afterAll(async () => {
-    await sushiEndpointsService.deleteAll();
+    await sushiEndpointsService.removeAll();
   });
 });

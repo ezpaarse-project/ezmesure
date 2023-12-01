@@ -114,17 +114,17 @@ describe('[repository permission]: Test create features', () => {
             expect(repositoryPermissionFromService).toHaveProperty('readonly', permissionTest.readonly);
           });
           afterAll(async () => {
-            await repositoryPermissionsService.deleteAll();
-            await usersService.deleteAll();
-            await membershipsService.deleteAll();
+            await repositoryPermissionsService.removeAll();
+            await usersService.removeAll();
+            await membershipsService.removeAll();
           });
         });
         afterAll(async () => {
-          await repositoriesService.deleteAll();
+          await repositoriesService.removeAll();
         });
       });
       afterAll(async () => {
-        await institutionsService.deleteAll();
+        await institutionsService.removeAll();
       });
     });
   });

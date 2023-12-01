@@ -19,7 +19,7 @@ const repositoriesService = require('../../entities/repositories.service');
 const sushiCredentialsService = require('../../entities/sushi-credentials.service');
 const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
-const SushiEndpointsService = require('../../entities/sushi-endpoint.service');
+const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 

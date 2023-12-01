@@ -62,7 +62,7 @@ describe('[space]: Test read spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesService.removeAll();
       });
     });
   });
@@ -93,11 +93,11 @@ describe('[space]: Test read spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesService.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('With random token', () => {
@@ -118,7 +118,7 @@ describe('[space]: Test read spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesService.removeAll();
       });
     });
   });
@@ -137,12 +137,12 @@ describe('[space]: Test read spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesService.removeAll();
       });
     });
   });
 
   afterAll(async () => {
-    await institutionsService.deleteAll();
+    await institutionsService.removeAll();
   });
 });

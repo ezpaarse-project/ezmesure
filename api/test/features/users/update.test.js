@@ -62,7 +62,7 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersService.removeAll();
         });
       });
     });
@@ -102,7 +102,7 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersService.removeAll();
         });
       });
     });
@@ -139,7 +139,7 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersService.removeAll();
         });
       });
     });

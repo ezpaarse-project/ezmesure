@@ -19,6 +19,8 @@ const {
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
+ * @typedef {{deletedInstitution: Institution, deletedRepos: Repository[], institution: Institution }} InstitutionRemoved
+ * @returns {Promise<RemoveInstitution | null>}
  */
 /* eslint-enable max-len */
 
@@ -110,7 +112,7 @@ function validate(id) {
 
 /**
  * @param {InstitutionDeleteArgs} params
- * @returns {Promise<Institution | null>}
+ * @returns {Promise<InstitutionRemoved | null>}
  */
 async function remove(params) {
   const transactionResult = await prisma.$transaction(async (tx) => {
@@ -180,7 +182,7 @@ async function remove(params) {
 /**
  * @returns {Promise<Institution[] | null>}
  */
-async function deleteAll() {
+async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
   const institutions = await this.findMany({});
@@ -223,6 +225,6 @@ module.exports = {
   addSubInstitution,
   validate,
   remove,
-  deleteAll,
+  removeAll,
   getContacts,
 };

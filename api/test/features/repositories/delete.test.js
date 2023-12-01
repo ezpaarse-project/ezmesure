@@ -48,7 +48,7 @@ describe('[repositories]: Test delete features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });
@@ -91,12 +91,12 @@ describe('[repositories]: Test delete features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -127,7 +127,7 @@ describe('[repositories]: Test delete features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesService.removeAll();
       });
     });
   });

@@ -1,7 +1,7 @@
 const ezmesure = require('../../setup/ezmesure');
 
 const usersService = require('../../../lib/entities/users.service');
-const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.service');
+const sushiEndpointsService = require('../../../lib/entities/sushi-endpoints.service');
 
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
@@ -55,7 +55,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsService.removeAll();
       });
     });
   });
@@ -109,12 +109,12 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsService.removeAll();
       });
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
 
@@ -159,7 +159,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsService.removeAll();
       });
     });
   });
@@ -201,7 +201,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsService.removeAll();
       });
     });
   });

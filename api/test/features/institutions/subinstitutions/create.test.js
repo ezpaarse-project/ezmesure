@@ -115,7 +115,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
       });
     });
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -138,11 +138,11 @@ describe('[institutions - subinstitution]: Test create features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.deleteAll();
+      await institutionsService.removeAll();
     });
   });
 
   afterAll(async () => {
-    await usersService.deleteAll();
+    await usersService.removeAll();
   });
 });

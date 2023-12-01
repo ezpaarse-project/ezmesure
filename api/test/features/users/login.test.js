@@ -53,7 +53,7 @@ describe('[users]: Test login users features', () => {
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
 
@@ -76,7 +76,7 @@ describe('[users]: Test login users features', () => {
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
 

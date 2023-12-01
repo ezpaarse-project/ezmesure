@@ -1,7 +1,7 @@
 const ezmesure = require('../../setup/ezmesure');
 
 const usersService = require('../../../lib/entities/users.service');
-const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.service');
+const sushiEndpointsService = require('../../../lib/entities/sushi-endpoints.service');
 
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
@@ -83,7 +83,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
       });
     });
     afterEach(async () => {
-      await sushiEndpointsService.deleteAll();
+      await sushiEndpointsService.removeAll();
     });
   });
   describe('As user', () => {
@@ -183,11 +183,11 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
     });
 
     afterEach(async () => {
-      await sushiEndpointsService.deleteAll();
+      await sushiEndpointsService.removeAll();
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersService.removeAll();
     });
   });
   describe('Without token', () => {
@@ -220,10 +220,10 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
       });
     });
     afterEach(async () => {
-      await sushiEndpointsService.deleteAll();
+      await sushiEndpointsService.removeAll();
     });
   });
   afterAll(async () => {
-    await sushiEndpointsService.deleteAll();
+    await sushiEndpointsService.removeAll();
   });
 });

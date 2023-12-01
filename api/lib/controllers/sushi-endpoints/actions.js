@@ -1,5 +1,5 @@
-const { adminImportSchema } = require('../../entities/sushi-endpoint.dto');
-const sushiEndpointService = require('../../entities/sushi-endpoint.service');
+const { adminImportSchema } = require('../../entities/sushi-endpoints.dto');
+const sushiEndpointService = require('../../entities/sushi-endpoints.service');
 
 exports.getAll = async (ctx) => {
   const {
