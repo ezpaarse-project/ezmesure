@@ -16,53 +16,44 @@
         v-model="formIsValid"
         @submit.prevent="createRepository"
       >
-        <template v-if="institutionId">
-          <v-autocomplete
-            v-model="selectedRepository"
-            :items="availableRepositories"
-            :label="$t('repositories.repositories')"
-            :search-input.sync="repositoriesSearch"
-            :loading="loadingRepositories"
-            item-text="pattern"
-            hide-no-data
-            hide-details
-            clearable
-            outlined
-            return-object
-          >
-            <template #item="{ item }">
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ item.pattern }}
-                </v-list-item-title>
+        <v-combobox
+          :value="selectedRepository"
+          :items="availableRepositories"
+          :label="`${$t('repositories.pattern')} *`"
+          :rules="[v => !!v || $t('fieldIsRequired')]"
+          :search-input.sync="repositoryPattern"
+          :loading="loadingRepositories"
+          item-text="pattern"
+          hide-no-data
+          clearable
+          outlined
+          autofocus
+          required
+          return-object
+          @change="selectRepo"
+        >
+          <template #item="{ item }">
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ item.pattern }}
+              </v-list-item-title>
 
-                <v-list-item-subtitle>
-                  {{ item.type }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-            </template>
-          </v-autocomplete>
+              <v-list-item-subtitle>
+                {{ item.type }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </v-combobox>
 
-          <v-divider v-if="!repositoriesSearch" class="my-4" />
-        </template>
-
-        <template v-if="!repositoriesSearch">
-          <v-text-field
-            v-model="repositoryPattern"
-            :label="`${$t('repositories.pattern')} *`"
-            :rules="[v => !!v || $t('fieldIsRequired')]"
-            outlined
-            autofocus
-            required
-          />
-          <v-select
-            v-model="repositoryType"
-            :items="repositoryTypes"
-            :label="$t('repositories.type')"
-            outlined
-            hide-details
-          />
-        </template>
+        <v-select
+          :value="selectedRepository?.type || repositoryType"
+          :items="repositoryTypes"
+          :label="$t('repositories.type')"
+          :disabled="selectedRepository?.pattern === repositoryPattern"
+          outlined
+          hide-details
+          @change="repositoryType = $event"
+        />
       </v-form>
     </v-card-text>
 
@@ -109,7 +100,6 @@ export default {
     repositoryType: 'ezpaarse',
     selectedRepository: null,
 
-    repositoriesSearch: '',
     loadingRepositories: false,
     availableRepositories: [],
 
@@ -122,8 +112,8 @@ export default {
     loading(val) {
       this.$emit('loading', val);
     },
-    repositoriesSearch(newValue) {
-      if (newValue) {
+    repositoryPattern(newValue) {
+      if (newValue && this.institutionId) {
         this.queryRepositories(newValue);
       }
     },
@@ -133,14 +123,20 @@ export default {
       this.$refs.creationForm?.resetValidation?.();
       this.repositoryPattern = '';
       this.repositoryType = 'ezpaarse';
-      this.repositoriesSearch = '';
       this.selectedRepository = null;
+    },
+
+    selectRepo(repo) {
+      this.selectedRepository = repo;
+      if (repo?.type) {
+        this.repositoryType = repo.type;
+      }
     },
 
     queryRepositories: debounce(async function queryRepositories() {
       this.loadingRepositories = true;
       try {
-        this.availableRepositories = await this.$axios.$get('/repositories', { params: { q: this.repositoriesSearch } });
+        this.availableRepositories = await this.$axios.$get('/repositories', { params: { q: this.repositoryPattern } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('searchFailed'));
       }
@@ -154,14 +150,9 @@ export default {
       try {
         let newRepository;
         if (this.institutionId) {
-          const repo = this.selectedRepository ?? {
-            pattern: this.repositoryPattern,
-            type: this.repositoryType,
-          };
-
           newRepository = await this.$axios.$put(
-            `/institutions/${this.institutionId}/repositories/${repo.pattern}`,
-            { type: repo.type },
+            `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
+            { type: this.repositoryType },
           );
         } else {
           newRepository = await this.$axios.$post(
