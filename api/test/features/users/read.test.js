@@ -9,6 +9,7 @@ const usersService = require('../../../lib/entities/users.service');
 
 const { createUserAsAdmin } = require('../../setup/users');
 const { getAdminToken, getToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[users]: Test read users features', () => {
   const userTest = {
@@ -21,6 +22,7 @@ describe('[users]: Test read users features', () => {
   let adminToken;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
@@ -296,5 +298,8 @@ describe('[users]: Test read users features', () => {
         await usersService.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

@@ -126,7 +126,7 @@ async function remove(params) {
  */
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
-  const memberships = await this.findMany({});
+  const memberships = await findMany({});
 
   await Promise.all(memberships.map(async (membership) => {
     await remove({

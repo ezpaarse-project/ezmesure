@@ -17,6 +17,7 @@ const {
 } = require('../../setup/users');
 
 const { getToken, getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[sushi]: Test update sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
@@ -92,6 +93,7 @@ describe('[sushi]: Test update sushi credential features', () => {
   let adminToken;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
     const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
@@ -576,6 +578,6 @@ describe('[sushi]: Test update sushi credential features', () => {
     });
   });
   afterAll(async () => {
-    await sushiEndpointsService.removeAll();
+    await resetDatabase();
   });
 });

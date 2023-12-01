@@ -103,10 +103,10 @@ async function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const spaces = await this.findMany({});
+  const spaces = await findMany({});
 
   await Promise.all(spaces.map(async (space) => {
-    await this.delete({
+    await remove({
       where: {
         id: space.id,
       },

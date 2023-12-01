@@ -10,6 +10,7 @@ const {
   createDefaultActivatedUserAsAdmin,
   createDefaultUserAsAdmin,
 } = require('../../setup/users');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[users]: Test login users features', () => {
   const userTest = {
@@ -19,6 +20,10 @@ describe('[users]: Test login users features', () => {
     isAdmin: false,
     password: 'changeme',
   };
+
+  beforeAll(async () => {
+    await resetDatabase();
+  });
   describe('Login with admin account', () => {
     it('#01 Should get auth token', async () => {
       const httpAppResponse = await ezmesure({
@@ -93,5 +98,8 @@ describe('[users]: Test login users features', () => {
 
       expect(httpAppResponse).toHaveProperty('status', 401);
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

@@ -5,6 +5,7 @@ const sushiEndpointsService = require('../../../lib/entities/sushi-endpoints.ser
 
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
   const sushiEndpointTest = {
@@ -26,6 +27,7 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
 
   let adminToken;
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
@@ -158,5 +160,8 @@ describe('[sushi-endpoint]: Test create sushi-endpoints features', () => {
         expect(sushiEndpointsFromService).toEqual([]);
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

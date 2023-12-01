@@ -4,6 +4,7 @@ const usersService = require('../../../lib/entities/users.service');
 
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getAdminToken, getToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[institutions]: Test delete features', () => {
   const institutionTest = {
@@ -13,6 +14,7 @@ describe('[institutions]: Test delete features', () => {
   let adminToken;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
@@ -143,5 +145,8 @@ describe('[institutions]: Test delete features', () => {
     afterAll(async () => {
       await institutionsService.removeAll();
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

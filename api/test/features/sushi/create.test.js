@@ -9,6 +9,7 @@ const membershipsService = require('../../../lib/entities/memberships.service');
 const { createInstitution } = require('../../setup/institutions');
 const { createDefaultActivatedUserAsAdmin, createUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[sushi]: Test create sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
@@ -74,6 +75,7 @@ describe('[sushi]: Test create sushi credential features', () => {
   let sushiEndpointId;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
     const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
@@ -501,6 +503,6 @@ describe('[sushi]: Test create sushi credential features', () => {
     });
   });
   afterAll(async () => {
-    await sushiEndpointsService.removeAll();
+    await resetDatabase();
   });
 });

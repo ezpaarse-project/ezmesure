@@ -176,7 +176,7 @@ async function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const repositories = await this.findMany({});
+  const repositories = await findMany({});
 
   await Promise.all(repositories.map(async (repository) => {
     await remove({

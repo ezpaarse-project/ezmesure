@@ -4,6 +4,7 @@ const usersService = require('../../../lib/entities/users.service');
 
 const { createUserAsAdmin } = require('../../setup/users');
 const { getUserTokenForActivate } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[users]: Test activate users features', () => {
   const userTest = {
@@ -17,6 +18,10 @@ describe('[users]: Test activate users features', () => {
     password: 'changeme',
     acceptTerms: true,
   };
+
+  beforeAll(async () => {
+    await resetDatabase();
+  });
   describe('As user', () => {
     describe(`activate new user [${userTest.username}] with user-test token`, () => {
       let userToken;
@@ -60,5 +65,8 @@ describe('[users]: Test activate users features', () => {
         await usersService.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

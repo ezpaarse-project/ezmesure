@@ -1,5 +1,6 @@
 const ezmesure = require('../../setup/ezmesure');
 
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 const institutionsService = require('../../../lib/entities/institutions.service');
 const usersService = require('../../../lib/entities/users.service');
 
@@ -15,6 +16,7 @@ describe('[institutions]: Test create features', () => {
   let adminToken;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
   });
 
@@ -200,5 +202,9 @@ describe('[institutions]: Test create features', () => {
     afterAll(async () => {
       await institutionsService.removeAll();
     });
+  });
+
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

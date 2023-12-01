@@ -9,6 +9,7 @@ const repositoryPermissionsService = require('../../../../lib/entities/repositor
 const { getToken, getAdminToken } = require('../../../setup/login');
 
 const { createUserAsAdmin } = require('../../../setup/users');
+const { resetDatabase } = require('../../../../lib/services/prisma/utils');
 
 describe('[repository permission]: Test delete features', () => {
   const allPermission = ['memberships:write', 'memberships:read'];
@@ -54,6 +55,7 @@ describe('[repository permission]: Test delete features', () => {
   describe('As admin', () => {
     let adminToken;
     beforeAll(async () => {
+      await resetDatabase();
       adminToken = await getAdminToken();
     });
 
@@ -126,5 +128,8 @@ describe('[repository permission]: Test delete features', () => {
         await institutionsService.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

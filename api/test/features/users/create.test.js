@@ -7,6 +7,7 @@ const ezmesure = require('../../setup/ezmesure');
 const usersService = require('../../../lib/entities/users.service');
 
 const { getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[users]: Test create users features', () => {
   const userTest = {
@@ -15,6 +16,10 @@ describe('[users]: Test create users features', () => {
     fullName: 'User test',
     isAdmin: false,
   };
+
+  beforeAll(async () => {
+    await resetDatabase();
+  });
   describe('As admin', () => {
     describe(`Create new user [${userTest.username}]`, () => {
       let adminToken;
@@ -94,5 +99,8 @@ describe('[users]: Test create users features', () => {
         expect(usersFromService).toEqual([]);
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

@@ -137,6 +137,8 @@ module.exports = class InstitutionsService {
   static async delete(params) {
     const data = await institutionsPrisma.remove(params);
 
+    if (!data) return null;
+
     const {
       deletedInstitution,
       deletedRepos,

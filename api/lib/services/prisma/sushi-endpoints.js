@@ -103,7 +103,7 @@ async function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const sushiEndpoints = await this.findMany({});
+  const sushiEndpoints = await findMany({});
 
   await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
     await remove({

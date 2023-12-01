@@ -90,10 +90,10 @@ async function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const permissions = await this.findMany({});
+  const permissions = await findMany({});
 
   await Promise.all(permissions.map(async (permission) => {
-    await this.remove({
+    await remove({
       where: {
         username_institutionId_repositoryPattern: {
           username: permission.username,

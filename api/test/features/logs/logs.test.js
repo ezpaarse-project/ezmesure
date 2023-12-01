@@ -9,19 +9,22 @@ const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken } = require('../../setup/login');
 
 const { getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+
+const logDir = path.resolve(__dirname, '..', '..', 'sources', 'log');
 
 describe('[logs]: Test insert features', () => {
   const indexName = 'index-text';
   describe('As admin', () => {
     let adminToken;
     beforeAll(async () => {
+      await resetDatabase();
       adminToken = await getAdminToken();
       await indicesService.create(indexName, null, { ignore: [404] });
     });
     describe(`Add [wiley.csv] in [${indexName}] index`, () => {
-      // FIXME, test break after 2 times
       it(`#01 Should upload ec in index [${indexName}]`, async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+        const pathFile = path.resolve(logDir, 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
           method: 'POST',
@@ -66,7 +69,7 @@ describe('[logs]: Test insert features', () => {
       });
 
       it(`#02 Should not upload ec in index [${indexName}]`, async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+        const pathFile = path.resolve(logDir, 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
           method: 'POST',
@@ -91,7 +94,7 @@ describe('[logs]: Test insert features', () => {
       });
 
       it(`#03 Should not upload ec in index [${indexName}]`, async () => {
-        const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+        const pathFile = path.resolve(logDir, 'wiley.csv');
 
         const httpAppResponse = await ezmesure({
           method: 'POST',
@@ -119,7 +122,7 @@ describe('[logs]: Test insert features', () => {
     });
 
     it(`#04 Should not upload ec in index [${indexName}]`, async () => {
-      const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+      const pathFile = path.resolve(logDir, 'wiley.csv');
 
       const httpAppResponse = await ezmesure({
         method: 'POST',
@@ -143,7 +146,7 @@ describe('[logs]: Test insert features', () => {
     });
 
     it(`#05 Should not upload ec in index [${indexName}]`, async () => {
-      const pathFile = path.resolve(__dirname, '..', '..', 'sources', 'wiley.csv');
+      const pathFile = path.resolve(logDir, 'wiley.csv');
 
       const httpAppResponse = await ezmesure({
         method: 'POST',
@@ -157,5 +160,8 @@ describe('[logs]: Test insert features', () => {
     afterAll(async () => {
       await indicesService.removeAll();
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

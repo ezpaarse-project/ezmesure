@@ -78,10 +78,10 @@ function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const sushiCredentials = await this.findMany({});
+  const sushiCredentials = await findMany({});
 
   await Promise.all(sushiCredentials.map(async (sushiCredential) => {
-    await this.remove({
+    await remove({
       where: {
         id: sushiCredential.id,
       },

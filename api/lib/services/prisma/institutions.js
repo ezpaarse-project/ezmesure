@@ -185,10 +185,10 @@ async function remove(params) {
 async function removeAll() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
-  const institutions = await this.findMany({});
+  const institutions = await findMany({});
 
   await Promise.all(institutions.map(async (institution) => {
-    await this.delete({
+    await remove({
       where: {
         id: institution.id,
       },

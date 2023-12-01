@@ -6,6 +6,7 @@ const { createInstitution } = require('../../setup/institutions');
 
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[institutions]: Test update features', () => {
   const institutionTest = {
@@ -20,6 +21,7 @@ describe('[institutions]: Test update features', () => {
   let adminToken;
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
   });
 
@@ -301,5 +303,8 @@ describe('[institutions]: Test update features', () => {
     afterAll(async () => {
       await institutionsService.removeAll();
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

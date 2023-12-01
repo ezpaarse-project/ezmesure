@@ -7,6 +7,7 @@ const usersService = require('../../../lib/entities/users.service');
 const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 const { createRepositoryAsAdmin } = require('../../setup/repositories');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
 describe('[repositories]: Test read features', () => {
   const ezpaarseRepositoryConfig = {
@@ -26,6 +27,7 @@ describe('[repositories]: Test read features', () => {
   describe('As admin', () => {
     let adminToken;
     beforeAll(async () => {
+      await resetDatabase();
       adminToken = await getAdminToken();
     });
     describe(`Get repository of type [${ezcounterRepositoryConfig.type}]`, () => {
@@ -147,5 +149,8 @@ describe('[repositories]: Test read features', () => {
         await repositoriesService.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
   });
 });

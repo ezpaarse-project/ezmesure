@@ -6,6 +6,7 @@ const usersService = require('../../../../lib/entities/users.service');
 
 const { createUserAsAdmin, activateUser } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
+const { resetDatabase } = require('../../../../lib/services/prisma/utils');
 
 describe('[institutions - memberships]: Test update memberships features', () => {
   let adminToken;
@@ -45,6 +46,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
   const emptyPermission = [];
 
   beforeAll(async () => {
+    await resetDatabase();
     adminToken = await getAdminToken();
 
     const institution = await institutionsService.create({ data: institutionTest });
@@ -369,7 +371,6 @@ describe('[institutions - memberships]: Test update memberships features', () =>
     });
   });
   afterAll(async () => {
-    await usersService.removeAll();
-    await institutionsService.removeAll();
+    await resetDatabase();
   });
 });
