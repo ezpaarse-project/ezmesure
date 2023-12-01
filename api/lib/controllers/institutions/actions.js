@@ -139,7 +139,6 @@ exports.createInstitution = async (ctx) => {
     institutionName: body?.name,
   };
 
-  const base64logo = body?.logo;
   const schema = isAdmin ? adminCreateSchema : createSchema;
   const { error, value: institutionData } = schema.validate(body);
 
@@ -156,8 +155,8 @@ exports.createInstitution = async (ctx) => {
     };
   }
 
-  if (base64logo) {
-    institutionData.logoId = await imagesService.storeLogo(base64logo);
+  if (body?.logo) {
+    institutionData.logoId = await imagesService.storeLogo(body.logo);
   }
 
   const institution = await institutionsService.create({
@@ -305,13 +304,11 @@ exports.importInstitutions = async (ctx) => {
       }
     }
 
-    const base64logo = item.logo;
-
     /** @type {InstitutionCreateInput} */
     const institutionData = {
       ...item,
       logo: undefined,
-      logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+      logoId: item.logo ? await imagesService.storeLogo(item.logo) : item.logoId,
 
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
