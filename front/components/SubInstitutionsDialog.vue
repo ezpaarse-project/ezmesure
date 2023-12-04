@@ -34,8 +34,11 @@ export default {
   },
   watch: {
     show(visible) {
-      if (!visible && this.hasChanged) {
-        this.$emit('updated');
+      if (!visible) {
+        this.institution = null;
+        if (this.hasChanged) {
+          this.$emit('updated');
+        }
       }
     },
   },
