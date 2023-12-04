@@ -63,7 +63,6 @@ const immutableFields = [
   'id',
   'updatedAt',
   'createdAt',
-  'logoId',
   'parentInstitution',
   'memberships',
   'spaces',
