@@ -532,6 +532,9 @@ function getExceptions(sushiResponse) {
   if (sushiResponse.Exception) {
     exceptions.push(sushiResponse.Exception);
   }
+  if (Array.isArray(sushiResponse.Exceptions)) {
+    exceptions.push(...sushiResponse.Exceptions);
+  }
 
   return exceptions.map((e) => normalizeException(e));
 }
