@@ -157,18 +157,32 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip
-          label
-          small
-          :color="item.validated ? 'success' : 'default'"
-          outlined
+        <ConfirmPopover
+          :message="$t('areYouSure')"
+          :agree-text="$t('confirm')"
+          bottom
+          right
+          offset-y
+          @agree="toggleValidationOfInstitution(item)"
         >
-          {{
-            item.validated
-              ? $t('institutions.institution.validated')
-              : $t('institutions.institution.notValidated')
-          }}
-        </v-chip>
+          <template #activator="{ on, attrs }">
+            <v-switch
+              :input-value="item.validated"
+              :label="item.validated
+                  ? $t('institutions.institution.validated')
+                  : $t('institutions.institution.notValidated')"
+              :loading="loadingMap[item.id]"
+              readonly
+              hide-details
+              role="switch"
+              class="mt-0"
+              dense
+              style="transform: scale(0.8);"
+              v-bind="attrs"
+              v-on="on"
+            />
+          </template>
+        </ConfirmPopover>
       </template>
 
       <template #[`item.monitor`]="{ item }">
@@ -310,6 +324,7 @@ import RepositoriesDialog from '~/components/RepositoriesDialog.vue';
 import SpacesDialog from '~/components/SpacesDialog.vue';
 import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 import InstitutionsFiltersDrawer from '~/components/institutions/InstitutionsFiltersDrawer.vue';
+import ConfirmPopover from '~/components/ConfirmPopover.vue';
 
 const iconDefMap = new Map([
   [
@@ -356,6 +371,7 @@ export default {
     SpacesDialog,
     SubInstitutionsDialog,
     InstitutionsFiltersDrawer,
+    ConfirmPopover,
   },
   data() {
     return {
@@ -366,6 +382,7 @@ export default {
       logo: null,
       logoPreview: null,
       institutions: [],
+      loadingMap: {},
       selectedTableHeaders: [
         'name',
         'acronym',
@@ -849,6 +866,24 @@ export default {
       }
 
       this.refreshing = false;
+      this.loadingMap = {};
+    },
+
+    async toggleValidationOfInstitution(item) {
+      this.loadingMap = {...this.loadingMap, [item.id]: true};
+
+      const value = !item.validated;
+      await this.$axios.$put(
+        `/institutions/${item.id}/validated`,
+        { value }
+      );
+
+      const index = this.institutions.findIndex((i) => i.id === item.id);
+      if (index >= 0) {
+        this.institutions.splice(index, 1, { ...item, validated: value });
+      }
+
+      this.loadingMap = {...this.loadingMap, [item.id]: false};
     },
 
     editInstitution(item) {
