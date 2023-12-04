@@ -213,7 +213,7 @@
     "paramSeparator": "Séparateur",
     "queryParameters": "Paramètres de la query",
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
-    "deleteNbEndpoints": "Vous allez supprimer {number} points d'accès.",
+    "deleteNbEndpoints": "Vous allez supprimer {count} point d'accès.|Vous allez supprimer {count} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
@@ -221,7 +221,10 @@
     "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
-    "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "deleteNbInstitutions": {
+      "text": "Vous allez supprimer {count} établissement. {affected}|Vous allez supprimer {count} établissements. {affected}",
+      "affected": "Les espaces, et rôles associés seront aussi supprimés. Les index, quant à eux, ne seront pas affectés. Cette action est irréversible."
+    },
     "newInstitution": "Nouvel établissement",
     "notMember": "Vous n'appartenez pas encore à un établissement.",
     "declareMyInstitution": "Déclarer mon établissement",
@@ -535,7 +538,7 @@
     "nInvalidCredentials": "1 identifiant invalide | {count} identifiants invalides",
     "nOperationalCredentials": "1 identifiant fonctionnel | {count} identifiants fonctionnels",
     "nProblematicEndpoints": "1 point d'accès problématique | {count} points d'accès problématiques",
-    "deleteNbCredentials": "Vous allez supprimer {number} identifiants SUSHI.",
+    "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
     "harvestState": "État du moissonnage",
@@ -643,7 +646,7 @@
   "users": {
     "toolbarTitle": "Utilisateurs ({count})",
     "updateUser": "Mettre à jour l'utilisateur",
-    "deleteNbUsers": "Vous allez supprimer {number} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "deleteNbUsers": "Vous allez supprimer {count} utilisateur. Les index, espaces, et rôles associés ne seront pas affectés.|Vous allez supprimer {count} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
     "newUser": "Nouvel utilisateur",
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
@@ -688,7 +691,7 @@
     "institutions": "Établissements",
     "institutionsCount": "{count} établissement|{count} établissements",
     "noInstitutions": "Aucun établissement n'utilise cet entrepôt",
-    "deleteNbRepositories": "Vous allez supprimer {number} entrepôts.",
+    "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts.",
     "filters": {
       "title": "Filtrer les entrepôts"
     }
@@ -706,7 +709,8 @@
     "descriptions": {
       "ezpaarse": "Espace ezPAARSE",
       "counter5": "Espace éditeurs"
-    }
+    },
+    "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
   },
   "permissions": {
     "none": "Aucun",

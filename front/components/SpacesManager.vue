@@ -62,28 +62,17 @@
                 </template>
               </SpaceFormMenu>
 
-              <ConfirmPopover
-                :message="$t('areYouSure')"
-                :agree-text="$t('delete')"
-                bottom
-                right
-                offset-y
-                @agree="deleteSpace(space.id)"
+              <v-btn
+                :loading="deleting[space.id]"
+                small
+                text
+                @click="deleteSpace(space.id)"
               >
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    :loading="deleting[space.id]"
-                    small text
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <v-icon left>
-                      mdi-delete
-                    </v-icon>
-                    {{ $t('delete') }}
-                  </v-btn>
-                </template>
-              </ConfirmPopover>
+                <v-icon left>
+                  mdi-delete
+                </v-icon>
+                {{ $t('delete') }}
+              </v-btn>
             </template>
           </SpaceCard>
         </v-col>
@@ -102,17 +91,19 @@
     </v-card-text>
 
     <slot name="actions" />
+
+    <ConfirmDialog ref="confirmDialog" />
   </v-card>
 </template>
 
 <script>
 import SpaceCard from '~/components/SpaceCard.vue';
 import SpaceFormMenu from '~/components/SpaceFormMenu.vue';
-import ConfirmPopover from '~/components/ConfirmPopover.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
   components: {
-    ConfirmPopover,
+    ConfirmDialog,
     SpaceFormMenu,
     SpaceCard,
   },
@@ -190,6 +181,16 @@ export default {
     },
 
     async deleteSpace(spaceId) {
+      const spaceName = this.spaces.find((s) => s.id === spaceId)?.name || spaceId;
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$t('spaces.deleteSpace', { spaceName }),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) { return; }
+
       this.$set(this.deleting, spaceId, true);
       this.errorMessage = '';
 

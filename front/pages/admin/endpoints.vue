@@ -49,8 +49,6 @@
       @update="refreshSushiEndpoints"
     />
 
-    <EndpointsDeleteDialog ref="deleteDialog" @removed="onEndpointsRemove" />
-
     <v-menu nudge-width="100" style="z-index:100" top offset-y>
       <template #activator="{ on, attrs }">
         <v-slide-y-reverse-transition>
@@ -105,7 +103,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :disabled="deleting" @click="deleteEndpoints">
+        <v-list-item :disabled="deleting" @click="deleteEndpoints()">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
@@ -209,6 +207,8 @@
         </v-menu>
       </template>
     </v-data-table>
+
+    <ConfirmDialog ref="confirmDialog" />
   </section>
 </template>
 
@@ -216,7 +216,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
-import EndpointsDeleteDialog from '~/components/EndpointsDeleteDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
   layout: 'space',
@@ -225,7 +225,7 @@ export default {
     ToolBar,
     EndpointForm,
     EndpointDetails,
-    EndpointsDeleteDialog,
+    ConfirmDialog,
   },
   data() {
     return {
@@ -353,11 +353,63 @@ export default {
       this.selected = [];
     },
 
-    deleteEndpoints() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
-    },
+    async deleteEndpoints(items) {
+      const endpoints = items || this.selected;
+      if (endpoints.length === 0) {
+        return;
+      }
 
-    onEndpointsRemove(removedIds) {
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc(
+          'endpoints.deleteNbEndpoints',
+          endpoints.length,
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+      this.removing = true;
+
+      const requests = endpoints.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/sushi-endpoints/${item.id}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
+        }
+        return { item, deleted };
+      });
+
+      const results = await Promise.all(requests);
+
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
+      }
+
+      this.removing = false;
+      this.show = false;
+      const removedIds = deleted.map((d) => d.id);
+
       const removeDeleted = (endpoint) => !removedIds.some((id) => endpoint.id === id);
       this.endpoints = this.endpoints.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);

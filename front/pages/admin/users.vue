@@ -20,7 +20,7 @@
           {{ $t('users.createMailUserList') }}
         </v-btn>
 
-        <v-btn text @click="deleteUsers">
+        <v-btn text @click="deleteUsers()">
           <v-icon left>
             mdi-delete
           </v-icon>
@@ -136,8 +136,8 @@
       </template>
     </v-data-table>
 
+    <ConfirmDialog ref="confirmDialog" />
     <UserForm ref="userForm" @update="refreshUsers" />
-    <UsersDeleteDialog ref="deleteDialog" @removed="onUsersRemove" />
     <UsersFiltersDrawer
       v-model="filters"
       :show.sync="showUsersFiltersDrawer"
@@ -153,9 +153,9 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import UserForm from '~/components/users/UserForm.vue';
-import UsersDeleteDialog from '~/components/users/UsersDeleteDialog.vue';
 import UsersFiltersDrawer from '~/components/users/UsersFiltersDrawer.vue';
 import MembershipsDialog from '~/components/users/MembershipsDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
   layout: 'space',
@@ -163,9 +163,9 @@ export default {
   components: {
     ToolBar,
     UserForm,
-    UsersDeleteDialog,
     MembershipsDialog,
     UsersFiltersDrawer,
+    ConfirmDialog,
   },
   data() {
     return {
@@ -435,7 +435,64 @@ export default {
     createUser() {
       this.$refs.userForm.createUser({ addAsMember: false });
     },
-    onUsersRemove(removedIds) {
+    async deleteUsers(items) {
+      const users = items || this.selected;
+      if (users.length === 0) {
+        return;
+      }
+
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc(
+          'users.deleteNbUsers',
+          users.length,
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.removing = true;
+
+      const requests = users.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/users/${item.username}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
+        }
+        return { item, deleted };
+      });
+
+      const results = await Promise.all(requests);
+
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.fullName || item.username }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
+      }
+
+      this.removing = false;
+      this.show = false;
+      const removedIds = deleted.map((d) => d.username);
+
       const removeDeleted = (user) => !removedIds.some((username) => user.username === username);
       this.users = this.users.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
@@ -452,9 +509,6 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('idCopied'));
-    },
-    deleteUsers() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
     },
     clearSelection() {
       this.selected = [];

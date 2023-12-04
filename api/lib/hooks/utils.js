@@ -20,7 +20,7 @@ const generateRoleNameFromRepository = (repository, modifier) => `repository.${r
 /**
  * Generate all Elasticsearch roles for a given username, based on the associated memberships
  * @param {string} username - The username of the user we want to generate roles for
- * @returns {string[]} all roles for the user
+ * @returns {Promise<string[]>} all roles for the user
  */
 const generateUserRoles = async (username) => {
   const user = await prisma.user.findUnique({
@@ -43,7 +43,11 @@ const generateUserRoles = async (username) => {
     },
   });
 
-  const roles = new Set(user?.memberships?.flatMap?.((membership) => {
+  if (!user) {
+    return [];
+  }
+
+  const roles = new Set(user.memberships?.flatMap?.((membership) => {
     const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
 
