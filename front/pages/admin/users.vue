@@ -92,7 +92,8 @@
 
       <template #[`item.memberships`]="{ item }">
         <v-chip
-          v-if="Array.isArray(item.memberships) && item.memberships.length > 0"
+          v-if="Array.isArray(item.memberships)"
+          :outlined="item.memberships?.length <= 0"
           small
           class="elevation-1"
           @click="$refs.membershipsDialog.display(item)"
