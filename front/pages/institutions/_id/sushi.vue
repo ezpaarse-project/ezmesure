@@ -542,10 +542,10 @@ export default {
     },
     availableSushiStatuses() {
       return [
-        { text: this.$t('institutions.sushi.untested'), value: 'untested' },
-        { text: this.$t('institutions.sushi.operational'), value: 'success' },
-        { text: this.$t('institutions.sushi.invalidCredentials'), value: 'unauthorized' },
-        { text: this.$t('error'), value: 'failed' },
+        { text: this.$t('institutions.sushi.untested'), value: 'untested', order: 0 },
+        { text: this.$t('institutions.sushi.operational'), value: 'success', order: 3 },
+        { text: this.$t('institutions.sushi.invalidCredentials'), value: 'unauthorized', order: 2 },
+        { text: this.$t('error'), value: 'failed', order: 1 },
       ];
     },
     tableHeaders() {
@@ -553,12 +553,7 @@ export default {
         {
           text: this.$t('institutions.sushi.endpoint'),
           value: 'endpoint.vendor',
-          sort: (a, b) => {
-            const vendor1 = a?.toLowerCase?.();
-            const vendor2 = b?.toLowerCase?.();
-
-            return vendor1 > vendor2 ? 1 : -1;
-          },
+          sort: (a, b) => a?.localeCompare?.(b, this.$i18n.locale, { sensitivity: 'base' }),
         },
         {
           text: this.$t('institutions.sushi.tags'),
@@ -571,6 +566,12 @@ export default {
           value: 'connection',
           align: 'right',
           width: '160px',
+          sort: (a, b) => {
+            const status1 = this.availableSushiStatuses.find((status) => status.value === a.status);
+            const status2 = this.availableSushiStatuses.find((status) => status.value === b.status);
+
+            return (status1?.order ?? 0) - (status2?.order ?? 0);
+          },
           filter: (value) => {
             if (this.filters.sushiStatuses.length === 0) {
               return true;
