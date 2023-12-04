@@ -180,6 +180,7 @@
               hide-details
               role="switch"
               class="mt-0"
+              dense
               style="transform: scale(0.8);"
               v-bind="attrs"
               v-on="on"
@@ -883,7 +884,7 @@ export default {
 
       const index = this.institutions.findIndex((i) => i.id === item.id);
       if (index >= 0) {
-        this.institutions.splice(index, 1, { ...item, validated: value })
+        this.institutions.splice(index, 1, { ...item, validated: value });
       }
 
       this.loadingMap = {...this.loadingMap, [item.id]: false};
