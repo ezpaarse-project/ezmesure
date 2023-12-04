@@ -47,3 +47,7 @@ registerHook('membership:create', onMembershipUpsert, hookOptions);
 registerHook('membership:update', onMembershipUpsert, hookOptions);
 registerHook('membership:upsert', onMembershipUpsert, hookOptions);
 registerHook('membership:delete', onMembershipDelete, hookOptions);
+
+module.exports = {
+  onMembershipUpsert,
+};

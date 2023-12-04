@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn text @click="deleteRepos">
+        <v-btn text @click="deleteRepositories()">
           <v-icon left>
             mdi-delete
           </v-icon>
@@ -132,7 +132,7 @@
           </template>
 
           <v-list>
-            <v-list-item @click="deleteRepo(item)">
+            <v-list-item @click="deleteRepositories([item])">
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
@@ -147,7 +147,7 @@
       </template>
     </v-data-table>
 
-    <RepositoriesDeleteDialog ref="deleteDialog" @removed="onReposRemove" />
+    <ConfirmDialog ref="confirmDialog" />
     <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" />
     <ReposFiltersDrawer
       v-model="filters"
@@ -162,7 +162,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import RepositoriesInstitutionsDialog from '~/components/repositories/RepositoriesInstitutionsDialog.vue';
 import RepositoriesCreateForm from '~/components/repositories/RepositoriesCreateForm.vue';
-import RepositoriesDeleteDialog from '~/components/repositories/DeleteDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
 
 export default {
@@ -173,7 +173,7 @@ export default {
     RepositoriesInstitutionsDialog,
     RepositoriesCreateForm,
     ReposFiltersDrawer,
-    RepositoriesDeleteDialog
+    ConfirmDialog,
   },
   data() {
     return {
@@ -362,14 +362,64 @@ export default {
       this.refreshing = false;
     },
 
-    deleteRepo(item) {
-      this.$refs.deleteDialog.confirmDelete([item]);
-    },
-    deleteRepos() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
-    },
-    onReposRemove(removedIds) {
-      const removeDeleted = (repo) => !removedIds.some((id) => repo.id === id);
+    async deleteRepositories(items) {
+      const repositories = items || this.selected;
+      if (repositories.length === 0) {
+        return;
+      }
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc(
+          'repositories.deleteNbRepositories',
+          repositories.length,
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.removing = true;
+
+      const requests = repositories.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/repositories/${item.pattern}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
+        }
+        return { item, deleted };
+      });
+
+      const results = await Promise.all(requests);
+
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.pattern }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
+      }
+
+      this.removing = false;
+      this.show = false;
+      const removedIds = deleted.map((d) => d.pattern);
+
+      const removeDeleted = (repo) => !removedIds.some((pattern) => repo.pattern === pattern);
       this.repos = this.repos.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },
