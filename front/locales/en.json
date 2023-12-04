@@ -246,6 +246,7 @@
     "institution": {
       "title": "My institution",
       "name": "Institution name",
+      "goToPage": "Go to institution's page",
       "members": "Members",
       "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
