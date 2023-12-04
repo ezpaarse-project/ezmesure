@@ -1,60 +1,63 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
-const { getAdminToken, getUserTokenForActivate } = require('../../setup/login');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createUserAsAdmin } = require('../../setup/users');
+const { getUserTokenForActivate } = require('../../setup/login');
 
 describe('[users]: Test activate users features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
+  const data = {
+    password: 'changeme',
+    acceptTerms: true,
+  };
   describe('As user', () => {
-    describe('POST /profile/_activate - activate new user [user.test] with user-test token', () => {
+    describe(`activate new user [${userTest.username}] with user-test token`, () => {
       let userToken;
-      let adminToken;
-      let userTest;
 
       beforeAll(async () => {
-        userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
-        userToken = await getUserTokenForActivate('user.test');
-        adminToken = await getAdminToken();
+        await createUserAsAdmin(
+          userTest.username,
+          userTest.email,
+          userTest.fullName,
+          userTest.isAdmin,
+        );
+        userToken = await getUserTokenForActivate(userTest.username);
       });
 
-      it('Should activate user [user.test]', async () => {
-        const res = await ezmesure({
+      it(`#01 Should activate user [${userTest.username}]`, async () => {
+        const httpAppResponse = await ezmesure({
           method: 'POST',
           url: '/profile/_activate',
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-          data: {
-            password: 'changeme',
-            acceptTerms: true,
-          },
+          data,
         });
 
-        expect(res).toHaveProperty('status', 200);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-      it('Should get user [user.test]', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: '/users/user.test',
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
+        // Test user service
+        const userFromService = await usersService.findByUsername('user.test');
 
-        expect(res).toHaveProperty('status', 200);
-
-        const user = res?.data;
-        expect(user).toHaveProperty('username', 'user.test');
-        expect(user).toHaveProperty('fullName', 'User test');
-        expect(user).toHaveProperty('email', 'user.test@test.fr');
-        expect(user).toHaveProperty('isAdmin', false);
-        expect(user?.createdAt).not.toBeNull();
-        expect(user?.updatedAt).not.toBeNull();
-        expect(user?.metadata).toHaveProperty('acceptedTerms', true);
+        expect(userFromService).toHaveProperty('username', userTest.username);
+        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
+        expect(userFromService).toHaveProperty('email', userTest.email);
+        expect(userFromService).toHaveProperty('isAdmin', false);
+        expect(userFromService?.createdAt).not.toBeNull();
+        expect(userFromService?.updatedAt).not.toBeNull();
+        expect(userFromService?.metadata).toHaveProperty('acceptedTerms', true);
       });
 
       afterAll(async () => {
-        await deleteUserAsAdmin(userTest.username);
+        await usersService.deleteAll();
       });
     });
   });

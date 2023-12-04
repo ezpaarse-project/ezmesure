@@ -106,6 +106,7 @@ export default {
       }
 
       return this.partner.contacts
+        .filter((user) => user.fullName)
         .map(
           (user) => {
             const roles = new Set(user.roles);

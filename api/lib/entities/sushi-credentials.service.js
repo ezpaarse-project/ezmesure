@@ -37,6 +37,14 @@ module.exports = class SushiCredentialssService {
   }
 
   /**
+   * @param {string} id
+   * @returns {Promise<SushiCredentials | null>}
+   */
+  static findByID(id) {
+    return prisma.sushiCredentials.findUnique({ where: { id } });
+  }
+
+  /**
    * @param {SushiCredentialsUpdateArgs} params
    * @returns {Promise<SushiCredentials>}
    */
@@ -63,5 +71,24 @@ module.exports = class SushiCredentialssService {
       }
       throw e;
     });
+  }
+
+  /**
+   * @returns {Promise<Array<SushiCredentials> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const sushiCredentials = await this.findMany({});
+
+    await Promise.all(sushiCredentials.map(async (sushiCredential) => {
+      await this.delete({
+        where: {
+          id: sushiCredential.id,
+        },
+      });
+    }));
+
+    return sushiCredentials;
   }
 };

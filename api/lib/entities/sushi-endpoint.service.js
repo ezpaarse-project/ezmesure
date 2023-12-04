@@ -38,6 +38,14 @@ module.exports = class SushiEndpointsService {
   }
 
   /**
+   * @param {string} id
+   * @returns {Promise<SushiEndpoint | null>}
+   */
+  static findByID(id) {
+    return prisma.sushiEndpoint.findUnique({ where: { id } });
+  }
+
+  /**
    * @param {SushiEndpointUpdateArgs} params
    * @returns {Promise<SushiEndpoint>}
    */
@@ -88,5 +96,24 @@ module.exports = class SushiEndpointsService {
     deletedEndpoint.credentials.forEach((credentials) => { triggerHooks('sushi_credentials:delete', credentials); });
 
     return deleteResult;
+  }
+
+  /**
+   * @returns {Promise<Array<SushiEndpoint> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const sushiEndpoints = await this.findMany({});
+
+    await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
+      await this.delete({
+        where: {
+          id: sushiEndpoint.id,
+        },
+      });
+    }));
+
+    return sushiEndpoints;
   }
 };

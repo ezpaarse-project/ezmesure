@@ -49,12 +49,36 @@ module.exports = class RepositoriesService {
   }
 
   /**
+   * @param {string} pattern
+   * @returns {Promise<Repository | null>}
+   */
+  static findByPattern(pattern) {
+    return prisma.repository.findUnique({ where: { pattern } });
+  }
+
+  /**
    * @param {RepositoryUpdateArgs} params
    * @returns {Promise<Repository>}
    */
   static async update(params) {
     const repository = await prisma.repository.update(params);
     triggerHooks('repository:update', repository);
+    return repository;
+  }
+
+  /**
+   *
+   * @param {string} pattern
+   * @param {string} institutionId
+   */
+  static async connectInstitution(pattern, institutionId) {
+    const repository = await prisma.repository.update({
+      where: { pattern },
+      data: { institutions: { connect: { id: institutionId } } },
+    });
+
+    triggerHooks('repository:update', repository);
+
     return repository;
   }
 
@@ -160,5 +184,24 @@ module.exports = class RepositoriesService {
     oldRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
 
     return newRepository;
+  }
+
+  /**
+   * @returns {Promise<Array<Repository> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const repositories = await this.findMany({});
+
+    await Promise.all(repositories.map(async (repository) => {
+      await this.delete({
+        where: {
+          pattern: repository.pattern,
+        },
+      });
+    }));
+
+    return repositories;
   }
 };

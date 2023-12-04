@@ -39,15 +39,18 @@
   },
   "myspace": {
     "title": "Mon Profil",
-    "noRoles": "Aucun rôle n'est encore associé à votre compte.",
-    "determineAccesRight": "Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.",
+    "noMemberships": "Vous ne faites partie d'aucun établissement.",
+    "determineAccessRight": "Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.",
     "name": "Nom",
     "mail": "Mail",
     "idp": "IDP",
     "organization": "Organisation",
     "unit": "Unité",
-    "yourRights": "Vos rôles",
-    "whatDoesRoles": "Ces rôles définissent vos droits d'accès aux données et aux tableaux de bord hébergés sur ezMESURE."
+    "yourRights": "Vos accès",
+    "whatDoesMemberships": "Vos droits d'accès aux données et aux tableaux de bord hébergés sur ezMESURE.",
+    "infos": "Vos informations",
+    "repos": "Vos entrepôts",
+    "spaces": "Vos espaces"
   },
   "files": {
     "title": "Mes dépots",
@@ -246,6 +249,7 @@
     "institution": {
       "title": "Mon établissement",
       "name": "Nom établissement",
+      "goToPage": "Aller à la page de l'établissement",
       "members": "Membres",
       "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
@@ -686,7 +690,11 @@
     "type": "Type",
     "institutions": "Établissements",
     "institutionsCount": "{count} établissement|{count} établissements",
-    "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts."
+    "noInstitutions": "Aucun établissement n'utilise cet entrepôt",
+    "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts.",
+    "filters": {
+      "title": "Filtrer les entrepôts"
+    }
   },
   "spaces": {
     "spaces": "Espaces",

@@ -18,7 +18,7 @@ exports.createAdmin = async function createAdmin() {
   const username = config.get('admin.username');
   const password = config.get('admin.password');
   const email = config.get('admin.email');
-  const fullName = 'ezMESURE Administrator';
+  const fullName = config.get('admin.fullName');
 
   return elastic.security.putUser({
     username,
@@ -136,7 +136,7 @@ exports.updateUser = function updateUser(user) {
  * @param {string} username - Username of user.
  * @returns {Promise<ElasticUserDeleted>} Deleted user.
  */
-exports.deleteUser = async function deleteUser(username) {
+exports.deleteUser = function deleteUser(username) {
   return elastic.security.deleteUser({ username }, { ignore: [404] });
 };
 

@@ -5,25 +5,13 @@ const { addHours } = require('date-fns');
 const passwordResetValidity = config.get('passwordResetValidity');
 const secret = config.get('auth.secret');
 
-const ezmesure = require('./ezmesure');
+const usersService = require('../../lib/entities/users.service');
 
 const usernameAdmin = config.get('admin.username');
 const passwordAdmin = config.get('admin.password');
 
-async function getToken(username, password) {
-  const res = await ezmesure({
-    method: 'POST',
-    url: '/login/local',
-    data: {
-      username,
-      password,
-    },
-  });
-
-  let token = res?.headers['set-cookie'][0];
-  const match = /^eztoken=([a-zA-Z0-9_.-]+);/i.exec(token);
-  [, token] = match;
-  return token;
+async function getToken(username) {
+  return usersService.generateToken(username);
 }
 
 async function getAdminToken() {

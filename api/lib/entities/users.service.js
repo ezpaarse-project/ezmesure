@@ -1,8 +1,12 @@
 // @ts-check
 const config = require('config');
+const jwt = require('jsonwebtoken');
 const elasticUsers = require('../services/elastic/users');
 const { client: prisma } = require('../services/prisma.service');
 const { triggerHooks } = require('../hooks/hookEmitter');
+
+const secret = config.get('auth.secret');
+const adminUsername = config.get('admin.username');
 
 const {
   MEMBER_ROLES: {
@@ -31,7 +35,7 @@ module.exports = class UsersService {
   static async createAdmin() {
     const username = config.get('admin.username');
     const email = config.get('admin.email');
-    const fullName = 'ezMESURE Administrator';
+    const fullName = config.get('admin.fullName');
 
     const adminData = {
       username,
@@ -78,6 +82,14 @@ module.exports = class UsersService {
   }
 
   /**
+   * @param {string} username
+   * @returns {Promise<User | null>}
+   */
+  static findByUsername(username) {
+    return prisma.user.findUnique({ where: { username } });
+  }
+
+  /*
    * @param {UserFindUniqueOrThrowArgs} params
    * @returns {Promise<User>}
    */
@@ -193,10 +205,51 @@ module.exports = class UsersService {
 
   /**
    * @param {string} username
+   * @returns {Promise<User | null>}
+   */
+  static deleteByUsername(username) {
+    return prisma.user.delete({ where: { username } });
+  }
+
+  /**
+   * @param {string} username
    * @param {string} password
    * @returns {Promise<void>}
    */
   static async updatePassword(username, password) {
     await elasticUsers.updatePassword(username, password);
+  }
+
+  /**
+   * @param {string} username
+   * @returns {Promise<string | null>}
+   */
+  static async generateToken(username) {
+    const user = await UsersService.findByUsername(username);
+    if (!user) {
+      // TODO throw ?
+      return null;
+    }
+    return jwt.sign({ username: user.username, email: user.email }, secret);
+  }
+
+  /**
+   * @returns {Promise<Array<User> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+    const users = await this.findMany({
+      where: { NOT: { username: adminUsername } },
+    });
+
+    await Promise.all(users.map(async (user) => {
+      await this.delete({
+        where: {
+          username: user.username,
+        },
+      });
+    }));
+
+    return users;
   }
 };

@@ -1,6 +1,6 @@
 # ezMESURE
 
-Platform aggregating electronic ressources usage statistics for the French researcher organizations.
+Platform aggregating electronic resources usage statistics for the French researcher organizations.
 https://ezmesure.couperin.org
 
 ## Prerequisites
@@ -23,7 +23,7 @@ ezMESURE uses an Apache reverse proxy which communicates with HTTPS only. Put th
 
 ### 2. Setup environment
 
-Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overriden by `ezmesure.local.env.sh`.
+Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overridden by `ezmesure.local.env.sh`.
 
 **NB**: a helper script is available at `tools/init_env.sh`.
 
@@ -59,7 +59,7 @@ Put the certificate (``server.crt``) and private key (``server.key``) used to de
 
 **NB**: the private key is critical and should not be shared.
 
-Additionnaly, set the environment variables `SHIBBOLETH_SP_URL` and `SHIBBOLETH_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable Shibboleth authentication (see below).
+Additionally, set the environment variables `SHIBBOLETH_SP_URL` and `SHIBBOLETH_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable Shibboleth authentication (see below).
 
 #### Disabling Shibboleth
 
@@ -86,7 +86,7 @@ For each node in the cluster, add certificates in `elasticsearch/config/certific
 
 Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
 
-To avoid memory exceptions, you may have to increase mmaps count. Edit `/etc/sysctl.conf` and add the following line :
+To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
 
 ```ini
 # configuration needed for elastic search

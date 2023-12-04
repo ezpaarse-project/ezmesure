@@ -1,8 +1,9 @@
 const ezmesure = require('../../setup/ezmesure');
+const institutionsService = require('../../../lib/entities/institutions.service');
+const usersService = require('../../../lib/entities/users.service');
 
-const { createInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
-const { createUserAsAdmin, deleteUserAsAdmin, activateUser } = require('../../setup/users');
-const { getAdminToken } = require('../../setup/login');
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
+const { getAdminToken, getToken } = require('../../setup/login');
 
 describe('[institutions]: Test delete features', () => {
   const institutionTest = {
@@ -15,156 +16,132 @@ describe('[institutions]: Test delete features', () => {
     adminToken = await getAdminToken();
   });
   describe('As admin', () => {
-    describe('DELETE /institutions/<id> - Delete institution', () => {
-      let institutionId;
+    let institutionId;
 
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
+
+    it(`#01 Should delete institution [${institutionTest.name}]`, async () => {
+      const res = await ezmesure({
+        method: 'DELETE',
+        url: `/institutions/${institutionId}`,
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
+      // Test API
+      expect(res).toHaveProperty('status', 200);
 
-      it('Should delete institution [Test]', async () => {
-        const res = await ezmesure({
-          method: 'DELETE',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-      });
+      // Test service
+      const institution = await institutionsService.findByID(institutionId);
+      expect(institution).toEqual(null);
+    });
 
-      it('Should get HTTP status 404', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 404);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
   describe('As user', () => {
-    let userToken;
     let userTest;
+    let userToken;
+    let institutionId;
     beforeAll(async () => {
-      userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
-      await activateUser('user.test', 'changeme');
-      userToken = await getAdminToken();
+      // TODO use service to create user
+      userTest = await createDefaultActivatedUserAsAdmin();
+      userToken = await getToken(userTest.username, userTest.password);
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
     });
 
-    describe('DELETE /institutions/<id> - Delete institution', () => {
-      let institutionId;
-
-      beforeAll(async () => {
-        userTest = await createUserAsAdmin('user.test', 'user.test@test.fr', 'User test', false);
-        await activateUser('user.test', 'changeme');
-        userToken = await getAdminToken();
-        institutionId = await createInstitutionAsAdmin(institutionTest);
+    it(`#02 Should delete institution [${institutionTest.name}]`, async () => {
+      const res = await ezmesure({
+        method: 'DELETE',
+        url: `/institutions/${institutionId}`,
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       });
+      // Test API
+      expect(res).toHaveProperty('status', 403);
 
-      it('Should delete institution [Test] ', async () => {
-        const res = await ezmesure({
-          method: 'DELETE',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-      });
+      // Test service
+      const institution = await institutionsService.findByID(institutionId);
 
-      it('Should get HTTP status 404', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-
-        expect(res).toHaveProperty('status', 404);
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+      expect(institution).toHaveProperty('parentInstitutionId', null);
+      expect(institution?.createdAt).not.toBeNull();
+      expect(institution?.updatedAt).not.toBeNull();
+      expect(institution).toHaveProperty('name', institutionTest.name);
+      expect(institution).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institution).toHaveProperty('validated', false);
+      expect(institution).toHaveProperty('hidePartner', false);
+      expect(institution).toHaveProperty('tags', []);
+      expect(institution).toHaveProperty('logoId', null);
+      expect(institution).toHaveProperty('type', null);
+      expect(institution).toHaveProperty('acronym', null);
+      expect(institution).toHaveProperty('websiteUrl', null);
+      expect(institution).toHaveProperty('city', null);
+      expect(institution).toHaveProperty('uai', null);
+      expect(institution).toHaveProperty('social', null);
+      expect(institution).toHaveProperty('sushiReadySince', null);
     });
+
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await institutionsService.deleteAll();
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('DELETE /institutions/<id> - Delete institution', () => {
-      let institutionId;
+    let institutionId;
 
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-      });
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'DELETE',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: 'Bearer: random',
-          },
-        });
-        expect(res).toHaveProperty('status', 401);
+    it(`#03 Should not delete institution [${institutionTest.name}]`, async () => {
+      const res = await ezmesure({
+        method: 'DELETE',
+        url: `/institutions/${institutionId}`,
+        headers: {
+          Authorization: 'Bearer: random',
+        },
       });
+      // Test API
+      expect(res).toHaveProperty('status', 401);
 
-      it('Should get institution [Test]', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-      });
+      // Test service
+      const institution = await institutionsService.findByID(institutionId);
+      expect(institution).not.toBeNull();
+    });
 
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
   describe('Without token', () => {
-    describe('DELETE /institutions/<id> - Delete institution', () => {
-      let institutionId;
+    let institutionId;
 
-      beforeAll(async () => {
-        institutionId = await createInstitutionAsAdmin(institutionTest);
-      });
+    beforeAll(async () => {
+      const institution = await institutionsService.create({ data: institutionTest });
+      institutionId = institution.id;
+    });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
-          method: 'DELETE',
-          url: `/institutions/${institutionId}`,
-        });
-        expect(res).toHaveProperty('status', 401);
+    it(`#04 Should not delete institution [${institutionTest.name}]`, async () => {
+      const res = await ezmesure({
+        method: 'DELETE',
+        url: `/institutions/${institutionId}`,
       });
+      expect(res).toHaveProperty('status', 401);
 
-      it('Should get institution [Test]', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/institutions/${institutionId}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
-      });
+      // Test service
+      const institution = await institutionsService.findByID(institutionId);
+      expect(institution).not.toBeNull();
+    });
 
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(institutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
 });

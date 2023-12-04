@@ -11,7 +11,7 @@
         offset-y
         bottom
         left
-        @input="resetForm"
+        @input="$refs.repoCreateForm?.resetForm?.()"
       >
         <template #activator="{ on, attrs }">
           <v-btn
@@ -28,61 +28,13 @@
           </v-btn>
         </template>
 
-        <v-card>
-          <v-card-text>
-            <v-alert
-              type="error"
-              dense
-              outlined
-              :value="!!creationErrorMessage"
-            >
-              {{ creationErrorMessage }}
-            </v-alert>
-
-            <v-form
-              id="creationForm"
-              ref="creationForm"
-              v-model="formIsValid"
-              @submit.prevent="createRepository"
-            >
-              <v-text-field
-                v-model="repositoryPattern"
-                :label="$t('repositories.pattern')"
-                :rules="[v => !!v || $t('fieldIsRequired')]"
-                outlined
-                autofocus
-                required
-              />
-              <v-select
-                v-model="repositoryType"
-                :items="repositoryTypes"
-                :label="$t('repositories.type')"
-                outlined
-                hide-details
-              />
-            </v-form>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-
-            <v-btn
-              text
-              @click="showCreationForm = false"
-            >
-              {{ $t('cancel') }}
-            </v-btn>
-            <v-btn
-              type="submit"
-              form="creationForm"
-              color="primary"
-              :loading="creating"
-              :disabled="!formIsValid"
-            >
-              {{ $t('add') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <RepositoriesCreateForm
+          ref="repoCreateForm"
+          :institution-id="institutionId"
+          @submit="onRepositoryCreate"
+          @cancel="showCreationForm = false"
+          @loading="creating = $event"
+        />
       </v-menu>
     </v-card-title>
 
@@ -149,10 +101,12 @@
 
 <script>
 import ConfirmPopover from '~/components/ConfirmPopover.vue';
+import RepositoriesCreateForm from '~/components/repositories/RepositoriesCreateForm.vue';
 
 export default {
   components: {
     ConfirmPopover,
+    RepositoriesCreateForm,
   },
   props: {
     institutionId: {
@@ -171,15 +125,6 @@ export default {
       repositories: [],
 
       errorMessage: '',
-      creationErrorMessage: '',
-
-      repositoryPattern: '',
-      repositoryType: 'ezpaarse',
-
-      repositoryTypes: [
-        { text: 'ezPAARSE', value: 'ezpaarse' },
-        { text: 'COUNTER 5', value: 'counter5' },
-      ],
     };
   },
   computed: {
@@ -194,12 +139,6 @@ export default {
     },
   },
   methods: {
-    resetForm() {
-      this.$refs.creationForm?.resetValidation?.();
-      this.repositoryPattern = '';
-      this.repositoryType = 'ezpaarse';
-    },
-
     reset() {
       this.repositories = [];
       this.deleting = {};
@@ -243,25 +182,10 @@ export default {
       this.$set(this.deleting, pattern, false);
     },
 
-    async createRepository() {
-      this.creating = true;
-      this.creationErrorMessage = '';
-
-      try {
-        const newRepository = await this.$axios.$put(
-          `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
-          { type: this.repositoryType },
-        );
-
-        this.repositories.push(newRepository);
-        this.repositoryPattern = '';
-        this.showCreationForm = false;
-        this.onChange();
-      } catch (e) {
-        this.creationErrorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
-      }
-
-      this.creating = false;
+    onRepositoryCreate(newRepository) {
+      this.repositories.push(newRepository);
+      this.showCreationForm = false;
+      this.onChange();
     },
   },
 };

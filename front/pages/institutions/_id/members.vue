@@ -1,6 +1,24 @@
 <template>
   <section>
     <ToolBar :title="institutionName">
+      <v-tooltip right>
+        <template #activator="{ attrs, on }">
+          <v-btn
+            class="ml-2"
+            icon
+            v-bind="attrs"
+            @click="goToInstitutionPage"
+            v-on="on"
+          >
+            <v-icon>
+              mdi-page-previous-outline
+            </v-icon>
+          </v-btn>
+        </template>
+
+        {{ $t('institutions.institution.goToPage') }}
+      </v-tooltip>
+
       <v-spacer />
 
       <v-btn text :loading="refreshing" @click="refreshMembers">
@@ -319,6 +337,10 @@ export default {
       }
 
       this.removing = false;
+    },
+
+    goToInstitutionPage() {
+      this.$router.push({ path: `/institutions/${this.institutionId}` });
     },
   },
 };

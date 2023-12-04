@@ -43,6 +43,14 @@ module.exports = class SpacesService {
   }
 
   /**
+   * @param {string} id
+   * @returns {Promise<Space | null>}
+   */
+  static findByID(id) {
+    return prisma.space.findUnique({ where: { id } });
+  }
+
+  /**
    * @param {SpaceUpdateArgs} params
    * @returns {Promise<Space>}
    */
@@ -101,5 +109,24 @@ module.exports = class SpacesService {
     deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
 
     return deleteResult;
+  }
+
+  /**
+   * @returns {Promise<Array<Space> | null>}
+   */
+  static async deleteAll() {
+    if (process.env.NODE_ENV === 'production') { return null; }
+
+    const spaces = await this.findMany({});
+
+    await Promise.all(spaces.map(async (space) => {
+      await this.delete({
+        where: {
+          id: space.id,
+        },
+      });
+    }));
+
+    return spaces;
   }
 };

@@ -1,6 +1,5 @@
 const config = require('config');
 const institutionsService = require('../../entities/institutions.service');
-const membershipService = require('../../entities/memberships.service');
 const usersService = require('../../entities/users.service');
 
 /* eslint-disable max-len */
@@ -140,7 +139,6 @@ exports.createInstitution = async (ctx) => {
     institutionName: body?.name,
   };
 
-  const base64logo = body?.logo;
   const schema = isAdmin ? adminCreateSchema : createSchema;
   const { error, value: institutionData } = schema.validate(body);
 
@@ -157,8 +155,8 @@ exports.createInstitution = async (ctx) => {
     };
   }
 
-  if (base64logo) {
-    institutionData.logoId = await imagesService.storeLogo(base64logo);
+  if (body?.logo) {
+    institutionData.logoId = await imagesService.storeLogo(body.logo);
   }
 
   const institution = await institutionsService.create({
@@ -216,7 +214,7 @@ exports.updateInstitution = async (ctx) => {
   }
 
   if (!wasValidated && institutionData.validated === true) {
-    const contactMemberships = await membershipService.findMany({
+    const contactMemberships = await membershipsService.findMany({
       where: {
         institutionId: ctx.state.institution.id,
         roles: {
@@ -306,13 +304,11 @@ exports.importInstitutions = async (ctx) => {
       }
     }
 
-    const base64logo = item.logo;
-
     /** @type {InstitutionCreateInput} */
     const institutionData = {
       ...item,
       logo: undefined,
-      logoId: base64logo ? await imagesService.storeLogo(base64logo) : undefined,
+      logoId: item.logo ? await imagesService.storeLogo(item.logo) : item.logoId,
 
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
@@ -485,7 +481,7 @@ exports.getInstitutionMember = async (ctx) => {
     include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
   }
 
-  const membership = await membershipService.findUnique({
+  const membership = await membershipsService.findUnique({
     where: {
       username_institutionId: { institutionId, username },
     },
@@ -510,7 +506,7 @@ exports.getInstitutionMembers = async (ctx) => {
     include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
   }
 
-  const memberships = await membershipService.findMany({
+  const memberships = await membershipsService.findMany({
     where: { institutionId: ctx.state.institution.id },
     include,
   });
@@ -649,7 +645,7 @@ exports.removeInstitutionMember = async (ctx) => {
   }
 
   try {
-    await membershipService.delete({
+    await membershipsService.delete({
       where: {
         username_institutionId: { username, institutionId },
       },

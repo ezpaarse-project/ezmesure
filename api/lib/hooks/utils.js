@@ -57,7 +57,7 @@ const generateUserRoles = async (username) => {
     ];
   }));
 
-  if (user.isAdmin) {
+  if (user?.isAdmin) {
     roles.add('superuser');
   }
 

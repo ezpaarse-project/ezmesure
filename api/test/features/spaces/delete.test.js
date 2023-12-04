@@ -1,8 +1,10 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const { createInstitutionAsAdmin, validateInstitutionAsAdmin, deleteInstitutionAsAdmin } = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin, deleteUserAsAdmin } = require('../../setup/users');
-const { deleteSpaceAsAdmin, createSpaceAsAdmin } = require('../../setup/spaces');
+const spacesService = require('../../../lib/entities/spaces.service');
+const institutionsService = require('../../../lib/entities/institutions.service');
+const usersService = require('../../../lib/entities/users.service');
+
+const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
 const { getToken, getAdminToken } = require('../../setup/login');
 
 describe('[space]: Test delete spaces features', () => {
@@ -15,7 +17,7 @@ describe('[space]: Test delete spaces features', () => {
     initials: 'EZ',
   };
 
-  const institution = {
+  const institutionTest = {
     name: 'Test',
     namespace: 'test',
   };
@@ -25,41 +27,35 @@ describe('[space]: Test delete spaces features', () => {
 
   beforeAll(async () => {
     adminToken = await getAdminToken();
-    institutionId = await createInstitutionAsAdmin(institution);
-    await validateInstitutionAsAdmin(institutionId);
+    const institution = await institutionsService.create({ data: institutionTest });
+    institutionId = institution.id;
   });
 
   describe('As admin', () => {
-    describe('DELETE /kibana-spaces/<id> - delete space [ezPAARSE] for institution [Test]', () => {
+    describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        await spacesService.create({ data: spaceConfig });
       });
 
-      it('Should delete space', async () => {
-        const res = await ezmesure({
+      it('#01 Should delete space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${adminToken}`,
           },
         });
-        expect(res).toHaveProperty('status', 204);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 204);
 
-      it('Should get HTTP status 404', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 404);
+        // Test service
+        const spaceFromService = await spacesService.findMany();
+        expect(spaceFromService).toEqual([]);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
@@ -71,111 +67,130 @@ describe('[space]: Test delete spaces features', () => {
       userToken = await getToken(userTest.username, userTest.password);
     });
 
-    describe('DELETE /kibana-spaces/<id> - delete space [ezPAARSE] for institution [Test]', () => {
+    describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 403', async () => {
-        const res = await ezmesure({
+      it('#02 Should not delete space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
-        expect(res).toHaveProperty('status', 403);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
+
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
     afterAll(async () => {
-      await deleteUserAsAdmin(userTest.username);
+      await usersService.deleteAll();
     });
   });
   describe('With random token', () => {
-    describe('DELETE /kibana-spaces/<id> - delete space [ezPAARSE] for institution [Test]', () => {
+    describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
+      it('#03 Should not delete space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
           headers: {
             Authorization: 'Bearer: random',
           },
         });
-        expect(res).toHaveProperty('status', 401);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
+
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
   describe('Without token', () => {
-    describe('DELETE /kibana-spaces/<id> - delete space [ezPAARSE] for institution [Test]', () => {
+    describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
+      let spaceId;
+
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-
-        await createSpaceAsAdmin(spaceConfig);
+        const space = await spacesService.create({ data: spaceConfig });
+        spaceId = space.id;
       });
 
-      it('Should get HTTP status 401', async () => {
-        const res = await ezmesure({
+      it('#04 Should not delete space', async () => {
+        const httpAppResponse = await ezmesure({
           method: 'DELETE',
           url: `/kibana-spaces/${spaceConfig.id}`,
         });
-        expect(res).toHaveProperty('status', 401);
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
 
-      it('Should get space', async () => {
-        const res = await ezmesure({
-          method: 'GET',
-          url: `/kibana-spaces/${spaceConfig.id}`,
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        expect(res).toHaveProperty('status', 200);
+        // Test service
+        const spaceFromService = await spacesService.findByID(spaceId);
+
+        expect(spaceFromService).toHaveProperty('id', spaceId);
+        expect(spaceFromService).toHaveProperty('institutionId', institutionId);
+        expect(spaceFromService?.createdAt).not.toBeNull();
+        expect(spaceFromService?.updatedAt).not.toBeNull();
+        expect(spaceFromService).toHaveProperty('name', spaceConfig.name);
+        expect(spaceFromService).toHaveProperty('description', spaceConfig.description);
+        expect(spaceFromService).toHaveProperty('initials', spaceConfig.initials);
+        expect(spaceFromService).toHaveProperty('color', null);
+        expect(spaceFromService).toHaveProperty('type', spaceConfig.type);
+        expect(spaceFromService).toHaveProperty('indexPatterns', []);
       });
 
       afterAll(async () => {
-        await deleteSpaceAsAdmin(spaceConfig.id);
+        await spacesService.deleteAll();
       });
     });
   });
 
   afterAll(async () => {
-    await deleteInstitutionAsAdmin(institutionId);
+    await institutionsService.deleteAll();
   });
 });

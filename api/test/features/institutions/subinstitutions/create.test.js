@@ -1,15 +1,11 @@
 /* eslint-disable max-len */
+const ezmesure = require('../../../setup/ezmesure');
 
-const {
-  createInstitution,
-  createInstitutionAsAdmin,
-  validateInstitutionAsAdmin,
-  deleteInstitutionAsAdmin,
-} = require('../../../setup/institutions');
-const { createUserAsAdmin, activateUser, deleteUserAsAdmin } = require('../../../setup/users');
+const institutionsService = require('../../../../lib/entities/institutions.service');
+const usersService = require('../../../../lib/entities/users.service');
+
+const { createUserAsAdmin, activateUser } = require('../../../setup/users');
 const { getToken, getAdminToken } = require('../../../setup/login');
-
-const { testCreateSubInstitution } = require('./utils');
 
 describe('[institutions - subinstitution]: Test create features', () => {
   const masterInstitutionTest = {
@@ -44,6 +40,7 @@ describe('[institutions - subinstitution]: Test create features', () => {
 
   beforeAll(async () => {
     adminToken = await getAdminToken();
+
     await createUserAsAdmin(
       userTest.username,
       userTest.email,
@@ -63,873 +60,89 @@ describe('[institutions - subinstitution]: Test create features', () => {
   });
 
   describe('As admin', () => {
-    describe('With master institution created by admin', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitutionAsAdmin(masterInstitutionTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
+    beforeAll(async () => {
+      const masterInstitution = await institutionsService.create({ data: masterInstitutionTest });
+      masterInstitutionId = masterInstitution.id;
+      const subInstitution = await institutionsService.create({ data: subInstitutionTest });
+      subInstitutionId = subInstitution.id;
     });
 
-    describe('With master institution created by user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, userTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#01 Should create subinstitution', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
         });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
 
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 200);
 
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
+        const masterInstitutionFromResponse = httpAppResponse?.data;
 
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
+        expect(masterInstitutionFromResponse).toHaveProperty('id', masterInstitutionId);
+        expect(masterInstitutionFromResponse).toHaveProperty('parentInstitutionId', null);
 
-    describe('With master institution created by another user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, anotherUserTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
+        const subInstitutionsFromResponse = masterInstitutionFromResponse.childInstitutions;
+        const [subInstitutionFromResponse] = subInstitutionsFromResponse;
 
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should create subinstitution', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: adminToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 200,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
+        expect(subInstitutionFromResponse).toHaveProperty('id', subInstitutionId);
+        expect(subInstitutionFromResponse).toHaveProperty('parentInstitutionId', masterInstitutionId);
       });
     });
   });
   describe('As User', () => {
-    describe('With master institution created by admin', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitutionAsAdmin(masterInstitutionTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
+    beforeAll(async () => {
+      const masterInstitution = await institutionsService.create({ data: masterInstitutionTest });
+      masterInstitutionId = masterInstitution.id;
+      const subInstitution = await institutionsService.create({ data: subInstitutionTest });
+      subInstitutionId = subInstitution.id;
+    });
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#02 Should not create subinstitution', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
 
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 403);
       });
     });
-
-    describe('With master institution created by user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, userTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
-
-    describe('With master institution created by another user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, anotherUserTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 403', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: userToken,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 403,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
   describe('Without token', () => {
-    describe('With master institution created by admin', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitutionAsAdmin(masterInstitutionTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
+    beforeAll(async () => {
+      const masterInstitution = await institutionsService.create({ data: masterInstitutionTest });
+      masterInstitutionId = masterInstitution.id;
+      const subInstitution = await institutionsService.create({ data: subInstitutionTest });
+      subInstitutionId = subInstitution.id;
+    });
+    describe('Create subinstitution [Sub Test] for [Master Test] institution', () => {
+      it('#03 Should not create subinstitution', async () => {
+        const httpAppResponse = await ezmesure({
+          method: 'PUT',
+          url: `/institutions/${masterInstitutionId}/subinstitutions/${subInstitutionId}`,
         });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
 
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
+        // Test API
+        expect(httpAppResponse).toHaveProperty('status', 401);
       });
     });
 
-    describe('With master institution created by user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, userTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
-
-    describe('With master institution created by another user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, anotherUserTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: undefined,
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
+    afterAll(async () => {
+      await institutionsService.deleteAll();
     });
   });
-  describe('With random token', () => {
-    describe('With master institution created by admin', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitutionAsAdmin(masterInstitutionTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
 
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
-
-    describe('With master institution created by user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, userTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
-
-    describe('With master institution created by another user', () => {
-      beforeAll(async () => {
-        masterInstitutionId = await createInstitution(masterInstitutionTest, anotherUserTest);
-        await validateInstitutionAsAdmin(masterInstitutionId);
-      });
-
-      describe('With sub institution created by admin', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitutionAsAdmin(subInstitutionTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: true,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, userTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      describe('With sub institution created by another user', () => {
-        beforeAll(async () => {
-          subInstitutionId = await createInstitution(subInstitutionTest, anotherUserTest);
-          await validateInstitutionAsAdmin(subInstitutionId);
-        });
-        describe('PUT /institutions/<id>/subinstitution/<subid> - Create subinstitution [Sub Test] for [Master Test] institution', () => {
-          it('Should get HTTP status 401', async () => {
-            const testConfig = {
-              masterInstitutionId,
-              subInstitutionId,
-              token: 'Bearer: random',
-              subInstitutionIsValidated: true,
-              subInstitutionCreatedByAdmin: false,
-              expectedHTTPStatus: 401,
-            };
-            await testCreateSubInstitution(testConfig);
-          });
-        });
-        afterAll(async () => {
-          await deleteInstitutionAsAdmin(subInstitutionId);
-        });
-      });
-
-      afterAll(async () => {
-        await deleteInstitutionAsAdmin(masterInstitutionId);
-      });
-    });
-  });
   afterAll(async () => {
-    await deleteUserAsAdmin(userTest.username);
-    await deleteUserAsAdmin(anotherUserTest.username);
+    await usersService.deleteAll();
   });
 });

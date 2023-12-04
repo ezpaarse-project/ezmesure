@@ -1,7 +1,7 @@
 <template>
-  <v-card :loading="loading" v-bind="$attrs">
+  <v-card v-bind="$attrs">
     <v-card-title class="headline">
-      {{ $t('components.components') }}
+      {{ $t('repositories.institutions') }}
 
       <v-spacer />
 
@@ -18,7 +18,7 @@
           <v-btn
             color="primary"
             text
-            :loading="savingSubInstitution"
+            :loading="savingInstitution"
             v-bind="attrs"
             v-on="on"
           >
@@ -41,13 +41,13 @@
             </v-alert>
 
             <v-form
-              id="subInstitutionForm"
-              ref="subInstitutionForm"
+              id="institutionForm"
+              ref="institutionForm"
               v-model="formIsValid"
-              @submit.prevent="saveSubInstitution"
+              @submit.prevent="saveInstitution"
             >
               <v-autocomplete
-                v-model="selectedSubInstitution"
+                v-model="selectedInstitution"
                 :items="availableInstitutions"
                 :label="`${$t('institutions.title')} *`"
                 :rules="[v => !!v || $t('fieldIsRequired')]"
@@ -98,9 +98,9 @@
             </v-btn>
             <v-btn
               type="submit"
-              form="subInstitutionForm"
+              form="institutionForm"
               color="primary"
-              :loading="savingSubInstitution"
+              :loading="savingInstitution"
               :disabled="!formIsValid"
             >
               {{ $t('add') }}
@@ -120,14 +120,14 @@
       {{ errorMessage }}
     </v-alert>
 
-    <v-list v-if="hasSubInstitutions">
+    <v-list v-if="hasInstitutions">
       <v-list-item
-        v-for="subInstitution in sortedSubInstitutions"
-        :key="subInstitution.id"
-        :to="`/institutions/${subInstitution.id}`"
+        v-for="institution in sortedInstitutions"
+        :key="institution.id"
+        :to="`/institutions/${institution.id}`"
       >
-        <v-list-item-avatar v-if="subInstitution.logoId" rounded>
-          <v-img :src="`/api/assets/logos/${subInstitution.logoId}`" contain />
+        <v-list-item-avatar v-if="institution.logoId" rounded>
+          <v-img :src="`/api/assets/logos/${institution.logoId}`" contain />
         </v-list-item-avatar>
 
         <v-list-item-avatar v-else color="grey lighten-2" rounded>
@@ -137,13 +137,13 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title>{{ subInstitution.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ subInstitution.type }}</v-list-item-subtitle>
+          <v-list-item-title>{{ institution.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ institution.type }}</v-list-item-subtitle>
         </v-list-item-content>
 
         <v-list-item-action>
           <v-progress-circular
-            v-if="removing[subInstitution.id]"
+            v-if="removing[institution.id]"
             indeterminate
             size="24"
             width="2"
@@ -155,7 +155,7 @@
             bottom
             right
             offset-y
-            @agree="removeSubInstitution(subInstitution.id)"
+            @agree="removeInstitution(institution.id)"
           >
             <template #activator="{ on: { click, ...on }, attrs }">
               <v-icon
@@ -172,13 +172,8 @@
     </v-list>
 
     <v-card-text v-else class="text-center py-5">
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        width="2"
-      />
-      <div v-else class="text-grey">
-        {{ $t('components.noComponent') }}
+      <div class="text-grey">
+        {{ $t('repositories.noInstitutions') }}
       </div>
     </v-card-text>
 
@@ -195,44 +190,46 @@ export default {
     ConfirmPopover,
   },
   props: {
-    institutionId: {
-      type: String,
-      default: () => '',
+    repository: {
+      type: Object,
+      required: true,
     },
   },
   data() {
     return {
-      loading: false,
       removing: {},
 
       errorMessage: '',
       saveErrorMessage: '',
 
-      subInstitutions: [],
+      institutions: [],
 
       availableInstitutions: [],
       institutionSearch: '',
-      selectedSubInstitution: null,
+      selectedInstitution: null,
       loadingInstitutions: false,
-      savingSubInstitution: false,
+      savingInstitution: false,
       showSearchForm: false,
       formIsValid: false,
     };
   },
   computed: {
-    hasSubInstitutions() {
-      return Array.isArray(this.subInstitutions) && this.subInstitutions.length > 0;
+    hasInstitutions() {
+      if (!Array.isArray(this.institutions)) {
+        return false;
+      }
+      return this.institutions.length > 0;
     },
-    sortedSubInstitutions() {
-      if (!Array.isArray(this.subInstitutions)) { return []; }
+    sortedInstitutions() {
+      if (!Array.isArray(this.institutions)) { return []; }
 
-      return this.subInstitutions.slice().sort(
+      return this.institutions.slice().sort(
         (a, b) => (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1),
       );
     },
   },
   watch: {
-    institutionId: {
+    repository: {
       immediate: true,
       handler() { this.reset(); },
     },
@@ -244,36 +241,17 @@ export default {
   },
   methods: {
     reset() {
-      this.subInstitutions = [];
+      this.institutions = this.repository?.institutions;
       this.removing = {};
       this.errorMessage = '';
-      this.refreshSubInstitutions();
     },
     onChange() {
-      this.$emit('change', this.subInstitutions);
+      this.$emit('change', this.repository?.institutions ?? []);
     },
 
     resetForm() {
-      this.$refs.subInstitutionForm?.resetValidation?.();
+      this.$refs.institutionForm?.resetValidation?.();
       this.selectedSubInstitution = null;
-    },
-
-    async refreshSubInstitutions() {
-      if (!this.institutionId) { return; }
-
-      this.loading = true;
-      this.errorMessage = '';
-
-      try {
-        this.subInstitutions = await this.$axios.$get(
-          `/institutions/${this.institutionId}/subinstitutions`,
-          { params: { institutionId: this.institutionId } },
-        );
-      } catch (e) {
-        this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
-      }
-
-      this.loading = false;
     },
 
     queryInstitutions: debounce(async function queryInstitutions() {
@@ -286,17 +264,20 @@ export default {
       this.loadingInstitutions = false;
     }, 500),
 
-    async saveSubInstitution() {
-      if (!this.selectedInstitution?.id) { return; }
+    async saveInstitution() {
+      if (!this.selectedInstitution?.id || !this.repository) { return; }
 
-      this.savingSubInstitution = true;
+      this.savingInstitution = true;
       this.saveErrorMessage = '';
 
       try {
-        await this.$axios.$put(`/institutions/${this.institutionId}/subinstitutions/${this.selectedInstitution.id}`);
+        await this.$axios.$put(
+          `/institutions/${this.selectedInstitution.id}/repositories/${this.repository.pattern}`,
+          { type: this.repository.type },
+        );
 
-        if (!this.subInstitutions.some((i) => i?.id === this.selectedInstitution.id)) {
-          this.subInstitutions.push(this.selectedInstitution);
+        if (!this.institutions.some((i) => i?.pattern === this.selectedInstitution.id)) {
+          this.institutions = [...this.institutions, this.selectedInstitution];
         }
         this.institutionSearch = '';
         this.showSearchForm = false;
@@ -305,16 +286,18 @@ export default {
         this.saveErrorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }
 
-      this.savingSubInstitution = false;
+      this.savingInstitution = false;
     },
 
-    async removeSubInstitution(institutionId) {
+    async removeInstitution(institutionId) {
+      if (!institutionId || !this.repository?.pattern) { return; }
+
       this.$set(this.removing, institutionId, true);
       this.errorMessage = '';
 
       try {
-        await this.$axios.$delete(`/institutions/${this.institutionId}/subinstitutions/${institutionId}`);
-        this.subInstitutions = this.subInstitutions.filter((i) => i?.id !== institutionId);
+        await this.$axios.$delete(`/institutions/${institutionId}/repositories/${this.repository.pattern}`);
+        this.institutions = this.institutions.filter((i) => i?.id !== institutionId);
         this.onChange();
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');

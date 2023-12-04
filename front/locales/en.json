@@ -39,15 +39,18 @@
   },
   "myspace": {
     "title": "My Profile",
-    "noRoles": "There are no roles associated with your account yet.",
-    "determineAccesRight": "In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.",
+    "noMemberships": "You're not a member of any institution yet.",
+    "determineAccessRight": "In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.",
     "name": "Name",
     "mail": "Mail",
     "idp": "IDP",
     "organization": "Organisation",
     "unit": "Unit",
     "yourRights": "Your rights",
-    "whatDoesRoles": "These roles define your access rights to data and dashboards hosted on ezMESURE."
+    "whatDoesMemberships": "Your access rights to data and dashboards hosted on ezMESURE.",
+    "infos": "Your informations",
+    "repos": "Your repositories",
+    "spaces": "Your spaces"
   },
   "files": {
     "title": "My Deposits",
@@ -246,6 +249,7 @@
     "institution": {
       "title": "My institution",
       "name": "Institution name",
+      "goToPage": "Go to institution's page",
       "members": "Members",
       "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
@@ -686,7 +690,11 @@
     "type": "Type",
     "institutions": "Institutions",
     "institutionsCount": "{count} institution|{count} institutions",
-    "deleteNbRepositories": "You are about to delete {number} repositories"
+    "noInstitutions": "No institutions is using this repository",
+    "deleteNbRepositories": "You are about to delete {number} repositories",
+    "filters": {
+      "title": "Filter repositories"
+    }
   },
   "spaces": {
     "spaces": "Spaces",
