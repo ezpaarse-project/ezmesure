@@ -42,7 +42,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint | null>}
    */
   static findByID(id) {
-    return sushiEndpointsPrisma.findUnique({ where: { id } });
+    return sushiEndpointsPrisma.findByID(id);
   }
 
   /**
@@ -70,7 +70,6 @@ module.exports = class SushiEndpointsService {
 
     triggerHooks('sushi_endpoint:delete', deletedEndpoint);
     deletedEndpoint.credentials.forEach((credentials) => { triggerHooks('sushi_credentials:delete', credentials); });
-
     return deleteResult;
   }
 

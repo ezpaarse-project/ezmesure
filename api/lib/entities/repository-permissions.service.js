@@ -20,9 +20,7 @@ module.exports = class RepositoryPermissionsService {
    */
   static async create(params) {
     const permission = await repositoryPermissionsPrisma.create(params);
-
     triggerHooks('repository_permission:create', permission);
-
     return permission;
   }
 
@@ -49,15 +47,7 @@ module.exports = class RepositoryPermissionsService {
    * @returns {Promise<RepositoryPermission | null>}
    */
   static findById(institutionId, pattern, username) {
-    return repositoryPermissionsPrisma.findUnique({
-      where: {
-        username_institutionId_repositoryPattern: {
-          username,
-          institutionId,
-          repositoryPattern: pattern,
-        },
-      },
-    });
+    return repositoryPermissionsPrisma.findById(institutionId, pattern, username);
   }
 
   /**
@@ -66,9 +56,7 @@ module.exports = class RepositoryPermissionsService {
    */
   static async update(params) {
     const permission = await repositoryPermissionsPrisma.update(params);
-
     triggerHooks('repository_permission:update', permission);
-
     return permission;
   }
 
@@ -78,9 +66,7 @@ module.exports = class RepositoryPermissionsService {
    */
   static async upsert(params) {
     const permission = await repositoryPermissionsPrisma.upsert(params);
-
     triggerHooks('repository_permission:upsert', permission);
-
     return permission;
   }
 
@@ -90,9 +76,7 @@ module.exports = class RepositoryPermissionsService {
    */
   static async delete(params) {
     const permission = await repositoryPermissionsPrisma.remove(params);
-
     triggerHooks('repository_permission:delete', permission);
-
     return permission;
   }
 

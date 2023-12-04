@@ -20,9 +20,7 @@ module.exports = class SpacePermissionsService {
    */
   static async create(params) {
     const spacePermission = await spacePermissionsPrisma.create(params);
-
     triggerHooks('space_permission:create', spacePermission);
-
     return spacePermission;
   }
 
@@ -48,9 +46,7 @@ module.exports = class SpacePermissionsService {
    */
   static async update(params) {
     const spacePermission = await spacePermissionsPrisma.update(params);
-
     triggerHooks('space_permission:update', spacePermission);
-
     return spacePermission;
   }
 
@@ -60,9 +56,7 @@ module.exports = class SpacePermissionsService {
    */
   static async upsert(params) {
     const spacePermission = await spacePermissionsPrisma.upsert(params);
-
     triggerHooks('space_permission:upsert', spacePermission);
-
     return spacePermission;
   }
 
@@ -72,9 +66,7 @@ module.exports = class SpacePermissionsService {
    */
   static async delete(params) {
     const spacePermission = await spacePermissionsPrisma.remove(params);
-
     triggerHooks('space_permission:delete', spacePermission);
-
     return spacePermission;
   }
 };

@@ -8,13 +8,6 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 const secret = config.get('auth.secret');
 const adminUsername = config.get('admin.username');
 
-const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('./memberships.dto');
-
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').User} User
@@ -44,6 +37,7 @@ module.exports = class UsersService {
       isAdmin: true,
       metadata: { acceptedTerms: true },
     };
+
     const admin = await usersPrisma.upsert({
       where: { username },
       update: adminData,
@@ -102,19 +96,7 @@ module.exports = class UsersService {
    * @returns {Promise<{email: string}[]> | null}
    */
   static findEmailOfCorrespondentsWithDomain(domain) {
-    return usersPrisma.findMany({
-      select: { email: true },
-      where: {
-        email: { endsWith: `@${domain}` },
-        memberships: {
-          some: {
-            roles: {
-              hasSome: [DOC_CONTACT, TECH_CONTACT],
-            },
-          },
-        },
-      },
-    });
+    return usersPrisma.findEmailOfCorrespondentsWithDomain(domain);
   }
 
   /**
@@ -135,12 +117,9 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async acceptTerms(username) {
-    return usersPrisma.update({
-      where: { username },
-      data: {
-        metadata: { acceptedTerms: true },
-      },
-    });
+    const user = usersPrisma.acceptTerms(username);
+    triggerHooks('user:update', user);
+    return user;
   }
 
   /**
@@ -176,8 +155,10 @@ module.exports = class UsersService {
    * @param {string} username
    * @returns {Promise<User | null>}
    */
-  static deleteByUsername(username) {
-    return usersPrisma.remove({ where: { username } });
+  static removeByUsername(username) {
+    const deletedUser = usersPrisma.removeByUsername(username);
+    triggerHooks('user:delete', deletedUser);
+    return deletedUser;
   }
 
   /**

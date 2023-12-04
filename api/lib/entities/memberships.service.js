@@ -23,9 +23,7 @@ module.exports = class MembershipsService {
    */
   static async create(params) {
     const membership = await membershipsPrisma.create(params);
-
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 
@@ -52,21 +50,7 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership | null>}
    */
   static findByID(institutionId, username, includes = null) {
-    let include;
-    if (includes) {
-      include = {
-        ...includes,
-      };
-    }
-    return membershipsPrisma.findUnique({
-      where: {
-        username_institutionId: {
-          institutionId,
-          username,
-        },
-      },
-      include,
-    });
+    return membershipsPrisma.findByID(institutionId, username, includes);
   }
 
   /**
@@ -75,9 +59,7 @@ module.exports = class MembershipsService {
    */
   static async update(params) {
     const membership = await membershipsPrisma.update(params);
-
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 
@@ -87,9 +69,7 @@ module.exports = class MembershipsService {
    */
   static async upsert(params) {
     const membership = await membershipsPrisma.upsert(params);
-
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 

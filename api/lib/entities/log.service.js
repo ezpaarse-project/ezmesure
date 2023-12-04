@@ -58,6 +58,6 @@ module.exports = class LogsService {
    * @returns {Promise<Log>}
    */
   static log(jobId, level, message) {
-    return logPrisma.create({ data: { jobId, level, message } });
+    return logPrisma.log(jobId, level, message);
   }
 };

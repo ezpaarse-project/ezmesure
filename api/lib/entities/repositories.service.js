@@ -73,13 +73,8 @@ module.exports = class RepositoriesService {
    * @param {string} institutionId
    */
   static async connectInstitution(pattern, institutionId) {
-    const repository = await repositoriesPrisma.update({
-      where: { pattern },
-      data: { institutions: { connect: { id: institutionId } } },
-    });
-
+    const repository = await repositoriesPrisma.connectInstitution(pattern, institutionId);
     triggerHooks('repository:update', repository);
-
     return repository;
   }
 

@@ -21,9 +21,7 @@ module.exports = class SpacesService {
    */
   static async create(params) {
     const space = await spacesPrisma.create(params);
-
     triggerHooks('space:create', space);
-
     return space;
   }
 
@@ -57,9 +55,7 @@ module.exports = class SpacesService {
    */
   static async update(params) {
     const space = await spacesPrisma.update(params);
-
     triggerHooks('space:update', space);
-
     return space;
   }
 
@@ -69,9 +65,7 @@ module.exports = class SpacesService {
    */
   static async upsert(params) {
     const space = await spacesPrisma.upsert(params);
-
     triggerHooks('space:upsert', space);
-
     return space;
   }
 
@@ -83,9 +77,7 @@ module.exports = class SpacesService {
     const { deleteResult, deletedSpace } = await spacesPrisma.remove(params);
 
     triggerHooks('space:delete', deletedSpace);
-
     deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
-
     return deleteResult;
   }
 

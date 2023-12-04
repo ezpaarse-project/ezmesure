@@ -26,28 +26,6 @@ const {
 /* eslint-enable max-len */
 
 /**
- * @returns {Promise<User>}
- */
-function createAdmin() {
-  const username = config.get('admin.username');
-  const email = config.get('admin.email');
-  const fullName = config.get('admin.fullName');
-
-  const adminData = {
-    username,
-    email,
-    fullName,
-    isAdmin: true,
-    metadata: { acceptedTerms: true },
-  };
-  return prisma.user.upsert({
-    where: { username },
-    update: adminData,
-    create: adminData,
-  });
-}
-
-/**
  * @param {UserCreateArgs} params
  * @returns {Promise<User>}
  */
@@ -206,7 +184,6 @@ async function removeAll() {
 }
 
 module.exports = {
-  createAdmin,
   create,
   findMany,
   findUnique,

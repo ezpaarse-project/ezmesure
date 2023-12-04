@@ -1,15 +1,7 @@
 // @ts-check
 const institutionsPrisma = require('../services/prisma/institutions');
-const membershipsPrisma = require('../services/prisma/memberships');
 
 const { triggerHooks } = require('../hooks/hookEmitter');
-
-const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('./memberships.dto');
 
 /* eslint-disable max-len */
 /**
@@ -30,9 +22,7 @@ module.exports = class InstitutionsService {
    */
   static async create(params) {
     const institution = await institutionsPrisma.create(params);
-
     triggerHooks('institution:create', institution);
-
     return institution;
   }
 
@@ -58,16 +48,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static findByID(id, includes = null) {
-    let include;
-    if (includes) {
-      include = {
-        ...includes,
-      };
-    }
-    return institutionsPrisma.findUnique({
-      where: { id },
-      include,
-    });
+    return institutionsPrisma.findByID(id, includes);
   }
 
   /**
@@ -76,9 +57,7 @@ module.exports = class InstitutionsService {
    */
   static async update(params) {
     const institution = await institutionsPrisma.update(params);
-
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -88,18 +67,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async addSubInstitution(institutionId, subInstitutionId) {
-    const institution = await institutionsPrisma.update({
-      where: { id: institutionId },
-      include: { childInstitutions: true },
-      data: {
-        childInstitutions: {
-          connect: { id: subInstitutionId },
-        },
-      },
-    });
-
+    const institution = await institutionsPrisma.addSubInstitution(institutionId, subInstitutionId);
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -108,13 +77,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async validate(id) {
-    const institution = await institutionsPrisma.update({
-      where: { id },
-      data: { validated: true },
-    });
-
+    const institution = await institutionsPrisma.validate(id);
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -124,9 +88,7 @@ module.exports = class InstitutionsService {
    */
   static async upsert(params) {
     const institution = await institutionsPrisma.upsert(params);
-
     triggerHooks('institution:upsert', institution);
-
     return institution;
   }
 
@@ -180,16 +142,6 @@ module.exports = class InstitutionsService {
   }
 
   static async getContacts(institutionId) {
-    return membershipsPrisma.findMany({
-      where: {
-        institutionId,
-        roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
+    return institutionsPrisma.getContacts(institutionId);
   }
 };

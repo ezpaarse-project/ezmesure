@@ -41,7 +41,7 @@ module.exports = class SushiCredentialsService {
    * @returns {Promise<SushiCredentials | null>}
    */
   static findByID(id) {
-    return sushiCredentialsPrisma.findUnique({ where: { id } });
+    return sushiCredentialsPrisma.findByID(id);
   }
 
   /**
