@@ -342,10 +342,6 @@ export default {
     goToInstitutionPage() {
       this.$router.push({ path: `/institutions/${this.institutionId}` });
     },
-
-    goToInstitutionPage() {
-      this.$router.push({ path: `/institutions/${this.institutionId}` });
-    },
   },
 };
 </script>
