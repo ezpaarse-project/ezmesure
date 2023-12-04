@@ -99,6 +99,7 @@
       <template #[`item.childInstitutions`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.childInstitutions)"
+          :outlined="item.childInstitutions?.length <= 0"
           small
           class="elevation-1"
           @click="$refs.subInstitutionsDialog?.display?.(item)"
@@ -114,6 +115,7 @@
       <template #[`item.memberships`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.memberships)"
+          :outlined="item.memberships?.length <= 0"
           small
           class="elevation-1"
           :to="`/institutions/${item.id}/members`"
@@ -129,6 +131,7 @@
       <template #[`item.repositories`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.repositories)"
+          :outlined="item.repositories?.length <= 0"
           small
           class="elevation-1"
           @click="$refs.repositoriesDialog.display(item)"
@@ -144,6 +147,7 @@
       <template #[`item.spaces`]="{ item }">
         <v-chip
           v-if="Array.isArray(item.spaces)"
+          :outlined="item.spaces?.length <= 0"
           small
           class="elevation-1"
           @click="$refs.spacesDialog.display(item)"
