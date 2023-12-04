@@ -101,6 +101,7 @@ exports.list = async (ctx) => {
           name: i.name,
           acronym: i.acronym,
           social: i.social,
+          logoId: i.logoId,
           servicesEnabled,
           contacts,
         };
