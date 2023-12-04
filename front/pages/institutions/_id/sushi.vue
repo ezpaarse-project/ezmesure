@@ -553,12 +553,7 @@ export default {
         {
           text: this.$t('institutions.sushi.endpoint'),
           value: 'endpoint.vendor',
-          sort: (a, b) => {
-            const vendor1 = a?.toLowerCase?.();
-            const vendor2 = b?.toLowerCase?.();
-
-            return vendor1.localeCompare(vendor2);
-          },
+          sort: (a, b) => a?.localeCompare?.(b, this.$i18n.locale, { sensitivity: 'base' }),
         },
         {
           text: this.$t('institutions.sushi.tags'),
