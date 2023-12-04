@@ -142,7 +142,7 @@ export default {
     user() { return this.$auth.user; },
     metadata() { return (this.user && this.user.metadata) || {}; },
     hasMemberships() {
-      return Array.isArray(this.user.memberships) && this.user.memberships.length > 0;
+      return Array.isArray(this.user?.memberships) && this.user.memberships.length > 0;
     },
     repos() {
       return this.user?.memberships?.map(
