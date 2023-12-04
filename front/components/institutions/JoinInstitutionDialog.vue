@@ -14,12 +14,13 @@
           {{ institution?.name }}
         </v-toolbar-title>
       </v-toolbar>
-      <i18n path="institutions.joinInstitution" tag="v-card-text" class="mt-4">
-        <template #institution>
-          <b>{{ institution?.name }}</b>
-        </template>
-      </i18n>
       <v-card-text>
+        <i18n path="institutions.joinInstitution" tag="p" class="mt-4">
+          <template #institution>
+            <b>{{ institution?.name }}</b>
+          </template>
+        </i18n>
+
         {{ $t('institutions.joinInstitutionEmail') }}
       </v-card-text>
       <v-card-actions>
