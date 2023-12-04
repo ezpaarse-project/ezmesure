@@ -687,7 +687,11 @@
     "type": "Type",
     "institutions": "Établissements",
     "institutionsCount": "{count} établissement|{count} établissements",
-    "deleteNbRepositories": "Vous allez supprimer {number} entrepôts."
+    "noInstitutions": "Aucun établissement n'utilise cet entrepôt",
+    "deleteNbRepositories": "Vous allez supprimer {number} entrepôts.",
+    "filters": {
+      "title": "Filtrer les entrepôts"
+    }
   },
   "spaces": {
     "spaces": "Espaces",

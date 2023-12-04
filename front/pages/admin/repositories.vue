@@ -24,12 +24,36 @@
       <template v-else #default>
         <v-spacer />
 
-        <!-- <v-btn text @click="createRepo">
-          <v-icon left>
-            mdi-plus
-          </v-icon>
-          {{ $t('add') }}
-        </v-btn> -->
+        <v-menu
+          v-model="showCreationForm"
+          :close-on-content-click="false"
+          :nudge-width="200"
+          offset-y
+          bottom
+          left
+          @input="$refs.repoCreateForm?.resetForm?.()"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            text
+            :loading="creating"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon left>
+              mdi-plus
+            </v-icon>
+            {{ $t('add') }}
+          </v-btn>
+        </template>
+
+        <RepositoriesCreateForm
+          ref="repoCreateForm"
+          @submit="onRepositoryCreate"
+          @cancel="showCreationForm = false"
+          @loading="creating = $event"
+        />
+      </v-menu>
 
         <v-btn text :loading="refreshing" @click="refreshRepos">
           <v-icon left>
@@ -38,7 +62,7 @@
           {{ $t('refresh') }}
         </v-btn>
 
-        <!-- <v-btn
+        <v-btn
           text
           color="black"
           @click="showReposFiltersDrawer = true"
@@ -54,7 +78,7 @@
             </v-icon>
           </v-badge>
           {{ $t('filter') }}
-        </v-btn> -->
+        </v-btn>
 
         <v-text-field
           v-model="search"
@@ -83,8 +107,8 @@
           v-if="Array.isArray(item.institutions)"
           small
           class="elevation-1"
+          @click="$refs.institutionsDialog?.display?.(item)"
         >
-          <!-- @click="$refs.institutionsDialog?.display?.(item)" -->
           {{ $tc('repositories.institutionsCount', item.institutions.length) }}
 
           <v-icon right small>
@@ -124,33 +148,39 @@
     </v-data-table>
 
     <RepositoriesDeleteDialog ref="deleteDialog" @removed="onReposRemove" />
-    <!-- <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" /> -->
-    <!-- <ReposFiltersDrawer
+    <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" />
+    <ReposFiltersDrawer
       v-model="filters"
       :show.sync="showReposFiltersDrawer"
       :search="search"
-      :max-institution-count="maxCounts.childRepos"
-    /> -->
+      :max-institutions-count="maxCounts.institutions"
+    />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
-// import RepositoriesInstitutionsDialog from '~/components/repositories/InstitutionsDialog.vue';
+import RepositoriesInstitutionsDialog from '~/components/repositories/RepositoriesInstitutionsDialog.vue';
+import RepositoriesCreateForm from '~/components/repositories/RepositoriesCreateForm.vue';
 import RepositoriesDeleteDialog from '~/components/repositories/DeleteDialog.vue';
+import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
 
 export default {
   layout: 'space',
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
-    // RepositoriesInstitutionsDialog,
+    RepositoriesInstitutionsDialog,
+    RepositoriesCreateForm,
+    ReposFiltersDrawer,
     RepositoriesDeleteDialog
   },
   data() {
     return {
       showReposFiltersDrawer: false,
 
+      showCreationForm: false,
+      creating: false,
       selected: [],
       search: '',
       refreshing: false,
@@ -205,24 +235,46 @@ export default {
         },
       ];
     },
-    // filtersCount() {
-    //   return Object.values(this.filters)
-    //     .reduce(
-    //       (prev, filter) => {
-    //         // skipping if undefined or empty
-    //         if (filter == null || filter === '') {
-    //           return prev;
-    //         }
-    //         // skipping if empty array
-    //         if (Array.isArray(filter) && filter.length <= 0) {
-    //           return prev;
-    //         }
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
 
-    //         return prev + 1;
-    //       },
-    //       0,
-    //     );
-    // },
+            return prev + 1;
+          },
+          0,
+        );
+    },
+    /**
+     * Compute maximum count of properties
+     *
+     * @returns {Record<string, number>}
+     */
+     maxCounts() {
+      const counters = {
+        institutions: 0,
+      };
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const institution of this.repos) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const property of Object.keys(counters)) {
+          if (Array.isArray(institution[property])) {
+            counters[property] = Math.max(counters[property], institution[property].length);
+          }
+        }
+      }
+
+      return counters;
+    },
   },
   methods: {
     /**
@@ -282,7 +334,12 @@ export default {
       return this.basicStringFilter(field, item[field]);
     },
     columnTypeFilter(field, item) {
-      return true;
+      const filter = this.filters[field]?.value;
+      if (!filter) {
+        return true;
+      }
+
+      return item[field] === filter;
     },
 
     async refreshRepos() {
@@ -305,9 +362,6 @@ export default {
       this.refreshing = false;
     },
 
-    // createRepo() {
-    //   this.$refs.repoForm.createRepo({ addAsMember: false });
-    // },
     deleteRepo(item) {
       this.$refs.deleteDialog.confirmDelete([item]);
     },
@@ -318,6 +372,10 @@ export default {
       const removeDeleted = (repo) => !removedIds.some((id) => repo.id === id);
       this.repos = this.repos.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
+    },
+    async onRepositoryCreate(newRepository) {
+      this.showCreationForm = false;
+      await this.refreshRepos();
     },
 
     clearSelection() {

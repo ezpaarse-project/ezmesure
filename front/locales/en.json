@@ -687,7 +687,11 @@
     "type": "Type",
     "institutions": "Institutions",
     "institutionsCount": "{count} institution|{count} institutions",
-    "deleteNbRepositories": "You are about to delete {number} repositories"
+    "noInstitutions": "No institutions is using this repository",
+    "deleteNbRepositories": "You are about to delete {number} repositories",
+    "filters": {
+      "title": "Filter repositories"
+    }
   },
   "spaces": {
     "spaces": "Spaces",
