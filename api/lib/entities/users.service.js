@@ -1,12 +1,14 @@
 // @ts-check
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const { addHours } = require('date-fns');
 const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 const secret = config.get('auth.secret');
 const adminUsername = config.get('admin.username');
+const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
 /**
@@ -181,6 +183,17 @@ module.exports = class UsersService {
       return null;
     }
     return jwt.sign({ username: user.username, email: user.email }, secret);
+  }
+
+  static async generateTokenForActivate(username) {
+    const currentDate = new Date();
+    const expiresAt = addHours(currentDate, passwordResetValidity);
+
+    return jwt.sign({
+      username,
+      createdAt: currentDate,
+      expiresAt,
+    }, secret);
   }
 
   /**
