@@ -9,12 +9,12 @@
       </slot>
 
       <ItemTree v-if="Array.isArray(item.items)" :items="item.items" class="pl-4">
-        <template #group="{ item: subitem }">
-          <slot name="group" :item="subitem" />
-        </template>
-
         <template #item="{ item: subitem }">
           <slot name="item" :item="subitem" />
+        </template>
+
+        <template #group="{ item: subitem }">
+          <slot name="group" :item="subitem" />
         </template>
       </ItemTree>
     </div>
@@ -29,10 +29,6 @@ export default {
       type: Array,
       required: true,
     },
-  },
-  mounted() {
-    // console.log(this.$slots);
-    // console.log(this.$scopedSlots);
   },
 };
 </script>

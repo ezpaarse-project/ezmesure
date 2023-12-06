@@ -215,8 +215,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      # redis:
-      #   condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
 
   reporting-mail:
@@ -245,7 +245,7 @@ services:
       - EMAIL_ATTEMPTS_INTERVAL=${EZREEPORT_EMAIL_ATTEMPTS_INTERVAL}
       # common
       - LOG_LEVEL=${EZREEPORT_LOG_LEVEL}
-    # depends_on:
-    #   redis:
-    #     condition: service_healthy
+    depends_on:
+      redis:
+        condition: service_started
     restart: unless-stopped
