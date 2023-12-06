@@ -78,7 +78,7 @@ describe('[users]: Test update users features', () => {
           await usersElastic.createUser(userTest);
         });
 
-        it(`#02 Should not update us${userTest.username}rTest.username}]`, async () => {
+        it(`#02 Should not update [${userTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
@@ -114,7 +114,7 @@ describe('[users]: Test update users features', () => {
           await usersElastic.createUser(userTest);
         });
 
-        it(`#03 Should not update us${userTest.username}rTest.username}]`, async () => {
+        it(`#03 Should not update [${userTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
