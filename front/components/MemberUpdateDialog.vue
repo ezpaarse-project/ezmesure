@@ -27,37 +27,39 @@
         </v-card-title>
 
         <v-card-text>
-          <v-label>
-            {{ $t('institutions.members.correspondent') }}
-          </v-label>
-
-          <div class="pl-4">
-            <v-checkbox
-              v-for="item in correspondents"
-              :key="item.value"
-              :input-value="item.isActive"
-              :disabled="saving"
-              hide-details
-              @click="changeRole(item.value)"
-            >
-              <template #label>
+          <ItemTree :items="rolesItems">
+            <template #group="{ item }">
+              <v-label>
                 {{ item.text }}
-                <v-slide-x-transition mode="out-in">
-                  <v-icon v-if="successfulSave" key="icon-success" color="success" right>
-                    mdi-check
-                  </v-icon>
-                  <v-progress-circular
-                    v-else-if="saving"
-                    key="loader"
-                    class="ml-2"
-                    indeterminate
-                    size="18"
-                    width="2"
-                  />
-                </v-slide-x-transition>
-              </template>
-            </v-checkbox>
-          </div>
+              </v-label>
+            </template>
+
+            <template #item="{item}">
+              <v-checkbox
+                :input-value="item.isActive"
+                :disabled="saving"
+                hide-details
+                @click="changeRole(item.value, item.accessLevel)"
+              >
+                <template #label>
+                  {{ item.text }}
+                  <v-slide-x-transition mode="out-in">
+                    <v-icon v-if="successfulSave" key="icon-success" color="success" right>
+                      mdi-check
+                    </v-icon>
+                    <v-progress-circular
+                      v-else-if="saving"
+                      key="loader"
+                      class="ml-2"
+                      indeterminate
+                      size="18"
+                      width="2"
+                    />
+                  </v-slide-x-transition>
+                </template>
+              </v-checkbox>
+            </template>
+          </ItemTree>
         </v-card-text>
 
         <v-divider />
@@ -166,12 +168,14 @@
 import MemberRepoPermissions from '~/components/MemberRepoPermissions.vue';
 import MemberSpacePermissions from '~/components/MemberSpacePermissions.vue';
 import MemberInstitutionPermissions from '~/components/MemberInstitutionPermissions.vue';
+import ItemTree from '~/components/ItemTree.vue';
 
 export default {
   components: {
     MemberRepoPermissions,
     MemberSpacePermissions,
     MemberInstitutionPermissions,
+    ItemTree,
   },
   props: {
     institutionId: {
@@ -199,21 +203,32 @@ export default {
     readonly() {
       return (this.locked === true) && !this.isAdmin;
     },
-    correspondents() {
+    rolesItems() {
       const roles = new Set(this.roles);
+      const genBaseItem = (value) => ({ value, isActive: roles.has(value) });
 
       return [
         {
-          value: 'contact:doc',
-          text: this.$t('institutions.members.documentary'),
+          text: this.$t('institutions.members.correspondent'),
+          items: [
+            {
+              ...genBaseItem('contact:doc'),
+              text: this.$t('institutions.members.documentary'),
+              accessLevel: 'write',
+            },
+            {
+              ...genBaseItem('contact:tech'),
+              text: this.$t('institutions.members.technical'),
+              accessLevel: 'write',
+            },
+          ],
         },
         {
-          value: 'contact:tech',
-          text: this.$t('institutions.members.technical'),
+          ...genBaseItem('guest'),
+          text: this.$t('institutions.members.roleNames.guest'),
+          accessLevel: 'read',
         },
-      ].map(
-        (item) => ({ ...item, isActive: roles.has(item.value) }),
-      );
+      ];
     },
   },
   watch: {
@@ -279,7 +294,7 @@ export default {
       );
     },
 
-    async changeRole(role) {
+    async changeRole(role, access) {
       const current = new Set(this.roles);
 
       if (current.has(role)) {
@@ -288,13 +303,16 @@ export default {
         current.add(role);
       }
 
-      // If it's the first role added, add all perms to write
-      if (current.size === 1 && this.roles.length === 0) {
-        await Promise.all([
-          this.changeAllInstitutionPermissions('write'),
-          this.changeAllRepoPermissions('write'),
-          this.changeAllSpacePermissions('write'),
-        ]);
+      // If access provided
+      if (access) {
+        // If it's the first role added, add all perms to write
+        if (current.size === 1 && this.roles.length === 0) {
+          await Promise.all([
+            this.changeAllInstitutionPermissions(access),
+            this.changeAllRepoPermissions(access),
+            this.changeAllSpacePermissions(access),
+          ]);
+        }
       }
 
       this.roles = [...current];
