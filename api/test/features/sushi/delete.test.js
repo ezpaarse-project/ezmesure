@@ -3,6 +3,7 @@ const config = require('config');
 const ezmesure = require('../../setup/ezmesure');
 
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const institutionsPrisma = require('../../../lib/services/prisma/institutions');
 const usersPrisma = require('../../../lib/services/prisma/users');
@@ -82,6 +83,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
 
   beforeAll(async () => {
     await resetDatabase();
+    await resetElastic();
     adminToken = await usersService.generateToken(adminUsername, adminPassword);
     const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
@@ -531,5 +533,6 @@ describe('[sushi]: Test delete sushi credential features', () => {
   });
   afterAll(async () => {
     await resetDatabase();
+    await resetElastic();
   });
 });

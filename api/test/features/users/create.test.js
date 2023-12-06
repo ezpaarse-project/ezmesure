@@ -3,6 +3,7 @@ const config = require('config');
 const ezmesure = require('../../setup/ezmesure');
 
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersService = require('../../../lib/entities/users.service');
@@ -20,6 +21,7 @@ describe('[users]: Test create users features', () => {
 
   beforeAll(async () => {
     await resetDatabase();
+    await resetElastic();
   });
   describe('As admin', () => {
     describe(`Create new user [${userTest.username}]`, () => {
@@ -103,5 +105,6 @@ describe('[users]: Test create users features', () => {
   });
   afterAll(async () => {
     await resetDatabase();
+    await resetElastic();
   });
 });

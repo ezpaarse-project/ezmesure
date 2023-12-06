@@ -9,6 +9,7 @@ const usersElastic = require('../../../../lib/services/elastic/users');
 const usersService = require('../../../../lib/entities/users.service');
 
 const { resetDatabase } = require('../../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../../lib/services/elastic/utils');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -49,6 +50,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
 
   beforeAll(async () => {
     await resetDatabase();
+    await resetElastic();
     adminToken = await usersService.generateToken(adminUsername, adminPassword);
 
     const institution = await institutionsPrisma.create({ data: institutionTest });
@@ -320,5 +322,6 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   });
   afterAll(async () => {
     await resetDatabase();
+    await resetElastic();
   });
 });

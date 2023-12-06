@@ -3,6 +3,7 @@ const config = require('config');
 const ezmesure = require('../../setup/ezmesure');
 
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
@@ -39,6 +40,7 @@ describe('[repositories]: Test create features', () => {
 
     beforeAll(async () => {
       await resetDatabase();
+    await resetElastic();
       adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
 
@@ -249,5 +251,6 @@ describe('[repositories]: Test create features', () => {
   });
   afterAll(async () => {
     await resetDatabase();
+    await resetElastic();
   });
 });
