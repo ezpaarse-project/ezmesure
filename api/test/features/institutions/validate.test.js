@@ -1,31 +1,41 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const institutionsService = require('../../../lib/entities/institutions.service');
-const usersService = require('../../../lib/entities/users.service');
-
-const { createInstitution } = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
+const institutionsPrisma = require('../../../lib/services/prisma/institutions');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[institutions]: Test validate institution features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
 
   let adminToken;
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
 
   describe('As admin', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
     it(`#01 Should validate institution [${institutionTest.name}]`, async () => {
@@ -44,7 +54,7 @@ describe('[institutions]: Test validate institution features', () => {
       expect(institutionFromResponse).toHaveProperty('validated', true);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', true);
     });
 
@@ -66,27 +76,27 @@ describe('[institutions]: Test validate institution features', () => {
       expect(institutionFromResponse).toHaveProperty('validated', false);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', false);
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('As user', () => {
     let userToken;
-    let userTest;
     beforeAll(async () => {
-      // TODO use service to create user
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
     let institutionId;
     describe('Institution created by user', () => {
       beforeAll(async () => {
-        // TODO use service to create institution
-        institutionId = await createInstitution(institutionTest, userTest);
+        const institution = await institutionsPrisma
+          .createAsUser(institutionTest, userTest.username);
+        institutionId = institution.id;
       });
 
       it(`#03 Should not validate institution [${institutionTest.name}]`, async () => {
@@ -103,7 +113,7 @@ describe('[institutions]: Test validate institution features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const institutionFromService = await institutionsService.findByID(institutionId);
+        const institutionFromService = await institutionsPrisma.findByID(institutionId);
         expect(institutionFromService).toHaveProperty('validated', false);
       });
 
@@ -123,7 +133,7 @@ describe('[institutions]: Test validate institution features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const institutionFromService = await institutionsService.findByID(institutionId);
+        const institutionFromService = await institutionsPrisma.findByID(institutionId);
         expect(institutionFromService).toHaveProperty('validated', false);
       });
     });
@@ -143,7 +153,7 @@ describe('[institutions]: Test validate institution features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const institutionFromService = await institutionsService.findByID(institutionId);
+        const institutionFromService = await institutionsPrisma.findByID(institutionId);
         expect(institutionFromService).toHaveProperty('validated', false);
       });
 
@@ -163,20 +173,20 @@ describe('[institutions]: Test validate institution features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const institutionFromService = await institutionsService.findByID(institutionId);
+        const institutionFromService = await institutionsPrisma.findByID(institutionId);
         expect(institutionFromService).toHaveProperty('validated', false);
       });
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
-      await usersService.removeAll();
+      await institutionsPrisma.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
     let institutionId;
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
     it(`#07 Should not validate institution [${institutionTest.name}]`, async () => {
@@ -193,7 +203,7 @@ describe('[institutions]: Test validate institution features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', false);
     });
 
@@ -212,18 +222,18 @@ describe('[institutions]: Test validate institution features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', false);
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('Without token', () => {
     let institutionId;
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
     it(`#09 Should not validate institution [${institutionTest.name}]`, async () => {
@@ -237,7 +247,7 @@ describe('[institutions]: Test validate institution features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', false);
     });
 
@@ -253,12 +263,12 @@ describe('[institutions]: Test validate institution features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
       expect(institutionFromService).toHaveProperty('validated', false);
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   afterAll(async () => {

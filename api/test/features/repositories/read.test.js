@@ -1,15 +1,25 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const repositoriesService = require('../../../lib/entities/repositories.service');
-const institutionsService = require('../../../lib/entities/institutions.service');
-const usersService = require('../../../lib/entities/users.service');
-
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
-const { createRepositoryAsAdmin } = require('../../setup/repositories');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+const repositoriesPrisma = require('../../../lib/services/prisma/repositories');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[repositories]: Test read features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const ezpaarseRepositoryConfig = {
     pattern: 'ezpaarse-*',
     type: 'ezPAARSE',
@@ -28,13 +38,13 @@ describe('[repositories]: Test read features', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-      adminToken = await getAdminToken();
+      adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
     describe(`Get repository of type [${ezcounterRepositoryConfig.type}]`, () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezcounterRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -59,23 +69,23 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
     let userToken;
-    let userTest;
 
     beforeAll(async () => {
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
     describe(`Get repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -93,11 +103,11 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random user', () => {
@@ -105,7 +115,7 @@ describe('[repositories]: Test read features', () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -123,7 +133,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });
@@ -132,7 +142,7 @@ describe('[repositories]: Test read features', () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -146,7 +156,7 @@ describe('[repositories]: Test read features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });

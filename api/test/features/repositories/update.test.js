@@ -1,13 +1,25 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const repositoriesService = require('../../../lib/entities/repositories.service');
-const usersService = require('../../../lib/entities/users.service');
-
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+const repositoriesPrisma = require('../../../lib/services/prisma/repositories');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[repositories]: Test update features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const ezpaarseRepositoryConfig = {
     pattern: 'ezpaarse-*',
     type: 'ezPAARSE',
@@ -32,13 +44,13 @@ describe('[repositories]: Test update features', () => {
 
     beforeAll(async () => {
       await resetDatabase();
-      adminToken = await getAdminToken();
+      adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
     describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}]`, () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -63,7 +75,7 @@ describe('[repositories]: Test update features', () => {
         expect(repository).toHaveProperty('type', updateRepositoryConfig?.type);
 
         // Test service
-        const repositoryFromService = await repositoriesService
+        const repositoryFromService = await repositoriesPrisma
           .findByPattern(updateRepositoryConfig.pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
@@ -73,23 +85,23 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
     let userToken;
-    let userTest;
     beforeAll(async () => {
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
 
     describe(`Update repository of type [${ezpaarseRepositoryConfig.type}] with [${updateRepositoryConfig.type}]`, () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -107,7 +119,7 @@ describe('[repositories]: Test update features', () => {
         expect(res).toHaveProperty('status', 403);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -116,11 +128,11 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
@@ -128,7 +140,7 @@ describe('[repositories]: Test update features', () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -146,7 +158,7 @@ describe('[repositories]: Test update features', () => {
         expect(res).toHaveProperty('status', 401);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -155,7 +167,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });
@@ -164,7 +176,7 @@ describe('[repositories]: Test update features', () => {
       let pattern;
 
       beforeAll(async () => {
-        const repository = await repositoriesService.create({ data: ezpaarseRepositoryConfig });
+        const repository = await repositoriesPrisma.create({ data: ezpaarseRepositoryConfig });
         pattern = repository.pattern;
       });
 
@@ -179,7 +191,7 @@ describe('[repositories]: Test update features', () => {
         expect(res).toHaveProperty('status', 401);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -188,7 +200,7 @@ describe('[repositories]: Test update features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.removeAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });

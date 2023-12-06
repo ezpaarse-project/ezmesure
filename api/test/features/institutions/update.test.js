@@ -1,17 +1,27 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
-const institutionsService = require('../../../lib/entities/institutions.service');
-const usersService = require('../../../lib/entities/users.service');
 
-const { createInstitution } = require('../../setup/institutions');
-
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
+const institutionsPrisma = require('../../../lib/services/prisma/institutions');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[institutions]: Test update features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
 
   const updateInstitutionTest = {
@@ -22,14 +32,14 @@ describe('[institutions]: Test update features', () => {
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
 
   describe('As admin', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -52,7 +62,7 @@ describe('[institutions]: Test update features', () => {
       expect(institutionFromResponse?.createdAt).not.toBeNull();
       expect(institutionFromResponse?.updatedAt).not.toBeNull();
       expect(institutionFromResponse).toHaveProperty('name', updateInstitutionTest.name);
-      expect(institutionFromResponse).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institutionFromResponse).toHaveProperty('namespace', null);
       expect(institutionFromResponse).toHaveProperty('validated', false);
       expect(institutionFromResponse).toHaveProperty('hidePartner', false);
       expect(institutionFromResponse).toHaveProperty('tags', []);
@@ -66,14 +76,14 @@ describe('[institutions]: Test update features', () => {
       expect(institutionFromResponse).toHaveProperty('sushiReadySince', null);
 
       // Test service
-      const institutionFromService = await institutionsService.findByID(institutionId);
+      const institutionFromService = await institutionsPrisma.findByID(institutionId);
 
       expect(institutionFromService).toHaveProperty('id', institutionId);
       expect(institutionFromService).toHaveProperty('parentInstitutionId', null);
       expect(institutionFromService?.createdAt).not.toBeNull();
       expect(institutionFromService?.updatedAt).not.toBeNull();
       expect(institutionFromService).toHaveProperty('name', updateInstitutionTest.name);
-      expect(institutionFromService).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institutionFromService).toHaveProperty('namespace', null);
       expect(institutionFromService).toHaveProperty('validated', false);
       expect(institutionFromService).toHaveProperty('hidePartner', false);
       expect(institutionFromService).toHaveProperty('tags', []);
@@ -88,22 +98,22 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('As user', () => {
     let userToken;
-    let userTest;
     let institutionId;
     beforeAll(async () => {
-      // TODO use service to create user
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
     describe('Institution created by user', () => {
       beforeAll(async () => {
-        // TODO user service to create institution by user
-        institutionId = await createInstitution(institutionTest, userTest);
+        const institution = await institutionsPrisma
+          .createAsUser(institutionTest, userTest.username);
+        institutionId = institution.id;
       });
 
       it(`#02 Should update institution [${institutionTest.name}] to [${updateInstitutionTest.name}]`, async () => {
@@ -139,7 +149,7 @@ describe('[institutions]: Test update features', () => {
         expect(institutionFromResponse).toHaveProperty('sushiReadySince', null);
 
         // Test service
-        const institutionFromService = await institutionsService.findByID(institutionId);
+        const institutionFromService = await institutionsPrisma.findByID(institutionId);
 
         expect(institutionFromService).toHaveProperty('id', institutionId);
         expect(institutionFromService).toHaveProperty('parentInstitutionId', null);
@@ -160,15 +170,13 @@ describe('[institutions]: Test update features', () => {
         expect(institutionFromService).toHaveProperty('sushiReadySince', null);
       });
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
 
     describe('Institution created by other', () => {
       beforeAll(async () => {
-        institutionId = await createInstitution(institutionTest, userTest);
-
-        const institution = await institutionsService.create({ data: institutionTest });
+        const institution = await institutionsPrisma.create({ data: institutionTest });
         institutionId = institution.id;
       });
 
@@ -186,14 +194,14 @@ describe('[institutions]: Test update features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const institution = await institutionsService.findByID(institutionId);
+        const institution = await institutionsPrisma.findByID(institutionId);
 
         expect(institution).toHaveProperty('id', institutionId);
         expect(institution).toHaveProperty('parentInstitutionId', null);
         expect(institution?.createdAt).not.toBeNull();
         expect(institution?.updatedAt).not.toBeNull();
         expect(institution).toHaveProperty('name', institutionTest.name);
-        expect(institution).toHaveProperty('namespace', institutionTest.namespace);
+        expect(institution).toHaveProperty('namespace', null);
         expect(institution).toHaveProperty('validated', false);
         expect(institution).toHaveProperty('hidePartner', false);
         expect(institution).toHaveProperty('tags', []);
@@ -207,17 +215,17 @@ describe('[institutions]: Test update features', () => {
         expect(institution).toHaveProperty('sushiReadySince', null);
       });
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
     let institutionId;
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -235,14 +243,14 @@ describe('[institutions]: Test update features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
 
       expect(institution).toHaveProperty('id', institutionId);
       expect(institution).toHaveProperty('parentInstitutionId', null);
       expect(institution?.createdAt).not.toBeNull();
       expect(institution?.updatedAt).not.toBeNull();
       expect(institution).toHaveProperty('name', institutionTest.name);
-      expect(institution).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institution).toHaveProperty('namespace', null);
       expect(institution).toHaveProperty('validated', false);
       expect(institution).toHaveProperty('hidePartner', false);
       expect(institution).toHaveProperty('tags', []);
@@ -257,14 +265,14 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('Without token', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -279,14 +287,14 @@ describe('[institutions]: Test update features', () => {
       expect(httpAppResponse).toHaveProperty('status', 401);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
 
       expect(institution).toHaveProperty('id', institutionId);
       expect(institution).toHaveProperty('parentInstitutionId', null);
       expect(institution?.createdAt).not.toBeNull();
       expect(institution?.updatedAt).not.toBeNull();
       expect(institution).toHaveProperty('name', institutionTest.name);
-      expect(institution).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institution).toHaveProperty('namespace', null);
       expect(institution).toHaveProperty('validated', false);
       expect(institution).toHaveProperty('hidePartner', false);
       expect(institution).toHaveProperty('tags', []);
@@ -301,7 +309,7 @@ describe('[institutions]: Test update features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   afterAll(async () => {

@@ -1,16 +1,14 @@
 const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const usersService = require('../../../lib/entities/users.service');
-
-const usernameAdmin = config.get('admin.username');
-const passwordAdmin = config.get('admin.password');
-
-const {
-  createDefaultActivatedUserAsAdmin,
-  createDefaultUserAsAdmin,
-} = require('../../setup/users');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[users]: Test login users features', () => {
   const userTest = {
@@ -18,8 +16,9 @@ describe('[users]: Test login users features', () => {
     email: 'user.test@test.fr',
     fullName: 'User test',
     isAdmin: false,
-    password: 'changeme',
   };
+
+  const userPassword = 'changeme';
 
   beforeAll(async () => {
     await resetDatabase();
@@ -30,8 +29,8 @@ describe('[users]: Test login users features', () => {
         method: 'POST',
         url: '/login/local',
         data: {
-          username: usernameAdmin,
-          password: passwordAdmin,
+          username: adminUsername,
+          password: adminPassword,
         },
       });
 
@@ -41,7 +40,10 @@ describe('[users]: Test login users features', () => {
 
   describe('Activated user', () => {
     beforeAll(async () => {
-      await createDefaultActivatedUserAsAdmin();
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      await usersElastic.updatePassword(userTest.username, userPassword);
+      await usersPrisma.acceptTerms(userTest.username);
     });
 
     it('#02 Should get auth token', async () => {
@@ -50,7 +52,7 @@ describe('[users]: Test login users features', () => {
         url: '/login/local',
         data: {
           username: userTest.username,
-          password: userTest.password,
+          password: userPassword,
         },
       });
 
@@ -58,13 +60,15 @@ describe('[users]: Test login users features', () => {
     });
 
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
 
   describe('Not activated user', () => {
     beforeAll(async () => {
-      await createDefaultUserAsAdmin();
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      await usersElastic.updatePassword(userTest.username, userPassword);
     });
 
     it('#03 Should get auth token', async () => {
@@ -73,7 +77,7 @@ describe('[users]: Test login users features', () => {
         url: '/login/local',
         data: {
           username: userTest.username,
-          password: userTest.password,
+          password: userPassword,
         },
       });
 
@@ -81,7 +85,7 @@ describe('[users]: Test login users features', () => {
     });
 
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
 

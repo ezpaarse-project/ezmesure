@@ -1,15 +1,19 @@
+const config = require('config');
+
 const ezmesure = require('../../../setup/ezmesure');
 
-const repositoriesService = require('../../../../lib/entities/repositories.service');
-const institutionsService = require('../../../../lib/entities/institutions.service');
-const membershipsService = require('../../../../lib/entities/memberships.service');
-const usersService = require('../../../../lib/entities/users.service');
-const repositoryPermissionsService = require('../../../../lib/entities/repository-permissions.service');
-
-const { getToken, getAdminToken } = require('../../../setup/login');
-
-const { createUserAsAdmin } = require('../../../setup/users');
 const { resetDatabase } = require('../../../../lib/services/prisma/utils');
+
+const repositoriesPrisma = require('../../../../lib/services/prisma/repositories');
+const institutionsPrisma = require('../../../../lib/services/prisma/institutions');
+const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
+const usersPrisma = require('../../../../lib/services/prisma/users');
+const usersElastic = require('../../../../lib/services/elastic/users');
+const usersService = require('../../../../lib/entities/users.service');
+const repositoryPermissionsPrisma = require('../../../../lib/services/prisma/repository-permissions');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[repository permission]: Test update features', () => {
   const allPermission = ['memberships:write', 'memberships:read'];
@@ -29,7 +33,6 @@ describe('[repository permission]: Test update features', () => {
 
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
 
   const ezpaarseRepositoryConfig = {
@@ -61,37 +64,33 @@ describe('[repository permission]: Test update features', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-      adminToken = await getAdminToken();
+      adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
 
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
+        const institution = await institutionsPrisma.create({ data: institutionTest });
         institutionId = institution.id;
       });
 
       describe('with pattern ezpaarse connected to institution', () => {
         let pattern;
         beforeAll(async () => {
-          const repository = await repositoriesService.create({ data: ezcounterRepositoryConfig });
+          const repository = await repositoriesPrisma.create({ data: ezcounterRepositoryConfig });
           pattern = repository.pattern;
-          await repositoriesService.connectInstitution(pattern, institutionId);
+          await repositoriesPrisma.connectInstitution(pattern, institutionId);
         });
-        describe('for user user.test', () => {
+        describe(`for user [${userTest.username}]`, () => {
           beforeAll(async () => {
-            await createUserAsAdmin(
-              userTest.username,
-              userTest.email,
-              userTest.fullName,
-              userTest.isAdmin,
-            );
+            await usersPrisma.create({ data: userTest });
+            await usersElastic.createUser(userTest);
             membershipUserTest.institutionId = institutionId;
-            await membershipsService.create({ data: membershipUserTest });
+            await membershipsPrisma.create({ data: membershipUserTest });
             permissionTest.username = userTest.username;
             permissionTest.institutionId = institutionId;
             permissionTest.repositoryPattern = pattern;
-            await repositoryPermissionsService.create({ data: permissionTest });
+            await repositoryPermissionsPrisma.create({ data: permissionTest });
           });
           it('#01 Should update repository permission', async () => {
             const httpAppResponse = await ezmesure({
@@ -115,7 +114,7 @@ describe('[repository permission]: Test update features', () => {
             expect(repositoryPermissionFromResponse).toHaveProperty('readonly', permissionUpdateTest.readonly);
 
             // Test service
-            const repositoryPermissionFromService = await repositoryPermissionsService
+            const repositoryPermissionFromService = await repositoryPermissionsPrisma
               .findById(institutionId, pattern, userTest.username);
 
             expect(repositoryPermissionFromService).toHaveProperty('institutionId', institutionId);
@@ -125,17 +124,17 @@ describe('[repository permission]: Test update features', () => {
             expect(repositoryPermissionFromService).toHaveProperty('readonly', permissionUpdateTest.readonly);
           });
           afterAll(async () => {
-            await repositoryPermissionsService.removeAll();
-            await usersService.removeAll();
-            await membershipsService.removeAll();
+            await repositoryPermissionsPrisma.removeAll();
+            await membershipsPrisma.removeAll();
+            await usersPrisma.removeAll();
           });
         });
         afterAll(async () => {
-          await repositoriesService.removeAll();
+          await repositoriesPrisma.removeAll();
         });
       });
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
   });

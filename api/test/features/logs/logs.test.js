@@ -1,26 +1,36 @@
 const path = require('path');
 const fs = require('fs-extra');
+const config = require('config');
 
 const ezmesure = require('../../setup/ezmesure');
-const indicesService = require('../../../lib/services/elastic/indices');
-const usersService = require('../../../lib/entities/users.service');
 
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken } = require('../../setup/login');
-
-const { getAdminToken } = require('../../setup/login');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+
+const indicesPrisma = require('../../../lib/services/elastic/indices');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
 
 const logDir = path.resolve(__dirname, '..', '..', 'sources', 'log');
 
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[logs]: Test insert features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const indexName = 'index-text';
   describe('As admin', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-      adminToken = await getAdminToken();
-      await indicesService.create(indexName, null, { ignore: [404] });
+      adminToken = await usersService.generateToken(adminUsername, adminPassword);
+      await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     describe(`Add [wiley.csv] in [${indexName}] index`, () => {
       it(`#01 Should upload ec in index [${indexName}]`, async () => {
@@ -49,23 +59,22 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.removeAll();
+        await indicesPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
-    let userTest;
     let userToken;
 
     beforeEach(async () => {
-      // TODO use service to create user
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
     // TODO create roles
     describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {
       beforeAll(async () => {
-        await indicesService.create(indexName, null, { ignore: [404] });
+        await indicesPrisma.create(indexName, null, { ignore: [404] });
       });
 
       it(`#02 Should not upload ec in index [${indexName}]`, async () => {
@@ -84,13 +93,13 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.removeAll();
+        await indicesPrisma.removeAll();
       });
     });
 
     describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {
       beforeAll(async () => {
-        await indicesService.create(indexName, null, { ignore: [404] });
+        await indicesPrisma.create(indexName, null, { ignore: [404] });
       });
 
       it(`#03 Should not upload ec in index [${indexName}]`, async () => {
@@ -109,16 +118,16 @@ describe('[logs]: Test insert features', () => {
       });
 
       afterAll(async () => {
-        await indicesService.removeAll();
+        await indicesPrisma.removeAll();
       });
     });
     afterEach(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
     beforeAll(async () => {
-      await indicesService.create(indexName, null, { ignore: [404] });
+      await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
 
     it(`#04 Should not upload ec in index [${indexName}]`, async () => {
@@ -137,12 +146,12 @@ describe('[logs]: Test insert features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.removeAll();
+      await indicesPrisma.removeAll();
     });
   });
   describe('Without token', () => {
     beforeAll(async () => {
-      await indicesService.create(indexName, null, { ignore: [404] });
+      await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
 
     it(`#05 Should not upload ec in index [${indexName}]`, async () => {
@@ -158,7 +167,7 @@ describe('[logs]: Test insert features', () => {
     });
 
     afterAll(async () => {
-      await indicesService.removeAll();
+      await indicesPrisma.removeAll();
     });
   });
   afterAll(async () => {

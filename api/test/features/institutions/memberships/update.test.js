@@ -1,12 +1,17 @@
+const config = require('config');
+
 const ezmesure = require('../../../setup/ezmesure');
 
-const institutionsService = require('../../../../lib/entities/institutions.service');
-const membershipsService = require('../../../../lib/entities/memberships.service');
+const { resetDatabase } = require('../../../../lib/services/prisma/utils');
+
+const institutionsPrisma = require('../../../../lib/services/prisma/institutions');
+const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
+const usersPrisma = require('../../../../lib/services/prisma/users');
+const usersElastic = require('../../../../lib/services/elastic/users');
 const usersService = require('../../../../lib/entities/users.service');
 
-const { createUserAsAdmin, activateUser } = require('../../../setup/users');
-const { getToken, getAdminToken } = require('../../../setup/login');
-const { resetDatabase } = require('../../../../lib/services/prisma/utils');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[institutions - memberships]: Test update memberships features', () => {
   let adminToken;
@@ -14,15 +19,14 @@ describe('[institutions - memberships]: Test update memberships features', () =>
 
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
   const userTest = {
     username: 'user.test',
     email: 'user.test@test.fr',
     fullName: 'User test',
     isAdmin: false,
-    password: 'changeme',
   };
+
   const membershipUserTest = {
     username: userTest.username,
   };
@@ -32,8 +36,10 @@ describe('[institutions - memberships]: Test update memberships features', () =>
     email: 'user.manager@test.fr',
     fullName: 'User manager',
     isAdmin: false,
-    password: 'changeme',
   };
+
+  const userManagerPassword = 'changeme';
+
   const membershipUserManagerTest = {
     username: userManagerTest.username,
   };
@@ -47,19 +53,13 @@ describe('[institutions - memberships]: Test update memberships features', () =>
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
 
-    const institution = await institutionsService.create({ data: institutionTest });
+    const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
 
-    // TODO use service to create user
-    await createUserAsAdmin(
-      userTest.username,
-      userTest.email,
-      userTest.fullName,
-      userTest.isAdmin,
-    );
-    await activateUser(userTest.username, userTest.password);
+    await usersPrisma.create({ data: userTest });
+    await usersElastic.createUser(userTest);
 
     membershipUserTest.institutionId = institutionId;
     membershipUserManagerTest.institutionId = institutionId;
@@ -68,7 +68,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
     describe(`Update membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = basePermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
 
       it(`#01 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
@@ -94,7 +94,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         expect(membershipFromResponse).toHaveProperty('locked', false);
 
         // Test service
-        const membershipFromService = await membershipsService
+        const membershipFromService = await membershipsPrisma
           .findByID(institutionId, userTest.username);
 
         expect(membershipFromService).toHaveProperty('username', userTest.username);
@@ -105,14 +105,14 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
 
     describe(`Update membership with permissions [memberships:write, memberships:read] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = basePermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
 
       it(`#02 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [memberships:write, memberships:read]`, async () => {
@@ -138,7 +138,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         expect(membershipFromResponse).toHaveProperty('locked', false);
 
         // Test service
-        const membershipFromService = await membershipsService
+        const membershipFromService = await membershipsPrisma
           .findByID(institutionId, userTest.username);
 
         expect(membershipFromService).toHaveProperty('username', userTest.username);
@@ -149,34 +149,27 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
     beforeAll(async () => {
-      // TODO use service to create user
-      await createUserAsAdmin(
-        userManagerTest.username,
-        userManagerTest.email,
-        userManagerTest.fullName,
-        userManagerTest.isAdmin,
-      );
-      await activateUser(
-        userManagerTest.username,
-        userManagerTest.password,
-      );
-      userManagerToken = await getToken('user.manager', 'changeme');
+      await usersPrisma.create({ data: userManagerTest });
+      await usersElastic.createUser(userManagerTest);
+
+      userManagerToken = await usersService
+        .generateToken(userManagerTest.username, userManagerPassword);
     });
     describe(`With permission [${allPermission}]`, () => {
       beforeEach(async () => {
         membershipUserManagerTest.permissions = allPermission;
-        await membershipsService.create({ data: membershipUserManagerTest });
+        await membershipsPrisma.create({ data: membershipUserManagerTest });
       });
       describe(`Update membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = basePermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it(`#03 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${emptyPermission}]`, async () => {
@@ -203,7 +196,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           expect(membershipFromResponse).toHaveProperty('locked', false);
 
           // Test service
-          const membershipFromService = await membershipsService
+          const membershipFromService = await membershipsPrisma
             .findByID(institutionId, userTest.username);
 
           expect(membershipFromService).toHaveProperty('username', userTest.username);
@@ -217,7 +210,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       describe(`Update membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = basePermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it(`#04 Should update user [${userTest.username}] in institution [${institutionTest.name}] with permissions [${readPermission}]`, async () => {
@@ -244,7 +237,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           expect(membershipFromResponse).toHaveProperty('locked', false);
 
           // Test service
-          const membershipFromService = await membershipsService
+          const membershipFromService = await membershipsPrisma
             .findByID(institutionId, userTest.username);
 
           expect(membershipFromService).toHaveProperty('username', userTest.username);
@@ -255,19 +248,19 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
       });
       afterEach(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
     describe(`With permission [${readPermission}]`, () => {
       beforeAll(async () => {
         membershipUserManagerTest.permissions = ['memberships:read'];
-        await membershipsService.create({ data: membershipUserManagerTest });
+        await membershipsPrisma.create({ data: membershipUserManagerTest });
       });
 
       describe(`Update membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = basePermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it(`#05 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
@@ -285,7 +278,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
           expect(httpAppResponse).toHaveProperty('status', 403);
 
           // Test service
-          const membership = await membershipsService.findByID(institutionId, userTest.username);
+          const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
 
           expect(membership).toHaveProperty('username', userTest.username);
           expect(membership).toHaveProperty('institutionId', institutionId);
@@ -295,7 +288,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         });
       });
       afterAll(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
@@ -303,7 +296,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
     describe(`Update membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = basePermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
 
       it(`#06 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
@@ -322,7 +315,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
@@ -332,7 +325,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
@@ -340,7 +333,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
     describe(`Update membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = basePermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
 
       it(`#07 Should get memberships between user [${userTest.username}] institution [${institutionTest.name}] without update`, async () => {
@@ -356,7 +349,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
@@ -366,7 +359,7 @@ describe('[institutions - memberships]: Test update memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.removeAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });

@@ -1,15 +1,19 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const institutionsService = require('../../../lib/entities/institutions.service');
-const usersService = require('../../../lib/entities/users.service');
-const sushiEndpointsService = require('../../../lib/entities/sushi-endpoints.service');
-const sushiCredentialsService = require('../../../lib/entities/sushi-credentials.service');
-const membershipsService = require('../../../lib/entities/memberships.service');
-
-const { createInstitution } = require('../../setup/institutions');
-const { createDefaultActivatedUserAsAdmin, createUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
+
+const institutionsPrisma = require('../../../lib/services/prisma/institutions');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+const sushiEndpointsPrisma = require('../../../lib/services/prisma/sushi-endpoints');
+const sushiCredentialsPrisma = require('../../../lib/services/prisma/sushi-credentials');
+const membershipsPrisma = require('../../../lib/services/prisma/memberships');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[sushi]: Test create sushi credential features', () => {
   const allPermission = ['sushi:write', 'sushi:read'];
@@ -19,7 +23,11 @@ describe('[sushi]: Test create sushi credential features', () => {
 
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
+    validated: true,
+  };
+
+  const institutionTest2 = {
+    name: 'Test2',
     validated: true,
   };
 
@@ -28,8 +36,10 @@ describe('[sushi]: Test create sushi credential features', () => {
     email: 'user.test@test.fr',
     fullName: 'User test',
     isAdmin: false,
-    password: 'changeme',
   };
+
+  const userPassword = 'changeme';
+
   const membershipUserTest = {
     username: userTest.username,
   };
@@ -39,8 +49,6 @@ describe('[sushi]: Test create sushi credential features', () => {
     email: 'another.user@test.fr',
     fullName: 'Another user',
     isAdmin: false,
-    password: 'changeme',
-    permissions: ['memberships:write', 'memberships:read'],
   };
 
   const sushiEndpointTest = {
@@ -76,8 +84,8 @@ describe('[sushi]: Test create sushi credential features', () => {
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
-    const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
   });
 
@@ -85,7 +93,7 @@ describe('[sushi]: Test create sushi credential features', () => {
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
+        const institution = await institutionsPrisma.create({ data: institutionTest });
         institutionId = institution.id;
       });
 
@@ -125,7 +133,7 @@ describe('[sushi]: Test create sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
 
           // Test service
-          const sushiFromService = await sushiCredentialsService.findByID(sushiId);
+          const sushiFromService = await sushiCredentialsPrisma.findByID(sushiId);
 
           expect(sushiFromService).toHaveProperty('id', sushiId);
           expect(sushiFromService?.createdAt).not.toBeNull();
@@ -141,19 +149,22 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await sushiCredentialsService.removeAll();
+          await sushiCredentialsPrisma.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
     describe('Institution created by user', () => {
       let institutionId;
       beforeAll(async () => {
-        await createDefaultActivatedUserAsAdmin();
-        institutionId = await createInstitution(institutionTest, userTest);
+        await usersPrisma.create({ data: userTest });
+        await usersElastic.createUser(userTest);
+        const institution = await institutionsPrisma
+          .createAsUser(institutionTest, userTest.username);
+        institutionId = institution.id;
       });
 
       describe('Create sushi', () => {
@@ -192,7 +203,7 @@ describe('[sushi]: Test create sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
 
           // Test service
-          const sushiFromService = await sushiCredentialsService.findByID(sushiId);
+          const sushiFromService = await sushiCredentialsPrisma.findByID(sushiId);
 
           expect(sushiFromService).toHaveProperty('id', sushiId);
           expect(sushiFromService?.createdAt).not.toBeNull();
@@ -208,12 +219,14 @@ describe('[sushi]: Test create sushi credential features', () => {
         });
 
         afterAll(async () => {
-          await sushiCredentialsService.removeAll();
+          await sushiCredentialsPrisma.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await membershipsPrisma.removeAll();
+        await usersPrisma.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
   });
@@ -221,14 +234,16 @@ describe('[sushi]: Test create sushi credential features', () => {
     let userToken;
 
     beforeAll(async () => {
-      await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      await usersPrisma.acceptTerms(userTest.username);
+      userToken = await usersService.generateToken(userTest.username, userPassword);
     });
 
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
+        const institution = await institutionsPrisma.create({ data: institutionTest });
         institutionId = institution.id;
       });
 
@@ -252,20 +267,22 @@ describe('[sushi]: Test create sushi credential features', () => {
           expect(httpAppResponse).toHaveProperty('status', 403);
 
           // Test service
-          const sushiFromService = await sushiCredentialsService.findMany();
+          const sushiFromService = await sushiCredentialsPrisma.findMany();
           expect(sushiFromService).toEqual([]);
         });
       });
 
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
     describe('Institution created by user', () => {
       let institutionId;
       beforeAll(async () => {
-        institutionId = await createInstitution(institutionTest, userTest);
-        await institutionsService.validate(institutionId);
+        const institution = await institutionsPrisma
+          .createAsUser(institutionTest, userTest.username);
+        institutionId = institution.id;
+        await institutionsPrisma.validate(institutionId);
       });
 
       describe(`User with memberships [${allPermission}]`, () => {
@@ -309,7 +326,7 @@ describe('[sushi]: Test create sushi credential features', () => {
             expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
 
             // Test service
-            const sushiFromService = await sushiCredentialsService.findByID(sushiId);
+            const sushiFromService = await sushiCredentialsPrisma.findByID(sushiId);
 
             expect(sushiFromService).toHaveProperty('id', sushiId);
             expect(sushiFromService?.createdAt).not.toBeNull();
@@ -325,11 +342,11 @@ describe('[sushi]: Test create sushi credential features', () => {
           });
 
           afterAll(async () => {
-            await sushiCredentialsService.removeAll();
+            await sushiCredentialsPrisma.removeAll();
           });
         });
         afterAll(async () => {
-          await membershipsService.removeAll();
+          await membershipsPrisma.removeAll();
         });
       });
 
@@ -337,7 +354,7 @@ describe('[sushi]: Test create sushi credential features', () => {
         beforeAll(async () => {
           membershipUserTest.institutionId = institutionId;
           membershipUserTest.permissions = readPermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
         describe('Create new sushi credential', () => {
           beforeAll(async () => {
@@ -359,17 +376,17 @@ describe('[sushi]: Test create sushi credential features', () => {
             expect(httpAppResponse).toHaveProperty('status', 403);
 
             // Test service
-            const sushiFromService = await sushiCredentialsService.findMany();
+            const sushiFromService = await sushiCredentialsPrisma.findMany();
             expect(sushiFromService).toEqual([]);
           });
           afterAll(async () => {
-            await membershipsService.removeAll();
+            await membershipsPrisma.removeAll();
           });
         });
       });
 
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
     describe('Institution created by another user', () => {
@@ -377,22 +394,24 @@ describe('[sushi]: Test create sushi credential features', () => {
       let userTestInstitutionId;
 
       beforeAll(async () => {
-        await createUserAsAdmin(
-          anotherUserTest.username,
-          anotherUserTest.email,
-          anotherUserTest.fullName,
-          anotherUserTest.isAdmin,
-        );
-        anotherUserTestInstitutionId = await createInstitution(institutionTest, anotherUserTest);
-        userTestInstitutionId = await createInstitution(institutionTest, userTest);
+        await usersPrisma.create({ data: anotherUserTest });
+        await usersElastic.createUser(anotherUserTest);
+
+        const institution2 = await institutionsPrisma
+          .createAsUser(institutionTest2, anotherUserTest.username);
+        anotherUserTestInstitutionId = institution2.id;
+
+        const institution = await institutionsPrisma
+          .createAsUser(institutionTest, userTest.username);
+        userTestInstitutionId = institution.id;
       });
 
       describe(`User with memberships [${allPermission}]`, () => {
         beforeAll(async () => {
           membershipUserTest.institutionId = userTestInstitutionId;
           membershipUserTest.permissions = allPermission;
-          // FIXME membership create by function createInstitution
-          // await membershipsService.create({ data: membershipUserTest });
+          // FIXME FIXME membership already created
+          // await membershipsPrisma.create({ data: membershipUserTest });
         });
         describe('Create new sushi credential', () => {
           beforeAll(async () => {
@@ -414,12 +433,12 @@ describe('[sushi]: Test create sushi credential features', () => {
             expect(httpAppResponse).toHaveProperty('status', 403);
 
             // Test service
-            const sushiFromService = await sushiCredentialsService.findMany();
+            const sushiFromService = await sushiCredentialsPrisma.findMany();
             expect(sushiFromService).toEqual([]);
           });
         });
         afterAll(async () => {
-          await membershipsService.removeAll();
+          await membershipsPrisma.removeAll();
         });
       });
 
@@ -427,7 +446,7 @@ describe('[sushi]: Test create sushi credential features', () => {
         beforeAll(async () => {
           membershipUserTest.institutionId = userTestInstitutionId;
           membershipUserTest.permissions = readPermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
         describe('Create new sushi credential', () => {
           beforeAll(async () => {
@@ -449,30 +468,30 @@ describe('[sushi]: Test create sushi credential features', () => {
             expect(httpAppResponse).toHaveProperty('status', 403);
 
             // Test service
-            const sushiFromService = await sushiCredentialsService.findMany();
+            const sushiFromService = await sushiCredentialsPrisma.findMany();
             expect(sushiFromService).toEqual([]);
           });
         });
 
         afterAll(async () => {
-          await membershipsService.removeAll();
+          await membershipsPrisma.removeAll();
         });
       });
 
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
 
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('Without token', () => {
     describe('Institution created by admin', () => {
       let institutionId;
       beforeAll(async () => {
-        const institution = await institutionsService.create({ data: institutionTest });
+        const institution = await institutionsPrisma.create({ data: institutionTest });
         institutionId = institution.id;
       });
 
@@ -493,12 +512,12 @@ describe('[sushi]: Test create sushi credential features', () => {
           expect(httpAppResponse).toHaveProperty('status', 401);
 
           // Test service
-          const sushiFromService = await sushiCredentialsService.findMany();
+          const sushiFromService = await sushiCredentialsPrisma.findMany();
           expect(sushiFromService).toEqual([]);
         });
       });
       afterAll(async () => {
-        await institutionsService.removeAll();
+        await institutionsPrisma.removeAll();
       });
     });
   });

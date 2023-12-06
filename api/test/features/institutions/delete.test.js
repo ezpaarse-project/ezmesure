@@ -1,27 +1,40 @@
-const ezmesure = require('../../setup/ezmesure');
-const institutionsService = require('../../../lib/entities/institutions.service');
-const usersService = require('../../../lib/entities/users.service');
+const config = require('config');
 
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getAdminToken, getToken } = require('../../setup/login');
+const ezmesure = require('../../setup/ezmesure');
+
 const { resetDatabase } = require('../../../lib/services/prisma/utils');
 
+const institutionsPrisma = require('../../../lib/services/prisma/institutions');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
+
 describe('[institutions]: Test delete features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
+
   let adminToken;
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -37,23 +50,22 @@ describe('[institutions]: Test delete features', () => {
       expect(res).toHaveProperty('status', 200);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
       expect(institution).toEqual(null);
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('As user', () => {
-    let userTest;
     let userToken;
     let institutionId;
     beforeAll(async () => {
-      // TODO use service to create user
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
-      const institution = await institutionsService.create({ data: institutionTest });
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -69,13 +81,13 @@ describe('[institutions]: Test delete features', () => {
       expect(res).toHaveProperty('status', 403);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
 
       expect(institution).toHaveProperty('parentInstitutionId', null);
       expect(institution?.createdAt).not.toBeNull();
       expect(institution?.updatedAt).not.toBeNull();
       expect(institution).toHaveProperty('name', institutionTest.name);
-      expect(institution).toHaveProperty('namespace', institutionTest.namespace);
+      expect(institution).toHaveProperty('namespace', null);
       expect(institution).toHaveProperty('validated', false);
       expect(institution).toHaveProperty('hidePartner', false);
       expect(institution).toHaveProperty('tags', []);
@@ -90,15 +102,15 @@ describe('[institutions]: Test delete features', () => {
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
-      await usersService.removeAll();
+      await institutionsPrisma.removeAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -114,19 +126,19 @@ describe('[institutions]: Test delete features', () => {
       expect(res).toHaveProperty('status', 401);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
       expect(institution).not.toBeNull();
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   describe('Without token', () => {
     let institutionId;
 
     beforeAll(async () => {
-      const institution = await institutionsService.create({ data: institutionTest });
+      const institution = await institutionsPrisma.create({ data: institutionTest });
       institutionId = institution.id;
     });
 
@@ -138,12 +150,12 @@ describe('[institutions]: Test delete features', () => {
       expect(res).toHaveProperty('status', 401);
 
       // Test service
-      const institution = await institutionsService.findByID(institutionId);
+      const institution = await institutionsPrisma.findByID(institutionId);
       expect(institution).not.toBeNull();
     });
 
     afterAll(async () => {
-      await institutionsService.removeAll();
+      await institutionsPrisma.removeAll();
     });
   });
   afterAll(async () => {

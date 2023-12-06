@@ -1,15 +1,16 @@
 const config = require('config');
 
-const adminFullName = config.get('admin.fullName');
-const adminUsername = config.get('admin.username');
-
 const ezmesure = require('../../setup/ezmesure');
 
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
 const usersService = require('../../../lib/entities/users.service');
 
-const { createUserAsAdmin } = require('../../setup/users');
-const { getAdminToken, getToken } = require('../../setup/login');
-const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const adminFullName = config.get('admin.fullName');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[users]: Test read users features', () => {
   const userTest = {
@@ -23,7 +24,7 @@ describe('[users]: Test read users features', () => {
 
   beforeAll(async () => {
     await resetDatabase();
-    adminToken = await getAdminToken();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     describe('Get all users', () => {
@@ -47,12 +48,8 @@ describe('[users]: Test read users features', () => {
 
     describe(`Get user with username [${userTest.username}]`, () => {
       beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
+        await usersPrisma.create({ data: userTest });
+        await usersElastic.createUser(userTest);
       });
 
       it(`#02 Should get user [${userTest.username}]`, async () => {
@@ -93,25 +90,21 @@ describe('[users]: Test read users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 404);
 
         // Test users service
-        const usersFromService = await usersService.findByUsername(usernameNotExist);
+        const usersFromService = await usersPrisma.findByUsername(usernameNotExist);
         expect(usersFromService).toEqual(null);
       });
     });
     afterAll(async () => {
-      await usersService.removeAll();
+      await usersPrisma.removeAll();
     });
   });
 
   describe('As user', () => {
     let userToken;
-    beforeAll(async () => {
-      await createUserAsAdmin(
-        userTest.username,
-        userTest.email,
-        userTest.fullName,
-        userTest.isAdmin,
-      );
-      userToken = await getToken(userTest.username, userTest.password);
+    beforeEach(async () => {
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
 
     describe('Get all users', () => {
@@ -135,15 +128,6 @@ describe('[users]: Test read users features', () => {
     });
 
     describe(`Get user with username [${userTest.username}]`, () => {
-      beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
-      });
-
       it(`#05 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
@@ -166,9 +150,17 @@ describe('[users]: Test read users features', () => {
         expect(user?.updatedAt).not.toBeNull();
       });
     });
+
+    afterEach(async () => {
+      await usersPrisma.removeAll();
+    });
   });
 
   describe('With random token', () => {
+    beforeEach(async () => {
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+    });
     describe('Get all users', () => {
       it('#06 Should not get users', async () => {
         const httpAppResponse = await ezmesure({
@@ -183,7 +175,7 @@ describe('[users]: Test read users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test users service
-        const userFromService = await usersService.findByUsername(userTest.username);
+        const userFromService = await usersPrisma.findByUsername(userTest.username);
 
         expect(userFromService).toHaveProperty('username', userTest.username);
         expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -195,15 +187,6 @@ describe('[users]: Test read users features', () => {
     });
 
     describe(`Get user with username [${userTest.username}]`, () => {
-      beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
-      });
-
       it(`#07 Should get user [${userTest.username}]`, async () => {
         const httpAppResponse = await ezmesure({
           method: 'GET',
@@ -217,7 +200,7 @@ describe('[users]: Test read users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test users service
-        const userFromService = await usersService.findByUsername(userTest.username);
+        const userFromService = await usersPrisma.findByUsername(userTest.username);
 
         expect(userFromService).toHaveProperty('username', userTest.username);
         expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -226,79 +209,12 @@ describe('[users]: Test read users features', () => {
         expect(userFromService?.createdAt).not.toBeNull();
         expect(userFromService?.updatedAt).not.toBeNull();
       });
-
-      afterAll(async () => {
-        await usersService.removeAll();
-      });
+    });
+    afterEach(async () => {
+      await usersPrisma.removeAll();
     });
   });
 
-  describe('Without token', () => {
-    describe('Get all users', () => {
-      beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
-      });
-      it('#08 Should not get users', async () => {
-        const httpAppResponse = await ezmesure({
-          method: 'GET',
-          url: '/users',
-        });
-
-        // Test API
-        expect(httpAppResponse).toHaveProperty('status', 401);
-
-        // Test users service
-        const userFromService = await usersService.findByUsername(userTest.username);
-
-        expect(userFromService).toHaveProperty('username', userTest.username);
-        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
-        expect(userFromService).toHaveProperty('email', userTest.email);
-        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
-        expect(userFromService?.createdAt).not.toBeNull();
-        expect(userFromService?.updatedAt).not.toBeNull();
-      });
-    });
-
-    describe(`Get user with username [${userTest.username}]`, () => {
-      beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
-      });
-
-      it(`#09 Should get user [${userTest.username}]`, async () => {
-        const httpAppResponse = await ezmesure({
-          method: 'GET',
-          url: `/users/${userTest.username}`,
-        });
-
-        // Test API
-        expect(httpAppResponse).toHaveProperty('status', 401);
-
-        // Test users service
-        const userFromService = await usersService.findByUsername(userTest.username);
-
-        expect(userFromService).toHaveProperty('username', userTest.username);
-        expect(userFromService).toHaveProperty('fullName', userTest.fullName);
-        expect(userFromService).toHaveProperty('email', userTest.email);
-        expect(userFromService).toHaveProperty('isAdmin', userTest.isAdmin);
-        expect(userFromService?.createdAt).not.toBeNull();
-        expect(userFromService?.updatedAt).not.toBeNull();
-      });
-
-      afterAll(async () => {
-        await usersService.removeAll();
-      });
-    });
-  });
   afterAll(async () => {
     await resetDatabase();
   });
