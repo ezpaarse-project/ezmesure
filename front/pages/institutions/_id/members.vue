@@ -21,6 +21,17 @@
 
       <v-spacer />
 
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        :label="$t('search')"
+        solo
+        dense
+        hide-details
+        autocomplete="off"
+        style="max-width: 200px"
+      />
+
       <v-btn text :loading="refreshing" @click="refreshMembers">
         <v-icon left>
           mdi-refresh
@@ -56,7 +67,8 @@
       :headers="tableHeaders"
       :items="members"
       :loading="refreshing"
-      sort-by="fullName"
+      :search.sync="search"
+      sort-by="user.fullName"
       item-key="username"
     >
       <template #top="{ originalItemsLength }">
@@ -188,6 +200,7 @@ export default {
       institution,
       members: [],
       addingUser: null,
+      search: '',
     };
   },
   computed: {
