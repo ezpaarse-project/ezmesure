@@ -2,6 +2,7 @@
 const { client: prisma } = require('./index');
 
 const {
+  PERMISSIONS,
   MEMBER_ROLES: {
     docContact: DOC_CONTACT,
     techContact: TECH_CONTACT,
@@ -30,6 +31,28 @@ const {
  */
 function create(params) {
   return prisma.institution.create(params);
+}
+
+/**
+ * @param {Institution} institution
+ * @param {string} username
+ * @returns {Promise<Institution>}
+ */
+function createAsUser(institution, username) {
+  return prisma.institution.create({
+    data: {
+      ...institution,
+      memberships: {
+        create: [{
+          username,
+          permissions: [...PERMISSIONS],
+          roles: [DOC_CONTACT, TECH_CONTACT],
+          locked: true,
+        }],
+      },
+    },
+
+  });
 }
 
 /**
@@ -217,6 +240,7 @@ function getContacts(institutionId) {
 
 module.exports = {
   create,
+  createAsUser,
   findMany,
   findUnique,
   findByID,

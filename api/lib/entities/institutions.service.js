@@ -27,6 +27,16 @@ module.exports = class InstitutionsService {
   }
 
   /**
+   * @param {InstitutionCreateArgs} params
+   * @returns {Promise<Institution>}
+   */
+  static async createAsUser(params) {
+    const institution = await institutionsPrisma.create(params);
+    triggerHooks('institution:create', institution);
+    return institution;
+  }
+
+  /**
    * @param {InstitutionFindManyArgs} params
    * @returns {Promise<Institution[]>}
    */
