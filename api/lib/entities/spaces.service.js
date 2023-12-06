@@ -89,6 +89,8 @@ module.exports = class SpacesService {
 
     const spaces = await this.findMany({});
 
+    if (spaces.length === 0) { return null; }
+
     await Promise.all(spaces.map(async (space) => {
       await this.delete({
         where: {

@@ -85,6 +85,8 @@ module.exports = class RepositoryPermissionsService {
 
     const permissions = await this.findMany({});
 
+    if (permissions.length === 0) { return null; }
+
     await Promise.all(permissions.map(async (permission) => {
       await this.delete({
         where: {

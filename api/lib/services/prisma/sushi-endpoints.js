@@ -105,6 +105,8 @@ async function removeAll() {
 
   const sushiEndpoints = await findMany({});
 
+  if (sushiEndpoints.length === 0) { return null; }
+
   await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
     await remove({
       where: {

@@ -140,6 +140,8 @@ module.exports = class InstitutionsService {
 
     const institutions = await this.findMany({});
 
+    if (institutions.length === 0) { return null; }
+
     await Promise.all(institutions.map(async (institution) => {
       await this.delete({
         where: {

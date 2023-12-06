@@ -96,7 +96,10 @@ module.exports = class MembershipsService {
    */
   static async removeAll() {
     if (process.env.NODE_ENV === 'production') { return null; }
+
     const memberships = await this.findMany({});
+
+    if (memberships.length === 0) { return null; }
 
     await Promise.all(memberships.map(async (membership) => {
       await this.delete({

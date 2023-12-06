@@ -127,6 +127,8 @@ module.exports = class RepositoriesService {
 
     const repositories = await this.findMany({});
 
+    if (repositories.length === 0) { return null; }
+
     await Promise.all(repositories.map(async (repository) => {
       await this.delete({
         where: {

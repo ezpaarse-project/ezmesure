@@ -92,6 +92,8 @@ async function removeAll() {
 
   const permissions = await findMany({});
 
+  if (permissions.length === 0) { return null; }
+
   await Promise.all(permissions.map(async (permission) => {
     await remove({
       where: {

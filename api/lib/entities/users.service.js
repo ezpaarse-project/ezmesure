@@ -201,9 +201,12 @@ module.exports = class UsersService {
    */
   static async removeAll() {
     if (process.env.NODE_ENV === 'production') { return null; }
+
     const users = await this.findMany({
       where: { NOT: { username: adminUsername } },
     });
+
+    if (users.length === 0) { return null; }
 
     await Promise.all(users.map(async (user) => {
       await this.delete({

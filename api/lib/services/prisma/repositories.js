@@ -178,6 +178,8 @@ async function removeAll() {
 
   const repositories = await findMany({});
 
+  if (repositories.length === 0) { return null; }
+
   await Promise.all(repositories.map(async (repository) => {
     await remove({
       where: {

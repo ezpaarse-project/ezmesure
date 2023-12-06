@@ -105,6 +105,8 @@ async function removeAll() {
 
   const spaces = await findMany({});
 
+  if (spaces.length === 0) { return null; }
+
   await Promise.all(spaces.map(async (space) => {
     await remove({
       where: {

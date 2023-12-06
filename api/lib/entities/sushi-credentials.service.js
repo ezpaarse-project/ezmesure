@@ -76,6 +76,8 @@ module.exports = class SushiCredentialsService {
 
     const sushiCredentials = await this.findMany({});
 
+    if (sushiCredentials.length === 0) { return null; }
+
     await Promise.all(sushiCredentials.map(async (sushiCredential) => {
       await this.delete({
         where: {

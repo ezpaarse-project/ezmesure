@@ -176,6 +176,8 @@ async function removeAll() {
     where: { NOT: { username: adminUsername } },
   });
 
+  if (users.length === 0) { return null; }
+
   await Promise.all(users.map(async (user) => {
     await removeByUsername(user.username);
   }));

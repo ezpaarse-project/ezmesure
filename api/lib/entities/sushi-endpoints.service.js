@@ -81,6 +81,8 @@ module.exports = class SushiEndpointsService {
 
     const sushiEndpoints = await this.findMany({});
 
+    if (sushiEndpoints.length === 0) { return null; }
+
     await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
       await this.delete({
         where: {
