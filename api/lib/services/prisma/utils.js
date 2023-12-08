@@ -3,6 +3,7 @@ const memberships = require('./memberships');
 const repositories = require('./repositories');
 const repositoryPermissions = require('./repository-permissions');
 const spaces = require('./spaces');
+const harvestJobs = require('./harvest-job');
 const sushiCredentials = require('./sushi-credentials');
 const sushiEndpoints = require('./sushi-endpoints');
 const users = require('./users');
@@ -10,6 +11,7 @@ const users = require('./users');
 async function resetDatabase() {
   if (process.env.NODE_ENV === 'production') { return null; }
 
+  await harvestJobs.removeAll();
   await institutions.removeAll();
   await memberships.removeAll();
   await repositories.removeAll();

@@ -113,6 +113,27 @@ function isDone(job) {
 }
 
 /**
+ * @returns {Promise<Array<HarvestJob> | null>}
+ */
+async function removeAll() {
+  if (process.env.NODE_ENV === 'production') { return null; }
+
+  const harvestJobs = await findMany({});
+
+  if (harvestJobs.length === 0) { return null; }
+
+  await Promise.all(harvestJobs.map(async (harvestJob) => {
+    await remove({
+      where: {
+        id: harvestJob.id,
+      },
+    });
+  }));
+
+  return harvestJobs;
+}
+
+/**
  * Cancel a job
  * @param {HarvestJob} job - The job to cancel
  */
@@ -134,4 +155,5 @@ module.exports = {
   finish,
   cancel,
   isDone,
+  removeAll,
 };
