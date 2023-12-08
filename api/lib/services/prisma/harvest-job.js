@@ -80,39 +80,6 @@ async function remove(params) {
 }
 
 /**
- * @param {HarvestJob} job
- * @param {object} options
- * @param {string} [options.status=finished] - The status of the task
- * @param {string} [options.errorCode] - An error code
- * @returns {Promise<HarvestJob>}
- */
-function finish(job, options = {}) {
-  const { status = 'finished', errorCode } = options;
-  const { startedAt, createdAt } = job;
-
-  let runningTime;
-
-  if (startedAt) {
-    runningTime = Date.now() - startedAt.getTime();
-  } else if (createdAt) {
-    runningTime = Date.now() - createdAt.getTime();
-  }
-
-  return update({
-    where: { id: job.id },
-    data: { status, runningTime, errorCode },
-  });
-}
-
-/**
- * Returns whether the job is terminated or not by checking its status
- * @param {HarvestJob} job - The job to check
- */
-function isDone(job) {
-  return ['finished', 'failed', 'cancelled', 'delayed'].includes(job?.status);
-}
-
-/**
  * @returns {Promise<Array<HarvestJob> | null>}
  */
 async function removeAll() {
@@ -152,8 +119,6 @@ module.exports = {
   update,
   upsert,
   remove,
-  finish,
   cancel,
-  isDone,
   removeAll,
 };
