@@ -200,7 +200,7 @@ module.exports = class UsersService {
    * @returns {Promise<Array<User> | null>}
    */
   static async removeAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const users = await this.findMany({
       where: { NOT: { username: adminUsername } },

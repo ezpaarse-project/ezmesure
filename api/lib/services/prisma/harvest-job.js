@@ -83,7 +83,7 @@ async function remove(params) {
  * @returns {Promise<Array<HarvestJob> | null>}
  */
 async function removeAll() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   const harvestJobs = await findMany({});
 

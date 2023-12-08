@@ -171,7 +171,7 @@ function removeByUsername(username) {
  * @returns {Promise<Array<User> | null>}
  */
 async function removeAll() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
   const users = await this.findMany({
     where: { NOT: { username: adminUsername } },
   });

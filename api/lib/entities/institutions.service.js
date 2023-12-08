@@ -136,7 +136,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Object | null>}
    */
   static async removeAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const institutions = await this.findMany({});
 

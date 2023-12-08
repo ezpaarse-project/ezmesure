@@ -77,7 +77,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<Array<SushiEndpoint> | null>}
    */
   static async removeAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const sushiEndpoints = await this.findMany({});
 

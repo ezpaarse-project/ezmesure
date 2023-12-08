@@ -168,7 +168,7 @@ exports.deleteUser = function deleteUser(username) {
  * @return {Promise<>} index.
  */
 exports.removeAll = async function removeAllUser() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   const res = await elastic.search({
     index: '.security',

@@ -101,7 +101,7 @@ async function remove(params) {
    * @returns {Promise<Array<Space> | null>}
    */
 async function removeAll() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   const spaces = await findMany({});
 

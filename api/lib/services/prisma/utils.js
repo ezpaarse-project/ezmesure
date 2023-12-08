@@ -9,7 +9,7 @@ const sushiEndpoints = require('./sushi-endpoints');
 const users = require('./users');
 
 async function resetDatabase() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   await harvestJobs.removeAll();
   await institutions.removeAll();

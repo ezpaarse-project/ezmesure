@@ -81,7 +81,7 @@ module.exports = class RepositoryPermissionsService {
   }
 
   static async removeAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const permissions = await this.findMany({});
 

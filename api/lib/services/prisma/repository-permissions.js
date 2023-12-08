@@ -88,7 +88,7 @@ async function remove(params) {
 }
 
 async function removeAll() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   const permissions = await findMany({});
 

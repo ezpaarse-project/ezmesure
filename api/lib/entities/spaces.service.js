@@ -85,7 +85,7 @@ module.exports = class SpacesService {
    * @returns {Promise<Array<Space> | null>}
    */
   static async removeAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const spaces = await this.findMany({});
 

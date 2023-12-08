@@ -174,7 +174,7 @@ async function remove(params) {
  * @returns {Promise<Array<Repository> | null>}
  */
 async function removeAll() {
-  if (process.env.NODE_ENV === 'production') { return null; }
+  if (process.env.NODE_ENV !== 'dev') { return null; }
 
   const repositories = await findMany({});
 
