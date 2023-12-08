@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
+const harvestJobPrisma = require('../services/prisma/harvest-job');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -19,7 +19,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob>}
    */
   static async create(params) {
-    const job = await prisma.harvestJob.create(params);
+    const job = await harvestJobPrisma.create(params);
 
     triggerHooks('harvest-job:create', job);
 
@@ -31,7 +31,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob[]>}
    */
   static findMany(params) {
-    return prisma.harvestJob.findMany(params);
+    return harvestJobPrisma.findMany(params);
   }
 
   /**
@@ -39,7 +39,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob | null>}
    */
   static findUnique(params) {
-    return prisma.harvestJob.findUnique(params);
+    return harvestJobPrisma.findUnique(params);
   }
 
   /**
@@ -47,7 +47,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob | null>}
    */
   static findFirst(params) {
-    return prisma.harvestJob.findFirst(params);
+    return harvestJobPrisma.findFirst(params);
   }
 
   /**
@@ -55,7 +55,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob>}
    */
   static async update(params) {
-    const job = await prisma.harvestJob.update(params);
+    const job = await harvestJobPrisma.update(params);
 
     triggerHooks('harvest-job:update', job);
 
@@ -67,7 +67,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob>}
    */
   static async upsert(params) {
-    const job = await prisma.harvestJob.upsert(params);
+    const job = await harvestJobPrisma.upsert(params);
 
     triggerHooks('harvest-job:upsert', job);
 
@@ -79,16 +79,7 @@ module.exports = class HarvestJobsService {
    * @returns {Promise<HarvestJob | null>}
    */
   static async delete(params) {
-    let job;
-
-    try {
-      job = await prisma.harvestJob.delete(params);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
-      }
-      throw error;
-    }
+    const job = await harvestJobPrisma.remove(params);
 
     triggerHooks('harvest-job:delete', job);
 

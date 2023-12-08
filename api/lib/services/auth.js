@@ -1,7 +1,7 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
 const institutionsService = require('../entities/institutions.service');
-const sushiEndpointService = require('../entities/sushi-endpoint.service');
+const sushiEndpointService = require('../entities/sushi-endpoints.service');
 const sushiCredentialsService = require('../entities/sushi-credentials.service');
 const usersService = require('../entities/users.service');
 const RepositoriesService = require('../entities/repositories.service');

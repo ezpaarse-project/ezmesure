@@ -1,5 +1,6 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+
+const spacesPrisma = require('../services/prisma/spaces');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -19,10 +20,8 @@ module.exports = class SpacesService {
    * @returns {Promise<Space>}
    */
   static async create(params) {
-    const space = await prisma.space.create(params);
-
+    const space = await spacesPrisma.create(params);
     triggerHooks('space:create', space);
-
     return space;
   }
 
@@ -31,7 +30,7 @@ module.exports = class SpacesService {
    * @returns {Promise<Space[]>}
    */
   static findMany(params) {
-    return prisma.space.findMany(params);
+    return spacesPrisma.findMany(params);
   }
 
   /**
@@ -39,7 +38,7 @@ module.exports = class SpacesService {
    * @returns {Promise<Space | null>}
    */
   static findUnique(params) {
-    return prisma.space.findUnique(params);
+    return spacesPrisma.findUnique(params);
   }
 
   /**
@@ -47,7 +46,7 @@ module.exports = class SpacesService {
    * @returns {Promise<Space | null>}
    */
   static findByID(id) {
-    return prisma.space.findUnique({ where: { id } });
+    return spacesPrisma.findUnique({ where: { id } });
   }
 
   /**
@@ -55,10 +54,8 @@ module.exports = class SpacesService {
    * @returns {Promise<Space>}
    */
   static async update(params) {
-    const space = await prisma.space.update(params);
-
+    const space = await spacesPrisma.update(params);
     triggerHooks('space:update', space);
-
     return space;
   }
 
@@ -67,10 +64,8 @@ module.exports = class SpacesService {
    * @returns {Promise<Space>}
    */
   static async upsert(params) {
-    const space = await prisma.space.upsert(params);
-
+    const space = await spacesPrisma.upsert(params);
     triggerHooks('space:upsert', space);
-
     return space;
   }
 
@@ -79,45 +74,22 @@ module.exports = class SpacesService {
    * @returns {Promise<Space | null>}
    */
   static async delete(params) {
-    const [deleteResult, deletedSpace] = await prisma.$transaction(async (tx) => {
-      const space = await tx.space.findUnique({
-        where: params.where,
-        include: {
-          permissions: true,
-        },
-      });
-
-      if (!space) {
-        return [null, null];
-      }
-
-      await tx.spacePermission.deleteMany({
-        where: { spaceId: space.id },
-      });
-
-      return [
-        await tx.space.delete(params),
-        space,
-      ];
-    });
-
-    if (!deletedSpace) {
-      return null;
-    }
+    const { deleteResult, deletedSpace } = await spacesPrisma.remove(params);
 
     triggerHooks('space:delete', deletedSpace);
     deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
-
     return deleteResult;
   }
 
   /**
    * @returns {Promise<Array<Space> | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const spaces = await this.findMany({});
+
+    if (spaces.length === 0) { return null; }
 
     await Promise.all(spaces.map(async (space) => {
       await this.delete({

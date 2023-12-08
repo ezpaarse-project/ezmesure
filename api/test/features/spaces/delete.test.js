@@ -1,13 +1,27 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const spacesService = require('../../../lib/entities/spaces.service');
-const institutionsService = require('../../../lib/entities/institutions.service');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
+
+const spacesPrisma = require('../../../lib/services/prisma/spaces');
+const institutionsPrisma = require('../../../lib/services/prisma/institutions');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
 const usersService = require('../../../lib/entities/users.service');
 
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[space]: Test delete spaces features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const spaceConfig = {
     id: 'test-ezpaarse-id',
     institutionId: '',
@@ -19,15 +33,16 @@ describe('[space]: Test delete spaces features', () => {
 
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
 
   let adminToken;
   let institutionId;
 
   beforeAll(async () => {
-    adminToken = await getAdminToken();
-    const institution = await institutionsService.create({ data: institutionTest });
+    await resetDatabase();
+    await resetElastic();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
   });
 
@@ -35,7 +50,7 @@ describe('[space]: Test delete spaces features', () => {
     describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        await spacesService.create({ data: spaceConfig });
+        await spacesPrisma.create({ data: spaceConfig });
       });
 
       it('#01 Should delete space', async () => {
@@ -50,21 +65,21 @@ describe('[space]: Test delete spaces features', () => {
         expect(httpAppResponse).toHaveProperty('status', 204);
 
         // Test service
-        const spaceFromService = await spacesService.findMany();
+        const spaceFromService = await spacesPrisma.findMany();
         expect(spaceFromService).toEqual([]);
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
-    let userTest;
     let userToken;
     beforeAll(async () => {
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
 
     describe(`Delete space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {
@@ -72,7 +87,7 @@ describe('[space]: Test delete spaces features', () => {
 
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        const space = await spacesService.create({ data: spaceConfig });
+        const space = await spacesPrisma.create({ data: spaceConfig });
         spaceId = space.id;
       });
 
@@ -88,7 +103,7 @@ describe('[space]: Test delete spaces features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const spaceFromService = await spacesService.findByID(spaceId);
+        const spaceFromService = await spacesPrisma.findByID(spaceId);
 
         expect(spaceFromService).toHaveProperty('id', spaceId);
         expect(spaceFromService).toHaveProperty('institutionId', institutionId);
@@ -103,11 +118,11 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesPrisma.removeAll();
       });
     });
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersPrisma.removeAll();
     });
   });
   describe('With random token', () => {
@@ -116,7 +131,7 @@ describe('[space]: Test delete spaces features', () => {
 
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        const space = await spacesService.create({ data: spaceConfig });
+        const space = await spacesPrisma.create({ data: spaceConfig });
         spaceId = space.id;
       });
 
@@ -132,7 +147,7 @@ describe('[space]: Test delete spaces features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const spaceFromService = await spacesService.findByID(spaceId);
+        const spaceFromService = await spacesPrisma.findByID(spaceId);
 
         expect(spaceFromService).toHaveProperty('id', spaceId);
         expect(spaceFromService).toHaveProperty('institutionId', institutionId);
@@ -147,7 +162,7 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesPrisma.removeAll();
       });
     });
   });
@@ -157,7 +172,7 @@ describe('[space]: Test delete spaces features', () => {
 
       beforeAll(async () => {
         spaceConfig.institutionId = institutionId;
-        const space = await spacesService.create({ data: spaceConfig });
+        const space = await spacesPrisma.create({ data: spaceConfig });
         spaceId = space.id;
       });
 
@@ -170,7 +185,7 @@ describe('[space]: Test delete spaces features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const spaceFromService = await spacesService.findByID(spaceId);
+        const spaceFromService = await spacesPrisma.findByID(spaceId);
 
         expect(spaceFromService).toHaveProperty('id', spaceId);
         expect(spaceFromService).toHaveProperty('institutionId', institutionId);
@@ -185,12 +200,13 @@ describe('[space]: Test delete spaces features', () => {
       });
 
       afterAll(async () => {
-        await spacesService.deleteAll();
+        await spacesPrisma.removeAll();
       });
     });
   });
 
   afterAll(async () => {
-    await institutionsService.deleteAll();
+    await resetDatabase();
+    await resetElastic();
   });
 });

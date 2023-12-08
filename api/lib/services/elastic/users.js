@@ -1,6 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const config = require('config');
 const elastic = require('.');
 const { randomString } = require('../../controllers/auth/password');
+
+const adminUsername = config.get('admin.username');
 
 /**
  * @typedef {import('@elastic/elasticsearch').estypes.SecurityUser} ElasticUser
@@ -131,16 +134,6 @@ exports.updateUser = function updateUser(user) {
 };
 
 /**
- * Delete user in elastic.
- *
- * @param {string} username - Username of user.
- * @returns {Promise<ElasticUserDeleted>} Deleted user.
- */
-exports.deleteUser = function deleteUser(username) {
-  return elastic.security.deleteUser({ username }, { ignore: [404] });
-};
-
-/**
  * Update password of user in elastic
  *
  * @param {string} username - Username of user.
@@ -155,4 +148,49 @@ exports.updatePassword = function updatePassword(username, password) {
       password,
     },
   });
+};
+
+/**
+ * Delete user in elastic.
+ *
+ * @param {string} username - Username of user.
+ * @returns {Promise<ElasticUserDeleted>} Deleted user.
+ */
+exports.deleteUser = function deleteUser(username) {
+  return elastic.security.deleteUser({ username }, { ignore: [404] });
+};
+
+/**
+ * delete all indices in elastic.
+ *
+ * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ *
+ * @return {Promise<>} index.
+ */
+exports.removeAll = async function removeAllUser() {
+  if (process.env.NODE_ENV !== 'dev') { return null; }
+
+  const res = await elastic.search({
+    index: '.security',
+    body: {
+      query: {
+        bool: {
+          filter: [
+            { term: { type: 'user' } },
+          ],
+        },
+      },
+    },
+  });
+
+  let users = res.body.hits.hits;
+
+  users = users.filter((user) => user?._source?.username !== adminUsername);
+  const usernames = users.map((user) => user?._source?.username);
+
+  await Promise.all(usernames.map(async (username) => {
+    elastic.security.deleteUser({ username }, { ignore: [404] });
+  }));
+
+  return users;
 };

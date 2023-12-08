@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const logPrisma = require('../services/prisma/log');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Log} Log */
@@ -16,7 +16,7 @@ module.exports = class LogsService {
    * @returns {Promise<Log>}
    */
   static create(params) {
-    return prisma.log.create(params);
+    return logPrisma.create(params);
   }
 
   /**
@@ -24,7 +24,7 @@ module.exports = class LogsService {
    * @returns {Promise<Log[]>}
    */
   static findMany(params) {
-    return prisma.log.findMany(params);
+    return logPrisma.findMany(params);
   }
 
   /**
@@ -32,7 +32,7 @@ module.exports = class LogsService {
    * @returns {Promise<Log | null>}
    */
   static findUnique(params) {
-    return prisma.log.findUnique(params);
+    return logPrisma.findUnique(params);
   }
 
   /**
@@ -40,7 +40,7 @@ module.exports = class LogsService {
    * @returns {Promise<Log>}
    */
   static update(params) {
-    return prisma.log.update(params);
+    return logPrisma.update(params);
   }
 
   /**
@@ -48,7 +48,7 @@ module.exports = class LogsService {
    * @returns {Promise<Log>}
    */
   static upsert(params) {
-    return prisma.log.upsert(params);
+    return logPrisma.upsert(params);
   }
 
   /**
@@ -58,6 +58,6 @@ module.exports = class LogsService {
    * @returns {Promise<Log>}
    */
   static log(jobId, level, message) {
-    return prisma.log.create({ data: { jobId, level, message } });
+    return logPrisma.log(jobId, level, message);
   }
 };

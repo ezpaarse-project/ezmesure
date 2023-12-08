@@ -1,19 +1,14 @@
 // @ts-check
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const { addHours } = require('date-fns');
 const elasticUsers = require('../services/elastic/users');
-const { client: prisma } = require('../services/prisma.service');
+const usersPrisma = require('../services/prisma/users');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 const secret = config.get('auth.secret');
 const adminUsername = config.get('admin.username');
-
-const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('./memberships.dto');
+const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
 /**
@@ -44,7 +39,8 @@ module.exports = class UsersService {
       isAdmin: true,
       metadata: { acceptedTerms: true },
     };
-    const admin = await prisma.user.upsert({
+
+    const admin = await usersPrisma.upsert({
       where: { username },
       update: adminData,
       create: adminData,
@@ -60,7 +56,7 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async create(params) {
-    const user = await prisma.user.create(params);
+    const user = await usersPrisma.create(params);
     triggerHooks('user:create', user);
     return user;
   }
@@ -70,7 +66,7 @@ module.exports = class UsersService {
    * @returns {Promise<User[]>}
    */
   static findMany(params) {
-    return prisma.user.findMany(params);
+    return usersPrisma.findMany(params);
   }
 
   /**
@@ -78,7 +74,7 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static findUnique(params) {
-    return prisma.user.findUnique(params);
+    return usersPrisma.findUnique(params);
   }
 
   /**
@@ -86,7 +82,7 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static findByUsername(username) {
-    return prisma.user.findUnique({ where: { username } });
+    return usersPrisma.findUnique({ where: { username } });
   }
 
   /*
@@ -94,7 +90,7 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static findUniqueOrThrow(params) {
-    return prisma.user.findUniqueOrThrow(params);
+    return usersPrisma.findUniqueOrThrow(params);
   }
 
   /**
@@ -102,19 +98,7 @@ module.exports = class UsersService {
    * @returns {Promise<{email: string}[]> | null}
    */
   static findEmailOfCorrespondentsWithDomain(domain) {
-    return prisma.user.findMany({
-      select: { email: true },
-      where: {
-        email: { endsWith: `@${domain}` },
-        memberships: {
-          some: {
-            roles: {
-              hasSome: [DOC_CONTACT, TECH_CONTACT],
-            },
-          },
-        },
-      },
-    });
+    return usersPrisma.findEmailOfCorrespondentsWithDomain(domain);
   }
 
   /**
@@ -123,7 +107,7 @@ module.exports = class UsersService {
    */
   static async update(params) {
     // TODO manage role
-    const user = await prisma.user.update(params);
+    const user = await usersPrisma.update(params);
     triggerHooks('user:update', user);
     return user;
   }
@@ -135,12 +119,9 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async acceptTerms(username) {
-    return prisma.user.update({
-      where: { username },
-      data: {
-        metadata: { acceptedTerms: true },
-      },
-    });
+    const user = usersPrisma.acceptTerms(username);
+    triggerHooks('user:update', user);
+    return user;
   }
 
   /**
@@ -148,7 +129,7 @@ module.exports = class UsersService {
    * @returns {Promise<User>}
    */
   static async upsert(params) {
-    const user = await prisma.user.upsert(params);
+    const user = await usersPrisma.upsert(params);
     triggerHooks('user:upsert', user);
     return user;
   }
@@ -158,38 +139,7 @@ module.exports = class UsersService {
    * @returns {Promise<User | null>}
    */
   static async delete(params) {
-    const [deleteResult, deletedUser] = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: params.where,
-        include: {
-          memberships: {
-            include: {
-              repositoryPermissions: true,
-              spacePermissions: true,
-            },
-          },
-        },
-      });
-
-      if (!user) {
-        return [null, null];
-      }
-
-      const findArgs = { where: { username: user.username } };
-
-      await tx.repositoryPermission.deleteMany(findArgs);
-      await tx.spacePermission.deleteMany(findArgs);
-      await tx.membership.deleteMany(findArgs);
-
-      return [
-        await tx.user.delete(params),
-        user,
-      ];
-    });
-
-    if (!deletedUser) {
-      return null;
-    }
+    const { deleteResult, deletedUser } = await usersPrisma.remove(params);
 
     triggerHooks('user:delete', deletedUser);
 
@@ -207,8 +157,10 @@ module.exports = class UsersService {
    * @param {string} username
    * @returns {Promise<User | null>}
    */
-  static deleteByUsername(username) {
-    return prisma.user.delete({ where: { username } });
+  static removeByUsername(username) {
+    const deletedUser = usersPrisma.removeByUsername(username);
+    triggerHooks('user:delete', deletedUser);
+    return deletedUser;
   }
 
   /**
@@ -233,14 +185,28 @@ module.exports = class UsersService {
     return jwt.sign({ username: user.username, email: user.email }, secret);
   }
 
+  static async generateTokenForActivate(username) {
+    const currentDate = new Date();
+    const expiresAt = addHours(currentDate, passwordResetValidity);
+
+    return jwt.sign({
+      username,
+      createdAt: currentDate,
+      expiresAt,
+    }, secret);
+  }
+
   /**
    * @returns {Promise<Array<User> | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
+
     const users = await this.findMany({
       where: { NOT: { username: adminUsername } },
     });
+
+    if (users.length === 0) { return null; }
 
     await Promise.all(users.map(async (user) => {
       await this.delete({

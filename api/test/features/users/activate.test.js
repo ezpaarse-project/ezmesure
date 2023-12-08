@@ -1,9 +1,11 @@
 const ezmesure = require('../../setup/ezmesure');
 
-const usersService = require('../../../lib/entities/users.service');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
-const { createUserAsAdmin } = require('../../setup/users');
-const { getUserTokenForActivate } = require('../../setup/login');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
 
 describe('[users]: Test activate users features', () => {
   const userTest = {
@@ -17,18 +19,19 @@ describe('[users]: Test activate users features', () => {
     password: 'changeme',
     acceptTerms: true,
   };
+
+  beforeAll(async () => {
+    await resetDatabase();
+    await resetElastic();
+  });
   describe('As user', () => {
     describe(`activate new user [${userTest.username}] with user-test token`, () => {
       let userToken;
 
       beforeAll(async () => {
-        await createUserAsAdmin(
-          userTest.username,
-          userTest.email,
-          userTest.fullName,
-          userTest.isAdmin,
-        );
-        userToken = await getUserTokenForActivate(userTest.username);
+        await usersPrisma.create({ data: userTest });
+        await usersElastic.createUser(userTest);
+        userToken = await usersService.generateTokenForActivate(userTest.username);
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {
@@ -45,7 +48,7 @@ describe('[users]: Test activate users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 200);
 
         // Test user service
-        const userFromService = await usersService.findByUsername('user.test');
+        const userFromService = await usersPrisma.findByUsername('user.test');
 
         expect(userFromService).toHaveProperty('username', userTest.username);
         expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -57,8 +60,12 @@ describe('[users]: Test activate users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersPrisma.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
+    await resetElastic();
   });
 });

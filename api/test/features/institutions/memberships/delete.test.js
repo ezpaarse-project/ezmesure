@@ -1,11 +1,18 @@
+const config = require('config');
+
 const ezmesure = require('../../../setup/ezmesure');
 
-const institutionsService = require('../../../../lib/entities/institutions.service');
-const membershipsService = require('../../../../lib/entities/memberships.service');
+const { resetDatabase } = require('../../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../../lib/services/elastic/utils');
+
+const institutionsPrisma = require('../../../../lib/services/prisma/institutions');
+const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
+const usersPrisma = require('../../../../lib/services/prisma/users');
+const usersElastic = require('../../../../lib/services/elastic/users');
 const usersService = require('../../../../lib/entities/users.service');
 
-const { createUserAsAdmin, activateUser } = require('../../../setup/users');
-const { getToken, getAdminToken } = require('../../../setup/login');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[institutions - memberships]: Test delete memberships features', () => {
   const allPermission = ['memberships:write', 'memberships:read'];
@@ -17,7 +24,6 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
 
   const institutionTest = {
     name: 'Test',
-    namespace: 'test',
   };
 
   const userTest = {
@@ -25,8 +31,8 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     email: 'user.test@test.fr',
     fullName: 'User test',
     isAdmin: false,
-    password: 'changeme',
   };
+
   const membershipUserTest = {
     username: userTest.username,
   };
@@ -36,8 +42,10 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     email: 'user.manager@test.fr',
     fullName: 'User manager',
     isAdmin: false,
-    password: 'changeme',
   };
+
+  const userManagerPassword = 'changeme';
+
   const membershipUserManagerTest = {
     username: userManagerTest.username,
   };
@@ -45,22 +53,16 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
   let userManagerToken;
 
   beforeAll(async () => {
-    adminToken = await getAdminToken();
+    await resetDatabase();
+    await resetElastic();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
 
-    const institution = await institutionsService.create({ data: institutionTest });
+    const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
 
-    // TODO use service to create user
-    await createUserAsAdmin(
-      userTest.username,
-      userTest.email,
-      userTest.fullName,
-      userTest.isAdmin,
-    );
-    await activateUser(
-      userTest.username,
-      userTest.password,
-    );
+    await usersPrisma.create({ data: userTest });
+    await usersElastic.createUser(userTest);
+
     membershipUserTest.institutionId = institutionId;
     membershipUserManagerTest.institutionId = institutionId;
   });
@@ -69,7 +71,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     describe(`Delete membership with permission [${readPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = readPermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
       it(`#01 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
@@ -83,21 +85,21 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 200);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
         expect(membership).toEqual(null);
 
-        // TODO test institutionsService
+        // TODO test institutionsPrisma
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
 
     describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = ['memberships:write', 'memberships:read'];
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
       it(`#02 Should delete permissions of user [${userTest.username}] in institution [${institutionTest.name}]`, async () => {
         const httpAppResponse = await ezmesure({
@@ -111,41 +113,35 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 200);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
         expect(membership).toEqual(null);
 
         // TODO Test institution service
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
     beforeAll(async () => {
       // TODO use service to create user
-      await createUserAsAdmin(
-        userManagerTest.username,
-        userManagerTest.email,
-        userManagerTest.fullName,
-        userManagerTest.isAdmin,
-      );
-      await activateUser(
-        userManagerTest.username,
-        userManagerTest.password,
-      );
-      userManagerToken = await getToken('user.manager', 'changeme');
+      await usersPrisma.create({ data: userManagerTest });
+      await usersElastic.createUser(userManagerTest);
+
+      userManagerToken = await usersService
+        .generateToken(userManagerTest.username, userManagerPassword);
     });
     describe(`With permission [${allPermission}]`, () => {
       beforeEach(async () => {
         membershipUserManagerTest.permissions = ['memberships:write', 'memberships:read'];
-        await membershipsService.create({ data: membershipUserManagerTest });
+        await membershipsPrisma.create({ data: membershipUserManagerTest });
       });
       describe(`Delete membership with permission [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = allPermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it('#03 Should delete membership', async () => {
@@ -161,7 +157,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           expect(httpAppResponse).toHaveProperty('status', 200);
 
           // Test service
-          const membership = await membershipsService.findByID(institutionId, userTest.username);
+          const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
           expect(membership).toEqual(null);
 
           // TODO Test institution service
@@ -173,7 +169,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
 
         beforeAll(async () => {
           membershipUserTest.permissions = userTestPermissions;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it('#04 Should delete membership', async () => {
@@ -189,7 +185,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           expect(httpAppResponse).toHaveProperty('status', 200);
 
           // Test service
-          const membership = await membershipsService.findByID(institutionId, userTest.username);
+          const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
           expect(membership).toEqual(null);
 
           // TODO Test institution service
@@ -199,7 +195,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
       describe(`Delete membership with permission [${emptyPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = emptyPermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it('#05 Should delete membership', async () => {
@@ -215,26 +211,26 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           expect(httpAppResponse).toHaveProperty('status', 200);
 
           // Test service
-          const membership = await membershipsService.findByID(institutionId, userTest.username);
+          const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
           expect(membership).toEqual(null);
 
           // TODO Test institution service
         });
       });
       afterEach(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
     describe(`With permission [${readPermission}]`, () => {
       beforeAll(async () => {
         membershipUserManagerTest.permissions = readPermission;
-        await membershipsService.create({ data: membershipUserManagerTest });
+        await membershipsPrisma.create({ data: membershipUserManagerTest });
       });
 
       describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
         beforeAll(async () => {
           membershipUserTest.permissions = allPermission;
-          await membershipsService.create({ data: membershipUserTest });
+          await membershipsPrisma.create({ data: membershipUserTest });
         });
 
         it('#06 Should not delete membership', async () => {
@@ -250,7 +246,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
           expect(httpAppResponse).toHaveProperty('status', 403);
 
           // Test service
-          const membership = await membershipsService.findByID(institutionId, userTest.username);
+          const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
           expect(membership).toHaveProperty('username', userTest.username);
           expect(membership).toHaveProperty('institutionId', institutionId);
           expect(membership).toHaveProperty('roles', []);
@@ -261,7 +257,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         });
       });
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
@@ -269,7 +265,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = allPermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
       it('#07 Should not delete membership', async () => {
         const httpAppResponse = await ezmesure({
@@ -281,7 +277,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
@@ -293,7 +289,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
@@ -301,7 +297,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
     describe(`Delete membership with permissions [${allPermission}] of user [${userTest.username}] for institution [${institutionTest.name}]`, () => {
       beforeAll(async () => {
         membershipUserTest.permissions = allPermission;
-        await membershipsService.create({ data: membershipUserTest });
+        await membershipsPrisma.create({ data: membershipUserTest });
       });
       it('#08 Should not delete membership', async () => {
         const httpAppResponse = await ezmesure({
@@ -313,7 +309,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const membership = await membershipsService.findByID(institutionId, userTest.username);
+        const membership = await membershipsPrisma.findByID(institutionId, userTest.username);
 
         expect(membership).toHaveProperty('username', userTest.username);
         expect(membership).toHaveProperty('institutionId', institutionId);
@@ -325,13 +321,13 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
       });
 
       afterAll(async () => {
-        await membershipsService.deleteAll();
+        await membershipsPrisma.removeAll();
       });
     });
   });
 
   afterAll(async () => {
-    await usersService.deleteAll();
-    await institutionsService.deleteAll();
+    await resetDatabase();
+    await resetElastic();
   });
 });

@@ -1,13 +1,7 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
-const { triggerHooks } = require('../hooks/hookEmitter');
+const institutionsPrisma = require('../services/prisma/institutions');
 
-const {
-  MEMBER_ROLES: {
-    docContact: DOC_CONTACT,
-    techContact: TECH_CONTACT,
-  },
-} = require('./memberships.dto');
+const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /**
@@ -27,10 +21,18 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async create(params) {
-    const institution = await prisma.institution.create(params);
-
+    const institution = await institutionsPrisma.create(params);
     triggerHooks('institution:create', institution);
+    return institution;
+  }
 
+  /**
+   * @param {InstitutionCreateArgs} params
+   * @returns {Promise<Institution>}
+   */
+  static async createAsUser(params) {
+    const institution = await institutionsPrisma.create(params);
+    triggerHooks('institution:create', institution);
     return institution;
   }
 
@@ -39,7 +41,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution[]>}
    */
   static findMany(params) {
-    return prisma.institution.findMany(params);
+    return institutionsPrisma.findMany(params);
   }
 
   /**
@@ -47,7 +49,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static findUnique(params) {
-    return prisma.institution.findUnique(params);
+    return institutionsPrisma.findUnique(params);
   }
 
   /**
@@ -56,16 +58,7 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static findByID(id, includes = null) {
-    let include;
-    if (includes) {
-      include = {
-        ...includes,
-      };
-    }
-    return prisma.institution.findUnique({
-      where: { id },
-      include,
-    });
+    return institutionsPrisma.findByID(id, includes);
   }
 
   /**
@@ -73,10 +66,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async update(params) {
-    const institution = await prisma.institution.update(params);
-
+    const institution = await institutionsPrisma.update(params);
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -86,18 +77,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async addSubInstitution(institutionId, subInstitutionId) {
-    const institution = await prisma.institution.update({
-      where: { id: institutionId },
-      include: { childInstitutions: true },
-      data: {
-        childInstitutions: {
-          connect: { id: subInstitutionId },
-        },
-      },
-    });
-
+    const institution = await institutionsPrisma.addSubInstitution(institutionId, subInstitutionId);
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -106,13 +87,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async validate(id) {
-    const institution = await prisma.institution.update({
-      where: { id },
-      data: { validated: true },
-    });
-
+    const institution = await institutionsPrisma.validate(id);
     triggerHooks('institution:update', institution);
-
     return institution;
   }
 
@@ -121,10 +97,8 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution>}
    */
   static async upsert(params) {
-    const institution = await prisma.institution.upsert(params);
-
+    const institution = await institutionsPrisma.upsert(params);
     triggerHooks('institution:upsert', institution);
-
     return institution;
   }
 
@@ -133,72 +107,15 @@ module.exports = class InstitutionsService {
    * @returns {Promise<Institution | null>}
    */
   static async delete(params) {
-    const transactionResult = await prisma.$transaction(async (tx) => {
-      const institution = await tx.institution.findUnique({
-        where: params.where,
-        include: {
-          memberships: {
-            include: {
-              repositoryPermissions: true,
-              spacePermissions: true,
-            },
-          },
-          spaces: true,
-          repositories: { include: { institutions: true } },
-          sushiCredentials: true,
-        },
-      });
+    const data = await institutionsPrisma.remove(params);
 
-      if (!institution) {
-        return null;
-      }
-
-      const deletedRepos = [];
-      const findArgs = { where: { institutionId: institution.id } };
-
-      await tx.repositoryPermission.deleteMany(findArgs);
-      await tx.spacePermission.deleteMany(findArgs);
-      await tx.membership.deleteMany(findArgs);
-
-      await Promise.all(
-        institution.repositories.map((r) => {
-          // If last institution, delete repo
-          if (r.institutions.length <= 1) {
-            deletedRepos.push(r);
-            return tx.repository.delete({ where: { pattern: r.pattern } });
-          }
-
-          // Otherwise disconnect institution from repo
-          return tx.repository.update({
-            where: { pattern: r.pattern },
-            data: {
-              institutions: {
-                disconnect: { id: institution.id },
-              },
-            },
-          });
-        }),
-      );
-      await tx.space.deleteMany(findArgs);
-
-      await tx.sushiCredentials.deleteMany(findArgs);
-
-      return {
-        deletedInstitution: await tx.institution.delete(params),
-        deletedRepos,
-        institution,
-      };
-    });
-
-    if (!transactionResult) {
-      return null;
-    }
+    if (!data) return null;
 
     const {
       deletedInstitution,
       deletedRepos,
       institution,
-    } = transactionResult;
+    } = data;
 
     triggerHooks('institution:delete', institution);
 
@@ -218,10 +135,12 @@ module.exports = class InstitutionsService {
   /**
    * @returns {Promise<Object | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const institutions = await this.findMany({});
+
+    if (institutions.length === 0) { return null; }
 
     await Promise.all(institutions.map(async (institution) => {
       await this.delete({
@@ -235,16 +154,6 @@ module.exports = class InstitutionsService {
   }
 
   static async getContacts(institutionId) {
-    return prisma.membership.findMany({
-      where: {
-        institutionId,
-        roles: {
-          hasSome: [DOC_CONTACT, TECH_CONTACT],
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
+    return institutionsPrisma.getContacts(institutionId);
   }
 };

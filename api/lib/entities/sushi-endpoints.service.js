@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -18,7 +18,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint>}
    */
   static create(params) {
-    return prisma.sushiEndpoint.create(params);
+    return sushiEndpointsPrisma.create(params);
   }
 
   /**
@@ -26,7 +26,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint[]>}
    */
   static findMany(params) {
-    return prisma.sushiEndpoint.findMany(params);
+    return sushiEndpointsPrisma.findMany(params);
   }
 
   /**
@@ -34,7 +34,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint | null>}
    */
   static findUnique(params) {
-    return prisma.sushiEndpoint.findUnique(params);
+    return sushiEndpointsPrisma.findUnique(params);
   }
 
   /**
@@ -42,7 +42,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint | null>}
    */
   static findByID(id) {
-    return prisma.sushiEndpoint.findUnique({ where: { id } });
+    return sushiEndpointsPrisma.findByID(id);
   }
 
   /**
@@ -50,7 +50,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint>}
    */
   static update(params) {
-    return prisma.sushiEndpoint.update(params);
+    return sushiEndpointsPrisma.update(params);
   }
 
   /**
@@ -58,7 +58,7 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint>}
    */
   static upsert(params) {
-    return prisma.sushiEndpoint.upsert(params);
+    return sushiEndpointsPrisma.upsert(params);
   }
 
   /**
@@ -66,45 +66,22 @@ module.exports = class SushiEndpointsService {
    * @returns {Promise<SushiEndpoint | null>}
    */
   static async delete(params) {
-    const [deleteResult, deletedEndpoint] = await prisma.$transaction(async (tx) => {
-      const endpoint = await tx.sushiEndpoint.findUnique({
-        where: params.where,
-        include: {
-          credentials: true,
-        },
-      });
-
-      if (!endpoint) {
-        return [null, null];
-      }
-
-      await tx.sushiCredentials.deleteMany({
-        where: { endpointId: endpoint.id },
-      });
-
-      return [
-        await tx.sushiEndpoint.delete(params),
-        endpoint,
-      ];
-    });
-
-    if (!deletedEndpoint) {
-      return null;
-    }
+    const { deleteResult, deletedEndpoint } = await sushiEndpointsPrisma.remove(params);
 
     triggerHooks('sushi_endpoint:delete', deletedEndpoint);
     deletedEndpoint.credentials.forEach((credentials) => { triggerHooks('sushi_credentials:delete', credentials); });
-
     return deleteResult;
   }
 
   /**
    * @returns {Promise<Array<SushiEndpoint> | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const sushiEndpoints = await this.findMany({});
+
+    if (sushiEndpoints.length === 0) { return null; }
 
     await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
       await this.delete({

@@ -1,12 +1,26 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const usersService = require('../../../lib/entities/users.service');
-const sushiEndpointsService = require('../../../lib/entities/sushi-endpoint.service');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+const sushiEndpointsPrisma = require('../../../lib/services/prisma/sushi-endpoints');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const sushiEndpointTest = {
     sushiUrl: 'http://localhost',
     vendor: 'test vendor',
@@ -43,13 +57,15 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
 
   let adminToken;
   beforeAll(async () => {
-    adminToken = await getAdminToken();
+    await resetDatabase();
+    await resetElastic();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     describe('Update sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
 
@@ -85,7 +101,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(sushiEndpointFromResponse).toHaveProperty('paramSeparator', sushiEndpointUpdateTest.paramSeparator);
 
         // Test sushi-endpoint service
-        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+        const sushiEndpointFromService = await sushiEndpointsPrisma.findByID(sushiEndpointId);
 
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
@@ -105,23 +121,23 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
-    let userTest;
     let userToken;
 
     beforeAll(async () => {
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
 
     describe('Update sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
 
@@ -139,7 +155,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test sushi-endpoint service
-        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+        const sushiEndpointFromService = await sushiEndpointsPrisma.findByID(sushiEndpointId);
 
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
@@ -159,12 +175,12 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsPrisma.removeAll();
       });
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersPrisma.removeAll();
     });
   });
 
@@ -172,7 +188,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
     describe('Update sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#03 Should not update sushi-endpoint', async () => {
@@ -189,7 +205,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test sushi-endpoint service
-        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+        const sushiEndpointFromService = await sushiEndpointsPrisma.findByID(sushiEndpointId);
 
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
@@ -209,7 +225,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsPrisma.removeAll();
       });
     });
   });
@@ -218,7 +234,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
     describe('Update sushi-endpoint', () => {
       let sushiEndpointId;
       beforeAll(async () => {
-        const sushiEndpoint = await sushiEndpointsService.create({ data: sushiEndpointTest });
+        const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
         sushiEndpointId = sushiEndpoint.id;
       });
       it('#04 Should not update sushi-endpoint', async () => {
@@ -232,7 +248,7 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test sushi-endpoint service
-        const sushiEndpointFromService = await sushiEndpointsService.findByID(sushiEndpointId);
+        const sushiEndpointFromService = await sushiEndpointsPrisma.findByID(sushiEndpointId);
 
         expect(sushiEndpointFromService?.createdAt).not.toBeNull();
         expect(sushiEndpointFromService?.updatedAt).not.toBeNull();
@@ -252,8 +268,12 @@ describe('[sushi-endpoint]: Test delete sushi-endpoints features', () => {
       });
 
       afterAll(async () => {
-        await sushiEndpointsService.deleteAll();
+        await sushiEndpointsPrisma.removeAll();
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
+    await resetElastic();
   });
 });

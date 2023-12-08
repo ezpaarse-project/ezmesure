@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const stepPrisma = require('../services/prisma/step');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Step} Step */
@@ -16,7 +16,7 @@ module.exports = class StepsService {
    * @returns {Promise<Step>}
    */
   static create(params) {
-    return prisma.step.create(params);
+    return stepPrisma.create(params);
   }
 
   /**
@@ -24,7 +24,7 @@ module.exports = class StepsService {
    * @returns {Promise<Step[]>}
    */
   static findMany(params) {
-    return prisma.step.findMany(params);
+    return stepPrisma.findMany(params);
   }
 
   /**
@@ -32,7 +32,7 @@ module.exports = class StepsService {
    * @returns {Promise<Step | null>}
    */
   static findUnique(params) {
-    return prisma.step.findUnique(params);
+    return stepPrisma.findUnique(params);
   }
 
   /**
@@ -40,7 +40,7 @@ module.exports = class StepsService {
    * @returns {Promise<Step>}
    */
   static update(params) {
-    return prisma.step.update(params);
+    return stepPrisma.update(params);
   }
 
   /**
@@ -48,6 +48,6 @@ module.exports = class StepsService {
    * @returns {Promise<Step>}
    */
   static upsert(params) {
-    return prisma.step.upsert(params);
+    return stepPrisma.upsert(params);
   }
 };

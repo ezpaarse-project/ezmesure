@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma.service');
+const membershipsPrisma = require('../services/prisma/memberships');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
@@ -22,10 +22,8 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership>}
    */
   static async create(params) {
-    const membership = await prisma.membership.create(params);
-
+    const membership = await membershipsPrisma.create(params);
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 
@@ -34,7 +32,7 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership[]>}
    */
   static findMany(params) {
-    return prisma.membership.findMany(params);
+    return membershipsPrisma.findMany(params);
   }
 
   /**
@@ -42,7 +40,7 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership | null>}
    */
   static findUnique(params) {
-    return prisma.membership.findUnique(params);
+    return membershipsPrisma.findUnique(params);
   }
 
   /**
@@ -52,21 +50,7 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership | null>}
    */
   static findByID(institutionId, username, includes = null) {
-    let include;
-    if (includes) {
-      include = {
-        ...includes,
-      };
-    }
-    return prisma.membership.findUnique({
-      where: {
-        username_institutionId: {
-          institutionId,
-          username,
-        },
-      },
-      include,
-    });
+    return membershipsPrisma.findByID(institutionId, username, includes);
   }
 
   /**
@@ -74,10 +58,8 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership>}
    */
   static async update(params) {
-    const membership = await prisma.membership.update(params);
-
+    const membership = await membershipsPrisma.update(params);
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 
@@ -86,10 +68,8 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership>}
    */
   static async upsert(params) {
-    const membership = await prisma.membership.upsert(params);
-
+    const membership = await membershipsPrisma.upsert(params);
     triggerHooks('membership:upsert', membership);
-
     return membership;
   }
 
@@ -98,35 +78,7 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership | null>}
    */
   static async delete(params) {
-    const [deleteResult, deletedMembership] = await prisma.$transaction(async (tx) => {
-      const membership = await tx.membership.findUnique({
-        where: params.where,
-        include: {
-          repositoryPermissions: true,
-          spacePermissions: true,
-        },
-      });
-
-      if (!membership) {
-        return [null, null];
-      }
-
-      /** @type {RepositoryPermissionDeleteManyArgs | SpacePermissionDeleteManyArgs} */
-      const findArgs = {
-        where: {
-          username: membership.username,
-          institutionId: membership.institutionId,
-        },
-      };
-
-      await tx.repositoryPermission.deleteMany(findArgs);
-      await tx.spacePermission.deleteMany(findArgs);
-
-      return [
-        await tx.membership.delete(params),
-        membership,
-      ];
-    });
+    const { deleteResult, deletedMembership } = await membershipsPrisma.remove(params);
 
     if (!deletedMembership) {
       return null;
@@ -142,9 +94,12 @@ module.exports = class MembershipsService {
   /**
    * @returns {Promise<Array<Membership> | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
+
     const memberships = await this.findMany({});
+
+    if (memberships.length === 0) { return null; }
 
     await Promise.all(memberships.map(async (membership) => {
       await this.delete({

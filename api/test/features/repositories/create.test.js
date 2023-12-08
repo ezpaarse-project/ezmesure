@@ -1,12 +1,26 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
-const repositoriesService = require('../../../lib/entities/repositories.service');
-const usersService = require('../../../lib/entities/users.service');
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
 
-const { createDefaultActivatedUserAsAdmin } = require('../../setup/users');
-const { getToken, getAdminToken } = require('../../setup/login');
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
+const usersService = require('../../../lib/entities/users.service');
+const repositoriesPrisma = require('../../../lib/services/prisma/repositories');
+
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[repositories]: Test create features', () => {
+  const userTest = {
+    username: 'user.test',
+    email: 'user.test@test.fr',
+    fullName: 'User test',
+    isAdmin: false,
+  };
+
   const ezpaarseRepositoryConfig = {
     pattern: 'ezpaarse-*',
     type: 'ezPAARSE',
@@ -25,7 +39,9 @@ describe('[repositories]: Test create features', () => {
     let adminToken;
 
     beforeAll(async () => {
-      adminToken = await getAdminToken();
+      await resetDatabase();
+    await resetElastic();
+      adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
 
     describe(`Create new repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
@@ -53,7 +69,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', ezpaarseRepositoryConfig.type);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -62,7 +78,7 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesPrisma.removeAll();
       });
     });
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
@@ -90,7 +106,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', ezcounterRepositoryConfig.type);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -99,7 +115,7 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesPrisma.removeAll();
       });
     });
 
@@ -128,7 +144,7 @@ describe('[repositories]: Test create features', () => {
         expect(repositoryFromResponse).toHaveProperty('type', randomRepositoryConfig.type);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findByPattern(pattern);
+        const repositoryFromService = await repositoriesPrisma.findByPattern(pattern);
 
         expect(repositoryFromService?.createdAt).not.toBeNull();
         expect(repositoryFromService?.updatedAt).not.toBeNull();
@@ -137,16 +153,17 @@ describe('[repositories]: Test create features', () => {
       });
 
       afterAll(async () => {
-        await repositoriesService.deleteAll();
+        await repositoriesPrisma.removeAll();
       });
     });
   });
   describe('As user', () => {
     let userToken;
-    let userTest;
+
     beforeAll(async () => {
-      userTest = await createDefaultActivatedUserAsAdmin();
-      userToken = await getToken(userTest.username, userTest.password);
+      await usersPrisma.create({ data: userTest });
+      await usersElastic.createUser(userTest);
+      userToken = await usersService.generateToken(userTest.username, userTest.password);
     });
 
     describe(`Create new repository of type [${ezcounterRepositoryConfig.type}]`, () => {
@@ -164,7 +181,7 @@ describe('[repositories]: Test create features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findMany();
+        const repositoryFromService = await repositoriesPrisma.findMany();
         expect(repositoryFromService).toEqual([]);
       });
     });
@@ -183,13 +200,13 @@ describe('[repositories]: Test create features', () => {
         expect(httpAppResponse).toHaveProperty('status', 403);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findMany();
+        const repositoryFromService = await repositoriesPrisma.findMany();
         expect(repositoryFromService).toEqual([]);
       });
     });
 
     afterAll(async () => {
-      await usersService.deleteAll();
+      await usersPrisma.removeAll();
     });
   });
 
@@ -209,7 +226,7 @@ describe('[repositories]: Test create features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findMany();
+        const repositoryFromService = await repositoriesPrisma.findMany();
         expect(repositoryFromService).toEqual([]);
       });
     });
@@ -227,9 +244,13 @@ describe('[repositories]: Test create features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test service
-        const repositoryFromService = await repositoriesService.findMany();
+        const repositoryFromService = await repositoriesPrisma.findMany();
         expect(repositoryFromService).toEqual([]);
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
+    await resetElastic();
   });
 });

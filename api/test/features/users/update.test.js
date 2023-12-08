@@ -1,9 +1,16 @@
+const config = require('config');
+
 const ezmesure = require('../../setup/ezmesure');
 
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
+
+const usersPrisma = require('../../../lib/services/prisma/users');
+const usersElastic = require('../../../lib/services/elastic/users');
 const usersService = require('../../../lib/entities/users.service');
 
-const { createUserAsAdmin } = require('../../setup/users');
-const { getAdminToken } = require('../../setup/login');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[users]: Test update users features', () => {
   const userTest = {
@@ -23,18 +30,16 @@ describe('[users]: Test update users features', () => {
   let adminToken;
 
   beforeAll(async () => {
-    adminToken = await getAdminToken();
+    await resetDatabase();
+    await resetElastic();
+    adminToken = await usersService.generateToken(adminUsername, adminPassword);
   });
   describe('Update', () => {
     describe('As admin', () => {
       describe(`Update user [${userTest.username}]`, () => {
         beforeAll(async () => {
-          await createUserAsAdmin(
-            userTest.username,
-            userTest.email,
-            userTest.fullName,
-            userTest.isAdmin,
-          );
+          await usersPrisma.create({ data: userTest });
+          await usersElastic.createUser(userTest);
         });
 
         it(`#01 Should update user [${userTest.username}]`, async () => {
@@ -51,7 +56,7 @@ describe('[users]: Test update users features', () => {
           expect(httpAppResponse).toHaveProperty('status', 200);
 
           // Test service
-          const userFromService = await usersService.findByUsername(userTest.username);
+          const userFromService = await usersPrisma.findByUsername(userTest.username);
 
           expect(userFromService).toHaveProperty('username', userTestUpdated.username);
           expect(userFromService).toHaveProperty('fullName', userTestUpdated.fullName);
@@ -62,22 +67,18 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersPrisma.removeAll();
         });
       });
     });
     describe('With random token', () => {
       describe(`Update user [${userTest.username}]`, () => {
         beforeAll(async () => {
-          await createUserAsAdmin(
-            userTest.username,
-            userTest.email,
-            userTest.fullName,
-            userTest.isAdmin,
-          );
+          await usersPrisma.create({ data: userTest });
+          await usersElastic.createUser(userTest);
         });
 
-        it(`#02 Should not update us${userTest.username}rTest.username}]`, async () => {
+        it(`#02 Should not update [${userTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
@@ -91,7 +92,7 @@ describe('[users]: Test update users features', () => {
           expect(httpAppResponse).toHaveProperty('status', 401);
 
           // Test service
-          const userFromService = await usersService.findByUsername(userTest.username);
+          const userFromService = await usersPrisma.findByUsername(userTest.username);
 
           expect(userFromService).toHaveProperty('username', userTest.username);
           expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -102,22 +103,18 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersPrisma.removeAll();
         });
       });
     });
     describe('Without token', () => {
       describe(`Update user [${userTest.username}]`, () => {
         beforeAll(async () => {
-          await createUserAsAdmin(
-            userTest.username,
-            userTest.email,
-            userTest.fullName,
-            userTest.isAdmin,
-          );
+          await usersPrisma.create({ data: userTest });
+          await usersElastic.createUser(userTest);
         });
 
-        it(`#03 Should not update us${userTest.username}rTest.username}]`, async () => {
+        it(`#03 Should not update [${userTest.username}]`, async () => {
           const httpAppResponse = await ezmesure({
             method: 'PUT',
             url: `/users/${userTest.username}`,
@@ -128,7 +125,7 @@ describe('[users]: Test update users features', () => {
           expect(httpAppResponse).toHaveProperty('status', 401);
 
           // Test service
-          const userFromService = await usersService.findByUsername(userTest.username);
+          const userFromService = await usersPrisma.findByUsername(userTest.username);
 
           expect(userFromService).toHaveProperty('username', userTest.username);
           expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -139,9 +136,13 @@ describe('[users]: Test update users features', () => {
         });
 
         afterAll(async () => {
-          await usersService.deleteAll();
+          await usersPrisma.removeAll();
         });
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
+    await resetElastic();
   });
 });

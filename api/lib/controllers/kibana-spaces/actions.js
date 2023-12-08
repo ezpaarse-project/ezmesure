@@ -7,7 +7,7 @@ const {
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
-} = require('../../services/prisma.service');
+} = require('../../services/prisma');
 
 exports.getMany = async (ctx) => {
   const {

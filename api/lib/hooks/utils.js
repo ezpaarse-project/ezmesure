@@ -1,4 +1,4 @@
-const { client: prisma } = require('../services/prisma.service');
+const { client: prisma } = require('../services/prisma');
 
 /**
  * @typedef {import('@prisma/client').Space} Space

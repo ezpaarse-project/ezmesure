@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma, Prisma } = require('../services/prisma.service');
+const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
@@ -11,13 +11,13 @@ const { client: prisma, Prisma } = require('../services/prisma.service');
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class SushiCredentialssService {
+module.exports = class SushiCredentialsService {
   /**
    * @param {SushiCredentialsCreateArgs} params
    * @returns {Promise<SushiCredentials>}
    */
   static create(params) {
-    return prisma.sushiCredentials.create(params);
+    return sushiCredentialsPrisma.create(params);
   }
 
   /**
@@ -25,7 +25,7 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials[]>}
    */
   static findMany(params) {
-    return prisma.sushiCredentials.findMany(params);
+    return sushiCredentialsPrisma.findMany(params);
   }
 
   /**
@@ -33,7 +33,7 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials | null>}
    */
   static findUnique(params) {
-    return prisma.sushiCredentials.findUnique(params);
+    return sushiCredentialsPrisma.findUnique(params);
   }
 
   /**
@@ -41,7 +41,7 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials | null>}
    */
   static findByID(id) {
-    return prisma.sushiCredentials.findUnique({ where: { id } });
+    return sushiCredentialsPrisma.findByID(id);
   }
 
   /**
@@ -49,7 +49,7 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials>}
    */
   static update(params) {
-    return prisma.sushiCredentials.update(params);
+    return sushiCredentialsPrisma.update(params);
   }
 
   /**
@@ -57,7 +57,7 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials>}
    */
   static upsert(params) {
-    return prisma.sushiCredentials.upsert(params);
+    return sushiCredentialsPrisma.upsert(params);
   }
 
   /**
@@ -65,21 +65,18 @@ module.exports = class SushiCredentialssService {
    * @returns {Promise<SushiCredentials | null>}
    */
   static delete(params) {
-    return prisma.sushiCredentials.delete(params).catch((e) => {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
-        return null;
-      }
-      throw e;
-    });
+    return sushiCredentialsPrisma.remove(params);
   }
 
   /**
    * @returns {Promise<Array<SushiCredentials> | null>}
    */
-  static async deleteAll() {
-    if (process.env.NODE_ENV === 'production') { return null; }
+  static async removeAll() {
+    if (process.env.NODE_ENV !== 'dev') { return null; }
 
     const sushiCredentials = await this.findMany({});
+
+    if (sushiCredentials.length === 0) { return null; }
 
     await Promise.all(sushiCredentials.map(async (sushiCredential) => {
       await this.delete({

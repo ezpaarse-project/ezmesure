@@ -1,12 +1,15 @@
 const config = require('config');
 
-const adminUsername = config.get('admin.username');
-
 const ezmesure = require('../../setup/ezmesure');
 
+const { resetDatabase } = require('../../../lib/services/prisma/utils');
+const { resetElastic } = require('../../../lib/services/elastic/utils');
+
+const usersPrisma = require('../../../lib/services/prisma/users');
 const usersService = require('../../../lib/entities/users.service');
 
-const { getAdminToken } = require('../../setup/login');
+const adminUsername = config.get('admin.username');
+const adminPassword = config.get('admin.password');
 
 describe('[users]: Test create users features', () => {
   const userTest = {
@@ -15,12 +18,17 @@ describe('[users]: Test create users features', () => {
     fullName: 'User test',
     isAdmin: false,
   };
+
+  beforeAll(async () => {
+    await resetDatabase();
+    await resetElastic();
+  });
   describe('As admin', () => {
     describe(`Create new user [${userTest.username}]`, () => {
       let adminToken;
 
       beforeAll(async () => {
-        adminToken = await getAdminToken();
+        adminToken = await usersService.generateToken(adminUsername, adminPassword);
       });
 
       it(`#01 Should create new user [${userTest.username}]`, async () => {
@@ -37,7 +45,7 @@ describe('[users]: Test create users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 201);
 
         // Test service
-        const userFromService = await usersService.findByUsername(userTest.username);
+        const userFromService = await usersPrisma.findByUsername(userTest.username);
 
         expect(userFromService).toHaveProperty('username', userTest.username);
         expect(userFromService).toHaveProperty('fullName', userTest.fullName);
@@ -48,7 +56,7 @@ describe('[users]: Test create users features', () => {
       });
 
       afterAll(async () => {
-        await usersService.deleteAll();
+        await usersPrisma.removeAll();
       });
     });
   });
@@ -68,7 +76,7 @@ describe('[users]: Test create users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test users service
-        const usersFromService = await usersService.findMany(
+        const usersFromService = await usersPrisma.findMany(
           { where: { NOT: { username: adminUsername } } },
         );
         expect(usersFromService).toEqual([]);
@@ -88,11 +96,15 @@ describe('[users]: Test create users features', () => {
         expect(httpAppResponse).toHaveProperty('status', 401);
 
         // Test users service
-        const usersFromService = await usersService.findMany(
+        const usersFromService = await usersPrisma.findMany(
           { where: { NOT: { username: adminUsername } } },
         );
         expect(usersFromService).toEqual([]);
       });
     });
+  });
+  afterAll(async () => {
+    await resetDatabase();
+    await resetElastic();
   });
 });
