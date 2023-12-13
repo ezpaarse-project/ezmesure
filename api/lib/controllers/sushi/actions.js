@@ -385,8 +385,10 @@ exports.harvestSushi = async (ctx) => {
   if (!index) {
     const repository = await repositoriesService.findFirst({
       where: {
-        institutionId: institution.id,
         type: 'counter5',
+        institutions: {
+          some: { id: institution.id },
+        },
       },
     });
 
