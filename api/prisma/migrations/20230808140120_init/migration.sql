@@ -52,7 +52,7 @@ CREATE TABLE "Membership" (
 -- CreateTable
 CREATE TABLE "Space" (
     "id" TEXT NOT NULL,
-    "institutionId" TEXT,
+    "institutionId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
@@ -78,7 +78,6 @@ CREATE TABLE "SpacePermission" (
 
 -- CreateTable
 CREATE TABLE "Repository" (
-    "institutionId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "pattern" TEXT NOT NULL,
@@ -95,7 +94,7 @@ CREATE TABLE "RepositoryPermission" (
     "readonly" BOOLEAN NOT NULL DEFAULT false,
     "locked" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "RepositoryPermission_pkey" PRIMARY KEY ("username","repositoryPattern")
+    CONSTRAINT "RepositoryPermission_pkey" PRIMARY KEY ("username","institutionId","repositoryPattern")
 );
 
 -- CreateTable
@@ -222,6 +221,18 @@ CREATE TABLE "SushiCredentials" (
     CONSTRAINT "SushiCredentials_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "_InstitutionToRepository" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_InstitutionToRepository_AB_unique" ON "_InstitutionToRepository"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_InstitutionToRepository_B_index" ON "_InstitutionToRepository"("B");
+
 -- AddForeignKey
 ALTER TABLE "Institution" ADD CONSTRAINT "Institution_parentInstitutionId_fkey" FOREIGN KEY ("parentInstitutionId") REFERENCES "Institution"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -238,10 +249,7 @@ ALTER TABLE "Space" ADD CONSTRAINT "Space_institutionId_fkey" FOREIGN KEY ("inst
 ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_username_institutionId_fkey" FOREIGN KEY ("username", "institutionId") REFERENCES "Membership"("username", "institutionId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Repository" ADD CONSTRAINT "Repository_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SpacePermission" ADD CONSTRAINT "SpacePermission_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_username_institutionId_fkey" FOREIGN KEY ("username", "institutionId") REFERENCES "Membership"("username", "institutionId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -250,7 +258,7 @@ ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_username
 ALTER TABLE "RepositoryPermission" ADD CONSTRAINT "RepositoryPermission_repositoryPattern_fkey" FOREIGN KEY ("repositoryPattern") REFERENCES "Repository"("pattern") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Action" ADD CONSTRAINT "Action_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Action" ADD CONSTRAINT "Action_institutionId_fkey" FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Action" ADD CONSTRAINT "Action_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("username") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -272,3 +280,9 @@ ALTER TABLE "SushiCredentials" ADD CONSTRAINT "SushiCredentials_institutionId_fk
 
 -- AddForeignKey
 ALTER TABLE "SushiCredentials" ADD CONSTRAINT "SushiCredentials_endpointId_fkey" FOREIGN KEY ("endpointId") REFERENCES "SushiEndpoint"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_InstitutionToRepository" ADD CONSTRAINT "_InstitutionToRepository_A_fkey" FOREIGN KEY ("A") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_InstitutionToRepository" ADD CONSTRAINT "_InstitutionToRepository_B_fkey" FOREIGN KEY ("B") REFERENCES "Repository"("pattern") ON DELETE CASCADE ON UPDATE CASCADE;
