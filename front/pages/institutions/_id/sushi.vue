@@ -791,9 +791,6 @@ export default {
           return undefined;
       }
     },
-    availableTags() {
-      return [...new Set(this.sushiItems.map((item) => item.tags).flat())];
-    },
   },
   mounted() {
     return this.refreshSushiItems();
