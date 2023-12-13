@@ -347,21 +347,21 @@
           <v-card>
             <v-card-text>
               <v-select
-                :value="tableOptions.groupBy[0]"
+                :value="tableOptions.groupBy?.[0]"
                 :items="groupOptions"
                 :label="$t('groupBy')"
                 @input="updateGroupProperty"
               >
                 <template #append-outer>
                   <v-btn
-                    :disabled="!tableOptions.groupBy[0]"
+                    :disabled="!tableOptions.groupBy?.[0]"
                     icon
                     class="ml-2"
-                    @click="updateGroupDesc(!tableOptions.groupDesc[0])"
+                    @click="updateGroupDesc(!tableOptions.groupDesc?.[0])"
                   >
                     <v-icon>
                       {{
-                        tableOptions.groupDesc[0]
+                        tableOptions.groupDesc?.[0]
                           ? 'mdi-sort-alphabetical-descending'
                           : 'mdi-sort-alphabetical-ascending'
                       }}
