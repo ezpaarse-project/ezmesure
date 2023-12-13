@@ -525,6 +525,8 @@
     }
   },
   "sushi": {
+    "credentials": "Credentials",
+    "credentialsCount": "{count} credentials",
     "copyId": "Copy ID",
     "showFiles": "View files",
     "unableToCopyId": "Unable to copy in the clipboard",
@@ -533,10 +535,12 @@
     "latestImport": "Latest import",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
+    "nInstitutions": "1 institution use this endpoint|{count} institutions use this endpoint",
     "nUntestedCredentials": "{count} untested credentials",
     "nInvalidCredentials": "{count} invalid credentials",
     "nOperationalCredentials": "{count} operational credentials",
     "nProblematicEndpoints": "1 problematic endpoint|{count} problematic endpoints",
+    "nErrsCredentials": "1 credential show that endpoint is problematic|{count} credentials show that endpoint is problematic",
     "deleteNbCredentials": "You are about to delete {number} SUSHI credentials.",
     "scope": "Scope",
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",

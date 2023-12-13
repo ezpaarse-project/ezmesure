@@ -174,6 +174,22 @@
         </v-chip>
       </template>
 
+      <template #[`item.credentials`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.credentials)"
+          :outlined="item.credentials?.length <= 0"
+          small
+          class="elevation-1"
+          @click="$refs.credentialsDialog?.display?.(item)"
+        >
+          {{ $tc('sushi.credentialsCount', item.credentials.length) }}
+
+          <v-icon right small>
+            mdi-key
+          </v-icon>
+        </v-chip>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
@@ -209,6 +225,7 @@
     </v-data-table>
 
     <ConfirmDialog ref="confirmDialog" />
+    <CredentialDialog ref="credentialsDialog" />
   </section>
 </template>
 
@@ -216,6 +233,7 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
+import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
@@ -226,6 +244,7 @@ export default {
     EndpointForm,
     EndpointDetails,
     ConfirmDialog,
+    CredentialDialog,
   },
   data() {
     return {
@@ -267,6 +286,12 @@ export default {
           value: 'validated',
           align: 'right',
           width: '130px',
+        },
+        {
+          text: this.$t('sushi.credentials'),
+          value: 'credentials',
+          align: 'center',
+          width: '200px',
         },
         {
           text: this.$t('actions'),
@@ -341,7 +366,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints');
+        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials'] } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
       }

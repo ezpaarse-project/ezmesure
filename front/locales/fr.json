@@ -526,6 +526,8 @@
     }
   },
   "sushi": {
+    "credentials": "Identifiants",
+    "credentialsCount": "1 identifiant|{count} identifiants",
     "copyId": "Copier l'ID",
     "showFiles": "Voir les fichiers",
     "unableToCopyId": "Impossible de copier dans le presse-papier",
@@ -534,10 +536,12 @@
     "latestImport": "Dernier import",
     "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
     "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verrouillée.",
+    "nInstitutions": "1 établissement utilise cet endpoint|{count} établissements utilisent cet endpoint",
     "nUntestedCredentials": "1 identifiant non testé|{count} identifiants non testés",
     "nInvalidCredentials": "1 identifiant invalide|{count} identifiants invalides",
     "nOperationalCredentials": "1 identifiant fonctionnel|{count} identifiants fonctionnels",
     "nProblematicEndpoints": "1 point d'accès problématique|{count} points d'accès problématiques",
+    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiant indique que le point d'accès est problématique",
     "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
@@ -684,7 +688,7 @@
   "repositories": {
     "repositories": "Entrepôts",
     "toolbarTitle": "Entrepôts ({count})",
-    "xRepositories": "1 entrepôt | {count} entrepôts",
+    "xRepositories": "1 entrepôt|{count} entrepôts",
     "noRepository": "Aucun entrepôt n'est encore attribué",
     "pattern": "Pattern",
     "type": "Type",
@@ -698,7 +702,7 @@
   },
   "spaces": {
     "spaces": "Espaces",
-    "xSpaces": "1 espace | {count} espaces",
+    "xSpaces": "1 espace|{count} espaces",
     "noSpace": "Aucun espace n'est encore attribué",
     "id": "Identifiant",
     "type": "Type",
