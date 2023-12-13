@@ -7,6 +7,29 @@
     <v-card style="position: relative;">
       <v-card-title>
         {{ endpoint?.vendor }}
+
+        <v-spacer />
+
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          :label="$t('search')"
+          solo
+          dense
+          hide-details
+          autocomplete="off"
+          style="max-width: 200px"
+        />
+
+        <v-btn icon class="ml-2" @click="invertSort">
+          <v-icon>
+            {{
+              tableOptions.groupDesc[0]
+                ? 'mdi-sort-alphabetical-descending'
+                : 'mdi-sort-alphabetical-ascending'
+            }}
+          </v-icon>
+        </v-btn>
       </v-card-title>
 
       <v-card-text style="position: relative;">
@@ -95,28 +118,6 @@
                     mdi-connection
                   </v-icon>
                   {{ $t('institutions.sushi.checkCredentials') }}
-                </v-btn>
-              </template>
-              <template v-else>
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  :label="$t('search')"
-                  solo
-                  dense
-                  hide-details
-                  autocomplete="off"
-                  style="max-width: 200px"
-                />
-
-                <v-btn icon class="ml-2" @click="invertSort">
-                  <v-icon>
-                    {{
-                      tableOptions.groupDesc[0]
-                        ? 'mdi-sort-alphabetical-descending'
-                        : 'mdi-sort-alphabetical-ascending'
-                    }}
-                  </v-icon>
                 </v-btn>
               </template>
             </v-toolbar>
