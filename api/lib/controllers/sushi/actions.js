@@ -368,14 +368,13 @@ exports.harvestSushi = async (ctx) => {
   const {
     target,
     forceDownload,
+    downloadUnsupported,
     ignoreValidation,
     harvestId = uuidv4(),
     timeout,
   } = body;
 
-  let {
-    reportType: reportTypes,
-  } = body;
+  let reportTypes = Array.from(new Set(body.reportType));
 
   const { sushi } = ctx.state;
   const { endpoint, institution } = sushi;
@@ -438,15 +437,13 @@ exports.harvestSushi = async (ctx) => {
   }
 
   if (reportTypes.includes('all')) {
-    const { supportedReports = [] } = sushi.endpoint;
+    reportTypes = Array.from(DEFAULT_HARVESTED_REPORTS);
+  }
 
-    if (supportedReports.length === 0) {
-      reportTypes = Array.from(DEFAULT_HARVESTED_REPORTS);
-    } else {
-      reportTypes = Array.from(
-        new Set(supportedReports.filter((reportId) => DEFAULT_HARVESTED_REPORTS.has(reportId))),
-      );
-    }
+  const supportedReports = new Set(sushi.endpoint.supportedReports);
+
+  if (!downloadUnsupported && supportedReports.size > 0) {
+    reportTypes = reportTypes.filter((reportId) => supportedReports.has(reportId));
   }
 
   /** @type {Date} */

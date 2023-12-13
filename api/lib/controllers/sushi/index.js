@@ -319,6 +319,7 @@ router.route({
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
+      downloadUnsupported: Joi.boolean().default(false),
       reportType: Joi.array().min(1).single().items(Joi.string().trim().lowercase()),
       ignoreValidation: Joi.boolean(),
       timeout: Joi.number().integer().min(10).default(600),
