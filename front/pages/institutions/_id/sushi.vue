@@ -227,18 +227,21 @@
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
+      :custom-group="customGroup"
       :items-per-page="50"
+      :options.sync="tableOptions"
       :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
       show-select
       show-expand
       single-expand
       item-key="id"
       sort-by="endpoint.vendor"
+      @pagination="currentItemCount = $event.itemsLength"
     >
-      <template #top="{ originalItemsLength }">
+      <template #top>
         <v-toolbar flat>
           <v-toolbar-title>
-            {{ $t('institutions.sushi.title', { total: originalItemsLength }) }}
+            {{ tableTitle }}
           </v-toolbar-title>
 
           <v-spacer />
@@ -324,6 +327,51 @@
             </v-card>
           </v-menu>
         </v-toolbar>
+      </template>
+
+      <template #[`header.data-table-expand`]>
+        <v-menu :close-on-content-click="false" offset-y>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              small
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon small>
+                mdi-format-list-group
+              </v-icon>
+            </v-btn>
+          </template>
+
+          <v-card>
+            <v-card-text>
+              <v-select
+                :value="tableOptions.groupBy[0]"
+                :items="groupOptions"
+                :label="$t('groupBy')"
+                @input="updateGroupProperty"
+              >
+                <template #append-outer>
+                  <v-btn
+                    :disabled="!tableOptions.groupBy[0]"
+                    icon
+                    class="ml-2"
+                    @click="updateGroupDesc(!tableOptions.groupDesc[0])"
+                  >
+                    <v-icon>
+                      {{
+                        tableOptions.groupDesc[0]
+                          ? 'mdi-sort-alphabetical-descending'
+                          : 'mdi-sort-alphabetical-ascending'
+                      }}
+                    </v-icon>
+                  </v-btn>
+                </template>
+              </v-select>
+            </v-card-text>
+          </v-card>
+        </v-menu>
       </template>
 
       <template #expanded-item="{ headers, item }">
@@ -512,6 +560,7 @@ export default {
     return {
       institution,
       sushiItems: [],
+      currentItemCount: 0,
       selected: [],
       filters: {
         sushiStatuses: [],
@@ -523,11 +572,20 @@ export default {
       showSushiReadyPopup: false,
       loadingSushiReady: false,
       loadingItems: {},
+      tableOptions: {},
       locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
     };
   },
   computed: {
+    tableTitle() {
+      let count = this.sushiItems?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('institutions.sushi.title', { total: count ?? '?' });
+    },
     isAdmin() {
       return this.$auth.user?.isAdmin;
     },
@@ -710,6 +768,31 @@ export default {
       ];
 
       return actions.filter((action) => !action.hide);
+    },
+    groupOptions() {
+      return [
+        {
+          text: this.$t('institutions.sushi.endpoint'),
+          value: 'endpoint.vendor',
+        },
+        {
+          text: this.$t('institutions.sushi.tags'),
+          value: 'tags',
+        },
+      ];
+    },
+    customGroup() {
+      switch (this.tableOptions?.groupBy?.at(0)) {
+        case 'tags':
+          return this.groupByTags;
+
+        default:
+          // Keep Vuetify's default
+          return undefined;
+      }
+    },
+    availableTags() {
+      return [...new Set(this.sushiItems.map((item) => item.tags).flat())];
     },
   },
   mounted() {
@@ -894,6 +977,39 @@ export default {
 
     goToInstitutionPage() {
       this.$router.push({ path: `/institutions/${this.$route.params.id}` });
+    },
+
+    updateGroupProperty(value) {
+      this.$set(this.tableOptions, 'groupBy', value ? [value] : []);
+    },
+    updateGroupDesc(value) {
+      this.$set(this.tableOptions, 'groupDesc', value ? [value] : []);
+    },
+    groupByTags(sushiItems) {
+      const itemsByTag = {};
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of sushiItems) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const tag of (item?.tags ?? [])) {
+          if (!itemsByTag[tag]) {
+            itemsByTag[tag] = [];
+          }
+
+          itemsByTag[tag].push(item);
+        }
+      }
+
+      return Object.entries(itemsByTag).map(
+        ([name, items]) => ({
+          depth: 0,
+          id: `root_tags_${name}`,
+          key: 'tags',
+          name,
+          items,
+          type: 'group',
+        }),
+      );
     },
   },
 };
