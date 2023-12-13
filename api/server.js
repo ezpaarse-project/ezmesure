@@ -13,7 +13,6 @@ const usersService = require('./lib/entities/users.service');
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
 const notifications = require('./lib/services/notifications');
-const Task = require('./lib/models/Task');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
 const sushi = require('./lib/services/sushi');
@@ -143,20 +142,6 @@ function start() {
   ezreeportSync.startCron();
   sushi.startCleanCron();
   cronMetrics.start();
-
-  // Change the status of tasks that was running when the server went down
-  Task.interruptRunningTasks()
-    .then(({ body = {} }) => {
-      const { updated } = body;
-      if (Number.isInteger(updated) && updated > 0) {
-        appLogger.info(`${updated} running task(s) was marked as interrupted`);
-      } else {
-        appLogger.info('No running tasks were found');
-      }
-    }).catch((err) => {
-      appLogger.error('Failed to change status of interrupted tasks');
-      appLogger.error(err.message);
-    });
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
