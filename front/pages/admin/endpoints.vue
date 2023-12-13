@@ -259,7 +259,7 @@ export default {
         {
           text: this.$t('endpoints.tags'),
           value: 'tags',
-          align: 'right',
+          align: 'center',
           width: '200px',
         },
         {

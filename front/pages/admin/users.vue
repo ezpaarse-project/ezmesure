@@ -219,11 +219,15 @@ export default {
           text: this.$t('users.user.isAdmin'),
           value: 'isAdmin',
           filter: (value) => this.basicBoolFilter('isAdmin', value),
+          align: 'center',
+          width: '200px',
         },
         {
           text: this.$t('users.user.memberships'),
           value: 'memberships',
           filter: (value) => this.membershipsFilter(value),
+          align: 'center',
+          width: '200px',
         },
         {
           text: this.$t('actions'),

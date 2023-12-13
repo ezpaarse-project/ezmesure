@@ -220,11 +220,14 @@ export default {
           text: this.$t('repositories.type'),
           value: 'type',
           filter: (_value, _search, item) => this.columnTypeFilter('type', item),
+          width: '200px'
         },
         {
           text: this.$t('repositories.institutions'),
           value: 'institutions',
           filter: (_value, _search, item) => this.columnArrayFilter('institutions', item),
+          align: 'center',
+          width: '200px'
         },
         {
           text: this.$t('actions'),
