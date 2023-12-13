@@ -20,16 +20,6 @@
           autocomplete="off"
           style="max-width: 200px"
         />
-
-        <v-btn icon class="ml-2" @click="invertSort">
-          <v-icon>
-            {{
-              tableOptions.groupDesc[0]
-                ? 'mdi-sort-alphabetical-descending'
-                : 'mdi-sort-alphabetical-ascending'
-            }}
-          </v-icon>
-        </v-btn>
       </v-card-title>
 
       <v-card-text style="position: relative;">
@@ -121,6 +111,18 @@
                 </v-btn>
               </template>
             </v-toolbar>
+          </template>
+
+          <template #[`header.data-table-expand`]>
+            <v-btn icon small @click="invertSort">
+              <v-icon small>
+                {{
+                  tableOptions.groupDesc?.[0]
+                    ? 'mdi-sort-alphabetical-descending'
+                    : 'mdi-sort-alphabetical-ascending'
+                }}
+              </v-icon>
+            </v-btn>
           </template>
 
           <template #[`item.tags`]="{ item }">
@@ -364,12 +366,12 @@ export default {
         const groupB = this.institutionsMap[b.institutionId]?.name;
 
         const res = groupA?.localeCompare?.(groupB, this.$i18n.locale, { sensitivity: 'base' });
-        return this.tableOptions.groupDesc[0] ? -res : res;
+        return this.tableOptions.groupDesc?.[0] ? -res : res;
       });
     },
 
     invertSort() {
-      this.tableOptions.groupDesc = [!this.tableOptions.groupDesc[0]];
+      this.tableOptions.groupDesc = [!this.tableOptions.groupDesc?.[0]];
     },
 
     async checkSingleConnection(sushiItem) {
