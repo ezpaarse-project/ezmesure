@@ -4,6 +4,7 @@ const { Joi } = require('koa-joi-router');
 const {
   adminUpdateSchema,
   adminCreateSchema,
+  includableFields,
 } = require('../../entities/sushi-endpoints.dto');
 
 const stringOrArray = Joi.alternatives().try(
@@ -41,14 +42,15 @@ router.route({
     getAll,
   ],
   validate: {
-    query: {
+    query: Joi.object({
       requireCustomerId: Joi.boolean(),
       requireRequestorId: Joi.boolean(),
       requireApiKey: Joi.boolean(),
       isSushiCompliant: Joi.boolean(),
       tags: stringOrArray,
       q: Joi.string(),
-    },
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    }).rename('include[]', 'include'),
   },
 });
 
