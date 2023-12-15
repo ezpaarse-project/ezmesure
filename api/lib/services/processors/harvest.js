@@ -21,6 +21,11 @@ const { appLogger } = require('../logger');
 const sushiService = require('../sushi');
 const elastic = require('../elastic');
 
+/**
+ * The processor lives in a separate process, so we must register hooks here
+ */
+require('../../hooks');
+
 const { SUSHI_CODES, ERROR_CODES } = sushiService;
 
 const harvestJobService = require('../../entities/harvest-job.service');
