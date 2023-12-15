@@ -1,12 +1,14 @@
 // @ts-check
 const { eachMonthOfInterval, parse, format } = require('date-fns');
 
-const { registerHook } = require('../hookEmitter');
+const { registerHook, createQueue } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 const { SUSHI_CODES } = require('../../services/sushi');
 
 const harvestService = require('../../entities/harvest.service');
+
+const queued = createQueue();
 
 /* eslint-disable max-len */
 /**
@@ -21,7 +23,7 @@ const HARVEST_FORMAT = 'yyyy-MM';
 /**
  * @param { HarvestJob } harvestJob
  */
-const onHarvestJobUpdate = async (harvestJob) => {
+const onHarvestJobUpdate = queued(async (harvestJob) => {
   const now = new Date();
 
   /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
@@ -76,8 +78,8 @@ const onHarvestJobUpdate = async (harvestJob) => {
       }
     }),
   );
-};
+});
 
-registerHook('harvest-job:create', onHarvestJobUpdate);
-registerHook('harvest-job:update', onHarvestJobUpdate, { queue: true });
-registerHook('harvest-job:upsert', onHarvestJobUpdate);
+registerHook('harvest-job:create', onHarvestJobUpdate, { debounce: false });
+registerHook('harvest-job:update', onHarvestJobUpdate, { debounce: false });
+registerHook('harvest-job:upsert', onHarvestJobUpdate, { debounce: false });
