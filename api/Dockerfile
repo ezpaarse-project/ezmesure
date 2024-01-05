@@ -1,4 +1,4 @@
-FROM node:18.14.2-alpine3.16 as dependencies
+FROM node:18.18.2-alpine3.18 as dependencies
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY prisma ./prisma
 RUN npm ci && NODE_ENV=production npm ci --omit=dev
 
 
-FROM node:18.14.2-alpine3.16
+FROM node:18.18.2-alpine3.18
 LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 
 WORKDIR /usr/src/app
