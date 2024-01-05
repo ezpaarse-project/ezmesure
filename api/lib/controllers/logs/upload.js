@@ -5,8 +5,7 @@ const parse = require('co-busboy');
 const zlib = require('zlib');
 const config = require('config');
 
-const dateIsValid = require('date-fns/isValid');
-const formatDate = require('date-fns/format');
+const { isValid: dateIsValid, format: formatDate } = require('date-fns');
 
 const validator = require('../../services/validator');
 const elastic = require('../../services/elastic');
@@ -165,7 +164,6 @@ module.exports = async function upload(ctx) {
       errors = errors.concat(result.errors.splice(0, 10 - errors.length));
     }
   }
-
 
   const endTime = process.hrtime.bigint();
 
