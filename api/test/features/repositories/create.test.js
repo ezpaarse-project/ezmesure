@@ -40,7 +40,7 @@ describe('[repositories]: Test create features', () => {
 
     beforeAll(async () => {
       await resetDatabase();
-    await resetElastic();
+      await resetElastic();
       adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
 

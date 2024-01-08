@@ -61,7 +61,7 @@ describe('[repository permission]: Test create features', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-    await resetElastic();
+      await resetElastic();
       adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
 

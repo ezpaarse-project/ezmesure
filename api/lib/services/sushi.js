@@ -598,7 +598,7 @@ async function cleanFiles() {
 }
 
 async function startCleanCron() {
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: cleanConfig.schedule,
     runOnInit: true,
     onTick: async () => {

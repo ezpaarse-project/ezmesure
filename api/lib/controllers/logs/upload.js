@@ -27,6 +27,191 @@ function createIndex(index) {
   }).then((res) => res.body);
 }
 
+/**
+ * Read a CSV stream and insert rows in elastic search
+ * @param  {stream}   stream
+ * @return {Promise}
+ */
+function readStream(stream, index, username, splittedFields) {
+  const buffer = [];
+  const result = {
+    total: 0,
+    inserted: 0,
+    updated: 0,
+    failed: 0,
+    errors: [],
+  };
+  let busy = false;
+
+  return new Promise((resolve, reject) => {
+    let doneReading = false;
+
+    const parser = csv.parse({
+      delimiter: ';',
+      columns: (columns) => {
+        try {
+          validator.validateColumns(columns);
+        } catch (e) {
+          return reject(e);
+        }
+        return columns;
+      },
+      skip_empty_lines: true,
+      relax_column_count: true,
+    });
+
+    // eslint-disable-next-line no-use-before-define
+    parser.on('readable', read);
+    parser.on('error', (err) => { reject(err); });
+    parser.on('end', () => {
+      doneReading = true;
+      if (busy) { return; }
+
+      // eslint-disable-next-line no-use-before-define
+      bulkInsert((err) => {
+        if (err) { return reject(err); }
+        resolve(result);
+      });
+    });
+
+    stream.on('error', (err) => { reject(err); });
+    stream.pipe(parser);
+
+    function read() {
+      if (busy) { return; }
+
+      let ec;
+      // eslint-disable-next-line no-cond-assign
+      while (ec = parser.read()) {
+        // eslint-disable-next-line no-loop-func
+        splittedFields.forEach((split) => {
+          if (typeof ec[split.field] === 'string') {
+            ec[split.field] = ec[split.field].split(split.delimiter);
+          }
+        });
+
+        if (result.total < 50) {
+          try {
+            validator.validateEvent(ec, result.total + 1);
+          } catch (e) {
+            return reject(e);
+          }
+        }
+
+        result.total += 1;
+        ec.index_name = index;
+
+        if (!ec.datetime && !ec.timestamp) {
+          // eslint-disable-next-line no-use-before-define
+          addError({ reason: 'missing datetime or timestamp' });
+          result.failed += 1;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        const docID = ec.log_id;
+
+        if (!docID) {
+          // eslint-disable-next-line no-use-before-define
+          addError({ reason: 'log_id is missing' });
+          result.failed += 1;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        const date = new Date(ec.datetime);
+
+        if (!dateIsValid(date)) {
+          // eslint-disable-next-line no-use-before-define
+          addError({ reason: 'datetime is not valid' });
+          result.failed += 1;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        ec.date = formatDate(date, 'yyyy-MM-dd');
+
+        if (ec['geoip-longitude'] && ec['geoip-latitude']) {
+          ec.location = {
+            lat: parseFloat(ec['geoip-latitude']),
+            lon: parseFloat(ec['geoip-longitude']),
+          };
+        }
+
+        // remove useless empty values
+        // eslint-disable-next-line no-restricted-syntax
+        for (const p in ec) {
+          if (!ec[p]) { ec[p] = undefined; }
+        }
+
+        buffer.push({ index: { _id: docID, _index: index } });
+        buffer.push(ec);
+      }
+
+      if (buffer.length < bulkSize) { return; }
+
+      busy = true;
+
+      // eslint-disable-next-line no-use-before-define
+      bulkInsert((err) => {
+        if (err) { return reject(err); }
+        busy = false;
+
+        if (!doneReading) {
+          return read();
+        }
+
+        resolve(result);
+      });
+    }
+
+    function bulkInsert(callback) {
+      if (buffer.length < bulkSize && !(doneReading && buffer.length > 0)) {
+        return callback();
+      }
+
+      elastic.bulk({
+        body: buffer.splice(0, bulkSize),
+      }, {
+        headers: { 'es-security-runas-user': username },
+      }, (err, { body }) => {
+        if (err) { return callback(err); }
+
+        (body.items || []).forEach((i) => {
+          if (!i.index) {
+            result.failed += 1;
+            return result.failed;
+          }
+
+          if (i.index.result === 'created') {
+            result.inserted += 1;
+            return result.inserted;
+          }
+          if (i.index.result === 'updated') {
+            result.updated += 1;
+            return result.updated;
+          }
+
+          if (i.index.error) {
+            // eslint-disable-next-line no-use-before-define
+            addError(i.index.error);
+          }
+
+          result.failed += 1;
+        });
+
+        bulkInsert(callback);
+      });
+    }
+  });
+
+  function addError(err) {
+    if (result.errors.length < 10) {
+      result.errors.push(err);
+    }
+  }
+}
+
 module.exports = async function upload(ctx) {
   const { index } = ctx.request.params;
 
@@ -69,11 +254,12 @@ module.exports = async function upload(ctx) {
   await fse.ensureDir(userDir);
 
   const splitHeader = ctx.request.headers['split-fields'];
-  const splitReg = new RegExp('([^()]+?)\\((.+?)\\)', 'ig');
+  const splitReg = /([^()]+?)\((.+?)\)/ig;
   const splittedFields = [];
 
   if (splitHeader) {
     let match;
+    // eslint-disable-next-line no-cond-assign
     while (match = splitReg.exec(splitHeader)) {
       splittedFields.push({ field: match[1].trim(), delimiter: match[2] });
     }
@@ -107,8 +293,8 @@ module.exports = async function upload(ctx) {
     } catch (e) {
       try {
         await fse.remove(filePath);
-      } catch (e) {
-        ctx.app.emit('error', e);
+      } catch (err) {
+        ctx.app.emit('error', err);
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
@@ -124,7 +310,9 @@ module.exports = async function upload(ctx) {
 
   const parts = parse(ctx);
 
+  // eslint-disable-next-line no-cond-assign, no-await-in-loop
   while (part = await parts()) {
+    // eslint-disable-next-line no-continue
     if (part.length) { continue; }
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
@@ -145,12 +333,14 @@ module.exports = async function upload(ctx) {
 
     let result;
     try {
+      // eslint-disable-next-line no-await-in-loop
       result = await readStream(stream, index, username, splittedFields);
     } catch (e) {
       try {
+        // eslint-disable-next-line no-await-in-loop
         await fse.remove(filePath);
-      } catch (e) {
-        ctx.app.emit('error', e);
+      } catch (err) {
+        ctx.app.emit('error', err);
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
@@ -178,166 +368,3 @@ module.exports = async function upload(ctx) {
   };
   return appLogger.info(`Insert into [${index}]`, ctx.body);
 };
-
-/**
- * Read a CSV stream and insert rows in elastic search
- * @param  {stream}   stream
- * @return {Promise}
- */
-function readStream(stream, index, username, splittedFields) {
-  const buffer = [];
-  const result = {
-    total: 0,
-    inserted: 0,
-    updated: 0,
-    failed: 0,
-    errors: [],
-  };
-  let busy = false;
-
-  return new Promise((resolve, reject) => {
-    let doneReading = false;
-
-    const parser = csv.parse({
-      delimiter: ';',
-      columns: (columns) => {
-        try {
-          validator.validateColumns(columns);
-        } catch (e) {
-          return reject(e);
-        }
-        return columns;
-      },
-      skip_empty_lines: true,
-      relax_column_count: true,
-    });
-
-    parser.on('readable', read);
-    parser.on('error', (err) => { reject(err); });
-    parser.on('end', () => {
-      doneReading = true;
-      if (busy) { return; }
-
-      bulkInsert((err) => {
-        if (err) { return reject(err); }
-        resolve(result);
-      });
-    });
-
-    stream.on('error', (err) => { reject(err); });
-    stream.pipe(parser);
-
-    function read() {
-      if (busy) { return; }
-
-      let ec;
-      while (ec = parser.read()) {
-        splittedFields.forEach((split) => {
-          if (typeof ec[split.field] === 'string') {
-            ec[split.field] = ec[split.field].split(split.delimiter);
-          }
-        });
-
-        if (result.total < 50) {
-          try {
-            validator.validateEvent(ec, result.total + 1);
-          } catch (e) {
-            return reject(e);
-          }
-        }
-
-        result.total++;
-        ec.index_name = index;
-
-        if (!ec.datetime && !ec.timestamp) {
-          addError({ reason: 'missing datetime or timestamp' });
-          result.failed++;
-          continue;
-        }
-
-        const docID = ec.log_id;
-
-        if (!docID) {
-          addError({ reason: 'log_id is missing' });
-          result.failed++;
-          continue;
-        }
-
-        const date = new Date(ec.datetime);
-
-        if (!dateIsValid(date)) {
-          addError({ reason: 'datetime is not valid' });
-          result.failed++;
-          continue;
-        }
-
-        ec.date = formatDate(date, 'yyyy-MM-dd');
-
-        if (ec['geoip-longitude'] && ec['geoip-latitude']) {
-          ec.location = {
-            lat: parseFloat(ec['geoip-latitude']),
-            lon: parseFloat(ec['geoip-longitude']),
-          };
-        }
-
-        // remove useless empty values
-        for (const p in ec) {
-          if (!ec[p]) { ec[p] = undefined; }
-        }
-
-        buffer.push({ index: { _id: docID, _index: index } });
-        buffer.push(ec);
-      }
-
-      if (buffer.length < bulkSize) { return; }
-
-      busy = true;
-
-      bulkInsert((err) => {
-        if (err) { return reject(err); }
-        busy = false;
-
-        if (!doneReading) {
-          return read();
-        }
-
-        resolve(result);
-      });
-    }
-
-    function bulkInsert(callback) {
-      if (buffer.length < bulkSize && !(doneReading && buffer.length > 0)) {
-        return callback();
-      }
-
-      elastic.bulk({
-        body: buffer.splice(0, bulkSize),
-      }, {
-        headers: { 'es-security-runas-user': username },
-      }, (err, { body }) => {
-        if (err) { return callback(err); }
-
-        (body.items || []).forEach((i) => {
-          if (!i.index) { return result.failed++; }
-
-          if (i.index.result === 'created') { return result.inserted++; }
-          if (i.index.result === 'updated') { return result.updated++; }
-
-          if (i.index.error) {
-            addError(i.index.error);
-          }
-
-          result.failed++;
-        });
-
-        bulkInsert(callback);
-      });
-    }
-  });
-
-  function addError(err) {
-    if (result.errors.length < 10) {
-      result.errors.push(err);
-    }
-  }
-}
