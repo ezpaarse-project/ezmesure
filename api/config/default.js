@@ -5,11 +5,6 @@ const oneMinute = 60;
 
 module.exports = {
   port: 3000,
-  mongo: {
-    port: 27017,
-    host: 'localhost',
-    db: 'ezmesure',
-  },
   elasticsearch: {
     scheme: 'https',
     port: 9200,
