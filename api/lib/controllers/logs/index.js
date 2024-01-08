@@ -1,6 +1,6 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const bodyParser = require('koa-bodyparser');
+const bodyParser = require('@koa/bodyparser');
 
 const { requireJwt, requireUser, requireTermsOfUse } = require('../../services/auth');
 
