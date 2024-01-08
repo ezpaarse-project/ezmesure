@@ -1,5 +1,5 @@
 // @ts-check
-const { client: prisma } = require('./index');
+const { client: prisma, Prisma } = require('./index');
 
 const {
   PERMISSIONS,
@@ -42,9 +42,15 @@ function createAsUser(institution, username) {
   return prisma.institution.create({
     data: {
       ...institution,
+      auto: institution.auto || Prisma.DbNull,
+      social: institution.social || Prisma.DbNull,
       memberships: {
         create: [{
-          username,
+          user: {
+            connect: {
+              username,
+            },
+          },
           permissions: [...PERMISSIONS],
           roles: [DOC_CONTACT, TECH_CONTACT],
           locked: true,
