@@ -289,10 +289,6 @@ export default {
         institutions: this.institutionIds.length,
       };
     },
-    hasSnackMessages() {
-      const messages = this.$store?.state?.snacks?.messages;
-      return Array.isArray(messages) && messages.length >= 1;
-    },
   },
   methods: {
     display(endpoint) {
