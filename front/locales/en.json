@@ -190,7 +190,7 @@
     "title": "SUSHI endpoints ({total})",
     "pageDescription": "Here you can manage the list of the available SUSHI endpoints.",
     "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
-    "manageNendpoints": "Manage endpoint | Manage {count} endpoints",
+    "manageNendpoints": "Manage endpoint|Manage {count} endpoints",
     "unableToRetriveEndpoints": "Unable to retrieve SUSHI endpoints",
     "soapWarning": "The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)",
     "sushiNotRootDetected": "It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.",
@@ -394,7 +394,7 @@
       "enterAPIKey": "Please enter an API Key.",
       "comment": "Comment",
       "credentials": "Sushi credentials",
-      "manageNcredentials": "Manage credentials | Manage {count} credentials",
+      "manageNcredentials": "Manage credentials|Manage {count} credentials",
       "pleaseEnterParams": "If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.",
       "checkCredentials": "Check credentials",
       "cannotCheckCredentials": "Failed to check credentials of {name}",
@@ -525,6 +525,8 @@
     }
   },
   "sushi": {
+    "credentials": "Credentials",
+    "credentialsCount": "{count} credentials",
     "copyId": "Copy ID",
     "showFiles": "View files",
     "unableToCopyId": "Unable to copy in the clipboard",
@@ -533,10 +535,12 @@
     "latestImport": "Latest import",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
+    "nInstitutions": "1 institution use this endpoint|{count} institutions use this endpoint",
     "nUntestedCredentials": "{count} untested credentials",
     "nInvalidCredentials": "{count} invalid credentials",
     "nOperationalCredentials": "{count} operational credentials",
-    "nProblematicEndpoints": "1 problematic endpoint | {count} problematic endpoints",
+    "nProblematicEndpoints": "1 problematic endpoint|{count} problematic endpoints",
+    "nErrsCredentials": "1 credential show that endpoint is problematic|{count} credentials show that endpoint is problematic",
     "deleteNbCredentials": "You are about to delete {number} SUSHI credentials.",
     "scope": "Scope",
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",
@@ -560,7 +564,7 @@
     "files": {
       "title": "Available files",
       "noFilesAvailable": "No files available",
-      "nbFiles": "1 file | {count} files"
+      "nbFiles": "1 file|{count} files"
     }
   },
   "reports": {
@@ -684,7 +688,7 @@
   "repositories": {
     "repositories": "Repositories",
     "toolbarTitle": "Repositories ({count})",
-    "xRepositories": "0 repository | 1 repository | {count} repositories",
+    "xRepositories": "0 repository|1 repository|{count} repositories",
     "noRepository": "No repository has been assigned yet",
     "pattern": "Pattern",
     "type": "Type",
@@ -698,7 +702,7 @@
   },
   "spaces": {
     "spaces": "Spaces",
-    "xSpaces": "0 space | 1 space | {count} spaces",
+    "xSpaces": "0 space|1 space|{count} spaces",
     "noSpace": "No space has been assigned yet",
     "id": "Identifier",
     "type": "Type",
