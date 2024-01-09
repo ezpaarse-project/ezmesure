@@ -43,7 +43,6 @@
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
     "http-proxy-middleware": "^2.0.6",
-    "https-proxy-agent": "^5.0.0",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.0",
