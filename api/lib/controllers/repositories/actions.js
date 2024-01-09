@@ -1,9 +1,11 @@
 const repositoriesService = require('../../entities/repositories.service');
+const { includableFields } = require('../../entities/repositories.dto');
 
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
+const { propsToPrismaInclude } = require('../utils');
 
 /* eslint-disable max-len */
 /**
@@ -19,12 +21,6 @@ exports.getMany = async (ctx) => {
     pattern,
     q: search,
   } = ctx.query;
-
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   /** @type {RepositoryWhereInput} */
   const where = {
@@ -46,7 +42,10 @@ exports.getMany = async (ctx) => {
   }
 
   ctx.type = 'json';
-  ctx.body = await repositoriesService.findMany({ where, include });
+  ctx.body = await repositoriesService.findMany({
+    where,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
+  });
 };
 
 exports.getOne = async (ctx) => {

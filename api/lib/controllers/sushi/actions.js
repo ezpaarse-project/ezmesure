@@ -21,6 +21,9 @@ const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
+const { includableFields } = require('../../entities/sushi-credentials.dto');
+const { propsToPrismaInclude } = require('../utils');
+
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 
 /* eslint-disable max-len */
@@ -45,8 +48,8 @@ exports.getAll = async (ctx) => {
 
   let include;
 
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   /** @type {SushiCredentialsFindManyArgs} */
