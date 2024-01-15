@@ -40,7 +40,6 @@ An institution
 | city              | `String?`            | Institution city                                                  |            |          |
 | uai               | `String?`            | Institution UAI (Unité Administrative Immatriculée)               |            |          |
 | social            | `Json?`              | Social links of the institution                                   |            |          |
-| auto              | `Json?`              | Automated services of the institution                             |            |          |
 | sushiReadySince   | `DateTime?`          | Date when SUSHI credentials have been marked as ready for harvest |            |          |
 | memberships       | `Membership[]`       | Institution members                                               |            |          |
 | spaces            | `Space[]`            | Institution spaces                                                |            |          |
