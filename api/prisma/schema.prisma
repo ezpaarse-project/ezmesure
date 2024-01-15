@@ -46,8 +46,6 @@ model Institution {
   uai                 String?
   /// Social links of the institution
   social              Json?
-  /// Automated services of the institution
-  auto                Json?
   /// Date when SUSHI credentials have been marked as ready for harvest
   sushiReadySince     DateTime?
   /// Institution members

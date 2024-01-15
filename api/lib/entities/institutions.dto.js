@@ -25,7 +25,6 @@ const schema = {
   uai: Joi.string().allow('').empty(null),
 
   social: Joi.object().pattern(Joi.string(), Joi.string().allow('')),
-  auto: Joi.object().pattern(Joi.string(), Joi.boolean()),
 
   sushiReadySince: Joi.date().allow(null),
   logo: Joi.any().strip(),
@@ -96,14 +95,6 @@ const adminCreateSchema = withModifiers(
     validated: false,
     hidePartner: false,
   }),
-  {
-    auto: (s) => s.keys({
-      ezmesure: Joi.boolean().default(false),
-      ezpaarse: Joi.boolean().default(false),
-      report: Joi.boolean().default(false),
-      sushi: Joi.boolean().default(false),
-    }),
-  },
 );
 
 /**
