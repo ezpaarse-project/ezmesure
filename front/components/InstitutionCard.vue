@@ -15,7 +15,21 @@
     </v-sheet>
 
     <v-card-title>
-      {{ institutionName }}
+      <div>
+        {{ institutionName }}
+        <v-chip
+          :color="institution.validated ? 'success' : 'default'"
+          label
+          outlined
+          small
+        >
+          {{
+            institution.validated
+              ? $t('institutions.institution.validated')
+              : $t('institutions.institution.notValidated')
+          }}
+        </v-chip>
+      </div>
     </v-card-title>
 
     <v-list>
@@ -63,22 +77,7 @@
 
     <v-spacer />
 
-    <v-card-text class="d-flex align-center justify-space-between">
-      <v-chip
-        :color="institution.validated ? 'success' : 'default'"
-        label
-        outlined
-        small
-      >
-        {{
-          institution.validated
-            ? $t('institutions.institution.validated')
-            : $t('institutions.institution.notValidated')
-        }}
-      </v-chip>
-
-      <slot name="menu" :permissions="permissions" :validated="validated" />
-    </v-card-text>
+    <slot name="menu" :permissions="permissions" :validated="validated" />
   </v-card>
 </template>
 
