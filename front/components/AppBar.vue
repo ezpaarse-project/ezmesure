@@ -17,6 +17,14 @@
 
     <v-toolbar-title class="ml-3">
       ezMESURE
+
+      <div
+        v-if="currentInstance"
+        class="text-overline"
+        style="font-size: 0.5em !important; text-align: center; line-height: normal;"
+      >
+        {{ currentInstance }}
+      </div>
     </v-toolbar-title>
 
     <v-toolbar-items class="hidden-sm-and-down">
@@ -125,6 +133,9 @@ export default {
     },
     currentLocal() {
       return this.$i18n.locales.find((locale) => locale.code === this.$i18n.locale).name;
+    },
+    currentInstance() {
+      return this.$config.currentInstance;
     },
   },
 };

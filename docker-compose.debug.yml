@@ -92,6 +92,7 @@ services:
     working_dir: /usr/src/app
     environment:
       - API_URL=https://${EZMESURE_DOMAIN}/api
+      - EZMESURE_INSTANCE="local"
       - EZMESURE_DISABLE_SHIBBOLETH
       - HOST=0.0.0.0
       - PORT=8080
