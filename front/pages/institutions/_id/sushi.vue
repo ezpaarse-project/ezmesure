@@ -244,7 +244,7 @@
               small
               outlined
             >
-              <v-icon v-if="sushiReady" left color="primary">
+              <v-icon v-if="sushiReady" left color="primary" small>
                 mdi-checkbox-marked-circle-outline
               </v-icon>
               {{
