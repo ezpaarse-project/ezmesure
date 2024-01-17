@@ -5,7 +5,7 @@
         <v-toolbar-title>
           {{ $t('sushi.files.title') }}
           <div class="caption">
-            {{ sushiVendor }} - {{ sushiPackage }}
+            {{ sushiVendor }} - {{ sushiTags }}
           </div>
         </v-toolbar-title>
 
@@ -86,8 +86,8 @@ export default {
   computed: {
     hasSushiItem() { return !!this.sushi?.id; },
     hasFiles() { return Array.isArray(this.files) && this.files.length > 0; },
-    sushiVendor() { return this.sushi?.vendor; },
-    sushiPackage() { return this.sushi?.package; },
+    sushiVendor() { return this.sushi?.endpoint?.vendor; },
+    sushiTags() { return this.sushi?.tags?.join?.(', '); },
   },
   methods: {
     prettySize(size) {
