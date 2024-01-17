@@ -15,7 +15,7 @@
       />
     </router-link>
 
-    <v-toolbar-title class="ml-3">
+    <v-toolbar-title class="mx-3">
       ezMESURE
 
       <div
