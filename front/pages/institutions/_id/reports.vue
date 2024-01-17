@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('report.title')">
+    <ToolBar :title="institution.name">
       <v-spacer />
 
       <v-btn text color="success" @click="showHealthDialog = true">
@@ -12,9 +12,10 @@
     </ToolBar>
 
     <v-card-text class="pa-0">
-      <ezr-task-table
-        :current-namespace.sync="currentInstitution"
+      <ezr-task-cards
+        :namespace="institution.id"
         :allowed-namespaces="allowedInstitutions"
+        hide-namespace-selector
       />
     </v-card-text>
 
@@ -33,18 +34,30 @@ export default {
     ToolBar,
     HealthDialog,
   },
-  data: () => ({
-    showHealthDialog: false,
-  }),
+  async asyncData({
+    $axios,
+    store,
+    params,
+    app,
+  }) {
+    let institution = null;
+
+    try {
+      institution = await $axios.$get(`/institutions/${params.id}`);
+    } catch (e) {
+      if (e.response?.status === 404) {
+        institution = {};
+      } else {
+        store.dispatch('snacks/error', app.i18n.t('institutions.unableToRetriveInformations'));
+      }
+    }
+
+    return {
+      institution,
+      showHealthDialog: false,
+    };
+  },
   computed: {
-    currentInstitution: {
-      get() {
-        return this.$route.query.institution?.toString();
-      },
-      set(institution) {
-        this.$router.replace({ query: { institution } });
-      },
-    },
     allowedInstitutions() {
       return this.$auth.user.memberships.map((m) => m.institutionId);
     },

@@ -4,6 +4,18 @@
       <v-spacer />
 
       <v-btn
+        v-if="canReadReports"
+        color="primary"
+        text
+        :to="`/institutions/${institutionId}/reports`"
+      >
+        <v-icon left>
+          mdi-file-chart-outline
+        </v-icon>
+        {{ $t('institutions.reports.reports') }}
+      </v-btn>
+
+      <v-btn
         v-if="canReadSushi"
         color="primary"
         text
@@ -174,6 +186,9 @@ export default {
     },
     canEditInstitution() {
       return this.isAdmin || this.permissions.has('institution:write');
+    },
+    canReadReports() {
+      return this.isAdmin || this.permissions.has('reporting:read');
     },
     canReadSushi() {
       return this.isAdmin || this.permissions.has('sushi:read');
