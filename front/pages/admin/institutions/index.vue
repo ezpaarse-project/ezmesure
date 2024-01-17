@@ -91,7 +91,7 @@
       </template>
 
       <template #[`item.name`]="{ item }">
-        <nuxt-link :to="`/institutions/${item.id}`">
+        <nuxt-link :to="`/admin/institutions/${item.id}`">
           {{ item.name }}
         </nuxt-link>
       </template>
@@ -118,7 +118,7 @@
           :outlined="item.memberships?.length <= 0"
           small
           class="elevation-1"
-          :to="`/institutions/${item.id}/members`"
+          :to="`/admin/institutions/${item.id}/members`"
         >
           {{ $tc('institutions.institution.membersCount', item.memberships.length) }}
 
@@ -253,7 +253,7 @@
 
             <v-divider />
 
-            <v-list-item :to="`/institutions/${item.id}/sushi`">
+            <v-list-item :to="`/admin/institutions/${item.id}/sushi`">
               <v-list-item-icon>
                 <v-icon>mdi-key</v-icon>
               </v-list-item-icon>
@@ -264,7 +264,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :to="`/institutions/${item.id}/members`">
+            <v-list-item :to="`/admin/institutions/${item.id}/members`">
               <v-list-item-icon>
                 <v-icon>mdi-account-multiple</v-icon>
               </v-list-item-icon>

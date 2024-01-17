@@ -15,33 +15,53 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
   },
+
   plugins: [
     { src: '~/plugins/dates.js' },
     '~/plugins/ezreeport.js',
   ],
+
   css: [
     'swagger-ui/dist/swagger-ui.css',
     '~/assets/css/custom.css',
   ],
+
   ssr: false,
   telemetry: false,
+
   publicRuntimeConfig: {
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
     supportMail: process.env.EZMESURE_SUPPORT_MAIL || 'ezteam@couperin.org',
   },
+
   modules: [
-    ['@nuxtjs/proxy', {
-      pathRewrite: {
-        '/api': process.env.API_URL,
+    [
+      '@nuxtjs/proxy',
+      {
+        pathRewrite: {
+          '/api': process.env.API_URL,
+        },
       },
-    }],
-    ['@nuxtjs/axios', {
-      prefix: '/api',
-      credentials: true,
-      proxy: true,
-    }],
+    ],
+    [
+      '@nuxtjs/axios',
+      {
+        prefix: '/api',
+        credentials: true,
+        proxy: true,
+      },
+    ],
     '@nuxtjs/i18n',
   ],
+
+  buildModules: [
+    '@nuxtjs/auth',
+    [
+      '@nuxtjs/vuetify',
+      { optionsPath: './vuetify.options.js' },
+    ],
+  ],
+
   i18n: {
     baseUrl: process.env.APPLI_APACHE_SERVERNAME,
     vueI18nLoader: true,
@@ -71,10 +91,7 @@ module.exports = {
       fallbackLocale: 'en',
     },
   },
-  buildModules: [
-    '@nuxtjs/auth',
-    ['@nuxtjs/vuetify', { optionsPath: './vuetify.options.js' }],
-  ],
+
   auth: {
     scopeKey: 'roles',
     redirect: {
@@ -94,6 +111,7 @@ module.exports = {
       },
     },
   },
+
   /*
   ** Customize the progress-bar color
   */
@@ -102,7 +120,63 @@ module.exports = {
     name: 'folding-cube',
     color: '#9c27b0',
   },
+
   pageTransition: 'fade-transition',
+
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push(
+        // Route aliases
+        {
+          name: 'admin-institution-id-sushi',
+          path: '/admin/institutions/:id/sushi',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/sushi.vue'),
+        },
+        {
+          name: 'admin-institution-id-members',
+          path: '/admin/institutions/:id/members',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/members.vue'),
+        },
+        // Legacy routes
+        {
+          name: 'legacy-institutions',
+          path: '/institutions',
+          redirect: '/admin/institutions',
+        },
+        {
+          name: 'legacy-institutions-id',
+          path: '/institutions/:id',
+          redirect: '/admin/institutions/:id',
+        },
+        {
+          name: 'legacy-my-institutions',
+          path: '/my-institutions',
+          redirect: '/myspace/my-institutions',
+        },
+        {
+          name: 'legacy-institutions-id-sub',
+          path: '/institutions/:id/*',
+          redirect: (to) => `/myspace${to.path}`,
+        },
+        {
+          name: 'legacy-files',
+          path: '/files',
+          redirect: '/myspace/files',
+        },
+        {
+          name: 'legacy-kibana',
+          path: '/kibana',
+          redirect: '/myspace/kibana',
+        },
+        {
+          name: 'legacy-token',
+          path: '/token',
+          redirect: '/myspace/token',
+        },
+      );
+    },
+  },
+
   /*
   ** Build configuration
   */

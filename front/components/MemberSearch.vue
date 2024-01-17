@@ -87,7 +87,7 @@
               <v-list-item
                 v-for="({ institution }) in user.memberships"
                 :key="`${user.username}:member:${institution.id}`"
-                :to="isAdmin ? `/institutions/${institution.id}` : undefined"
+                :to="isAdmin ? `/admin/institutions/${institution.id}` : undefined"
               >
                 <v-list-item-avatar>
                   <v-img
