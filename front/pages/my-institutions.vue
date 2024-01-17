@@ -62,8 +62,8 @@
           v-for="membership in memberships"
           :key="membership.id"
           cols="12"
-          sm="6"
-          xl="3"
+          md="6"
+          xl="4"
         >
           <InstitutionCard
             :institution="membership.institution"
@@ -73,85 +73,70 @@
             <template
               #menu="{ permissions, validated }"
             >
-              <v-menu v-if="permissions.size > 0" left bottom>
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    color="primary"
-                    small
-                    text
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    {{ $t('actions') }}
-                    <v-icon right>
-                      mdi-menu-down
-                    </v-icon>
-                  </v-btn>
-                </template>
+              <v-divider v-if="permissions.size > 0" />
+              <v-list v-if="permissions.size > 0" dense color="grey lighten-5">
+                <v-list-item
+                  :disabled="!permissions.has('institution:write')"
+                  @click="editInstitution(membership.institution)"
+                >
+                  <v-list-item-icon>
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ $t('modify') }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
 
-                <v-list>
-                  <v-list-item
-                    :disabled="!permissions.has('institution:write')"
-                    @click="editInstitution(membership.institution)"
-                  >
-                    <v-list-item-icon>
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ $t('modify') }}
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
+                <v-list-item
+                  :disabled="!validated || !permissions.has('sushi:read')"
+                  :to="`/institutions/${membership.institution.id}/sushi`"
+                >
+                  <v-list-item-icon>
+                    <v-icon>mdi-key</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ $t('institutions.sushi.credentials') }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
 
-                  <v-list-item
-                    :disabled="!validated || !permissions.has('sushi:read')"
-                    :to="`/institutions/${membership.institution.id}/sushi`"
-                  >
-                    <v-list-item-icon>
-                      <v-icon>mdi-key</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ $t('institutions.sushi.credentials') }}
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
+                <v-list-item
+                  :disabled="!validated || !permissions.has('memberships:read')"
+                  :to="`/institutions/${membership.institution.id}/members`"
+                >
+                  <v-list-item-icon>
+                    <v-icon>mdi-account-multiple</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ $t('institutions.members.members') }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
 
-                  <v-list-item
-                    :disabled="!validated || !permissions.has('memberships:read')"
-                    :to="`/institutions/${membership.institution.id}/members`"
-                  >
-                    <v-list-item-icon>
-                      <v-icon>mdi-account-multiple</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ $t('institutions.members.members') }}
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-list-item
-                    :disabled="!validated || !permissions.has('reporting:read')"
-                    :to="`/report/?institution=${membership.institution.id}`"
-                  >
-                    <v-list-item-icon>
-                      <v-icon>mdi-file-chart-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ $t('institutions.reports.reports') }}
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+                <v-list-item
+                  :disabled="!validated || !permissions.has('reporting:read')"
+                  :to="`/report/?institution=${membership.institution.id}`"
+                >
+                  <v-list-item-icon>
+                    <v-icon>mdi-file-chart-outline</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ $t('institutions.reports.reports') }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
             </template>
           </InstitutionCard>
         </v-col>
       </v-row>
     </v-container>
+
     <v-container>
       <v-row v-if="memberships?.length === 0" align="center" justify="center">
         <v-col class="text-center" cols="12">
