@@ -1,6 +1,9 @@
-const subMonths = require('date-fns/subMonths');
-const format = require('date-fns/format');
-const { subDays, isBefore } = require('date-fns');
+const {
+  subDays,
+  isBefore,
+  subMonths,
+  format,
+} = require('date-fns');
 
 const { CronJob } = require('cron');
 const { glob } = require('glob');
@@ -12,12 +15,6 @@ const path = require('path');
 const fs = require('fs-extra');
 const { stat: fsStats } = require('fs/promises');
 const EventEmitter = require('events');
-
-// Workaround because axios fails make HTTP requests over a HTTPS proxy
-// https://github.com/axios/axios/issues/3459
-const HttpsProxyAgent = require('https-proxy-agent');
-
-const httpsAgent = process.env.https_proxy && new HttpsProxyAgent(process.env.https_proxy);
 
 const Ajv = require('ajv').default;
 const addFormats = require('ajv-formats').default;
@@ -215,8 +212,6 @@ async function getAvailableReports(sushi) {
     url: `${baseUrl}/reports`,
     responseType: 'json',
     params,
-    httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
-    proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
   });
 
   if (!response) {
@@ -280,8 +275,6 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
     responseType: stream ? 'stream' : 'json',
     validateStatus: false,
     params,
-    httpsAgent: (baseUrl.startsWith('https') && httpsAgent) ? httpsAgent : undefined,
-    proxy: (baseUrl.startsWith('https') && httpsAgent) ? false : undefined,
   };
 }
 
@@ -595,7 +588,7 @@ async function cleanFiles() {
 }
 
 async function startCleanCron() {
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: cleanConfig.schedule,
     runOnInit: true,
     onTick: async () => {

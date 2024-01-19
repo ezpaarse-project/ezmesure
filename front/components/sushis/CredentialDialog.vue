@@ -81,7 +81,7 @@
           show-expand
           single-expand
           item-key="id"
-          group-by="institutionId"
+          group-by="institution.name"
           class="mt-2"
           @pagination="currentItemCount = $event.itemsLength"
         >
@@ -151,7 +151,7 @@
             />
           </template>
 
-          <template #[`group.header`]="{ group, isOpen, headers, toggle }">
+          <template #[`group.header`]="{ group, items, isOpen, headers, toggle }">
             <td :colspan="headers.length">
               <div class="d-flex align-center">
                 <v-btn icon @click="toggle">
@@ -159,16 +159,18 @@
                 </v-btn>
 
                 <div style="flex: 1;">
-                  <template v-if="institutionsMap[group]">
-                    <nuxt-link :to="`/institutions/${group}`">
-                      {{ institutionsMap[group].name }}
+                  <template v-if="items?.[0]?.institution">
+                    <nuxt-link :to="`/institutions/${items[0].institution.id}`">
+                      {{ items[0].institution.name }}
                     </nuxt-link>
 
-                    <template v-if="institutionsMap[group].acronym">
-                      ({{ institutionsMap[group].acronym }})
+                    <template v-if="items[0].institution.acronym">
+                      ({{ items[0].institution.acronym }})
                     </template>
                   </template>
-                  <v-skeleton-loader v-else type="text" style="margin-top: 6px;" />
+                  <i v-else>
+                    {{ group }}
+                  </i>
                 </div>
               </div>
             </td>
@@ -210,7 +212,6 @@ export default {
     selected: [],
 
     endpoint: null,
-    institutionsMap: {},
 
     tableOptions: {},
     currentItemCount: 0,
@@ -219,7 +220,7 @@ export default {
     tableHeaders() {
       return [
         {
-          value: 'institutionId',
+          value: 'institution.name',
         },
         {
           text: this.$t('institutions.sushi.tags'),
@@ -300,12 +301,11 @@ export default {
         itemsPerPage: 10,
         groupDesc: [false],
       };
-      this.refreshInstitutions();
+      this.refresh();
     },
 
-    async refreshInstitutions() {
+    async refresh() {
       this.loading = true;
-      let institutions = [];
 
       try {
         const status = await this.$axios.$get('/sushi/_lock');
@@ -314,30 +314,6 @@ export default {
         this.$store.dispatch('snacks/error', this.$t('sushi.unableToGetLockStatus'));
       }
 
-      // fetch institutions in chunks to avoid spamming
-      let chunkSize = this.institutionIds.length;
-      if (this.tableOptions.itemsPerPage >= 0) {
-        chunkSize = this.tableOptions.itemsPerPage;
-      }
-
-      for (let i = 0; i < this.institutionIds.length; i += chunkSize) {
-        const chunk = this.institutionIds.slice(i, i + chunkSize);
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          const results = await Promise.all(chunk.map((id) => this.$axios.$get(`/institutions/${id}`)));
-          institutions = [
-            ...institutions,
-            ...results,
-          ];
-        } catch (e) {
-          this.$store.dispatch(
-            'snacks/error',
-            this.$t('institutions.unableToRetriveInformations'),
-          );
-        }
-      }
-
-      this.institutionsMap = Object.fromEntries(institutions.map((i) => [i.id, i]));
       this.loading = false;
     },
 
@@ -346,7 +322,7 @@ export default {
         return true;
       }
 
-      const institution = this.institutionsMap[item.institutionId];
+      const { institution } = item;
       const s = search?.toLowerCase();
       const isSearchIn = (str) => str?.toLowerCase()?.includes(s);
 
@@ -358,8 +334,8 @@ export default {
 
     customSort(items) {
       return items.sort((a, b) => {
-        const groupA = this.institutionsMap[a.institutionId]?.name;
-        const groupB = this.institutionsMap[b.institutionId]?.name;
+        const groupA = a.institution?.name;
+        const groupB = b.institution?.name;
 
         const res = groupA?.localeCompare?.(groupB, this.$i18n.locale, { sensitivity: 'base' });
         return this.tableOptions.groupDesc?.[0] ? -res : res;

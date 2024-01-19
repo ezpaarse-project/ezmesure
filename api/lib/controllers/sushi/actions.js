@@ -1,13 +1,15 @@
 const fs = require('fs-extra');
 const path = require('path');
-const format = require('date-fns/format');
-const isBefore = require('date-fns/isBefore');
-const subMonths = require('date-fns/subMonths');
-const parseISO = require('date-fns/parseISO');
-const isValidDate = require('date-fns/isValid');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
 const config = require('config');
+const {
+  format,
+  isBefore,
+  subMonths,
+  parseISO,
+  isValid: isValidDate,
+} = require('date-fns');
 
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
@@ -20,6 +22,9 @@ const sushiCredentialsService = require('../../entities/sushi-credentials.servic
 const harvestJobsService = require('../../entities/harvest-job.service');
 const harvestsService = require('../../entities/harvest.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
+
+const { includableFields } = require('../../entities/sushi-credentials.dto');
+const { propsToPrismaInclude } = require('../utils');
 
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 
@@ -45,8 +50,8 @@ exports.getAll = async (ctx) => {
 
   let include;
 
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   /** @type {SushiCredentialsFindManyArgs} */

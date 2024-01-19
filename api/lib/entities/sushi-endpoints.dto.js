@@ -55,6 +55,7 @@ const immutableFields = [
  */
 const includableFields = [
   'credentials',
+  'credentials.institution',
 ];
 
 /**

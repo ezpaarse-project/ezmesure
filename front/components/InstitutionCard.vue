@@ -1,18 +1,26 @@
 <template>
   <v-card class="d-flex flex-column" v-bind="$attrs">
-    <v-sheet color="grey lighten-4" class="shrink d-flex justify-center">
-      <v-responsive :aspect-ratio="3" max-width="400">
-        <v-img
-          v-if="logoSrc"
-          :aspect-ratio="3"
-          :src="logoSrc"
-          contain
-        />
-        <span v-else class="font-weight-light text--secondary">
-          {{ $t('institutions.noLogo') }}
-        </span>
-      </v-responsive>
-    </v-sheet>
+    <v-img
+      :aspect-ratio="3"
+      :src="logoSrc"
+      contain
+      max-height="100"
+      class="mt-3"
+      @error="logoLoadError = true"
+    >
+      <template #placeholder>
+        <v-row
+          class="fill-height ma-0"
+          align="center"
+          justify="center"
+        >
+          <v-progress-circular
+            indeterminate
+            color="grey lighten-1"
+          />
+        </v-row>
+      </template>
+    </v-img>
 
     <v-card-title>
       <div>
@@ -97,6 +105,7 @@ export default {
   },
   data() {
     return {
+      logoLoadError: false,
       defaultLogo,
     };
   },
@@ -159,7 +168,10 @@ export default {
       return links.filter((f) => f.url);
     },
     logoSrc() {
-      return this.institution?.logoId && `/api/assets/logos/${this.institution.logoId}`;
+      if (this.institution?.logoId && !this.logoLoadError) {
+        return `/api/assets/logos/${this.institution.logoId}`;
+      }
+      return defaultLogo;
     },
     validated() {
       return !!this.institution?.validated;
