@@ -42,7 +42,6 @@ function createAsUser(institution, username) {
   return prisma.institution.create({
     data: {
       ...institution,
-      auto: institution.auto || Prisma.DbNull,
       social: institution.social || Prisma.DbNull,
       memberships: {
         create: [{
