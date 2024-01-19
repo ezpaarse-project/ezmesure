@@ -681,7 +681,7 @@
     "admin": {
       "taskTab": "Gestion des rapports",
       "templateTab": "Gestion des modèles",
-      "activityTab": "Activité d'ezREEPORT",
+      "presetTab": "Gestion des prédéfinis",
       "adminTab": "Administration générale"
     }
   },

@@ -119,7 +119,7 @@
 
                 <v-list-item
                   :disabled="!validated || !permissions.has('reporting:read')"
-                  :to="`/report/?institution=${membership.institution.id}`"
+                  :to="`/institutions/${membership.institution.id}/reports`"
                 >
                   <v-list-item-icon>
                     <v-icon>mdi-file-chart-outline</v-icon>

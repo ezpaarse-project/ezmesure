@@ -9,6 +9,7 @@
         :token="ezrToken"
         :namespace-logo-url="logoBaseUrl"
         :namespace-label="namespaceLabel"
+        namespace-icon="mdi-domain"
         api-url="/report/api/v1/"
       >
         <v-fade-transition>

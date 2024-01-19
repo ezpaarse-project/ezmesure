@@ -16,7 +16,7 @@
         <v-tabs v-model="currentTab" grow>
           <v-tab>{{ $t('report.admin.taskTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.templateTab') }}</v-tab>
-          <v-tab>{{ $t('report.admin.activityTab') }}</v-tab>
+          <v-tab>{{ $t('report.admin.presetTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.adminTab') }}</v-tab>
         </v-tabs>
       </template>
@@ -26,7 +26,16 @@
       <v-tabs-items v-model="currentTab">
         <!-- tasks tab -->
         <v-tab-item class="pa-1">
-          <ezr-task-table :current-namespace.sync="currentInstitution" />
+          <ezr-task-table>
+            <template #[`item.namespace`]="{ value, item }">
+              <nuxt-link v-if="value" :to="`/institutions/${value.id}`">
+                {{ value.name }}
+              </nuxt-link>
+              <template v-else>
+                {{ item.namespaceId }}
+              </template>
+            </template>
+          </ezr-task-table>
         </v-tab-item>
 
         <!-- template tab -->
@@ -34,9 +43,9 @@
           <ezr-template-list />
         </v-tab-item>
 
-        <!-- activity tab -->
+        <!-- presets tab -->
         <v-tab-item class="pa-1">
-          <ezr-tasks-activity-table />
+          <ezr-tasks-presets-cards />
         </v-tab-item>
 
         <!-- "admin" tab -->
@@ -48,6 +57,12 @@
 
             <v-col>
               <ezr-queue-list />
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col>
+              <ezr-tasks-activity-table />
             </v-col>
           </v-row>
         </v-tab-item>
@@ -73,17 +88,6 @@ export default {
     showHealthDialog: false,
   }),
   computed: {
-    /**
-     * Keep selected institution in query
-     */
-    currentInstitution: {
-      get() {
-        return this.$route.query.institution?.toString();
-      },
-      set(institution) {
-        this.$router.replace({ query: { institution } });
-      },
-    },
     /**
      * Keep current tab in query
      */
