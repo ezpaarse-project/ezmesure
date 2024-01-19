@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar :title="institutionName">
-      <v-tooltip right>
+      <v-tooltip v-if="isAdmin" right>
         <template #activator="{ attrs, on }">
           <v-btn
             class="ml-2"
@@ -907,7 +907,7 @@ export default {
     },
 
     goToInstitutionPage() {
-      this.$router.push({ path: `/institutions/${this.$route.params.id}` });
+      this.$router.push({ path: `/admin/institutions/${this.$route.params.id}` });
     },
   },
 };

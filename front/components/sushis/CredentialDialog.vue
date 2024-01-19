@@ -160,7 +160,7 @@
 
                 <div style="flex: 1;">
                   <template v-if="items?.[0]?.institution">
-                    <nuxt-link :to="`/institutions/${items[0].institution.id}`">
+                    <nuxt-link :to="`/admin/institutions/${items[0].institution.id}`">
                       {{ items[0].institution.name }}
                     </nuxt-link>
 

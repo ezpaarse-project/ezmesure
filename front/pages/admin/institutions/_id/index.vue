@@ -7,7 +7,7 @@
         v-if="canReadReports"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/reports`"
+        :to="`/admin/institutions/${institutionId}/reports`"
       >
         <v-icon left>
           mdi-file-chart-outline
@@ -19,7 +19,7 @@
         v-if="canReadSushi"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/sushi`"
+        :to="`/admin/institutions/${institutionId}/sushi`"
       >
         <v-icon left>
           mdi-key
@@ -31,7 +31,7 @@
         v-if="canReadMembers"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/members`"
+        :to="`/admin/institutions/${institutionId}/members`"
       >
         <v-icon left>
           mdi-account-multiple

@@ -124,7 +124,7 @@
       <v-list-item
         v-for="institution in sortedInstitutions"
         :key="institution.id"
-        :to="`/institutions/${institution.id}`"
+        :to="`/admin/institutions/${institution.id}`"
       >
         <v-list-item-avatar v-if="institution.logoId" rounded>
           <v-img :src="`/api/assets/logos/${institution.logoId}`" contain />

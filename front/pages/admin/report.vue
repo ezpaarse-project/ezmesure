@@ -28,7 +28,7 @@
         <v-tab-item class="pa-1">
           <ezr-task-table>
             <template #[`item.namespace`]="{ value, item }">
-              <nuxt-link v-if="value" :to="`/institutions/${value.id}`">
+              <nuxt-link v-if="value" :to="`/admin/institutions/${value.id}`">
                 {{ value.name }}
               </nuxt-link>
               <template v-else>
