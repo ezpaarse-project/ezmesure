@@ -5,7 +5,7 @@
         <v-toolbar-title>
           {{ $t('reports.availableReportsOnPlatform') }}
           <div class="caption">
-            {{ sushiVendor }} - {{ sushiPackage }}
+            {{ sushiVendor }} - {{ sushiTags }}
           </div>
         </v-toolbar-title>
 
@@ -106,8 +106,8 @@ export default {
   computed: {
     hasSushiItem() { return !!this.sushi?.id; },
     hasExceptions() { return this.exceptions.length > 0; },
-    sushiVendor() { return this.sushi?.vendor; },
-    sushiPackage() { return this.sushi?.package; },
+    sushiVendor() { return this.sushi?.endpoint?.vendor; },
+    sushiTags() { return this.sushi?.tags?.join?.(', '); },
     headers() {
       return [
         {

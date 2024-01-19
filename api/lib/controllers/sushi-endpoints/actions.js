@@ -1,8 +1,10 @@
-const { adminImportSchema } = require('../../entities/sushi-endpoints.dto');
+const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
 const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+const { propsToPrismaInclude } = require('../utils');
 
 exports.getAll = async (ctx) => {
   const {
+    include: propsToInclude,
     requireCustomerId,
     requireRequestorId,
     requireApiKey,
@@ -10,6 +12,12 @@ exports.getAll = async (ctx) => {
     tags,
     q: search,
   } = ctx.query;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
+  }
 
   const where = {
     requireCustomerId,
@@ -33,7 +41,7 @@ exports.getAll = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiEndpointService.findMany({ where });
+  ctx.body = await sushiEndpointService.findMany({ where, include });
 };
 
 exports.getOne = async (ctx) => {

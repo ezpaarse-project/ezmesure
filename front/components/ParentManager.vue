@@ -122,7 +122,7 @@
 
     <v-list v-if="hasParentInstitution">
       <v-list-item
-        :to="`/institutions/${parentInstitution.id}`"
+        :to="`/admin/institutions/${parentInstitution.id}`"
       >
         <v-list-item-avatar v-if="parentInstitution.logoId" rounded>
           <v-img :src="`/api/assets/logos/${parentInstitution.logoId}`" contain />

@@ -120,7 +120,7 @@ async function sync() {
 }
 
 async function startCron() {
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: syncSchedule,
     runOnInit: false,
     onTick: async () => {

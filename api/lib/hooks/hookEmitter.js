@@ -102,4 +102,5 @@ const registerHook = (event, handler, opts = {}) => {
 module.exports = {
   triggerHooks,
   registerHook,
+  createQueue,
 };

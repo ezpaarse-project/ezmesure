@@ -36,6 +36,8 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
+  'id',
+  'type',
   'updatedAt',
   'createdAt',
   'institution',
@@ -56,6 +58,10 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  {
+    id: () => schema.id,
+    type: () => schema.type,
+  },
   requireFields(['id', 'name', 'type', 'institutionId']),
 );
 

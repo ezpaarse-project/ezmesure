@@ -54,8 +54,8 @@
 
 <script>
 const colors = new Map([
-  ['ezpaarse', '#009688'],
-  ['counter5', '#1188B3'],
+  ['ezpaarse', 'teal'],
+  ['counter5', 'red'],
 ]);
 
 export default {

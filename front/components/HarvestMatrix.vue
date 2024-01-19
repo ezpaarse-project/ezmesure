@@ -1,7 +1,12 @@
 <template>
   <v-card min-height="500">
     <v-card-title primary-title>
-      {{ $t('sushi.harvestState') }}
+      <div>
+        {{ $t('sushi.harvestState') }}
+        <div class="caption">
+          {{ sushiVendor }} - {{ sushiTags }}
+        </div>
+      </div>
 
       <v-spacer />
 
@@ -80,9 +85,9 @@ export default {
     HarvestStateCell,
   },
   props: {
-    sushiId: {
-      type: String,
-      default: () => '',
+    sushiItem: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -103,6 +108,9 @@ export default {
     },
   },
   computed: {
+    sushiId() { return this.sushiItem?.id; },
+    sushiVendor() { return this.sushiItem?.endpoint?.vendor; },
+    sushiTags() { return this.sushiItem?.tags?.join?.(', '); },
     harvestsByType() {
       const harvestsByType = this.harvests.reduce((acc, harvest) => {
         const reportId = harvest.reportId?.toUpperCase?.();

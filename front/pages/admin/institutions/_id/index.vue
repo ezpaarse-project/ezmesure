@@ -4,10 +4,22 @@
       <v-spacer />
 
       <v-btn
+        v-if="canReadReports"
+        color="primary"
+        text
+        :to="`/admin/institutions/${institutionId}/reports`"
+      >
+        <v-icon left>
+          mdi-file-chart-outline
+        </v-icon>
+        {{ $t('institutions.reports.reports') }}
+      </v-btn>
+
+      <v-btn
         v-if="canReadSushi"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/sushi`"
+        :to="`/admin/institutions/${institutionId}/sushi`"
       >
         <v-icon left>
           mdi-key
@@ -19,7 +31,7 @@
         v-if="canReadMembers"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/members`"
+        :to="`/admin/institutions/${institutionId}/members`"
       >
         <v-icon left>
           mdi-account-multiple
@@ -174,6 +186,9 @@ export default {
     },
     canEditInstitution() {
       return this.isAdmin || this.permissions.has('institution:write');
+    },
+    canReadReports() {
+      return this.isAdmin || this.permissions.has('reporting:read');
     },
     canReadSushi() {
       return this.isAdmin || this.permissions.has('sushi:read');

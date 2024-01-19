@@ -52,26 +52,18 @@ export default {
     return {
       partners: await app.$axios.$get('/partners'),
       search: '',
-      selectedAutomations: [],
-      automations: [
-        { label: 'ezpaarse', color: 'teal' },
-        { label: 'ezmesure', color: 'purple' },
-        { label: 'report', color: 'blue' },
-        { label: 'sushi', color: 'red' },
-      ],
     };
   },
 
   computed: {
     filteredPartners() {
       const search = this.search.toLowerCase();
-      const automations = this.selectedAutomations;
 
-      if (!search && automations.length === 0) {
+      if (!search) {
         return this.partners.slice().sort(this.sortByName);
       }
 
-      const includeSearch = (partner) => {
+      const partners = this.partners.filter((partner) => {
         const {
           name: orgName,
           acronym,
@@ -84,17 +76,6 @@ export default {
         if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
         if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
         return false;
-      };
-
-      const partners = this.partners.filter((partner) => {
-        const {
-          auto = {},
-        } = partner;
-
-        const searchMatch = !search || includeSearch(partner);
-        const autoMatch = automations.length === 0 || automations.every((label) => auto?.[label]);
-
-        return searchMatch && autoMatch;
       });
 
       return partners.sort(this.sortByName);
@@ -104,9 +85,6 @@ export default {
   methods: {
     sortByName(a, b) {
       return (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1);
-    },
-    deselectAutomation(label) {
-      this.selectedAutomations = this.selectedAutomations.filter((l) => l !== label);
     },
   },
 };

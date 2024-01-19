@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar :title="institutionName">
-      <v-tooltip right>
+      <v-tooltip v-if="isAdmin" right>
         <template #activator="{ attrs, on }">
           <v-btn
             class="ml-2"
@@ -227,21 +227,32 @@
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
-      :custom-group="customGroup"
       :items-per-page="50"
-      :options.sync="tableOptions"
       :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
       show-select
       show-expand
       single-expand
       item-key="id"
       sort-by="endpoint.vendor"
-      @pagination="currentItemCount = $event.itemsLength"
     >
-      <template #top>
+      <template #top="{ originalItemsLength }">
         <v-toolbar flat>
           <v-toolbar-title>
-            {{ tableTitle }}
+            <div>{{ $t('institutions.sushi.title', { total: originalItemsLength }) }}</div>
+
+            <v-chip
+              small
+              outlined
+            >
+              <v-icon v-if="sushiReady" left color="primary" small>
+                mdi-checkbox-marked-circle-outline
+              </v-icon>
+              {{
+                sushiReady
+                  ? $t('institutions.sushi.entryCompletedOn', { date: sushiReadySince })
+                  : $t('institutions.sushi.entryInProgress')
+              }}
+            </v-chip>
           </v-toolbar-title>
 
           <v-spacer />
@@ -256,9 +267,8 @@
           >
             <template #activator="{ on }">
               <v-chip
-                outlined
                 label
-                :color="sushiReady ? 'success' : 'secondary'"
+                :color="sushiReady ? 'secondary' : 'primary'"
                 v-on="on"
               >
                 <v-progress-circular
@@ -268,13 +278,10 @@
                   width="2"
                 />
                 <template v-else>
-                  <v-icon v-if="sushiReady" left>
-                    mdi-checkbox-marked-circle-outline
-                  </v-icon>
                   {{
                     sushiReady
-                      ? $t('institutions.sushi.entryCompletedOn', { date: sushiReadySince })
-                      : $t('institutions.sushi.entryInProgress')
+                      ? $t('institutions.sushi.resumeMyEntry')
+                      : $t('institutions.sushi.validateMyCredentials')
                   }}
                   <v-icon right>
                     mdi-chevron-down
@@ -287,8 +294,8 @@
               <v-card-title>
                 {{
                   sushiReady
-                    ? $t('institutions.sushi.entryCompleted')
-                    : $t('institutions.sushi.entryInProgress')
+                    ? $t('institutions.sushi.resumeMyEntry')
+                    : $t('institutions.sushi.validateMyCredentials')
                 }}
               </v-card-title>
 
@@ -317,61 +324,20 @@
                   @click="toggleSushiReady"
                 >
                   <v-icon left>
-                    {{ sushiReady ? 'mdi-text-box-edit-outline' : 'mdi-text-box-check-outline' }}
+                    {{
+                      sushiReady ? 'mdi-text-box-edit-outline' : 'mdi-text-box-check-outline'
+                    }}
                   </v-icon>
                   {{
-                    $t(`institutions.sushi.${sushiReady ? 'iResumeMyEntry' : 'iCompletedMyEntry'}`)
+                    sushiReady
+                      ? $t('institutions.sushi.resumeMyEntry')
+                      : $t('institutions.sushi.validateMyCredentials')
                   }}
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-menu>
         </v-toolbar>
-      </template>
-
-      <template #[`header.data-table-expand`]>
-        <v-menu :close-on-content-click="false" offset-y>
-          <template #activator="{ on, attrs }">
-            <v-btn
-              icon
-              small
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon small>
-                mdi-format-list-group
-              </v-icon>
-            </v-btn>
-          </template>
-
-          <v-card>
-            <v-card-text>
-              <v-select
-                :value="tableOptions.groupBy?.[0]"
-                :items="groupOptions"
-                :label="$t('groupBy')"
-                @input="updateGroupProperty"
-              >
-                <template #append-outer>
-                  <v-btn
-                    :disabled="!tableOptions.groupBy?.[0]"
-                    icon
-                    class="ml-2"
-                    @click="updateGroupDesc(!tableOptions.groupDesc?.[0])"
-                  >
-                    <v-icon>
-                      {{
-                        tableOptions.groupDesc?.[0]
-                          ? 'mdi-sort-alphabetical-descending'
-                          : 'mdi-sort-alphabetical-ascending'
-                      }}
-                    </v-icon>
-                  </v-btn>
-                </template>
-              </v-select>
-            </v-card-text>
-          </v-card>
-        </v-menu>
       </template>
 
       <template #expanded-item="{ headers, item }">
@@ -560,7 +526,6 @@ export default {
     return {
       institution,
       sushiItems: [],
-      currentItemCount: 0,
       selected: [],
       filters: {
         sushiStatuses: [],
@@ -572,20 +537,11 @@ export default {
       showSushiReadyPopup: false,
       loadingSushiReady: false,
       loadingItems: {},
-      tableOptions: {},
       locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
     };
   },
   computed: {
-    tableTitle() {
-      let count = this.sushiItems?.length;
-      if (count != null && this.currentItemCount !== count) {
-        count = `${this.currentItemCount}/${count}`;
-      }
-
-      return this.$t('institutions.sushi.title', { total: count ?? '?' });
-    },
     isAdmin() {
       return this.$auth.user?.isAdmin;
     },
@@ -769,28 +725,6 @@ export default {
 
       return actions.filter((action) => !action.hide);
     },
-    groupOptions() {
-      return [
-        {
-          text: this.$t('institutions.sushi.endpoint'),
-          value: 'endpoint.vendor',
-        },
-        {
-          text: this.$t('institutions.sushi.tags'),
-          value: 'tags',
-        },
-      ];
-    },
-    customGroup() {
-      switch (this.tableOptions?.groupBy?.at(0)) {
-        case 'tags':
-          return this.groupByTags;
-
-        default:
-          // Keep Vuetify's default
-          return undefined;
-      }
-    },
   },
   mounted() {
     return this.refreshSushiItems();
@@ -973,40 +907,7 @@ export default {
     },
 
     goToInstitutionPage() {
-      this.$router.push({ path: `/institutions/${this.$route.params.id}` });
-    },
-
-    updateGroupProperty(value) {
-      this.$set(this.tableOptions, 'groupBy', value ? [value] : []);
-    },
-    updateGroupDesc(value) {
-      this.$set(this.tableOptions, 'groupDesc', value ? [value] : []);
-    },
-    groupByTags(sushiItems) {
-      const itemsByTag = {};
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const item of sushiItems) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const tag of (item?.tags ?? [])) {
-          if (!itemsByTag[tag]) {
-            itemsByTag[tag] = [];
-          }
-
-          itemsByTag[tag].push(item);
-        }
-      }
-
-      return Object.entries(itemsByTag).map(
-        ([name, items]) => ({
-          depth: 0,
-          id: `root_tags_${name}`,
-          key: 'tags',
-          name,
-          items,
-          type: 'group',
-        }),
-      );
+      this.$router.push({ path: `/admin/institutions/${this.$route.params.id}` });
     },
   },
 };

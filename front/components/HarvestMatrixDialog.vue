@@ -4,7 +4,7 @@
     scrollable
     width="1400"
   >
-    <HarvestMatrix :sushi-id="sushi?.id" />
+    <HarvestMatrix :sushi-item="sushi" />
   </v-dialog>
 </template>
 

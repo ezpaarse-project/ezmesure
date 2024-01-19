@@ -267,27 +267,6 @@
               }
             }
           },
-          "auto": {
-            "description": "Automated services of the institution",
-            "type": [
-              "object",
-              "null"
-            ],
-            "properties": {
-              "ezpaarse": {
-                "type": "boolean"
-              },
-              "ezmesure": {
-                "type": "boolean"
-              },
-              "report": {
-                "type": "boolean"
-              },
-              "sushi": {
-                "type": "boolean"
-              }
-            }
-          },
           "sushiReadySince": {
             "type": [
               "string",

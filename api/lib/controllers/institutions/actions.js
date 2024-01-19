@@ -1,4 +1,5 @@
 const config = require('config');
+const { propsToPrismaInclude } = require('../utils');
 const institutionsService = require('../../entities/institutions.service');
 const usersService = require('../../entities/users.service');
 
@@ -21,6 +22,7 @@ const {
   createSchema,
   updateSchema,
   adminImportSchema,
+  includableFields,
 } = require('../../entities/institutions.dto');
 
 const imagesService = require('../../services/images');
@@ -79,9 +81,8 @@ exports.getInstitutions = async (ctx) => {
   } = ctx.query;
 
   let include;
-
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   /** @type {InstitutionFindManyArgs} */
@@ -114,9 +115,8 @@ exports.getInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
 
   let include;
-
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   ctx.type = 'json';
@@ -436,15 +436,10 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionRepositories = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   const repositories = await repositoriesService.findMany({
     where: { institutions: { some: { id: ctx.state.institution.id } } },
-    include,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
   ctx.type = 'json';
@@ -455,15 +450,10 @@ exports.getInstitutionRepositories = async (ctx) => {
 
 exports.getInstitutionSpaces = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   const spaces = await spacesService.findMany({
     where: { institutionId: ctx.state.institution.id },
-    include,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
   ctx.type = 'json';
@@ -475,17 +465,12 @@ exports.getInstitutionSpaces = async (ctx) => {
 exports.getInstitutionMember = async (ctx) => {
   const { institutionId, username } = ctx.params;
   const { include: propsToInclude } = ctx.query;
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   const membership = await membershipsService.findUnique({
     where: {
       username_institutionId: { institutionId, username },
     },
-    include,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
   if (!membership) {
@@ -500,15 +485,10 @@ exports.getInstitutionMember = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   const memberships = await membershipsService.findMany({
     where: { institutionId: ctx.state.institution.id },
-    include,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
   ctx.type = 'json';

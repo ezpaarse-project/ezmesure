@@ -34,6 +34,7 @@
             v-model="spaceType"
             :items="spaceTypes"
             :label="$t('type')"
+            :disabled="editMode"
             outlined
             dense
             @change="applyPreset"
@@ -42,11 +43,13 @@
             v-model="spaceId"
             :label="`${$t('identifier')} *`"
             :rules="[v => !!v || $t('fieldIsRequired')]"
-            :prefix="namespace && `${namespace}-`"
+            :disabled="editMode"
+            :suffix="suffix"
             outlined
             autofocus
             required
             dense
+            @input="applyPreset"
           />
           <v-text-field
             v-model="spaceName"
@@ -137,8 +140,8 @@ export default {
         { text: this.$t('spaces.types.counter5'), value: 'counter5' },
       ];
     },
-    namespace() {
-      return this.institution?.namespace || '';
+    suffix() {
+      return this.spaceType === 'ezpaarse' ? '-ezpaarse' : '-publisher';
     },
   },
   methods: {
@@ -151,23 +154,14 @@ export default {
       this.spaceName = this.space?.name || '';
       this.spaceInitials = this.space?.initials || '';
       this.spaceDescription = this.space?.description || '';
-
-      if (this.spaceId) {
-        if (this.namespace && this.spaceId?.startsWith?.(`${this.namespace}-`)) {
-          this.spaceId = this.spaceId.substring(this.namespace.length + 1);
-        };
-      } else {
-        this.applyPreset();
-      }
     },
 
     applyPreset() {
       const spaceDesc = this.$te(`spaces.descriptions.${this.spaceType}`)
         ? this.$t(`spaces.descriptions.${this.spaceType}`)
         : this.spaceType;
-      this.spaceId = this.spaceType.toLowerCase();
       this.spaceName = `${this.institution?.name} (${this.spaceType})`;
-      this.spaceDescription = `${spaceDesc} (id: ${this.namespace}-${this.spaceId})`;
+      this.spaceDescription = `${spaceDesc} (id: ${this.spaceId}${this.suffix})`;
     },
 
     async saveSpace() {
@@ -179,7 +173,7 @@ export default {
           method: this.editMode ? 'PATCH' : 'POST',
           url: this.editMode ? `/kibana-spaces/${this.space.id}` : '/kibana-spaces',
           data: {
-            id: this.namespace ? `${this.namespace}-${this.spaceId}` : this.spaceId,
+            id: this.editMode ? undefined : `${this.spaceId}${this.suffix}`,
             type: this.spaceType,
             name: this.spaceName,
             initials: this.spaceInitials,

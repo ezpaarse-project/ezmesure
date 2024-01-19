@@ -51,6 +51,14 @@ const immutableFields = [
 ];
 
 /**
+ * Fields that can be populated with related items
+ */
+const includableFields = [
+  'credentials',
+  'credentials.institution',
+];
+
+/**
  * Schema to be applied when an administrator creates a SUSHI endpoint
  */
 const adminCreateSchema = withModifiers(
@@ -83,6 +91,7 @@ const adminImportSchema = withModifiers(
 
 module.exports = {
   schema,
+  includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
   adminImportSchema: Joi.object(adminImportSchema).required(),

@@ -212,7 +212,7 @@ const sync = async () => {
  * Start cron to periodically sync Kibana to ezMESURE
  */
 const startCron = async () => {
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: syncSchedule,
     runOnInit: true,
     onTick: async () => {

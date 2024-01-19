@@ -194,34 +194,6 @@
             </v-card-text>
           </v-card>
 
-          <v-card outlined class="mt-4">
-            <v-card-title>
-              {{ $t('institutions.institution.automations') }}
-            </v-card-title>
-            <v-card-text>
-              <v-checkbox
-                v-model="institution.auto.ezpaarse"
-                :label="$t('partners.auto.ezpaarse')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="institution.auto.ezmesure"
-                :label="$t('partners.auto.ezmesure')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="institution.auto.report"
-                :label="$t('partners.auto.report')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="institution.auto.sushi"
-                :label="$t('institutions.institution.auto.sushi')"
-                hide-details
-              />
-            </v-card-text>
-          </v-card>
-
           <v-card v-if="isAdmin" outlined class="mt-4">
             <v-card-title>
               {{ $t('administration') }}
@@ -317,7 +289,6 @@ export default {
 
       institution: {
         social: {},
-        auto: {},
       },
 
       namespaceRules: [
@@ -356,7 +327,6 @@ export default {
 
       this.institution = JSON.parse(JSON.stringify(institution));
       this.institution.social = this.institution.social || {};
-      this.institution.auto = this.institution.auto || {};
 
       this.logoPreview = null;
       this.logoHasError = false;
