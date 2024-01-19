@@ -10,7 +10,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@ezpaarse-project/ezreeport-vue": "^1.0.0-beta.30",
+    "@ezpaarse-project/ezreeport-vue": "1.0.0-beta.30",
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/i18n": "^7.3.1",
