@@ -138,6 +138,11 @@ module.exports = {
           path: '/admin/institutions/:id/members',
           component: resolve(__dirname, 'pages/myspace/institutions/_id/members.vue'),
         },
+        {
+          name: 'admin-institution-id-reports',
+          path: '/admin/institutions/:id/reports',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/reports.vue'),
+        },
         // Legacy routes
         {
           name: 'legacy-institutions',

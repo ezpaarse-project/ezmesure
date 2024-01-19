@@ -1,5 +1,6 @@
-const { adminImportSchema } = require('../../entities/sushi-endpoints.dto');
+const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
 const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+const { propsToPrismaInclude } = require('../utils');
 
 exports.getAll = async (ctx) => {
   const {
@@ -14,8 +15,8 @@ exports.getAll = async (ctx) => {
 
   let include;
 
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   const where = {

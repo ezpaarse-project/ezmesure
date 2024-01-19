@@ -1,10 +1,5 @@
 {
   "port": "EZMESURE_PORT",
-  "mongo": {
-    "port": "EZMESURE_MONGO_PORT",
-    "host": "EZMESURE_MONGO_HOST",
-    "db": "EZMESURE_MONGO_DB"
-  },
   "elasticsearch": {
     "scheme": "EZMESURE_ELASTIC_SCHEME",
     "port": "EZMESURE_ELASTIC_PORT",

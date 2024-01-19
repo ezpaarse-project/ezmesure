@@ -1,5 +1,4 @@
 // @ts-check
-const { client: prisma } = require('../services/prisma');
 const repositoriesPrisma = require('../services/prisma/repositories');
 const { triggerHooks } = require('../hooks/hookEmitter');
 
@@ -93,9 +92,15 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static async delete(params) {
-    const { deleteResult, deletedRepository } = await repositoriesPrisma.remove(params);
+    const result = await repositoriesPrisma.remove(params);
+    if (!result) {
+      return null;
+    }
+    const { deleteResult, deletedRepository } = result;
+
     triggerHooks('repository:delete', deletedRepository);
     deletedRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+
     return deleteResult;
   }
 
@@ -106,12 +111,11 @@ module.exports = class RepositoriesService {
    * @returns {Promise<Repository | null>}
    */
   static async disconnectInstitution(pattern, institutionId) {
-    const { newRepository, oldRepository } = await repositoriesPrisma
-      .disconnectInstitution(pattern, institutionId);
-
-    if (!oldRepository) {
+    const result = await repositoriesPrisma.disconnectInstitution(pattern, institutionId);
+    if (!result) {
       return null;
     }
+    const { newRepository, oldRepository } = result;
 
     triggerHooks('repository:disconnected', oldRepository, institutionId);
     oldRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });

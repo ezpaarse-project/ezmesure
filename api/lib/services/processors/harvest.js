@@ -9,13 +9,15 @@ const maxDeferrals = parseInt(config.get('jobs.harvest.maxDeferrals'), 10);
 
 const { DelayedError } = require('bullmq');
 
-const addSeconds = require('date-fns/addSeconds');
-const dateIsValid = require('date-fns/isValid');
-const isFuture = require('date-fns/isFuture');
-const format = require('date-fns/format');
-const isSameMonth = require('date-fns/isSameMonth');
-const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
-const isFirstDayOfMonth = require('date-fns/isFirstDayOfMonth');
+const {
+  addSeconds,
+  isValid: dateIsValid,
+  isFuture,
+  format,
+  isSameMonth,
+  isLastDayOfMonth,
+  isFirstDayOfMonth,
+} = require('date-fns');
 
 const { appLogger } = require('../logger');
 const sushiService = require('../sushi');

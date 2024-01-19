@@ -151,7 +151,7 @@ const sync = async () => {
  * Start cron to periodically sync Elastic to ezMESURE
  */
 const startCron = async () => {
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: syncSchedule,
     runOnInit: false,
     onTick: async () => {
