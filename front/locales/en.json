@@ -681,7 +681,7 @@
     "admin": {
       "taskTab": "Reports management",
       "templateTab": "Template management",
-      "activityTab": "Preset management",
+      "presetTab": "Preset management",
       "adminTab": "General administration"
     }
   },
