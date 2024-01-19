@@ -143,6 +143,11 @@ module.exports = {
           path: '/admin/institutions/:id/reports',
           component: resolve(__dirname, 'pages/myspace/institutions/_id/reports.vue'),
         },
+        {
+          name: 'admin-root',
+          path: '/admin',
+          redirect: '/admin/institutions',
+        },
         // Legacy routes
         {
           name: 'legacy-institutions',
