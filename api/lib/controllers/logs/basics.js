@@ -1,6 +1,6 @@
 const elastic = require('../../services/elastic');
 
-exports.list = async function (ctx) {
+exports.list = async function list(ctx) {
   ctx.action = 'indices/list';
   ctx.type = 'json';
 
@@ -13,7 +13,7 @@ exports.list = async function (ctx) {
   ctx.body = body;
 };
 
-exports.deleteIndice = async function (ctx) {
+exports.deleteIndice = async function deleteIndice(ctx) {
   const { index } = ctx.request.params;
   ctx.action = 'indices/delete';
   ctx.index = index;
@@ -42,7 +42,7 @@ exports.deleteIndice = async function (ctx) {
   ctx.body = body;
 };
 
-exports.deleteEvents = async function (ctx) {
+exports.deleteEvents = async function deleteEvents(ctx) {
   const { index } = ctx.request.params;
   ctx.action = 'events/delete';
   ctx.index = index;

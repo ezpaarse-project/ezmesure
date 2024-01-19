@@ -30,7 +30,7 @@ describe('[logs]: Test insert features', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-    await resetElastic();
+      await resetElastic();
       adminToken = await usersService.generateToken(adminUsername, adminPassword);
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });

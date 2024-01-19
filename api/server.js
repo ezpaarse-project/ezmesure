@@ -2,7 +2,7 @@ const env = process.env.NODE_ENV || 'development';
 
 const Koa = require('koa');
 const mount = require('koa-mount');
-const cors = require('koa-cors');
+const cors = require('@koa/cors');
 const config = require('config');
 const path = require('path');
 const { setTimeout } = require('timers/promises');

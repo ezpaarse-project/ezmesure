@@ -39,7 +39,7 @@ describe('[repositories]: Test read features', () => {
     let adminToken;
     beforeAll(async () => {
       await resetDatabase();
-    await resetElastic();
+      await resetElastic();
       adminToken = await usersService.generateToken(adminUsername, adminPassword);
     });
     describe(`Get repository of type [${ezcounterRepositoryConfig.type}]`, () => {

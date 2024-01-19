@@ -9,7 +9,80 @@ const validator = require('../../services/validator');
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../services/logger');
 
-exports.upload = async function (ctx) {
+/**
+ * Validate a file, assuming it's a CSV file
+ * @param {String} filePath
+ */
+function validateFile(filePath) {
+  return new Promise((resolve, reject) => {
+    let lineNumber = 0;
+    let emptyLines = 0;
+    const readLimit = 50;
+    let columns;
+    let err;
+
+    let stream = fse.createReadStream(filePath);
+
+    if (filePath.endsWith('gz')) {
+      stream = stream.pipe(zlib.createGunzip());
+    }
+
+    Papa.parse(stream, {
+      delimiter: ';',
+      complete: () => resolve(err),
+      error: (error) => reject(error),
+      step: ({ data: row, errors }, parser) => {
+        lineNumber += 1;
+
+        if (row.filter((f) => f.trim()).length === 0) {
+          emptyLines += 1;
+          return;
+        }
+
+        if ((lineNumber - emptyLines) > readLimit) {
+          return parser.abort();
+        }
+
+        if (errors.length > 0) {
+          [err] = errors;
+
+          if (err.type === 'Quotes') {
+            // FIXME: translate me!
+            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
+          }
+
+          return parser.abort();
+        }
+
+        if (typeof columns === 'undefined') {
+          columns = row;
+
+          try {
+            return validator.validateColumns(columns);
+          } catch (e) {
+            err = e;
+            return parser.abort();
+          }
+        }
+
+        const ec = {};
+
+        columns.forEach((colName, index) => {
+          ec[colName] = row[index];
+        });
+
+        try {
+          validator.validateEvent(ec, lineNumber);
+        } catch (e) {
+          err = e;
+          parser.abort();
+        }
+      },
+    });
+  });
+}
+
+exports.upload = async function upload(ctx) {
   let { fileName } = ctx.request.params;
 
   ctx.action = 'file/upload';
@@ -49,7 +122,7 @@ exports.upload = async function (ctx) {
   }
 };
 
-exports.list = async function (ctx) {
+exports.list = async function list(ctx) {
   ctx.action = 'file/list';
   const { username, email } = ctx.state.user;
 
@@ -69,7 +142,9 @@ exports.list = async function (ctx) {
 
   fileList = fileList.map((name) => ({ name }));
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const file of fileList) {
+    // eslint-disable-next-line no-await-in-loop
     const stat = await fse.stat(path.resolve(userDir, file.name));
     file.size = stat.size;
     file.createdAt = stat.ctime;
@@ -79,7 +154,7 @@ exports.list = async function (ctx) {
   ctx.body = fileList;
 };
 
-exports.deleteOne = async function (ctx) {
+exports.deleteOne = async function deleteOne(ctx) {
   const { fileName } = ctx.request.params;
   ctx.action = 'file/delete';
   const { username, email } = ctx.state.user;
@@ -100,7 +175,7 @@ exports.deleteOne = async function (ctx) {
   ctx.status = 204;
 };
 
-exports.deleteMany = async function (ctx) {
+exports.deleteMany = async function deleteMany(ctx) {
   ctx.action = 'file/delete-many';
   const { username, email } = ctx.state.user;
 
@@ -124,82 +199,11 @@ exports.deleteMany = async function (ctx) {
 
   ctx.metadata = { path: relativePaths };
 
-  for (filePath of relativePaths) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const filePath of relativePaths) {
+    // eslint-disable-next-line no-await-in-loop
     await fse.remove(path.resolve(storagePath, filePath));
   }
 
   ctx.status = 204;
 };
-
-/**
- * Validate a file, assuming it's a CSV file
- * @param {String} filePath
- */
-function validateFile(filePath) {
-  return new Promise((resolve, reject) => {
-    let lineNumber = 0;
-    let emptyLines = 0;
-    const readLimit = 50;
-    let columns;
-    let err;
-
-    let stream = fse.createReadStream(filePath);
-
-    if (filePath.endsWith('gz')) {
-      stream = stream.pipe(zlib.createGunzip());
-    }
-
-    Papa.parse(stream, {
-      delimiter: ';',
-      complete: () => resolve(err),
-      error: (error) => reject(error),
-      step: ({ data: row, errors }, parser) => {
-        lineNumber += 1;
-
-        if (row.filter((f) => f.trim()).length === 0) {
-          emptyLines += 1;
-          return;
-        }
-
-        if ((lineNumber - emptyLines) > readLimit) {
-          return parser.abort();
-        }
-
-        if (errors.length > 0) {
-          err = errors[0];
-
-          if (err.type === 'Quotes') {
-            // FIXME: translate me!
-            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
-          }
-
-          return parser.abort();
-        }
-
-        if (typeof columns === 'undefined') {
-          columns = row;
-
-          try {
-            return validator.validateColumns(columns);
-          } catch (e) {
-            err = e;
-            return parser.abort();
-          }
-        }
-
-        const ec = {};
-
-        columns.forEach((colName, index) => {
-          ec[colName] = row[index];
-        });
-
-        try {
-          validator.validateEvent(ec, lineNumber);
-        } catch (e) {
-          err = e;
-          parser.abort();
-        }
-      },
-    });
-  });
-}
