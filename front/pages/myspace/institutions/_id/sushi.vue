@@ -227,18 +227,21 @@
       :items="sushiItems"
       :loading="refreshing"
       :search="search"
+      :custom-group="customGroup"
       :items-per-page="50"
+      :options.sync="tableOptions"
       :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
       show-select
       show-expand
       single-expand
       item-key="id"
       sort-by="endpoint.vendor"
+      @pagination="currentItemCount = $event.itemsLength"
     >
-      <template #top="{ originalItemsLength }">
+      <template #top>
         <v-toolbar flat>
           <v-toolbar-title>
-            <div>{{ $t('institutions.sushi.title', { total: originalItemsLength }) }}</div>
+            {{ tableTitle }}
 
             <v-chip
               small
@@ -340,6 +343,23 @@
         </v-toolbar>
       </template>
 
+      <template #[`header.data-table-expand`]>
+        <v-btn
+          v-if="tableOptions.groupBy?.[0]"
+          icon
+          small
+          @click="updateGroupDesc(!tableOptions.groupDesc?.[0])"
+        >
+          <v-icon small>
+            {{
+              tableOptions.groupDesc?.[0]
+                ? 'mdi-sort-alphabetical-descending'
+                : 'mdi-sort-alphabetical-ascending'
+            }}
+          </v-icon>
+        </v-btn>
+      </template>
+
       <template #expanded-item="{ headers, item }">
         <td />
         <td :colspan="headers.length - 1" class="py-4">
@@ -347,7 +367,31 @@
         </td>
       </template>
 
-      <template #[`header.tags`]>
+      <template #[`header.endpoint.vendor`]="{ header }">
+        <v-btn
+          icon
+          small
+          @click="updateGroupProperty(header.value)"
+        >
+          <v-icon small>
+            mdi-format-list-group
+          </v-icon>
+        </v-btn>
+
+        {{ header.text }}
+      </template>
+
+      <template #[`header.tags`]="{ header }">
+        <v-btn
+          icon
+          small
+          @click="updateGroupProperty(header.value)"
+        >
+          <v-icon small>
+            mdi-format-list-group
+          </v-icon>
+        </v-btn>
+
         {{ $t('institutions.sushi.tags') }}
 
         <v-tooltip top>
@@ -526,6 +570,7 @@ export default {
     return {
       institution,
       sushiItems: [],
+      currentItemCount: 0,
       selected: [],
       filters: {
         sushiStatuses: [],
@@ -537,11 +582,20 @@ export default {
       showSushiReadyPopup: false,
       loadingSushiReady: false,
       loadingItems: {},
+      tableOptions: {},
       locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
     };
   },
   computed: {
+    tableTitle() {
+      let count = this.sushiItems?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('institutions.sushi.title', { total: count ?? '?' });
+    },
     isAdmin() {
       return this.$auth.user?.isAdmin;
     },
@@ -724,6 +778,29 @@ export default {
       ];
 
       return actions.filter((action) => !action.hide);
+    },
+    groupOptions() {
+      return [
+        {
+          text: this.$t('institutions.sushi.endpoint'),
+          value: 'endpoint.vendor',
+        },
+        {
+          text: this.$t('institutions.sushi.tags'),
+          value: 'tags',
+        },
+      ];
+    },
+    customGroup() {
+      switch (this.tableOptions?.groupBy?.at(0)) {
+        case 'tags':
+          return this.groupByTags;
+        case 'endpoint.vendor':
+          return this.groupByVendor;
+
+        default:
+          return undefined;
+      }
     },
   },
   mounted() {
@@ -908,6 +985,62 @@ export default {
 
     goToInstitutionPage() {
       this.$router.push({ path: `/admin/institutions/${this.$route.params.id}` });
+    },
+
+    updateGroupProperty(value) {
+      this.$set(this.tableOptions, 'groupBy', value ? [value] : []);
+    },
+    updateGroupDesc(value) {
+      this.$set(this.tableOptions, 'groupDesc', value ? [value] : []);
+    },
+    groupByTags(sushiItems) {
+      const itemsByTag = {};
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of sushiItems) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const tag of (item?.tags ?? [])) {
+          if (!itemsByTag[tag]) {
+            itemsByTag[tag] = [];
+          }
+
+          itemsByTag[tag].push(item);
+        }
+      }
+
+      return Object.entries(itemsByTag).map(
+        ([name, items]) => ({
+          depth: 0,
+          id: `root_tags_${name}`,
+          key: 'tags',
+          name,
+          items,
+          type: 'group',
+        }),
+      );
+    },
+    groupByVendor(sushiItems) {
+      const itemsByVendor = {};
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of sushiItems) {
+        if (!itemsByVendor[item.endpoint.vendor]) {
+          itemsByVendor[item.endpoint.vendor] = [];
+        }
+
+        itemsByVendor[item.endpoint.vendor].push(item);
+      }
+
+      return Object.entries(itemsByVendor).map(
+        ([name, items]) => ({
+          depth: 0,
+          id: `root_vendor_${name}`,
+          key: 'vendor',
+          name,
+          items,
+          type: 'group',
+        }),
+      );
     },
   },
 };
