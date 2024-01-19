@@ -7,8 +7,6 @@ const { appLogger } = require('../../services/logger');
 /**
  * key is institution id, value is if a reporting was
  * @type {Map<string, { value: boolean, date: Date }>}
- *
- * @deprecated after ezreeport@1.0.0-beta.28, you can request all the namespaces in one request
  */
 const reportingCache = new Map();
 
@@ -29,14 +27,7 @@ const institutionHasReport = async (institutionId) => {
   let found = false;
 
   try {
-    const { data } = await ezrAxios.get(
-      `/admin/namespaces/${institutionId}`,
-      {
-        params: {
-          count: 0,
-        },
-      },
-    );
+    const { data } = await ezrAxios.get(`/admin/namespaces/${institutionId}`);
     // eslint-disable-next-line no-restricted-syntax
     for (const task of (data.content?.tasks ?? [])) {
       if (task.enabled) {
