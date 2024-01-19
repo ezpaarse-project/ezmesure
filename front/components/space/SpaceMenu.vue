@@ -85,10 +85,6 @@ export default {
     administration() {
       return [
         {
-          title: this.$t('menu.activity'),
-          href: '/activity',
-        },
-        {
           title: this.$t('menu.institutions'),
           href: '/institutions',
         },
@@ -107,6 +103,10 @@ export default {
         {
           title: this.$t('menu.adminReport'),
           href: '/report',
+        },
+        {
+          title: this.$t('menu.activity'),
+          href: '/activity',
         },
       ];
     },
