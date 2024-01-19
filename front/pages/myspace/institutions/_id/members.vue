@@ -1,7 +1,7 @@
 <template>
   <section>
     <ToolBar :title="institutionName">
-      <v-tooltip right>
+      <v-tooltip v-if="isAdmin" right>
         <template #activator="{ attrs, on }">
           <v-btn
             class="ml-2"

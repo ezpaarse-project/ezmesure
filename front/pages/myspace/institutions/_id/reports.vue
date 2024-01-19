@@ -1,6 +1,24 @@
 <template>
   <section>
     <ToolBar :title="institution.name">
+      <v-tooltip v-if="isAdmin" right>
+        <template #activator="{ attrs, on }">
+          <v-btn
+            class="ml-2"
+            icon
+            v-bind="attrs"
+            @click="goToInstitutionPage"
+            v-on="on"
+          >
+            <v-icon>
+              mdi-page-previous-outline
+            </v-icon>
+          </v-btn>
+        </template>
+
+        {{ $t('institutions.institution.goToPage') }}
+      </v-tooltip>
+
       <v-spacer />
 
       <v-btn text color="success" @click="showHealthDialog = true">
@@ -60,6 +78,14 @@ export default {
   computed: {
     allowedInstitutions() {
       return this.$auth.user.memberships.map((m) => m.institutionId);
+    },
+    isAdmin() {
+      return this.$auth.user?.isAdmin;
+    },
+  },
+  methods: {
+    goToInstitutionPage() {
+      this.$router.push({ path: `/institutions/${this.institution.id}` });
     },
   },
 };
