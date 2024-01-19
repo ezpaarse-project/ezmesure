@@ -1,16 +1,13 @@
 const institutionsService = require('../../entities/institutions.service');
+const { includableFields } = require('../../entities/institutions.dto');
+const { propsToPrismaInclude } = require('../utils');
 
 exports.getSubInstitutions = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
-  let include;
-
-  if (Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(propsToInclude.map((prop) => [prop, true]));
-  }
 
   const subInstitutions = await institutionsService.findMany({
     where: { parentInstitutionId: ctx.state.institution.id },
-    include,
+    include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
   ctx.type = 'json';

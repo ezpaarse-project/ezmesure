@@ -2,7 +2,8 @@ const usersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
 const { activateUserLink } = require('../auth/password');
-const { adminImportSchema } = require('../../entities/users.dto');
+const { adminImportSchema, includableFields } = require('../../entities/users.dto');
+const { propsToPrismaInclude } = require('../utils');
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -23,13 +24,10 @@ exports.getUser = async (ctx) => {
 
 exports.list = async (ctx) => {
   const {
-    include: propsToInclude,
-  } = ctx.query;
-
-  const {
     q: search = '',
     size = 10,
     source = 'fullName,username',
+    include: propsToInclude,
   } = ctx.query;
 
   let select = Object.assign(
@@ -41,19 +39,8 @@ exports.list = async (ctx) => {
   }
 
   let include;
-
-  if (ctx.state?.user?.isAdmin && Array.isArray(propsToInclude)) {
-    include = Object.fromEntries(
-      propsToInclude.map(
-        (prop) => {
-          const [parent, child] = prop.split('.', 2);
-          if (child) {
-            return [parent, { include: { [child]: true } }];
-          }
-          return [prop, true];
-        },
-      ),
-    );
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
   const users = await usersService.findMany({
