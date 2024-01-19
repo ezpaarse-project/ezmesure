@@ -7,7 +7,7 @@
         v-if="canReadReports"
         color="primary"
         text
-        :to="`/institutions/${institutionId}/reports`"
+        :to="`/admin/institutions/${institutionId}/reports`"
       >
         <v-icon left>
           mdi-file-chart-outline
