@@ -275,7 +275,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :disabled="!item.validated" :to="`/institutions/${item.id}/reports`">
+            <v-list-item :disabled="!item.validated" :to="`/admin/institutions/${item.id}/reports`">
               <v-list-item-icon>
                 <v-icon>mdi-file-chart-outline</v-icon>
               </v-list-item-icon>
