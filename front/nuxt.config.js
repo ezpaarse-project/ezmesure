@@ -18,7 +18,7 @@ module.exports = {
 
   plugins: [
     { src: '~/plugins/dates.js' },
-    '~/plugins/ezreeport.js',
+    { src: '~/plugins/ezreeport.js' },
   ],
 
   css: [
@@ -53,6 +53,7 @@ module.exports = {
       },
     ],
     '@nuxtjs/i18n',
+    '~/modules/vuetify-locales',
   ],
 
   buildModules: [

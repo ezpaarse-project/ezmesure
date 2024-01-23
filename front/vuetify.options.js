@@ -1,7 +1,10 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import colors from 'vuetify/lib/util/colors';
 
-export default {
+export default ({ app }) => ({
+  lang: {
+    t: (key, ...params) => app.i18n.t(key, params),
+  },
   theme: {
     themes: {
       light: {
@@ -11,4 +14,4 @@ export default {
       },
     },
   },
-};
+});
