@@ -15,8 +15,8 @@
       <template #extension>
         <v-tabs v-model="currentTab" grow>
           <v-tab>{{ $t('report.admin.taskTab') }}</v-tab>
-          <v-tab>{{ $t('report.admin.templateTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.presetTab') }}</v-tab>
+          <v-tab>{{ $t('report.admin.templateTab') }}</v-tab>
           <v-tab>{{ $t('report.admin.adminTab') }}</v-tab>
         </v-tabs>
       </template>
@@ -38,14 +38,14 @@
           </ezr-task-table>
         </v-tab-item>
 
-        <!-- template tab -->
-        <v-tab-item class="pa-1">
-          <ezr-template-list />
-        </v-tab-item>
-
         <!-- presets tab -->
         <v-tab-item class="pa-1">
           <ezr-tasks-presets-cards />
+        </v-tab-item>
+
+        <!-- template tab -->
+        <v-tab-item class="pa-1">
+          <ezr-template-list />
         </v-tab-item>
 
         <!-- "admin" tab -->
