@@ -32,28 +32,28 @@
           bottom
           left
           @input="$refs.repoCreateForm?.resetForm?.()"
-      >
-        <template #activator="{ on, attrs }">
-          <v-btn
-            text
-            :loading="creating"
-            v-bind="attrs"
-            v-on="on"
-          >
-            <v-icon left>
-              mdi-plus
-            </v-icon>
-            {{ $t('add') }}
-          </v-btn>
-        </template>
+        >
+          <template #activator="{ on, attrs }">
+            <v-btn
+              text
+              :loading="creating"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon left>
+                mdi-plus
+              </v-icon>
+              {{ $t('add') }}
+            </v-btn>
+          </template>
 
-        <RepositoriesCreateForm
-          ref="repoCreateForm"
-          @submit="onRepositoryCreate"
-          @cancel="showCreationForm = false"
-          @loading="creating = $event"
-        />
-      </v-menu>
+          <RepositoriesCreateForm
+            ref="repoCreateForm"
+            @submit="onRepositoryCreate"
+            @cancel="showCreationForm = false"
+            @loading="creating = $event"
+          />
+        </v-menu>
 
         <v-btn text :loading="refreshing" @click="refreshRepos">
           <v-icon left>
@@ -220,14 +220,14 @@ export default {
           text: this.$t('repositories.type'),
           value: 'type',
           filter: (_value, _search, item) => this.columnTypeFilter('type', item),
-          width: '200px'
+          width: '200px',
         },
         {
           text: this.$t('repositories.institutions'),
           value: 'institutions',
           filter: (_value, _search, item) => this.columnArrayFilter('institutions', item),
           align: 'center',
-          width: '200px'
+          width: '200px',
         },
         {
           text: this.$t('actions'),
@@ -262,7 +262,7 @@ export default {
      *
      * @returns {Record<string, number>}
      */
-     maxCounts() {
+    maxCounts() {
       const counters = {
         institutions: 0,
       };
@@ -314,7 +314,8 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     columnArrayFilter(field, item) {
-      const range = this.filters?.[`${field}Range`]?.value;
+      const rangeField = `${field}Range`;
+      const range = this.filters?.[rangeField]?.value;
       if (range == null || !Array.isArray(item[field])) {
         return true;
       }
@@ -427,7 +428,7 @@ export default {
       this.repos = this.repos.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },
-    async onRepositoryCreate(newRepository) {
+    async onRepositoryCreate() {
       this.showCreationForm = false;
       await this.refreshRepos();
     },

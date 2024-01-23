@@ -173,8 +173,8 @@
             <v-switch
               :input-value="item.validated"
               :label="item.validated
-                  ? $t('institutions.institution.validated')
-                  : $t('institutions.institution.notValidated')"
+                ? $t('institutions.institution.validated')
+                : $t('institutions.institution.notValidated')"
               :loading="loadingMap[item.id]"
               readonly
               hide-details
@@ -713,7 +713,8 @@ export default {
      * @return {boolean} If the item must be showed or not
      */
     columnArrayFilter(field, item) {
-      const range = this.filters?.[`${field}Range`]?.value;
+      const rangeField = `${field}Range`;
+      const range = this.filters?.[rangeField]?.value;
       if (range == null || !Array.isArray(item[field])) {
         return true;
       }
@@ -874,12 +875,12 @@ export default {
     },
 
     async toggleValidationOfInstitution(item) {
-      this.loadingMap = {...this.loadingMap, [item.id]: true};
+      this.loadingMap = { ...this.loadingMap, [item.id]: true };
 
       const value = !item.validated;
       await this.$axios.$put(
         `/institutions/${item.id}/validated`,
-        { value }
+        { value },
       );
 
       const index = this.institutions.findIndex((i) => i.id === item.id);
@@ -887,7 +888,7 @@ export default {
         this.institutions.splice(index, 1, { ...item, validated: value });
       }
 
-      this.loadingMap = {...this.loadingMap, [item.id]: false};
+      this.loadingMap = { ...this.loadingMap, [item.id]: false };
     },
 
     editInstitution(item) {
@@ -907,7 +908,7 @@ export default {
         message: this.$tc(
           'institutions.deleteNbInstitutions.text',
           institutions.length,
-          { affected: this.$t('institutions.deleteNbInstitutions.affected') }
+          { affected: this.$t('institutions.deleteNbInstitutions.affected') },
         ),
         agreeText: this.$t('delete'),
         agreeIcon: 'mdi-delete',
