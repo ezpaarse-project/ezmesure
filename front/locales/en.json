@@ -790,5 +790,6 @@
   "validate": "Validate",
   "invalidate": "Invalidate",
   "reason": "Reason: {reason}",
+  "groupBy": "Group by",
   "indeterminate": "indeterminate"
 }
