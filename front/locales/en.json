@@ -24,7 +24,8 @@
     "contact": "Contact",
     "report": "My reports",
     "adminReport": "ezREEPORT",
-    "repositories": "Repositories"
+    "repositories": "Repositories",
+    "harvest": "Harvest"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -715,6 +716,24 @@
       "counter5": "Publisher space"
     },
     "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
+  },
+  "harvest": {
+    "filtersTitle": "Filter tasks",
+    "title": "Harvesting tasks",
+    "name": "Harvest from {createdAt}",
+    "metrics": "Successful: {success} | Failed: {failed} | Active: {active} | Pending: {pending}",
+    "harvestId": "Harvesting ID",
+    "reportType": "Report type",
+    "beginDate": "Start date",
+    "endDate": "End date",
+    "period": "Period",
+    "createdAt": "Requested on",
+    "runningTime": "Processing time",
+    "index": "Insertion index",
+    "coveredPeriods": "Covered months",
+    "inserted": "Items inserted",
+    "updated": "Items updated",
+    "failed": "Items not retrieved"
   },
   "permissions": {
     "none": "None",

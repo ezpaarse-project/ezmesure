@@ -101,6 +101,10 @@ export default {
           href: '/endpoints',
         },
         {
+          title: this.$t('menu.harvest'),
+          href: '/harvests',
+        },
+        {
           title: this.$t('menu.adminReport'),
           href: '/report',
         },

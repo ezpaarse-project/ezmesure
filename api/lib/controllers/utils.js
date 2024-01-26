@@ -34,6 +34,37 @@ const propsToPrismaInclude = (props, includableFields) => {
   );
 };
 
+/**
+ * Transform props to sort into a valid prisma `sort` field
+ *
+ * @param {string} prop
+ * @param {'asc'|'desc'} order
+ * @param {(string[] | Set<string>)?} sortableFields
+ * @returns
+ */
+const propsToPrismaSort = (prop, order, sortableFields) => {
+  if (!prop) {
+    return undefined;
+  }
+
+  if (sortableFields && (Array.isArray(sortableFields) || sortableFields instanceof Set)) {
+    const sortable = new Set(sortableFields);
+    if (sortable.has(prop)) {
+      return undefined;
+    }
+  }
+
+  const [parent, ...children] = prop.split('.');
+
+  let value = order;
+  if (children?.length > 0) {
+    value = propsToPrismaSort(children.join('.'), order);
+  }
+
+  return { [parent]: value };
+};
+
 module.exports = {
   propsToPrismaInclude,
+  propsToPrismaSort,
 };
