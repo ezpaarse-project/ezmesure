@@ -84,7 +84,7 @@
             <v-chip
               :color="status[value]?.color"
               :style="{
-                color: status[value].text || 'white',
+                color: status[value]?.text || 'white',
               }"
               v-bind="attrs"
               v-on="on"
