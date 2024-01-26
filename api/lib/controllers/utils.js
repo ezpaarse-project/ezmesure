@@ -38,7 +38,7 @@ const propsToPrismaInclude = (props, includableFields) => {
  * Transform props to sort into a valid prisma `sort` field
  *
  * @param {string} prop
- * @param {'asc'|'dsc'} order
+ * @param {'asc'|'desc'} order
  * @param {(string[] | Set<string>)?} sortableFields
  * @returns
  */
