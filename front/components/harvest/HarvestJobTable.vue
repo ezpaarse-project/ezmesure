@@ -285,7 +285,7 @@ export default defineComponent({
         vendor: this.filters.vendor,
         institution: this.filters.institution,
         status: this.filters.status,
-        // tags: this.filters.tags,
+        tags: this.filters.tags,
 
         page: this.tableOptions.page,
         size: this.tableOptions.itemsPerPage,

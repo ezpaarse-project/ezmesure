@@ -44,7 +44,7 @@ exports.getJobs = async (ctx) => {
     vendor,
     institution,
     status,
-    // tags,
+    tags,
     size,
     sort,
     order = 'asc',
@@ -70,8 +70,13 @@ exports.getJobs = async (ctx) => {
     options.where.credentials = { institutionId: institution };
   }
 
-  if (vendor) {
-    options.where.credentials = { endpoint: { id: vendor } };
+  if (vendor || tags) {
+    options.where.credentials = {
+      tags: { has: tags },
+      endpoint: vendor ? {
+        id: vendor,
+      } : undefined,
+    };
   }
 
   const harvests = await harvestsJobsService.findMany({

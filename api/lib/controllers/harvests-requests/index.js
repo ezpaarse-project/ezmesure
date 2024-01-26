@@ -50,7 +50,7 @@ router.route({
       vendor: Joi.string().trim(),
       institution: Joi.string().trim(),
       status: Joi.string().trim(),
-      // tags: Joi.string().trim(),
+      tags: Joi.string().trim(),
       size: Joi.number().min(0),
       page: Joi.number().min(1),
       sort: Joi.string(),
