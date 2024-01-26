@@ -9,6 +9,8 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
@@ -42,6 +44,22 @@ function findUnique(params) {
  */
 function findFirst(params) {
   return prisma.harvestJob.findFirst(params);
+}
+
+/**
+ * @param {HarvestJobCountArgs} params
+ * @returns {Promise<number>}
+ */
+function count(params) {
+  return prisma.harvestJob.count(params);
+}
+
+/**
+ * @param {HarvestJobGroupByArgs} params
+ * @returns {Promise<number>}
+ */
+function groupBy(params) {
+  return prisma.harvestJob.groupBy(params);
 }
 
 /**
@@ -116,6 +134,8 @@ module.exports = {
   findMany,
   findUnique,
   findFirst,
+  count,
+  groupBy,
   update,
   upsert,
   remove,

@@ -10,6 +10,7 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
@@ -48,6 +49,14 @@ module.exports = class HarvestJobsService {
    */
   static findFirst(params) {
     return harvestJobPrisma.findFirst(params);
+  }
+
+  /**
+   * @param {HarvestJobCountArgs} params
+   * @returns {Promise<number>}
+   */
+  static count(params) {
+    return harvestJobPrisma.count(params);
   }
 
   /**
