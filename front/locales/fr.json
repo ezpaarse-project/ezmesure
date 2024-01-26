@@ -24,7 +24,8 @@
     "contact": "Contact",
     "report": "Mes rapports",
     "adminReport": "ezREEPORT",
-    "repositories": "Entrepôts"
+    "repositories": "Entrepôts",
+    "harvest": "Moissonnage"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -715,6 +716,24 @@
       "counter5": "Espace éditeurs"
     },
     "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
+  },
+  "harvest": {
+    "filtersTitle": "Filtrer les tâches",
+    "title": "Tâches de moissonnage",
+    "name": "Moissonnage du {createdAt}",
+    "metrics": "Réussi: {success} | Échoué: {failed} | Actif: {active} | En attente: {pending}",
+    "harvestId": "Identifiant de moissonnage",
+    "reportType": "Type de rapport",
+    "beginDate": "Date de début",
+    "endDate": "Date de fin",
+    "period": "Période",
+    "createdAt": "Demandé le",
+    "runningTime": "Durée de traitement",
+    "index": "Index d'insertion",
+    "coveredPeriods": "Mois concernés",
+    "inserted": "Éléments insérés",
+    "updated": "Éléments mis à jour",
+    "failed": "Éléments non récupérés"
   },
   "permissions": {
     "none": "Aucun",

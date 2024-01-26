@@ -1,0 +1,315 @@
+<template>
+  <section>
+    <ToolBar :title="$t('harvest.title')">
+      <v-spacer />
+
+      <v-btn
+        text
+        color="primary"
+        @click="showFiltrerDrawer = true"
+      >
+        <v-badge
+          :value="filtersCount > 0"
+          :content="filtersCount"
+          overlap
+          left
+        >
+          <v-icon>
+            mdi-filter
+          </v-icon>
+        </v-badge>
+        {{ $t('filter') }}
+      </v-btn>
+
+      <v-btn
+        color="primary"
+        text
+        :loading="refreshing"
+        @click.stop="refreshJobs"
+      >
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        {{ $t('refresh') }}
+      </v-btn>
+    </ToolBar>
+
+    <v-data-table
+      :headers="tableHeaders"
+      :items="jobs"
+      :loading="refreshing"
+      :options.sync="tableOptions"
+      :server-items-length="jobsCount"
+      item-key="id"
+      sort-by="createdAt"
+      sort-desc
+      @update:options="refreshJobs"
+    >
+      <template #[`item.credentials.institution.name`]="{ item, value }">
+        <nuxt-link :to="`/admin/institutions/${item.credentials.institutionId}/sushi`">
+          {{ value }}
+        </nuxt-link>
+      </template>
+
+      <template #[`item.credentials.tags`]="{ value }">
+        <v-chip
+          v-for="(tag, index) in value"
+          :key="index"
+          label
+          small
+          class="ml-1"
+        >
+          {{ tag }}
+        </v-chip>
+      </template>
+
+      <template #[`item.reportType`]="{ value }">
+        <v-chip color="primary" style="text-transform: uppercase" outlined>
+          {{ value }}
+        </v-chip>
+      </template>
+
+      <template #[`item.status`]="{ item, value }">
+        <v-menu
+          :disabled="!status[value]?.ended"
+          :close-on-click="false"
+          top
+          left
+          offset-y
+          max-width="400"
+          open-on-hover
+          offset-overflow
+        >
+          <template #activator="{ on, attrs }">
+            <v-chip
+              :color="status[value]?.color"
+              :style="{
+                color: status[value].text || 'white',
+              }"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon small left>
+                {{ status[value]?.icon }}
+              </v-icon>
+
+              <template v-if="$te(`tasks.status.${value}`)">
+                {{ $t(`tasks.status.${value}`) }}
+              </template>
+              <template v-else>
+                {{ value }}
+              </template>
+            </v-chip>
+          </template>
+
+          <HarvestJobCard :harvest="item" />
+        </v-menu>
+      </template>
+
+      <template #[`item.createdAt`]="{ value }">
+        <LocalDate v-if="value" :date="value" />
+      </template>
+    </v-data-table>
+
+    <HarvestJobFilters
+      v-model="filters"
+      :show.sync="showFiltrerDrawer"
+      :disabled-filters="disabledFilters"
+      :harvest-ids="meta?.harvestIds ?? []"
+      :vendors="meta?.vendors ?? []"
+      :institutions="meta?.institutions ?? []"
+      :report-types="meta?.reportTypes ?? []"
+      :tags="meta?.tags ?? []"
+      :statuses="meta?.statuses ?? []"
+      @input="refreshJobs"
+    />
+  </section>
+</template>
+
+<script>
+import { defineComponent } from 'vue';
+import ToolBar from '~/components/space/ToolBar.vue';
+import HarvestJobCard from '~/components/harvest/HarvestJobCard.vue';
+import LocalDate from '~/components/LocalDate.vue';
+import HarvestJobFilters from '~/components/harvest/HarvestJobFilters.vue';
+
+export default defineComponent({
+  components: {
+    ToolBar,
+    LocalDate,
+    HarvestJobCard,
+    HarvestJobFilters,
+  },
+  props: {
+    harvestId: {
+      type: String,
+      required: true,
+    },
+    disabledFilters: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  data: () => ({
+    showFiltrerDrawer: false,
+    filters: {
+      harvestId: undefined,
+      vendor: undefined,
+      institution: undefined,
+      tags: undefined,
+      reportType: undefined,
+      beginDate: undefined,
+      endDate: undefined,
+      status: undefined,
+    },
+
+    jobs: [],
+    meta: {},
+    jobsCount: 0,
+
+    tableOptions: {},
+    currentHarvestId: undefined,
+
+    refreshing: false,
+  }),
+  computed: {
+    tableHeaders() {
+      return [
+        {
+          text: this.$t('endpoints.vendor'),
+          value: 'credentials.endpoint.vendor',
+        },
+        {
+          text: this.$t('institutions.title'),
+          value: 'credentials.institution.name',
+        },
+        {
+          text: this.$t('endpoints.tags'),
+          value: 'credentials.tags',
+        },
+        {
+          text: this.$t('harvest.reportType'),
+          value: 'reportType',
+          align: 'center',
+          width: 0,
+        },
+        {
+          text: this.$t('harvest.beginDate'),
+          value: 'beginDate',
+          align: 'center',
+        },
+        {
+          text: this.$t('harvest.endDate'),
+          value: 'endDate',
+          align: 'center',
+        },
+        {
+          text: this.$t('status'),
+          value: 'status',
+          align: 'center',
+        },
+        {
+          text: this.$t('harvest.createdAt'),
+          value: 'createdAt',
+        },
+      ];
+    },
+    status() {
+      return {
+        waiting: {
+          color: 'grey',
+          icon: 'mdi-clock-outline',
+        },
+        running: {
+          color: 'blue',
+          icon: 'mdi-play',
+        },
+        finished: {
+          color: 'green',
+          icon: 'mdi-check',
+          ended: true,
+        },
+        failed: {
+          color: 'red',
+          icon: 'mdi-exclamation',
+          ended: true,
+        },
+        interrupted: {
+          color: 'red',
+          icon: 'mdi-progress-close',
+          ended: true,
+        },
+        cancelled: {
+          color: 'red',
+          icon: 'mdi-cancel',
+          ended: true,
+        },
+        delayed: {
+          color: 'blue',
+          icon: 'mdi-update',
+        },
+      };
+    },
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filter) => {
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
+
+            return prev + 1;
+          },
+          0,
+        );
+    },
+  },
+  mounted() {
+    this.refreshJobs();
+  },
+  methods: {
+    async refreshJobs() {
+      this.refreshing = true;
+
+      const params = {
+        include: ['credentials.institution', 'credentials.endpoint'],
+
+        from: this.filters.beginDate,
+        to: this.filters.endDate,
+        reportType: this.filters.reportType,
+        vendor: this.filters.vendor,
+        institution: this.filters.institution,
+        status: this.filters.status,
+        // tags: this.filters.tags,
+
+        page: this.tableOptions.page,
+        size: this.tableOptions.itemsPerPage,
+        sort: this.tableOptions.sortBy[0],
+        order: this.tableOptions.sortDesc[0] ? 'desc' : 'asc',
+      };
+
+      try {
+        this.meta = await this.$axios.$get(`/harvests-requests/${this.harvestId}/jobs/_meta`);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.unableToRetriveHarvestsIds'));
+      }
+
+      try {
+        const { headers, data } = await this.$axios.get(`/harvests-requests/${this.harvestId}/jobs`, { params });
+
+        this.jobs = data;
+        this.jobsCount = Number.parseInt(headers['x-total-count'], 10);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.unableToRetriveHarvests'));
+      }
+
+      this.refreshing = false;
+    },
+  },
+});
+</script>
