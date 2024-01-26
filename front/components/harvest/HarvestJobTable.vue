@@ -269,9 +269,6 @@ export default defineComponent({
         );
     },
   },
-  mounted() {
-    this.refreshJobs();
-  },
   methods: {
     async refreshJobs() {
       this.refreshing = true;

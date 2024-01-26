@@ -193,9 +193,6 @@ export default defineComponent({
       });
     },
   },
-  mounted() {
-    this.refreshHarvests();
-  },
   methods: {
     async refreshHarvests() {
       this.refreshing = true;
