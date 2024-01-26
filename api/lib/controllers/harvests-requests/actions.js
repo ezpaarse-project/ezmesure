@@ -25,7 +25,7 @@ exports.getRequests = async (ctx) => {
   const requests = await HarvestRequestService.findMany({
     ...options,
     // orderBy: propsToPrismaSort(sort, order),
-    take: Number.isInteger(size) ? size : undefined,
+    take: Number.isInteger(size) && size > 0 ? size : undefined,
     skip: Number.isInteger(size) ? size * (page - 1) : undefined,
   });
 
@@ -82,7 +82,7 @@ exports.getJobs = async (ctx) => {
   const harvests = await harvestsJobsService.findMany({
     ...options,
     orderBy: propsToPrismaSort(sort, order),
-    take: Number.isInteger(size) ? size : undefined,
+    take: Number.isInteger(size) && size > 0 ? size : undefined,
     skip: Number.isInteger(size) ? size * (page - 1) : undefined,
     include: propsToPrismaInclude(propsToInclude, includableFields),
   });

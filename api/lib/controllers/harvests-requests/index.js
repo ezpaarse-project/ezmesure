@@ -28,7 +28,7 @@ router.route({
   ],
   validate: {
     query: Joi.object({
-      size: Joi.number().min(0),
+      size: Joi.number().min(-1),
       page: Joi.number().min(1),
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),
@@ -51,7 +51,7 @@ router.route({
       institution: Joi.string().trim(),
       status: Joi.string().trim(),
       tags: Joi.string().trim(),
-      size: Joi.number().min(0),
+      size: Joi.number().min(-1),
       page: Joi.number().min(1),
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),
