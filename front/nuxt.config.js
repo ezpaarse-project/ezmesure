@@ -163,7 +163,7 @@ module.exports = {
         {
           name: 'legacy-my-institutions',
           path: '/my-institutions',
-          redirect: '/myspace/my-institutions',
+          redirect: '/myspace/institutions',
         },
         {
           name: 'legacy-institutions-id-sub',
