@@ -66,17 +66,16 @@ exports.getJobs = async (ctx) => {
     options.where.beginDate = { lte: to };
   }
 
-  if (institution) {
+  if (institution || vendor || tags) {
     options.where.credentials = { institutionId: institution };
-  }
 
-  if (vendor || tags) {
-    options.where.credentials = {
-      tags: { has: tags },
-      endpoint: vendor ? {
-        id: vendor,
-      } : undefined,
-    };
+    if (vendor) {
+      options.where.credentials.endpoint = { id: vendor };
+    }
+
+    if (tags) {
+      options.where.credentials.tags = { has: tags };
+    }
   }
 
   const harvests = await harvestsJobsService.findMany({
