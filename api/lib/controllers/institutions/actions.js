@@ -24,6 +24,15 @@ const {
   adminImportSchema,
   includableFields,
 } = require('../../entities/institutions.dto');
+const {
+  includableFields: membershipIncludableFields,
+} = require('../../entities/memberships.dto');
+const {
+  includableFields: repositoryIncludableFields,
+} = require('../../entities/repositories.dto');
+const {
+  includableFields: spaceIncludableFields,
+} = require('../../entities/repositories.dto');
 
 const imagesService = require('../../services/images');
 const { sendMail, generateMail } = require('../../services/mail');
@@ -439,7 +448,7 @@ exports.getInstitutionRepositories = async (ctx) => {
 
   const repositories = await repositoriesService.findMany({
     where: { institutions: { some: { id: ctx.state.institution.id } } },
-    include: propsToPrismaInclude(propsToInclude, includableFields),
+    include: propsToPrismaInclude(propsToInclude, repositoryIncludableFields),
   });
 
   ctx.type = 'json';
@@ -453,7 +462,7 @@ exports.getInstitutionSpaces = async (ctx) => {
 
   const spaces = await spacesService.findMany({
     where: { institutionId: ctx.state.institution.id },
-    include: propsToPrismaInclude(propsToInclude, includableFields),
+    include: propsToPrismaInclude(propsToInclude, spaceIncludableFields),
   });
 
   ctx.type = 'json';
@@ -470,7 +479,7 @@ exports.getInstitutionMember = async (ctx) => {
     where: {
       username_institutionId: { institutionId, username },
     },
-    include: propsToPrismaInclude(propsToInclude, includableFields),
+    include: propsToPrismaInclude(propsToInclude, membershipIncludableFields),
   });
 
   if (!membership) {
@@ -488,7 +497,7 @@ exports.getInstitutionMembers = async (ctx) => {
 
   const memberships = await membershipsService.findMany({
     where: { institutionId: ctx.state.institution.id },
-    include: propsToPrismaInclude(propsToInclude, includableFields),
+    include: propsToPrismaInclude(propsToInclude, membershipIncludableFields),
   });
 
   ctx.type = 'json';
