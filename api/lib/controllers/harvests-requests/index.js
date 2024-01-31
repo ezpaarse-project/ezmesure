@@ -43,6 +43,9 @@ router.route({
     getJobs,
   ],
   validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
     query: Joi.object({
       from: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       to: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
@@ -66,6 +69,11 @@ router.route({
   handler: [
     getJobsMeta,
   ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
+  },
 });
 
 module.exports = router;
