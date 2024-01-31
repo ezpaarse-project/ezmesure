@@ -5965,6 +5965,403 @@
         ]
       }
     },
+    "/harvests-requests": {
+      "parameters": [],
+      "get": {
+        "summary": "Get harvest requests",
+        "tags": [
+          "Harvests"
+        ],
+        "parameters": [
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Total-Count": {
+                "schema": { "type": "integer" },
+                "description": "Number of items available"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "isActive": { "type": "boolean" },
+                      "beginDate": { "type": "string" },
+                      "endDate": { "type": "string" },
+                      "runningTime": { "type": "integer" },
+                      "statuses": {
+                        "type": "object",
+                        "properties": {
+                          "waiting": { "type": "integer" },
+                          "running": { "type": "integer" },
+                          "delayed": { "type": "integer" },
+                          "finished": { "type": "integer" },
+                          "failed": { "type": "integer" },
+                          "cancelled": { "type": "integer" },
+                          "interrupted": { "type": "integer" }
+                        }
+                      },
+                      "metrics": {
+                        "type": "object",
+                        "properties": {
+                          "success": { "type": "integer" },
+                          "failed": { "type": "integer" },
+                          "active": { "type": "integer" },
+                          "pending": { "type": "integer" }
+                        }
+                      },
+                      "counts": {
+                        "type": "object",
+                        "properties": {
+                          "jobs": { "type": "integer" },
+                          "reportTypes": { "type": "integer" },
+                          "endpoints": { "type": "integer" },
+                          "institutions": { "type": "integer" }
+                        }
+                      },
+                      "createdAt": { "type": "string" },
+                      "updatedAt": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests-requests",
+        "description": "Get harvest requests",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-requests/:harvestId/jobs": {
+      "parameters": [],
+      "get": {
+        "summary": "Get jobs of an harvest request",
+        "tags": [
+          "Harvests"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "Start date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "reportType",
+            "description": "Filter by report type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "tr"
+            }
+          },
+          {
+            "name": "vendor",
+            "description": "Filter by endpoint ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "810083d0-a564-11ec-90fa-59b27aa8d341"
+            }
+          },
+          {
+            "name": "institution",
+            "description": "Filter by institution ID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "abba8400-1216-11eb-af77-ff33b5dd411e"
+            }
+          },
+          {
+            "name": "status",
+            "description": "Filter by job status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "failed"
+            }
+          },
+          {
+            "name": "tags",
+            "description": "Filter by credentials tags",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "INSB"
+            }
+          },
+          {
+            "name": "size",
+            "description": "Number of harvests to get. Defaults to all.",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          },
+          {
+            "name": "include",
+            "description": "Fields to include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Total-Count": {
+                "schema": { "type": "integer" },
+                "description": "Number of items available"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "credentialsId": { "type": "string" },
+                      "createdAt": { "type": "string" },
+                      "updatedAt": { "type": "string" },
+                      "startedAt": { "type": "string" },
+                      "beginDate": { "type": "string" },
+                      "endDate": { "type": "string" },
+                      "status": { "type": "string" },
+                      "reportType": { "type": "string" },
+                      "harvestId": { "type": "string" },
+                      "index": { "type": "string" },
+                      "runningTime": { "type": "integer" },
+                      "timeout": { "type": "integer" },
+                      "forceDownload": { "type": "boolean" },
+                      "ignoreValidation": { "type": "boolean" },
+                      "params": { "type": "object" },
+                      "result": { "type": "object" },
+                      "errorCode": { "type": "string" },
+                      "sushiExceptions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "description": "The exception code",
+                              "type": "string",
+                              "example": "3030"
+                            },
+                            "severity": {
+                              "description": "The exception severity",
+                              "type": "string",
+                              "enum": [
+                                "info",
+                                "warning",
+                                "error"
+                              ]
+                            },
+                            "message": {
+                              "description": "The exception message",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests-requests-harvestId-jobs",
+        "description": "Get jobs of an harvest request",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-requests/:harvestId/jobs/_meta": {
+      "parameters": [],
+      "get": {
+        "summary": "Get metadata about jobs of an harvest request",
+        "tags": [
+          "Harvests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "vendors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "vendor": { "type": "string" }
+                        }
+                      }
+                    },
+                    "institutions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "acronym": { "type": "string" }
+                        }
+                      }
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "reportTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "statuses": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests-requests-harvestId-jobs-meta",
+        "description": "Get metadata about jobs of an harvest request",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/sushi": {
       "get": {
         "summary": "Get all Sushi items",
