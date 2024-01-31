@@ -1,6 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('harvest.title')">
+    <ToolBar :title="$t('harvest.jobs.title')">
       <v-spacer />
 
       <v-btn
@@ -188,18 +188,18 @@ export default defineComponent({
           value: 'credentials.tags',
         },
         {
-          text: this.$t('harvest.reportType'),
+          text: this.$t('harvest.jobs.reportType'),
           value: 'reportType',
           align: 'center',
           width: 0,
         },
         {
-          text: this.$t('harvest.beginDate'),
+          text: this.$t('harvest.jobs.beginDate'),
           value: 'beginDate',
           align: 'center',
         },
         {
-          text: this.$t('harvest.endDate'),
+          text: this.$t('harvest.jobs.endDate'),
           value: 'endDate',
           align: 'center',
         },
@@ -209,7 +209,7 @@ export default defineComponent({
           align: 'center',
         },
         {
-          text: this.$t('harvest.createdAt'),
+          text: this.$t('harvest.jobs.createdAt'),
           value: 'createdAt',
         },
       ];
@@ -293,7 +293,7 @@ export default defineComponent({
       try {
         this.meta = await this.$axios.$get(`/harvests-requests/${this.harvestId}/jobs/_meta`);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('harvest.unableToRetriveHarvestsIds'));
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToRetriveMeta'));
       }
 
       try {
@@ -302,7 +302,7 @@ export default defineComponent({
         this.jobs = data;
         this.jobsCount = Number.parseInt(headers['x-total-count'], 10);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('harvest.unableToRetriveHarvests'));
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToRetrive'));
       }
 
       this.refreshing = false;

@@ -27,13 +27,13 @@
       <template #default="{ items }">
         <v-expansion-panels>
           <v-expansion-panel
-            v-for="({ item, bars, runningTime, metrics, createdAtLocale }) in items"
+            v-for="({ item, bars, runningTime, createdAtLocale }) in items"
             :key="item.id"
           >
             <v-expansion-panel-header>
               <div>
                 <div class="mb-2">
-                  {{ $t('harvest.name', { createdAt: createdAtLocale }) }}
+                  {{ $t('harvest.requests.name', { createdAt: createdAtLocale }) }}
 
                   <span class="text--secondary mx-2" style="font-size: 0.75em;">
                     ({{ item.id }})
@@ -48,7 +48,31 @@
                   {{ item.beginDate }} ~ {{ item.endDate }}
                 </v-chip>
 
-                <v-chip outlined small class="mx-2">
+                <v-chip v-if="item.counts.institutions > 0" outlined small>
+                  <v-icon left small>
+                    mdi-domain
+                  </v-icon>
+
+                  {{ $tc('harvest.requests.counts.institutions', item.counts.institutions) }}
+                </v-chip>
+
+                <v-chip v-if="item.counts.endpoints > 0" outlined small>
+                  <v-icon left small>
+                    mdi-web
+                  </v-icon>
+
+                  {{ $tc('harvest.requests.counts.endpoints', item.counts.endpoints) }}
+                </v-chip>
+
+                <v-chip v-if="item.counts.reportTypes > 0" outlined small>
+                  <v-icon left small>
+                    mdi-file
+                  </v-icon>
+
+                  {{ $tc('harvest.requests.counts.reportTypes', item.counts.reportTypes) }}
+                </v-chip>
+
+                <v-chip v-if="item.runningTime" outlined small>
                   <v-icon left small>
                     mdi-timer-outline
                   </v-icon>
@@ -61,7 +85,7 @@
 
               <div class="d-flex align-center">
                 <v-progress-circular
-                  v-if="metrics.active || metrics.pending"
+                  v-if="item.isActive"
                   color="primary"
                   width="2"
                   indeterminate
@@ -94,7 +118,7 @@
                     </div>
                   </template>
 
-                  {{ $t('harvest.metrics', metrics) }}
+                  {{ $t('harvest.requests.metrics', item.metrics) }}
                 </v-tooltip>
               </div>
             </v-expansion-panel-header>
@@ -139,54 +163,39 @@ export default defineComponent({
   computed: {
     requestsItems() {
       return this.requests.map((item) => {
-        const { id, statuses } = item;
-
-        const failed = (statuses.failed ?? 0)
-            + (statuses.interrupted ?? 0)
-            + (statuses.cancelled ?? 0);
-
-        const active = (statuses.delayed ?? 0)
-              + (statuses.running ?? 0);
-
-        const finishedValue = ((statuses.finished ?? 0) / item.jobCount) * 100;
-        const errorValue = (failed / item.jobCount) * 100;
-        const activeValue = (active / item.jobCount) * 100;
-        const pendingValue = 100 - finishedValue - errorValue - activeValue;
+        const { id, metrics } = item;
 
         return {
           item,
+
           createdAtLocale: this.$dateFunctions.format(parseISO(item.createdAt), 'PPPpp'),
+
           runningTime: this.$dateFunctions.msToLocalDistance(
             item.runningTime,
             { format: ['days', 'hours', 'minutes', 'seconds'] },
           ),
-          metrics: {
-            success: statuses.finished ?? 0,
-            failed,
-            active,
-            pending: item.jobCount - (statuses.finished ?? 0) - failed - active,
-          },
+
           bars: [
             {
-              key: `${id}-finished`,
+              key: `${id}-success`,
               color: 'success',
-              value: finishedValue,
+              value: (metrics.success / item.counts.jobs) * 100,
             },
             {
               key: `${id}-failed`,
               color: 'error',
-              value: errorValue,
+              value: (metrics.failed / item.counts.jobs) * 100,
             },
             {
               key: `${id}-active`,
               color: 'blue',
-              value: activeValue,
+              value: (metrics.active / item.counts.jobs) * 100,
             },
             {
               key: `${id}-pending`,
               color: 'grey',
               stream: true,
-              value: pendingValue,
+              value: (metrics.pending / item.counts.jobs) * 100,
             },
           ],
         };
@@ -210,7 +219,7 @@ export default defineComponent({
         this.requests = data;
         this.requestsCount = Number.parseInt(headers['x-total-count'], 10);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('harvest.unableToRetriveHarvests'));
+        this.$store.dispatch('snacks/error', this.$t('harvest.requests.unableToRetrive'));
       }
 
       // eslint-disable-next-line no-restricted-syntax

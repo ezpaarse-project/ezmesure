@@ -718,22 +718,34 @@
     "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
   },
   "harvest": {
-    "filtersTitle": "Filter tasks",
-    "title": "Harvesting tasks",
-    "name": "Harvest from {createdAt}",
-    "metrics": "Successful: {success} | Failed: {failed} | Active: {active} | Pending: {pending}",
-    "harvestId": "Harvesting ID",
-    "reportType": "Report type",
-    "beginDate": "Start date",
-    "endDate": "End date",
-    "period": "Period",
-    "createdAt": "Requested on",
-    "runningTime": "Processing time",
-    "index": "Insertion index",
-    "coveredPeriods": "Covered months",
-    "inserted": "Items inserted",
-    "updated": "Items updated",
-    "failed": "Items not retrieved"
+    "requests": {
+      "name": "Harvesting from {createdAt}",
+      "metrics": "Success: {success} | Failed: {failed} | Active: {active} | Pending: {pending}",
+      "counts": {
+        "institutions": "{n} institution|{n} institutions",
+        "endpoints": "{n} endpoint|{n} endpoints",
+        "reportTypes": "{n} report type|{n} report types"
+      },
+      "unableToRetrive": "Unable to retrieve harvests"
+    },
+    "jobs": {
+      "title": "Harvesting Tasks",
+      "filtersTitle": "Filter Tasks",
+      "harvestId": "Harvesting ID",
+      "reportType": "Report Type",
+      "beginDate": "Start Date",
+      "endDate": "End Date",
+      "period": "Period",
+      "createdAt": "Requested on",
+      "runningTime": "Processing Time",
+      "index": "Insertion Index",
+      "coveredPeriods": "Covered Months",
+      "inserted": "Items Inserted",
+      "updated": "Items Updated",
+      "failed": "Items Not Retrieved",
+      "unableToRetrive": "Unable to retrieve harvesting tasks",
+      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks"
+    }
   },
   "permissions": {
     "none": "None",

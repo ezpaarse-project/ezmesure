@@ -718,22 +718,34 @@
     "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
   },
   "harvest": {
-    "filtersTitle": "Filtrer les tâches",
-    "title": "Tâches de moissonnage",
-    "name": "Moissonnage du {createdAt}",
-    "metrics": "Réussi: {success} | Échoué: {failed} | Actif: {active} | En attente: {pending}",
-    "harvestId": "Identifiant de moissonnage",
-    "reportType": "Type de rapport",
-    "beginDate": "Date de début",
-    "endDate": "Date de fin",
-    "period": "Période",
-    "createdAt": "Demandé le",
-    "runningTime": "Durée de traitement",
-    "index": "Index d'insertion",
-    "coveredPeriods": "Mois concernés",
-    "inserted": "Éléments insérés",
-    "updated": "Éléments mis à jour",
-    "failed": "Éléments non récupérés"
+    "requests": {
+      "name": "Moissonnage du {createdAt}",
+      "metrics": "Réussi: {success} | Échoué: {failed} | Actif: {active} | En attente: {pending}",
+      "counts": {
+        "institutions": "{n} établissement|{n} établissements",
+        "endpoints": "{n} point d'accès|{n} points d'accès",
+        "reportTypes": "{n} type de rapport|{n} types de rapport"
+      },
+      "unableToRetrive": "Impossible de récupérer les moissonnages"
+    },
+    "jobs": {
+      "title": "Tâches de moissonnage",
+      "filtersTitle": "Filtrer les tâches",
+      "harvestId": "Identifiant de moissonnage",
+      "reportType": "Type de rapport",
+      "beginDate": "Date de début",
+      "endDate": "Date de fin",
+      "period": "Période",
+      "createdAt": "Demandé le",
+      "runningTime": "Durée de traitement",
+      "index": "Index d'insertion",
+      "coveredPeriods": "Mois concernés",
+      "inserted": "Éléments insérés",
+      "updated": "Éléments mis à jour",
+      "failed": "Éléments non récupérés",
+      "unableToRetrive": "Impossible de récupérer les tâches de moissonnage",
+      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage"
+    }
   },
   "permissions": {
     "none": "Aucun",

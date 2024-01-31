@@ -6,7 +6,7 @@
           <div>
             <v-icon>mdi-timer-outline</v-icon>
 
-            {{ $t('harvest.runningTime') }}
+            {{ $t('harvest.jobs.runningTime') }}
           </div>
 
           <div>
@@ -20,7 +20,7 @@
           <div>
             <v-icon>mdi-database-outline</v-icon>
 
-            {{ $t('harvest.index') }}
+            {{ $t('harvest.jobs.index') }}
           </div>
 
           <code>
@@ -36,7 +36,7 @@
               <div>
                 <v-icon>mdi-calendar-blank</v-icon>
 
-                {{ $t('harvest.coveredPeriods') }}
+                {{ $t('harvest.jobs.coveredPeriods') }}
               </div>
 
               <div class="mt-1 d-flex flex-wrap" style="gap: 0.25rem">

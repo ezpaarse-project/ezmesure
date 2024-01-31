@@ -9,7 +9,7 @@
   >
     <v-toolbar flat>
       <v-toolbar-title>
-        {{ $t('harvest.filtersTitle') }}
+        {{ $t('harvest.jobs.filtersTitle') }}
       </v-toolbar-title>
 
       <v-spacer />
@@ -34,7 +34,7 @@
           <v-select
             :value="value.harvestId"
             :items="harvestIdsItems"
-            :label="$t('harvest.harvestId')"
+            :label="$t('harvest.jobs.harvestId')"
             prepend-icon="mdi-key"
             clearable
             hide-details
@@ -76,7 +76,7 @@
           <v-select
             :value="value.reportType"
             :items="reportTypesItems"
-            :label="$t('harvest.reportType')"
+            :label="$t('harvest.jobs.reportType')"
             prepend-icon="mdi-format-list-bulleted-type"
             clearable
             hide-details
@@ -109,7 +109,7 @@
             <template #activator="{ on, attrs }">
               <v-text-field
                 :value="dateStr"
-                :label="$t('harvest.period')"
+                :label="$t('harvest.jobs.period')"
                 prepend-icon="mdi-calendar-range"
                 clearable
                 hide-details
