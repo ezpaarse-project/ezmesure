@@ -11,6 +11,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
+/** @typedef {import('@prisma/client').Prisma.GetHarvestJobGroupByPayload<{ by: keyof HarvestJob }>} GetHarvestJobGroupByPayload */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
@@ -56,7 +57,7 @@ function count(params) {
 
 /**
  * @param {HarvestJobGroupByArgs} params
- * @returns {Promise<number>}
+ * @returns {Promise<GetHarvestJobGroupByPayload>}
  */
 function groupBy(params) {
   return prisma.harvestJob.groupBy(params);

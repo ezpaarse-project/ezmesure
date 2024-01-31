@@ -1,5 +1,7 @@
-const { differenceInMilliseconds } = require('date-fns');
+// @ts-check
+
 const harvestJobPrisma = require('../services/prisma/harvest-job');
+const HarvestRequest = require('../models/HarvestRequest');
 
 module.exports = class HarvestRequestService {
   static async findMany(params) {
@@ -7,45 +9,28 @@ module.exports = class HarvestRequestService {
       orderBy: {
         createdAt: 'desc',
       },
+      include: {
+        credentials: true,
+      },
     });
 
     const requests = new Map();
     // eslint-disable-next-line no-restricted-syntax
     for (const job of harvestsJobs) {
-      const request = requests.get(job.harvestId) || {
-        id: job.harvestId,
-        beginDate: job.beginDate,
-        endDate: job.endDate,
-        createdAt: job.createdAt,
-        runningTime: 0,
-        jobCount: 0,
-        statuses: {},
-      };
+      const request = requests.get(job.harvestId) || new HarvestRequest(job);
 
-      request.jobCount += 1;
-      request.statuses[job.status] = (request.statuses[`${job.status}`] || 0) + 1;
-
-      const isActive = request.statuses.waiting
-        || request.statuses.delayed
-        || request.statuses.running;
-
-      if (!isActive) {
-        const diffMs = differenceInMilliseconds(job.updatedAt, request.createdAt);
-        if (diffMs > request.runningTime) {
-          request.runningTime = diffMs;
-        }
-      } else {
-        request.runningTime = differenceInMilliseconds(new Date(), request.createdAt);
-      }
+      request.addJob(job);
 
       requests.set(job.harvestId, request);
     }
 
+    // Apply pagination
     const start = params.skip;
     const end = params.take && (params.skip ?? 0) + params.take;
 
-    return [...requests.values()]
-      .slice(start, end);
+    return Array.from(requests.values())
+      .slice(start, end)
+      .sort((a, b) => b.createdAt - a.createdAt);
   }
 
   static async count(params) {

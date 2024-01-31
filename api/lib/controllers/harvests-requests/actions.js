@@ -1,4 +1,4 @@
-const harvestsJobsService = require('../../entities/harvest-job.service');
+const HarvestsJobsService = require('../../entities/harvest-job.service');
 const HarvestRequestService = require('../../entities/harvest-request.service');
 const prisma = require('../../services/prisma');
 const { REPORT_IDS } = require('../../services/sushi');
@@ -78,7 +78,7 @@ exports.getJobs = async (ctx) => {
     }
   }
 
-  const harvests = await harvestsJobsService.findMany({
+  const harvests = await HarvestsJobsService.findMany({
     ...options,
     orderBy: propsToPrismaSort(sort, order),
     take: Number.isInteger(size) && size > 0 ? size : undefined,
@@ -86,7 +86,7 @@ exports.getJobs = async (ctx) => {
     include: propsToPrismaInclude(propsToInclude, includableFields),
   });
 
-  ctx.set('X-Total-Count', await harvestsJobsService.count(options));
+  ctx.set('X-Total-Count', await HarvestsJobsService.count(options));
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = harvests;
@@ -118,7 +118,7 @@ exports.getJobsMeta = async (ctx) => {
       },
     },
   };
-  const harvests = await harvestsJobsService.findMany(options);
+  const harvests = await HarvestsJobsService.findMany(options);
 
   const meta = {
     vendors: new Map(),
