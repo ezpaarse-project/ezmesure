@@ -3,12 +3,27 @@
     <ToolBar :title="institution.name">
       <v-spacer />
 
-      <v-btn text color="success" @click="showHealthDialog = true">
-        <v-icon left>
-          mdi-heart-outline
-        </v-icon>
-        {{ $t('report.health') }}
-      </v-btn>
+      <DocDialog>
+        <template #activator="{ attrs, on }">
+          <v-btn text color="primary" v-bind="attrs" v-on="on">
+            <v-icon left>
+              mdi-file-document-outline
+            </v-icon>
+            {{ $t('menu.api') }}
+          </v-btn>
+        </template>
+      </DocDialog>
+
+      <HealthDialog>
+        <template #activator="{ attrs, on }">
+          <v-btn text color="success" v-bind="attrs" v-on="on">
+            <v-icon left>
+              mdi-heart-outline
+            </v-icon>
+            {{ $t('report.health') }}
+          </v-btn>
+        </template>
+      </HealthDialog>
     </ToolBar>
 
     <v-card-text class="pa-0">
@@ -18,14 +33,13 @@
         hide-namespace-selector
       />
     </v-card-text>
-
-    <HealthDialog v-model="showHealthDialog" />
   </section>
 </template>
 
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import HealthDialog from '~/components/report/HealthDialog.vue';
+import DocDialog from '~/components/report/DocDialog.vue';
 
 export default {
   layout: 'reporting',
@@ -33,6 +47,7 @@ export default {
   components: {
     ToolBar,
     HealthDialog,
+    DocDialog,
   },
   async asyncData({
     $axios,
@@ -54,7 +69,6 @@ export default {
 
     return {
       institution,
-      showHealthDialog: false,
     };
   },
   computed: {
