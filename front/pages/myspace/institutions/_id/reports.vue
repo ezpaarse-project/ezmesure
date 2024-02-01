@@ -21,17 +21,6 @@
 
       <v-spacer />
 
-      <DocDialog>
-        <template #activator="{ attrs, on }">
-          <v-btn text color="primary" v-bind="attrs" v-on="on">
-            <v-icon left>
-              mdi-file-document-outline
-            </v-icon>
-            {{ $t('menu.api') }}
-          </v-btn>
-        </template>
-      </DocDialog>
-
       <HealthDialog>
         <template #activator="{ attrs, on }">
           <v-btn text color="success" v-bind="attrs" v-on="on">
@@ -57,7 +46,6 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 import HealthDialog from '~/components/report/HealthDialog.vue';
-import DocDialog from '~/components/report/DocDialog.vue';
 
 export default {
   layout: 'reporting',
@@ -65,7 +53,6 @@ export default {
   components: {
     ToolBar,
     HealthDialog,
-    DocDialog,
   },
   async asyncData({
     $axios,
