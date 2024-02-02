@@ -25,7 +25,7 @@
         color="primary"
         text
         :loading="refreshing"
-        @click.stop="refreshJobs"
+        @click.stop="refreshJobs()"
       >
         <v-icon left>
           mdi-refresh
@@ -43,7 +43,7 @@
       item-key="id"
       sort-by="createdAt"
       sort-desc
-      @update:options="refreshJobs"
+      @update:options="refreshJobs()"
     >
       <template #[`item.credentials.institution.name`]="{ item, value }">
         <nuxt-link :to="`/admin/institutions/${item.credentials.institutionId}/sushi`">
@@ -121,7 +121,7 @@
       :report-types="meta?.reportTypes ?? []"
       :tags="meta?.tags ?? []"
       :statuses="meta?.statuses ?? []"
-      @input="refreshJobs"
+      @input="refreshJobs(1)"
     />
   </section>
 </template>
@@ -270,8 +270,14 @@ export default defineComponent({
     },
   },
   methods: {
-    async refreshJobs() {
+    async refreshJobs(page) {
       this.refreshing = true;
+      if (page != null) {
+        this.tableOptions = {
+          ...this.tableOptions,
+          page,
+        };
+      }
 
       const params = {
         include: ['credentials.institution', 'credentials.endpoint'],
