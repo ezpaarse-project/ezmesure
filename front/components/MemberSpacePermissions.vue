@@ -14,7 +14,7 @@
     <v-row v-for="space in spaces" :key="space.id" align="center">
       <v-col>
         <div class="body-1">
-          {{ space.id }}
+          {{ space.name || space.id }}
 
           <v-chip small label outlined>
             {{ space.type }}
