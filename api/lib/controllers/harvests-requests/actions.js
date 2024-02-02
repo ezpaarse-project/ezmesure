@@ -35,6 +35,15 @@ exports.getRequests = async (ctx) => {
   ctx.body = requests;
 };
 
+exports.deleteRequest = async (ctx) => {
+  const { harvestId } = ctx.params;
+
+  // await HarvestRequestService.delete({ where: { harvestId } });
+
+  ctx.status = 204;
+  ctx.body = harvestId;
+};
+
 exports.getJobs = async (ctx) => {
   const { harvestId } = ctx.params;
   const {

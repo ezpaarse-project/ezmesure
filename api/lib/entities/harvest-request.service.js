@@ -2,6 +2,7 @@
 
 const harvestJobPrisma = require('../services/prisma/harvest-job');
 const HarvestRequest = require('../models/HarvestRequest');
+const { harvestQueue } = require('../services/jobs');
 
 module.exports = class HarvestRequestService {
   static async findMany(params) {
@@ -36,5 +37,40 @@ module.exports = class HarvestRequestService {
   static async count(params) {
     const harvestIds = await harvestJobPrisma.groupBy({ by: 'harvestId' });
     return harvestIds.length;
+  }
+
+  static async delete(params) {
+    if (!params.where?.harvestId) {
+      throw new Error('No harvestId provided');
+    }
+
+    const harvestJobs = await harvestJobPrisma.findMany({
+      where: {
+        harvestId: params.where.harvestId,
+      },
+    });
+
+    await Promise.all(
+      harvestJobs.map(async (harvestJob) => {
+        const job = await harvestQueue.getJob(harvestJob.id);
+        if (job) {
+          if (await job.isActive()) {
+            if (!job?.data?.pid) {
+              throw new Error('Cannot cancel job without PID');
+            }
+
+            process.kill(job.data.pid, 'SIGTERM');
+          } else {
+            await job.remove();
+          }
+        }
+      }),
+    );
+
+    await harvestJobPrisma.removeMany({
+      where: {
+        harvestId: params.where.harvestId,
+      },
+    });
   }
 };
