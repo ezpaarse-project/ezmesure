@@ -150,7 +150,10 @@ exports.updateSushi = async (ctx) => {
 
   const updatedSushiCredentials = await sushiCredentialsService.update({
     where: { id: sushi.id },
-    data: body,
+    data: {
+      ...body,
+      connection: {},
+    },
   });
 
   ctx.status = 200;
