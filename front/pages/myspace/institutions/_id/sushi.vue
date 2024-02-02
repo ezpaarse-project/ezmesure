@@ -952,6 +952,8 @@ export default {
         return;
       }
 
+      this.clearSelection();
+
       this.deleting = true;
 
       const deleted = [];
