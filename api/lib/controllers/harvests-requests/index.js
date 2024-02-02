@@ -12,6 +12,7 @@ const {
   getJobs,
   getJobsMeta,
   includableFields,
+  deleteRequest,
 } = require('./actions');
 
 router.use(
@@ -33,6 +34,19 @@ router.route({
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),
     }),
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:harvestId',
+  handler: [
+    deleteRequest,
+  ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
   },
 });
 

@@ -6,6 +6,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobDeleteManyArgs} HarvestJobDeleteManyArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
@@ -99,6 +100,14 @@ async function remove(params) {
 }
 
 /**
+ * @param {HarvestJobDeleteManyArgs} params
+ * @returns {Promise<{ count: number }>}
+ */
+function removeMany(params) {
+  return prisma.harvestJob.deleteMany(params);
+}
+
+/**
  * @returns {Promise<Array<HarvestJob> | null>}
  */
 async function removeAll() {
@@ -140,6 +149,7 @@ module.exports = {
   update,
   upsert,
   remove,
+  removeMany,
   cancel,
   removeAll,
 };

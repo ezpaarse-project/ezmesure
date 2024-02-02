@@ -1,6 +1,7 @@
 // @ts-check
 
 const { differenceInMilliseconds } = require('date-fns');
+const HarvestJobsService = require('../entities/harvest-job.service');
 
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
 
@@ -39,9 +40,7 @@ module.exports = class HarvestRequest {
     }
 
     if (!this.isActive) {
-      this.isActive = job.status === 'waiting'
-          || job.status === 'delayed'
-          || job.status === 'running';
+      this.isActive = !HarvestJobsService.isDone(job);
     }
 
     if (job.updatedAt > (this.lastUpdatedAt ?? 0)) {
@@ -62,12 +61,12 @@ module.exports = class HarvestRequest {
   getMetrics() {
     const failed = (this.statuses.get('failed') ?? 0)
             + (this.statuses.get('interrupted') ?? 0)
-            + (this.statuses.get('cancelled') ?? 0);
+            + (this.statuses.get('cancelled') ?? 0)
+            + (this.statuses.get('delayed') ?? 0);
 
-    const success = (this.statuses.get('finished') ?? 0);
+    const success = this.statuses.get('finished') ?? 0;
 
-    const active = (this.statuses.get('delayed') ?? 0)
-              + (this.statuses.get('running') ?? 0);
+    const active = this.statuses.get('running') ?? 0;
 
     return {
       success,

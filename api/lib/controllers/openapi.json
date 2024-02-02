@@ -6086,6 +6086,33 @@
         ]
       }
     },
+    "/harvests-requests/:harvestId": {
+      "parameters": [],
+      "delete": {
+        "summary": "Delete an harvest request",
+        "tags": [
+          "Harvests"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests-requests",
+        "description": "Get harvest requests",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/harvests-requests/:harvestId/jobs": {
       "parameters": [],
       "get": {
