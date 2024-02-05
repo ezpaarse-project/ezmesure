@@ -300,8 +300,16 @@ exports.getUser = async (ctx) => {
     include: {
       memberships: {
         include: {
-          repositoryPermissions: true,
-          spacePermissions: true,
+          repositoryPermissions: {
+            include: {
+              repository: true,
+            },
+          },
+          spacePermissions: {
+            include: {
+              space: true,
+            },
+          },
         },
       },
     },

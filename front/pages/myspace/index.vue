@@ -63,23 +63,36 @@
         </p>
 
         <v-row>
-          <v-col v-if="repos.length > 0">
+          <v-col v-if="spacesPermissions.length > 0">
             <v-list>
-              <v-subheader>{{ $t('myspace.repos') }}</v-subheader>
+              <v-subheader>{{ $t('myspace.spaces') }}</v-subheader>
 
               <v-list-item
-                v-for="(repo, i) in repos"
+                v-for="(permission, i) in spacesPermissions"
                 :key="i"
+                :href="`/kibana/s/${permission.spaceId}/spaces/enter`"
               >
                 <v-list-item-icon>
-                  <v-icon>mdi-tray-arrow-down</v-icon>
+                  <v-icon>mdi-tab</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>{{ repo.repositoryPattern }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ repo.readonly ? $t('permissions.read') : $t('permissions.write') }}
+                  <v-list-item-title>
+                    {{ permission.space.name || permission.spaceId }}
 
-                    <v-icon v-if="repo.locked" small>
+                    <v-chip
+                      :color="colors.get(permission.space.type)"
+                      label
+                      x-small
+                      class="ml-2"
+                      style="color: white;"
+                    >
+                      {{ permission.space.type }}
+                    </v-chip>
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
+
+                    <v-icon v-if="permission.locked" small>
                       mdi-lock
                     </v-icon>
                   </v-list-item-subtitle>
@@ -88,24 +101,35 @@
             </v-list>
           </v-col>
 
-          <v-col v-if="spaces.length > 0">
+          <v-col v-if="reposPermissions.length > 0">
             <v-list>
-              <v-subheader>{{ $t('myspace.spaces') }}</v-subheader>
+              <v-subheader>{{ $t('myspace.repos') }}</v-subheader>
 
               <v-list-item
-                v-for="(space, i) in spaces"
+                v-for="(permission, i) in reposPermissions"
                 :key="i"
-                :href="`/kibana/s/${space.spaceId}/spaces/enter`"
               >
                 <v-list-item-icon>
-                  <v-icon>mdi-tab</v-icon>
+                  <v-icon>mdi-tray-arrow-down</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>{{ space.spaceId }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ space.readonly ? $t('permissions.read') : $t('permissions.write') }}
+                  <v-list-item-title>
+                    {{ permission.repositoryPattern }}
 
-                    <v-icon v-if="space.locked" small>
+                    <v-chip
+                      :color="colors.get(permission.repository.type)"
+                      label
+                      x-small
+                      class="ml-2"
+                      style="color: white;"
+                    >
+                      {{ permission.repository.type }}
+                    </v-chip>
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
+
+                    <v-icon v-if="permission.locked" small>
                       mdi-lock
                     </v-icon>
                   </v-list-item-subtitle>
@@ -122,6 +146,11 @@
 <script>
 import ToolBar from '~/components/space/ToolBar.vue';
 
+const colors = new Map([
+  ['ezpaarse', 'teal'],
+  ['counter5', 'red'],
+]);
+
 export default {
   layout: 'space',
   middleware: ['auth', 'terms'],
@@ -132,6 +161,7 @@ export default {
     return {
       selectedFiles: [],
       token: '',
+      colors,
     };
   },
   computed: {
@@ -144,12 +174,12 @@ export default {
     hasMemberships() {
       return Array.isArray(this.user?.memberships) && this.user.memberships.length > 0;
     },
-    repos() {
+    reposPermissions() {
       return this.user?.memberships?.map(
         (m) => m.repositoryPermissions,
       )?.flat() ?? [];
     },
-    spaces() {
+    spacesPermissions() {
       return this.user?.memberships?.map(
         (m) => m.spacePermissions,
       )?.flat() ?? [];
