@@ -41,6 +41,7 @@ exports.getAll = async (ctx) => {
     institutionId,
     endpointId,
     include: propsToInclude,
+    connection,
     q: query,
     size,
     sort,
@@ -89,6 +90,24 @@ exports.getAll = async (ctx) => {
     options.where.endpointId = Array.isArray(endpointId)
       ? { in: endpointId }
       : { equals: endpointId };
+  }
+
+  if (connection) {
+    options.where.connection = {};
+    switch (connection) {
+      case 'working':
+        options.where.connection = { path: ['status'], equals: 'success' };
+        break;
+      case 'faulty':
+        options.where.connection = { path: ['status'], equals: 'failed' };
+        break;
+      case 'untested':
+        options.where.connection = { equals: {} };
+        break;
+
+      default:
+        break;
+    }
   }
 
   ctx.type = 'json';
