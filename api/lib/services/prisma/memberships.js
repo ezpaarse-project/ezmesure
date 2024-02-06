@@ -10,8 +10,11 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
+ * @typedef {import('@prisma/client').SpacePermission} SpacePermission
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
+ * @typedef {{ deleteResult: Membership, membership: Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] } }} MembershipRemoved
  */
 /* eslint-enable max-len */
 
@@ -81,10 +84,10 @@ function upsert(params) {
 
 /**
  * @param {MembershipDeleteArgs} params
- * @returns {Promise<Membership | null>}
+ * @returns {Promise<MembershipRemoved | null>}
  */
 async function remove(params) {
-  const { deleteResult, deletedMembership } = await prisma.$transaction(async (tx) => {
+  const transactionResult = await prisma.$transaction(async (tx) => {
     const membership = await tx.membership.findUnique({
       where: params.where,
       include: {
@@ -94,10 +97,10 @@ async function remove(params) {
     });
 
     if (!membership) {
-      return [null, null];
+      return null;
     }
 
-    /** @type {RepositoryPermissionDeleteManyArgs | SpacePermissionDeleteManyArgs} */
+    /** @type {RepositoryPermissionDeleteManyArgs & SpacePermissionDeleteManyArgs} */
     const findArgs = {
       where: {
         username: membership.username,
@@ -110,15 +113,15 @@ async function remove(params) {
 
     return {
       deleteResult: await tx.membership.delete(params),
-      deletedMembership: membership,
+      membership,
     };
   });
 
-  if (!deletedMembership) {
+  if (!transactionResult) {
     return null;
   }
 
-  return deleteResult;
+  return transactionResult;
 }
 
 /**

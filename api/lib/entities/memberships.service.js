@@ -78,15 +78,17 @@ module.exports = class MembershipsService {
    * @returns {Promise<Membership | null>}
    */
   static async delete(params) {
-    const { deleteResult, deletedMembership } = await membershipsPrisma.remove(params);
+    const result = await membershipsPrisma.remove(params);
 
-    if (!deletedMembership) {
+    if (!result) {
       return null;
     }
 
-    triggerHooks('membership:delete', deletedMembership);
-    deletedMembership.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
-    deletedMembership.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    const { deleteResult, membership } = result;
+
+    triggerHooks('membership:delete', membership);
+    membership.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+    membership.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
 
     return deleteResult;
   }
