@@ -656,12 +656,13 @@ exports.deleteSushiConnection = async (ctx) => {
 
   const { sushi } = ctx.state;
 
-  ctx.body = await sushiCredentialsService.update({
+  await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
       connection: {},
     },
   });
+  ctx.status = 204;
 };
 
 exports.importSushiItems = async (ctx) => {
