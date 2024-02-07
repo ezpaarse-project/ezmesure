@@ -6086,12 +6086,22 @@
         ]
       }
     },
-    "/harvests-requests/:harvestId": {
+    "/harvests-requests/{harvestId}": {
       "parameters": [],
       "delete": {
         "summary": "Delete an harvest request",
         "tags": [
           "Harvests"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "harvestId",
+            "in": "path",
+            "required": true
+          }
         ],
         "responses": {
           "204": {
@@ -6104,8 +6114,8 @@
             "$ref": "#/components/responses/ForbiddenError"
           }
         },
-        "operationId": "get-harvests-requests",
-        "description": "Get harvest requests",
+        "operationId": "delete-harvests-requests",
+        "description": "Delete an harvest request",
         "security": [
           {
             "bearerAuth": []
@@ -6113,7 +6123,7 @@
         ]
       }
     },
-    "/harvests-requests/:harvestId/jobs": {
+    "/harvests-requests/{harvestId}/jobs": {
       "parameters": [],
       "get": {
         "summary": "Get jobs of an harvest request",
@@ -6121,6 +6131,14 @@
           "Harvests"
         ],
         "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "harvestId",
+            "in": "path",
+            "required": true
+          },
           {
             "name": "from",
             "description": "Start date of the period",
@@ -6314,12 +6332,22 @@
         ]
       }
     },
-    "/harvests-requests/:harvestId/jobs/_meta": {
+    "/harvests-requests/{harvestId}/jobs/_meta": {
       "parameters": [],
       "get": {
         "summary": "Get metadata about jobs of an harvest request",
         "tags": [
           "Harvests"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "harvestId",
+            "in": "path",
+            "required": true
+          }
         ],
         "responses": {
           "200": {
@@ -6992,6 +7020,42 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/sushi/{id}/connection": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "delete": {
+        "tags": [
+          "Sushi"
+        ],
+        "summary": "Reset SUSHI crendentials connection",
+        "operationId": "delete-sushi-id-connection",
+        "description": "Reset the connection state of the SUSHI credentials",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized"
