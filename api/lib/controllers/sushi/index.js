@@ -35,6 +35,7 @@ const {
   deleteOne,
   getHarvests,
   checkSushiConnection,
+  deleteSushiConnection,
 } = require('./actions');
 
 const { FEATURES } = require('../../entities/memberships.dto');
@@ -204,6 +205,20 @@ router.route({
   handler: [
     commonHandlers(FEATURES.sushi.write),
     checkSushiConnection,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
+  path: '/:sushiId/connection',
+  handler: [
+    commonHandlers(FEATURES.sushi.write),
+    deleteSushiConnection,
   ],
   validate: {
     params: {

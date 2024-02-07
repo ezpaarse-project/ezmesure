@@ -650,6 +650,20 @@ exports.checkSushiConnection = async (ctx) => {
   });
 };
 
+exports.deleteSushiConnection = async (ctx) => {
+  ctx.action = 'sushi/deleteConnection';
+  ctx.type = 'json';
+
+  const { sushi } = ctx.state;
+
+  ctx.body = await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: {
+      connection: {},
+    },
+  });
+};
+
 exports.importSushiItems = async (ctx) => {
   ctx.action = 'sushi/import';
   const { body = [] } = ctx.request;
