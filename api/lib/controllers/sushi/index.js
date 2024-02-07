@@ -217,6 +217,7 @@ router.route({
   method: 'DELETE',
   path: '/:sushiId/connection',
   handler: [
+    requireAdmin,
     commonHandlers(FEATURES.sushi.write),
     deleteSushiConnection,
   ],

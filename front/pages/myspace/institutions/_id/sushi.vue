@@ -196,7 +196,11 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :disabled="testingConnection || locked" @click="resetChecks(selected)">
+        <v-list-item
+          v-if="isAdmin"
+          :disabled="testingConnection || locked"
+          @click="resetChecks(selected)"
+        >
           <v-list-item-icon>
             <v-icon>mdi-restore</v-icon>
           </v-list-item-icon>
@@ -949,6 +953,10 @@ export default {
     },
 
     async resetChecks(selection) {
+      if (!this.isAdmin) {
+        return;
+      }
+
       const sushiItems = selection.slice() || this.sushiItems;
 
       const testedItems = sushiItems.filter((sushiItem) => !!sushiItem?.connection?.status);
