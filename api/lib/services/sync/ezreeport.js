@@ -1,3 +1,5 @@
+// @ts-check
+
 const config = require('config');
 const { CronJob } = require('cron');
 const ezrAxios = require('../ezreeport/axios');
@@ -12,11 +14,17 @@ const { syncSchedule } = config.get('ezreeport');
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
+ * @typedef {{ created: number, updated: number, deleted: number }} EzrSyncCounts
+ */
+
+/**
+ * @template {string} T
+ * @typedef {ThrottledPromisesResult & { [K in T]: EzrSyncCounts }} EzrSyncResult
  */
 
 /**
  * Sync ezREEPORT's users with current users
- * @returns {Promise<ThrottledPromisesResult>}
+ * @returns {Promise<EzrSyncResult<'users'>>}
  */
 async function syncUsers() {
   const users = await usersService.findMany({});
@@ -34,20 +42,22 @@ async function syncUsers() {
     return counts;
   }, { created: 0, updated: 0, deleted: 0 });
 
-  appLogger.info('[ezreeport] Users synchronized');
+  appLogger.info(`[ezreeport] ${data?.meta?.users ?? -1} Users synchronized`);
   appLogger.verbose(`[ezreeport] ${results?.created} users created`);
   appLogger.verbose(`[ezreeport] ${results?.updated} users updated`);
   appLogger.verbose(`[ezreeport] ${results?.deleted} users deleted`);
 
   return {
-    fulfilled: (results?.created ?? 0) + (results?.updated ?? 0),
+    fulfilled: data?.meta?.users ?? -1,
     errors: 0,
+
+    users: results,
   };
 }
 
 /**
  * Sync ezREEPORT's namespaces with current institutions
- * @returns {Promise<ThrottledPromisesResult>}
+ * @returns {Promise<EzrSyncResult<'namespaces' | 'memberships'>>}
  */
 async function syncNamespaces() {
   const institutions = await institutionsService.findMany({
@@ -86,11 +96,12 @@ async function syncNamespaces() {
     return counts;
   }, { created: 0, updated: 0, deleted: 0 });
 
-  appLogger.info('[ezreeport] Namespaces synchronized');
+  appLogger.info(`[ezreeport] ${data?.meta?.namespaces ?? -1} Namespaces synchronized`);
   appLogger.verbose(`[ezreeport] ${namespacesResults?.created} namespaces created`);
   appLogger.verbose(`[ezreeport] ${namespacesResults?.updated} namespaces updated`);
   appLogger.verbose(`[ezreeport] ${namespacesResults?.deleted} namespaces deleted`);
 
+  appLogger.info(`[ezreeport] ${data?.meta?.members ?? -1} Memberships synchronized`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.created} memberships created`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.updated} memberships updated`);
   appLogger.verbose(`[ezreeport] ${membershipsResults?.deleted} memberships deleted`);
@@ -100,7 +111,7 @@ async function syncNamespaces() {
     data?.content?.namespaces?.map((n) => (n.type === 'deleted' ? n.data : undefined)) ?? [],
   )
     .then((results) => {
-      appLogger.info('[ezreeport] Reporting users synchronized');
+      appLogger.info(`[ezreeport] ${results.upserted} Reporting users synchronized`);
       appLogger.verbose(`[ezreeport] ${results.upserted} reporting users upserted`);
       appLogger.verbose(`[ezreeport] ${results.deleted} reporting users deleted`);
     })
@@ -109,8 +120,11 @@ async function syncNamespaces() {
     });
 
   return {
-    fulfilled: (namespacesResults?.created ?? 0) + (namespacesResults?.updated ?? 0),
+    fulfilled: data?.meta?.namespaces ?? -1,
     errors: 0,
+
+    namespaces: namespacesResults,
+    memberships: membershipsResults,
   };
 }
 
