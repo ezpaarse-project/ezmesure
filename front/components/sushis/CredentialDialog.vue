@@ -145,7 +145,7 @@
           <template #[`item.connection`]="{ item }">
             <SushiConnectionIcon
               :connection="item.connection"
-              :loading="loadingItems[item.id]"
+              :state="loadingItems[item.id]"
               :disabled="testingConnection"
               @checkConnection="() => checkSingleConnection(item)"
             />

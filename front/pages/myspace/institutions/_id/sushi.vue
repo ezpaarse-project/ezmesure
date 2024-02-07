@@ -196,6 +196,19 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item :disabled="testingConnection || locked" @click="resetChecks(selected)">
+          <v-list-item-icon>
+            <v-icon>mdi-restore</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $t('institutions.sushi.resetChecks') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-divider />
+
         <v-list-item :disabled="deleting || locked || !canEdit" @click="deleteSushiItems">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
@@ -440,7 +453,7 @@
       <template #[`item.connection`]="{ item }">
         <SushiConnectionIcon
           :connection="item.connection"
-          :loading="loadingItems[item.id]"
+          :state="loadingItems[item.id]"
           :disabled="locked || testingConnection"
           @checkConnection="() => checkSingleConnection(item)"
         />
@@ -905,7 +918,7 @@ export default {
     },
 
     async checkSingleConnection(sushiItem) {
-      this.$set(this.loadingItems, sushiItem.id, true);
+      this.$set(this.loadingItems, sushiItem.id, 'loading');
 
       try {
         const data = await this.$axios.$post(`/sushi/${sushiItem.id}/_check_connection`);
@@ -924,9 +937,65 @@ export default {
 
       this.clearSelection();
 
+      // Set loading state
+      for (let i = 0; i < selected.length; i += 1) {
+        this.$set(this.loadingItems, selected[i].id, 'queued');
+      }
+
       for (let i = 0; i < selected.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         await this.checkSingleConnection(selected[i]);
+      }
+    },
+
+    async resetChecks(selection) {
+      const sushiItems = selection.slice() || this.sushiItems;
+
+      const testedItems = sushiItems.filter((sushiItem) => !!sushiItem?.connection?.status);
+      // No reset needed, simulate like we just did
+      if (selection && testedItems.length <= 0) {
+        this.clearSelection();
+        return;
+      }
+
+      // Adjust selection to filtered items
+      if (selection) {
+        this.selected = testedItems;
+      }
+
+      const confirmDelete = await this.$refs.confirm?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc('institutions.sushi.resetNbChecks', testedItems.length),
+        agreeText: this.$t('delete'),
+        disagreeText: this.$t('cancel'),
+      });
+
+      if (!confirmDelete) {
+        return;
+      }
+
+      // Clear selection as we are about to reset
+      if (selection) {
+        this.clearSelection();
+      }
+
+      // Set loading state
+      for (let i = 0; i < testedItems.length; i += 1) {
+        this.$set(this.loadingItems, testedItems[i].id, 'queued');
+      }
+
+      // Reset connections
+      for (let i = 0; i < testedItems.length; i += 1) {
+        const sushiItem = testedItems[i];
+        this.$set(this.loadingItems, sushiItem.id, 'loading');
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await this.$axios.$delete(`/sushi/${sushiItem.id}/connection`);
+          this.$set(sushiItem, 'connection', {});
+        } catch (error) {
+          this.$store.dispatch('snacks/error', this.$t('institutions.sushi.cannotResetCheck', { name: sushiItem?.endpoint?.vendor }));
+        }
+        this.$delete(this.loadingItems, sushiItem.id);
       }
     },
 

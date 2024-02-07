@@ -19,7 +19,11 @@
         @click="() => !loading && !disabled && $emit('checkConnection')"
       >
         <v-avatar v-if="loading" left>
+          <v-icon v-if="state === 'queued'" small>
+            mdi-dots-horizontal
+          </v-icon>
           <v-progress-circular
+            v-else
             indeterminate
             size="14"
             width="2"
@@ -127,9 +131,9 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    loading: {
-      type: Boolean,
-      default: () => false,
+    state: {
+      type: String,
+      default: () => undefined,
     },
     disabled: {
       type: Boolean,
@@ -145,6 +149,7 @@ export default {
     };
   },
   computed: {
+    loading() { return ['loading', 'queued'].includes(this.state); },
     untested() { return !this.connection; },
     status() { return this.connection?.status; },
     success() { return this.status === 'success'; },
