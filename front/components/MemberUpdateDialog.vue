@@ -21,7 +21,7 @@
 
       <v-divider />
 
-      <template v-if="isAdmin">
+      <template v-if="rolesItems.length > 0">
         <v-card-title>
           {{ $t('institutions.members.roles') }}
         </v-card-title>
@@ -39,7 +39,7 @@
                 :input-value="item.isActive"
                 :disabled="saving"
                 hide-details
-                @click="changeRole(item.value, item.accessLevel)"
+                @click="changeRole(item.value, item.permissions)"
               >
                 <template #label>
                   {{ item.text }}
@@ -93,6 +93,7 @@
           :username="username"
           :readonly="readonly"
           class="px-0"
+          @update:repositories="repositories = $event"
           @change="hasChanged = true"
         />
       </v-card-text>
@@ -110,6 +111,7 @@
           :username="username"
           :readonly="readonly"
           class="px-0"
+          @update:spaces="spaces = $event"
           @change="hasChanged = true"
         />
       </v-card-text>
@@ -165,9 +167,9 @@
 </template>
 
 <script>
+import MemberInstitutionPermissions, { featureScopes } from '~/components/MemberInstitutionPermissions.vue';
 import MemberRepoPermissions from '~/components/MemberRepoPermissions.vue';
 import MemberSpacePermissions from '~/components/MemberSpacePermissions.vue';
-import MemberInstitutionPermissions from '~/components/MemberInstitutionPermissions.vue';
 import ItemTree from '~/components/ItemTree.vue';
 
 export default {
@@ -194,6 +196,9 @@ export default {
       fullName: '',
       roles: [],
       locked: false,
+
+      repositories: [],
+      spaces: [],
     };
   },
   computed: {
@@ -204,29 +209,60 @@ export default {
       return (this.locked === true) && !this.isAdmin;
     },
     rolesItems() {
+      if (featureScopes.length <= 0 && this.repositories.length <= 0 && this.spaces.length <= 0) {
+        return [];
+      }
+
       const roles = new Set(this.roles);
       const genBaseItem = (value) => ({ value, isActive: roles.has(value) });
+
+      const genPerms = (items, getId, value) => {
+        if (items.length <= 0) {
+          return undefined;
+        }
+        return Object.fromEntries(items.map((i) => [getId(i), value]));
+      };
+
+      const genFeaturesPerms = (value) => genPerms(featureScopes ?? [], (f) => f, value);
+      const genReposPerms = (value) => genPerms(this.repositories ?? [], (r) => r.pattern, value);
+      const genSpacesPerms = (value) => genPerms(this.spaces ?? [], (s) => s.id, value);
 
       return [
         {
           text: this.$t('institutions.members.correspondent'),
+          hide: !this.isAdmin,
           items: [
             {
               ...genBaseItem('contact:doc'),
               text: this.$t('institutions.members.documentary'),
-              accessLevel: 'write',
+              permissions: {
+                features: genFeaturesPerms('write'),
+                repositories: genReposPerms('read'),
+                spaces: genSpacesPerms('write'),
+              },
             },
             {
               ...genBaseItem('contact:tech'),
               text: this.$t('institutions.members.technical'),
-              accessLevel: 'write',
+              permissions: {
+                features: genFeaturesPerms('write'),
+                repositories: genReposPerms('write'),
+                spaces: genSpacesPerms('write'),
+              },
             },
           ],
         },
         {
           ...genBaseItem('guest'),
           text: this.$t('institutions.members.roleNames.guest'),
-          accessLevel: 'read',
+          permissions: {
+            features: {
+              ...(genFeaturesPerms('none') ?? {}),
+              institution: 'read',
+            },
+            repositories: genReposPerms('read'),
+            spaces: genSpacesPerms('read'),
+          },
         },
       ];
     },
@@ -254,47 +290,35 @@ export default {
       });
     },
 
-    changeAllInstitutionPermissions(level) {
+    changeAllInstitutionPermissions(permissions) {
       // using refs here to avoid rewriting all the component and move the fetch logic
-      const { features, savePermissions } = this.$refs.institutionPermissions;
-
-      const permissions = Object.fromEntries(
-        features.map((f) => [f.scope, level]),
-      );
+      const { savePermissions } = this.$refs.institutionPermissions;
 
       this.$refs.institutionPermissions.permissions = permissions;
       return savePermissions();
     },
 
-    changeAllRepoPermissions(level) {
+    changeAllRepoPermissions(permissions) {
       // using refs here to avoid rewriting all the component and move the fetch logic
-      const { repositories, savePermission } = this.$refs.repoPermissions;
-
-      const permissions = Object.fromEntries(
-        repositories.map((r) => [r.pattern, level]),
-      );
+      const { savePermission } = this.$refs.repoPermissions;
 
       this.$refs.repoPermissions.repoPermissions = permissions;
       return Promise.all(
-        repositories.map((r) => savePermission(r.pattern)),
+        this.repositories.map((r) => savePermission(r.pattern)),
       );
     },
 
-    changeAllSpacePermissions(level) {
+    changeAllSpacePermissions(permissions) {
       // using refs here to avoid rewriting all the component and move the fetch logic
-      const { spaces, savePermission } = this.$refs.spacePermissions;
-
-      const permissions = Object.fromEntries(
-        spaces.map((s) => [s.id, level]),
-      );
+      const { savePermission } = this.$refs.spacePermissions;
 
       this.$refs.spacePermissions.spacesPermissions = permissions;
       return Promise.all(
-        spaces.map((s) => savePermission(s.id)),
+        this.spaces.map((s) => savePermission(s.id)),
       );
     },
 
-    async changeRole(role, access) {
+    async changeRole(role, permissions) {
       const current = new Set(this.roles);
 
       if (current.has(role)) {
@@ -304,13 +328,13 @@ export default {
       }
 
       // If access provided
-      if (access) {
+      if (permissions) {
         // If it's the first role added, add all perms to write
         if (current.size === 1 && this.roles.length === 0) {
           await Promise.all([
-            this.changeAllInstitutionPermissions(access),
-            this.changeAllRepoPermissions(access),
-            this.changeAllSpacePermissions(access),
+            permissions.features && this.changeAllInstitutionPermissions(permissions.features),
+            permissions.repositories && this.changeAllRepoPermissions(permissions.repositories),
+            permissions.spaces && this.changeAllSpacePermissions(permissions.spaces),
           ]);
         }
       }

@@ -151,8 +151,11 @@ export default {
         });
       }
 
-      this.$set(this, 'repoPermissions', newPermissions);
+      // this.$set(this, 'repoPermissions', newPermissions);
+      this.repoPermissions = newPermissions;
       this.loading = false;
+      this.$emit('update:repositories', this.repositories);
+      this.$emit('update:permissions', newPermissions);
     },
 
     async savePermission(pattern) {

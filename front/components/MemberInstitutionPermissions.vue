@@ -60,7 +60,7 @@
 </template>
 
 <script>
-const featureScopes = [
+export const featureScopes = [
   'institution',
   'memberships',
   'sushi',
@@ -151,6 +151,7 @@ export default {
 
       this.permissions = newPermissions;
       this.loading = false;
+      this.$emit('update:permissions', newPermissions);
     },
 
     async savePermissions() {

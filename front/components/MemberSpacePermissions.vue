@@ -151,8 +151,11 @@ export default {
         });
       }
 
-      this.$set(this, 'spacesPermissions', newPermissions);
+      // this.$set(this, 'spacesPermissions', newPermissions);
+      this.spacesPermissions = newPermissions;
       this.loading = false;
+      this.$emit('update:spaces', this.spaces);
+      this.$emit('update:permissions', newPermissions);
     },
 
     async savePermission(spaceId) {
