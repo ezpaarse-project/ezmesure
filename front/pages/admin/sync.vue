@@ -232,7 +232,10 @@ export default defineComponent({
       };
     },
     status() {
-      const status = this.syncState.hasErrors ? 'error' : this.syncState.status;
+      const status = this.syncState.hasErrors && !this.synchronizing
+        ? 'error'
+        : this.syncState.status;
+
       return this.states[status] || this.states.idle;
     },
   },
