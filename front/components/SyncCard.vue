@@ -5,11 +5,11 @@
     </v-card-title>
 
     <v-card-subtitle>
-      <template v-if="total !== expected">
-        {{ `${total} / ${expected}` }}
-      </template>
       <template v-if="!total">
         {{ `? / ${expected}` }}
+      </template>
+      <template v-else-if="total !== expected">
+        {{ `${total} / ${expected}` }}
       </template>
     </v-card-subtitle>
 
