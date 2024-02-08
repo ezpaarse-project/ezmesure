@@ -109,6 +109,10 @@ export default {
           href: '/report',
         },
         {
+          title: this.$t('menu.sync'),
+          href: '/sync',
+        },
+        {
           title: this.$t('menu.activity'),
           href: '/activity',
         },
