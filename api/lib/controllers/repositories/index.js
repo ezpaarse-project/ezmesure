@@ -29,6 +29,7 @@ router.get('/', {
   handler: getMany,
   validate: {
     query: Joi.object({
+      size: Joi.number().integer().min(-1),
       q: Joi.string(),
       type: Joi.string(),
       institutionId: Joi.string(),

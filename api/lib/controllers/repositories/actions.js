@@ -16,6 +16,8 @@ const { propsToPrismaInclude } = require('../utils');
 exports.getMany = async (ctx) => {
   const {
     include: propsToInclude,
+    size,
+    page = 1,
     type,
     institutionId,
     pattern,
@@ -43,6 +45,8 @@ exports.getMany = async (ctx) => {
 
   ctx.type = 'json';
   ctx.body = await repositoriesService.findMany({
+    take: Number.isInteger(size) && size >= 0 ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
     where,
     include: propsToPrismaInclude(propsToInclude, includableFields),
   });
