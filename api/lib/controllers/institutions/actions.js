@@ -83,6 +83,7 @@ exports.getInstitutions = async (ctx) => {
   const {
     include: propsToInclude,
     q: query,
+    validated,
     size,
     sort,
     order = 'asc',
@@ -97,8 +98,9 @@ exports.getInstitutions = async (ctx) => {
   /** @type {InstitutionFindManyArgs} */
   const options = {
     include,
-    take: Number.isInteger(size) ? size : undefined,
+    take: Number.isInteger(size) && size >= 0 ? size : undefined,
     skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+    where: {},
   };
 
   if (sort) {
@@ -106,8 +108,15 @@ exports.getInstitutions = async (ctx) => {
   }
 
   if (query) {
-    options.where = {
-      name: { contains: query, mode: 'insensitive' },
+    options.where.name = {
+      contains: query,
+      mode: 'insensitive',
+    };
+  }
+
+  if (validated != null) {
+    options.where.validated = {
+      equals: validated,
     };
   }
 
