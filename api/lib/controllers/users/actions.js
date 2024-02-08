@@ -26,6 +26,7 @@ exports.list = async (ctx) => {
   const {
     q: search = '',
     size = 10,
+    page = 1,
     source = 'fullName,username',
     include: propsToInclude,
   } = ctx.query;
@@ -44,7 +45,8 @@ exports.list = async (ctx) => {
   }
 
   const users = await usersService.findMany({
-    take: Number.parseInt(size, 10),
+    take: Number.isInteger(size) && size >= 0 ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
     select,
     include,
     where: {

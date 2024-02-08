@@ -25,7 +25,8 @@
     "report": "My reports",
     "adminReport": "ezREEPORT",
     "repositories": "Repositories",
-    "harvest": "Harvest"
+    "harvest": "Harvest",
+    "sync": "Synchronisation"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -749,6 +750,29 @@
       "unableToRetrive": "Unable to retrieve harvesting tasks",
       "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks"
     }
+  },
+  "sync": {
+    "status": {
+      "notSynced": "Not yet synchronized",
+      "synchronizing": "Synchronizing",
+      "completed": "Synchronized",
+      "error": "Error occurred during synchronization"
+    },
+    "description": {
+      "notSynced": "The data of EzMESURE are not yet synchronized, you may encounter some incoherences between EzMESURE's interface and the different services linked to EzMESURE. Just click on the button below to synchronize.",
+      "completed": "The data of EzMESURE have been successfully synchronized with the different services linked to EzMESURE.",
+      "error": "An error occurred during the synchronization of EzMESURE data with the different services linked to EzMESURE. Please check your instance logs for more information."
+    },
+    "start": "Launch synchronization",
+    "startedAt": "Started at {date}",
+    "running": "Ran for {time}",
+    "spaces": "Spaces",
+    "repositories": "Repositories",
+    "users": "Users",
+    "ezreeportUsers": "Users",
+    "ezreeportNamespaces": "Institutions",
+    "unableToRetrieveInformation": "Unable to retrieve information about synchronization",
+    "unableToStart": "Unable to launch synchronization"
   },
   "permissions": {
     "none": "None",

@@ -70,7 +70,8 @@ router.route({
   validate: {
     query: Joi.object({
       q: Joi.string().min(0),
-      size: Joi.number().min(0),
+      validated: Joi.boolean(),
+      size: Joi.number().min(-1),
       page: Joi.number().min(1),
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),

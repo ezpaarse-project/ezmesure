@@ -16,6 +16,7 @@ const ezr = require('./ezreeport');
  * @typedef {object} EntitySyncResult
  * @property {number} synchronized - Number of items that were synchronized
  * @property {number} errors - Number of items that failed to be synchronized
+ * @property {any} [meta] - Additional data
  */
 
 /**
@@ -88,9 +89,12 @@ async function startSync() {
       syncStatus.hasErrors = true;
     }
 
+    const { fulfilled, errors, ...meta } = res || {};
+
     syncStatus.result[itemType] = {
-      synchronized: res?.fulfilled || 0,
-      errors: res?.errors || 0,
+      synchronized: fulfilled,
+      errors,
+      meta,
     };
   };
 
