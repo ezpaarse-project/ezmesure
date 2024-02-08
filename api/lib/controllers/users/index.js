@@ -26,7 +26,7 @@ router.route({
   validate: {
     query: {
       q: Joi.string().trim(),
-      size: Joi.number().integer().min(0),
+      size: Joi.number().integer().min(-1),
       source: Joi.string().trim(),
       include: Joi.array().single().items(Joi.string().valid(...includableFields)),
     },
