@@ -40,7 +40,7 @@ module.exports = class HarvestRequest {
     }
 
     if (!this.isActive) {
-      this.isActive = !HarvestJobsService.isDone(job);
+      this.isActive = !HarvestJobsService.isDone(job) || job.status === 'delayed';
     }
 
     if (job.updatedAt > (this.lastUpdatedAt ?? 0)) {
@@ -61,8 +61,9 @@ module.exports = class HarvestRequest {
   getMetrics() {
     const failed = (this.statuses.get('failed') ?? 0)
             + (this.statuses.get('interrupted') ?? 0)
-            + (this.statuses.get('cancelled') ?? 0)
-            + (this.statuses.get('delayed') ?? 0);
+            + (this.statuses.get('cancelled') ?? 0);
+
+    const delayed = this.statuses.get('delayed') ?? 0;
 
     const success = this.statuses.get('finished') ?? 0;
 
@@ -72,7 +73,8 @@ module.exports = class HarvestRequest {
       success,
       failed,
       active,
-      pending: this.jobCount - success - failed - active,
+      delayed,
+      pending: this.jobCount - success - failed - active - delayed,
     };
   }
 
