@@ -31,7 +31,7 @@
             :key="item.id"
           >
             <v-expansion-panel-header>
-              <div>
+              <div style="flex: 1">
                 <div class="mb-2">
                   {{ $t('harvest.requests.name', { createdAt: createdAtLocale }) }}
 
@@ -81,9 +81,7 @@
                 </v-chip>
               </div>
 
-              <v-spacer />
-
-              <div class="d-flex align-center">
+              <div class="d-flex align-center" style="flex: 0.4">
                 <v-progress-circular
                   v-if="item.isActive"
                   color="primary"
@@ -92,7 +90,7 @@
                 />
                 <div v-else style="width: 32px;" />
 
-                <v-tooltip top>
+                <v-tooltip bottom>
                   <template #activator="{ attrs, on }">
                     <div
                       class="d-flex mx-4 progress-bars"
@@ -109,8 +107,8 @@
                           <v-progress-linear
                             :color="props.color"
                             :stream="props.stream"
-                            :value="props.stream ? 0 : 100"
-                            buffer-value="0"
+                            :value="props.stream || props.buffered ? 0 : 100"
+                            :buffer-value="!props.buffered ? 0 : 100"
                             height="8"
                           />
                         </div>
@@ -118,7 +116,21 @@
                     </div>
                   </template>
 
-                  {{ $t('harvest.requests.metrics', item.metrics) }}
+                  <v-simple-table dark class="px-4 py-1">
+                    <template #default>
+                      <tbody>
+                        <template v-for="([name, count]) in Object.entries(item.metrics)">
+                          <tr
+                            v-if="count > 0"
+                            :key="name"
+                          >
+                            <td>{{ $t(`harvest.requests.metrics.${name}`) }}</td>
+                            <td>{{ count }}</td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
                 </v-tooltip>
               </div>
             </v-expansion-panel-header>
@@ -165,6 +177,8 @@ export default defineComponent({
       return this.requests.map((item) => {
         const { id, metrics } = item;
 
+        const calcPercentage = (value) => (value / item.counts.jobs) * 100;
+
         return {
           item,
 
@@ -179,23 +193,29 @@ export default defineComponent({
             {
               key: `${id}-success`,
               color: 'success',
-              value: (metrics.success / item.counts.jobs) * 100,
+              value: calcPercentage(metrics.success),
             },
             {
               key: `${id}-failed`,
               color: 'error',
-              value: (metrics.failed / item.counts.jobs) * 100,
+              value: calcPercentage(metrics.failed),
             },
             {
               key: `${id}-active`,
               color: 'blue',
-              value: (metrics.active / item.counts.jobs) * 100,
+              value: calcPercentage(metrics.active),
+            },
+            {
+              key: `${id}-delayed`,
+              color: 'blue',
+              buffered: true,
+              value: calcPercentage(metrics.delayed),
             },
             {
               key: `${id}-pending`,
               color: 'grey',
               stream: true,
-              value: (metrics.pending / item.counts.jobs) * 100,
+              value: calcPercentage(metrics.pending),
             },
           ],
         };
@@ -239,5 +259,9 @@ export default defineComponent({
 }
 .progress-bars > div:last-child > div[aria-valuenow="100"] {
   border-radius: 0 1rem 1rem 0;
+}
+
+.v-tooltip__content {
+  padding: 0;
 }
 </style>

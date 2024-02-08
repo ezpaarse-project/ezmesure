@@ -724,7 +724,13 @@
   "harvest": {
     "requests": {
       "name": "Harvesting from {createdAt}",
-      "metrics": "Success: {success} | Failed: {failed} | Active: {active} | Pending: {pending}",
+      "metrics": {
+        "success": "Success",
+        "failed": "Failed",
+        "active": "Active",
+        "delayed": "Delayed",
+        "pending": "Pending"
+      },
       "counts": {
         "institutions": "{n} institution|{n} institutions",
         "endpoints": "{n} endpoint|{n} endpoints",

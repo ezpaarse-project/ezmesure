@@ -170,7 +170,7 @@ export default defineComponent({
 
       return this.$dateFunctions.msToLocalDistance(
         this.harvest.runningTime,
-        { format: ['days', 'hours', 'minutes', 'seconds'] },
+        { includeSeconds: true },
       );
     },
   },

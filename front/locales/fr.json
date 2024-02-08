@@ -724,7 +724,13 @@
   "harvest": {
     "requests": {
       "name": "Moissonnage du {createdAt}",
-      "metrics": "Réussi: {success} | Échoué: {failed} | Actif: {active} | En attente: {pending}",
+      "metrics": {
+        "success": "Réussi",
+        "failed": "Échoué",
+        "active": "Actif",
+        "delayed": "Reporté",
+        "pending": "En attente"
+      },
       "counts": {
         "institutions": "{n} établissement|{n} établissements",
         "endpoints": "{n} point d'accès|{n} points d'accès",
