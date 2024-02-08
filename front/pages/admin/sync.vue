@@ -1,29 +1,6 @@
 <template>
   <section>
-    <ToolBar :title="$t('menu.sync').toString()">
-      <!--
-      <v-chip
-        :color="status.color || 'primary'"
-        small
-        class="ml-4"
-        style="color: white"
-      >
-        <v-avatar left>
-          <v-progress-circular
-            v-if="synchronizing"
-            size="14"
-            width="2"
-            indeterminate
-          />
-          <v-icon v-if="status.icon" small>
-            {{ status.icon }}
-          </v-icon>
-        </v-avatar>
-
-        {{ status.label || $t(`sync.status.${syncState.status}`) }}
-      </v-chip>
-      -->
-
+    <ToolBar :title="$t('menu.sync')">
       <v-chip v-if="syncState.startedAt" small outlined class="ml-2">
         <v-icon left small>
           mdi-calendar-blank
