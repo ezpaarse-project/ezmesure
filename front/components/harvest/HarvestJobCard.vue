@@ -128,21 +128,21 @@ export default defineComponent({
       return [
         {
           key: 'inserted',
-          label: this.$t('harvest.inserted'),
+          label: this.$t('harvest.jobs.inserted'),
           icon: 'mdi-file-download',
           color: 'success',
           value: this.harvest.result.inserted.toLocaleString(),
         },
         {
           key: 'updated',
-          label: this.$t('harvest.updated'),
+          label: this.$t('harvest.jobs.updated'),
           icon: 'mdi-file-replace',
           color: 'warning',
           value: this.harvest.result.updated.toLocaleString(),
         },
         {
           key: 'failed',
-          label: this.$t('harvest.failed'),
+          label: this.$t('harvest.jobs.failed'),
           icon: 'mdi-file-alert',
           color: 'error',
           value: this.harvest.result.failed.toLocaleString(),
