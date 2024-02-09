@@ -122,6 +122,7 @@ errors:
     noIndexMatching: The index pattern [%s] doesn't match any index
 
   files:
+    malformedField: "Line #%d: a field between double quotes is malformed"
     wrongEntriesFormat: entries should be an array of file names
     missingEntries: "missing required field: entries"
     unsupportedType: unsupported file type

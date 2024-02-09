@@ -123,6 +123,7 @@ errors:
     noIndexMatching: L'index pattern [%s] ne correspond à aucun index
 
   files:
+    malformedField: "Ligne #%d: un champ entre guillemets est mal formaté"
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
     missingEntries: "Champ requis manquant: entries"
     unsupportedType: Type de fichier non supporté

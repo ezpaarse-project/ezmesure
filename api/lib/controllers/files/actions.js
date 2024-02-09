@@ -12,8 +12,9 @@ const { appLogger } = require('../../services/logger');
 /**
  * Validate a file, assuming it's a CSV file
  * @param {String} filePath
+ * @param {(key: string) => string} $t i18n translate method
  */
-function validateFile(filePath) {
+function validateFile(filePath, $t) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
     let emptyLines = 0;
@@ -47,8 +48,7 @@ function validateFile(filePath) {
           [err] = errors;
 
           if (err.type === 'Quotes') {
-            // FIXME: translate me!
-            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
+            err.message = $t('files.malformedField', lineNumber);
           }
 
           return parser.abort();
@@ -112,7 +112,7 @@ exports.upload = async function upload(ctx) {
 
   appLogger.info(`Saved file [${filePath}]`);
 
-  const result = await validateFile(filePath);
+  const result = await validateFile(filePath, ctx.$t);
 
   if (result instanceof Error) {
     await fse.unlink(filePath);
