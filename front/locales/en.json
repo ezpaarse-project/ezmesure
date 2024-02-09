@@ -765,9 +765,9 @@
       "error": "Error occurred during synchronization"
     },
     "description": {
-      "notSynced": "The data of EzMESURE are not yet synchronized, you may encounter some incoherences between EzMESURE's interface and the different services linked to EzMESURE. Just click on the button below to synchronize.",
-      "completed": "The data of EzMESURE have been successfully synchronized with the different services linked to EzMESURE.",
-      "error": "An error occurred during the synchronization of EzMESURE data with the different services linked to EzMESURE. Please check your instance logs for more information."
+      "notSynced": "The data of ezMESURE are not yet synchronized, you may encounter some incoherences between ezMESURE's interface and the different services linked to ezMESURE. Just click on the button above to synchronize.",
+      "completed": "The data of ezMESURE have been successfully synchronized with the different services linked to ezMESURE.",
+      "error": "An error occurred during the synchronization of ezMESURE data with the different services linked to ezMESURE. Please check your instance logs for more information."
     },
     "start": "Launch synchronization",
     "startedAt": "Started at {date}",
