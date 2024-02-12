@@ -575,10 +575,10 @@
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
     "checkCredentials": "Check credentials",
-    "availableReports": "Available reports",
-    "availableReportsOnPlatform": "Available reports on the publisher platform",
+    "supportedReports": "Supported reports",
+    "supportedReportsOnPlatform": "Reports supported by the publisher platform",
     "failedToFetchReports": "Failed to fetch the list of available reports",
-    "showAllReports": "Show all reports"
+    "onlyShowMasterReports": "Only show master reports"
   },
   "identifier": "Identifier",
   "authenticate": {

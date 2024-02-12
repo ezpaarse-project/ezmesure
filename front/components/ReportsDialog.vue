@@ -3,7 +3,7 @@
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
         <v-toolbar-title>
-          {{ $t('reports.availableReportsOnPlatform') }}
+          {{ $t('reports.supportedReportsOnPlatform') }}
           <div class="caption">
             {{ sushiVendor }} - {{ sushiTags }}
           </div>
@@ -76,9 +76,9 @@
       <v-divider />
 
       <v-card-actions>
-        <v-checkbox
-          v-model="showAllReports"
-          :label="$t('reports.showAllReports')"
+        <v-switch
+          v-model="onlyShowMasterReports"
+          :label="$t('reports.onlyShowMasterReports')"
         />
 
         <v-spacer />
@@ -98,7 +98,7 @@ export default {
       show: false,
       exceptions: [],
       refreshing: false,
-      showAllReports: false,
+      onlyShowMasterReports: true,
       sushi: null,
       reports: [],
     };
@@ -136,7 +136,7 @@ export default {
       });
     },
     filteredReports() {
-      if (this.showAllReports) { return this.reports; }
+      if (!this.onlyShowMasterReports) { return this.reports; }
 
       return this.reports.filter((report) => {
         // eslint-disable-next-line camelcase

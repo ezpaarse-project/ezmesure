@@ -773,7 +773,7 @@ export default {
         },
         {
           icon: 'mdi-file-search',
-          label: this.$t('reports.availableReports'),
+          label: this.$t('reports.supportedReports'),
           callback: this.showAvailableReports,
         },
         {

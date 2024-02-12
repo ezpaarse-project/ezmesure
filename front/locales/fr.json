@@ -576,10 +576,10 @@
   "reports": {
     "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
     "checkCredentials": "Vérifier les identifiants",
-    "availableReports": "Rapports disponibles",
-    "availableReportsOnPlatform": "Rapports disponibles sur la plateforme éditeur",
+    "supportedReports": "Rapports supportés",
+    "supportedReportsOnPlatform": "Rapports supportés par la plateforme éditeur",
     "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles",
-    "showAllReports": "Afficher tous les rapports"
+    "onlyShowMasterReports": "Afficher uniquement les rapports maîtres"
   },
   "identifier": "Identifiant",
   "authenticate": {
