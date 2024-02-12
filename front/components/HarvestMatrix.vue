@@ -32,30 +32,27 @@
       hide-default-footer
     >
       <template #top>
-        <div class="d-flex">
+        <div class="d-flex justify-center align-center">
           <v-btn
-            text
+            icon
             color="primary"
             :disabled="loading"
             @click="year -= 1"
           >
-            <v-icon left>
-              mdi-arrow-left
-            </v-icon> {{ year - 1 }}
+            <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
 
-          <v-spacer />
+          <span class="text-h4 mx-3">
+            {{ year }}
+          </span>
 
           <v-btn
-            text
+            icon
             color="primary"
             :disabled="loading"
             @click="year += 1"
           >
-            {{ year + 1 }}
-            <v-icon right>
-              mdi-arrow-right
-            </v-icon>
+            <v-icon>mdi-arrow-right</v-icon>
           </v-btn>
         </div>
       </template>
