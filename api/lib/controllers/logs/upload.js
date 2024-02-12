@@ -220,7 +220,6 @@ module.exports = async function upload(ctx) {
 
   const startTime = process.hrtime.bigint();
   const { username, email } = ctx.state.user;
-  const { query } = ctx.request;
 
   const { body: perm } = await elastic.security.hasPrivileges({
     username,
@@ -232,7 +231,6 @@ module.exports = async function upload(ctx) {
   });
 
   const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
-  const storeFile = !Object.hasOwnProperty.call(query, 'nostore') || query.nostore === 'false';
 
   if (!canWrite) {
     return ctx.throw(403, ctx.$t('errors.perms.writeInIndex', index));
@@ -270,12 +268,6 @@ module.exports = async function upload(ctx) {
     const encoding = ctx.request.headers['content-encoding'];
     const isGzip = encoding && encoding.toLowerCase().includes('gzip');
     const filePath = path.resolve(userDir, `${now.toISOString()}.csv`);
-
-    if (storeFile) {
-      const fileStream = fse.createWriteStream(filePath);
-      fileStream.on('error', (err) => ctx.app.emit('error', err));
-      ctx.req.pipe(fileStream);
-    }
 
     let stream = ctx.req;
 
@@ -317,12 +309,6 @@ module.exports = async function upload(ctx) {
 
     const isGzip = part.mime && part.mime.toLowerCase().includes('gzip');
     const filePath = path.resolve(userDir, part.filename.replace(/\s/g, '_'));
-
-    if (storeFile) {
-      const fileStream = fse.createWriteStream(filePath);
-      fileStream.on('error', (err) => ctx.app.emit('error', err));
-      ctx.req.pipe(fileStream);
-    }
 
     let stream = part;
 
