@@ -4,7 +4,17 @@
     scrollable
     width="1400"
   >
-    <HarvestMatrix :sushi-item="sushi" />
+    <HarvestMatrix :sushi-item="sushi">
+      <template #actions>
+        <v-card-actions>
+          <v-spacer />
+
+          <v-btn text @click="show = false">
+            {{ $t('close') }}
+          </v-btn>
+        </v-card-actions>
+      </template>
+    </HarvestMatrix>
   </v-dialog>
 </template>
 

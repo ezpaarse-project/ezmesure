@@ -68,6 +68,9 @@
         />
       </template>
     </v-data-table>
+
+    <v-spacer />
+    <slot name="actions" />
   </v-card>
 </template>
 
