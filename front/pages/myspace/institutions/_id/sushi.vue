@@ -152,6 +152,7 @@
     <SushiForm
       ref="sushiForm"
       :endpoints="endpoints"
+      :available-tags="availableTags"
       @update="onSushiUpdate"
     />
 
@@ -650,6 +651,12 @@ export default {
         { text: this.$t('institutions.sushi.invalidCredentials'), value: 'unauthorized', order: 2 },
         { text: this.$t('error'), value: 'failed', order: 1 },
       ];
+    },
+    availableTags() {
+      const tags = new Set(
+        this.sushiItems?.flatMap?.((s) => (Array.isArray(s?.tags) ? s.tags : [])),
+      );
+      return Array.from(tags);
     },
     tableHeaders() {
       return [

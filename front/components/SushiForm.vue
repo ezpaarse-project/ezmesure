@@ -77,7 +77,7 @@
 
           <v-combobox
             v-model="sushiForm.tags"
-            :items="[]"
+            :items="availableTags"
             :hint="$t('institutions.sushi.tagsDescription')"
             item-text="name"
             hide-selected
@@ -222,9 +222,9 @@ export default {
     SushiParam,
   },
   props: {
-    endpoints: {
+    availableTags: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
   },
   data() {
