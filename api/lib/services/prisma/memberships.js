@@ -3,6 +3,7 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
  * @typedef {import('@prisma/client').Membership} Membership
  * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
  * @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
@@ -12,50 +13,57 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
+ *
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
- * @typedef {{ deleteResult: Membership, membership: Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] } }} MembershipRemoved
+ *
+ * @typedef {Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] }} OldMembership
+ * @typedef {{ deleteResult: Membership, membership: OldMembership }} MembershipRemoved
  */
 /* eslint-enable max-len */
 
 /**
  * @param {MembershipCreateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership>}
  */
-function create(params) {
-  return prisma.membership.create(params);
+function create(params, tx = prisma) {
+  return tx.membership.create(params);
 }
 
 /**
  * @param {MembershipFindManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership[]>}
  */
-function findMany(params) {
-  return prisma.membership.findMany(params);
+function findMany(params, tx = prisma) {
+  return tx.membership.findMany(params);
 }
 
 /**
  * @param {MembershipFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership | null>}
  */
-function findUnique(params) {
-  return prisma.membership.findUnique(params);
+function findUnique(params, tx = prisma) {
+  return tx.membership.findUnique(params);
 }
 
 /**
  * @param {string} institutionId
  * @param {string} username
  * @param {Object | null} includes
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership | null>}
  */
-function findByID(institutionId, username, includes = null) {
+function findByID(institutionId, username, includes = null, tx = prisma) {
   let include;
   if (includes) {
     include = {
       ...includes,
     };
   }
-  return prisma.membership.findUnique({
+  return tx.membership.findUnique({
     where: {
       username_institutionId: {
         institutionId,
@@ -68,27 +76,31 @@ function findByID(institutionId, username, includes = null) {
 
 /**
  * @param {MembershipUpdateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership>}
  */
-function update(params) {
-  return prisma.membership.update(params);
+function update(params, tx = prisma) {
+  return tx.membership.update(params);
 }
 
 /**
  * @param {MembershipUpsertArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Membership>}
  */
-function upsert(params) {
-  return prisma.membership.upsert(params);
+function upsert(params, tx = prisma) {
+  return tx.membership.upsert(params);
 }
 
 /**
  * @param {MembershipDeleteArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<MembershipRemoved | null>}
  */
-async function remove(params) {
-  const transactionResult = await prisma.$transaction(async (tx) => {
-    const membership = await tx.membership.findUnique({
+async function remove(params, tx = prisma) {
+  /** @param {TransactionClient} txx */
+  const processor = async (txx) => {
+    const membership = await txx.membership.findUnique({
       where: params.where,
       include: {
         repositoryPermissions: true,
@@ -100,52 +112,56 @@ async function remove(params) {
       return null;
     }
 
-    /** @type {RepositoryPermissionDeleteManyArgs & SpacePermissionDeleteManyArgs} */
-    const findArgs = {
-      where: {
-        username: membership.username,
-        institutionId: membership.institutionId,
-      },
-    };
-
-    await tx.repositoryPermission.deleteMany(findArgs);
-    await tx.spacePermission.deleteMany(findArgs);
-
     return {
-      deleteResult: await tx.membership.delete(params),
+      deleteResult: await txx.membership.delete(params),
       membership,
     };
-  });
+  };
 
-  if (!transactionResult) {
-    return null;
+  let transactionResult;
+  if (tx) {
+    transactionResult = await processor(tx);
+  } else {
+    transactionResult = await prisma.$transaction(processor);
   }
 
   return transactionResult;
 }
 
 /**
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Array<Membership> | null>}
  */
-async function removeAll() {
+async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
-  const memberships = await findMany({});
+  /** @param {TransactionClient} txx */
+  const processor = async (txx) => {
+    const memberships = await findMany({}, txx);
 
-  if (memberships.length === 0) { return null; }
+    if (memberships.length === 0) { return null; }
 
-  await Promise.all(memberships.map(async (membership) => {
-    await remove({
-      where: {
-        username_institutionId: {
-          username: membership.username,
-          institutionId: membership.institutionId,
+    await Promise.all(
+      memberships.map((membership) => remove(
+        {
+          where: {
+            username_institutionId: {
+              username: membership.username,
+              institutionId: membership.institutionId,
+            },
+          },
         },
-      },
-    });
-  }));
+        txx,
+      )),
+    );
 
-  return memberships;
+    return memberships;
+  };
+
+  if (tx) {
+    return processor(tx);
+  }
+  return prisma.$transaction(processor);
 }
 
 module.exports = {

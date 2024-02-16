@@ -2,6 +2,7 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
+/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
 /** @typedef {import('@prisma/client').SpacePermission} SpacePermission */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpdateArgs} SpacePermissionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpsertArgs} SpacePermissionUpsertArgs */
@@ -13,53 +14,59 @@ const { client: prisma, Prisma } = require('./index');
 
 /**
  * @param {SpacePermissionCreateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission>}
  */
-function create(params) {
-  return prisma.spacePermission.create(params);
+function create(params, tx = prisma) {
+  return tx.spacePermission.create(params);
 }
 
 /**
  * @param {SpacePermissionFindManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission[]>}
  */
-function findMany(params) {
-  return prisma.spacePermission.findMany(params);
+function findMany(params, tx = prisma) {
+  return tx.spacePermission.findMany(params);
 }
 
 /**
  * @param {SpacePermissionFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission | null>}
  */
-function findUnique(params) {
-  return prisma.spacePermission.findUnique(params);
+function findUnique(params, tx = prisma) {
+  return tx.spacePermission.findUnique(params);
 }
 
 /**
  * @param {SpacePermissionUpdateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission>}
  */
-function update(params) {
-  return prisma.spacePermission.update(params);
+function update(params, tx = prisma) {
+  return tx.spacePermission.update(params);
 }
 
 /**
  * @param {SpacePermissionUpsertArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission>}
  */
-function upsert(params) {
-  return prisma.spacePermission.upsert(params);
+function upsert(params, tx = prisma) {
+  return tx.spacePermission.upsert(params);
 }
 
 /**
  * @param {SpacePermissionDeleteArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission | null>}
  */
-async function remove(params) {
+async function remove(params, tx = prisma) {
   let spacePermission;
 
   try {
-    spacePermission = await prisma.spacePermission.delete(params);
+    spacePermission = await tx.spacePermission.delete(params);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       return null;
