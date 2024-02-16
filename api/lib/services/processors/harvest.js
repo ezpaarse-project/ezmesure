@@ -105,10 +105,13 @@ async function importSushiReport(options = {}) {
 
   const {
     index,
-    beginDate,
-    endDate,
-    forceDownload,
-    harvestId,
+    session: {
+      id: harvestId,
+      beginDate,
+      endDate,
+      forceDownload,
+      ignoreValidation,
+    },
     reportType = sushiService.DEFAULT_REPORT_TYPE,
   } = task;
 
@@ -127,9 +130,8 @@ async function importSushiReport(options = {}) {
   };
 
   let { ignoreReportValidation } = endpoint;
-
-  if (typeof options.ignoreValidation === 'boolean') {
-    ignoreReportValidation = options.ignoreValidation;
+  if (typeof ignoreValidation === 'boolean') {
+    ignoreReportValidation = ignoreValidation;
   }
 
   const reportPath = sushiService.getReportPath(sushiData);
@@ -148,6 +150,7 @@ async function importSushiReport(options = {}) {
       where: { id: task.id },
       data: {
         ...task,
+        session: undefined,
         logs: { createMany: { data: newLogs } },
         result: task.result || undefined,
         credentials: undefined,
@@ -712,9 +715,8 @@ async function processJob(job, taskData) {
   const {
     credentials,
     credentialsId,
-    beginDate,
-    endDate,
     reportType,
+    session: { beginDate, endDate },
   } = task;
 
   if (!credentials) {
@@ -736,6 +738,7 @@ async function processJob(job, taskData) {
     where: { id: task.id },
     data: {
       ...task,
+      session: undefined,
       result: task.result || undefined,
       credentials: undefined,
     },
@@ -825,6 +828,7 @@ module.exports = async function handle(job, lockToken) {
   task = taskId && await harvestJobService.findUnique({
     where: { id: taskId },
     include: {
+      session: true,
       credentials: {
         include: {
           endpoint: true,

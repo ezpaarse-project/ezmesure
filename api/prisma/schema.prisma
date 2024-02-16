@@ -115,7 +115,7 @@ model Space {
   /// ID of the institution this space is associated to
   institutionId String
   /// The institution this space is associated to
-  institution   Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution   Institution       @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Creation date (in the DB, not in Kibana)
   createdAt     DateTime          @default(now())
   /// Latest update date (in the DB, not in Kibana)
@@ -159,35 +159,35 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions  Institution[]
+  institutions Institution[]
   /// Creation date
-  createdAt     DateTime               @default(now())
+  createdAt    DateTime               @default(now())
   /// Latest update date
-  updatedAt     DateTime               @updatedAt
+  updatedAt    DateTime               @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern       String                 @id
+  pattern      String                 @id
   /// The repository type (ezpaarse, counter5)
-  type          String                 @db.VarChar(50)
+  type         String                 @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions   RepositoryPermission[]
+  permissions  RepositoryPermission[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
 model RepositoryPermission {
   /// Username of the member
-  username      String
+  username          String
   /// Institution of the member
-  institutionId String
+  institutionId     String
   /// The member
-  membership    Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  membership        Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
   /// Pattern of the repository
-  repositoryPattern  String
+  repositoryPattern String
   /// The repository
-  repository    Repository @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  repository        Repository @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
   /// Whether the member has a readonly access to the repository
-  readonly      Boolean    @default(false)
+  readonly          Boolean    @default(false)
   /// Whether the permission can be modified or not
-  locked        Boolean    @default(false)
+  locked            Boolean    @default(false)
 
   @@id([username, institutionId, repositoryPattern])
 }
@@ -195,7 +195,7 @@ model RepositoryPermission {
 /// Represent the actions that are triggered
 model Action {
   /// ID of the action
-  id            String      @id @default(cuid())
+  id            String       @id @default(cuid())
   // ID of the institution concerned by the action
   institutionId String?
   // The institution concerned by the action
@@ -205,11 +205,43 @@ model Action {
   /// The user that triggered the action
   author        User?        @relation(fields: [authorId], references: [username])
   /// When the action occurred
-  date          DateTime    @default(now())
+  date          DateTime     @default(now())
   /// The action type (ex: commentInstitution, createSpace)
-  type          String      @db.VarChar(50)
+  type          String       @db.VarChar(50)
   /// Arbitrary data associated with the action (comment message, old/new state...)
-  data          Json        @default("{}")
+  data          Json         @default("{}")
+}
+
+/// Represent a harvest session
+model HarvestSession {
+  /// ID of the session
+  id                  String             @id @default(cuid())
+  /// Beginning of the requested period
+  beginDate           String
+  /// End of the requested period
+  endDate             String
+  /// Credentials to harvest
+  credentials         SushiCredentials[]
+  /// Jobs created after request
+  jobs                HarvestJob[]
+  /// IDs of the requested reports (ex: tr_j1)
+  reportTypes         String[]
+  /// Maximum execution time of a job
+  timeout             Int                @default(600)
+  /// Whether the reports should be fetched even if credentials aren't verified or wrong
+  allowFaulty         Boolean            @default(false)
+  /// Whether the reports should be downloaded even if not supported by the endpoint
+  downloadUnsupported Boolean            @default(false)
+  /// Whether the reports should be downloaded even if a local copy already exists
+  forceDownload       Boolean            @default(false)
+  /// Whether the reports should be inserted even if it does not pass the validation step
+  ignoreValidation    Boolean?
+  /// Parameters to pass to jobs
+  params              Json?              @default("{}")
+  /// Creation date
+  createdAt           DateTime           @default(now())
+  /// Latest update date
+  updatedAt           DateTime           @updatedAt
 }
 
 /// Possible statuses of a harvest job
@@ -233,49 +265,39 @@ enum HarvestJobStatus {
 /// Represent the execution of a harvest job
 model HarvestJob {
   /// ID of the job
-  id               String           @id @default(cuid())
+  id              String           @id @default(cuid())
   /// ID of the SUSHI credentials
-  credentialsId    String
+  credentialsId   String
   /// SUSHI credentials used to harvest
-  credentials      SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
+  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
   /// Creation date
-  createdAt        DateTime         @default(now())
+  createdAt       DateTime         @default(now())
   /// Latest update date
-  updatedAt        DateTime         @updatedAt
+  updatedAt       DateTime         @updatedAt
   /// Start date (when the job moved from waiting to running)
-  startedAt        DateTime?
-  /// Beginning of the harvested period
-  beginDate        String
-  /// End of the harvested period
-  endDate          String
+  startedAt       DateTime?
   /// Job status
-  status           HarvestJobStatus
+  status          HarvestJobStatus
   /// ID of the harvested report (ex: tr_j1)
-  reportType       String
+  reportType      String
   /// ID of the harvest session
-  harvestId        String
+  sessionId       String
+  /// Session that created the job
+  session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   /// Index where the harvested data should be inserted
-  index            String
+  index           String
   /// Job running time
-  runningTime      Int?
-  /// Maximum execution time of the job
-  timeout          Int
-  /// Whether the report should be downloaded even if a local copy already exists
-  forceDownload    Boolean          @default(false)
-  /// Whether the report should be inserted even if it does not pass the validation step
-  ignoreValidation Boolean          @default(false)
-  /// Job parameters
-  params           Json?            @default("{}")
+  runningTime     Int?
   /// Job result
-  result           Json?
+  result          Json?
   /// Error code, if a fatal exception was encountered
-  errorCode        String?
+  errorCode       String?
   /// SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string })
-  sushiExceptions  Json[]
+  sushiExceptions Json[]
   /// Job logs
-  logs             Log[]
+  logs            Log[]
   /// Job steps
-  steps            Step[]
+  steps           Step[]
 }
 
 /// Harvest state of a SUSHI item, for a specific month and report ID
@@ -397,35 +419,37 @@ model SushiEndpoint {
 /// A set of SUSHI credentials, associated to a SUSHI endpoint
 model SushiCredentials {
   /// ID of the SUSHI credentials
-  id            String           @id @default(cuid())
+  id              String           @id @default(cuid())
   /// Creation date
-  createdAt     DateTime         @default(now())
+  createdAt       DateTime         @default(now())
   /// Latest update date
-  updatedAt     DateTime         @updatedAt
+  updatedAt       DateTime         @updatedAt
   /// ID of the institution that owns the credentials
-  institutionId String
+  institutionId   String
   /// ID of the SUSHI endpoint
-  endpointId    String
+  endpointId      String
   /// Value of the customer_id parameter
-  customerId    String?
+  customerId      String?
   /// Value of the requestor_id parameter
-  requestorId   String?
+  requestorId     String?
   /// Value of the api_key parameter
-  apiKey        String?
+  apiKey          String?
   /// Abritrary comment about the credentials
-  comment       String?
+  comment         String?
   /// Abritrary tag list associated to the credentials
-  tags          String[]
+  tags            String[]
   /// Additionnal parameters. Each param has a name, a value, and a scope.
-  params        Json[]
+  params          Json[]
   /// Institution that owns the credentials
-  institution   Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution     Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// The SUSHI endpoint
-  endpoint      SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  endpoint        SushiEndpoint    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  /// Harvest requests associated to the credentials
+  harvestRequests HarvestSession[]
   /// The harvest jobs associated to the credentials
-  harvestJobs   HarvestJob[]
+  harvestJobs     HarvestJob[]
   /// The harvest states associated to the credentials
-  harvests      Harvest[]
+  harvests        Harvest[]
   /// Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? }
-  connection    Json?
+  connection      Json?
 }
