@@ -4,7 +4,7 @@ const { merge } = require('lodash');
  * Transform props to include into a valid prisma `include` field
  *
  * @param {string[]} props
- * @param {(string[] | Set<string>)?} includableFields
+ * @param {(string[] | Set<string>)?} [includableFields]
  * @returns
  */
 const propsToPrismaInclude = (props, includableFields) => {
@@ -39,7 +39,7 @@ const propsToPrismaInclude = (props, includableFields) => {
  *
  * @param {string} prop
  * @param {'asc'|'desc'} order
- * @param {(string[] | Set<string>)?} sortableFields
+ * @param {(string[] | Set<string>)?} [sortableFields]
  * @returns
  */
 const propsToPrismaSort = (prop, order, sortableFields) => {
