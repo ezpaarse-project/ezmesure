@@ -77,6 +77,14 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   }
 
   /**
+   * @param {HarvestJobAggregateArgs} params
+   * @returns
+   */
+  aggregate(params) {
+    return harvestJobPrisma.aggregate(params, this.prisma);
+  }
+
+  /**
    * @param {HarvestJobCountArgs} params
    * @returns {Promise<number>}
    */

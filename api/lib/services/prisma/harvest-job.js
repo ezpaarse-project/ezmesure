@@ -64,6 +64,15 @@ function groupBy(params, tx = prisma) {
 }
 
 /**
+ * @param {HarvestJobAggregateArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns
+ */
+function aggregate(params, tx = prisma) {
+  return tx.harvestJob.aggregate(params);
+}
+
+/**
  * @param {HarvestJobCountArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<number>}
@@ -157,6 +166,7 @@ module.exports = {
   findUnique,
   findFirst,
   groupBy,
+  aggregate,
   count,
   update,
   upsert,
