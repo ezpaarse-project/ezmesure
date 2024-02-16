@@ -91,10 +91,6 @@
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
-
-                    <v-icon v-if="permission.locked" small>
-                      mdi-lock
-                    </v-icon>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -128,10 +124,6 @@
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
-
-                    <v-icon v-if="permission.locked" small>
-                      mdi-lock
-                    </v-icon>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
