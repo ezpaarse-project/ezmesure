@@ -15,9 +15,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    
+
   migrate_reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report:latest
+    image: ghcr.io/ezpaarse-project/ezreeport-report:1.0.0
     entrypoint: ""
     command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
     environment:
