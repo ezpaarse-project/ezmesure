@@ -71,6 +71,7 @@
                 v-for="(permission, i) in spacesPermissions"
                 :key="i"
                 :href="`/kibana/s/${permission.spaceId}/spaces/enter`"
+                elevation="1"
               >
                 <v-list-item-icon>
                   <v-icon>mdi-tab</v-icon>
@@ -93,6 +94,11 @@
                     {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
+                <v-list-item-action>
+                  <v-icon>
+                    mdi-arrow-right
+                  </v-icon>
+                </v-list-item-action>
               </v-list-item>
             </v-list>
           </v-col>
@@ -106,7 +112,7 @@
                 :key="i"
               >
                 <v-list-item-icon>
-                  <v-icon>mdi-tray-arrow-down</v-icon>
+                  <v-icon>mdi-database-outline</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>
