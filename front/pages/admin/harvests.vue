@@ -17,129 +17,112 @@
     </ToolBar>
 
     <v-data-iterator
-      :items="requestsItems"
+      :items="sessionItems"
       :loading="refreshing"
       :options.sync="iteratorOptions"
-      :server-items-length="requestsCount"
+      :server-items-length="sessionsCount"
       item-key="id"
       @update:options="refreshHarvests"
     >
       <template #default="{ items }">
         <v-expansion-panels>
           <v-expansion-panel
-            v-for="({ item, bars, runningTime, createdAtLocale }) in items"
-            :key="item.id"
+            v-for="item in items"
+            :key="item.data.id"
+            :readonly="item.data._count.jobs <= 0"
           >
             <v-expansion-panel-header>
               <div style="flex: 1">
                 <div class="mb-2">
-                  {{ $t('harvest.requests.name', { createdAt: createdAtLocale }) }}
+                  {{ $t('harvest.sessions.name', { createdAt: item.createdAtLocale }) }}
 
                   <span class="text--secondary mx-2" style="font-size: 0.75em;">
-                    ({{ item.id }})
+                    ({{ item.data.id }})
                   </span>
                 </div>
 
-                <v-chip outlined small>
-                  <v-icon left small>
-                    mdi-calendar-range
-                  </v-icon>
+                <div class="d-flex flex-wrap" style="gap: 0.5rem">
+                  <v-tooltip
+                    v-for="tag in sessionChips[item.data.id]"
+                    :key="tag.key"
+                    :disabled="!tag.tooltip"
+                    bottom
+                  >
+                    <template #activator="{ attrs, on }">
+                      <v-chip
+                        outlined
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        <v-icon v-if="tag.icon" left small>
+                          {{ tag.icon }}
+                        </v-icon>
 
-                  {{ item.beginDate }} ~ {{ item.endDate }}
-                </v-chip>
+                        {{ tag.text }}
+                      </v-chip>
+                    </template>
 
-                <v-chip v-if="item.counts.institutions > 0" outlined small>
-                  <v-icon left small>
-                    mdi-domain
-                  </v-icon>
-
-                  {{ $tc('harvest.requests.counts.institutions', item.counts.institutions) }}
-                </v-chip>
-
-                <v-chip v-if="item.counts.endpoints > 0" outlined small>
-                  <v-icon left small>
-                    mdi-web
-                  </v-icon>
-
-                  {{ $tc('harvest.requests.counts.endpoints', item.counts.endpoints) }}
-                </v-chip>
-
-                <v-chip v-if="item.counts.reportTypes > 0" outlined small>
-                  <v-icon left small>
-                    mdi-file
-                  </v-icon>
-
-                  {{ $tc('harvest.requests.counts.reportTypes', item.counts.reportTypes) }}
-                </v-chip>
-
-                <v-chip v-if="item.runningTime" outlined small>
-                  <v-icon left small>
-                    mdi-timer-outline
-                  </v-icon>
-
-                  {{ runningTime }}
-                </v-chip>
+                    {{ tag.tooltip || '' }}
+                  </v-tooltip>
+                </div>
               </div>
 
-              <div class="d-flex align-center" style="flex: 0.4">
-                <v-progress-circular
-                  v-if="item.isActive"
-                  color="primary"
-                  width="2"
-                  indeterminate
-                />
-                <div v-else style="width: 32px;" />
-
-                <v-tooltip bottom>
-                  <template #activator="{ attrs, on }">
-                    <div
-                      class="d-flex mx-4 progress-bars"
-                      style="flex: 1;"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      <template v-for="{ key, ...props } in bars">
-                        <div
-                          v-if="props.value >= 1"
-                          :key="key"
-                          :style="{ width: `${props.value}%` }"
-                        >
-                          <v-progress-linear
-                            :color="props.color"
-                            :stream="props.stream"
-                            :value="props.stream || props.buffered ? 0 : 100"
-                            :buffer-value="!props.buffered ? 0 : 100"
-                            height="8"
-                          />
-                        </div>
-                      </template>
-                    </div>
-                  </template>
-
-                  <v-simple-table dark class="px-4 py-1">
-                    <template #default>
-                      <tbody>
-                        <template v-for="([name, count]) in Object.entries(item.metrics)">
-                          <tr
-                            v-if="count > 0"
-                            :key="name"
-                          >
-                            <td>{{ $t(`harvest.requests.metrics.${name}`) }}</td>
-                            <td>{{ count }}</td>
-                          </tr>
-                        </template>
-                      </tbody>
+              <div
+                class="d-flex align-center flex-row-reverse mr-2"
+                style="flex: 0.4"
+              >
+                <div v-if="!item.hasStarted" style="text-align: end;">
+                  <v-chip color="error">
+                    {{ $t('harvest.sessions.notStarted') }}
+                  </v-chip>
+                </div>
+                <template v-else>
+                  <v-tooltip :disabled="!item.status.metrics" bottom>
+                    <template #activator="{ attrs, on }">
+                      <div style="flex: 1;" v-bind="attrs" v-on="on">
+                        <ProgressLinearStack
+                          :value="item.bars"
+                          height="8"
+                        />
+                      </div>
                     </template>
-                  </v-simple-table>
-                </v-tooltip>
+
+                    <v-simple-table dark class="px-4 py-1">
+                      <template #default>
+                        <tbody>
+                          <template
+                            v-for="([name, count]) in Object.entries(item.status.metrics ?? {})"
+                          >
+                            <tr
+                              v-if="count > 0"
+                              :key="name"
+                            >
+                              <td>{{ $t(`harvest.sessions.metrics.${name}`) }}</td>
+                              <td>{{ count }}</td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-tooltip>
+
+                  <v-progress-circular
+                    v-if="item.status.isActive"
+                    color="primary"
+                    width="2"
+                    indeterminate
+                  />
+                  <div v-else style="width: 32px;" />
+                </template>
               </div>
             </v-expansion-panel-header>
 
             <v-expansion-panel-content>
               <HarvestJobTable
-                :ref="(ref) => (tables[item.id] = ref)"
-                :harvest-id="item.id"
-                :disabled-filters="['harvestId', 'period']"
+                :ref="(ref) => (tables[item.data.id] = ref)"
+                :session-id="item.data.id"
+                :disabled-filters="['harvestId']"
               />
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -152,6 +135,7 @@
 <script>
 import { defineComponent } from 'vue';
 import { parseISO } from 'date-fns';
+import ProgressLinearStack from '~/components/ProgressLinearStack.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import HarvestJobTable from '~/components/harvest/HarvestJobTable.vue';
 
@@ -159,6 +143,7 @@ export default defineComponent({
   layout: 'space',
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
+    ProgressLinearStack,
     ToolBar,
     HarvestJobTable,
   },
@@ -167,66 +152,161 @@ export default defineComponent({
 
     iteratorOptions: {},
 
-    requests: [],
-    requestsCount: 0,
+    sessions: [],
+    sessionsCount: 0,
+    sessionStatuses: {},
 
     tables: {},
+    openedTooltips: {},
   }),
   computed: {
-    requestsItems() {
-      return this.requests.map((item) => {
-        const { id, metrics } = item;
-
-        const calcPercentage = (value) => (value / item.counts.jobs) * 100;
+    sessionItems() {
+      return this.sessions.map((item) => {
+        const status = this.sessionStatuses[item.id];
 
         return {
-          item,
+          data: item,
+          status: status ?? {},
+          // eslint-disable-next-line no-underscore-dangle
+          hasStarted: Object.keys(status?._count.statuses ?? {}).length > 0,
+
+          counts: this.computeCounts(item),
+          bars: this.computeBars(item),
 
           createdAtLocale: this.$dateFunctions.format(parseISO(item.createdAt), 'PPPpp'),
 
           runningTime: this.$dateFunctions.msToLocalDistance(
-            item.runningTime,
+            status?.runningTime,
             { format: ['days', 'hours', 'minutes', 'seconds'] },
           ),
 
-          bars: [
-            {
-              key: `${id}-success`,
-              color: 'success',
-              value: calcPercentage(metrics.success),
-            },
-            {
-              key: `${id}-failed`,
-              color: 'error',
-              value: calcPercentage(metrics.failed),
-            },
-            {
-              key: `${id}-active`,
-              color: 'blue',
-              value: calcPercentage(metrics.active),
-            },
-            {
-              key: `${id}-delayed`,
-              color: 'blue',
-              buffered: true,
-              value: calcPercentage(metrics.delayed),
-            },
-            {
-              key: `${id}-pending`,
-              color: 'grey',
-              stream: true,
-              value: calcPercentage(metrics.pending),
-            },
-          ],
         };
       });
     },
+    sessionChips() {
+      const chipsPerSession = {};
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const item of this.sessionItems) {
+        chipsPerSession[item.data.id] = [
+          {
+            key: `${item.data.id}-period`,
+            icon: 'mdi-calendar-range',
+            text: `${item.data.beginDate} ~ ${item.data.endDate}`,
+          },
+          {
+            key: `${item.data.id}-institutions`,
+            icon: 'mdi-domain',
+            text: this.$tc('harvest.sessions.counts.institutions', item.counts.institutions),
+          },
+          {
+            key: `${item.data.id}-endpoints`,
+            icon: 'mdi-web',
+            text: this.$tc('harvest.sessions.counts.endpoints', item.counts.endpoints),
+          },
+          {
+            key: `${item.data.id}-credentials`,
+            icon: 'mdi-key',
+            text: this.$tc(
+              'harvest.sessions.counts.credentials',
+              item.counts.credentials.harvestable || item.counts.credentials.total,
+            ),
+            tooltip: this.$t('harvest.sessions.credentialsTooltip', item.counts.credentials),
+          },
+          {
+            key: `${item.data.id}-reports`,
+            icon: 'mdi-file',
+            text: this.$tc('harvest.sessions.counts.reportTypes', item.counts.reportTypes),
+          },
+          {
+            key: `${item.data.id}-runningTime`,
+            icon: 'mdi-timer-outline',
+            text: item.runningTime,
+          },
+        ];
+      }
+
+      return chipsPerSession;
+    },
   },
   methods: {
+    computeBars(session) {
+      const status = this.sessionStatuses[session.id];
+      if (!status) {
+        return [
+          {
+            key: `${session.id}-unknown`,
+            type: 'buffer',
+            value: 1,
+            color: 'primary',
+          },
+        ];
+      }
+
+      // eslint-disable-next-line no-underscore-dangle
+      const getValue = (value) => (value / session._count.jobs);
+
+      return [
+        {
+          key: `${session.id}-success`,
+          color: 'success',
+          value: getValue(status.metrics.success),
+        },
+        {
+          key: `${session.id}-failed`,
+          color: 'error',
+          value: getValue(status.metrics.failed),
+        },
+        {
+          key: `${session.id}-active`,
+          color: 'blue',
+          value: getValue(status.metrics.active),
+        },
+        {
+          key: `${session.id}-delayed`,
+          type: 'buffer',
+          color: 'blue',
+          value: getValue(status.metrics.delayed),
+        },
+        {
+          key: `${session.id}-pending`,
+          type: 'stream',
+          color: 'grey',
+          value: getValue(status.metrics.pending),
+        },
+      ];
+    },
+
+    computeCounts(session) {
+      const status = this.sessionStatuses[session.id];
+
+      const institutionIds = new Set();
+      const endpointIds = new Set();
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const credential of session.credentials) {
+        institutionIds.add(credential.institutionId);
+        endpointIds.add(credential.endpointId);
+      }
+
+      return {
+        institutions: institutionIds.size,
+        endpoints: endpointIds.size,
+        reportTypes: session.reportTypes.length,
+        credentials: {
+          // eslint-disable-next-line no-underscore-dangle
+          harvestable: status?._count.harvestableCredentials,
+          // eslint-disable-next-line no-underscore-dangle
+          total: session._count.credentials,
+        },
+      };
+    },
+
     async refreshHarvests() {
       this.refreshing = true;
 
       const params = {
+        include: ['credentials'],
         page: this.iteratorOptions.page,
         size: this.iteratorOptions.itemsPerPage,
         sort: this.iteratorOptions.sortBy[0],
@@ -234,17 +314,30 @@ export default defineComponent({
       };
 
       try {
-        const { headers, data } = await this.$axios.get('/harvests-requests', { params });
+        const { headers, data } = await this.$axios.get('/harvests-sessions', { params });
 
-        this.requests = data;
-        this.requestsCount = Number.parseInt(headers['x-total-count'], 10);
+        this.sessions = data;
+        this.sessionsCount = Number.parseInt(headers['x-total-count'], 10);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('harvest.requests.unableToRetrive'));
+        this.$store.dispatch('snacks/error', this.$t('harvest.sessions.unableToRetrive'));
       }
 
       // eslint-disable-next-line no-restricted-syntax
       for (const table of Object.values(this.tables)) {
         table.refreshJobs();
+      }
+
+      try {
+        const statuses = await Promise.all(
+          this.sessions.map((session) => this.$axios.get(`/harvests-sessions/${session.id}/status`)),
+        );
+
+        this.sessionStatuses = {
+          ...this.sessionStatuses,
+          ...Object.fromEntries(statuses.map(({ data: { id, ...status } }) => [id, status])),
+        };
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.sessions.unableToRetrive'));
       }
 
       this.refreshing = false;
@@ -254,13 +347,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.progress-bars > div:first-child > div[aria-valuenow="100"] {
-  border-radius: 1rem 0 0 1rem;
-}
-.progress-bars > div:last-child > div[aria-valuenow="100"] {
-  border-radius: 0 1rem 1rem 0;
-}
-
 .v-tooltip__content {
   padding: 0;
 }
