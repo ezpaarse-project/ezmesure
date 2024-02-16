@@ -9,7 +9,7 @@ const institutionsPrisma = require('../../../../lib/services/prisma/institutions
 const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
 const usersPrisma = require('../../../../lib/services/prisma/users');
 const usersElastic = require('../../../../lib/services/elastic/users');
-const usersService = require('../../../../lib/entities/users.service');
+const UsersService = require('../../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -55,7 +55,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
 
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;

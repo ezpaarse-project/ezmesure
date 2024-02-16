@@ -1,4 +1,5 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const logPrisma = require('../services/prisma/log');
 
 /* eslint-disable max-len */
@@ -10,45 +11,48 @@ const logPrisma = require('../services/prisma/log');
 /** @typedef {import('@prisma/client').Prisma.LogCreateArgs} LogCreateArgs */
 /* eslint-enable max-len */
 
-module.exports = class LogsService {
+module.exports = class LogsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<LogsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {LogCreateArgs} params
    * @returns {Promise<Log>}
    */
-  static create(params) {
-    return logPrisma.create(params);
+  create(params) {
+    return logPrisma.create(params, this.prisma);
   }
 
   /**
    * @param {LogFindManyArgs} params
    * @returns {Promise<Log[]>}
    */
-  static findMany(params) {
-    return logPrisma.findMany(params);
+  findMany(params) {
+    return logPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {LogFindUniqueArgs} params
    * @returns {Promise<Log | null>}
    */
-  static findUnique(params) {
-    return logPrisma.findUnique(params);
+  findUnique(params) {
+    return logPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {LogUpdateArgs} params
    * @returns {Promise<Log>}
    */
-  static update(params) {
-    return logPrisma.update(params);
+  update(params) {
+    return logPrisma.update(params, this.prisma);
   }
 
   /**
    * @param {LogUpsertArgs} params
    * @returns {Promise<Log>}
    */
-  static upsert(params) {
-    return logPrisma.upsert(params);
+  upsert(params) {
+    return logPrisma.upsert(params, this.prisma);
   }
 
   /**
@@ -57,7 +61,7 @@ module.exports = class LogsService {
    * @param {string} message - log message
    * @returns {Promise<Log>}
    */
-  static log(jobId, level, message) {
-    return logPrisma.log(jobId, level, message);
+  log(jobId, level, message) {
+    return logPrisma.log(jobId, level, message, this.prisma);
   }
 };

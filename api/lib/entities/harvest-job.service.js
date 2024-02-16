@@ -1,28 +1,45 @@
 // @ts-check
 const harvestJobPrisma = require('../services/prisma/harvest-job');
-const { triggerHooks } = require('../hooks/hookEmitter');
+const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
+/** @typedef {import('@prisma/client').HarvestJobStatus} HarvestJobStatus */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobDeleteArgs} HarvestJobDeleteArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
-module.exports = class HarvestJobsService {
+module.exports = class HarvestJobsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<HarvestJobsService>} */
+  static $transaction = super.$transaction;
+
+  /** @type {HarvestJobStatus[]} */
+  static endStatuses = ['finished', 'failed', 'cancelled', 'delayed'];
+
+  /**
+   * Returns whether the job is terminated or not by checking its status
+   * @param {HarvestJob} job - The job to check
+   */
+  static isDone(job) {
+    return this.endStatuses.includes(job?.status);
+  }
+
   /**
    * @param {HarvestJobCreateArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static async create(params) {
-    const job = await harvestJobPrisma.create(params);
+  async create(params) {
+    const job = await harvestJobPrisma.create(params, this.prisma);
 
-    triggerHooks('harvest-job:create', job);
+    this.triggerHooks('harvest-job:create', job);
 
     return job;
   }
@@ -31,42 +48,50 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJobFindManyArgs} params
    * @returns {Promise<HarvestJob[]>}
    */
-  static findMany(params) {
-    return harvestJobPrisma.findMany(params);
+  findMany(params) {
+    return harvestJobPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {HarvestJobFindUniqueArgs} params
    * @returns {Promise<HarvestJob | null>}
    */
-  static findUnique(params) {
-    return harvestJobPrisma.findUnique(params);
+  findUnique(params) {
+    return harvestJobPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {HarvestJobFindFirstArgs} params
    * @returns {Promise<HarvestJob | null>}
    */
-  static findFirst(params) {
-    return harvestJobPrisma.findFirst(params);
+  findFirst(params) {
+    return harvestJobPrisma.findFirst(params, this.prisma);
+  }
+
+  /**
+   * @param {HarvestJobGroupByArgs} params
+   * @returns
+   */
+  groupBy(params) {
+    return harvestJobPrisma.groupBy(params, this.prisma);
   }
 
   /**
    * @param {HarvestJobCountArgs} params
    * @returns {Promise<number>}
    */
-  static count(params) {
-    return harvestJobPrisma.count(params);
+  count(params) {
+    return harvestJobPrisma.count(params, this.prisma);
   }
 
   /**
    * @param {HarvestJobUpdateArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static async update(params) {
-    const job = await harvestJobPrisma.update(params);
+  async update(params) {
+    const job = await harvestJobPrisma.update(params, this.prisma);
 
-    triggerHooks('harvest-job:update', job);
+    this.triggerHooks('harvest-job:update', job);
 
     return job;
   }
@@ -75,10 +100,10 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJobUpsertArgs} params
    * @returns {Promise<HarvestJob>}
    */
-  static async upsert(params) {
-    const job = await harvestJobPrisma.upsert(params);
+  async upsert(params) {
+    const job = await harvestJobPrisma.upsert(params, this.prisma);
 
-    triggerHooks('harvest-job:upsert', job);
+    this.triggerHooks('harvest-job:upsert', job);
 
     return job;
   }
@@ -87,10 +112,10 @@ module.exports = class HarvestJobsService {
    * @param {HarvestJobDeleteArgs} params
    * @returns {Promise<HarvestJob | null>}
    */
-  static async delete(params) {
-    const job = await harvestJobPrisma.remove(params);
+  async delete(params) {
+    const job = await harvestJobPrisma.remove(params, this.prisma);
 
-    triggerHooks('harvest-job:delete', job);
+    this.triggerHooks('harvest-job:delete', job);
 
     return job;
   }
@@ -102,7 +127,7 @@ module.exports = class HarvestJobsService {
    * @param {string} [options.errorCode] - An error code
    * @returns {Promise<HarvestJob>}
    */
-  static finish(job, options = {}) {
+  finish(job, options = {}) {
     const { status = 'finished', errorCode } = options;
     const { startedAt, createdAt } = job;
 
@@ -114,26 +139,23 @@ module.exports = class HarvestJobsService {
       runningTime = Date.now() - createdAt.getTime();
     }
 
-    return HarvestJobsService.update({
+    return this.update({
       where: { id: job.id },
-      data: { status, runningTime, errorCode },
+      data: {
+        // @ts-ignore
+        status,
+        runningTime,
+        errorCode,
+      },
     });
-  }
-
-  /**
-   * Returns whether the job is terminated or not by checking its status
-   * @param {HarvestJob} job - The job to check
-   */
-  static isDone(job) {
-    return ['finished', 'failed', 'cancelled', 'delayed'].includes(job?.status);
   }
 
   /**
    * Cancel a job
    * @param {HarvestJob} job - The job to cancel
    */
-  static cancel(job) {
-    return HarvestJobsService.update({
+  cancel(job) {
+    return this.update({
       where: { id: job.id },
       data: { status: 'cancelled' },
     });

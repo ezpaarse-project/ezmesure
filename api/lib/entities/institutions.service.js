@@ -1,7 +1,6 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const institutionsPrisma = require('../services/prisma/institutions');
-
-const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /**
@@ -15,14 +14,17 @@ const { triggerHooks } = require('../hooks/hookEmitter');
  */
 /* eslint-enable max-len */
 
-module.exports = class InstitutionsService {
+module.exports = class InstitutionsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<InstitutionsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {InstitutionCreateArgs} params
    * @returns {Promise<Institution>}
    */
-  static async create(params) {
-    const institution = await institutionsPrisma.create(params);
-    triggerHooks('institution:create', institution);
+  async create(params) {
+    const institution = await institutionsPrisma.create(params, this.prisma);
+    this.triggerHooks('institution:create', institution);
     return institution;
   }
 
@@ -30,9 +32,9 @@ module.exports = class InstitutionsService {
    * @param {InstitutionCreateArgs} params
    * @returns {Promise<Institution>}
    */
-  static async createAsUser(params) {
-    const institution = await institutionsPrisma.create(params);
-    triggerHooks('institution:create', institution);
+  async createAsUser(params) {
+    const institution = await institutionsPrisma.create(params, this.prisma);
+    this.triggerHooks('institution:create', institution);
     return institution;
   }
 
@@ -40,16 +42,16 @@ module.exports = class InstitutionsService {
    * @param {InstitutionFindManyArgs} params
    * @returns {Promise<Institution[]>}
    */
-  static findMany(params) {
-    return institutionsPrisma.findMany(params);
+  findMany(params) {
+    return institutionsPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {InstitutionFindUniqueArgs} params
    * @returns {Promise<Institution | null>}
    */
-  static findUnique(params) {
-    return institutionsPrisma.findUnique(params);
+  findUnique(params) {
+    return institutionsPrisma.findUnique(params, this.prisma);
   }
 
   /**
@@ -57,17 +59,17 @@ module.exports = class InstitutionsService {
    * @param {Object | null} includes
    * @returns {Promise<Institution | null>}
    */
-  static findByID(id, includes = null) {
-    return institutionsPrisma.findByID(id, includes);
+  findByID(id, includes = null) {
+    return institutionsPrisma.findByID(id, includes, this.prisma);
   }
 
   /**
    * @param {InstitutionUpdateArgs} params
    * @returns {Promise<Institution>}
    */
-  static async update(params) {
-    const institution = await institutionsPrisma.update(params);
-    triggerHooks('institution:update', institution);
+  async update(params) {
+    const institution = await institutionsPrisma.update(params, this.prisma);
+    this.triggerHooks('institution:update', institution);
     return institution;
   }
 
@@ -76,9 +78,13 @@ module.exports = class InstitutionsService {
    * @param {string} subInstitutionId
    * @returns {Promise<Institution>}
    */
-  static async addSubInstitution(institutionId, subInstitutionId) {
-    const institution = await institutionsPrisma.addSubInstitution(institutionId, subInstitutionId);
-    triggerHooks('institution:update', institution);
+  async addSubInstitution(institutionId, subInstitutionId) {
+    const institution = await institutionsPrisma.addSubInstitution(
+      institutionId,
+      subInstitutionId,
+      this.prisma,
+    );
+    this.triggerHooks('institution:update', institution);
     return institution;
   }
 
@@ -86,9 +92,9 @@ module.exports = class InstitutionsService {
    * @param {string} id
    * @returns {Promise<Institution>}
    */
-  static async validate(id) {
-    const institution = await institutionsPrisma.validate(id);
-    triggerHooks('institution:update', institution);
+  async validate(id) {
+    const institution = await institutionsPrisma.validate(id, this.prisma);
+    this.triggerHooks('institution:update', institution);
     return institution;
   }
 
@@ -96,9 +102,9 @@ module.exports = class InstitutionsService {
    * @param {InstitutionUpsertArgs} params
    * @returns {Promise<Institution>}
    */
-  static async upsert(params) {
-    const institution = await institutionsPrisma.upsert(params);
-    triggerHooks('institution:upsert', institution);
+  async upsert(params) {
+    const institution = await institutionsPrisma.upsert(params, this.prisma);
+    this.triggerHooks('institution:upsert', institution);
     return institution;
   }
 
@@ -106,8 +112,8 @@ module.exports = class InstitutionsService {
    * @param {InstitutionDeleteArgs} params
    * @returns {Promise<Institution | null>}
    */
-  static async delete(params) {
-    const data = await institutionsPrisma.remove(params);
+  async delete(params) {
+    const data = await institutionsPrisma.remove(params, this.prisma);
 
     if (!data) return null;
 
@@ -117,17 +123,17 @@ module.exports = class InstitutionsService {
       institution,
     } = data;
 
-    triggerHooks('institution:delete', institution);
+    this.triggerHooks('institution:delete', institution);
 
     institution.memberships?.forEach((element) => {
-      triggerHooks('memberships:delete', element);
+      this.triggerHooks('memberships:delete', element);
 
-      element.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
-      element.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+      element.repositoryPermissions.forEach((repoPerm) => { this.triggerHooks('repository_permission:delete', repoPerm); });
+      element.spacePermissions.forEach((spacePerm) => { this.triggerHooks('space_permission:delete', spacePerm); });
     });
-    institution.spaces?.forEach((element) => { triggerHooks('space:delete', element); });
-    deletedRepos.forEach((element) => { triggerHooks('repository:delete', element); });
-    institution.sushiCredentials?.forEach((element) => { triggerHooks('sushi_credentials:delete', element); });
+    institution.spaces?.forEach((element) => { this.triggerHooks('space:delete', element); });
+    deletedRepos.forEach((element) => { this.triggerHooks('repository:delete', element); });
+    institution.sushiCredentials?.forEach((element) => { this.triggerHooks('sushi_credentials:delete', element); });
 
     return deletedInstitution;
   }
@@ -135,25 +141,39 @@ module.exports = class InstitutionsService {
   /**
    * @returns {Promise<Object | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const institutions = await this.findMany({});
+    /** @param {InstitutionsService} service */
+    const processor = async (service) => {
+      const institutions = await service.findMany({});
 
-    if (institutions.length === 0) { return null; }
+      if (institutions.length === 0) { return null; }
 
-    await Promise.all(institutions.map(async (institution) => {
-      await this.delete({
-        where: {
-          id: institution.id,
-        },
-      });
-    }));
+      await Promise.all(
+        institutions.map(
+          (institution) => service.delete({
+            where: {
+              id: institution.id,
+            },
+          }),
+        ),
+      );
 
-    return institutions;
+      return institutions;
+    };
+
+    if (this.currentTransaction) {
+      return processor(this);
+    }
+    return InstitutionsService.$transaction(processor);
   }
 
-  static async getContacts(institutionId) {
-    return institutionsPrisma.getContacts(institutionId);
+  /**
+   * @param {string} institutionId
+   * @returns
+   */
+  getContacts(institutionId) {
+    return institutionsPrisma.getContacts(institutionId, this.prisma);
   }
 };

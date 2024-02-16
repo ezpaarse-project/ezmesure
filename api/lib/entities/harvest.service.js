@@ -1,5 +1,6 @@
 // @ts-check
 const harvestPrisma = require('../services/prisma/harvest');
+const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Harvest} Harvest */
@@ -10,44 +11,47 @@ const harvestPrisma = require('../services/prisma/harvest');
 /** @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs */
 /* eslint-enable max-len */
 
-module.exports = class HarvestsService {
+module.exports = class HarvestsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<HarvestsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {HarvestCreateArgs} params
    * @returns {Promise<Harvest>}
    */
-  static create(params) {
-    return harvestPrisma.create(params);
+  create(params) {
+    return harvestPrisma.create(params, this.prisma);
   }
 
   /**
    * @param {HarvestFindManyArgs} params
    * @returns {Promise<Harvest[]>}
    */
-  static findMany(params) {
-    return harvestPrisma.findMany(params);
+  findMany(params) {
+    return harvestPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {HarvestFindUniqueArgs} params
    * @returns {Promise<Harvest | null>}
    */
-  static findUnique(params) {
-    return harvestPrisma.findUnique(params);
+  findUnique(params) {
+    return harvestPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {HarvestUpdateArgs} params
    * @returns {Promise<Harvest>}
    */
-  static update(params) {
-    return harvestPrisma.update(params);
+  update(params) {
+    return harvestPrisma.update(params, this.prisma);
   }
 
   /**
    * @param {HarvestUpsertArgs} params
    * @returns {Promise<Harvest>}
    */
-  static upsert(params) {
-    return harvestPrisma.upsert(params);
+  upsert(params) {
+    return harvestPrisma.upsert(params, this.prisma);
   }
 };

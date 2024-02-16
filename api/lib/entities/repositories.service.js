@@ -1,6 +1,6 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const repositoriesPrisma = require('../services/prisma/repositories');
-const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Repository} Repository */
@@ -13,14 +13,17 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 /** @typedef {import('@prisma/client').Prisma.RepositoryDeleteArgs} RepositoryDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class RepositoriesService {
+module.exports = class RepositoriesService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<RepositoriesService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {RepositoryCreateArgs} params
    * @returns {Promise<Repository>}
    */
-  static async create(params) {
-    const repository = await repositoriesPrisma.create(params);
-    triggerHooks('repository:create', repository);
+  async create(params) {
+    const repository = await repositoriesPrisma.create(params, this.prisma);
+    this.triggerHooks('repository:create', repository);
     return repository;
   }
 
@@ -28,41 +31,41 @@ module.exports = class RepositoriesService {
    * @param {RepositoryFindManyArgs} params
    * @returns {Promise<Repository[]>}
    */
-  static findMany(params) {
-    return repositoriesPrisma.findMany(params);
+  findMany(params) {
+    return repositoriesPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {RepositoryFindUniqueArgs} params
    * @returns {Promise<Repository | null>}
    */
-  static findUnique(params) {
-    return repositoriesPrisma.findUnique(params);
+  findUnique(params) {
+    return repositoriesPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {RepositoryFindFirstArgs} params
    * @returns {Promise<Repository | null>}
    */
-  static findFirst(params) {
-    return repositoriesPrisma.findFirst(params);
+  findFirst(params) {
+    return repositoriesPrisma.findFirst(params, this.prisma);
   }
 
   /**
    * @param {string} pattern
    * @returns {Promise<Repository | null>}
    */
-  static findByPattern(pattern) {
-    return repositoriesPrisma.findUnique({ where: { pattern } });
+  findByPattern(pattern) {
+    return repositoriesPrisma.findUnique({ where: { pattern } }, this.prisma);
   }
 
   /**
    * @param {RepositoryUpdateArgs} params
    * @returns {Promise<Repository>}
    */
-  static async update(params) {
-    const repository = await repositoriesPrisma.update(params);
-    triggerHooks('repository:update', repository);
+  async update(params) {
+    const repository = await repositoriesPrisma.update(params, this.prisma);
+    this.triggerHooks('repository:update', repository);
     return repository;
   }
 
@@ -71,9 +74,9 @@ module.exports = class RepositoriesService {
    * @param {string} pattern
    * @param {string} institutionId
    */
-  static async connectInstitution(pattern, institutionId) {
+  async connectInstitution(pattern, institutionId) {
     const repository = await repositoriesPrisma.connectInstitution(pattern, institutionId);
-    triggerHooks('repository:update', repository);
+    this.triggerHooks('repository:update', repository);
     return repository;
   }
 
@@ -81,9 +84,9 @@ module.exports = class RepositoriesService {
    * @param {RepositoryUpsertArgs} params
    * @returns {Promise<Repository>}
    */
-  static async upsert(params) {
-    const repository = await repositoriesPrisma.upsert(params);
-    triggerHooks('repository:upsert', repository);
+  async upsert(params) {
+    const repository = await repositoriesPrisma.upsert(params, this.prisma);
+    this.triggerHooks('repository:upsert', repository);
     return repository;
   }
 
@@ -91,15 +94,15 @@ module.exports = class RepositoriesService {
    * @param {RepositoryDeleteArgs} params
    * @returns {Promise<Repository | null>}
    */
-  static async delete(params) {
-    const result = await repositoriesPrisma.remove(params);
+  async delete(params) {
+    const result = await repositoriesPrisma.remove(params, this.prisma);
     if (!result) {
       return null;
     }
     const { deleteResult, deletedRepository } = result;
 
-    triggerHooks('repository:delete', deletedRepository);
-    deletedRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+    this.triggerHooks('repository:delete', deletedRepository);
+    deletedRepository.permissions.forEach((repoPerm) => { this.triggerHooks('repository_permission:delete', repoPerm); });
 
     return deleteResult;
   }
@@ -110,15 +113,15 @@ module.exports = class RepositoriesService {
    * @param {string} institutionId
    * @returns {Promise<Repository | null>}
    */
-  static async disconnectInstitution(pattern, institutionId) {
+  async disconnectInstitution(pattern, institutionId) {
     const result = await repositoriesPrisma.disconnectInstitution(pattern, institutionId);
     if (!result) {
       return null;
     }
     const { newRepository, oldRepository } = result;
 
-    triggerHooks('repository:disconnected', oldRepository, institutionId);
-    oldRepository.permissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
+    this.triggerHooks('repository:disconnected', oldRepository, institutionId);
+    oldRepository.permissions.forEach((repoPerm) => { this.triggerHooks('repository_permission:delete', repoPerm); });
 
     return newRepository;
   }
@@ -126,21 +129,29 @@ module.exports = class RepositoriesService {
   /**
    * @returns {Promise<Array<Repository> | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const repositories = await this.findMany({});
+    /** @param {RepositoriesService} service */
+    const processor = async (service) => {
+      const repositories = await service.findMany({});
 
-    if (repositories.length === 0) { return null; }
+      if (repositories.length === 0) { return null; }
 
-    await Promise.all(repositories.map(async (repository) => {
-      await this.delete({
-        where: {
-          pattern: repository.pattern,
-        },
-      });
-    }));
+      await Promise.all(
+        repositories.map(
+          (repository) => service.delete(
+            { where: { pattern: repository.pattern } },
+          ),
+        ),
+      );
 
-    return repositories;
+      return repositories;
+    };
+
+    if (this.currentTransaction) {
+      return processor(this);
+    }
+    return RepositoriesService.$transaction(processor);
   }
 };

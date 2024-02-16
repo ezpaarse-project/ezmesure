@@ -1,5 +1,5 @@
 const { addDays, isAfter } = require('date-fns');
-const institutionService = require('../../entities/institutions.service');
+const InstitutionService = require('../../entities/institutions.service');
 
 const ezrAxios = require('../../services/ezreeport/axios');
 const { appLogger } = require('../../services/logger');
@@ -44,6 +44,7 @@ const institutionHasReport = async (institutionId) => {
 };
 
 exports.list = async (ctx) => {
+  const institutionService = new InstitutionService(ctx);
   const partners = await institutionService.findMany({
     where: {
       validated: true,

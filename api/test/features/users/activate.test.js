@@ -5,7 +5,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 describe('[users]: Test activate users features', () => {
   const userTest = {
@@ -31,7 +31,7 @@ describe('[users]: Test activate users features', () => {
       beforeAll(async () => {
         await usersPrisma.create({ data: userTest });
         await usersElastic.createUser(userTest);
-        userToken = await usersService.generateTokenForActivate(userTest.username);
+        userToken = await UsersService.generateTokenForActivate(userTest.username);
       });
 
       it(`#01 Should activate user [${userTest.username}]`, async () => {

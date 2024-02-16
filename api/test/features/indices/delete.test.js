@@ -6,7 +6,7 @@ const indicesPrisma = require('../../../lib/services/elastic/indices');
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
 
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -23,7 +23,7 @@ describe('[indices]: Test delete features', () => {
 
   let adminToken;
   beforeAll(async () => {
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     beforeEach(async () => {
@@ -53,7 +53,7 @@ describe('[indices]: Test delete features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      userToken = await UsersService.generateToken(userTest.username, userTest.password);
     });
     beforeEach(async () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });

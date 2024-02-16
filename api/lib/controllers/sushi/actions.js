@@ -17,10 +17,10 @@ const { harvestQueue } = require('../../services/jobs');
 
 const { SUSHI_CODES, ERROR_CODES } = sushiService;
 
-const repositoriesService = require('../../entities/repositories.service');
-const sushiCredentialsService = require('../../entities/sushi-credentials.service');
-const harvestJobsService = require('../../entities/harvest-job.service');
-const harvestsService = require('../../entities/harvest.service');
+const RepositoriesService = require('../../entities/repositories.service');
+const SushiCredentialsService = require('../../entities/sushi-credentials.service');
+const HarvestJobsService = require('../../entities/harvest-job.service');
+const HarvestsService = require('../../entities/harvest.service');
 const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
 
 const { includableFields } = require('../../entities/sushi-credentials.dto');
@@ -110,6 +110,8 @@ exports.getAll = async (ctx) => {
     }
   }
 
+  const sushiCredentialsService = new SushiCredentialsService();
+
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = await sushiCredentialsService.findMany(options);
@@ -125,6 +127,8 @@ exports.getOne = async (ctx) => {
 exports.getTasks = async (ctx) => {
   const { sushi } = ctx.state;
 
+  const harvestJobsService = new HarvestJobsService();
+
   ctx.status = 200;
   ctx.body = await harvestJobsService.findMany({ where: { credentialsId: sushi.id } });
 };
@@ -139,6 +143,8 @@ exports.addSushi = async (ctx) => {
     institutionId: institution.id,
     institutionName: institution.name,
   };
+
+  const sushiCredentialsService = new SushiCredentialsService();
 
   const sushiItem = await sushiCredentialsService.create({
     data: {
@@ -167,6 +173,8 @@ exports.updateSushi = async (ctx) => {
     institutionName: institution.name,
   };
 
+  const sushiCredentialsService = new SushiCredentialsService();
+
   const updatedSushiCredentials = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
@@ -187,6 +195,8 @@ exports.deleteOne = async (ctx) => {
     sushiId: sushi?.id,
     endpointVendor: sushi?.endpoint?.vendor,
   };
+
+  const sushiCredentialsService = new SushiCredentialsService();
 
   await sushiCredentialsService.delete({ where: { id: sushi?.id } });
 
@@ -219,6 +229,8 @@ exports.getHarvests = async (ctx) => {
   if (from || to) {
     options.where.period = { gte: from, lte: to };
   }
+
+  const harvestsService = new HarvestsService();
 
   const harvests = await harvestsService.findMany(options);
 
@@ -408,6 +420,9 @@ exports.harvestSushi = async (ctx) => {
 
   let index = target;
 
+  const repositoriesService = new RepositoriesService();
+  const sushiEndpointsService = new SushiEndpointsService();
+
   if (!index) {
     const repository = await repositoriesService.findFirst({
       where: {
@@ -454,7 +469,7 @@ exports.harvestSushi = async (ctx) => {
       appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
     }
 
-    sushi.endpoint = await SushiEndpointsService.update({
+    sushi.endpoint = await sushiEndpointsService.update({
       where: { id: sushi?.endpoint?.id },
       data: {
         supportedReports,
@@ -500,41 +515,43 @@ exports.harvestSushi = async (ctx) => {
   }
 
   ctx.type = 'json';
-  ctx.body = await Promise.all(
-    reportTypes.flatMap(
-      async (reportType) => {
-        const task = await harvestJobsService.create({
-          include: {
-            credentials: {
-              include: {
-                endpoint: true,
+  ctx.body = await HarvestJobsService.$transaction(
+    (harvestJobsService) => Promise.all(
+      reportTypes.flatMap(
+        async (reportType) => {
+          const task = await harvestJobsService.create({
+            include: {
+              credentials: {
+                include: {
+                  endpoint: true,
+                },
               },
             },
-          },
-          data: {
-            credentials: {
-              connect: { id: sushi.id },
+            data: {
+              credentials: {
+                connect: { id: sushi.id },
+              },
+              status: 'waiting',
+              harvestId,
+              timeout,
+              reportType,
+              index,
+              beginDate: format(beginDate, 'yyyy-MM'),
+              endDate: format(endDate, 'yyyy-MM'),
+              forceDownload,
+              ignoreValidation,
             },
-            status: 'waiting',
-            harvestId,
-            timeout,
-            reportType,
-            index,
-            beginDate: format(beginDate, 'yyyy-MM'),
-            endDate: format(endDate, 'yyyy-MM'),
-            forceDownload,
-            ignoreValidation,
-          },
-        });
+          });
 
-        await harvestQueue.add(
-          'harvest',
-          { taskId: task.id, timeout },
-          { jobId: task.id },
-        );
+          await harvestQueue.add(
+            'harvest',
+            { taskId: task.id, timeout },
+            { jobId: task.id },
+          );
 
-        return task;
-      },
+          return task;
+        },
+      ),
     ),
   );
 };
@@ -637,6 +654,8 @@ exports.checkSushiConnection = async (ctx) => {
     status = 'success';
   }
 
+  const sushiCredentialsService = new SushiCredentialsService();
+
   ctx.body = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
@@ -655,6 +674,8 @@ exports.deleteSushiConnection = async (ctx) => {
   ctx.type = 'json';
 
   const { sushi } = ctx.state;
+
+  const sushiCredentialsService = new SushiCredentialsService();
 
   await sushiCredentialsService.update({
     where: { id: sushi.id },
@@ -696,7 +717,11 @@ exports.importSushiItems = async (ctx) => {
     });
   };
 
-  const importItem = async (data = {}) => {
+  /**
+   * @param {SushiCredentialsService} sushiCredentialsService
+   * @param {*} data
+   */
+  const importItem = async (sushiCredentialsService, data = {}) => {
     if (data.id) {
       const sushiItem = await sushiCredentialsService.findUnique({ where: { id: data.id } });
 
@@ -728,15 +753,18 @@ exports.importSushiItems = async (ctx) => {
     addResponseItem(sushiItem, 'created');
   };
 
-  for (let i = 0; i < body.length; i += 1) {
-    const sushiData = body[i] || {};
+  await SushiCredentialsService.$transaction(async (sushiCredentialsService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const sushiData = body[i] || {};
 
-    try {
-      await importItem(sushiData); // eslint-disable-line no-await-in-loop
-    } catch (e) {
-      addResponseItem(sushiData, 'error', e.message);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(sushiCredentialsService, sushiData);
+      } catch (e) {
+        addResponseItem(sushiData, 'error', e.message);
+      }
     }
-  }
+  });
 
   ctx.type = 'json';
   ctx.body = response;

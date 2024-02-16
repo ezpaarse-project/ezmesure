@@ -6,7 +6,7 @@ const { registerHook, createQueue } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 const { SUSHI_CODES } = require('../../services/sushi');
 
-const harvestService = require('../../entities/harvest.service');
+const HarvestService = require('../../entities/harvest.service');
 
 const queued = createQueue();
 
@@ -49,34 +49,36 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
     coveredPeriods = new Set(harvestJob.result.coveredPeriods);
   }
 
-  await Promise.all(
-    periods.map(async (period) => {
-      const periodStr = format(period, HARVEST_FORMAT);
-      const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${periodStr}`;
+  await HarvestService.$transaction(
+    (harvestService) => Promise.all(
+      periods.map(async (period) => {
+        const periodStr = format(period, HARVEST_FORMAT);
+        const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${periodStr}`;
 
-      try {
-        const data = { ...harvestData, period: periodStr };
-        if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
-          data.status = 'failed';
-          data.errorCode = `sushi:${SUSHI_CODES.unavailablePeriod}`;
-        }
+        try {
+          const data = { ...harvestData, period: periodStr };
+          if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
+            data.status = 'failed';
+            data.errorCode = `sushi:${SUSHI_CODES.unavailablePeriod}`;
+          }
 
-        await harvestService.upsert({
-          where: {
-            credentialsId_reportId_period: {
-              credentialsId: harvestJob.credentialsId,
-              reportId: harvestJob.reportType,
-              period: periodStr,
+          await harvestService.upsert({
+            where: {
+              credentialsId_reportId_period: {
+                credentialsId: harvestJob.credentialsId,
+                reportId: harvestJob.reportType,
+                period: periodStr,
+              },
             },
-          },
-          create: data,
-          update: data,
-        });
-        appLogger.verbose(`[harvest][hooks] Harvest state [${harvestStateId}] has been updated`);
-      } catch (error) {
-        appLogger.error(`[harvest][hooks] Harvest state [${harvestStateId}] cannot be updated: ${error.message}`);
-      }
-    }),
+            create: data,
+            update: data,
+          });
+          appLogger.verbose(`[harvest][hooks] Harvest state [${harvestStateId}] has been updated`);
+        } catch (error) {
+          appLogger.error(`[harvest][hooks] Harvest state [${harvestStateId}] cannot be updated: ${error.message}`);
+        }
+      }),
+    ),
   );
 });
 

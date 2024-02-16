@@ -1,7 +1,7 @@
 // @ts-check
 
+const BasePrismaService = require('./base-prisma.service');
 const spacesPrisma = require('../services/prisma/spaces');
-const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').Space} Space */
@@ -14,14 +14,17 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
 /* eslint-enable max-len */
 
-module.exports = class SpacesService {
+module.exports = class SpacesService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<SpacesService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {SpaceCreateArgs} params
    * @returns {Promise<Space>}
    */
-  static async create(params) {
-    const space = await spacesPrisma.create(params);
-    triggerHooks('space:create', space);
+  async create(params) {
+    const space = await spacesPrisma.create(params, this.prisma);
+    this.triggerHooks('space:create', space);
     return space;
   }
 
@@ -29,33 +32,33 @@ module.exports = class SpacesService {
    * @param {SpaceFindManyArgs} params
    * @returns {Promise<Space[]>}
    */
-  static findMany(params) {
-    return spacesPrisma.findMany(params);
+  findMany(params) {
+    return spacesPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {SpaceFindUniqueArgs} params
    * @returns {Promise<Space | null>}
    */
-  static findUnique(params) {
-    return spacesPrisma.findUnique(params);
+  findUnique(params) {
+    return spacesPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {string} id
    * @returns {Promise<Space | null>}
    */
-  static findByID(id) {
-    return spacesPrisma.findUnique({ where: { id } });
+  findByID(id) {
+    return spacesPrisma.findUnique({ where: { id } }, this.prisma);
   }
 
   /**
    * @param {SpaceUpdateArgs} params
    * @returns {Promise<Space>}
    */
-  static async update(params) {
-    const space = await spacesPrisma.update(params);
-    triggerHooks('space:update', space);
+  async update(params) {
+    const space = await spacesPrisma.update(params, this.prisma);
+    this.triggerHooks('space:update', space);
     return space;
   }
 
@@ -63,9 +66,9 @@ module.exports = class SpacesService {
    * @param {SpaceUpsertArgs} params
    * @returns {Promise<Space>}
    */
-  static async upsert(params) {
-    const space = await spacesPrisma.upsert(params);
-    triggerHooks('space:upsert', space);
+  async upsert(params) {
+    const space = await spacesPrisma.upsert(params, this.prisma);
+    this.triggerHooks('space:upsert', space);
     return space;
   }
 
@@ -73,32 +76,47 @@ module.exports = class SpacesService {
    * @param {SpaceDeleteArgs} params
    * @returns {Promise<Space | null>}
    */
-  static async delete(params) {
-    const { deleteResult, deletedSpace } = await spacesPrisma.remove(params);
+  async delete(params) {
+    const result = await spacesPrisma.remove(params, this.prisma);
+    if (!result) {
+      return null;
+    }
 
-    triggerHooks('space:delete', deletedSpace);
-    deletedSpace.permissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    const { deleteResult, deletedSpace } = result;
+
+    this.triggerHooks('space:delete', deletedSpace);
+    deletedSpace.permissions.forEach((spacePerm) => { this.triggerHooks('space_permission:delete', spacePerm); });
     return deleteResult;
   }
 
   /**
    * @returns {Promise<Array<Space> | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const spaces = await this.findMany({});
+    /** @param {SpacesService} service */
+    const processor = async (service) => {
+      const spaces = await service.findMany({});
 
-    if (spaces.length === 0) { return null; }
+      if (spaces.length === 0) { return null; }
 
-    await Promise.all(spaces.map(async (space) => {
-      await this.delete({
-        where: {
-          id: space.id,
-        },
-      });
-    }));
+      await Promise.all(
+        spaces.map(
+          (space) => service.delete({
+            where: {
+              id: space.id,
+            },
+          }),
+        ),
+      );
 
-    return spaces;
+      return spaces;
+    };
+
+    if (this.currentTransaction) {
+      return processor(this);
+    }
+    return SpacesService.$transaction(processor);
   }
 };

@@ -12,7 +12,7 @@ module.exports = class ImagesService {
 
   /**
    * Remove a logo with a given ID
-   * @static
+   *
    * @param {String} logoId
    * @return {Promise}
    */
@@ -25,7 +25,6 @@ module.exports = class ImagesService {
   /**
    * Take a Base64 image, resize it and store it
    *
-   * @static
    * @param {String} base64logo
    */
   static async storeLogo(base64logo) {

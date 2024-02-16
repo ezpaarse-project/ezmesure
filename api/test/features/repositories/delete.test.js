@@ -7,7 +7,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 const repositoriesPrisma = require('../../../lib/services/prisma/repositories');
 
 const adminUsername = config.get('admin.username');
@@ -36,7 +36,7 @@ describe('[repositories]: Test delete features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await usersService.generateToken(adminUsername, adminPassword);
+      adminToken = await UsersService.generateToken(adminUsername, adminPassword);
     });
 
     describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}]`, () => {
@@ -73,7 +73,7 @@ describe('[repositories]: Test delete features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      userToken = await UsersService.generateToken(userTest.username, userTest.password);
     });
 
     describe(`Delete repository of type [${ezpaarseRepositoryConfig.type}]`, () => {

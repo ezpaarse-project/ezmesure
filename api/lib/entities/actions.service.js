@@ -1,4 +1,5 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const actionsPrisma = require('../services/prisma/actions');
 
 /* eslint-disable max-len */
@@ -10,44 +11,47 @@ const actionsPrisma = require('../services/prisma/actions');
 /** @typedef {import('@prisma/client').Prisma.ActionCreateArgs} ActionCreateArgs */
 /* eslint-enable max-len */
 
-module.exports = class ActionsService {
+module.exports = class ActionsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<ActionsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {ActionCreateArgs} params
    * @returns {Promise<Action>}
    */
-  static create(params) {
-    return actionsPrisma.create(params);
+  create(params) {
+    return actionsPrisma.create(params, this.prisma);
   }
 
   /**
    * @param {ActionFindManyArgs} params
    * @returns {Promise<Action[]>}
    */
-  static findMany(params) {
-    return actionsPrisma.findMany(params);
+  findMany(params) {
+    return actionsPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {ActionFindUniqueArgs} params
    * @returns {Promise<Action | null>}
    */
-  static findUnique(params) {
-    return actionsPrisma.findUnique(params);
+  findUnique(params) {
+    return actionsPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {ActionUpdateArgs} params
    * @returns {Promise<Action>}
    */
-  static update(params) {
-    return actionsPrisma.update(params);
+  update(params) {
+    return actionsPrisma.update(params, this.prisma);
   }
 
   /**
    * @param {ActionUpsertArgs} params
    * @returns {Promise<Action>}
    */
-  static upsert(params) {
-    return actionsPrisma.upsert(params);
+  upsert(params) {
+    return actionsPrisma.upsert(params, this.prisma);
   }
 };
