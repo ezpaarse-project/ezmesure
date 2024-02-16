@@ -3,9 +3,9 @@
     <v-card>
       <v-toolbar flat color="rgba(0, 0, 0, 0)">
         <v-toolbar-title>
-          {{ $t('reports.availableReportsOnPlatform') }}
+          {{ $t('reports.supportedReportsOnPlatform') }}
           <div class="caption">
-            {{ sushiVendor }} - {{ sushiPackage }}
+            {{ sushiVendor }} - {{ sushiTags }}
           </div>
         </v-toolbar-title>
 
@@ -22,18 +22,19 @@
       <v-card-text v-if="hasExceptions">
         <v-alert text color="error">
           <v-row align="center" no-gutters>
-            <v-col
-              class="grow"
-              v-text="$t('reports.sushiReturnedErrors')"
-            />
+            <v-col class="grow">
+              {{ $t('reports.sushiReturnedErrors') }}
+            </v-col>
+
             <v-col class="shrink">
               <v-btn
                 color="error"
                 small
                 outlined
                 @click="editSushiItem"
-                v-text="$t('reports.checkCredentials')"
-              />
+              >
+                {{ $t('reports.checkCredentials') }}
+              </v-btn>
             </v-col>
           </v-row>
 
@@ -41,14 +42,15 @@
             <li
               v-for="(message, index) in exceptionStrings"
               :key="index"
-              v-text="message"
-            />
+            >
+              {{ message }}
+            </li>
           </ul>
         </v-alert>
       </v-card-text>
 
       <v-simple-table>
-        <template v-slot:default>
+        <template #default>
           <thead>
             <tr>
               <th class="text-left">
@@ -74,9 +76,9 @@
       <v-divider />
 
       <v-card-actions>
-        <v-checkbox
-          v-model="showAllReports"
-          :label="$t('reports.showAllReports')"
+        <v-switch
+          v-model="onlyShowMasterReports"
+          :label="$t('reports.onlyShowMasterReports')"
         />
 
         <v-spacer />
@@ -96,7 +98,7 @@ export default {
       show: false,
       exceptions: [],
       refreshing: false,
-      showAllReports: false,
+      onlyShowMasterReports: true,
       sushi: null,
       reports: [],
     };
@@ -104,8 +106,8 @@ export default {
   computed: {
     hasSushiItem() { return !!this.sushi?.id; },
     hasExceptions() { return this.exceptions.length > 0; },
-    sushiVendor() { return this.sushi?.vendor; },
-    sushiPackage() { return this.sushi?.package; },
+    sushiVendor() { return this.sushi?.endpoint?.vendor; },
+    sushiTags() { return this.sushi?.tags?.join?.(', '); },
     headers() {
       return [
         {
@@ -134,10 +136,11 @@ export default {
       });
     },
     filteredReports() {
-      if (this.showAllReports) { return this.reports; }
+      if (!this.onlyShowMasterReports) { return this.reports; }
 
       return this.reports.filter((report) => {
-        if (typeof report?.['Report_ID'] !== 'string') { return false; }
+        // eslint-disable-next-line camelcase
+        if (typeof report?.Report_ID !== 'string') { return false; }
         return !report.Report_ID.includes('_');
       });
     },

@@ -49,10 +49,8 @@
       @update="refreshSushiEndpoints"
     />
 
-    <EndpointsDeleteDialog ref="deleteDialog" @removed="onEndpointsRemove" />
-
     <v-menu nudge-width="100" style="z-index:100" top offset-y>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-slide-y-reverse-transition>
           <v-btn
             v-show="hasSelection"
@@ -84,7 +82,9 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('validate')" />
+            <v-list-item-title>
+              {{ $t('validate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -97,16 +97,20 @@
             <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('invalidate')" />
+            <v-list-item-title>
+              {{ $t('invalidate') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item :disabled="deleting" @click="deleteEndpoints">
+        <v-list-item :disabled="deleting" @click="deleteEndpoints()">
           <v-list-item-icon>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('delete')" />
+            <v-list-item-title>
+              {{ $t('delete') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -115,7 +119,9 @@
             <v-icon>mdi-close</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="$t('deselect')" />
+            <v-list-item-title>
+              {{ $t('deselect') }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -123,7 +129,7 @@
 
     <v-data-table
       v-model="selected"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="endpoints"
       :loading="refreshing"
       :search="search"
@@ -135,14 +141,14 @@
       item-key="id"
       sort-by="vendor"
     >
-      <template v-slot:expanded-item="{ headers, item }">
+      <template #expanded-item="{ headers, item }">
         <td />
         <td :colspan="headers.length - 1" class="py-4">
           <EndpointDetails :item="item" />
         </td>
       </template>
 
-      <template v-slot:item.validated="{ item }">
+      <template #[`item.validated`]="{ item }">
         <v-chip
           v-if="item.validated"
           label
@@ -154,7 +160,7 @@
         </v-chip>
       </template>
 
-      <template v-slot:item.tags="{ item }">
+      <template #[`item.tags`]="{ item }">
         <v-chip
           v-for="(tag, index) in item.tags"
           :key="index"
@@ -168,9 +174,25 @@
         </v-chip>
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.credentials`]="{ item }">
+        <v-chip
+          v-if="Array.isArray(item.credentials)"
+          :outlined="item.credentials?.length <= 0"
+          small
+          class="elevation-1"
+          @click="$refs.credentialsDialog?.display?.(item)"
+        >
+          {{ $tc('sushi.credentialsCount', item.credentials.length) }}
+
+          <v-icon right small>
+            mdi-key
+          </v-icon>
+        </v-chip>
+      </template>
+
+      <template #[`item.actions`]="{ item }">
         <v-menu>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               icon
               v-bind="attrs"
@@ -192,36 +214,39 @@
                 <v-icon>{{ action.icon }}</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="action.label" />
+                <v-list-item-title>
+                  {{ action.label }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-menu>
       </template>
     </v-data-table>
+
+    <ConfirmDialog ref="confirmDialog" />
+    <CredentialDialog ref="credentialsDialog" />
   </section>
 </template>
 
 <script>
-import ToolBar from '~/components/space/ToolBar';
-import EndpointForm from '~/components/EndpointForm';
-import EndpointDetails from '~/components/EndpointDetails';
-import EndpointsDeleteDialog from '~/components/EndpointsDeleteDialog';
+import ToolBar from '~/components/space/ToolBar.vue';
+import EndpointForm from '~/components/EndpointForm.vue';
+import EndpointDetails from '~/components/EndpointDetails.vue';
+import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 
 export default {
   layout: 'space',
-  middleware: ['auth', 'terms'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     ToolBar,
     EndpointForm,
     EndpointDetails,
-    EndpointsDeleteDialog,
+    ConfirmDialog,
+    CredentialDialog,
   },
-  async asyncData({ $auth, redirect }) {
-    if (!$auth.hasScope('superuser') && !$auth.hasScope('admin')) {
-      return redirect({ name: 'myspace' });
-    }
-
+  data() {
     return {
       endpoints: [],
       selected: [],
@@ -241,10 +266,10 @@ export default {
       return this?.endpoints.length || 0;
     },
     availableTags() {
-      const tags = new Set(this.endpoints.flatMap(e => (Array.isArray(e?.tags) ? e.tags : [])));
+      const tags = new Set(this.endpoints.flatMap((e) => (Array.isArray(e?.tags) ? e.tags : [])));
       return Array.from(tags);
     },
-    headers() {
+    tableHeaders() {
       return [
         {
           text: this.$t('endpoints.vendor'),
@@ -253,7 +278,7 @@ export default {
         {
           text: this.$t('endpoints.tags'),
           value: 'tags',
-          align: 'right',
+          align: 'center',
           width: '200px',
         },
         {
@@ -261,6 +286,12 @@ export default {
           value: 'validated',
           align: 'right',
           width: '130px',
+        },
+        {
+          text: this.$t('sushi.credentials'),
+          value: 'credentials',
+          align: 'center',
+          width: '200px',
         },
         {
           text: this.$t('actions'),
@@ -275,10 +306,10 @@ export default {
       return this.selected.length > 0;
     },
     hasValidatedInSelection() {
-      return this.selected.some(endpoint => endpoint?.validated);
+      return this.selected.some((endpoint) => endpoint?.validated);
     },
     hasNonValidatedInSelection() {
-      return this.selected.some(endpoint => !endpoint?.validated);
+      return this.selected.some((endpoint) => !endpoint?.validated);
     },
     itemActions() {
       return [
@@ -335,7 +366,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints');
+        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials.institution'] } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
       }
@@ -347,12 +378,64 @@ export default {
       this.selected = [];
     },
 
-    deleteEndpoints() {
-      this.$refs.deleteDialog.confirmDelete(this.selected);
-    },
+    async deleteEndpoints(items) {
+      const endpoints = items || this.selected;
+      if (endpoints.length === 0) {
+        return;
+      }
 
-    onEndpointsRemove(removedIds) {
-      const removeDeleted = endpoint => !removedIds.some(id => endpoint.id === id);
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        message: this.$tc(
+          'endpoints.deleteNbEndpoints',
+          endpoints.length,
+        ),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+      this.removing = true;
+
+      const requests = endpoints.map(async (item) => {
+        let deleted = false;
+        try {
+          await this.$axios.$delete(`/sushi-endpoints/${item.id}`);
+          deleted = true;
+        } catch (e) {
+          deleted = false;
+        }
+        return { item, deleted };
+      });
+
+      const results = await Promise.all(requests);
+
+      const { deleted, failed } = results.reduce((acc, result) => {
+        const { item } = result;
+
+        if (result.deleted) {
+          acc.deleted.push(item);
+        } else {
+          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
+          acc.failed.push(item);
+        }
+        return acc;
+      }, { deleted: [], failed: [] });
+
+      if (failed.length > 0) {
+        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
+      }
+      if (deleted.length > 0) {
+        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
+      }
+
+      this.removing = false;
+      this.show = false;
+      const removedIds = deleted.map((d) => d.id);
+
+      const removeDeleted = (endpoint) => !removedIds.some((id) => endpoint.id === id);
       this.endpoints = this.endpoints.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
     },

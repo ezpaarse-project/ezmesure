@@ -1,0 +1,42 @@
+version: '2.4'
+services:
+  migrate_api:
+    build:
+      context: ./api
+      args:
+        - http_proxy
+        - https_proxy
+    working_dir: /usr/src/app
+    environment:
+      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZMESURE_POSTGRES_DB:-ezmesure}
+    restart: "no"
+    entrypoint: ""
+    command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  migrate_reporting:
+    image: ghcr.io/ezpaarse-project/ezreeport-report:1.0.0
+    entrypoint: ""
+    command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
+    environment:
+      - DATABASE_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZREEPORT_POSTGRES_DB:-ezreeport}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  postgres:
+    image: postgres:15.1-alpine3.16
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${EZMESURE_POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${EZMESURE_POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${EZMESURE_POSTGRES_USER:-postgres}"]
+      interval: ${POSTGRES_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${POSTGRES_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${POSTGRES_HEALTHCHECK_RETRIES:-5}

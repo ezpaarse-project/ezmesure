@@ -1,6 +1,6 @@
 # ezMESURE
 
-Platform aggregating electronic ressources usage statistics for the French researcher organizations.
+Platform aggregating electronic resources usage statistics for the French researcher organizations.
 https://ezmesure.couperin.org
 
 ## Prerequisites
@@ -23,7 +23,7 @@ ezMESURE uses an Apache reverse proxy which communicates with HTTPS only. Put th
 
 ### 2. Setup environment
 
-Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overriden by `ezmesure.local.env.sh`.
+Create an environment file named `ezmesure.local.env.sh` and export the following environment variables. You can then source `ezmesure.env.sh` , which contains a set of predefined variables and is overridden by `ezmesure.local.env.sh`.
 
 **NB**: a helper script is available at `tools/init_env.sh`.
 
@@ -59,7 +59,7 @@ Put the certificate (``server.crt``) and private key (``server.key``) used to de
 
 **NB**: the private key is critical and should not be shared.
 
-Additionnaly, set the environment variables `SHIBBOLETH_SP_URL` and `SHIBBOLETH_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable Shibboleth authentication (see below).
+Additionally, set the environment variables `SHIBBOLETH_SP_URL` and `SHIBBOLETH_DS_URL` with the URL of the service provider and discovery service. Those variables are not necessary if you disable Shibboleth authentication (see below).
 
 #### Disabling Shibboleth
 
@@ -86,7 +86,7 @@ For each node in the cluster, add certificates in `elasticsearch/config/certific
 
 Elasticsearch has some [system requirements](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html) that you should check.
 
-To avoid memory exceptions, you may have to increase mmaps count. Edit `/etc/sysctl.conf` and add the following line :
+To avoid memory exceptions, you may have to increase maps count. Edit `/etc/sysctl.conf` and add the following line :
 
 ```ini
 # configuration needed for elastic search
@@ -154,10 +154,10 @@ The ezMESURE API is documented here : https://localhost/api-reference
 
 ### Prerequisites
 
-* [Docker](https://www.docker.com/) 
-* [docker-compose](https://docs.docker.com/compose/)
+* [docker](https://www.docker.com/) 
+* [docker compose](https://docs.docker.com/compose/)
 * [npm](https://docs.npmjs.com/about-npm)
-* [node 14](https://nodejs.org/en/)
+* [node 18](https://nodejs.org/en/)
 
 ### 1. Install local dependencies
 
@@ -168,6 +168,14 @@ ezmesure/api npm i
 
 ezmesure/front npm i
 ```
+
+If you want to start ezmesure in docker mode, you need to install `sharp` in the container
+
+```bash
+$ rm -rf ./api/node_modules
+$ docker compose -f docker-compose.debug.yml run --rm api npm i
+```
+
 ### 2. Source environnement variable
 
 You should source ``ezmesure.env.sh`` for the following and before each start.
@@ -198,9 +206,7 @@ Instance added to ./tools/../certs/instances.yml
 Add another instance (Y/n) ? n
 ```
 
-// TODO Add elastic in dns
-
-Once the file is created, you can generate the certificates.
+Once the file is created, you need to add elastic in dns and you can generate the certificates.
 
 ```bash
 ezmesure/certs docker-compose -f create-certs.yml run --rm create_certs
@@ -231,13 +237,34 @@ Don't forget to restore the environment variables after the modification.
 
 ### 6. Prepare start
 
-Before launching ezmesure, you must create the elastic container, for that you must use this command.
+Before launching ezmesure, you have to create the elastic container and launch the database migration, for that you have to use these commands :
 
 ```bash
-docker-compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+docker compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+docker compose -f docker-compose.migrate.yml up
+docker compose -f docker-compose.migrate.yml down
 ```
 ### 7. Start
 
 ```bash
 docker-compose -f docker-compose.debug.yml up -d
+```
+
+### 8. Database update
+
+If you have updated the database schema, you need to migrate your database :
+
+```bash
+# node
+npx prisma db push
+# docker
+docker compose -f docker-compose.debug.yml run --rm api npx prisma db push
+```
+
+### 9. Test
+
+To start test, make sur you have a ezmesure started in dev mode
+
+```bash
+docker compose exec api npm run test
 ```

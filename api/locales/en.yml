@@ -12,6 +12,9 @@ errors:
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
     taskExists: "SUSHI item [%s] already have an associated task (status: [%s])"
+    invalidDate: The date [%s] is invalid
+    invalidPeriod: The period [from %s to %s] is invalid
+    failedToUpdateSupportedReports: Failed to update the list of supported reports
 
   queue:
     notFound: Queue not found
@@ -26,6 +29,9 @@ errors:
 
   sushi-endpoint:
     notFound: Endpoint not found
+
+    import:
+      alreadyExists: Endpoint [%s] already exists
 
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
@@ -49,6 +55,11 @@ errors:
     cannotDeleteActiveTask: Cannot delete active task
     cannotCancelJobWithoutPID: Cannot cancel task, the process is not identifiable
 
+  repository:
+    notFound: Repository not found
+    alreadyExists: The repository [%s] is already associated to the institution
+    typeMismatch: A repository [%s] with a different type already exists
+
   institution:
     notFound: Institution not found
     unauthorized: You are not allowed to access this institution
@@ -62,17 +73,27 @@ errors:
     noSpace: The space [%s] of the institution [%s] does not exist
     forbiddenSpaceName: The space name [%s] is not allowed for the institution [%s]. It must starts with [%s].
 
+    import:
+      alreadyExists: Institution [%s] already exists
+
+  member:
+    notFound: Member not found
+
   members:
     alreadyMember: "The user belongs to another institution: %s"
     cannotRemoveContact: You can't remove an institution contact
     cannotUpdateContact: You can't update an institution contact
+    notEditable: This member is not editable
 
   user:
+    alreadyActivated: this account is already activated
     notFound: User not found
     noEmail: mandatory email is missing from user profile
     failedToSave: Failed to save user data
     failedToUpdateRoles: Failed to update user roles
 
+    import:
+      alreadyExists: User [%s] already exists
   users:
     failedToQuery: failed to query users
 
@@ -101,6 +122,7 @@ errors:
     noIndexMatching: The index pattern [%s] doesn't match any index
 
   files:
+    malformedField: "Line #%d: a field between double quotes is malformed"
     wrongEntriesFormat: entries should be an array of file names
     missingEntries: "missing required field: entries"
     unsupportedType: unsupported file type

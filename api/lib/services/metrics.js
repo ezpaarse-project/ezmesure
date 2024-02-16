@@ -37,6 +37,7 @@ exports.save = async (ctx) => {
     case 'sushi/download-report':
     case 'sushi/harvest':
     case 'sushi/import':
+    case 'institutions/import':
     case 'sushi/check-connection':
       if (metric.response.body && !metric.response.body.error) {
         metric.response.body = null;

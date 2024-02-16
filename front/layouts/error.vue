@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import AppBar from '~/components/AppBar';
+import AppBar from '~/components/AppBar.vue';
 
 export default {
   props: {
@@ -47,6 +47,12 @@ export default {
       }
       return this.error.message;
     },
+  },
+  head() {
+    return this.$nuxtI18nHead({
+      addDirAttribute: true,
+      addSeoAttributes: true,
+    });
   },
 };
 </script>

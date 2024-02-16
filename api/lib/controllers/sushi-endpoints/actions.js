@@ -1,34 +1,47 @@
-const SushiEndpoint = require('../../models/SushiEndpoint');
+const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
+const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+const { propsToPrismaInclude } = require('../utils');
 
 exports.getAll = async (ctx) => {
-  const filters = [];
   const {
+    include: propsToInclude,
     requireCustomerId,
     requireRequestorId,
     requireApiKey,
     isSushiCompliant,
     tags,
+    q: search,
   } = ctx.query;
 
-  if (typeof requireCustomerId === 'boolean') {
-    filters.push(SushiEndpoint.filterBy('requireCustomerId', requireCustomerId));
+  let include;
+
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
   }
-  if (typeof requireRequestorId === 'boolean') {
-    filters.push(SushiEndpoint.filterBy('requireRequestorId', requireRequestorId));
-  }
-  if (typeof requireApiKey === 'boolean') {
-    filters.push(SushiEndpoint.filterBy('requireApiKey', requireApiKey));
-  }
-  if (typeof isSushiCompliant === 'boolean') {
-    filters.push(SushiEndpoint.filterBy('isSushiCompliant', isSushiCompliant));
-  }
+
+  const where = {
+    requireCustomerId,
+    requireRequestorId,
+    requireApiKey,
+    isSushiCompliant,
+  };
+
   if (tags) {
-    filters.push(SushiEndpoint.filterBy('tags', Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim())));
+    where.tags = {
+      hasSome: Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim()),
+    };
+  }
+
+  if (search) {
+    where.vendor = {
+      contains: search,
+      mode: 'insensitive',
+    };
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await SushiEndpoint.findAll({ filters });
+  ctx.body = await sushiEndpointService.findMany({ where, include });
 };
 
 exports.getOne = async (ctx) => {
@@ -46,12 +59,9 @@ exports.addEndpoint = async (ctx) => {
     vendor: body.vendor,
   };
 
-  const endpoint = new SushiEndpoint(body, {
-    schema: ctx.state?.userIsAdmin ? 'adminCreate' : 'create',
-  });
-  await endpoint.save();
+  const endpoint = await sushiEndpointService.create({ data: body });
 
-  ctx.metadata.endpointId = endpoint.getId();
+  ctx.metadata.endpointId = endpoint.id;
   ctx.status = 201;
   ctx.body = endpoint;
 };
@@ -61,23 +71,18 @@ exports.updateEndpoint = async (ctx) => {
   const { endpoint } = ctx.state;
   const { body } = ctx.request;
 
-  endpoint.update(body, {
-    schema: ctx.state?.userIsAdmin ? 'adminUpdate' : 'update',
-  });
-
   ctx.metadata = {
-    endpointId: endpoint.getId(),
-    vendor: endpoint.get('vendor'),
+    endpointId: endpoint.id,
+    vendor: body.vendor || endpoint.vendor,
   };
 
-  try {
-    await endpoint.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  const updatedEndpoint = await sushiEndpointService.update({
+    where: { id: endpoint.id },
+    data: body,
+  });
 
   ctx.status = 200;
-  ctx.body = endpoint;
+  ctx.body = updatedEndpoint;
 };
 
 exports.deleteOne = async (ctx) => {
@@ -87,10 +92,10 @@ exports.deleteOne = async (ctx) => {
 
   ctx.metadata = {
     endpointId: endpoint.id,
-    endpointVendor: endpoint.get('vendor'),
+    endpointVendor: endpoint.vendor,
   };
 
-  await SushiEndpoint.deleteOne(endpointId);
+  await sushiEndpointService.delete({ where: { id: endpointId } });
 
   ctx.status = 204;
 };
@@ -120,20 +125,27 @@ exports.importEndpoints = async (ctx) => {
   };
 
   const importItem = async (endpointData = {}) => {
-    if (endpointData.id) {
-      const endpoint = await SushiEndpoint.findById(endpointData.id);
+    const { value: item, error } = adminImportSchema.validate(endpointData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const endpoint = await sushiEndpointService.findUnique({ where: { id: item.id } });
 
       if (endpoint && !overwrite) {
-        addResponseItem(endpointData, 'conflict', ctx.$t('errors.endpoint.import.alreadyExists', endpoint.getId()));
+        addResponseItem(item, 'conflict', ctx.$t('errors.sushi-endpoint.import.alreadyExists', endpoint.id));
         return;
       }
     }
 
-    const endpoint = new SushiEndpoint(endpointData);
-
-    endpoint.setId(endpointData.id);
-
-    await endpoint.save();
+    const endpoint = await sushiEndpointService.upsert({
+      where: { id: item?.id },
+      create: item,
+      update: item,
+    });
 
     addResponseItem(endpoint, 'created');
   };

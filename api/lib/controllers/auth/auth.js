@@ -1,17 +1,17 @@
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const {
-  addHours, differenceInHours, isBefore, parseISO,
-} = require('date-fns');
+const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
-const { sendMail, generateMail } = require('../../services/mail');
+
+const usersElastic = require('../../services/elastic/users');
+const ezrUsers = require('../../services/ezreeport/users');
+const usersService = require('../../entities/users.service');
+const membershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
+const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
-const sender = config.get('notifications.sender');
-const supports = config.get('notifications.supportRecipients');
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -26,55 +26,34 @@ function decode(value) {
   return Buffer.from(value, 'binary').toString('utf8');
 }
 
-function randomString() {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(5, (err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buffer.toString('hex'));
-      }
-    });
-  });
-}
-
-function sendWelcomeMail(user) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Bienvenue sur ezMESURE !',
-    ...generateMail('welcome', { user }),
-  });
-}
-
-function sendPasswordRecovery(user, data) {
-  return sendMail({
-    from: sender,
-    to: user.email,
-    subject: 'Réinitialisation mot de passe ezMESURE/Kibana',
-    ...generateMail('new-password', { user, ...data }),
-  });
-}
-
-function sendNewUserToContacts(receivers, data) {
-  return sendMail({
-    from: sender,
-    to: receivers,
-    cc: supports,
-    subject: `${data.newUser} s'est inscrit sur ezMESURE`,
-    ...generateMail('new-account', { data }),
-  });
-}
+exports.getReportingToken = async (ctx) => {
+  const token = await ezrUsers.getToken(ctx?.state?.user?.username);
+  ctx.body = { token };
+};
 
 exports.renaterLogin = async (ctx) => {
   const { query } = ctx.request;
   const headers = ctx.request.header;
-  const props = {
-    full_name: decode(headers.displayname || headers.cn || headers.givenname),
-    email: decode(headers.mail),
-    roles: ['new_user'],
+
+  const email = decode(headers.mail);
+  const idp = headers['shib-identity-provider'];
+
+  if (!idp) {
+    ctx.throw(400, ctx.$t('errors.auth.IDPNotFound'));
+    return;
+  }
+
+  if (!email) {
+    ctx.throw(400, ctx.$t('errors.auth.noEmailInHeaders'));
+    return;
+  }
+
+  const userProps = {
+    username: email.split('@')[0].toLowerCase(),
+    fullName: decode(headers.displayname || headers.cn || headers.givenname),
+    email,
     metadata: {
-      idp: headers['shib-identity-provider'],
+      idp,
       uid: headers.uid,
       org: decode(headers.o),
       unit: decode(headers.ou),
@@ -85,37 +64,18 @@ exports.renaterLogin = async (ctx) => {
     },
   };
 
-  if (!props.metadata.idp) {
-    ctx.throw(400, ctx.$t('errors.auth.IDPNotFound'));
-    return;
-  }
+  const { username } = userProps;
 
-  if (!props.email) {
-    ctx.throw(400, ctx.$t('errors.auth.noEmailInHeaders'));
-    return;
-  }
-
-  const username = props.email.split('@')[0].toLowerCase();
-
-  let user = await elastic.security.findUser({ username });
+  let user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.action = 'user/register';
     ctx.metadata = { username };
 
-    const now = new Date();
-    props.metadata.createdAt = now;
-    props.metadata.updatedAt = now;
-    props.metadata.acceptedTerms = false;
-    props.password = await randomString();
+    userProps.metadata.acceptedTerms = false;
 
-    await elastic.security.putUser({ username, body: props });
-    user = await elastic.security.findUser({ username });
-
-    if (!user) {
-      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
-      return;
-    }
+    // First create the user
+    user = await usersService.create({ data: userProps });
 
     try {
       await sendWelcomeMail(user);
@@ -126,17 +86,17 @@ exports.renaterLogin = async (ctx) => {
     ctx.action = 'user/refresh';
     ctx.metadata = { username };
 
-    props.metadata.updatedAt = new Date();
-    props.metadata.createdAt = user.metadata.createdAt;
-    props.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
-    props.roles = user.roles;
-    props.username = username;
+    userProps.metadata.acceptedTerms = !!user.metadata.acceptedTerms;
 
     try {
-      await elastic.security.putUser({ username, body: props });
-      user = props;
-    } catch (e) {
-      ctx.throw(500, ctx.$t('errors.user.failedToSave'));
+      await usersService.update({
+        where: { username },
+        data: userProps,
+      });
+      appLogger.info(`User [${user.username}] is updated`);
+    } catch (err) {
+      appLogger.error(`User [${user.username}] cannot be updated: ${err.message}`);
+      ctx.throw(500, err);
       return;
     }
   } else {
@@ -172,9 +132,16 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   if (user.metadata && user.metadata._reserved) {
     ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
     return;
+  }
+
+  user = await usersService.findUnique({ where: { username } });
+
+  if (!user) {
+    ctx.throw(401);
   }
 
   ctx.metadata = { username };
@@ -183,46 +150,51 @@ exports.elasticLogin = async (ctx) => {
   ctx.status = 200;
 };
 
-exports.acceptTerms = async (ctx) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+exports.activate = async (ctx) => {
+  const { body } = ctx.request;
+  const { password } = body;
 
-  const origin = ctx.get('origin');
+  const { user } = ctx.state;
+  const { email } = user;
 
-  if (!user) {
+  if (user?.metadata?.acceptedTerms) {
+    ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
+    return;
+  }
+
+  try {
+    await usersService.acceptTerms(user.username);
+  } catch (err) {
+    ctx.status = 500;
+    appLogger.error(`Failed to update user: ${err}`);
+    return;
+  }
+
+  const userElastic = await usersElastic.getUserByUsername(user.username);
+
+  if (!userElastic) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  user.metadata.acceptedTerms = true;
-  await elastic.security.putUser({ username: user.username, body: user });
+  await usersElastic.updatePassword(user.username, password);
 
-  const { email } = user;
+  await sendWelcomeMail(user);
+
+  const origin = ctx.get('origin');
   const [, domain] = email.split('@');
 
-  let res;
+  let correspondents;
   try {
-    res = await elastic.search({
-      index: '.security',
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { type: 'user' } },
-              { terms: { roles: ['doc_contact', 'tech_contact'] } },
-              { wildcard: { email: { value: `*@${domain}` } } },
-            ],
-          },
-        },
-      },
-    });
+    correspondents = await usersService.findEmailOfCorrespondentsWithDomain(domain);
   } catch (err) {
     appLogger.error(`Failed to get collaborators of new user: ${err}`);
   }
 
-  const correspondents = res?.body?.hits?.hits;
   if (Array.isArray(correspondents) && correspondents.length > 0) {
-    const emails = correspondents.map((c) => c?.['_source']?.email).filter((x) => x);
+    const emails = correspondents.map((c) => c?.email).filter((x) => x);
 
+    // TODO manage this if the user belongs to several institutions
     try {
       await sendNewUserToContacts(emails, {
         manageMemberLink: `${origin}/institutions/self/members`,
@@ -233,7 +205,8 @@ exports.acceptTerms = async (ctx) => {
     }
   }
 
-  ctx.status = 204;
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
 };
 
 exports.getResetToken = async (ctx) => {
@@ -241,7 +214,7 @@ exports.getResetToken = async (ctx) => {
 
   const username = body.username || ctx.state.user.username;
 
-  const user = await elastic.security.findUser({ username });
+  const user = await usersElastic.getUserByUsername(username);
 
   if (!user) {
     ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
@@ -269,32 +242,16 @@ exports.getResetToken = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const { token, password } = ctx.request.body;
+  const { password } = ctx.request.body;
+  const { username } = ctx.state.user;
+  const { createdAt } = ctx.state.jwtdata;
 
-  let decoded;
-  try {
-    decoded = jwt.verify(token, secret);
-  } catch (err) {
-    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
-    return;
-  }
+  const user = await usersService.findUnique({ where: { username } });
 
-  const { username, expiresAt, createdAt } = decoded;
+  user.metadata = user.metadata || {};
 
-  let tokenIsValid = isBefore(new Date(), parseISO(expiresAt));
-  if (!tokenIsValid) {
-    ctx.throw(400, ctx.$t('errors.password.expires'));
-    return;
-  }
-
-  const user = await elastic.security.findUser({ username });
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
-    return;
-  }
-
-  if (user && user.metadata && user.metadata.passwordDate) {
-    tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
+  if (user?.metadata?.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(404, ctx.$t('errors.password.expires'));
@@ -302,16 +259,19 @@ exports.resetPassword = async (ctx) => {
     }
   }
 
-  await elastic.security.changePassword({
-    username,
-    body: {
-      password,
-    },
-  });
-
   user.metadata.passwordDate = new Date();
-  user.password = password;
-  await elastic.security.putUser({ username, body: user });
+
+  try {
+    await usersService.update({
+      where: { username },
+      data: user,
+    });
+  } catch (err) {
+    ctx.throw(500, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
+
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };
@@ -320,25 +280,40 @@ exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;
 
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const { username } = ctx.state.user;
+
+  const user = await usersElastic.getUserByUsername(username);
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  await elastic.security.changePassword({
-    username: ctx.state.user.username,
-    body: {
-      password,
-    },
-  });
+  await usersElastic.updatePassword(username, password);
 
   ctx.status = 204;
 };
 
 exports.getUser = async (ctx) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await usersService.findUnique({
+    where: { username: ctx.state.user.username },
+    include: {
+      memberships: {
+        include: {
+          repositoryPermissions: {
+            include: {
+              repository: true,
+            },
+          },
+          spacePermissions: {
+            include: {
+              space: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
@@ -352,6 +327,15 @@ exports.getUser = async (ctx) => {
 exports.getToken = async (ctx) => {
   ctx.status = 200;
   ctx.body = generateToken(ctx.state.user);
+};
+
+exports.getMemberships = async (ctx) => {
+  const { username } = ctx.state.user;
+  ctx.status = 200;
+  ctx.body = await membershipsService.findMany({
+    where: { username },
+    include: { institution: true },
+  });
 };
 
 exports.logout = async (ctx) => {

@@ -6,7 +6,7 @@ const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
 const kibana = require('./kibana');
-const logger = require('./logger');
+const { appLogger } = require('./logger');
 
 const {
   sender,
@@ -216,8 +216,8 @@ async function getSentReports() {
       });
       dashboard = res;
     } catch (err) {
-      logger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
-      logger.error(err);
+      appLogger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
+      appLogger.error(err);
     }
 
     const dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
@@ -247,7 +247,7 @@ function setBroadcasted(actions) {
 /**
  * Send a mail containing new files and users
  */
-async function sendNotifications(appLogger) {
+async function sendNotifications(logger = appLogger) {
   const {
     actions: ezMesureActions = [],
     files,
@@ -263,7 +263,7 @@ async function sendNotifications(appLogger) {
   const actions = [...ezMesureActions, ...reportingActions];
 
   if (actions.length === 0 && !sendEmptyActivity) {
-    appLogger.info('No recent activity to be broadcasted');
+    logger.info('No recent activity to be broadcasted');
     return;
   }
 
@@ -283,29 +283,29 @@ async function sendNotifications(appLogger) {
     }),
   });
 
-  appLogger.info('Recent activity successfully broadcasted');
+  logger.info('Recent activity successfully broadcasted');
 
   if (actions.length > 0) {
     try {
       await setBroadcasted(actions);
     } catch (err) {
-      appLogger.error(`Failed to mark actions as broadcasted : ${err}`);
+      logger.error(`Failed to mark actions as broadcasted : ${err}`);
     }
   }
 }
 
 module.exports = {
-  start(appLogger) {
+  start(logger = appLogger) {
     const job = new CronJob(cron, () => {
-      sendNotifications(appLogger).catch((err) => {
-        appLogger.error(`Failed to broadcast recent activity : ${err}`);
+      sendNotifications(logger).catch((err) => {
+        logger.error(`Failed to broadcast recent activity : ${err}`);
       });
     });
 
     if (recipients) {
       job.start();
     } else {
-      appLogger.warn('No recipient configured, notifications will be disabled');
+      logger.warn('No recipient configured, notifications will be disabled');
     }
   },
 };

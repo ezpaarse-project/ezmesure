@@ -1,8 +1,7 @@
 const config = require('config');
 const Axios = require('axios');
 const Papa = require('papaparse');
-const dateIsValid = require('date-fns/isValid');
-const dateIsBefore = require('date-fns/isBefore');
+const { isValid: dateIsValid, isBefore: dateIsBefore } = require('date-fns');
 const { CronJob } = require('cron');
 
 const elastic = require('./elastic');
@@ -282,7 +281,7 @@ async function startCron(appLogger) {
     appLogger.error(`[OpenData] Failed to check the index '${index}' exists: ${e.message}`);
   }
 
-  const job = new CronJob({
+  const job = CronJob.from({
     cronTime: cron,
     runOnInit: !indexExists,
     onTick: async () => {

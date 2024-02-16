@@ -1,25 +1,28 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const Sushi = require('../../models/Sushi');
-const Institution = require('../../models/Institution');
-const { stringifyException } = require('../../services/sushi');
+
+const {
+  createSchema,
+  importSchema,
+  updateSchema,
+  includableFields,
+} = require('../../entities/sushi-credentials.dto');
+
 const {
   requireJwt,
   requireUser,
   requireAdmin,
   requireTermsOfUse,
-  requireAnyRole,
   fetchInstitution,
   fetchSushi,
   fetchSushiEndpoint,
-  requireContact,
   requireValidatedInstitution,
+  requireMemberPermissions,
 } = require('../../services/auth');
 
 const {
   getAll,
   getOne,
-  deleteSushiData,
   updateSushi,
   addSushi,
   harvestSushi,
@@ -29,7 +32,13 @@ const {
   downloadFile,
   getTasks,
   getAvailableReports,
+  deleteOne,
+  getHarvests,
+  checkSushiConnection,
+  deleteSushiConnection,
 } = require('./actions');
+
+const { FEATURES } = require('../../entities/memberships.dto');
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),
@@ -40,9 +49,10 @@ let sushiLocked = false;
 let lockReason;
 
 const blockIfLocked = (ctx, next) => {
-  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.userIsAdmin) {
+  if (sushiLocked && ctx.method !== 'GET' && !ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.sushi.managementLocked'), { detail: lockReason });
   }
+
   return next();
 };
 
@@ -50,7 +60,6 @@ router.use(
   requireJwt,
   requireUser,
   requireTermsOfUse,
-  requireAnyRole(['sushi_form', 'admin', 'superuser']),
   blockIfLocked,
 );
 
@@ -96,33 +105,22 @@ router.route({
     getAll,
   ],
   validate: {
-    query: {
+    query: Joi.object({
       id: stringOrArray,
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       connection: Joi.string().valid('working', 'faulty', 'untested'),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
-  path: '/batch_delete',
-  handler: [
-    async (ctx, next) => {
-      const { user } = ctx.state;
-      ctx.state.institution = await Institution.findOneByCreatorOrRole(user.username, user.roles);
-      return next();
-    },
-    requireContact(),
-    requireValidatedInstitution({ ignoreIfAdmin: true }),
-    deleteSushiData,
-  ],
-  validate: {
-    type: 'json',
-    body: {
-      ids: Joi.array().items(Joi.string().trim()),
-    },
+      q: Joi.string().min(0),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    })
+      .rename('include[]', 'include')
+      .rename('id[]', 'id')
+      .rename('endpointId[]', 'endpointId')
+      .rename('institutionId[]', 'institutionId'),
   },
 });
 
@@ -131,14 +129,14 @@ router.route({
   path: '/',
   handler: [
     fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institutionId }),
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.write),
     requireValidatedInstitution({ ignoreIfAdmin: true }),
     fetchSushiEndpoint({ getId: (ctx) => ctx?.request?.body?.endpointId }),
     addSushi,
   ],
   validate: {
     type: 'json',
-    body: Sushi.getSchema('create'),
+    body: createSchema,
   },
 });
 
@@ -147,7 +145,7 @@ router.route({
   path: '/_import',
   handler: [
     fetchInstitution({ query: 'institutionId' }),
-    requireContact(),
+    requireMemberPermissions(FEATURES.sushi.write),
     importSushiItems,
   ],
   validate: {
@@ -156,10 +154,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
       overwrite: Joi.boolean().default(false),
     },
-    body: Joi.array().required().items({
-      ...Sushi.getSchema('update'),
-      id: Sushi.getSchema('base')?.id,
-    }),
+    body: importSchema,
   },
 });
 
@@ -169,10 +164,10 @@ router.route({
  * Check that the user is either admin or institution contact
  * Check that the institution is validated
  */
-const commonHandlers = [
-  fetchSushi(),
-  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.get?.('institutionId') }),
-  requireContact(),
+const commonHandlers = (requiredPermission) => [
+  fetchSushi({ include: { endpoint: true, institution: true } }),
+  fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
+  requireMemberPermissions(requiredPermission),
   requireValidatedInstitution({ ignoreIfAdmin: true }),
 ];
 
@@ -180,7 +175,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     getOne,
   ],
   validate: {
@@ -194,7 +189,7 @@ router.route({
   method: 'GET',
   path: '/:sushiId/tasks',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.read),
     getTasks,
   ],
   validate: {
@@ -205,60 +200,26 @@ router.route({
 });
 
 router.route({
-  method: 'GET',
+  method: 'POST',
+  path: '/:sushiId/_check_connection',
+  handler: [
+    commonHandlers(FEATURES.sushi.write),
+    checkSushiConnection,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.route({
+  method: 'DELETE',
   path: '/:sushiId/connection',
   handler: [
-    commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
-    async (ctx) => {
-      const { sushi, institution } = ctx.state;
-
-      ctx.action = 'sushi/check-connection';
-      ctx.metadata = {
-        sushiId: sushi.getId(),
-        vendor: sushi.get('vendor'),
-        institutionId: institution.getId(),
-        institutionName: institution.get('name'),
-      };
-
-      let error;
-      try {
-        await getAvailableReports(ctx);
-      } catch (e) {
-        error = e;
-      }
-
-      const exceptions = Array.isArray(ctx?.body?.exceptions)
-        ? ctx.body.exceptions.map(stringifyException)
-        : [];
-
-      if (exceptions.length === 0 && error) {
-        if (error?.expose && error?.message) {
-          exceptions.push(error?.message);
-        } else if (error?.response) {
-          const status = error?.response?.status;
-          const statusText = error?.response?.statusText;
-          exceptions.push(ctx.$t('errors.sushi.badStatus', status, statusText));
-        } else {
-          exceptions.push(ctx.$t('errors.sushi.requestFailed'));
-        }
-      }
-
-      sushi.set('connection', {
-        success: !error && ctx.status === 200,
-        date: new Date(),
-        exceptions,
-      });
-
-      try {
-        await sushi.save();
-      } catch (e) {
-        throw new Error(e);
-      }
-
-      ctx.status = 200;
-      ctx.body = sushi.get('connection');
-    },
+    requireAdmin,
+    commonHandlers(FEATURES.sushi.write),
+    deleteSushiConnection,
   ],
   validate: {
     params: {
@@ -271,8 +232,8 @@ router.route({
   method: 'GET',
   path: '/:sushiId/reports',
   handler: [
-    commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    commonHandlers(FEATURES.sushi.read),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     getAvailableReports,
   ],
   validate: {
@@ -283,10 +244,33 @@ router.route({
 });
 
 router.route({
+  method: 'GET',
+  path: '/:sushiId/harvests',
+  handler: [
+    commonHandlers(FEATURES.sushi.read),
+    getHarvests,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      from: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      to: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+      reportId: Joi.string().trim(),
+      size: Joi.number().min(0),
+      page: Joi.number().min(1),
+      sort: Joi.string(),
+      order: Joi.string().valid('asc', 'desc'),
+    },
+  },
+});
+
+router.route({
   method: 'PATCH',
   path: '/:sushiId',
   handler: [
-    commonHandlers,
+    commonHandlers(FEATURES.sushi.write),
     updateSushi,
   ],
   validate: {
@@ -294,18 +278,32 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
-    body: Sushi.getSchema('update'),
+    body: updateSchema,
   },
 });
 
-requireAnyRole(['admin', 'superuser']);
+router.route({
+  method: 'DELETE',
+  path: '/:sushiId',
+  handler: [
+    commonHandlers(FEATURES.sushi.write),
+    deleteOne,
+  ],
+  validate: {
+    params: {
+      sushiId: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.use(requireAdmin);
 
 router.route({
   method: 'GET',
   path: '/:sushiId/report.json',
   handler: [
-    commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    commonHandlers(FEATURES.sushi.delete),
+    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.endpointId }),
     downloadReport,
   ],
   validate: {
@@ -323,8 +321,7 @@ router.route({
   method: 'POST',
   path: '/:sushiId/_harvest',
   handler: [
-    commonHandlers,
-    fetchSushiEndpoint({ getId: (ctx) => ctx?.state?.sushi?.get?.('endpointId') }),
+    fetchSushi({ include: { endpoint: true, institution: true } }),
     harvestSushi,
   ],
   validate: {
@@ -338,7 +335,8 @@ router.route({
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       forceDownload: Joi.boolean().default(false),
-      reportType: Joi.string().trim().lowercase().default('tr'),
+      downloadUnsupported: Joi.boolean().default(false),
+      reportType: Joi.array().min(1).single().items(Joi.string().trim().lowercase()),
       ignoreValidation: Joi.boolean(),
       timeout: Joi.number().integer().min(10).default(600),
     },
@@ -349,7 +347,8 @@ router.route({
   method: 'GET',
   path: '/:sushiId/files',
   handler: [
-    commonHandlers,
+    fetchSushi({ include: { endpoint: true } }),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
     getFileList,
   ],
   validate: {
@@ -363,7 +362,8 @@ router.route({
   method: 'GET',
   path: '/:sushiId/files/:filePath(.*)',
   handler: [
-    commonHandlers,
+    fetchSushi({ include: { endpoint: true } }),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.sushi?.institutionId }),
     downloadFile,
   ],
   validate: {

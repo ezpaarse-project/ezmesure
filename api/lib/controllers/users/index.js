@@ -1,25 +1,42 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
-const handleElasticErrors = require('../../utils/elastic-error-handler');
+const {
+  adminUpdateSchema,
+  adminCreateSchema,
+  includableFields,
+} = require('../../entities/users.dto');
 
-const { requireJwt, requireUser, requireAnyRole } = require('../../services/auth');
+const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   list,
   getUser,
-  getUserInstitution,
+  createOrReplaceUser,
   updateUser,
   deleteUser,
+  importUsers,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
 
-router.get('/', [handleElasticErrors, list]);
+router.route({
+  method: 'GET',
+  path: '/',
+  handler: list,
+  validate: {
+    query: {
+      q: Joi.string().trim(),
+      size: Joi.number().integer().min(-1),
+      source: Joi.string().trim(),
+      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
+    },
+  },
+});
 
 router.route({
   method: 'GET',
   path: '/:username',
-  handler: [handleElasticErrors, getUser],
+  handler: getUser,
   validate: {
     params: {
       username: Joi.string().trim().required(),
@@ -27,37 +44,31 @@ router.route({
   },
 });
 
-router.route({
-  method: 'GET',
-  path: '/:username/institution',
-  handler: [handleElasticErrors, getUserInstitution],
-  validate: {
-    params: {
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.use(requireAnyRole(['admin', 'superuser']));
+router.use(requireAdmin);
 
 router.route({
   method: 'PUT',
   path: '/:username',
-  handler: [handleElasticErrors, updateUser],
+  handler: createOrReplaceUser,
   validate: {
     type: 'json',
     params: {
       username: Joi.string().trim().required(),
     },
-    body: {
-      username: Joi.any().strip(),
-      enabled: Joi.boolean(),
-      email: Joi.string().trim().email(),
-      full_name: Joi.string().trim(),
-      metadata: Joi.object().unknown(true),
-      password: Joi.string().trim().min(6),
-      roles: Joi.array().items(Joi.string().trim()).required(),
+    body: adminCreateSchema,
+  },
+});
+
+router.route({
+  method: 'PATCH',
+  path: '/:username',
+  handler: updateUser,
+  validate: {
+    type: 'json',
+    params: {
+      username: Joi.string().trim().required(),
     },
+    body: adminUpdateSchema,
   },
 });
 
@@ -69,6 +80,19 @@ router.route({
     params: {
       username: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: importUsers,
+  validate: {
+    type: 'json',
+    params: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

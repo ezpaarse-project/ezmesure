@@ -1,28 +1,31 @@
 {
   "port": "EZMESURE_PORT",
-  "mongo": {
-    "port": "EZMESURE_MONGO_PORT",
-    "host": "EZMESURE_MONGO_HOST",
-    "db": "EZMESURE_MONGO_DB"
-  },
   "elasticsearch": {
     "scheme": "EZMESURE_ELASTIC_SCHEME",
     "port": "EZMESURE_ELASTIC_PORT",
     "host": "EZMESURE_ELASTIC_HOST",
     "user": "EZMESURE_ELASTIC_USER",
     "password": "ELASTICSEARCH_PASSWORD",
-    "apiVersion": "EZMESURE_ELASTIC_VERSION"
+    "apiVersion": "EZMESURE_ELASTIC_VERSION",
+    "syncSchedule": "EZMESURE_ELASTIC_SYNC_SCHEDULE"
   },
   "kibana": {
     "username": "KIBANA_USERNAME",
     "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
-    "host": "EZMESURE_KIBANA_HOST"
+    "host": "EZMESURE_KIBANA_HOST",
+    "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },
   "redis": {
     "host": "EZMESURE_REDIS_HOST",
     "port": "EZMESURE_REDIS_PORT",
     "password": "EZMESURE_REDIS_PASSWORD"
+  },
+  "ezreeport": {
+    "host": "EZMESURE_REPORT_HOST",
+    "port": "EZMESURE_REPORT_PORT",
+    "syncSchedule": "EZMESURE_REPORT_SYNC_SCHEDULE",
+    "apiKey": "EZMESURE_REPORT_ADMIN_KEY"
   },
   "smtp": {
     "host": "EZMESURE_SMTP_HOST",
@@ -46,6 +49,7 @@
   },
   "admin": {
     "username": "EZMESURE_ADMIN_USERNAME",
+    "fullName": "EZMESURE_ADMIN_FULLNAME",
     "password": "EZMESURE_ADMIN_PASSWORD",
     "email": "EZMESURE_ADMIN_EMAIL"
   },
@@ -54,7 +58,20 @@
   },
   "jobs": {
     "harvest": {
-      "concurrency": "EZMESURE_HARVEST_CONCURRENCY"
+      "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
+      "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
+      "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION",
+      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION"
+    }
+  },
+  "counter": {
+    "defaultHarvestedReports": {
+      "__name": "EZMESURE_DEFAULT_HARVESTED_REPORTS",
+      "__format": "json"
+    },
+    "clean": {
+      "schedule": "EZMESURE_CLEAN_COUNTER_SCHEDULE",
+      "maxDayAge": "EZMESURE_COUNTER_MAX_AGE"
     }
   },
   "depositors": {
@@ -66,6 +83,13 @@
   "reportingIndex": "REPORTING_INDEX",
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
+  },
+  "logs": {
+    "app": {
+      "Console": {
+        "level": "EZMESURE_LOG_LEVEL"
+      }
+    }
   },
   "appName": "EZMESURE_APP_NAME"
 }

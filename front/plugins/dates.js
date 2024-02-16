@@ -7,7 +7,6 @@ import {
 
 const locales = { fr, en };
 
-
 export default (ctx, inject) => {
   function getCurrentLocale() {
     const { locale } = ctx.app.i18n;

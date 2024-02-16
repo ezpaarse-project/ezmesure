@@ -21,15 +21,17 @@
       </div>
     </v-card-text>
 
-    <v-divider />
+    <template v-if="hasContacts">
+      <v-divider />
 
-    <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.correspondents')" />
+      <v-card-text class="text-center">
+        <div class="subtitle-1">
+          {{ $t('partners.correspondents') }}
+        </div>
 
-      <template v-if="hasContacts">
         <div v-for="contact in contacts" :key="contact.name">
           <v-tooltip right>
-            <template v-slot:activator="{ on }">
+            <template #activator="{ on }">
               <v-chip class="mb-1" :color="contact.color" outlined v-on="on">
                 <v-icon small left>
                   {{ contact.icon }}
@@ -41,21 +43,15 @@
             <span>{{ contact.label }}</span>
           </v-tooltip>
         </div>
-      </template>
+      </v-card-text>
+    </template>
 
-      <div v-else class="font-italic">
-        {{ $t('partners.noContacts') }}
-      </div>
-    </v-card-text>
+    <template v-if="hasServices">
+      <v-divider />
 
-    <v-divider />
-
-    <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.automated')" />
-
-      <template v-if="hasAutomation">
+      <v-card-text class="text-center">
         <v-chip
-          v-for="auto in automations"
+          v-for="auto in servicesEnabled"
           :key="auto.label"
           :color="auto.color"
           small
@@ -65,19 +61,13 @@
         >
           {{ $t(`partners.auto.${auto.label}`) }}
         </v-chip>
-      </template>
+      </v-card-text>
+    </template>
 
-      <div v-else class="font-italic">
-        {{ $t('partners.noAutomations') }}
-      </div>
-    </v-card-text>
+    <template v-if="hasLinks">
+      <v-divider />
 
-    <v-divider />
-
-    <v-card-text class="text-center">
-      <div class="subtitle-1" v-text="$t('partners.links')" />
-
-      <template v-if="hasLinks">
+      <v-card-text class="text-center">
         <v-btn
           v-for="link in links"
           :key="link.icon"
@@ -87,12 +77,8 @@
         >
           <v-icon>{{ link.icon }}</v-icon>
         </v-btn>
-      </template>
-
-      <div v-else class="font-italic">
-        {{ $t('partners.noLinks') }}
-      </div>
-    </v-card-text>
+      </v-card-text>
+    </template>
   </v-card>
 </template>
 
@@ -115,62 +101,89 @@ export default {
       return this.contacts.length > 0;
     },
     contacts() {
-      const doc = this.partner?.docContactName;
-      const tech = this.partner?.techContactName;
-      const contacts = [];
-
-      if (doc) {
-        contacts.push({
-          name: doc,
-          type: 'doc',
-          icon: 'mdi-book',
-          color: 'green',
-          label: this.$t('partners.documentary'),
-        });
-      }
-      if (tech) {
-        contacts.push({
-          name: tech,
-          type: 'tech',
-          icon: 'mdi-wrench',
-          color: 'blue',
-          label: this.$t('partners.technical'),
-        });
+      if (!this.partnerName) {
+        return [];
       }
 
-      return contacts;
+      return this.partner.contacts
+        .filter((user) => user.fullName)
+        .map(
+          (user) => {
+            const roles = new Set(user.roles);
+
+            if (roles.has('contact:doc')) {
+              return {
+                name: user.fullName,
+                type: 'doc',
+                icon: 'mdi-book',
+                color: 'green',
+                label: this.$t('partners.documentary'),
+              };
+            }
+
+            if (roles.has('contact:tech')) {
+              return {
+                name: user.fullName,
+                type: 'tech',
+                icon: 'mdi-wrench',
+                color: 'blue',
+                label: this.$t('partners.technical'),
+              };
+            }
+
+            return {
+              name: user.fullName,
+              type: 'unknown',
+              icon: 'mdi-mdi',
+              color: 'grey',
+              label: '????',
+            };
+          },
+        )
+        .sort(
+          ({ type }) => (type === 'doc' ? -1 : 1),
+        );
     },
-    automations() {
+    servicesEnabled() {
+      const servicesEnabled = this.partner?.servicesEnabled;
+      if (!servicesEnabled) {
+        return [];
+      }
+
       return [
-        { label: 'ezpaarse', color: 'teal', automated: this.partner?.auto?.ezpaarse },
-        { label: 'ezmesure', color: 'purple', automated: this.partner?.auto?.ezmesure },
-        { label: 'report', color: 'blue', automated: this.partner?.auto?.report },
-        { label: 'sushi', color: 'red', automated: this.partner?.auto?.sushi },
-      ].filter(auto => auto.automated);
+        { label: 'ezpaarse', color: 'teal', automated: servicesEnabled.ezpaarse },
+        { label: 'ezreeport', color: 'blue', automated: servicesEnabled.ezreeport },
+        { label: 'ezcounter', color: 'red', automated: servicesEnabled.ezcounter },
+      ].filter((auto) => auto.automated);
     },
-    hasAutomation() {
-      return this.automations.length > 0;
+    hasServices() {
+      return this.servicesEnabled.length > 0;
     },
     hasLinks() {
       return this.links.length > 0;
     },
     links() {
+      const social = this.partner?.social;
+      if (!social) {
+        return [];
+      }
+
       const links = [];
 
-      if (this.partner?.website) {
-        links.push({ icon: 'mdi-web', color: '#616161', url: this.partner?.website });
+      if (social.website) {
+        links.push({ icon: 'mdi-web', color: '#616161', url: social.website });
       }
-      if (this.partner?.twitterUrl) {
-        links.push({ icon: 'mdi-twitter', color: '#1da1f2', url: this.partner?.twitterUrl });
+      if (social.twitterUrl) {
+        links.push({ icon: 'mdi-twitter', color: '#1da1f2', url: social.twitterUrl });
       }
-      if (this.partner?.linkedinUrl) {
-        links.push({ icon: 'mdi-linkedin', color: '#0077b5', url: this.partner?.linkedinUrl });
+      if (social.linkedinUrl) {
+        links.push({ icon: 'mdi-linkedin', color: '#0077b5', url: social.linkedinUrl });
       }
-      if (this.partner?.youtubeUrl) {
-        links.push({ icon: 'mdi-youtube', color: '#ff0000', url: this.partner?.youtubeUrl });
+      if (social.youtubeUrl) {
+        links.push({ icon: 'mdi-youtube', color: '#ff0000', url: social.youtubeUrl });
       }
-      if (this.partner?.facebookUrl) {
-        links.push({ icon: 'mdi-facebook', color: '#1877f2', url: this.partner?.facebookUrl });
+      if (social.facebookUrl) {
+        links.push({ icon: 'mdi-facebook', color: '#1877f2', url: social.facebookUrl });
       }
 
       return links;

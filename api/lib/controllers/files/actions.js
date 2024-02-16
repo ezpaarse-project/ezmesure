@@ -9,133 +9,12 @@ const validator = require('../../services/validator');
 const storagePath = config.get('storage.path');
 const { appLogger } = require('../../services/logger');
 
-exports.upload = async function (ctx) {
-  let { fileName } = ctx.request.params;
-
-  ctx.action = 'file/upload';
-
-  if (!/\.(csv|gz)$/i.test(fileName)) {
-    return ctx.throw(400, ctx.$t('errors.files.unsupportedType'));
-  }
-
-  fileName = fileName.replace(/\s/g, '_');
-
-  const { user } = ctx.state;
-  const domain = user.email.split('@')[1];
-
-  const relativePath = path.join(domain, user.username, fileName);
-  const userDir = path.resolve(storagePath, domain, user.username);
-  const filePath = path.resolve(userDir, fileName);
-
-  ctx.metadata = { path: relativePath };
-
-  await fse.ensureDir(userDir);
-
-  await new Promise((resolve, reject) => {
-    const stream = ctx.req.pipe(fse.createWriteStream(filePath));
-    stream.on('error', reject);
-    stream.on('finish', resolve);
-  });
-
-  appLogger.info(`Saved file [${filePath}]`);
-
-  const result = await validateFile(filePath);
-
-  if (result instanceof Error) {
-    await fse.unlink(filePath);
-    ctx.throw(400, result.message);
-  } else {
-    ctx.status = 204;
-  }
-};
-
-exports.list = async function (ctx) {
-  ctx.action = 'file/list';
-  const { username, email } = ctx.state.user;
-
-  if (!email) {
-    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
-  }
-
-  const userDir = path.resolve(storagePath, email.split('@')[1], username);
-
-  let fileList;
-  try {
-    fileList = await fse.readdir(userDir);
-  } catch (e) {
-    if (e.code !== 'ENOENT') { throw e; }
-    fileList = [];
-  }
-
-  fileList = fileList.map((name) => ({ name }));
-
-  for (const file of fileList) {
-    const stat = await fse.stat(path.resolve(userDir, file.name));
-    file.size = stat.size;
-    file.createdAt = stat.ctime;
-    file.lastModified = stat.mtime;
-  }
-
-  ctx.body = fileList;
-};
-
-exports.deleteOne = async function (ctx) {
-  const { fileName } = ctx.request.params;
-  ctx.action = 'file/delete';
-  const { username, email } = ctx.state.user;
-
-  if (!email) {
-    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
-  }
-
-  const domain = email.split('@')[1];
-
-  const relativePath = path.join(domain, username, fileName);
-  const filePath = path.resolve(storagePath, relativePath);
-
-  ctx.metadata = { path: relativePath };
-
-  await fse.remove(filePath);
-
-  ctx.status = 204;
-};
-
-exports.deleteMany = async function (ctx) {
-  ctx.action = 'file/delete-many';
-  const { username, email } = ctx.state.user;
-
-  if (!email) {
-    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
-  }
-
-  const domain = email.split('@')[1];
-  const { body } = ctx.request;
-  const fileNames = body && body.entries;
-
-  if (!fileNames) {
-    return ctx.throw(400, ctx.$t('errors.files.missingEntries'));
-  }
-
-  if (!Array.isArray(fileNames)) {
-    return ctx.throw(400, ctx.$t('errors.files.wrongEntriesFormat'));
-  }
-
-  const relativePaths = fileNames.map((fileName) => path.join(domain, username, fileName));
-
-  ctx.metadata = { path: relativePaths };
-
-  for (filePath of relativePaths) {
-    await fse.remove(path.resolve(storagePath, filePath));
-  }
-
-  ctx.status = 204;
-};
-
 /**
  * Validate a file, assuming it's a CSV file
  * @param {String} filePath
+ * @param {(key: string) => string} $t i18n translate method
  */
-function validateFile(filePath) {
+function validateFile(filePath, $t) {
   return new Promise((resolve, reject) => {
     let lineNumber = 0;
     let emptyLines = 0;
@@ -166,11 +45,10 @@ function validateFile(filePath) {
         }
 
         if (errors.length > 0) {
-          err = errors[0];
+          [err] = errors;
 
           if (err.type === 'Quotes') {
-            // FIXME: translate me!
-            err.message = `Ligne #${lineNumber}: un champ entre guillemets est mal formaté`;
+            err.message = $t('files.malformedField', lineNumber);
           }
 
           return parser.abort();
@@ -203,3 +81,129 @@ function validateFile(filePath) {
     });
   });
 }
+
+exports.upload = async function upload(ctx) {
+  let { fileName } = ctx.request.params;
+
+  ctx.action = 'file/upload';
+
+  if (!/\.(csv|gz)$/i.test(fileName)) {
+    return ctx.throw(400, ctx.$t('errors.files.unsupportedType'));
+  }
+
+  fileName = fileName.replace(/\s/g, '_');
+
+  const { user } = ctx.state;
+  const domain = user.email.split('@')[1];
+
+  const relativePath = path.join(domain, user.username, fileName);
+  const userDir = path.resolve(storagePath, domain, user.username);
+  const filePath = path.resolve(userDir, fileName);
+
+  ctx.metadata = { path: relativePath };
+
+  await fse.ensureDir(userDir);
+
+  await new Promise((resolve, reject) => {
+    const stream = ctx.req.pipe(fse.createWriteStream(filePath));
+    stream.on('error', reject);
+    stream.on('finish', resolve);
+  });
+
+  appLogger.info(`Saved file [${filePath}]`);
+
+  const result = await validateFile(filePath, ctx.$t);
+
+  if (result instanceof Error) {
+    await fse.unlink(filePath);
+    ctx.throw(400, result.message);
+  } else {
+    ctx.status = 204;
+  }
+};
+
+exports.list = async function list(ctx) {
+  ctx.action = 'file/list';
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
+  }
+
+  const userDir = path.resolve(storagePath, email.split('@')[1], username);
+
+  let fileList;
+  try {
+    fileList = await fse.readdir(userDir);
+  } catch (e) {
+    if (e.code !== 'ENOENT') { throw e; }
+    fileList = [];
+  }
+
+  fileList = fileList.map((name) => ({ name }));
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const file of fileList) {
+    // eslint-disable-next-line no-await-in-loop
+    const stat = await fse.stat(path.resolve(userDir, file.name));
+    file.size = stat.size;
+    file.createdAt = stat.ctime;
+    file.lastModified = stat.mtime;
+  }
+
+  ctx.body = fileList;
+};
+
+exports.deleteOne = async function deleteOne(ctx) {
+  const { fileName } = ctx.request.params;
+  ctx.action = 'file/delete';
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
+  }
+
+  const domain = email.split('@')[1];
+
+  const relativePath = path.join(domain, username, fileName);
+  const filePath = path.resolve(storagePath, relativePath);
+
+  ctx.metadata = { path: relativePath };
+
+  await fse.remove(filePath);
+
+  ctx.status = 204;
+};
+
+exports.deleteMany = async function deleteMany(ctx) {
+  ctx.action = 'file/delete-many';
+  const { username, email } = ctx.state.user;
+
+  if (!email) {
+    return ctx.throw(400, ctx.$t('errors.user.noEmail'));
+  }
+
+  const domain = email.split('@')[1];
+  const { body } = ctx.request;
+  const fileNames = body && body.entries;
+
+  if (!fileNames) {
+    return ctx.throw(400, ctx.$t('errors.files.missingEntries'));
+  }
+
+  if (!Array.isArray(fileNames)) {
+    return ctx.throw(400, ctx.$t('errors.files.wrongEntriesFormat'));
+  }
+
+  const relativePaths = fileNames.map((fileName) => path.join(domain, username, fileName));
+
+  ctx.metadata = { path: relativePaths };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const filePath of relativePaths) {
+    // eslint-disable-next-line no-await-in-loop
+    await fse.remove(path.resolve(storagePath, filePath));
+  }
+
+  ctx.status = 204;
+};

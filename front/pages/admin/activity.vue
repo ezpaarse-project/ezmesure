@@ -14,7 +14,7 @@
     </ToolBar>
 
     <v-data-table
-      :headers="headers"
+      :headers="tableHeaders"
       :items="activity"
       :loading="loading"
       :options.sync="tableOptions"
@@ -27,7 +27,7 @@
       :sort-desc="true"
       @update:options="loadActivity"
     >
-      <template v-slot:top>
+      <template #top>
         <v-container fluid>
           <v-row>
             <v-col cols="12" lg="4" class="d-flex justify-start align-center">
@@ -48,13 +48,14 @@
                 offset-y
                 min-width="auto"
               >
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ on, attrs }">
                   <span
                     class="text-h4 mx-2"
                     v-bind="attrs"
                     v-on="on"
-                    v-text="$dateFunctions.format(new Date(date), 'PPP')"
-                  />
+                  >
+                    {{ $dateFunctions.format(new Date(date), 'PPP') }}
+                  </span>
                 </template>
 
                 <v-date-picker
@@ -90,7 +91,7 @@
                 dense
                 @change="loadActivity"
               >
-                <template v-slot:selection="{ item, index }">
+                <template #selection="{ item, index }">
                   <v-chip v-if="index === 0" small label>
                     <span>{{ item.label }}</span>
                   </v-chip>
@@ -117,7 +118,7 @@
                 dense
                 @change="loadActivity"
               >
-                <template v-slot:selection="{ attrs, item, parent, selected }">
+                <template #selection="{ attrs, item, parent, selected }">
                   <v-chip
                     v-bind="attrs"
                     :input-value="selected"
@@ -138,14 +139,16 @@
         </v-container>
       </template>
 
-      <template v-slot:item.action="{ item }">
+      <template #[`item.action`]="{ item }">
         <v-hover v-slot="{ hover }">
           <span>
-            <span
-              v-if="$te(`activity.actions.${item.action}`)"
-              v-text="$t(`activity.actions.${item.action}`)"
-            />
-            <span v-else v-text="item.action" />
+            <span v-if="$te(`activity.actions.${item.action}`)">
+              {{ $t(`activity.actions.${item.action}`) }}
+            </span>
+            <span v-else>
+              {{ item.action }}
+            </span>
+
             <v-btn
               v-if="hover"
               x-small
@@ -161,14 +164,14 @@
         </v-hover>
       </template>
 
-      <template v-slot:item.datetime="{ item }">
+      <template #[`item.datetime`]="{ item }">
         <LocalDate
           :date="item.datetime"
           format="Pp"
         />
       </template>
 
-      <template v-slot:item.user.name="{ item }">
+      <template #[`item.user.name`]="{ item }">
         <v-menu
           v-if="item.user"
           :close-on-content-click="false"
@@ -176,7 +179,7 @@
           open-on-hover
           offset-x
         >
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-chip
               small
               outlined
@@ -198,7 +201,9 @@
                 </v-list-item-action>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.user.name" />
+                  <v-list-item-title>
+                    {{ item.user.name }}
+                  </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
 
@@ -231,18 +236,18 @@
                 <v-icon left>
                   mdi-filter
                 </v-icon>
-                {{ $t('activity.filter') }}
+                {{ $t('filter') }}
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
       </template>
 
-      <template v-slot:item.details="{ item }">
+      <template #[`item.details`]="{ item }">
         <ActivityItemDetails :item="item" />
       </template>
 
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-btn
           text
           small
@@ -280,9 +285,9 @@
 <script>
 import { addDays, subDays, format } from 'date-fns';
 
-import ToolBar from '~/components/space/ToolBar';
-import LocalDate from '~/components/LocalDate';
-import ActivityItemDetails from '~/components/ActivityItemDetails';
+import ToolBar from '~/components/space/ToolBar.vue';
+import LocalDate from '~/components/LocalDate.vue';
+import ActivityItemDetails from '~/components/ActivityItemDetails.vue';
 
 export default {
   layout: 'space',
@@ -317,7 +322,7 @@ export default {
     },
   },
   computed: {
-    headers() {
+    tableHeaders() {
       return [
         { text: this.$t('date'), value: 'datetime', width: '180px' },
         { text: this.$t('activity.user'), value: 'user.name', width: '250px' },
@@ -362,6 +367,7 @@ export default {
         { header: 'sushi' },
         'sushi/create',
         'sushi/update',
+        'sushi/delete',
         'sushi/delete-many',
         'sushi/download-report',
         'sushi/harvest',
@@ -421,7 +427,7 @@ export default {
       }
 
       if (this.selectedActions.length > 0) {
-        params.type = this.selectedActions.map(item => item.value).join(',');
+        params.type = this.selectedActions.map((item) => item.value).join(',');
       }
       if (this.selectedUsers.length > 0) {
         params.username = this.selectedUsers.join(',');

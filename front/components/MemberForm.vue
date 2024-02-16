@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="show" width="600">
     <v-card>
-      <v-card-title class="headline" v-text="memberForm.fullName" />
+      <v-card-title class="headline">
+        {{ memberForm.fullName }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="memberForm" ref="form" v-model="valid" @submit.prevent="save">
@@ -25,7 +27,9 @@
               </v-col>
 
               <v-col cols="12">
-                <p v-text="$t('institutions.members.thisMemberIs')" />
+                <p>
+                  {{ $t('institutions.members.thisMemberIs') }}
+                </p>
                 <v-checkbox
                   v-model="memberForm.type"
                   :label="$t('institutions.members.technicalCorrespondent')"
@@ -47,7 +51,9 @@
       <v-card-actions>
         <v-spacer />
 
-        <v-btn text @click="show = false" v-text="$t('close')" />
+        <v-btn text @click="show = false">
+          {{ $t('close') }}
+        </v-btn>
 
         <v-btn
           type="submit"
@@ -56,8 +62,9 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="$t('update')"
-        />
+        >
+          {{ $t('update') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

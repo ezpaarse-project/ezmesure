@@ -12,6 +12,7 @@
     "authentificationToken": "Token d'authentification",
     "administration": "Administration",
     "myInstitution": "Mon établissement",
+    "myInstitutions": "Mes établissements",
     "institutions": "Établissements",
     "sushiEndpoints": "Points d'accès SUSHI",
     "activity": "Activité",
@@ -20,7 +21,12 @@
     "sushi": "Sushi",
     "users": "Utilisateurs",
     "logout": "Déconnexion",
-    "contact": "Contact"
+    "contact": "Contact",
+    "report": "Mes rapports",
+    "adminReport": "ezREEPORT",
+    "repositories": "Entrepôts",
+    "harvest": "Moissonnage",
+    "sync": "Synchronisation"
   },
   "home": {
     "whatDoesEzMESURE": "Qu'est-ce qu'ezMESURE ?",
@@ -35,15 +41,18 @@
   },
   "myspace": {
     "title": "Mon Profil",
-    "noRoles": "Aucun rôle n'est encore associé à votre compte.",
-    "determineAccesRight": "Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.",
+    "noMemberships": "Vous ne faites partie d'aucun établissement.",
+    "determineAccessRight": "Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.",
     "name": "Nom",
     "mail": "Mail",
     "idp": "IDP",
     "organization": "Organisation",
     "unit": "Unité",
-    "yourRights": "Vos rôles",
-    "whatDoesRoles": "Ces rôles définissent vos droits d'accès aux données et aux tableaux de bord hébergés sur ezMESURE."
+    "yourRights": "Vos accès",
+    "whatDoesMemberships": "Vos droits d'accès aux données et aux tableaux de bord hébergés sur ezMESURE.",
+    "infos": "Vos informations",
+    "repos": "Vos entrepôts",
+    "spaces": "Vos espaces"
   },
   "files": {
     "title": "Mes dépots",
@@ -66,19 +75,32 @@
     "missingField": "Le champ \"{missingField}\" est manquant",
     "fieldIsEmpty": "Ligne #{lineNumber}: champ \"{field}\" vide",
     "invalidField": "Ligne #{lineNumber}: champ \"{field}\" invalide, le fichier a-t-il été modifié ?",
-    "depositFiles": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est <strong>pas</strong> immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos <a href=\"http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/\">règles de bonnes pratiques</a> afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants."
+    "depositFiles": {
+      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est {not} immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
+      "not": "pas",
+      "bestPracticeLink": "règles de bonnes pratiques"
+    }
   },
   "kibana": {
     "title": "Identifiants kibana",
     "passwordLost": "Mot de passe oublié",
     "username": "Nom d'utilisateur",
     "newPasswordSentByEmail": "Un courriel vous a été envoyé pour réinitialiser votre mot de passe.",
-    "resetPassword": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur <code>réinitialiser</code> pour recevoir un courriel de réinitialisation.",
-    "whatDoesUsername": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre <a href=\"/kibana/app/kibana#/account\">compte Kibana</a>."
+    "resetPassword": {
+      "text": "Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur {reset} pour recevoir un courriel de réinitialisation.",
+      "reset": "réinitialiser"
+    },
+    "whatDoesUsername": {
+      "text": "Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez à votre {accountLink}.",
+      "accountLink": "compte Kibana"
+    }
   },
   "token": {
     "title": "Token d'autentification",
-    "whatDoesToken": "Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : <code>Authorization: Bearer {insérez le token ici}</code>",
+    "whatDoesToken": {
+      "text": "Ce token est nécessaire pour utiliser l'API d'ezMESURE. Pour l'utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}",
+      "header": "Authorization: Bearer {insérez le token ici}"
+    },
     "token": "Token",
     "unableToRetriveToken": "Impossible de récupérer le token d'authentification",
     "copyFailed": "La copie du token a échoué",
@@ -101,6 +123,8 @@
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
+      "ezcounter": "ezCOUNTER",
+      "ezreeport": "ezREEPORT",
       "report": "Reporting",
       "sushi": "SUSHI"
     }
@@ -112,7 +136,6 @@
     "details": "Details",
     "failedToLoad": "Impossible de charger l'activité",
     "noActivity": "Aucune activité enregistrée durant cette période",
-    "filter": "Filtrer",
     "actionTypes": {
       "users": "Utilisateurs",
       "files": "Fichiers",
@@ -146,7 +169,8 @@
       "indices/insert": "Chargement de données",
       "sushi/create": "Création d'identifiant SUSHI",
       "sushi/update": "Mise à jour d'identifiant SUSHI",
-      "sushi/delete-many": "Suppression d'identifiants SUSHI",
+      "sushi/delete": "Suppression d'identifiant SUSHI",
+      "sushi/delete-many": "Suppression par lot d'identifiants SUSHI",
       "sushi/download-report": "Téléchargement de rapport SUSHI",
       "sushi/harvest": "Moissonnage SUSHI",
       "sushi/import": "Import d'identifiants SUSHI",
@@ -168,7 +192,7 @@
     "title": "Points d'accès SUSHI ({total})",
     "pageDescription": "Gérez ici la liste des points d'accès SUSHI disponibles.",
     "pageDescription2": "Seule la version 5 du protocole SUSHI est supportée.",
-    "manageNendpoints": "Gérer le point d'accès | Gérer {count} points d'accès",
+    "manageNendpoints": "Gérer le point d'accès|Gérer {count} points d'accès",
     "unableToRetriveEndpoints": "Impossible de récupérer les points d'accès",
     "soapWarning": "L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)",
     "sushiNotRootDetected": "L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.",
@@ -187,29 +211,55 @@
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
     "ignoreReportValidation": "Ignorer la validation du rapport",
     "description": "Description",
-    "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres <code>Attributes_To_Show</code>, <code>Access_Type</code> et <code>Section_Type</code> lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard <code>|</code> pour ces champs multivalués, renseignez le séparateur ici.",
+    "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.",
     "paramSeparator": "Séparateur",
     "queryParameters": "Paramètres de la query",
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
-    "deleteNbEndpoints": "Vous allez supprimer {number} points d'accès.",
+    "deleteNbEndpoints": "Vous allez supprimer {count} point d'accès.|Vous allez supprimer {count} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un"
   },
   "institutions": {
+    "toolbarTitle": "Établissements ({count})",
     "title": "Établissement",
     "updateInstitution": "Mettre à jour l'établissement",
-    "deleteNbInstitutions": "Vous allez supprimer {number} établissements. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "deleteNbInstitutions": {
+      "text": "Vous allez supprimer {count} établissement. {affected}|Vous allez supprimer {count} établissements. {affected}",
+      "affected": "Les espaces, et rôles associés seront aussi supprimés. Les index, quant à eux, ne seront pas affectés. Cette action est irréversible."
+    },
     "newInstitution": "Nouvel établissement",
     "notMember": "Vous n'appartenez pas encore à un établissement.",
     "declareMyInstitution": "Déclarer mon établissement",
+    "declareNewInstitution": "Déclarer un nouvel établissement",
     "doesNotExist": "L'établissement auquel vous essayez d'accéder n'est pas réferencé.",
+    "noLogo": "Pas de logo",
+    "noInstitutions": "Vous n'êtes pas attaché à un établissement.",
+    "institutionFoundDeclareNewInstitution": "Votre établissement n'est pas déclaré, déclarez un nouvel établissement.",
+    "sendMailToJoin": "Un message sera envoyé aux correspondant de l'établissement pour les prévenir.",
+    "askToJoinAnInstitution": "Demander à rejoindre un établissement",
+    "joinInstitution": "Vous souhaitez rejoindre {institution} ?",
+    "joinInstitutionEmail": "Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.",
+    "reports": {
+      "reports": "Rapports"
+    },
+    "filters": {
+      "title": "Filtrer les établissements",
+      "searchHint": "Ce champ est remplacé par la barre de recherche",
+      "exclusiveHint": "L'établissement doit correspondre exactement à ce filtre",
+      "inclusiveHint": "L'établissement peut correspondre partiellement à ce filtre"
+    },
     "institution": {
       "title": "Mon établissement",
-      "name": "Nom établissement *",
+      "name": "Nom établissement",
+      "goToPage": "Aller à la page de l'établissement",
+      "members": "Membres",
+      "membersCount": "{count} membre|{count} membres",
       "nameExample": "ex: Université de Blancherive",
       "nameError": "Veuillez saisir un nom d'établissement.",
       "indexCount": "Évènements de consultations indexés",
       "indexPrefix": "Préfixe alloué pour les index",
+      "namespace": "Espace de nommage",
+      "namespaceHint": "Préfixe ajouté aux entités liées à l'établissement (entrepôts, espaces Kibana)",
       "role": "Rôle associé",
       "uai": "UAI",
       "uaiExample": "ex: 1234567A",
@@ -218,14 +268,17 @@
       "homepageExample": "ex: https://cnrs.fr/",
       "affectedIndex": "Index affecté",
       "affectedIndexExample": "ex: univ-blancherive",
+      "group": "Regroupement",
       "city": "Ville",
       "acronym": "Sigle",
       "type": "Type d'établissement",
       "domains": "Domaines",
       "general": "Général",
       "logo": "Logo",
+      "links": "Liens",
       "localisation": "Localisation",
       "automations": "Automatisations",
+      "monitor": "Contrôle",
       "dropImageHere": "Déposez votre image ici",
       "invalidImageFile": "Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG",
       "imageTooLarge": "L'image est trop volumineuse. Taille maximale autorisée : 2mb",
@@ -269,14 +322,16 @@
       "title": "Membres ({total})",
       "technical": "Technique",
       "documentary": "Documentaire",
+      "noCorrespondent": "Aucun correspondant",
       "technicalCorrespondent": "Correspondant technique",
       "documentaryCorrespondent": "Correspondant documentaire",
       "creator": "Créateur",
       "unableToRetriveMembers": "Impossible de récupérer les membres",
+      "cannotAddMember": "Impossible d'ajouter le membre",
       "name": "Nom",
       "username": "Identifiant",
       "correspondent": "Correspondant",
-      "permissions": "Permissions Kibana",
+      "permissions": "Permissions",
       "read": "Lecture",
       "write": "Écriture",
       "updated": "Membre mis à jour",
@@ -294,15 +349,36 @@
       "permissionsOf": "Permissions de {name}",
       "readPermDesc": "L'utilisateur peut consulter les tableaux de bord Kibana, sans les modifier.",
       "writePermDesc": "L'utilisateur peut consulter et modifier les tableaux de bord Kibana.",
-      "failedToUpdatePerms": "La mise à jour des permissions a échoué"
+      "personNotRegistered": "Cette personne n'est pas inscrite",
+      "failedToUpdatePerms": "La mise à jour des permissions a échoué",
+      "locked": "Empêcher la modification du membre",
+      "notEditable": "Ce membre n'est pas modifiable",
+      "accessRights": "Droits d'accès",
+      "institutionManagement": "Gestion de l'établissement",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Contact documentaire",
+        "contact:tech": "Contact technique",
+        "guest": "Invité"
+      },
+      "featureLabels": {
+        "institution": "Fiche établissement",
+        "memberships": "Membres",
+        "sushi": "Identifiants SUSHI",
+        "reporting": "Reporting"
+      }
     },
     "sushi": {
       "title": "Identifiants SUSHI ({total})",
       "pageDescription": "Entrez ici les identifiants SUSHI qui serviront à moissonner automatiquement vos rapports COUNTER.",
       "pageDescription2": "Seule la version 5 du protocole SUSHI est supportée.",
       "addCredentials": "Ajouter des identifiants",
+      "updateCredentials": "Mettre à jour des identifiants",
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
+      "tags": "Étiquettes",
+      "tagsHint": "Profils, comptes, fonds, antennes, etc.",
+      "tagsDescription": "Les étiquettes définies ici pourront être utilisées dans vos tableaux de bord, à travers le champ X_Tags",
       "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
       "endpoint": "Point d'accès",
       "package": "Package",
@@ -321,13 +397,25 @@
       "enterAPIKey": "Veuillez saisir une Clé API.",
       "comment": "Commentaire",
       "credentials": "Identifiants Sushi",
-      "manageNcredentials": "Gérer les identifiants | Gérer {count} identifiants",
+      "manageNcredentials": "Gérer les identifiants|Gérer {count} identifiants",
       "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
-      "checkConnection": "Vérifier la connexion",
-      "cannotCheckConnection": "Échec de la connexion à {name}",
+      "checkCredentials": "Vérifier les identifiants",
+      "cannotCheckCredentials": "Échec de la vérification pour {name}",
+      "resetChecks": "Réinitialiser les états de connexion",
+      "resetNbChecks": "Vous allez réinitialiser {count} état de connexion. Les identifiants non testés ne sont pas pris en compte.|Vous allez réinitialiser {count} états de connexion. Les identifiants non testés ne sont pas pris en compte.",
+      "cannotResetCheck": "Impossible de réinitialiser l'état de connexion pour {name}",
+      "connection": "Connexion",
+      "untested": "Non testé",
+      "operational": "Fonctionnel",
+      "invalidCredentials": "Identifiants invalides",
       "connectionSuccessful": "Connexion réussie",
+      "connectionSuccessfulDesc": "Un rapport de test a été téléchargé avec succès, ou a généré des erreurs sans lien avec l'authentification (ex: période indisponible).",
       "connectionFailed": "Connexion échouée",
+      "connectionFailedDesc": "Un problème est survenu lors de la communication avec le point d'accès. L'équipe est en contact avec l'éditeur pour en déterminer les raisons.",
+      "connectionUnauthorized": "Identifiants invalides",
+      "connectionUnauthorizedDesc": "Un problème d'authentification a empêché le téléchargement du rapport de test. Vérifiez vos identifiants.",
       "connectionUntested": "Connexion non testée",
+      "connectionUntestedDesc": "L'authentification au point d'accès n'a pas encore été testée.",
       "testedOn": "Testée le {date}",
       "entryCompleted": "Saisie terminée",
       "entryCompletedOn": "Saisie terminée le {date}",
@@ -345,32 +433,77 @@
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
+  "components": {
+    "components": "Composantes",
+    "count": "{count} composante|{count} composantes",
+    "noComponent": "Aucune composante"
+  },
+  "group": {
+    "group": "Regroupé dans",
+    "noGroup": "Aucun groupe"
+  },
   "tasks": {
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
     "history": "Historique des tâches",
     "parameters": "Paramètres",
+    "statusDescriptions": {
+      "waiting": "Un moissonnage a été programmé. Il sera lancé dès que possible.",
+      "running": "Le moissonnage est en cours.",
+      "finished": "Le moissonnage est terminé.",
+      "failed": "Le moissonnage a échoué.",
+      "interrupted": "Le moissonnage a été interrompu.",
+      "cancelled": "Le moissonnage a été annulé.",
+      "delayed": "Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu."
+    },
     "status": {
       "notLaunchedYet": "Pas encore lancé",
       "waiting": "En attente",
       "running": "En cours",
       "finished": "Terminé",
+      "failed": "Erreur",
       "error": "Erreur",
       "cancelled": "Annulé",
       "delayed": "Reporté",
       "exceptions": {
-        "1000": "Service indisponible",
-        "1010": "Service surchargé",
-        "1020": "Trop de requêtes",
-        "1030": "Informations insuffisantes",
-        "2000": "Demandeur non autorisé",
-        "2010": "Demandeur non autorisé",
-        "2020": "Clé d'API invalide",
-        "2030": "Adresse IP non autorisée",
-        "3000": "Rapport non supporté",
-        "3010": "Version non supportée",
-        "3020": "Dates invalides",
-        "3030": "Période indisponible"
+        "network_error": "Service injoignable",
+        "unreadable_report": "Rapport illisible",
+        "invalid_json": "Rapport invalide",
+        "max_defferals_exceeded": "Trop de reports",
+        "unauthorized": "Non autorisé",
+        "invalid_report": "Rapport invalide",
+        "sushi:1000": "Service indisponible",
+        "sushi:1010": "Service surchargé",
+        "sushi:1020": "Trop de requêtes",
+        "sushi:1030": "Informations insuffisantes",
+        "sushi:2000": "Demandeur non autorisé",
+        "sushi:2010": "Demandeur non autorisé",
+        "sushi:2020": "Clé d'API invalide",
+        "sushi:2030": "Adresse IP non autorisée",
+        "sushi:3000": "Rapport non supporté",
+        "sushi:3010": "Version non supportée",
+        "sushi:3020": "Dates invalides",
+        "sushi:3030": "Période indisponible"
+      },
+      "exceptionMeaning": {
+        "network_error": "Un problème est survenu lors de la communication avec le point d'accès.",
+        "unreadable_report": "Le rapport téléchargé ne peut être lu.",
+        "invalid_json": "Le rapport téléchargé n'est pas au bon format (JSON), ou présente des problèmes de syntaxe.",
+        "max_defferals_exceeded": "Après plusieurs tentatives, le rapport n'était toujours pas prêt.",
+        "unauthorized": "L'identification auprès du point d'accès a échoué. Vérifiez que vos identifiants sont correctement saisis.",
+        "invalid_report": "Le rapport téléchargé n'est pas valide, ou contient des modifications qui ne font pas partie du standard SUSHI.",
+        "sushi:1000": "La rapport n'a pas pu être moissonné car le point d'accès n'est pas accessible.",
+        "sushi:1010": "Le point d'accès est dans l'incapacité de fournir le rapport en raison d'une forte charge.",
+        "sushi:1020": "Le point d'accès refuse de fournir le rapport en raison d'un nombre de requêtes trop élevé.",
+        "sushi:1030": "Le point d'accès n'a pas pu fournir le rapport en raison d'un manque d'informations lors de la demande.",
+        "sushi:2000": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2010": "Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2020": "Le point d'accès refuse de fournir le rapport car la clé d'API fournie n'est pas valide. Vérifiez que vos identifiants sont correctement saisis.",
+        "sushi:2030": "Le point d'accès refuse de fournir le rapport car l'adresse IP n'est pas autorisée. Assurez-vous que l'IP d'ezMESURE est bien déclarée auprès du point d'accès.",
+        "sushi:3000": "Le point d'accès est dans l'incapacité de fournir le rapport, car ce dernier n'est pas supporté.",
+        "sushi:3010": "Le point d'accès est dans l'incapacité de fournir le rapport, car la version demandée n'est pas supportée.",
+        "sushi:3020": "La période demandée au point d'accès n'est pas valide. Il est possible que le rapport ne soit pas encore disponible pour cette période.",
+        "sushi:3030": "Le rapport n'est pas disponible pour la période demandée."
       }
     },
     "failedStep": {
@@ -398,6 +531,8 @@
     }
   },
   "sushi": {
+    "credentials": "Identifiants",
+    "credentialsCount": "1 identifiant|{count} identifiants",
     "copyId": "Copier l'ID",
     "showFiles": "Voir les fichiers",
     "unableToCopyId": "Impossible de copier dans le presse-papier",
@@ -406,10 +541,23 @@
     "latestImport": "Dernier import",
     "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
     "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verrouillée.",
-    "youHaveUntestedCredentials": "Vous avez 1 identifiant non testé | Vous avez {count} identifiants non testés",
-    "deleteNbCredentials": "Vous allez supprimer {number} identifiants SUSHI.",
+    "nInstitutions": "1 établissement utilise cet endpoint|{count} établissements utilisent cet endpoint",
+    "nUntestedCredentials": "1 identifiant non testé|{count} identifiants non testés",
+    "nInvalidCredentials": "1 identifiant invalide|{count} identifiants invalides",
+    "nOperationalCredentials": "1 identifiant fonctionnel|{count} identifiants fonctionnels",
+    "nProblematicEndpoints": "1 point d'accès problématique|{count} points d'accès problématiques",
+    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiant indique que le point d'accès est problématique",
+    "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
+    "harvestState": "État du moissonnage",
+    "harvestedAt": "Moissonné le {date}",
+    "report": "Rapport",
+    "openHelpPage": "Ouvrir page d'aide",
+    "insertedItems": "{count} éléments du rapport ont été insérés.",
+    "updatedItems": "{count} éléments du rapport ont été mis à jour.",
+    "failedItems": "{count} éléments du rapport n'ont pas pu être récupérés.",
+    "messagesFromEndpoint": "Messages du point d'accès :",
     "paramScopes": {
       "all": "Toutes les requêtes au point d'accès",
       "report_list": "Listing des rapports",
@@ -422,16 +570,16 @@
     "files": {
       "title": "Fichiers disponibles",
       "noFilesAvailable": "Aucun fichier disponible",
-      "nbFiles": "1 fichier | {count} fichiers"
+      "nbFiles": "1 fichier|{count} fichiers"
     }
   },
   "reports": {
     "sushiReturnedErrors": "Le point d'accès SUSHI a retourné des erreurs.",
     "checkCredentials": "Vérifier les identifiants",
-    "availableReports": "Rapports disponibles",
-    "availableReportsOnPlatform": "Rapports disponibles sur la plateforme éditeur",
+    "supportedReports": "Rapports supportés",
+    "supportedReportsOnPlatform": "Rapports supportés par la plateforme éditeur",
     "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles",
-    "showAllReports": "Afficher tous les rapports"
+    "onlyShowMasterReports": "Afficher uniquement les rapports maîtres"
   },
   "identifier": "Identifiant",
   "authenticate": {
@@ -453,13 +601,15 @@
     "user": "Utilisateur",
     "password": "Mot de passe",
     "repeatPassword": "Répéter le mot de passe",
-    "fieldIsRequired": "Ce champs est requis",
+    "passwordIsRequired": "Mot de passe requis",
     "enterUser": "Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.",
-    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.<br> S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
+    "checkYourEmail": "Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.",
+    "waitFewMinutes": "S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.",
     "notEqual": "Les mots de passes ne correspondent pas",
     "updated": "Mot de passe mis à jour",
     "pattern": "Minimum 6 caractères",
-    "length": "Le mot de passe doit contenir au moins 6 caractères"
+    "length": "Le mot de passe doit contenir au moins 6 caractères",
+    "update": "Mettre à jour votre mot de passe"
   },
   "contact": {
     "contactUs": "Nous contacter",
@@ -487,9 +637,12 @@
     "500": "Une erreur interne est survenue",
     "generic": "Une erreur inattendue est survenue"
   },
-  "validation": {
+  "account": {
     "title": "Activation du compte",
-    "description": "Afin d'utiliser ce service, vous vous engagez à respecter le <a href=\"https://www.cnil.fr/fr/reglement-europeen-protection-donnees\" target=\"_blank\">règlement général sur la protection des données</a>.",
+    "description": {
+      "text": "Afin d'utiliser ce service, vous vous engagez à respecter le {regulationLink}.",
+      "regulationLink": "règlement général sur la protection des données"
+    },
     "acceptTerms": "Veuillez accepter les conditions d'utilisation.",
     "readAndAccept": "J'ai lu et j'accepte les conditions d'utilisation",
     "activate": "Activer mon compte"
@@ -499,6 +652,147 @@
     "unableToCopy": "Impossible de copier dans le presse-papier",
     "textCopied": "Texte copié dans le presse-papier"
   },
+  "users": {
+    "toolbarTitle": "Utilisateurs ({count})",
+    "updateUser": "Mettre à jour l'utilisateur",
+    "deleteNbUsers": "Vous allez supprimer {count} utilisateur. Les index, espaces, et rôles associés ne seront pas affectés.|Vous allez supprimer {count} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.",
+    "newUser": "Nouvel utilisateur",
+    "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
+    "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
+    "createMailUserList": "Nouveau mail groupé",
+    "filters": {
+      "title": "Filtrer les utilisateurs",
+      "searchHint": "Ce champ est remplacé par la barre de recherche"
+    },
+    "user": {
+      "saved": "Utilisateur sauvegardé",
+      "general": "Général",
+      "fullName": "Nom complet",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse email",
+      "isAdmin": "Est Administrateur ?",
+      "memberships": "Établissements",
+      "membershipsCount": "{count} établissement|{count} établissements",
+      "roles": "Roles",
+      "no_roles": "Aucun rôle",
+      "permissions": "Permissions",
+      "no_permissions": "Aucune permission",
+      "no_institution": "Aucun établissement"
+    }
+  },
+  "report": {
+    "title": "Mes rapports",
+    "health": "État de santé",
+    "admin": {
+      "taskTab": "Gestion des rapports",
+      "templateTab": "Gestion des modèles",
+      "presetTab": "Gestion des prédéfinis",
+      "adminTab": "Administration générale"
+    }
+  },
+  "repositories": {
+    "repositories": "Entrepôts",
+    "toolbarTitle": "Entrepôts ({count})",
+    "xRepositories": "1 entrepôt|{count} entrepôts",
+    "noRepository": "Aucun entrepôt n'est encore attribué",
+    "pattern": "Pattern",
+    "type": "Type",
+    "institutions": "Établissements",
+    "institutionsCount": "{count} établissement|{count} établissements",
+    "noInstitutions": "Aucun établissement n'utilise cet entrepôt",
+    "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts.",
+    "filters": {
+      "title": "Filtrer les entrepôts"
+    }
+  },
+  "spaces": {
+    "spaces": "Espaces",
+    "xSpaces": "1 espace|{count} espaces",
+    "noSpace": "Aucun espace n'est encore attribué",
+    "id": "Identifiant",
+    "type": "Type",
+    "types": {
+      "ezpaarse": "ezPAARSE",
+      "counter5": "COUNTER 5"
+    },
+    "descriptions": {
+      "ezpaarse": "Espace ezPAARSE",
+      "counter5": "Espace éditeurs"
+    },
+    "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
+  },
+  "harvest": {
+    "requests": {
+      "name": "Moissonnage du {createdAt}",
+      "metrics": {
+        "success": "Réussi",
+        "failed": "Échoué",
+        "active": "Actif",
+        "delayed": "Reporté",
+        "pending": "En attente"
+      },
+      "counts": {
+        "institutions": "{n} établissement|{n} établissements",
+        "endpoints": "{n} point d'accès|{n} points d'accès",
+        "reportTypes": "{n} type de rapport|{n} types de rapport"
+      },
+      "unableToRetrive": "Impossible de récupérer les moissonnages"
+    },
+    "jobs": {
+      "title": "Tâches de moissonnage",
+      "filtersTitle": "Filtrer les tâches",
+      "harvestId": "Identifiant de moissonnage",
+      "reportType": "Type de rapport",
+      "beginDate": "Date de début",
+      "endDate": "Date de fin",
+      "period": "Période",
+      "createdAt": "Demandé le",
+      "runningTime": "Durée de traitement",
+      "index": "Index d'insertion",
+      "coveredPeriods": "Mois concernés",
+      "inserted": "Éléments insérés",
+      "updated": "Éléments mis à jour",
+      "failed": "Éléments non récupérés",
+      "unableToRetrive": "Impossible de récupérer les tâches de moissonnage",
+      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage"
+    }
+  },
+  "sync": {
+    "status": {
+      "notSynced": "Pas encore synchronisé",
+      "synchronizing": "En cours de synchronisation",
+      "completed": "Synchronisation terminée",
+      "error": "Des erreurs sont survenues"
+    },
+    "description": {
+      "notSynced": "Les données de gestions ne sont pas encore synchronisées, des incohérences entre l'interface d'ezMESURE et les différents services liés à ezMESURE peuvent survenir. Il vous suffit de cliquer sur le bouton ci-dessus pour les synchroniser.",
+      "completed": "Les données de gestions ont bien être synchronisées avec les services liés à ezMESURE.",
+      "error": "Des erreurs sont survenues durant la synchronisation des données de gestion avec les différents services liés à ezMESURE. Veuillez consulter les logs de votre instance pour plus d'informations."
+    },
+    "start": "Lancer la synchronisation",
+    "startedAt": "Démarrée le {date}",
+    "running": "A duré {time}",
+    "spaces": "Espaces",
+    "repositories": "Entrepôts",
+    "users": "Utilisateurs",
+    "ezreeportUsers": "Utilisateurs",
+    "ezreeportNamespaces": "Établissements",
+    "unableToRetrieveInformation": "Impossible de récupérer les informations de la synchronisation",
+    "unableToStart": "Impossible de lancer la synchronisation"
+  },
+  "permissions": {
+    "none": "Aucun",
+    "read": "Lecture",
+    "write": "Lecture / Écriture"
+  },
+  "social": {
+    "website": "Site web",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "youtube": "Youtube",
+    "facebook": "Facebook"
+  },
+  "anErrorOccurred": "Une erreur est survenue",
   "url": "URL",
   "type": "Type",
   "copyId": "Copier l'ID",
@@ -511,6 +805,8 @@
   "status": "Statut",
   "date": "Date",
   "duration": "Durée",
+  "description": "Description",
+  "initials": "Initiales",
   "language": "Langue",
   "refresh": "Actualiser",
   "delete": "Supprimer",
@@ -527,12 +823,15 @@
   "save": "Sauvegarder",
   "search": "Rechercher",
   "apply": "Appliquer",
+  "filter": "Filtrer",
   "fixIt": "Corriger",
   "leaveIt": "Laisser tel quel",
   "nSelected": "{count} sélectionné(s)",
   "deselect": "Désélectionner",
+  "show": "Afficher",
   "requiredFields": "* champs obligatoires",
   "formSendingFailed": "L'envoi du formulaire a échoué",
+  "searchFailed": "Oups! La recherche a échoué.",
   "add": "Ajouter",
   "cannotDeleteItems": "Impossible de supprimer {count} élément(s)",
   "cannotDeleteItem": "Impossible de supprimer l'élément {id}",
@@ -547,10 +846,14 @@
   "areYouSure": "Êtes-vous sûr ?",
   "fieldIsRequired": "Ce champ est requis",
   "fieldMustMatch": "Ce champ doit correspondre à : {pattern}",
+  "maxLength": "Longueur maximale : {n} caractères",
+  "open": "Ouvrir",
   "send": "Envoyer",
   "yes": "Oui",
   "no": "Non",
   "validate": "Valider",
   "invalidate": "Invalider",
-  "reason": "Raison : {reason}"
+  "reason": "Raison : {reason}",
+  "groupBy": "Regrouper par",
+  "indeterminate": "indéterminée"
 }

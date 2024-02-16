@@ -1,7 +1,5 @@
-export default function ({ $auth, redirect }) {
-  const acceptedTerms = $auth.user && $auth.user.metadata && $auth.user.metadata.acceptedTerms;
-
-  if (!acceptedTerms) {
-    redirect('/activation');
+export default function hasAcceptedTerms({ $auth, redirect }) {
+  if (!$auth?.user?.metadata?.acceptedTerms) {
+    redirect('/activate');
   }
 }

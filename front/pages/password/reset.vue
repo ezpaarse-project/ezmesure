@@ -15,8 +15,12 @@
             flat
             dense
           >
-            <v-toolbar-title v-text="$t('password.forgot')" />
+            <v-toolbar-title>
+              {{ $t('password.forgot') }}
+            </v-toolbar-title>
+
             <v-spacer />
+
             <v-icon>mdi-lock</v-icon>
           </v-toolbar>
 
@@ -32,27 +36,33 @@
               {{ resetErrorText }}
             </v-alert>
 
-            <!-- eslint-disable-next-line -->
-            <v-alert type="success" :value="reset" v-html="$t('password.checkYourEmail')"/>
+            <v-alert type="green" :value="reset">
+              <div>{{ $t('password.checkYourEmail') }}</div>
+              <div>{{ $t('password.waitFewMinutes') }}</div>
+            </v-alert>
+
             <v-btn
               v-if="reset"
               block
               color="primary"
               to="/authenticate"
-              v-text="$t('password.backToLogin')"
-            />
+            >
+              {{ $t('password.backToLogin') }}
+            </v-btn>
 
             <v-form
               v-if="!reset"
               v-model="resetFormValid"
               @submit.prevent="resetPassword"
             >
-              <p v-text="$t('password.enterUser')" />
+              <p>
+                {{ $t('password.enterUser') }}
+              </p>
 
               <v-text-field
                 v-model="username"
                 :label="$t('password.user')"
-                :rules="[() => !!username || ($t('password.fieldIsRequired'))]"
+                :rules="fieldIsRequiredRules"
                 prepend-inner-icon="mdi-account"
                 outlined
                 required
@@ -68,7 +78,6 @@
               >
                 {{ $t('password.reset') }}
               </v-btn>
-
 
               <a href="/authenticate" class="caption">
                 {{ $t('password.backToLogin') }}
@@ -92,6 +101,11 @@ export default {
       resetErrorText: '',
       reset: false,
     };
+  },
+  computed: {
+    fieldIsRequiredRules() {
+      return [!!this.username || this.$t('fieldIsRequired')];
+    },
   },
   methods: {
     async resetPassword() {

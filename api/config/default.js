@@ -1,25 +1,24 @@
 const path = require('path');
 const { format } = require('winston');
 
+const oneMinute = 60;
+
 module.exports = {
   port: 3000,
-  mongo: {
-    port: 27017,
-    host: 'localhost',
-    db: 'ezmesure',
-  },
   elasticsearch: {
     scheme: 'https',
     port: 9200,
     host: 'localhost',
     user: 'elastic',
     password: 'changeme',
+    syncSchedule: '0 0 0 * * *',
   },
   kibana: {
     username: 'kibana_system',
     password: 'changeme',
     port: 5601,
     host: 'localhost',
+    syncSchedule: '0 0 0 * * *',
   },
   redis: {
     host: 'localhost',
@@ -31,6 +30,12 @@ module.exports = {
     port: 25,
     secure: false,
     ignoreTLS: false,
+  },
+  ezreeport: {
+    host: 'reporting',
+    port: 8080,
+    syncSchedule: '0 0 0 * * *',
+    apiKey: '00000000-0000-0000-0000-000000000000',
   },
   logs: {
     app: {
@@ -59,6 +64,7 @@ module.exports = {
   },
   admin: {
     username: 'ezmesure-admin',
+    fullName: 'ezMESURE Administrator',
     password: 'changeme',
     email: 'admin@admin.com',
   },
@@ -67,7 +73,26 @@ module.exports = {
   },
   jobs: {
     harvest: {
-      concurrency: 3,
+      concurrency: 1,
+      maxDeferrals: 5,
+      deferralBackoffDuration: 10 * oneMinute,
+      busyBackoffDuration: 10 * oneMinute,
+    },
+  },
+  counter: {
+    defaultHarvestedReports: [
+      'dr',
+      'dr_d1',
+      'ir',
+      'pr',
+      'pr_p1',
+      'tr',
+      'tr_b1',
+      'tr_j1',
+    ],
+    clean: {
+      schedule: '0 0 0 * * *',
+      maxDayAge: 7,
     },
   },
   notifications: {

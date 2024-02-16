@@ -12,6 +12,9 @@ errors:
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
     taskExists: "L'item SUSHI [%s] a déjà une tâche associée (statut: [%s])"
+    invalidDate: La date [%s] est invalide
+    invalidPeriod: La période [de %s à %s] est invalide
+    failedToUpdateSupportedReports: La mise à jour de la liste des rapports disponibles a échoué
 
   queue:
     notFound: File d'attente introuvable
@@ -26,6 +29,9 @@ errors:
 
   sushi-endpoint:
     notFound: Point d'accès introuvable
+
+    import:
+      alreadyExists: Le point d'accès [%s] existe déjà
 
   sushi:
     unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
@@ -49,6 +55,11 @@ errors:
     cannotDeleteActiveTask: Impossible de supprimer une tâche active
     cannotCancelJobWithoutPID: Impossible d'annuler la tâche, le processus n'est pas identifiable
 
+  repository:
+    notFound: Dépôt introuvable
+    alreadyExists: Le dépôt [%s] est déjà associé à l'établissement
+    typeMismatch: Un dépôt [%s] de type différent existe déjà
+
   institution:
     notFound: Établissement introuvable
     unauthorized: Vous n'êtes pas autorisé à accéder à cet établissement
@@ -62,16 +73,27 @@ errors:
     noSpace: L'espace [%s] de l'établissement [%s] n'existe pas
     forbiddenSpaceName: Le nom d'espace [%s] n'est pas autorisé pour l'établissement [%s]. Il doit commencer par [%s].
 
+    import:
+      alreadyExists: L'établissement [%s] existe déjà
+
+  member:
+    notFound: Membre introuvable
+
   members:
     alreadyMember: "L'utilisateur appartient à un autre établissement : %s"
     cannotRemoveContact: Vous ne pouvez pas supprimer un correspondant d'établissement
     cannotUpdateContact: Vous ne pouvez pas modifier un correspondant d'établissement
+    notEditable: Ce membre n'est pas modifiable
 
   user:
+    alreadyActivated: Ce compte est déjà activé
     notFound: Utilisateur introuvable
     noEmail: L'email obligatoire est absent du profil utilisateur
     failedToSave: Impossible de sauvegarder les données utilisateur
     failedToUpdateRoles: Impossible de mettre à jour les rôles de l'utilisateur
+
+    import:
+      alreadyExists: Ce compte [%s] existe déjà
 
   users:
     failedToQuery: Impossible de récupérer les utilisateurs
@@ -101,6 +123,7 @@ errors:
     noIndexMatching: L'index pattern [%s] ne correspond à aucun index
 
   files:
+    malformedField: "Ligne #%d: un champ entre guillemets est mal formaté"
     wrongEntriesFormat: "'entries' devrait être une liste de noms de fichiers"
     missingEntries: "Champ requis manquant: entries"
     unsupportedType: Type de fichier non supporté

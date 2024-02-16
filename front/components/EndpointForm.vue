@@ -1,8 +1,9 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title v-if="endpointForm.id" class="headline" v-text="formTitle" />
-      <v-card-title v-else class="headline" v-text="$t('endpoints.addEndpoint')" />
+      <v-card-title class="headline">
+        {{ endpointForm.id ? formTitle : $t('endpoints.addEndpoint') }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="endpointForm" ref="form" v-model="valid" @submit.prevent="save">
@@ -84,11 +85,6 @@
             hide-details
           />
           <v-checkbox
-            v-model="endpointForm.isSushiCompliant"
-            :label="$t('endpoints.isSushiCompliant')"
-            hide-details
-          />
-          <v-checkbox
             v-model="endpointForm.ignoreReportValidation"
             :label="$t('endpoints.ignoreReportValidation')"
           />
@@ -102,8 +98,24 @@
       </v-card-title>
 
       <v-card-text>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <p class="text-justify" v-html="$t('endpoints.paramSeparatorDesc')" />
+        <i18n path="endpoints.paramSeparatorDesc" tag="p" class="text-justify">
+          <template #0>
+            <code>Attributes_To_Show</code>
+          </template>
+
+          <template #1>
+            <code>Access_Type</code>
+          </template>
+
+          <template #2>
+            <code>Section_Type</code>
+          </template>
+
+          <template #separator>
+            <code>|</code>
+          </template>
+        </i18n>
+
         <v-text-field
           v-model="endpointForm.paramSeparator"
           :label="$t('endpoints.paramSeparator')"
@@ -112,7 +124,9 @@
           required
         />
 
-        <p v-text="$t('endpoints.pleaseEnterParams')" />
+        <p>
+          {{ $t('endpoints.pleaseEnterParams') }}
+        </p>
 
         <v-btn
           type="submit"
@@ -150,8 +164,9 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('add')"
-        />
+        >
+          {{ editMode ? $t('update') : $t('add') }}
+        </v-btn>
       </v-card-actions>
 
       <ConfirmDialog ref="confirm" />
@@ -160,8 +175,8 @@
 </template>
 
 <script>
-import ConfirmDialog from '~/components/ConfirmDialog';
-import SushiParam from '~/components/SushiParam';
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import SushiParam from '~/components/SushiParam.vue';
 
 export default {
   components: {
@@ -191,11 +206,9 @@ export default {
         technicalProvider: '',
         counterVersion: '',
         paramSeparator: '',
-        validated: false,
         requireCustomerId: false,
         requireRequestorId: false,
         requireApiKey: false,
-        isSushiCompliant: false,
         ignoreReportValidation: false,
       },
 
@@ -235,11 +248,9 @@ export default {
       this.endpointForm.counterVersion = data.counterVersion || '';
       this.endpointForm.paramSeparator = data.paramSeparator || '';
 
-      this.endpointForm.validated = !!data.validated;
       this.endpointForm.requireCustomerId = !!data.requireCustomerId;
       this.endpointForm.requireRequestorId = !!data.requireRequestorId;
       this.endpointForm.requireApiKey = !!data.requireApiKey;
-      this.endpointForm.isSushiCompliant = !!data.isSushiCompliant;
       this.endpointForm.ignoreReportValidation = !!data.ignoreReportValidation;
 
       this.formTitle = this.endpointForm.vendor;
@@ -279,7 +290,7 @@ export default {
     async save() {
       this.saving = true;
 
-      this.endpointForm.params = this.endpointForm.params.filter(param => param.name);
+      this.endpointForm.params = this.endpointForm.params.filter((param) => param.name);
 
       try {
         if (this.endpointForm.id) {

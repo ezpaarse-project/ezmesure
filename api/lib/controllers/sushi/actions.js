@@ -1,50 +1,118 @@
 const fs = require('fs-extra');
 const path = require('path');
-const format = require('date-fns/format');
-const subMonths = require('date-fns/subMonths');
 const { v4: uuidv4 } = require('uuid');
 const send = require('koa-send');
+const config = require('config');
+const {
+  format,
+  isBefore,
+  subMonths,
+  parseISO,
+  isValid: isValidDate,
+} = require('date-fns');
 
-const Sushi = require('../../models/Sushi');
-const Task = require('../../models/Task');
-const elastic = require('../../services/elastic');
 const sushiService = require('../../services/sushi');
 const { appLogger } = require('../../services/logger');
 const { harvestQueue } = require('../../services/jobs');
 
+const { SUSHI_CODES, ERROR_CODES } = sushiService;
+
+const repositoriesService = require('../../entities/repositories.service');
+const sushiCredentialsService = require('../../entities/sushi-credentials.service');
+const harvestJobsService = require('../../entities/harvest-job.service');
+const harvestsService = require('../../entities/harvest.service');
+const SushiEndpointsService = require('../../entities/sushi-endpoints.service');
+
+const { includableFields } = require('../../entities/sushi-credentials.dto');
+const { propsToPrismaInclude } = require('../utils');
+
+const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
+ * @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs
+ */
+/* eslint-enable max-len */
+
 exports.getAll = async (ctx) => {
-  const options = { filters: [] };
-  const { query = {} } = ctx.request;
   const {
     id: sushiIds,
     institutionId,
     endpointId,
+    include: propsToInclude,
     connection,
-  } = query;
+    q: query,
+    size,
+    sort,
+    order = 'asc',
+    page = 1,
+  } = ctx.query;
+
+  let include;
+
+  if (ctx.state?.user?.isAdmin) {
+    include = propsToPrismaInclude(propsToInclude, includableFields);
+  }
+
+  /** @type {SushiCredentialsFindManyArgs} */
+  const options = {
+    include,
+    take: Number.isInteger(size) ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+    where: {},
+  };
+
+  if (sort) {
+    options.orderBy = { [sort]: order };
+  }
+
+  if (query) {
+    options.where = {
+      OR: [
+        { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
+        { institution: { name: { contains: query, mode: 'insensitive' } } },
+      ],
+    };
+  }
 
   if (sushiIds) {
-    options.filters.push(Sushi.filterById(Array.isArray(sushiIds) ? sushiIds : sushiIds.split(',').map((s) => s.trim())));
+    options.where.id = Array.isArray(sushiIds)
+      ? { in: sushiIds }
+      : { equals: sushiIds };
   }
   if (institutionId) {
-    options.filters.push(Sushi.filterBy('institutionId', Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim())));
+    options.where.institutionId = Array.isArray(institutionId)
+      ? { in: institutionId }
+      : { equals: institutionId };
   }
   if (endpointId) {
-    options.filters.push(Sushi.filterBy('endpointId', Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim())));
+    options.where.endpointId = Array.isArray(endpointId)
+      ? { in: endpointId }
+      : { equals: endpointId };
   }
 
-  if (connection === 'untested') {
-    options.must_not = [{
-      exists: { field: `${Sushi.type}.connection.success` },
-    }];
-  } else if (connection) {
-    options.filters.push({
-      term: { [`${Sushi.type}.connection.success`]: connection === 'working' },
-    });
+  if (connection) {
+    options.where.connection = {};
+    switch (connection) {
+      case 'working':
+        options.where.connection = { path: ['status'], equals: 'success' };
+        break;
+      case 'faulty':
+        options.where.connection = { path: ['status'], equals: 'failed' };
+        break;
+      case 'untested':
+        options.where.connection = { equals: {} };
+        break;
+
+      default:
+        break;
+    }
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await Sushi.findAll(options);
+  ctx.body = await sushiCredentialsService.findMany(options);
 };
 
 exports.getOne = async (ctx) => {
@@ -58,29 +126,31 @@ exports.getTasks = async (ctx) => {
   const { sushi } = ctx.state;
 
   ctx.status = 200;
-  ctx.body = await Task.findBySushiId(sushi.getId());
+  ctx.body = await harvestJobsService.findMany({ where: { credentialsId: sushi.id } });
 };
 
 exports.addSushi = async (ctx) => {
   ctx.action = 'sushi/create';
-  const { body } = ctx.request;
-  const { institution, endpoint } = ctx.state;
-
-  const sushiData = {
-    ...body,
-    vendor: body.vendor || endpoint.get('vendor'),
-  };
+  const { body: sushiData } = ctx.request;
+  const { institution } = ctx.state;
 
   ctx.metadata = {
     vendor: sushiData.vendor,
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
-  const sushiItem = new Sushi(sushiData);
-  await sushiItem.save();
+  const sushiItem = await sushiCredentialsService.create({
+    data: {
+      ...sushiData,
+      endpoint: { connect: { id: sushiData?.endpointId } },
+      institution: { connect: { id: sushiData?.institutionId } },
+      endpointId: undefined,
+      institutionId: undefined,
+    },
+  });
 
-  ctx.metadata.sushiId = sushiItem.getId();
+  ctx.metadata.sushiId = sushiItem?.id;
   ctx.status = 201;
   ctx.body = sushiItem;
 };
@@ -90,69 +160,82 @@ exports.updateSushi = async (ctx) => {
   const { sushi, institution } = ctx.state;
   const { body } = ctx.request;
 
-  sushi.update(body);
-  sushi.set('connection', undefined);
-
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: sushi.endpoint?.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
-  try {
-    await sushi.save();
-  } catch (e) {
-    throw new Error(e);
-  }
+  const updatedSushiCredentials = await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: {
+      ...body,
+      connection: {},
+    },
+  });
 
   ctx.status = 200;
-  ctx.body = sushi;
+  ctx.body = updatedSushiCredentials;
 };
 
-exports.deleteSushiData = async (ctx) => {
-  ctx.action = 'sushi/delete-many';
-  const { body } = ctx.request;
-  const { userIsAdmin, institution } = ctx.state;
-
-  const sushiItems = await Sushi.findManyById(body.ids);
-
-  const response = await Promise.all(sushiItems.map(async (sushiItem) => {
-    const result = {
-      id: sushiItem.getId(),
-      vendor: sushiItem.get('vendor'),
-    };
-
-    if (!userIsAdmin && (sushiItem.getInstitutionId() !== institution.id)) {
-      return { ...result, status: 'failed' };
-    }
-
-    try {
-      await sushiItem.delete();
-      return { ...result, status: 'deleted' };
-    } catch (error) {
-      appLogger.error(`Failed to delete sushi data: ${error}`);
-      return { ...result, status: 'failed' };
-    }
-  }));
+exports.deleteOne = async (ctx) => {
+  ctx.action = 'sushi/delete';
+  const { sushi } = ctx.state;
 
   ctx.metadata = {
-    sushiDeleteResult: response,
+    sushiId: sushi?.id,
+    endpointVendor: sushi?.endpoint?.vendor,
   };
 
+  await sushiCredentialsService.delete({ where: { id: sushi?.id } });
+
+  ctx.status = 204;
+};
+
+exports.getHarvests = async (ctx) => {
+  const { sushiId } = ctx.params;
+  const {
+    from,
+    to,
+    reportId,
+    size,
+    sort,
+    order = 'asc',
+    page = 1,
+  } = ctx.request.query;
+
+  /** @type {HarvestFindManyArgs} */
+  const options = {
+    take: Number.isInteger(size) ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+    orderBy: sort ? { [sort]: order } : undefined,
+    where: {
+      credentialsId: sushiId,
+      reportId,
+    },
+  };
+
+  if (from || to) {
+    options.where.period = { gte: from, lte: to };
+  }
+
+  const harvests = await harvestsService.findMany(options);
+
+  ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = response;
+  ctx.body = harvests;
 };
 
 exports.getAvailableReports = async (ctx) => {
-  const { sushi, endpoint } = ctx.state;
+  const { sushi } = ctx.state;
 
   let data;
   let headers;
   let exceptions;
 
   try {
-    ({ data, headers } = await sushiService.getAvailableReports(endpoint, sushi));
+    ({ data, headers } = await sushiService.getAvailableReports(sushi));
   } catch (e) {
     exceptions = sushiService.getExceptions(e?.response?.data);
 
@@ -194,10 +277,10 @@ exports.downloadReport = async (ctx) => {
   let { beginDate, endDate } = query;
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
   };
 
   if (!beginDate && !endDate) {
@@ -269,7 +352,7 @@ exports.getFileList = async (ctx) => {
         type: 'file',
         size: stat.size,
         mtime: stat.mtime,
-        href: `/api/sushi/${sushi.getId()}/files/${parentDirPath}/${filename}`,
+        href: `/api/sushi/${sushi.id}/files/${parentDirPath}/${filename}`,
       };
     }
 
@@ -312,55 +395,102 @@ exports.harvestSushi = async (ctx) => {
   const {
     target,
     forceDownload,
-    reportType,
+    downloadUnsupported,
     ignoreValidation,
-    harvestId,
+    harvestId = uuidv4(),
     timeout,
   } = body;
-  let { beginDate, endDate } = body;
-  const {
-    endpoint,
-    sushi,
-    user,
-    institution,
-  } = ctx.state;
+
+  let reportTypes = Array.from(new Set(body.reportType));
+
+  const { sushi } = ctx.state;
+  const { endpoint, institution } = sushi;
 
   let index = target;
 
   if (!index) {
-    const prefix = institution.get('indexPrefix');
+    const repository = await repositoriesService.findFirst({
+      where: {
+        type: 'counter5',
+        institutions: {
+          some: { id: institution.id },
+        },
+      },
+    });
 
-    if (!prefix) {
-      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.getId()));
+    if (!repository?.pattern) {
+      ctx.throw(400, ctx.$t('errors.harvest.noTarget', institution.id));
     }
 
-    index = `${prefix}-publisher`;
+    index = repository.pattern.replace(/[*]/g, '');
   }
 
   ctx.metadata = {
-    sushiId: sushi.getId(),
-    vendor: sushi.get('vendor'),
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
-    reportType,
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
+    reportTypes,
   };
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username: user.username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': user.username },
-  });
-  const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
+  const supportedReportsUpdatedAt = endpoint?.supportedReportsUpdatedAt;
+  const oneMonthAgo = subMonths(new Date(), 1);
 
-  if (!canWrite) {
-    ctx.throw(403, `you don't have permission to write in ${index}`);
+  if (!isValidDate(supportedReportsUpdatedAt) || isBefore(supportedReportsUpdatedAt, oneMonthAgo)) {
+    appLogger.verbose(`Updating supported SUSHI reports of [${endpoint?.vendor}]`);
+
+    const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+    let supportedReports;
+
+    try {
+      const { data } = await sushiService.getAvailableReports(sushi);
+
+      if (!Array.isArray(data) || !data.every(isValidReport)) {
+        throw new Error('invalid response body');
+      }
+
+      supportedReports = data.map((report) => report.Report_ID.toLowerCase());
+    } catch (e) {
+      appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
+    }
+
+    sushi.endpoint = await SushiEndpointsService.update({
+      where: { id: sushi?.endpoint?.id },
+      data: {
+        supportedReports,
+        supportedReportsUpdatedAt: new Date(),
+      },
+    });
+  }
+
+  if (reportTypes.includes('all')) {
+    reportTypes = Array.from(DEFAULT_HARVESTED_REPORTS);
+  }
+
+  const supportedReports = new Set(sushi.endpoint.supportedReports);
+
+  if (!downloadUnsupported && supportedReports.size > 0) {
+    reportTypes = reportTypes.filter((reportId) => supportedReports.has(reportId));
+  }
+
+  /** @type {Date} */
+  let beginDate = body.beginDate && parseISO(body.beginDate, 'yyyy-MM');
+  /** @type {Date} */
+  let endDate = body.endDate && parseISO(body.endDate, 'yyyy-MM');
+
+  if (beginDate && !isValidDate(beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.beginDate));
+  }
+  if (endDate && !isValidDate(endDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidDate', body.endDate));
+  }
+  if (beginDate && endDate && isBefore(endDate, beginDate)) {
+    ctx.throw(400, ctx.$t('errors.harvest.invalidPeriod', body.beginDate, body.endDate));
   }
 
   if (!beginDate && !endDate) {
-    const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+    /** @type {Date} */
+    const prevMonth = subMonths(new Date(), 1);
     beginDate = prevMonth;
     endDate = prevMonth;
   } else if (!beginDate) {
@@ -369,37 +499,170 @@ exports.harvestSushi = async (ctx) => {
     endDate = beginDate;
   }
 
-  const task = new Task({
-    type: 'sushi-harvest',
-    status: 'waiting',
-    params: {
-      sushiId: sushi.getId(),
-      endpointId: sushi.get('endpointId'),
-      institutionId: institution.getId(),
-      harvestId: harvestId || uuidv4(),
-      username: user.username,
-      timeout,
-      reportType,
-      index,
-      beginDate,
-      endDate,
-      forceDownload,
-      ignoreValidation,
-      endpointVendor: endpoint.get('vendor'),
-      sushiLabel: sushi.get('vendor'),
-      sushiPackage: sushi.get('package'),
-      institutionName: institution.get('name'),
-    },
-  });
+  ctx.type = 'json';
+  ctx.body = await Promise.all(
+    reportTypes.flatMap(
+      async (reportType) => {
+        const task = await harvestJobsService.create({
+          include: {
+            credentials: {
+              include: {
+                endpoint: true,
+              },
+            },
+          },
+          data: {
+            credentials: {
+              connect: { id: sushi.id },
+            },
+            status: 'waiting',
+            harvestId,
+            timeout,
+            reportType,
+            index,
+            beginDate: format(beginDate, 'yyyy-MM'),
+            endDate: format(endDate, 'yyyy-MM'),
+            forceDownload,
+            ignoreValidation,
+          },
+        });
 
-  await task.save();
-  await harvestQueue.add(
-    { taskId: task.getId(), timeout },
-    { jobId: task.getId() },
+        await harvestQueue.add(
+          'harvest',
+          { taskId: task.id, timeout },
+          { jobId: task.id },
+        );
+
+        return task;
+      },
+    ),
+  );
+};
+
+exports.checkSushiConnection = async (ctx) => {
+  ctx.action = 'sushi/checkConnection';
+  ctx.type = 'json';
+
+  const { sushi } = ctx.state;
+  const { endpoint, institution } = sushi;
+
+  ctx.metadata = {
+    sushiId: sushi.id,
+    vendor: endpoint.vendor,
+    institutionId: institution.id,
+    institutionName: institution.name,
+  };
+
+  const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
+
+  const sushiData = {
+    sushi,
+    institution,
+    endpoint,
+    beginDate: threeMonthAgo,
+    endDate: threeMonthAgo,
+    reportType: 'pr',
+  };
+
+  const reportPath = sushiService.getReportPath(sushiData);
+
+  const download = (
+    sushiService.getOngoingDownload(sushiData) || sushiService.initiateDownload(sushiData)
   );
 
+  /** @type {import('axios').AxiosResponse} */
+  let response;
+  /** @type {'unauthorized'|'failed'|'success'} */
+  let status;
+  let report;
+  let errorCode;
+
+  try {
+    response = await new Promise((resolve, reject) => {
+      download.on('error', reject);
+      download.on('finish', (res) => { resolve(res); });
+    });
+  } catch (e) {
+    errorCode = ERROR_CODES.networkError;
+  }
+
+  if (!errorCode) {
+    try {
+      report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        errorCode = ERROR_CODES.invalidJson;
+      } else {
+        errorCode = ERROR_CODES.unreadableReport;
+      }
+    }
+  }
+
+  if (response?.status === 401) {
+    status = 'unauthorized';
+    errorCode = ERROR_CODES.unauthorized;
+  }
+
+  const exceptions = sushiService.getExceptions(report);
+
+  exceptions.forEach((e) => {
+    switch (e.Code) {
+      case SUSHI_CODES.insufficientInformation:
+      case SUSHI_CODES.unauthorizedRequestor:
+      case SUSHI_CODES.unauthorizedRequestorAlt:
+      case SUSHI_CODES.invalidAPIKey:
+      case SUSHI_CODES.unauthorizedIPAddress:
+        status = 'unauthorized';
+        errorCode = `sushi:${e.Code}`;
+        break;
+      case SUSHI_CODES.serviceUnavailable:
+      case SUSHI_CODES.serviceBusy:
+      case SUSHI_CODES.tooManyRequests:
+        status = 'failed';
+        errorCode = `sushi:${e.Code}`;
+        break;
+      default:
+    }
+  });
+
+  if (report && exceptions?.length === 0) {
+    const { valid } = sushiService.validateReport(report);
+
+    if (!valid) {
+      errorCode = ERROR_CODES.invalidReport;
+    }
+  }
+
+  if (!status && !errorCode) {
+    status = 'success';
+  }
+
+  ctx.body = await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: {
+      connection: {
+        date: Date.now(),
+        status: status || 'failed',
+        exceptions: exceptions || null,
+        errorCode: errorCode || null,
+      },
+    },
+  });
+};
+
+exports.deleteSushiConnection = async (ctx) => {
+  ctx.action = 'sushi/deleteConnection';
   ctx.type = 'json';
-  ctx.body = task;
+
+  const { sushi } = ctx.state;
+
+  await sushiCredentialsService.update({
+    where: { id: sushi.id },
+    data: {
+      connection: {},
+    },
+  });
+  ctx.status = 204;
 };
 
 exports.importSushiItems = async (ctx) => {
@@ -407,11 +670,11 @@ exports.importSushiItems = async (ctx) => {
   const { body = [] } = ctx.request;
   const { overwrite } = ctx.query;
   const { institution } = ctx.state;
-  const institutionId = institution.getId();
+  const institutionId = institution.id;
 
   ctx.metadata = {
-    institutionId: institution.getId(),
-    institutionName: institution.get('name'),
+    institutionId,
+    institutionName: institution.name,
   };
 
   const response = {
@@ -433,29 +696,34 @@ exports.importSushiItems = async (ctx) => {
     });
   };
 
-  const importItem = async (sushiData = {}) => {
-    if (sushiData.id) {
-      const sushiItem = await Sushi.findById(sushiData.id);
+  const importItem = async (data = {}) => {
+    if (data.id) {
+      const sushiItem = await sushiCredentialsService.findUnique({ where: { id: data.id } });
 
-      if (sushiItem && sushiItem.get('institutionId') !== institutionId) {
-        addResponseItem(sushiData, 'error', ctx.$t('errors.sushi.import.belongsToAnother', sushiItem.getId()));
+      if (sushiItem && sushiItem.institutionId !== institutionId) {
+        addResponseItem(sushiItem, 'error', ctx.$t('errors.sushi.import.belongsToAnother', sushiItem.id));
         return;
       }
 
       if (sushiItem && !overwrite) {
-        addResponseItem(sushiData, 'conflict', ctx.$t('errors.sushi.import.alreadyExists', sushiItem.getId()));
+        addResponseItem(sushiItem, 'conflict', ctx.$t('errors.sushi.import.alreadyExists', sushiItem.id));
         return;
       }
     }
 
-    const sushiItem = new Sushi({
-      ...sushiData,
-      institutionId,
+    const sushiData = {
+      ...data,
+      endpoint: { connect: { id: data?.endpointId } },
+      institution: { connect: { id: institutionId } },
+      endpointId: undefined,
+      institutionId: undefined,
+    };
+
+    const sushiItem = await sushiCredentialsService.upsert({
+      where: { id: sushiData.id },
+      create: sushiData,
+      update: sushiData,
     });
-
-    sushiItem.setId(sushiData.id);
-
-    await sushiItem.save();
 
     addResponseItem(sushiItem, 'created');
   };

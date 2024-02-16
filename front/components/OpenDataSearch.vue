@@ -14,7 +14,7 @@
     prepend-icon="mdi-database-search"
     return-object
   >
-    <template v-slot:item="{ item }">
+    <template #item="{ item }">
       <OpenDataSearchItem :item="item" />
     </template>
   </v-autocomplete>
@@ -22,7 +22,7 @@
 
 <script>
 import debounce from 'lodash.debounce';
-import OpenDataSearchItem from '~/components/OpenDataSearchItem';
+import OpenDataSearchItem from '~/components/OpenDataSearchItem.vue';
 
 export default {
   components: {

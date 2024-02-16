@@ -13,16 +13,26 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
+
         <v-btn
           text
           @click="disagree"
         >
+          <v-icon v-if="disagreeIcon" left>
+            {{ agreeIcon }}
+          </v-icon>
+
           {{ disagreeText || $t('cancel') }}
         </v-btn>
+
         <v-btn
           color="primary"
           @click="agree"
         >
+          <v-icon v-if="agreeIcon" left>
+            {{ agreeIcon }}
+          </v-icon>
+
           {{ agreeText || $t('confirm') }}
         </v-btn>
       </v-card-actions>
@@ -38,7 +48,9 @@ export default {
       title: null,
       message: null,
       agreeText: null,
+      agreeIcon: null,
       disagreeText: null,
+      disagreeIcon: null,
     };
   },
   methods: {
@@ -46,7 +58,9 @@ export default {
       this.title = opts?.title;
       this.message = opts?.message;
       this.agreeText = opts?.agreeText;
+      this.agreeIcon = opts?.agreeIcon;
       this.disagreeText = opts?.disagreeText;
+      this.disagreeIcon = opts?.disagreeIcon;
       this.show = true;
 
       return new Promise((resolve) => {

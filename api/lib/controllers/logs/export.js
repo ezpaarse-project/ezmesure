@@ -132,7 +132,7 @@ exports.aggregate = async function aggregate(ctx) {
     const isWritable = ctx.body.write('\n');
 
     if (!isWritable) {
-      await new Promise((resolve) => ctx.body.once('drain', resolve));
+      await new Promise((resolve) => { ctx.body.once('drain', resolve); });
     }
 
     if (afterKey) {

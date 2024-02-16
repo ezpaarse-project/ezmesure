@@ -1,0 +1,36 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>Bienvenue sur ezMESURE</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Bienvenue {{ username }},</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ username }}</strong>
+    </mj-text>
+
+    <mj-text>
+      Vous pouvez activer votre compte en créant votre mot de passe en cliquant sur le bouton suivant :
+    </mj-text>
+
+    <mj-button href="{{ activateLink }}" font-family="Helvetica" background-color="#9c27b0" color="white">
+      Activer votre compte
+    </mj-button>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

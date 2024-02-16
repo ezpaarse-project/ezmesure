@@ -1,7 +1,14 @@
 <template>
   <v-container>
-    <!-- eslint-disable-next-line vue/no-v-html -->
-    <p v-html="$t('files.depositFiles')" />
+    <i18n path="files.depositFiles.text" tag="p">
+      <template #not>
+        <strong>{{ $t('files.depositFiles.not') }}</strong>
+      </template>
+
+      <template #bestPracticeLink>
+        <a href="http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/">{{ $t('files.depositFiles.bestPracticeLink') }}</a>
+      </template>
+    </i18n>
 
     <FileInput @change="addFilesToUpload" />
 
@@ -56,10 +63,22 @@
                     <span v-if="upload.error" class="error--text">
                       {{ upload.errorMessage || $t('error') }}
                     </span>
-                    <span v-else-if="upload.done" v-text="$t('files.uploaded')" />
-                    <span v-else-if="upload.progress" v-text="$t('files.loadingInProgress')" />
-                    <span v-else-if="upload.validating" v-text="$t('files.validatingFile')" />
-                    <span v-else v-text="$t('files.isWaiting')" />
+
+                    <span v-else-if="upload.done">
+                      {{ $t('files.uploaded') }}
+                    </span>
+
+                    <span v-else-if="upload.progress">
+                      {{ $t('files.loadingInProgress') }}
+                    </span>
+
+                    <span v-else-if="upload.validating">
+                      {{ $t('files.validatingFile') }}
+                    </span>
+
+                    <span v-else>
+                      {{ $t('files.isWaiting') }}
+                    </span>
                   </div>
                 </v-flex>
 
@@ -87,7 +106,7 @@ import Papa from 'papaparse';
 import prettyBytes from 'pretty-bytes';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CancelToken, isCancel } from 'axios';
-import FileInput from './FileInput';
+import FileInput from './FileInput.vue';
 
 export default {
   components: {
@@ -150,7 +169,7 @@ export default {
     },
 
     async uploadNextFile() {
-      const upload = this.uploads.find(u => !u.done);
+      const upload = this.uploads.find((u) => !u.done);
       if (!upload) {
         this.uploading = false;
         this.$emit('upload');
@@ -177,7 +196,7 @@ export default {
             cancelToken: source.token,
             onUploadProgress: (event) => {
               if (event.lengthComputable) {
-                upload.progress = Math.floor(event.loaded / event.total * 100);
+                upload.progress = Math.floor((event.loaded / event.total) * 100);
               }
             },
           });
@@ -221,11 +240,11 @@ export default {
 
         Papa.parse(file, {
           delimiter: ';',
-          error: e => reject(e),
+          error: (e) => reject(e),
           step: ({ data: row, errors }, parser) => {
             lineNumber += 1;
 
-            if (row.filter(f => f.trim()).length === 0) {
+            if (row.filter((f) => f.trim()).length === 0) {
               emptyLines += 1;
               return;
             }
@@ -250,7 +269,7 @@ export default {
             if (typeof columns === 'undefined') {
               columns = row;
 
-              const missingField = mandatoryFields.find(field => !columns.includes(field));
+              const missingField = mandatoryFields.find((field) => !columns.includes(field));
 
               if (missingField) {
                 err = new Error(this.$t('files.missingField', { missingField }));
@@ -287,11 +306,11 @@ export default {
     },
 
     removeUpload(id) {
-      this.uploads = this.uploads.filter(upload => upload.id !== id);
+      this.uploads = this.uploads.filter((upload) => upload.id !== id);
     },
 
     clearCompletedUploads() {
-      this.uploads = this.uploads.filter(u => !u.done);
+      this.uploads = this.uploads.filter((u) => !u.done);
     },
   },
 };

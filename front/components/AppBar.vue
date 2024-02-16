@@ -15,22 +15,45 @@
       />
     </router-link>
 
-    <v-toolbar-title class="ml-3">
+    <v-toolbar-title class="mx-3">
       ezMESURE
+
+      <div
+        v-if="currentInstance"
+        class="text-overline"
+        style="font-size: 0.5em !important; text-align: center; line-height: normal;"
+      >
+        {{ currentInstance }}
+      </div>
     </v-toolbar-title>
+
+    <v-toolbar-items class="hidden-sm-and-down">
+      <v-btn text exact to="/partners">
+        {{ $t('menu.partners') }}
+      </v-btn>
+      <v-btn text exact to="/api-reference">
+        {{ $t('menu.api') }}
+      </v-btn>
+      <v-btn text exact to="/contact-us">
+        {{ $t('menu.contact') }}
+      </v-btn>
+    </v-toolbar-items>
 
     <v-spacer />
 
     <v-toolbar-items class="hidden-sm-and-down">
-      <v-btn text exact to="/" v-text="$t('menu.home')" />
-      <v-btn text href="/kibana/" v-text="$t('menu.dashboard')" />
-      <v-btn text to="/myspace" v-text="$t('menu.myspace')" />
-      <v-btn text exact to="/partners" v-text="$t('menu.partners')" />
-      <v-btn text exact to="/api-reference" v-text="$t('menu.api')" />
-      <v-btn text exact to="/contact-us" v-text="$t('menu.contact')" />
+      <v-btn text href="/kibana/">
+        {{ $t('menu.dashboard') }}
+      </v-btn>
+      <v-btn text to="/myspace">
+        {{ $t('menu.myspace') }}
+      </v-btn>
+      <v-btn v-if="isAdmin" text to="/admin">
+        {{ $t('administration') }}
+      </v-btn>
 
-      <v-menu tilev-model="chooseLanguage" offset-y>
-        <template v-slot:activator="{ on, value }">
+      <v-menu tile offset-y>
+        <template #activator="{ on, value }">
           <v-btn
             text
             v-on="on"
@@ -62,32 +85,35 @@
     </v-toolbar-items>
 
     <v-bottom-sheet v-model="sheet">
-      <template v-slot:activator="{ on }">
+      <template #activator="{ on }">
         <v-btn class="hidden-md-and-up" icon dark v-on="on">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
       </template>
 
       <v-list>
-        <v-subheader v-text="$t('menu.navigateTo')" />
+        <v-subheader>{{ $t('menu.navigateTo') }}</v-subheader>
 
         <v-list-item exact to="/" @click="sheet = false">
-          <v-list-item-title v-text="$t('menu.home')" />
+          <v-list-item-title>{{ $t('menu.home') }}</v-list-item-title>
         </v-list-item>
         <v-list-item href="/kibana/" @click="sheet = false">
-          <v-list-item-title v-text="$t('menu.dashboard')" />
+          <v-list-item-title>{{ $t('menu.dashboard') }}</v-list-item-title>
         </v-list-item>
         <v-list-item exact to="/myspace" @click="sheet = false">
-          <v-list-item-title v-text="$t('menu.myspace')" />
+          <v-list-item-title>{{ $t('menu.myspace') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item v-if="isAdmin" exact to="/admin" @click="sheet = false">
+          {{ $t('administration') }}
         </v-list-item>
         <v-list-item exact to="/partners" @click="sheet = false">
-          <v-list-item-title v-text="$t('menu.partners')" />
+          <v-list-item-title>{{ $t('menu.partners') }}</v-list-item-title>
         </v-list-item>
         <v-list-item exact to="/api-reference" @click="sheet = false">
-          <v-list-item-title v-text="$t('menu.api')" />
+          <v-list-item-title>{{ $t('menu.api') }}</v-list-item-title>
         </v-list-item>
         <v-list-item exact to="/contact-us" @click="sheet = false">
-          <v-list-item-title>Contact</v-list-item-title>
+          <v-list-item-title>{{ $t('menu.contact') }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-bottom-sheet>
@@ -102,8 +128,14 @@ export default {
     };
   },
   computed: {
+    isAdmin() {
+      return this.$auth?.user?.isAdmin;
+    },
     currentLocal() {
-      return this.$i18n.locales.find(locale => locale.code === this.$i18n.locale).name;
+      return this.$i18n.locales.find((locale) => locale.code === this.$i18n.locale).name;
+    },
+    currentInstance() {
+      return this.$config.currentInstance;
     },
   },
 };

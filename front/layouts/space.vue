@@ -1,29 +1,35 @@
 <template>
   <v-app>
-    <Menu />
+    <SpaceMenu />
 
     <AppBar />
 
     <v-main>
-      <v-card flat tile color="transparent">
+      <v-card flat tile color="transparent" style="height: 100%;">
         <nuxt />
       </v-card>
     </v-main>
 
-    <Snackbar />
+    <AppSnackbar />
   </v-app>
 </template>
 
 <script>
-import AppBar from '~/components/AppBar';
-import Snackbar from '~/components/Snackbar';
-import Menu from '~/components/space/Menu';
+import AppBar from '~/components/AppBar.vue';
+import AppSnackbar from '~/components/AppSnackbar.vue';
+import SpaceMenu from '~/components/space/SpaceMenu.vue';
 
 export default {
   components: {
     AppBar,
-    Snackbar,
-    Menu,
+    AppSnackbar,
+    SpaceMenu,
+  },
+  head() {
+    return this.$nuxtI18nHead({
+      addDirAttribute: true,
+      addSeoAttributes: true,
+    });
   },
 };
 </script>

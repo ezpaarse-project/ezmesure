@@ -7,6 +7,10 @@ const sender = config.get('notifications.sender');
 const supportRecipients = config.get('notifications.supportRecipients');
 
 const { appLogger } = require('../../services/logger');
+const InstitutionsService = require('../../entities/institutions.service');
+const UsersService = require('../../entities/users.service');
+
+const { MEMBER_ROLES } = require('../../entities/memberships.dto');
 
 function sendValidateInstitution(receivers) {
   return sendMail({
@@ -44,13 +48,25 @@ exports.validateInstitution = async (ctx) => {
   const { value: validated } = body;
   const { institution } = ctx.state;
 
-  const wasValidated = institution.get('validated');
+  const wasValidated = institution.validated;
 
-  institution.setValidation(validated);
-  await institution.save();
+  const updatedInstitution = await InstitutionsService.update({
+    where: { id: institution.id },
+    data: { validated },
+  });
 
   if (!wasValidated && validated === true) {
-    let contacts = await institution.getContacts();
+    let contacts = await UsersService.findMany({
+      where: {
+        memberships: {
+          some: {
+            institutionId: institution.id,
+            roles: { hasSome: [MEMBER_ROLES.docContact, MEMBER_ROLES.techContact] },
+          },
+        },
+      },
+    });
+
     contacts = contacts?.map?.((e) => e.email);
 
     if (Array.isArray(contacts) && contacts.length > 0) {
@@ -63,17 +79,5 @@ exports.validateInstitution = async (ctx) => {
   }
 
   ctx.status = 200;
-  ctx.body = institution;
-};
-
-exports.deleteInstitutionCreator = async (ctx) => {
-  const { institution } = ctx.state;
-
-  if (institution.get('creator')) {
-    await institution.setCreator(null);
-    await institution.save();
-  }
-
-  ctx.status = 200;
-  ctx.body = institution;
+  ctx.body = updatedInstitution;
 };

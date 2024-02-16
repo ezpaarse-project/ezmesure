@@ -1,4 +1,4 @@
-import colors from 'vuetify/lib/util/colors';
+const path = require('path');
 
 module.exports = {
   /*
@@ -15,33 +15,58 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
   },
+
   plugins: [
     { src: '~/plugins/dates.js' },
+    { src: '~/plugins/ezreeport.js' },
   ],
+
   css: [
     'swagger-ui/dist/swagger-ui.css',
-    '~/assets/css/custom.scss',
+    '~/assets/css/custom.css',
   ],
+
   ssr: false,
   telemetry: false,
+
   publicRuntimeConfig: {
     shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
+    supportMail: process.env.EZMESURE_SUPPORT_MAIL || 'ezteam@couperin.org',
+    currentInstance: process.env.EZMESURE_INSTANCE,
   },
+
   modules: [
-    ['@nuxtjs/proxy', {
-      pathRewrite: {
-        '/api': process.env.API_URL,
+    [
+      '@nuxtjs/proxy',
+      {
+        pathRewrite: {
+          '/api': process.env.API_URL,
+        },
       },
-    }],
-    ['@nuxtjs/axios', {
-      prefix: '/api',
-      credentials: true,
-      proxy: true,
-    }],
-    'nuxt-i18n',
+    ],
+    [
+      '@nuxtjs/axios',
+      {
+        prefix: '/api',
+        credentials: true,
+        proxy: true,
+      },
+    ],
+    '@nuxtjs/i18n',
+    '~/modules/vuetify-locales',
   ],
+
+  buildModules: [
+    '@nuxtjs/auth',
+    [
+      '@nuxtjs/vuetify',
+      { optionsPath: './vuetify.options.js' },
+    ],
+  ],
+
   i18n: {
     baseUrl: process.env.APPLI_APACHE_SERVERNAME,
+    vueI18nLoader: true,
     locales: [
       {
         name: 'Français',
@@ -57,31 +82,18 @@ module.exports = {
       },
     ],
     defaultLocale: 'fr',
-    seo: true,
     lazy: true,
     langDir: 'locales/',
     strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'ezmesure_i18n',
+      redirectOn: 'all',
       alwaysRedirect: true,
       fallbackLocale: 'en',
     },
   },
-  devModules: [
-    '@nuxtjs/auth',
-    ['@nuxtjs/vuetify', {
-      theme: {
-        themes: {
-          light: {
-            primary: colors.purple,
-            secondary: colors.grey.darken2,
-            accent: colors.lightBlue,
-          },
-        },
-      },
-    }],
-  ],
+
   auth: {
     scopeKey: 'roles',
     redirect: {
@@ -101,6 +113,7 @@ module.exports = {
       },
     },
   },
+
   /*
   ** Customize the progress-bar color
   */
@@ -109,7 +122,73 @@ module.exports = {
     name: 'folding-cube',
     color: '#9c27b0',
   },
+
   pageTransition: 'fade-transition',
+
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push(
+        // Route aliases
+        {
+          name: 'admin-institution-id-sushi',
+          path: '/admin/institutions/:id/sushi',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/sushi.vue'),
+        },
+        {
+          name: 'admin-institution-id-members',
+          path: '/admin/institutions/:id/members',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/members.vue'),
+        },
+        {
+          name: 'admin-institution-id-reports',
+          path: '/admin/institutions/:id/reports',
+          component: resolve(__dirname, 'pages/myspace/institutions/_id/reports.vue'),
+        },
+        {
+          name: 'admin-root',
+          path: '/admin',
+          redirect: '/admin/institutions',
+        },
+        // Legacy routes
+        {
+          name: 'legacy-institutions',
+          path: '/institutions',
+          redirect: '/admin/institutions',
+        },
+        {
+          name: 'legacy-institutions-id',
+          path: '/institutions/:id',
+          redirect: '/admin/institutions/:id',
+        },
+        {
+          name: 'legacy-my-institutions',
+          path: '/my-institutions',
+          redirect: '/myspace/institutions',
+        },
+        {
+          name: 'legacy-institutions-id-sub',
+          path: '/institutions/:id/*',
+          redirect: (to) => `/myspace${to.path}`,
+        },
+        {
+          name: 'legacy-files',
+          path: '/files',
+          redirect: '/myspace/files',
+        },
+        {
+          name: 'legacy-kibana',
+          path: '/kibana',
+          redirect: '/myspace/kibana',
+        },
+        {
+          name: 'legacy-token',
+          path: '/token',
+          redirect: '/myspace/token',
+        },
+      );
+    },
+  },
+
   /*
   ** Build configuration
   */
@@ -119,6 +198,10 @@ module.exports = {
     ** Run ESLINT on save
     */
     extend(config, ctx) {
+      // https://github.com/vuetifyjs/vuetify/discussions/4068#discussioncomment-24984
+      config.resolve.alias.vue$ = path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm.js');
+      config.resolve.alias['^vuetify'] = path.resolve(__dirname, 'node_modules/vuetify');
+
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',

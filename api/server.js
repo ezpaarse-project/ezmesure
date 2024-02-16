@@ -2,23 +2,31 @@ const env = process.env.NODE_ENV || 'development';
 
 const Koa = require('koa');
 const mount = require('koa-mount');
-const cors = require('koa-cors');
+const cors = require('@koa/cors');
 const config = require('config');
 const path = require('path');
+const { setTimeout } = require('timers/promises');
 const { STATUS_CODES } = require('http');
+
+const usersService = require('./lib/entities/users.service');
 
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
 const notifications = require('./lib/services/notifications');
-const depositors = require('./lib/services/depositors');
-const Task = require('./lib/models/Task');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
+const sushi = require('./lib/services/sushi');
+
+const ezreeportSync = require('./lib/services/sync/ezreeport');
+
+/**
+ * Register hooks. Must not be called elsewhere. Some services can both
+ * trigger hooks and be used by hook handlers, leading to circular dependencies.
+ */
+require('./lib/hooks');
 
 const cronMetrics = require('./lib/controllers/metrics/cron');
 const { appLogger, httpLogger } = require('./lib/services/logger');
-
-module.exports = { appLogger };
 
 const mailSender = config.get('notifications.sender');
 
@@ -111,7 +119,7 @@ app.use(async (ctx, next) => {
     ctx.type = 'json';
     ctx.body = {
       status: ctx.status,
-      error: error.message,
+      error: error.originalError?.message || error.message,
       detail: error.detail,
       stack: error.stack,
       code: error.code,
@@ -130,23 +138,10 @@ app.use(mount('/', controller));
 
 function start() {
   notifications.start(appLogger);
-  depositors.start(appLogger);
   opendata.startCron(appLogger);
+  ezreeportSync.startCron();
+  sushi.startCleanCron();
   cronMetrics.start();
-
-  // Change the status of tasks that was running when the server went down
-  Task.interruptRunningTasks()
-    .then(({ body = {} }) => {
-      const { updated } = body;
-      if (Number.isInteger(updated) && updated > 0) {
-        appLogger.info(`${updated} running task(s) was marked as interrupted`);
-      } else {
-        appLogger.info('No running tasks were found');
-      }
-    }).catch((err) => {
-      appLogger.error('Failed to change status of interrupted tasks');
-      appLogger.error(err.message);
-    });
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
@@ -180,8 +175,6 @@ async function waitForElasticsearch() {
       }
 
       appLogger.info(`Elasticsearch not ready yet (status: ${status})`);
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (e) {
       const status = (e.meta && e.meta.body && e.meta.body.status);
 
@@ -190,10 +183,10 @@ async function waitForElasticsearch() {
       } else {
         appLogger.info(`Cannot connect to Elasticsearch yet : ${e.message}`);
       }
-
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
+
+    // eslint-disable-next-line no-await-in-loop
+    await setTimeout(5000);
   }
 
   appLogger.error('Elasticsearch does not respond or is in a bad state');
@@ -201,30 +194,11 @@ async function waitForElasticsearch() {
 }
 
 async function createAdmin() {
-  const username = config.get('admin.username');
-  const password = config.get('admin.password');
-  const email = config.get('admin.email');
-
-  if (!username || !password) { return; }
-
-  appLogger.info(`Creating or updating admin user [${username}]`);
-
   try {
-    await elastic.security.putUser({
-      username,
-      refresh: true,
-      body: {
-        password,
-        email,
-        full_name: 'ezMESURE Administrator',
-        roles: ['superuser'],
-        metadata: {
-          acceptedTerms: true,
-        },
-      },
-    });
-  } catch (e) {
-    appLogger.error(`Failed to create admin : ${e.message}`);
+    await usersService.createAdmin();
+    appLogger.info('Admin user is created');
+  } catch (err) {
+    appLogger.error(`Cannot create admin user : ${err}`);
   }
 }
 

@@ -1,0 +1,9 @@
+Bienvenue {{ username }},
+Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ username }}</strong>
+
+Vous pouvez activer votre compte en créant votre mot de passe en cliquant sur le bouton suivant :
+
+{{ activateLink }}
+
+Cordialement,
+L'équipe ezMESURE.

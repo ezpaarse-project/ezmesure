@@ -1,37 +1,43 @@
 <template>
   <v-card outlined>
     <v-card-text>
-      <p v-if="topText" v-text="topText" />
+      <p v-if="topText">
+        {{ topText }}
+      </p>
+
       <v-row>
         <v-col cols="12">
           <v-select
-            v-model="value.scope"
+            :value="value.scope"
             :label="$t('sushi.scope')"
             :items="availableScopes"
             :disabled="readonly"
             hide-details
             outlined
             dense
+            @input="$emit('input', {...value, scope: $event})"
           />
         </v-col>
         <v-col cols="6">
           <v-text-field
-            v-model="value.name"
+            :value="value.name"
             :label="$t('name')"
             :disabled="readonly"
             hide-details
             outlined
             dense
+            @input="$emit('input', {...value, name: $event})"
           />
         </v-col>
         <v-col cols="6">
           <v-text-field
-            v-model="value.value"
+            :value="value.value"
             :label="$t('value')"
             :disabled="readonly"
             hide-details
             outlined
             dense
+            @input="$emit('input', {...value, value: $event})"
           />
         </v-col>
       </v-row>
@@ -64,6 +70,9 @@ export default {
       type: String,
       default: () => '',
     },
+  },
+  emits: {
+    input: (value) => !!value,
   },
   computed: {
     availableScopes() {

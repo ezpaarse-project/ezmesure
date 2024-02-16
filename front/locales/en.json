@@ -12,6 +12,7 @@
     "authentificationToken": "Authentification token",
     "administration": "Administration",
     "myInstitution": "My institution",
+    "myInstitutions": "My institutions",
     "institutions": "Institutions",
     "sushiEndpoints": "SUSHI endpoints",
     "activity": "Activity",
@@ -20,7 +21,12 @@
     "sushi": "Sushi",
     "users": "Users",
     "logout": "Logout",
-    "contact": "Contact"
+    "contact": "Contact",
+    "report": "My reports",
+    "adminReport": "ezREEPORT",
+    "repositories": "Repositories",
+    "harvest": "Harvest",
+    "sync": "Synchronisation"
   },
   "home": {
     "whatDoesEzMESURE": "What does ezMESURE ?",
@@ -35,15 +41,18 @@
   },
   "myspace": {
     "title": "My Profile",
-    "noRoles": "There are no roles associated with your account yet.",
-    "determineAccesRight": "In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.",
+    "noMemberships": "You're not a member of any institution yet.",
+    "determineAccessRight": "In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.",
     "name": "Name",
     "mail": "Mail",
     "idp": "IDP",
     "organization": "Organisation",
     "unit": "Unit",
     "yourRights": "Your rights",
-    "whatDoesRoles": "These roles define your access rights to data and dashboards hosted on ezMESURE."
+    "whatDoesMemberships": "Your access rights to data and dashboards hosted on ezMESURE.",
+    "infos": "Your informations",
+    "repos": "Your repositories",
+    "spaces": "Your spaces"
   },
   "files": {
     "title": "My Deposits",
@@ -66,19 +75,32 @@
     "missingField": "\"{missingField}\" is missing",
     "fieldIsEmpty": "Line #{lineNumber}: \"{field}\" is blank.",
     "invalidField": "Line #{lineNumber}: \"{field}\" is not valid, has the file been modified ?",
-    "depositFiles": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is <strong>not</strong> immediate, and will be done by us as soon as possible. We invite you to read our <a href=\"http://blog.ezpaarse.org/2017/06/les-fichiers-ecs-dans-ezmesure/\">best practice rules</a> in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers."
+    "depositFiles": {
+      "text": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is {not} immediate, and will be done by us as soon as possible. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
+      "not": "not",
+      "bestPracticeLink": "best practice rules"
+    }
   },
   "kibana": {
     "title": "Kibana identifiers",
     "passwordLost": "Password forgoten",
     "username": "Username",
     "newPasswordSentByEmail": "An email has been sent to you to reset your password.",
-    "resetPassword": "Don't remember your password? Click on <code>reset</code> to receive a reset email.",
-    "whatDoesUsername": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your <a href=\"/kibana/app/kibana#/account\">Kibana account</a>."
+    "resetPassword": {
+      "text": "Don't remember your password? Click on {reset} to receive a reset email.",
+      "reset": "reset"
+    },
+    "whatDoesUsername": {
+      "text": "This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, go to your {accountLink}.",
+      "accountLink": "Kibana account"
+    }
   },
   "token": {
     "title": "Authentication token",
-    "whatDoesToken": "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: <code>Authorization: Bearer {insert the token here}</code>.",
+    "whatDoesToken": {
+      "text": "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}",
+      "header": "Authorization: Bearer {insert the token here}"
+    },
     "token": "Token",
     "unableToRetriveToken": "Unable to retrieve authentication token",
     "copyFailed": "The copy of the token failed",
@@ -101,6 +123,8 @@
     "auto": {
       "ezpaarse": "ezPAARSE",
       "ezmesure": "ezMESURE",
+      "ezcounter": "ezCOUNTER",
+      "ezreeport": "ezREEPORT",
       "report": "Reporting",
       "sushi": "SUSHI"
     }
@@ -112,7 +136,6 @@
     "details": "Details",
     "failedToLoad": "Failed to load activity",
     "noActivity": "This period has no registered activity",
-    "filter": "Filter",
     "actionTypes": {
       "users": "Users",
       "files": "Files",
@@ -146,7 +169,8 @@
       "indices/insert": "Data load",
       "sushi/create": "SUSHI credentials creation",
       "sushi/update": "SUSHI credentials update",
-      "sushi/delete-many": "SUSHI credentials deletion",
+      "sushi/delete": "SUSHI credentials deletion",
+      "sushi/delete-many": "Bulk SUSHI credentials deletion",
       "sushi/download-report": "SUSHI report download",
       "sushi/harvest": "SUSHI harvest",
       "sushi/import": "SUSHI credentials import",
@@ -168,7 +192,7 @@
     "title": "SUSHI endpoints ({total})",
     "pageDescription": "Here you can manage the list of the available SUSHI endpoints.",
     "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
-    "manageNendpoints": "Manage endpoint | Manage {count} endpoints",
+    "manageNendpoints": "Manage endpoint|Manage {count} endpoints",
     "unableToRetriveEndpoints": "Unable to retrieve SUSHI endpoints",
     "soapWarning": "The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)",
     "sushiNotRootDetected": "It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.",
@@ -187,7 +211,7 @@
     "isSushiCompliant": "The endpoint is SUSHI compliant",
     "ignoreReportValidation": "Ignore report validation",
     "description": "Description",
-    "paramSeparatorDesc": "ezMESURE automatically adds <code>Attributes_To_Show</code>, <code>Access_Type</code> and <code>Section_Type</code> parameters while harvesting. If the endpoint does not accept the standard separator <code>|</code> for this multivalued fields, please enter the separator here.",
+    "paramSeparatorDesc": "ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.",
     "paramSeparator": "Separator",
     "queryParameters": "Query parameters",
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
@@ -196,20 +220,46 @@
     "clickToDeclareOne": "Click here to declare one"
   },
   "institutions": {
+    "toolbarTitle": "Institutions ({count})",
     "title": "Institution",
     "updateInstitution": "Update institution",
-    "deleteNbInstitutions": "You are about to delete {number} institutions. The associated indices, spaces and roles will not be affected.",
+    "deleteNbInstitutions": {
+      "text": "You are about to delete {number} institutions. {affected}",
+      "affected": "The associated spaces and roles will be deleted. The associated indices will stay unaffected. This action cannot be undone."
+    },
     "newInstitution": "New institution",
     "notMember": "You don't belong to an institution yet.",
     "declareMyInstitution": "Declare my institution",
+    "declareNewInstitution": "Declare a new institution",
     "doesNotExist": "The institution you are trying to access is not registered.",
+    "noLogo": "No logo",
+    "noInstitutions": "You're not attached to a institution.",
+    "institutionFoundDeclareNewInstitution": "Your institution is not declared, declare a new institution.",
+    "sendMailToJoin": "An email has been sent to the institution's correspondents",
+    "askToJoinAnInstitution": "Ask to join an institution",
+    "joinInstitution": "Would you join {institution} ?",
+    "joinInstitutionEmail": "A message will be sent to the correspondents of this institution to let them know.",
+    "reports": {
+      "reports": "Reports"
+    },
+    "filters": {
+      "title": "Filter institutions",
+      "searchHint": "This field is override by the search bar",
+      "exclusiveHint": "Institution must match exactly this filter",
+      "inclusiveHint": "Institution can match partially this filter"
+    },
     "institution": {
       "title": "My institution",
-      "name": "Institution name *",
+      "name": "Institution name",
+      "goToPage": "Go to institution's page",
+      "members": "Members",
+      "membersCount": "{count} member|{count} members",
       "nameExample": "e.g. Blancherive University",
       "nameError": "Please enter an institution name.",
       "indexCount": "Indexed consultation events",
       "indexPrefix": "Allocated prefix for indices",
+      "namespace": "Institution namespace",
+      "namespaceHint": "Prefix added to entities related to the institution (repositories, Kibana spaces)",
       "role": "Associated role",
       "uai": "RAU",
       "uaiExample": "e.g. 1234567A",
@@ -218,14 +268,17 @@
       "homepageExample": "e.g. https://cnrs.fr/",
       "affectedIndex": "Affected index",
       "affectedIndexExample": "e.g. univ-blancherive",
+      "group": "Group",
       "city": "City",
       "acronym": "Acronym",
       "type": "Institution type",
       "domains": "Domains",
       "general": "General",
       "logo": "Logo",
+      "links": "Links",
       "localisation": "Localisation",
       "automations": "Automations",
+      "monitor": "Monitoring",
       "dropImageHere": "Drop your image here",
       "invalidImageFile": "Invalid image file. Accepted file types: JPEG, PNG, SVG",
       "imageTooLarge": "Image is too large. Maximum allowed size: 2mb",
@@ -240,7 +293,7 @@
       "invalidate": "Invalidate",
       "validated": "Validated",
       "notValidated": "Not validated",
-      "showPartner": "Do not show as partner",
+      "hidePartner": "Do not show as partner",
       "failedToUpdateValidation": "Failed to update validation",
       "attachedDomains": "Attached domains",
       "noAttachedDomains": "There's no domain attached to this institution yet.",
@@ -269,14 +322,16 @@
       "title": "Members ({total})",
       "technical": "Technical",
       "documentary": "Documentary",
+      "noCorrespondent": "No correspondent",
       "technicalCorrespondent": "Technical correspondent",
       "documentaryCorrespondent": "Documentary correspondent",
       "creator": "Creator",
       "unableToRetriveMembers": "Unable to retrieve members",
+      "cannotAddMember": "Unable to add member",
       "name": "Name",
       "username": "Identifier",
       "correspondent": "Correspondent",
-      "permissions": "Kibana permissions",
+      "permissions": "Permissions",
       "read": "Read",
       "write": "Write",
       "updated": "Member updated",
@@ -294,15 +349,35 @@
       "permissionsOf": "Permissions of {name}",
       "readPermDesc": "The user can view the Kibana dashboards, but can't modify them.",
       "writePermDesc": "The user can view and modify Kibana dashboards.",
-      "failedToUpdatePerms": "Failed to update user permissions"
+      "personNotRegistered": "This person is not registered",
+      "failedToUpdatePerms": "Failed to update user permissions",
+      "locked": "Prevent member modification",
+      "notEditable": "This member is not editable",
+      "accessRights": "Access rights",
+      "institutionManagement": "Institution management",
+      "roles": "Roles",
+      "roleNames": {
+        "contact:doc": "Documentary contact",
+        "contact:tech": "Technical contact",
+        "guest": "Guest"
+      },
+      "featureLabels": {
+        "institution": "Institution card",
+        "memberships": "Members",
+        "sushi": "SUSHI credentials"
+      }
     },
     "sushi": {
       "title": "SUSHI credentials ({total})",
       "pageDescription": "Here you can enter the SUSHI credentials that will be used to automatically harvest your COUNTER reports.",
       "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
       "addCredentials": "Add credentials",
+      "updateCredentials": "Update credentials",
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
+      "tags": "Tags",
+      "tagsHint": "Profiles, accounts, funds, antennas, etc.",
+      "tagsDescription": "The tags defined here will be usable in your dashboards, using the X_Tags field",
       "unableToRetriveSushiData": "Unable to retrieve sushi information",
       "endpoint": "Endpoint",
       "package": "Package",
@@ -321,13 +396,25 @@
       "enterAPIKey": "Please enter an API Key.",
       "comment": "Comment",
       "credentials": "Sushi credentials",
-      "manageNcredentials": "Manage credentials | Manage {count} credentials",
+      "manageNcredentials": "Manage credentials|Manage {count} credentials",
       "pleaseEnterParams": "If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.",
-      "checkConnection": "Check connection",
-      "cannotCheckConnection": "Failed to check connection to {name}",
+      "checkCredentials": "Check credentials",
+      "cannotCheckCredentials": "Failed to check credentials of {name}",
+      "resetChecks": "Reset connection status",
+      "resetNbChecks": "You will reset {count} connection states. Untested identifiers are not taken into account.",
+      "cannotResetCheck": "Failed to reset connection status for {name}",
+      "connection": "Connection",
+      "untested": "Untested",
+      "operational": "Operational",
+      "invalidCredentials": "Invalid credentials",
       "connectionSuccessful": "Successful connection",
+      "connectionSuccessfulDesc": "A test report has been successfuly downloaded, or generated errors that are not related to authentication (ex: unavailable period).",
       "connectionFailed": "Connection failed",
+      "connectionFailedDesc": "An error occurred when communicating with the endpoint. The team is in contact with the publisher to find out why.",
+      "connectionUnauthorized": "Invalid credentials",
+      "connectionUnauthorizedDesc": "An authentication issue prevented the test report from being downloaded. Check your credentials.",
       "connectionUntested": "Connection untested",
+      "connectionUntestedDesc": "Authentication to the endpoint has not been tested yet.",
       "testedOn": "Tested on {date}",
       "entryCompleted": "Entry completed",
       "entryCompletedOn": "Entry completed on {date}",
@@ -345,32 +432,77 @@
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
+  "components": {
+    "components": "Components",
+    "count": "{count} components",
+    "noComponent": "No components"
+  },
+  "group": {
+    "group": "Grouped in",
+    "noGroup": "No group"
+  },
   "tasks": {
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
     "history": "Tasks history",
     "parameters": "Parameters",
+    "statusDescriptions": {
+      "waiting": "A harvest has been scheduled. It will be launched as soon as possible.",
+      "running": "The harvest is on progress.",
+      "finished": "The harvest is terminated.",
+      "failed": "The harvest has failed.",
+      "interrupted": "The harvest has been interrupted.",
+      "cancelled": "The harvest has been cancelled.",
+      "delayed": "The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon."
+    },
     "status": {
       "notLaunchedYet": "Not launched yet",
       "waiting": "Waiting",
       "running": "Running",
       "finished": "Finished",
+      "failed": "Error",
       "error": "Error",
       "cancelled": "Cancelled",
       "delayed": "Delayed",
       "exceptions": {
-        "1000": "Service not available",
-        "1010": "Service busy",
-        "1020": "Too many requests",
-        "1030": "Insufficient Information",
-        "2000": "Unauthorized requestor",
-        "2010": "Unauthorized requestor",
-        "2020": "Invalid API key",
-        "2030": "Unauthorized IP address",
-        "3000": "Unsupported report",
-        "3010": "Unsupported report version",
-        "3020": "Invalide dates",
-        "3030": "Unavailable period"
+        "network_error": "Unreachable service",
+        "unreadable_report": "Unreadable report",
+        "invalid_json": "Invalid report",
+        "max_defferals_exceeded": "Too much deferrals",
+        "unauthorized": "Unauthorized",
+        "invalid_report": "Invalid report",
+        "sushi:1000": "Service not available",
+        "sushi:1010": "Service busy",
+        "sushi:1020": "Too many requests",
+        "sushi:1030": "Insufficient Information",
+        "sushi:2000": "Unauthorized requestor",
+        "sushi:2010": "Unauthorized requestor",
+        "sushi:2020": "Invalid API key",
+        "sushi:2030": "Unauthorized IP address",
+        "sushi:3000": "Unsupported report",
+        "sushi:3010": "Unsupported report version",
+        "sushi:3020": "Invalide dates",
+        "sushi:3030": "Unavailable period"
+      },
+      "exceptionMeaning": {
+        "network_error": "An issue occurred while communicating with the endpoint.",
+        "unreadable_report": "The downloaded report is unreadable.",
+        "invalid_json": "The downloaded report is not in the good format (JSON), or has syntax issues.",
+        "max_defferals_exceeded": "After several attempts, the report was still not ready.",
+        "unauthorized": "Authentication to the endpoint failed. Check that your credentials are entered correctly.",
+        "invalid_report": "The downloaded report is not valid, or include changes that are not SUSHI compliant.",
+        "sushi:1000": "The report could not be harvested because the endpoint is unreachable.",
+        "sushi:1010": "The endpoint is unable to provide the report because it's under heavy load.",
+        "sushi:1020": "The endpoint refuses to provide the report because the number of requests is too high.",
+        "sushi:1030": "The endpoint was unable to provide the report due to a lack of information provided with the request.",
+        "sushi:2000": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "sushi:2010": "The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.",
+        "sushi:2020": "The endpoint refuses to provide the report because the provided API key is not valid. Check that your credentials are entered correctly.",
+        "sushi:2030": "The endpoint refuses to provide the report because the IP address is not authorized. Make sure that the IP address of ezMESURE is correctly declared to the endpoint.",
+        "sushi:3000": "The endpoint is unable to provide the report because it's not supported.",
+        "sushi:3010": "The endpoint is unable to provide the report because the requested version is not supported.",
+        "sushi:3020": "The period requested from the endpoint is invalid. The report may not be available yet.",
+        "sushi:3030": "The report is not available yet for the requested period."
       }
     },
     "failedStep": {
@@ -398,6 +530,8 @@
     }
   },
   "sushi": {
+    "credentials": "Credentials",
+    "credentialsCount": "{count} credentials",
     "copyId": "Copy ID",
     "showFiles": "View files",
     "unableToCopyId": "Unable to copy in the clipboard",
@@ -406,10 +540,23 @@
     "latestImport": "Latest import",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
-    "youHaveUntestedCredentials": "You have untested credentials | You have {count} untested credentials",
+    "nInstitutions": "1 institution use this endpoint|{count} institutions use this endpoint",
+    "nUntestedCredentials": "{count} untested credentials",
+    "nInvalidCredentials": "{count} invalid credentials",
+    "nOperationalCredentials": "{count} operational credentials",
+    "nProblematicEndpoints": "1 problematic endpoint|{count} problematic endpoints",
+    "nErrsCredentials": "1 credential show that endpoint is problematic|{count} credentials show that endpoint is problematic",
     "deleteNbCredentials": "You are about to delete {number} SUSHI credentials.",
     "scope": "Scope",
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",
+    "harvestState": "Harvest state",
+    "harvestedAt": "Harvested on {date}",
+    "report": "Report",
+    "openHelpPage": "Open help page",
+    "insertedItems": "{count} report items have been inserted.",
+    "updatedItems": "{count} report items have been updated.",
+    "failedItems": "{count} report items could not be retrieved.",
+    "messagesFromEndpoint": "Messages from the endpoint:",
     "paramScopes": {
       "all": "All requests to the endpoint",
       "report_list": "Report list",
@@ -422,16 +569,16 @@
     "files": {
       "title": "Available files",
       "noFilesAvailable": "No files available",
-      "nbFiles": "1 file | {count} files"
+      "nbFiles": "1 file|{count} files"
     }
   },
   "reports": {
     "sushiReturnedErrors": "The SUSHI endpoint responded with errors.",
     "checkCredentials": "Check credentials",
-    "availableReports": "Available reports",
-    "availableReportsOnPlatform": "Available reports on the publisher platform",
+    "supportedReports": "Supported reports",
+    "supportedReportsOnPlatform": "Reports supported by the publisher platform",
     "failedToFetchReports": "Failed to fetch the list of available reports",
-    "showAllReports": "Show all reports"
+    "onlyShowMasterReports": "Only show master reports"
   },
   "identifier": "Identifier",
   "authenticate": {
@@ -453,13 +600,16 @@
     "user": "User",
     "password": "Password",
     "repeatPassword": "Repeat password",
+    "passwordIsRequired": "Password required",
     "backToLogin": "Back to login",
     "enterUser": "Please enter your username so we can send you an email to retrieve your password.",
-    "checkYourEmail": "Check your email for a link to reset your password.<br>If it doesn’t appear within a few minutes, check your spam folder",
+    "checkYourEmail": "Check your email for a link to reset your password.",
+    "waitFewMinutes": "If it doesn’t appear within a few minutes, check your spam folder",
     "notEqual": "Passwords don't match",
     "updated": "Password updated",
     "pattern": "Minimum 6 characters",
-    "length": "The password must be at least 6 characters long"
+    "length": "The password must be at least 6 characters long",
+    "update": "Update your password"
   },
   "contact": {
     "contactUs": "Contact us",
@@ -487,9 +637,12 @@
     "500": "An internal error occurred",
     "generic": "An unexpected error has occurred"
   },
-  "validation": {
+  "account": {
     "title": "Account activation",
-    "description": "In order to use this service, you agree to comply with the <a href=\"https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2\" target=\"_blank\">General Data Protection Regulation</a>.",
+    "description": {
+      "text": "In order to use this service, you agree to comply with the {regulationLink}.",
+      "regulationLink": "General Data Protection Regulation"
+    },
     "acceptTerms": "Please accept the terms of use.",
     "readAndAccept": "I have read and accept the terms of use",
     "activate": "Activate my account"
@@ -499,6 +652,147 @@
     "unableToCopy": "Unable to copy in the clipboard",
     "textCopied": "Text copied in the clipboard"
   },
+  "users": {
+    "toolbarTitle": "Users ({count})",
+    "updateUser": "Update user",
+    "deleteNbUsers": "You are about to delete {number} users. The associated indices, spaces and roles will not be affected.",
+    "newUser": "New user",
+    "doesNotExist": "The user you are trying to access is not registered.",
+    "unableToFetchInformations": "Unable to retrieve institution information",
+    "createMailUserList": "New grouped mail",
+    "filters": {
+      "title": "Filter users",
+      "searchHint": "This field is overriden by the search bar"
+    },
+    "user": {
+      "saved": "User saved",
+      "general": "General",
+      "fullName": "Full name",
+      "username": "Username",
+      "email": "Email address",
+      "isAdmin": "Is Administrator ?",
+      "memberships": "Institutions",
+      "membershipsCount": "{count} institution|{count} institutions",
+      "roles": "Roles",
+      "no_roles": "No roles",
+      "permissions": "Permissions",
+      "no_permissions": "No permissions",
+      "no_institution": "No institutions"
+    }
+  },
+  "report": {
+    "title": "My reports",
+    "health": "Health status",
+    "admin": {
+      "taskTab": "Reports management",
+      "templateTab": "Template management",
+      "presetTab": "Preset management",
+      "adminTab": "General administration"
+    }
+  },
+  "repositories": {
+    "repositories": "Repositories",
+    "toolbarTitle": "Repositories ({count})",
+    "xRepositories": "0 repository|1 repository|{count} repositories",
+    "noRepository": "No repository has been assigned yet",
+    "pattern": "Pattern",
+    "type": "Type",
+    "institutions": "Institutions",
+    "institutionsCount": "{count} institution|{count} institutions",
+    "noInstitutions": "No institutions is using this repository",
+    "deleteNbRepositories": "You are about to delete {number} repositories",
+    "filters": {
+      "title": "Filter repositories"
+    }
+  },
+  "spaces": {
+    "spaces": "Spaces",
+    "xSpaces": "0 space|1 space|{count} spaces",
+    "noSpace": "No space has been assigned yet",
+    "id": "Identifier",
+    "type": "Type",
+    "types": {
+      "ezpaarse": "ezPAARSE",
+      "counter5": "COUNTER 5"
+    },
+    "descriptions": {
+      "ezpaarse": "ezPAARSE space",
+      "counter5": "Publisher space"
+    },
+    "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
+  },
+  "harvest": {
+    "requests": {
+      "name": "Harvesting from {createdAt}",
+      "metrics": {
+        "success": "Success",
+        "failed": "Failed",
+        "active": "Active",
+        "delayed": "Delayed",
+        "pending": "Pending"
+      },
+      "counts": {
+        "institutions": "{n} institution|{n} institutions",
+        "endpoints": "{n} endpoint|{n} endpoints",
+        "reportTypes": "{n} report type|{n} report types"
+      },
+      "unableToRetrive": "Unable to retrieve harvests"
+    },
+    "jobs": {
+      "title": "Harvesting Tasks",
+      "filtersTitle": "Filter Tasks",
+      "harvestId": "Harvesting ID",
+      "reportType": "Report Type",
+      "beginDate": "Start Date",
+      "endDate": "End Date",
+      "period": "Period",
+      "createdAt": "Requested on",
+      "runningTime": "Processing Time",
+      "index": "Insertion Index",
+      "coveredPeriods": "Covered Months",
+      "inserted": "Items Inserted",
+      "updated": "Items Updated",
+      "failed": "Items Not Retrieved",
+      "unableToRetrive": "Unable to retrieve harvesting tasks",
+      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks"
+    }
+  },
+  "sync": {
+    "status": {
+      "notSynced": "Not yet synchronized",
+      "synchronizing": "Synchronizing",
+      "completed": "Synchronized",
+      "error": "Error occurred during synchronization"
+    },
+    "description": {
+      "notSynced": "The data of ezMESURE are not yet synchronized, you may encounter some incoherences between ezMESURE's interface and the different services linked to ezMESURE. Just click on the button above to synchronize.",
+      "completed": "The data of ezMESURE have been successfully synchronized with the different services linked to ezMESURE.",
+      "error": "An error occurred during the synchronization of ezMESURE data with the different services linked to ezMESURE. Please check your instance logs for more information."
+    },
+    "start": "Launch synchronization",
+    "startedAt": "Started at {date}",
+    "running": "Ran for {time}",
+    "spaces": "Spaces",
+    "repositories": "Repositories",
+    "users": "Users",
+    "ezreeportUsers": "Users",
+    "ezreeportNamespaces": "Institutions",
+    "unableToRetrieveInformation": "Unable to retrieve information about synchronization",
+    "unableToStart": "Unable to launch synchronization"
+  },
+  "permissions": {
+    "none": "None",
+    "read": "Read",
+    "write": "Read / Write"
+  },
+  "social": {
+    "website": "Website",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "youtube": "Youtube",
+    "facebook": "Facebook"
+  },
+  "anErrorOccurred": "An error occurred",
   "url": "URL",
   "type": "Type",
   "copyId": "Copy ID",
@@ -511,6 +805,8 @@
   "status": "Status",
   "date": "Date",
   "duration": "Duration",
+  "description": "Description",
+  "initials": "Initials",
   "language": "Language",
   "refresh": "Refresh",
   "delete": "Remove",
@@ -527,12 +823,15 @@
   "save": "Save",
   "search": "Search",
   "apply": "Apply",
+  "filter": "Filter",
   "fixIt": "Fix it",
   "leaveIt": "Leave it as is",
   "nSelected": "{count} selected",
   "deselect": "Deselect",
+  "show": "Show",
   "requiredFields": "* required fields",
   "formSendingFailed": "Sending the form failed",
+  "searchFailed": "Oops! The search failed.",
   "add": "Add",
   "cannotDeleteItems": "Cannot delete {count} item(s)",
   "cannotDeleteItem": "Cannot remove the element {id}",
@@ -547,10 +846,14 @@
   "areYouSure": "Are you sure ?",
   "fieldIsRequired": "This field is required",
   "fieldMustMatch": "This field must match : {pattern}",
+  "maxLength": "Maximum length: {n} characters",
+  "open": "Open",
   "send": "Send",
   "yes": "Yes",
   "no": "No",
   "validate": "Validate",
   "invalidate": "Invalidate",
-  "reason": "Reason: {reason}"
+  "reason": "Reason: {reason}",
+  "groupBy": "Group by",
+  "indeterminate": "indeterminate"
 }

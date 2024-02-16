@@ -1,38 +1,45 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
-const elastic = require('./elastic');
-const { getModel } = require('../models/TypedModel');
+const institutionsService = require('../entities/institutions.service');
+const sushiEndpointService = require('../entities/sushi-endpoints.service');
+const sushiCredentialsService = require('../entities/sushi-credentials.service');
+const usersService = require('../entities/users.service');
+const RepositoriesService = require('../entities/repositories.service');
+const SpacesService = require('../entities/spaces.service');
+
+const { MEMBER_ROLES } = require('../entities/memberships.dto');
+
+const { DOC_CONTACT, TECH_CONTACT } = MEMBER_ROLES;
 
 const requireJwt = jwt({
   secret: auth.secret,
   cookie: auth.cookie,
+  key: 'jwtdata',
 });
 
 const requireUser = async (ctx, next) => {
-  if (!ctx.state.user || !ctx.state.user.username) {
+  const username = ctx.state?.jwtdata?.username;
+
+  if (!username) {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
 
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
+  const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
     ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
     return;
   }
 
-  const roles = new Set(user.roles || []);
-
   ctx.state.user = user;
-  ctx.state.userIsAdmin = (roles.has('admin') || roles.has('superuser'));
+  ctx.state.userIsAdmin = user.isAdmin;
 
   await next();
 };
 
 const requireTermsOfUse = async (ctx, next) => {
-  const user = await elastic.security.findUser({ username: ctx.state.user.username });
-
-  if (!user.metadata.acceptedTerms) {
+  if (!ctx.state?.user?.metadata?.acceptedTerms) {
     ctx.throw(403, ctx.$t('errors.termsOfUse'));
     return;
   }
@@ -53,7 +60,7 @@ const requireAnyRole = (role) => async (ctx, next) => {
 };
 
 const requireAdmin = (ctx, next) => {
-  if (!ctx.state?.userIsAdmin) {
+  if (!ctx.state?.user?.isAdmin) {
     ctx.throw(403, ctx.$t('errors.perms.feature'));
   }
 
@@ -74,6 +81,7 @@ function fetchModel(modelName, opts = {}) {
   } = opts;
 
   return async (ctx, next) => {
+    const username = ctx.state?.user?.username;
     let modelId;
 
     if (typeof getId === 'function') {
@@ -86,7 +94,45 @@ function fetchModel(modelName, opts = {}) {
       modelId = ctx.query[queryField];
     }
 
-    const item = modelId && await getModel(modelName).findById(modelId);
+    let item;
+
+    const findOptions = {
+      where: { id: modelId },
+      include: opts?.include,
+      select: opts?.select,
+    };
+
+    switch (modelName) {
+      case 'institution':
+        item = modelId && (await institutionsService.findUnique({
+          where: { id: modelId },
+          include: {
+            memberships: {
+              where: { username },
+            },
+          },
+        }));
+        break;
+
+      case 'sushi-endpoint':
+        item = modelId && await sushiEndpointService.findUnique(findOptions);
+        break;
+
+      case 'sushi':
+        item = modelId && await sushiCredentialsService.findUnique(findOptions);
+        break;
+
+      case 'repository':
+        findOptions.where = { pattern: modelId };
+        item = modelId && await RepositoriesService.findUnique(findOptions);
+        break;
+
+      case 'space':
+        item = modelId && await SpacesService.findUnique(findOptions);
+        break;
+
+      default:
+    }
 
     if (!item && !ignoreNotFound) {
       ctx.throw(404, ctx.$t(`errors.${modelName}.notFound`));
@@ -102,17 +148,41 @@ function fetchModel(modelName, opts = {}) {
  * Middleware that checks that user is either admin or institution contact
  * Assumes that ctx.state contains institution and user
  */
-function requireContact(opts = {}) {
-  const { allowCreator } = opts;
-
+function requireContact() {
   return (ctx, next) => {
-    const { user, institution, userIsAdmin } = ctx.state;
+    const { user, institution } = ctx.state;
 
-    if (userIsAdmin) { return next(); }
-    if (user && institution && institution.isContact(user)) { return next(); }
-    if (allowCreator && user && institution && institution.isCreator(user)) { return next(); }
+    if (user?.isAdmin) { return next(); }
+
+    const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
+    const isContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
+    if (isContact) { return next(); }
 
     ctx.throw(403, ctx.$t('errors.institution.unauthorized'));
+    return undefined;
+  };
+}
+
+/**
+ * Middleware that checks that user has a sufficient permission level on a feature
+ * Assumes that ctx.state contains institution and user
+ */
+function requireMemberPermissions(...permissions) {
+  return (ctx, next) => {
+    const { user, institution } = ctx.state;
+
+    if (user?.isAdmin) { return next(); }
+
+    const membership = institution?.memberships?.find?.((m) => m?.username === user?.username);
+
+    const memberPermissions = new Set(
+      Array.isArray(membership?.permissions) ? membership?.permissions : [],
+    );
+    const hasPermissions = memberPermissions.has('all') || permissions.every((perm) => memberPermissions.has(perm));
+
+    if (hasPermissions) { return next(); }
+
+    ctx.throw(403, ctx.$t('errors.perms.feature'));
     return undefined;
   };
 }
@@ -128,7 +198,7 @@ function requireValidatedInstitution(opts = {}) {
     const { institution, userIsAdmin } = ctx.state;
 
     if (userIsAdmin && ignoreIfAdmin) { return next(); }
-    if (institution?.get?.('validated') === true) { return next(); }
+    if (institution?.validated === true) { return next(); }
 
     ctx.throw(400, ctx.$t('errors.sushi.institutionNotValidated'));
     return undefined;
@@ -142,9 +212,12 @@ module.exports = {
   requireTermsOfUse,
   requireAnyRole,
   requireContact,
+  requireMemberPermissions,
   requireValidatedInstitution,
   fetchModel,
   fetchInstitution: (opts = {}) => fetchModel('institution', { state: 'institution', ...opts }),
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
+  fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'pattern', ...opts }),
+  fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };

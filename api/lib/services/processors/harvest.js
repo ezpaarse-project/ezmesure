@@ -1,43 +1,118 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
+const config = require('config');
+const { setTimeout } = require('timers/promises');
 
-const format = require('date-fns/format');
-const isSameMonth = require('date-fns/isSameMonth');
-const isLastDayOfMonth = require('date-fns/isLastDayOfMonth');
-const isFirstDayOfMonth = require('date-fns/isFirstDayOfMonth');
+const busyBackoffDuration = parseInt(config.get('jobs.harvest.busyBackoffDuration'), 10);
+const deferralBackoffDuration = parseInt(config.get('jobs.harvest.deferralBackoffDuration'), 10);
+const maxDeferrals = parseInt(config.get('jobs.harvest.maxDeferrals'), 10);
+
+const { DelayedError } = require('bullmq');
+
+const {
+  addSeconds,
+  isValid: dateIsValid,
+  isFuture,
+  format,
+  isSameMonth,
+  isLastDayOfMonth,
+  isFirstDayOfMonth,
+} = require('date-fns');
 
 const { appLogger } = require('../logger');
 const sushiService = require('../sushi');
 const elastic = require('../elastic');
 
-const SushiEndpoint = require('../../models/SushiEndpoint');
-const Sushi = require('../../models/Sushi');
-const Institution = require('../../models/Institution');
-const Task = require('../../models/Task');
+/**
+ * The processor lives in a separate process, so we must register hooks here
+ */
+require('../../hooks');
+
+const { SUSHI_CODES, ERROR_CODES } = sushiService;
+
+const harvestJobService = require('../../entities/harvest-job.service');
+const stepService = require('../../entities/step.service');
+const logService = require('../../entities/log.service');
+const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('../../entities/sushi-credentials.service').SushiCredentials} SushiCredentials
+ * @typedef {import('../../entities/harvest-job.service').HarvestJob} HarvestJob
+ * @typedef {import('bullmq').Job} Job
+ * @typedef {import('bullmq').Processor} Processor
+ */
+/* eslint-enable max-len */
 
 const publisherIndexTemplate = require('../../utils/publisher-template');
 
 class HarvestError extends Error {
-  constructor(message, cause) {
+  constructor(message, options) {
     super(message);
-    this.cause = cause;
+    this.type = options?.type;
+    this.cause = options?.cause;
   }
 }
 
+/**
+ * Defer job by a given number of seconds
+ * @param {Job} job - The BullMQ job
+ * @param {HarvestJob} task - The HarvestJob associated to the BullMQ job
+ * @param {number} timestamp - Timestamp where the job should be moved back to the waiting list
+ * @param {string} lockToken - The job lock token
+ */
+async function deferJob(job, task, timestamp, lockToken, options = {}) {
+  const {
+    incrementCounter = true,
+  } = options;
+  let timesDelayed = job?.data?.timesDelayed || 0;
+
+  if (incrementCounter) {
+    timesDelayed += 1;
+  }
+
+  if (timesDelayed > maxDeferrals) {
+    await Promise.all([
+      harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
+      logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
+    ]);
+    throw new HarvestError('Maximum number of download deferral exceeded');
+  } else {
+    await harvestJobService.finish(task, { status: 'delayed' });
+  }
+
+  await job.updateData({ ...job.data, timesDelayed });
+  await job.moveToDelayed(timestamp, lockToken);
+  throw new DelayedError();
+}
+
+/**
+ *
+ * @param {object} options
+ * @param {SushiCredentials} options.sushi - The SUSHI item to be harvested
+ * @param {HarvestJob} options.job - The harvest job data
+ * @param {boolean} options.ignoreValidation - Whether validation errors should be ignored
+ * @returns {Promise<void>}
+ */
 async function importSushiReport(options = {}) {
   const {
-    institution,
-    endpoint,
     sushi,
     task,
+  } = options;
+
+  const {
     index,
-    username,
     beginDate,
     endDate,
     forceDownload,
     harvestId,
     reportType = sushiService.DEFAULT_REPORT_TYPE,
-  } = options;
+  } = task;
+
+  const {
+    institution,
+    endpoint,
+  } = sushi;
 
   const sushiData = {
     reportType,
@@ -48,7 +123,7 @@ async function importSushiReport(options = {}) {
     endDate,
   };
 
-  let ignoreReportValidation = endpoint.get('ignoreReportValidation');
+  let { ignoreReportValidation } = endpoint;
 
   if (typeof options.ignoreValidation === 'boolean') {
     ignoreReportValidation = options.ignoreValidation;
@@ -57,31 +132,77 @@ async function importSushiReport(options = {}) {
   const reportPath = sushiService.getReportPath(sushiData);
   let report;
   let reportContent;
+  let logs = [];
 
   function saveTask() {
-    return task.save().catch((err) => {
-      appLogger.error(`Failed to save sushi task ${task.getId()}`);
+    const newLogs = logs;
+    logs = [];
+
+    return harvestJobService.update({
+      where: { id: task.id },
+      data: {
+        ...task,
+        logs: { createMany: { data: newLogs } },
+        result: task.result || undefined,
+        credentials: undefined,
+      },
+    }).catch((err) => {
+      appLogger.error(`Failed to save sushi task ${task.id}`);
       appLogger.error(err.message);
     });
   }
 
-  const downloadStep = task.newStep('download');
+  function createNewStep(label, data) {
+    return stepService.create({
+      data: {
+        label,
+        jobId: task.id,
+        startedAt: new Date(),
+        status: 'running',
+        runningTime: 0,
+        data: data || {},
+      },
+    });
+  }
+
+  function updateStep(stepData) {
+    return stepService.update({
+      where: { id: stepData.id },
+      data: stepData,
+    });
+  }
+
+  function endStep(stepData, opts = {}) {
+    const { success = true } = opts;
+
+    return updateStep({
+      ...stepData,
+      runningTime: Date.now() - stepData.startedAt,
+      status: success ? 'finished' : 'failed',
+    });
+  }
+
+  function addLog(level, message) {
+    logs.push({ level, message });
+  }
+
+  const downloadStep = await createNewStep('download');
 
   try {
     reportContent = await fs.readFile(reportPath, 'utf8');
   } catch (e) {
     if (e.code !== 'ENOENT') {
-      throw new HarvestError('Failed to read report file', e);
+      throw new HarvestError('Failed to read report file', { cause: e });
     }
   }
 
   if (reportContent) {
-    task.log('info', 'A local copy of the COUNTER report is already present');
+    addLog('info', 'A local copy of the COUNTER report is already present');
 
     try {
       report = JSON.parse(reportContent);
     } catch (e) {
-      task.log('warning', 'The report is not a valid JSON, it will be re-downloaded');
+      addLog('warning', 'The report is not a valid JSON, it will be re-downloaded');
     }
 
     const exceptions = sushiService.getExceptions(report);
@@ -91,7 +212,19 @@ async function importSushiReport(options = {}) {
     });
 
     if (hasFatalException) {
-      task.log('warning', 'The report contains fatal exceptions, it will be re-downloaded');
+      addLog('warning', 'The report contains fatal exceptions, it will be re-downloaded');
+      report = null;
+    }
+
+    const wasDelayed = exceptions.some((e) => e?.Code === SUSHI_CODES.queuedForProcessing);
+
+    if (wasDelayed) {
+      addLog('info', 'The report was delayed, it will be re-downloaded');
+      report = null;
+    }
+
+    if (!sushiService.hasReportItems(report)) {
+      addLog('info', 'The report does not contain items, it will be re-downloaded');
       report = null;
     }
   }
@@ -100,44 +233,50 @@ async function importSushiReport(options = {}) {
     try {
       await fs.remove(reportPath);
     } catch (e) {
-      throw new HarvestError('Failed to delete the local copy of the report', e);
+      throw new HarvestError('Failed to delete the local copy of the report', { cause: e });
     }
+
+    let deferred = false;
 
     try {
       let download = sushiService.getOngoingDownload(sushiData);
 
       if (download) {
-        task.log('info', 'Report is already being downloaded, waiting for completion');
+        addLog('info', 'Report is already being downloaded, waiting for completion');
       } else {
-        task.log('info', 'Report download initiated, waiting for completion');
+        addLog('info', 'Report download initiated, waiting for completion');
         download = sushiService.initiateDownload(sushiData);
       }
 
       downloadStep.data.url = download?.getUri?.({ obfuscate: true });
 
+      // We must not wait for the task to be saved, otherwise the download
+      // may be finished before we register listeners.
       await Promise.all([
         saveTask(),
 
         new Promise((resolve, reject) => {
           download.on('error', reject);
           download.on('finish', (response) => {
-            task.log('info', 'Download complete');
+            addLog('info', 'Download complete');
 
             const contentType = /^\s*([^;\s]*)/.exec(response?.headers?.['content-type'])?.[1];
 
             downloadStep.data.statusCode = response?.status;
 
             if (response?.status === 202) {
-              task.log('warning', `Endpoint responded with status [${response?.status}]`);
-              task.delay();
+              addLog('warning', `Endpoint responded with status [${response?.status}]`);
+              deferred = true;
               resolve();
               return;
             }
+
             if (response?.status !== 200) {
-              task.log('error', `Endpoint responded with status [${response?.status}]`);
+              addLog('error', `Endpoint responded with status [${response?.status}]`);
             }
+
             if (contentType !== 'application/json') {
-              task.log('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
+              addLog('error', `Endpoint responded with [${contentType}] instead of [application/json]`);
             }
 
             resolve();
@@ -145,12 +284,11 @@ async function importSushiReport(options = {}) {
         }),
       ]);
     } catch (e) {
-      throw new HarvestError('Failed to download the COUNTER report', e);
+      throw new HarvestError('Failed to download the COUNTER report', { cause: e });
     }
 
-    if (task.isDelayed()) {
-      await saveTask();
-      return;
+    if (deferred) {
+      throw new HarvestError('Report download has been deferred', { type: 'delayed' });
     }
 
     try {
@@ -159,7 +297,7 @@ async function importSushiReport(options = {}) {
       if (e instanceof SyntaxError) {
         throw new HarvestError('The report is not a valid JSON');
       } else {
-        throw new HarvestError('Fail to read downloaded report file', e);
+        throw new HarvestError('Fail to read downloaded report file', { cause: e });
       }
     }
   }
@@ -169,52 +307,78 @@ async function importSushiReport(options = {}) {
   if (exceptions.length > 0) {
     let hasError = false;
     let isDelayed = false;
+    let endpointIsBusy = false;
+
+    task.sushiExceptions = [];
 
     exceptions.forEach((e) => {
       const prefix = e?.Code ? `[Exception #${e.Code}]` : '[Exception]';
       const message = `${prefix} ${e?.Message}`;
       const severity = sushiService.getExceptionSeverity(e);
+      const code = Number.parseInt(e?.Code, 10);
 
-      if (Number.parseInt(e?.Code, 10) === 1011) {
-        isDelayed = true;
+      task.sushiExceptions.push({ code, severity, message: e?.Message });
+
+      switch (code) {
+        case SUSHI_CODES.serviceBusy:
+          addLog('warning', 'Endpoint is too busy to respond');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.tooManyRequests:
+          addLog('warning', 'Too many requests to the endpoint');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.serviceUnavailable:
+          addLog('warning', 'Endpoint is unavailable');
+          endpointIsBusy = true;
+          break;
+        case SUSHI_CODES.queuedForProcessing:
+          addLog('info', 'Report has been queued for processing');
+          isDelayed = true;
+          break;
+        default:
       }
 
       switch (severity) {
         case 'fatal':
         case 'error':
           hasError = true;
-          downloadStep.data.sushiErrorCode = Number.parseInt(e?.Code, 10);
-          task.log('error', message);
+          downloadStep.data.sushiErrorCode = code;
+          task.errorCode = `sushi:${code}`;
+          addLog('error', message);
           break;
         case 'debug':
-          task.log('verbose', message);
+          addLog('verbose', message);
           break;
         case 'info':
-          task.log('info', message);
+          addLog('info', message);
           break;
         case 'warning':
         default:
-          task.log('warning', message);
+          addLog('warning', message);
       }
 
-      if (e?.Data) { task.log('info', `[Add. data] ${e.Data}`); }
-      if (e?.Help_URL) { task.log('info', `[Help URL] ${e.Help_URL}`); }
+      if (e?.Data) { addLog('info', `[Add. data] ${e.Data}`); }
+      if (e?.Help_URL) { addLog('info', `[Help URL] ${e.Help_URL}`); }
     });
 
+    await saveTask();
+
+    if (endpointIsBusy) {
+      throw new HarvestError('Endpoint is busy', { type: 'busy' });
+    }
     if (isDelayed) {
-      task.log('warning', 'Endpoint has queued report for processing');
-      task.delay();
-      await saveTask();
-      return;
+      addLog('warning', 'Endpoint has queued report for processing');
+      throw new HarvestError('Report download has been delayed', { type: 'delayed' });
     }
     if (hasError) {
       throw new HarvestError('The report contains exceptions');
     }
   }
 
-  task.endStep('download');
-  task.newStep('validation');
-  task.log('info', 'Validating COUNTER report');
+  await endStep(downloadStep);
+  const validationStep = await createNewStep('validation');
+  addLog('info', 'Validating COUNTER report');
   await saveTask();
 
   const {
@@ -225,29 +389,29 @@ async function importSushiReport(options = {}) {
   } = sushiService.validateReport(report);
 
   if (foundReportId) {
-    task.log('info', `Report_ID is [${foundReportId}]`);
+    addLog('info', `Report_ID is [${foundReportId}]`);
   } else {
-    task.log('error', 'Report_ID is missing from the report header');
+    addLog('error', 'Report_ID is missing from the report header');
   }
 
   if (!valid) {
     if (unsupported) {
-      task.log('error', 'Unsupported report type');
+      addLog('error', 'Unsupported report type');
     }
     if (Array.isArray(errors)) {
-      errors.slice(0, 10).forEach((e) => task.log('error', e));
+      errors.slice(0, 10).forEach((e) => addLog('error', e));
     }
 
     if (!ignoreReportValidation) {
       throw new HarvestError('The report is not valid');
     } else {
-      task.log('info', 'Ignoring report validation');
+      addLog('info', 'Ignoring report validation');
     }
   }
 
-  task.log('info', `Importing report into [${index}]`);
-  task.endStep('validation');
-  const insertStep = task.newStep('insert');
+  addLog('info', `Importing report into [${index}]`);
+  await endStep(validationStep);
+  const insertStep = await createNewStep('insert');
   await saveTask();
 
   let indexExists;
@@ -255,7 +419,7 @@ async function importSushiReport(options = {}) {
     const { body: response } = await elastic.indices.exists({ index });
     indexExists = response;
   } catch (e) {
-    throw new HarvestError(`Failed to check that index [${index}] exists`, e);
+    throw new HarvestError(`Failed to check that index [${index}] exists`, { cause: e });
   }
 
   if (!indexExists) {
@@ -265,7 +429,7 @@ async function importSushiReport(options = {}) {
         body: publisherIndexTemplate,
       });
     } catch (e) {
-      throw new HarvestError(`Failed to create index [${index}]`, e);
+      throw new HarvestError(`Failed to create index [${index}]`, { cause: e });
     }
   }
 
@@ -289,10 +453,7 @@ async function importSushiReport(options = {}) {
   };
 
   const insertItems = async (bulkOps) => {
-    const { body: bulkResult } = await elastic.bulk(
-      { body: bulkOps },
-      { headers: { 'es-security-runas-user': username } },
-    );
+    const { body: bulkResult } = await elastic.bulk({ body: bulkOps });
 
     if (!Array.isArray(bulkResult?.items)) { return; }
 
@@ -371,11 +532,11 @@ async function importSushiReport(options = {}) {
     const reportItem = reportItems[i];
 
     const item = {
-      X_Sushi_ID: sushi.getId(),
-      X_Institution_ID: sushi.get('institutionId'),
-      X_Endpoint_ID: endpoint.getId(),
-      X_Package: sushi.get('package'),
-      X_Endpoint_Tags: endpoint.get('tags'),
+      X_Sushi_ID: sushi.id,
+      X_Institution_ID: sushi.institutionId,
+      X_Endpoint_ID: endpoint.id,
+      X_Tags: sushi.tags,
+      X_Endpoint_Tags: endpoint.tags,
       X_Harvest_ID: harvestId,
 
       Report_Header: reportHeader,
@@ -509,115 +670,79 @@ async function importSushiReport(options = {}) {
   insertStep.data.processedReportItems = totalItems;
   insertStep.data.progress = 100;
 
-  task.setResult(response);
+  addLog('info', 'Sushi harvesting terminated');
+  addLog('info', `Covered periods: ${response.coveredPeriods.join(', ')}`);
+  addLog('info', `Inserted items: ${response.inserted}`);
+  addLog('info', `Updated items: ${response.updated}`);
+  addLog('info', `Failed insertions: ${response.failed}`);
 
-  task.log('info', 'Sushi harvesting terminated');
-  task.log('info', `Covered periods: ${response.coveredPeriods.join(', ')}`);
-  task.log('info', `Inserted items: ${response.inserted}`);
-  task.log('info', `Updated items: ${response.updated}`);
-  task.log('info', `Failed insertions: ${response.failed}`);
-
-  task.endStep('insert');
-  task.setResult(response);
-  task.done();
+  await endStep(insertStep);
+  task.result = response;
+  task.status = 'finished';
+  if (task.startedAt) {
+    task.runningTime = Date.now() - task.startedAt.getTime();
+  }
   await saveTask();
-  appLogger.info(`Sushi report ${sushi.getId()} imported`);
+  appLogger.info(`Sushi report ${sushi.id} imported`);
 }
 
-async function processJob(job, task) {
-  if (job.attemptsMade > 0) {
-    appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade + 1})`);
-    task.log('info', `New attempt (total: ${job.attemptsMade + 1})`);
+/**
+ * Entrypoint of the harvest processor
+ * @param {Job} job - the Bull job
+ * @param {HarvestJob} taskData - the job data stored in the database
+ * @returns {Promise<any>}
+ */
+async function processJob(job, taskData) {
+  const task = taskData;
+
+  if (job.attemptsMade > 1) {
+    appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade})`);
+    await logService.log(job.id, 'info', `New attempt (total: ${job.attemptsMade})`);
   }
 
-  const { params: taskParams = {} } = task.getData();
   const {
-    sushiId,
+    credentials,
+    credentialsId,
     beginDate,
     endDate,
     reportType,
-  } = taskParams;
+  } = task;
 
-  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching SUSHI credentials [${sushiId}]`);
-
-  const sushi = await Sushi.findById(sushiId);
-
-  if (!sushi) {
-    throw new HarvestError(`SUSHI item [${sushiId}] not found`);
+  if (!credentials) {
+    throw new HarvestError(`SUSHI item [${credentialsId}] not found`);
   }
 
-  const institutionId = sushi.get('institutionId');
-
-  if (!institutionId) {
-    throw new HarvestError(`SUSHI item [${sushiId}] has no institution ID`);
-  }
-
-  const institution = await Institution.findById(institutionId);
-
-  if (!institution) {
-    throw new HarvestError(`Institution [${institutionId}] not found`);
-  }
-
-  const endpointId = sushi.get('endpointId');
-  appLogger.verbose(`[Harvest Job #${job?.id}] Fetching endpoint [${endpointId}]`);
-
-  const endpoint = await SushiEndpoint.findById(endpointId);
-
-  if (!endpoint) {
-    throw HarvestError(`SUSHI Endpoint [${endpointId}] not found`);
-  }
-
-  task.start();
-  task.log('info', 'Sushi import task initiated');
-  task.log('info', `Requested report type: ${reportType?.toUpperCase?.()}`);
+  task.status = 'running';
+  task.startedAt = new Date();
+  await logService.log(job.id, 'info', 'Sushi import task initiated');
+  await logService.log(job.id, 'info', `Requested report type: ${reportType?.toUpperCase?.()}`);
 
   if (beginDate || endDate) {
-    task.log('info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
+    await logService.log(job.id, 'info', `Requested period: from ${beginDate || endDate} to ${endDate || beginDate}`);
   } else {
-    task.log('info', 'No period requested, defaulting to last month');
+    await logService.log(job.id, 'info', 'No period requested, defaulting to last month');
   }
 
-  await task.save();
+  await harvestJobService.update({
+    where: { id: task.id },
+    data: {
+      ...task,
+      result: task.result || undefined,
+      credentials: undefined,
+    },
+  });
 
-  try {
-    await importSushiReport({
-      ...taskParams,
-      sushi,
-      endpoint,
-      institution,
-      task,
-    });
-  } catch (err) {
-    appLogger.error(`Failed to import sushi report [${sushi.getId()}]`);
-    task.log('error', err.message);
+  await importSushiReport({
+    sushi: credentials,
+    task,
+  });
 
-    if (err instanceof HarvestError) {
-      if (err.cause instanceof Error) {
-        task.log('error', err.cause.message);
-        appLogger.error(err.cause.message);
-        appLogger.error(err.cause.stack);
-      }
-    } else {
-      appLogger.error(err.message);
-      appLogger.error(err.stack);
-    }
-
-    try {
-      task.fail();
-      await task.save();
-    } catch (e) {
-      appLogger.error(`Failed to save sushi task ${task.getId()}`);
-      appLogger.error(e.message);
-    }
-
-    throw err;
-  }
-
-  return task.get('result');
+  return task.result;
 }
 
-module.exports = async function handle(job) {
-  await job.update({ ...job.data, pid: process.pid });
+/** @type {Processor} */
+module.exports = async function handle(job, lockToken) {
+  await job.updateData({ ...job.data, pid: process.pid });
 
   const jobTimeout = Number.isInteger(job?.data?.timeout) ? job.data.timeout : 600;
   let task;
@@ -641,8 +766,10 @@ module.exports = async function handle(job) {
     if (!task) { exit('timeout', 1); }
 
     // Try to gracefully fail
-    task.fail([`Timeout of ${jobTimeout}s exceeded`]);
-    task.save().finally(() => { exit('timeout', 1); });
+    Promise.all([
+      harvestJobService.finish(task, { status: 'failed' }),
+      logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
+    ]).finally(() => { exit('timeout', 1); });
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('timeout', 1); }, 3000);
@@ -652,9 +779,10 @@ module.exports = async function handle(job) {
     appLogger.debug(`[Harvest Job #${job?.id}] Received SIGTERM, discarding job and exiting with code ${exitCode}`);
 
     // Try to gracefully fail
-    task.cancel();
-    task.log('error', 'The task was cancelled');
-    task.save().finally(() => { exit('cancel', exitCode); });
+    Promise.all([
+      harvestJobService.finish(task, { status: 'cancelled' }),
+      logService.log(task.id, 'error', 'The task was cancelled'),
+    ]).finally(() => { exit('cancel', exitCode); });
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('cancel', exitCode); }, 3000);
@@ -665,7 +793,17 @@ module.exports = async function handle(job) {
   const { taskId } = job?.data || {};
 
   appLogger.verbose(`[Harvest Job #${job?.id}] Fetching data of task [${taskId}]`);
-  task = taskId && await Task.findById(taskId);
+  task = taskId && await harvestJobService.findUnique({
+    where: { id: taskId },
+    include: {
+      credentials: {
+        include: {
+          endpoint: true,
+          institution: true,
+        },
+      },
+    },
+  });
 
   if (!task) {
     appLogger.error(`[Harvest Job #${job?.id}] Associated task [${taskId || 'n/a'}] does not exist, removing job`);
@@ -674,14 +812,79 @@ module.exports = async function handle(job) {
     return job.remove();
   }
 
+  const endpoint = task.credentials?.endpoint;
+
+  if (endpoint?.id && endpoint?.disabledUntil) {
+    const disabledUntil = new Date(endpoint?.disabledUntil);
+
+    if (dateIsValid(disabledUntil) && isFuture(disabledUntil)) {
+      appLogger.info(`[Harvest Job #${job?.id}] Endpoint [${endpoint?.vendor || endpoint?.id}] is currently disabled, job will be postponed`);
+      await deferJob(job, task, disabledUntil.getTime(), lockToken, { incrementCounter: false });
+    } else {
+      await sushiEndpointService.update({
+        where: { id: endpoint.id },
+        data: { disabledUntil: null },
+      });
+    }
+  }
+
   let result;
+
+  // Just a little delay to avoid spamming too fast when harvesting a single platform
+  await setTimeout(500);
 
   try {
     result = await processJob(job, task);
-  } finally {
+  } catch (err) {
     clearTimeout(timeoutId);
     process.removeListener('SIGTERM', exitHandler);
+
+    if (err.type === 'delayed') {
+      appLogger.verbose(`[Harvest Job #${job?.id}] Deferring task [${taskId}] by ${deferralBackoffDuration} seconds`);
+
+      const deferredDate = addSeconds(Date.now(), deferralBackoffDuration);
+      await deferJob(job, task, deferredDate.getTime(), lockToken);
+      return;
+    }
+
+    if (err.type === 'busy') {
+      appLogger.verbose(`[Harvest Job #${job?.id}] Disabling endpoint [${endpoint?.vendor || endpoint?.id}] for ${busyBackoffDuration} seconds`);
+      const disabledUntil = addSeconds(Date.now(), busyBackoffDuration);
+
+      await sushiEndpointService.update({
+        where: { id: endpoint?.id },
+        data: { disabledUntil },
+      });
+
+      await deferJob(job, task, disabledUntil.getTime(), lockToken);
+    }
+
+    appLogger.error(`Failed to import sushi report [${task.credentials?.id}]`);
+    await logService.log(job.id, 'error', err.message);
+
+    if (err instanceof HarvestError) {
+      if (err.cause instanceof Error) {
+        await logService.log(job.id, 'error', err.cause.message);
+        appLogger.error(err.cause.message);
+        appLogger.error(err.cause.stack);
+      }
+    } else {
+      appLogger.error(err.message);
+      appLogger.error(err.stack);
+    }
+
+    try {
+      await harvestJobService.finish(task, { status: 'failed' });
+    } catch (e) {
+      appLogger.error(`Failed to save sushi task ${task.id}`);
+      appLogger.error(e.message);
+    }
+
+    throw err;
   }
+
+  clearTimeout(timeoutId);
+  process.removeListener('SIGTERM', exitHandler);
 
   return result;
 };

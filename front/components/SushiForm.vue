@@ -1,18 +1,22 @@
 <template>
   <v-dialog v-model="show" width="700">
     <v-card>
-      <v-card-title v-if="sushiForm.id" class="headline" v-text="formTitle" />
-      <v-card-title v-else class="headline" v-text="$t('institutions.sushi.addCredentials')" />
+      <v-card-title class="headline">
+        {{ formTitle }}
+      </v-card-title>
 
       <v-card-text>
         <v-form id="sushiForm" ref="form" v-model="valid" @submit.prevent="save">
           <v-autocomplete
             ref="endpointsBox"
             v-model="endpoint"
-            :items="endpoints"
+            :items="availableEndpoints"
             :label="`${$t('institutions.sushi.endpoint')} *`"
             :rules="[v => !!v || $t('institutions.sushi.pleaseSelectEndpoint')]"
             item-text="vendor"
+            :search-input.sync="endpointSearch"
+            :loading="loadingEndpoints"
+            :hide-no-data="!endpointSearch"
             clearable
             outlined
             required
@@ -20,9 +24,12 @@
             return-object
             @change="onEndpointChange"
           >
-            <template v-slot:item="{ item }">
+            <template #item="{ item }">
               <v-list-item-content>
-                <v-list-item-title v-text="item.vendor" />
+                <v-list-item-title>
+                  {{ item.vendor }}
+                </v-list-item-title>
+
                 <v-list-item-subtitle>
                   <template v-if="Array.isArray(item.tags)">
                     <v-chip
@@ -41,7 +48,7 @@
               </v-list-item-content>
             </template>
 
-            <template v-slot:no-data>
+            <template #no-data>
               <v-list-item to="/contact-us">
                 <v-list-item-avatar>
                   <v-icon>
@@ -68,21 +75,37 @@
             disabled
           />
 
-          <v-text-field
-            v-model="sushiForm.vendor"
-            :label="`${$t('institutions.sushi.label')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterLabel')]"
+          <v-combobox
+            v-model="sushiForm.tags"
+            :items="availableTags"
+            :hint="$t('institutions.sushi.tagsDescription')"
+            item-text="name"
+            hide-selected
+            return-object
+            hide-no-data
+            multiple
+            small-chips
+            deletable-chips
+            persistent-hint
             outlined
-            required
-          />
+          >
+            <template #label>
+              {{ $t('institutions.sushi.tags') }}
 
-          <v-text-field
-            v-model="sushiForm.package"
-            :label="`${$t('institutions.sushi.package')} *`"
-            :rules="[v => !!v || $t('institutions.sushi.enterPackage')]"
-            outlined
-            required
-          />
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </template>
+                <span>{{ $t('institutions.sushi.tagsHint') }}</span>
+              </v-tooltip>
+            </template>
+          </v-combobox>
 
           <v-row>
             <v-col cols="6">
@@ -130,7 +153,9 @@
             {{ $t('advancedSettings') }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <p v-text="$t('institutions.sushi.pleaseEnterParams')" />
+            <p>
+              {{ $t('institutions.sushi.pleaseEnterParams') }}
+            </p>
 
             <v-btn
               type="submit"
@@ -157,7 +182,7 @@
             <SushiParam
               v-for="(param, index) in endpointParams"
               :key="`e-param-${index}`"
-              v-model="endpointParams[index]"
+              :value="endpointParams[index]"
               :top-text="$t('sushi.unchangeableParam')"
               class="my-2"
               readonly
@@ -180,24 +205,26 @@
           text
           :disabled="!valid"
           :loading="saving"
-          v-text="editMode ? $t('update') : $t('add')"
-        />
+        >
+          {{ editMode ? $t('update') : $t('add') }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import SushiParam from '~/components/SushiParam';
+import debounce from 'lodash.debounce';
+import SushiParam from '~/components/SushiParam.vue';
 
 export default {
   components: {
     SushiParam,
   },
   props: {
-    endpoints: {
+    availableTags: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
   },
   data() {
@@ -206,11 +233,12 @@ export default {
       saving: false,
       institutionId: null,
       valid: false,
+      availableEndpoints: [],
       endpoint: null,
-      formTitle: '',
+      endpointSearch: '',
+      loadingEndpoints: false,
 
       sushiForm: {
-        vendor: '',
         requestorId: '',
         customerId: '',
         apiKey: '',
@@ -236,6 +264,18 @@ export default {
     apiKeyLabel() {
       return `${this.$t('institutions.sushi.apiKey')} ${this.requireApiKey ? '*' : ''}`;
     },
+    formTitle() {
+      return this.sushiForm.id
+        ? this.$t('institutions.sushi.updateCredentials')
+        : this.$t('institutions.sushi.addCredentials');
+    },
+  },
+  watch: {
+    endpointSearch(newValue) {
+      if (newValue) {
+        this.queryEndpoints(newValue);
+      }
+    },
   },
   methods: {
     editSushiItem(institution, sushiData = {}) {
@@ -244,8 +284,7 @@ export default {
       }
 
       this.institutionId = institution?.id;
-      this.sushiForm.vendor = sushiData.vendor || '';
-      this.sushiForm.package = sushiData.package || institution?.indexPrefix || '';
+      this.sushiForm.tags = Array.isArray(sushiData.tags) ? sushiData.tags : [];
       this.sushiForm.requestorId = sushiData.requestorId || '';
       this.sushiForm.customerId = sushiData.customerId || '';
       this.sushiForm.apiKey = sushiData.apiKey || '';
@@ -257,8 +296,8 @@ export default {
         this.sushiForm.params = [];
       }
 
-      this.endpoint = this.endpoints.find(endpoint => endpoint?.id === sushiData?.endpointId);
-      this.formTitle = this.sushiForm.vendor;
+      this.endpoint = sushiData.endpoint;
+      this.availableEndpoints = [sushiData.endpoint];
       this.show = true;
     },
 
@@ -269,10 +308,6 @@ export default {
     onEndpointChange() {
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
-      }
-
-      if (this.endpoint?.vendor) {
-        this.sushiForm.vendor = this.endpoint.vendor;
       }
 
       // workaround to hide vendors list on change
@@ -287,10 +322,20 @@ export default {
       this.$delete(this.sushiForm.params, index);
     },
 
+    queryEndpoints: debounce(async function queryEndpoints() {
+      this.loadingEndpoints = true;
+      try {
+        this.availableEndpoints = await this.$axios.$get('/sushi-endpoints', { params: { q: this.endpointSearch } });
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetrivePlatforms'));
+      }
+      this.loadingEndpoints = false;
+    }, 500),
+
     async save() {
       this.saving = true;
 
-      this.sushiForm.params = this.sushiForm.params.filter(param => param.name);
+      this.sushiForm.params = this.sushiForm.params.filter((param) => param.name);
 
       try {
         if (this.sushiForm.id) {
@@ -320,7 +365,6 @@ export default {
         return;
       }
 
-      this.$store.dispatch('snacks/success', this.$t('informationSubmitted'));
       this.saving = false;
       this.show = false;
     },

@@ -1,5 +1,0 @@
-Bienvenue {{ user.full_name }},
-Vous êtes à présent enregistré sur ezMESURE avec l'utilisateur Kibana <strong>{{ user.username }}</strong>
-
-Cordialement,
-L'équipe ezMESURE.

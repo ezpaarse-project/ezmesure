@@ -1,19 +1,46 @@
 <template>
-  <v-card class="w-600 mx-auto">
+  <v-card class="d-flex flex-column" v-bind="$attrs">
     <v-img
-      v-if="institution.logoId"
-      :src="`/api/assets/logos/${institution.logoId}`"
+      :aspect-ratio="3"
+      :src="logoSrc"
       contain
-      height="100"
-    />
-
-    <v-divider v-if="institution.logoId" />
+      max-height="100"
+      class="mt-3"
+      @error="logoLoadError = true"
+    >
+      <template #placeholder>
+        <v-row
+          class="fill-height ma-0"
+          align="center"
+          justify="center"
+        >
+          <v-progress-circular
+            indeterminate
+            color="grey lighten-1"
+          />
+        </v-row>
+      </template>
+    </v-img>
 
     <v-card-title>
-      {{ $t('institutions.institution.identity') }}
+      <div>
+        {{ institutionName }}
+        <v-chip
+          :color="institution.validated ? 'success' : 'default'"
+          label
+          outlined
+          small
+        >
+          {{
+            institution.validated
+              ? $t('institutions.institution.validated')
+              : $t('institutions.institution.notValidated')
+          }}
+        </v-chip>
+      </div>
     </v-card-title>
 
-    <v-list two-line>
+    <v-list>
       <v-list-item v-for="field in fields" :key="field.name">
         <v-list-item-icon>
           <v-icon color="secondary">
@@ -22,46 +49,43 @@
         </v-list-item-icon>
 
         <v-list-item-content>
-          <v-list-item-title v-text="field.value" />
-          <v-list-item-subtitle v-text="$t(`institutions.institution.${field.name}`)" />
+          <v-list-item-title>{{ field.value }}</v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t(`institutions.institution.${field.name}`) }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon color="secondary">
+            mdi-link-variant
+          </v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title>
+            <v-btn
+              v-for="link in links"
+              :key="link.icon"
+              :href="link.url"
+              :color="link.color"
+              :title="link.title"
+              icon
+            >
+              <v-icon>{{ link.icon }}</v-icon>
+            </v-btn>
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t(`institutions.institution.links`) }}
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
 
-    <v-divider />
+    <v-spacer />
 
-    <v-card-title>
-      {{ $t('institutions.institution.status') }}
-
-      <v-spacer />
-
-      <v-chip
-        label
-        :color="institution.validated ? 'success' : 'default'"
-        outlined
-      >
-        <span v-if="institution.validated" v-text="$t('institutions.institution.validated')" />
-        <span v-else v-text="$t('institutions.institution.notValidated')" />
-      </v-chip>
-    </v-card-title>
-
-    <v-divider />
-
-    <v-card-title>
-      {{ $t('institutions.institution.attachedDomains') }}
-    </v-card-title>
-
-    <v-card-text>
-      <template v-if="hasDomains">
-        <v-list-item v-for="domain in institution.domains" :key="domain">
-          <v-list-item-content>
-            <v-list-item-title>{{ domain }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-
-      <p v-else v-text="$t('institutions.institution.noAttachedDomains')" />
-    </v-card-text>
+    <slot name="menu" :permissions="permissions" :validated="validated" />
   </v-card>
 </template>
 
@@ -74,39 +98,90 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    membership: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
+      logoLoadError: false,
       defaultLogo,
     };
   },
   computed: {
-    fields() {
-      let { name } = this.institution;
+    institutionName() {
+      let name = this.institution?.name;
 
-      if (name && this.institution.acronym) {
+      if (name && this.institution?.acronym) {
         name = `${name} (${this.institution.acronym})`;
       }
 
+      return name;
+    },
+    fields() {
       const fields = [
-        { name: 'name', value: name, icon: 'mdi-card-account-details' },
+        { name: 'group', value: this.institution.parentInstitution?.name, icon: 'mdi-home-group' },
         { name: 'homepage', value: this.institution.homepage, icon: 'mdi-web' },
         { name: 'city', value: this.institution.city, icon: 'mdi-map-marker' },
         { name: 'type', value: this.institution.type, icon: 'mdi-tag' },
         { name: 'uai', value: this.institution.uai, icon: 'mdi-identifier' },
         { name: 'role', value: this.institution.role, icon: 'mdi-shield' },
-        { name: 'indexPrefix', value: this.institution.indexPrefix, icon: 'mdi-contain-start' },
-        { name: 'indexCount', value: this.institution.indexCount, icon: 'mdi-counter' },
       ];
 
-      return fields.filter(f => f.value);
+      return fields.filter((f) => f.value);
+    },
+    links() {
+      const links = [
+        {
+          title: this.$t('social.website'),
+          icon: 'mdi-web',
+          color: '#616161',
+          url: this.institution?.websiteUrl,
+        },
+        {
+          title: this.$t('social.twitter'),
+          icon: 'mdi-twitter',
+          color: '#1da1f2',
+          url: this.institution?.social?.twitterUrl,
+        },
+        {
+          title: this.$t('social.linkedin'),
+          icon: 'mdi-linkedin',
+          color: '#0077b5',
+          url: this.institution?.social?.linkedinUrl,
+        },
+        {
+          title: this.$t('social.youtube'),
+          icon: 'mdi-youtube',
+          color: '#ff0000',
+          url: this.institution?.social?.youtubeUrl,
+        },
+        {
+          title: this.$t('social.facebook'),
+          icon: 'mdi-facebook',
+          color: '#1877f2',
+          url: this.institution?.social?.facebookUrl,
+        },
+      ];
+
+      return links.filter((f) => f.url);
     },
     logoSrc() {
-      if (this.institution?.logoId) { return `/api/assets/logos/${this.institution.logoId}`; }
+      if (this.institution?.logoId && !this.logoLoadError) {
+        return `/api/assets/logos/${this.institution.logoId}`;
+      }
       return defaultLogo;
     },
-    hasDomains() {
-      return Array.isArray(this.institution?.domains) && this.institution.domains.length > 0;
+    validated() {
+      return !!this.institution?.validated;
+    },
+    permissions() {
+      return new Set(
+        Array.isArray(this.membership?.permissions)
+          ? this.membership.permissions
+          : [],
+      );
     },
   },
 };
