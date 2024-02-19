@@ -765,8 +765,8 @@
       "error": "Des erreurs sont survenues"
     },
     "description": {
-      "notSynced": "Les données de gestions ne sont pas encore synchronisées, des incohérences entre l'interface d'ezMESURE et les différents services liés à ezMESURE peuvent survenir. Il vous suffit de cliquer sur le bouton ci-dessus pour les synchroniser.",
-      "completed": "Les données de gestions ont bien être synchronisées avec les services liés à ezMESURE.",
+      "notSynced": "Les données de gestion ne sont pas encore synchronisées, des incohérences entre l'interface d'ezMESURE et les différents services liés à ezMESURE peuvent survenir. Il vous suffit de cliquer sur le bouton ci-dessus pour les synchroniser.",
+      "completed": "Les données de gestion ont bien été synchronisées avec les services liés à ezMESURE.",
       "error": "Des erreurs sont survenues durant la synchronisation des données de gestion avec les différents services liés à ezMESURE. Veuillez consulter les logs de votre instance pour plus d'informations."
     },
     "start": "Lancer la synchronisation",
