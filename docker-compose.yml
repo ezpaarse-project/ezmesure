@@ -92,7 +92,7 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - no_proxy=localhost,kibana
+      - no_proxy=localhost,kibana,reporting
       - EZMESURE_ELASTIC_SCHEME=${EZMESURE_ELASTIC_SCHEME:-https}
       - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
       - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
