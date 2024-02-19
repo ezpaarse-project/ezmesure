@@ -41,7 +41,7 @@ services:
     environment:
       - http_proxy
       - https_proxy
-      - no_proxy=reporting
+      - no_proxy=legacy-reporting
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_USERNAME=${KIBANA_USERNAME:-kibana_system}
       - SERVER_BASEPATH
