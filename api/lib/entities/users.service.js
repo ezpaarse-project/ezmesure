@@ -142,7 +142,7 @@ module.exports = class UsersService extends BasePrismaService {
    * @returns {Promise<User>}
    */
   async acceptTerms(username) {
-    const user = usersPrisma.acceptTerms(username);
+    const user = await usersPrisma.acceptTerms(username);
     this.triggerHooks('user:update', user);
     return user;
   }
