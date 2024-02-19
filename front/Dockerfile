@@ -2,7 +2,7 @@ FROM node:18.18.2-alpine3.18 as builder
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build && NODE_ENV=production npm ci --omit=dev

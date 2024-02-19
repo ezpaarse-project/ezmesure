@@ -2,7 +2,7 @@ FROM node:18.18.2-alpine3.18 as dependencies
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package*.json ./
 COPY prisma ./prisma
 
 # "npm ci" is needed so that prisma can run "prisma generate"
