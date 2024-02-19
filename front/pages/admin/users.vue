@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn :href="userListMailLink" target="_blank" rel="noopener noreferrer" text>
+        <v-btn target="_blank" rel="noopener noreferrer" text @click="copyMailList">
           <v-icon left>
             mdi-email-multiple
           </v-icon>
@@ -257,11 +257,6 @@ export default {
         roles: [...data.roles],
         institutions: [...data.institutions.values()],
       };
-    },
-    userListMailLink() {
-      const addresses = this.selected.map((user) => user.email).join(',');
-      const teamMail = this.$config.supportMail;
-      return `mailto:${teamMail}?bcc=${addresses}`;
     },
     filtersCount() {
       return Object.values(this.filters)
@@ -513,6 +508,20 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('idCopied'));
+    },
+    async copyMailList() {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      const addresses = this.selected.map((user) => user.email).join('; ');
+      try {
+        await navigator.clipboard.writeText(addresses);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('emailsCopied'));
     },
     clearSelection() {
       this.selected = [];
