@@ -99,7 +99,7 @@ function upsert(params, tx = prisma) {
  */
 async function remove(params, tx = prisma) {
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const membership = await txx.membership.findUnique({
       where: params.where,
       include: {
@@ -120,9 +120,9 @@ async function remove(params, tx = prisma) {
 
   let transactionResult;
   if (tx) {
-    transactionResult = await processor(tx);
+    transactionResult = await transaction(tx);
   } else {
-    transactionResult = await prisma.$transaction(processor);
+    transactionResult = await prisma.$transaction(transaction);
   }
 
   return transactionResult;
@@ -136,7 +136,7 @@ async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const memberships = await findMany({}, txx);
 
     if (memberships.length === 0) { return null; }
@@ -159,9 +159,9 @@ async function removeAll(tx) {
   };
 
   if (tx) {
-    return processor(tx);
+    return transaction(tx);
   }
-  return prisma.$transaction(processor);
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {

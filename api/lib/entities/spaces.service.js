@@ -96,7 +96,7 @@ module.exports = class SpacesService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** @param {SpacesService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const spaces = await service.findMany({});
 
       if (spaces.length === 0) { return null; }
@@ -115,8 +115,8 @@ module.exports = class SpacesService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return SpacesService.$transaction(processor);
+    return SpacesService.$transaction(transaction);
   }
 };

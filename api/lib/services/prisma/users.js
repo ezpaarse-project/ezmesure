@@ -179,8 +179,8 @@ function removeByUsername(username, tx = prisma) {
 async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
-  /**  */
-  const processor = async (txx) => {
+  /** @param {TransactionClient} txx } */
+  const transaction = async (txx) => {
     const users = await findMany(
       { where: { NOT: { username: adminUsername } } },
       txx,
@@ -196,9 +196,9 @@ async function removeAll(tx) {
   };
 
   if (tx) {
-    return processor(tx);
+    return transaction(tx);
   }
-  return prisma.$transaction(processor);
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {

@@ -107,7 +107,7 @@ function connectInstitution(pattern, institutionId, tx = prisma) {
  */
 async function disconnectInstitution(pattern, institutionId, tx) {
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const currentRepository = await txx.repository.findUnique({
       where: { pattern },
       include: {
@@ -146,9 +146,9 @@ async function disconnectInstitution(pattern, institutionId, tx) {
 
   let transactionResult;
   if (tx) {
-    transactionResult = await processor(tx);
+    transactionResult = await transaction(tx);
   } else {
-    transactionResult = await prisma.$transaction(processor);
+    transactionResult = await prisma.$transaction(transaction);
   }
 
   return transactionResult;
@@ -186,7 +186,7 @@ async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const repositories = await findMany({}, txx);
 
     if (repositories.length === 0) { return null; }
@@ -202,9 +202,9 @@ async function removeAll(tx) {
   };
 
   if (tx) {
-    return processor(tx);
+    return transaction(tx);
   }
-  return prisma.$transaction(processor);
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {

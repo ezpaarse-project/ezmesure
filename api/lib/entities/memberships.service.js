@@ -103,7 +103,7 @@ module.exports = class MembershipsService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** @param {MembershipsService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const memberships = await service.findMany({});
 
       if (memberships.length === 0) { return null; }
@@ -125,8 +125,8 @@ module.exports = class MembershipsService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return MembershipsService.$transaction(processor);
+    return MembershipsService.$transaction(transaction);
   }
 };

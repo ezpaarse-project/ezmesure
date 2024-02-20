@@ -88,7 +88,7 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** @param {SushiEndpointsService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const sushiEndpoints = await service.findMany({});
 
       if (sushiEndpoints.length === 0) { return null; }
@@ -107,8 +107,8 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return SushiEndpointsService.$transaction(processor);
+    return SushiEndpointsService.$transaction(transaction);
   }
 };

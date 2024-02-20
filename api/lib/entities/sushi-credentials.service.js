@@ -79,7 +79,7 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** @param {SushiCredentialsService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const sushiCredentials = await service.findMany({});
 
       if (sushiCredentials.length === 0) { return null; }
@@ -98,8 +98,8 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return SushiCredentialsService.$transaction(processor);
+    return SushiCredentialsService.$transaction(transaction);
   }
 };

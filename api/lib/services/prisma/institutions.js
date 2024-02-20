@@ -163,7 +163,7 @@ function validate(id, tx = prisma) {
  */
 async function remove(params, tx) {
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const institution = await txx.institution.findUnique({
       where: params.where,
       include: {
@@ -214,9 +214,9 @@ async function remove(params, tx) {
 
   let transactionResult;
   if (tx) {
-    transactionResult = await processor(tx);
+    transactionResult = await transaction(tx);
   } else {
-    transactionResult = await prisma.$transaction(processor);
+    transactionResult = await prisma.$transaction(transaction);
   }
 
   return transactionResult;
@@ -230,7 +230,7 @@ async function removeAll(tx = prisma) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const institutions = await findMany({}, txx);
 
     if (institutions.length === 0) { return null; }
@@ -252,9 +252,9 @@ async function removeAll(tx = prisma) {
   };
 
   if (tx) {
-    return processor(tx);
+    return transaction(tx);
   }
-  return prisma.$transaction(processor);
+  return prisma.$transaction(transaction);
 }
 
 /**

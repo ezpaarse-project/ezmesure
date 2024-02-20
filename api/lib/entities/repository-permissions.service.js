@@ -87,7 +87,7 @@ module.exports = class RepositoryPermissionsService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** * @param {RepositoryPermissionsService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const permissions = await service.findMany({});
 
       if (permissions.length === 0) { return null; }
@@ -110,8 +110,8 @@ module.exports = class RepositoryPermissionsService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return RepositoryPermissionsService.$transaction(processor);
+    return RepositoryPermissionsService.$transaction(transaction);
   }
 };

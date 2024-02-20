@@ -133,7 +133,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
     /** @param {RepositoriesService} service */
-    const processor = async (service) => {
+    const transaction = async (service) => {
       const repositories = await service.findMany({});
 
       if (repositories.length === 0) { return null; }
@@ -150,8 +150,8 @@ module.exports = class RepositoriesService extends BasePrismaService {
     };
 
     if (this.currentTransaction) {
-      return processor(this);
+      return transaction(this);
     }
-    return RepositoriesService.$transaction(processor);
+    return RepositoriesService.$transaction(transaction);
   }
 };

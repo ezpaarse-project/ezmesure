@@ -105,7 +105,7 @@ async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
   /** @param {TransactionClient} txx */
-  const processor = async (txx) => {
+  const transaction = async (txx) => {
     const permissions = await findMany({}, txx);
 
     if (permissions.length === 0) { return null; }
@@ -131,9 +131,9 @@ async function removeAll(tx) {
   };
 
   if (tx) {
-    return processor(tx);
+    return transaction(tx);
   }
-  return prisma.$transaction(processor);
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {
