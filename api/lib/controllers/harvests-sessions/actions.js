@@ -1,3 +1,5 @@
+const HTTPError = require('../../models/HTTPError');
+
 const HarvestSessionService = require('../../entities/harvest-session.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
@@ -7,6 +9,7 @@ const { harvestQueue } = require('../../services/jobs');
 const { propsToPrismaInclude, propsToPrismaSort } = require('../utils');
 
 const { includableFields } = require('../../entities/harvest-session.dto');
+const { appLogger } = require('../../services/logger');
 
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
@@ -65,7 +68,7 @@ exports.getOne = async (ctx) => {
   });
 
   if (!session) {
-    ctx.throw(ctx.$t('errors.harvestSession.notFound'));
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
   }
 
@@ -78,8 +81,8 @@ exports.getOneStatus = async (ctx) => {
   const { harvestId } = ctx.params;
 
   const sessionStatus = await HarvestSessionService.$transaction(
-    /* eslint-disable no-underscore-dangle */
     async (harvestSessionService) => {
+      /* eslint-disable no-underscore-dangle */
       const session = await harvestSessionService.findUnique({
         where: { id: harvestId },
         include: {
@@ -93,8 +96,7 @@ exports.getOneStatus = async (ctx) => {
       });
 
       if (!session) {
-        // TODO: better error - session.id
-        throw new Error('errors.harvestSession.notFound');
+        return null;
       }
 
       const harvestJobsService = new HarvestJobsService(harvestSessionService);
@@ -153,9 +155,14 @@ exports.getOneStatus = async (ctx) => {
           statuses: Object.fromEntries(statuses),
         },
       };
+      /* eslint-enable no-underscore-dangle */
     },
-    /* eslint-enable no-underscore-dangle */
   );
+
+  if (!sessionStatus) {
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
+    return;
+  }
 
   ctx.status = 200;
   ctx.body = sessionStatus;
@@ -180,7 +187,7 @@ exports.getOneInstitutions = async (ctx) => {
   });
 
   if (!session) {
-    ctx.throw(ctx.$t('errors.harvestSession.notFound'));
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
   }
 
@@ -231,11 +238,6 @@ exports.createOne = async (ctx) => {
     });
   });
 
-  if (!createdSession) {
-    ctx.throw(ctx.$t('errors.harvestSession.notFound'));
-    return;
-  }
-
   ctx.status = 200;
   ctx.body = createdSession;
 };
@@ -261,8 +263,7 @@ exports.upsertOne = async (ctx) => {
 
       // eslint-disable-next-line no-underscore-dangle
       if (session && session._count.jobs > 0) {
-      // TODO: better error - session.id
-        throw new Error('errors.harvestSession.updateAfterStart');
+        throw new HTTPError(409, 'errors.harvest.updateSessionAfterStart', [harvestId]);
       }
 
       const sushiCredentialsService = new SushiCredentialsService(harvestSessionService);
@@ -311,11 +312,6 @@ exports.upsertOne = async (ctx) => {
     },
   );
 
-  if (!upsertedSession) {
-    ctx.throw(ctx.$t('errors.harvestSession.notFound'));
-    return;
-  }
-
   ctx.status = 200;
   ctx.body = upsertedSession;
 };
@@ -332,7 +328,12 @@ exports.startOne = async (ctx) => {
   });
 
   if (!session) {
-    ctx.throw(ctx.$t('errors.harvestSession.notFound'));
+    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
+    return;
+  }
+
+  if (await harvestSessionService.isActive(session)) {
+    ctx.throw(409, ctx.$t('errors.harvest.sessionAlreadyRunning', harvestId));
     return;
   }
 
@@ -401,7 +402,7 @@ exports.stopOne = async (ctx) => {
               }
             }
           } catch (error) {
-            console.error(error);
+            appLogger.error(`[Harvest Queue] Failed to stop job ${harvestJob.id}: ${error}`);
           }
 
           if (!HarvestJobsService.isDone(harvestJob)) {

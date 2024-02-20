@@ -15,6 +15,9 @@ errors:
     invalidDate: La date [%s] est invalide
     invalidPeriod: La période [de %s à %s] est invalide
     failedToUpdateSupportedReports: La mise à jour de la liste des rapports disponibles a échoué
+    sessionNotFound: La session [%s] n'existe pas
+    updateSessionAfterStart: Impossible de mettre a jour la session [%s] une fois lancée
+    sessionAlreadyRunning: La session [%s] est déjà lancée
 
   queue:
     notFound: File d'attente introuvable

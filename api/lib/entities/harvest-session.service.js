@@ -17,6 +17,7 @@ const BasePrismaService = require('./base-prisma.service');
 const HarvestJobsService = require('./harvest-job.service');
 const RepositoriesService = require('./repositories.service');
 const SushiEndpointsService = require('./sushi-endpoints.service');
+const HTTPError = require('../models/HTTPError');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestSession} HarvestSession */
@@ -53,16 +54,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     let endDate = eD && parseDate(eD, format, now);
 
     if (beginDate && !isValidDate(beginDate)) {
-      // TODO: better error - beginDate
-      throw new Error('errors.harvest.invalidDate');
+      throw new HTTPError(400, 'errors.harvest.invalidDate', [bD]);
     }
     if (endDate && !isValidDate(endDate)) {
-      // TODO: better error - endDate
-      throw new Error('errors.harvest.invalidDate');
+      throw new HTTPError(400, 'errors.harvest.invalidDate', [eD]);
     }
     if (beginDate && endDate && isBefore(endDate, beginDate)) {
-      // TODO: better error - beginDate, endDate
-      throw new Error('errors.harvest.invalidPeriod');
+      throw new HTTPError(400, 'errors.harvest.invalidPeriod', [bD, eD]);
     }
 
     if (!bD && !eD) {
@@ -266,8 +264,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       });
 
       if (!fullSession) {
-        // TODO: better error - session.id
-        throw new Error('errors.harvestSession.notFound');
+        throw new HTTPError(404, 'errors.harvest.sessionNotFound', [session.id]);
       }
 
       // Get report types
@@ -308,8 +305,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             });
 
             if (!repository?.pattern) {
-              // TODO: better error - institution.id
-              throw new Error('errors.harvest.noTarget');
+              throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
             }
 
             index = repository.pattern.replace(/[*]/g, '');
@@ -358,7 +354,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           const supportedReportsSet = new Set(supportedReports);
 
           // Filter supported report based on session params
-          if (!session.downloadUnsupported && supportedReportsSet.size > 0) {
+          if (!fullSession.downloadUnsupported && supportedReportsSet.size > 0) {
             reportTypes = reportTypes.filter((reportId) => supportedReportsSet.has(reportId));
           }
 
