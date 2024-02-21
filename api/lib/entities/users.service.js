@@ -7,7 +7,6 @@ const elasticUsers = require('../services/elastic/users');
 const usersPrisma = require('../services/prisma/users');
 
 const secret = config.get('auth.secret');
-const adminUsername = config.get('admin.username');
 const passwordResetValidity = config.get('passwordResetValidity');
 
 /* eslint-disable max-len */
@@ -48,9 +47,7 @@ module.exports = class UsersService extends BasePrismaService {
    * @returns {Promise<User>}
    */
   async createAdmin() {
-    const username = config.get('admin.username');
-    const email = config.get('admin.email');
-    const fullName = config.get('admin.fullName');
+    const { username, email, fullName } = config.get('admin');
 
     const adminData = {
       username,
@@ -210,20 +207,28 @@ module.exports = class UsersService extends BasePrismaService {
   async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const users = await this.findMany({
-      where: { NOT: { username: adminUsername } },
-    });
+    /** @param {UsersService} service */
+    const transaction = async (service) => {
+      const users = await service.findMany({});
 
-    if (users.length === 0) { return null; }
+      if (users.length === 0) { return null; }
 
-    await Promise.all(users.map(async (user) => {
-      await this.delete({
-        where: {
-          username: user.username,
-        },
-      });
-    }));
+      await Promise.all(
+        users.map(
+          (user) => service.delete({
+            where: {
+              username: user.username,
+            },
+          }),
+        ),
+      );
 
-    return users;
+      return users;
+    };
+
+    if (this.currentTransaction) {
+      return transaction(this);
+    }
+    return UsersService.$transaction(transaction);
   }
 };
