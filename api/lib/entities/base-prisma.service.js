@@ -23,7 +23,11 @@ class BasePrismaService {
   currentTransaction = undefined;
 
   /**
-   * @param {TransactionClient | BasePrismaService} prismaOrService
+   * Create a new service with a prisma client
+   *
+   * @param {TransactionClient | BasePrismaService} prismaOrService Prisma instance or service.
+   * Default to global prisma instance, if a service is provided it'll reuse the prisma instance
+   * and transaction
    */
   constructor(prismaOrService = client) {
     if (prismaOrService instanceof BasePrismaService) {
@@ -36,8 +40,11 @@ class BasePrismaService {
   }
 
   /**
-   * @param {Function} executor
-   * @returns
+   * Start a new interactive transaction
+   *
+   * @param {Function} executor The executor of the transaction, take a service as parameter
+   *
+   * @returns {Promise<any>} The result of the transaction
    */
   static $transaction(executor) {
     const currentTransaction = client.$transaction(
@@ -61,8 +68,8 @@ class BasePrismaService {
    * @param {string} action The event name
    * @param {any[]} payload The payload of the event
    *
-   * @returns Returns `true` if the event had listeners, `false` otherwise.
-   * If in transaction returns a Promise resolved when the hook is triggered
+   * @returns {boolean | Promise<boolean>} Returns `true` if the event had listeners
+   * `false` otherwise. If in transaction returns a Promise resolved when the hook is triggered
    */
   triggerHooks(action, ...payload) {
     if (!this.currentTransaction) {
