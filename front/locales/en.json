@@ -659,7 +659,7 @@
     "newUser": "New user",
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
-    "createMailUserList": "New grouped mail",
+    "createMailUserList": "Copy emails",
     "filters": {
       "title": "Filter users",
       "searchHint": "This field is overriden by the search bar"
@@ -798,6 +798,7 @@
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
   "idCopied": "ID copied in the clipboard",
+  "emailsCopied": "Emails copied in the clipboard",
   "advancedSettings": "Advanced settings",
   "actions": "Actions",
   "name": "Name",
