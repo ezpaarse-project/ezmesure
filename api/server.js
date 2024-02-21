@@ -8,7 +8,7 @@ const path = require('path');
 const { setTimeout } = require('timers/promises');
 const { STATUS_CODES } = require('http');
 
-const usersService = require('./lib/entities/users.service');
+const UsersService = require('./lib/entities/users.service');
 
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
@@ -194,6 +194,7 @@ async function waitForElasticsearch() {
 }
 
 async function createAdmin() {
+  const usersService = new UsersService();
   try {
     await usersService.createAdmin();
     appLogger.info('Admin user is created');

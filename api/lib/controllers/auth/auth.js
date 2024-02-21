@@ -5,8 +5,8 @@ const elastic = require('../../services/elastic');
 
 const usersElastic = require('../../services/elastic/users');
 const ezrUsers = require('../../services/ezreeport/users');
-const usersService = require('../../entities/users.service');
-const membershipsService = require('../../entities/memberships.service');
+const UsersService = require('../../entities/users.service');
+const MembershipsService = require('../../entities/memberships.service');
 const { appLogger } = require('../../services/logger');
 const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
@@ -65,6 +65,8 @@ exports.renaterLogin = async (ctx) => {
   };
 
   const { username } = userProps;
+
+  const usersService = new UsersService();
 
   let user = await usersService.findUnique({ where: { username } });
 
@@ -138,6 +140,8 @@ exports.elasticLogin = async (ctx) => {
     return;
   }
 
+  const usersService = new UsersService();
+
   user = await usersService.findUnique({ where: { username } });
 
   if (!user) {
@@ -161,6 +165,8 @@ exports.activate = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.user.alreadyActivated'));
     return;
   }
+
+  const usersService = new UsersService();
 
   try {
     await usersService.acceptTerms(user.username);
@@ -246,6 +252,7 @@ exports.resetPassword = async (ctx) => {
   const { username } = ctx.state.user;
   const { createdAt } = ctx.state.jwtdata;
 
+  const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
 
   user.metadata = user.metadata || {};
@@ -295,6 +302,7 @@ exports.changePassword = async (ctx) => {
 };
 
 exports.getUser = async (ctx) => {
+  const usersService = new UsersService();
   const user = await usersService.findUnique({
     where: { username: ctx.state.user.username },
     include: {
@@ -332,6 +340,7 @@ exports.getToken = async (ctx) => {
 exports.getMemberships = async (ctx) => {
   const { username } = ctx.state.user;
   ctx.status = 200;
+  const membershipsService = new MembershipsService();
   ctx.body = await membershipsService.findMany({
     where: { username },
     include: { institution: true },

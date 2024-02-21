@@ -3,7 +3,7 @@ const path = require('path');
 const { Queue, Worker } = require('bullmq');
 
 const { appLogger } = require('./logger');
-const harvestJobService = require('../entities/harvest-job.service');
+const HarvestJobService = require('../entities/harvest-job.service');
 
 const harvestConcurrency = Number.parseInt(config.get('jobs.harvest.concurrency'), 10);
 const redisConfig = config.get('redis');
@@ -20,9 +20,11 @@ const harvestWorker = new Worker('sushi-harvest', workerFile, {
 async function checkTask(taskId, jobId) {
   if (!taskId) { return; }
 
+  const harvestJobService = new HarvestJobService();
+
   const task = await harvestJobService.findUnique({ where: { id: taskId } });
 
-  if (!task || harvestJobService.isDone(task)) { return; }
+  if (!task || HarvestJobService.isDone(task)) { return; }
 
   appLogger.verbose(`${logPrefix} Job [${jobId}] stopped unexpectedly, setting task from status [${task.status}] to [failed]...`);
 

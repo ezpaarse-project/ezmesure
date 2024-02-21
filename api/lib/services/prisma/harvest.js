@@ -2,6 +2,7 @@
 const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
+/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
 /** @typedef {import('@prisma/client').Harvest} Harvest */
 /** @typedef {import('@prisma/client').Prisma.HarvestUpdateArgs} HarvestUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestUpsertArgs} HarvestUpsertArgs */
@@ -12,42 +13,47 @@ const { client: prisma } = require('./index');
 
 /**
  * @param {HarvestCreateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Harvest>}
  */
-function create(params) {
-  return prisma.harvest.create(params);
+function create(params, tx = prisma) {
+  return tx.harvest.create(params);
 }
 
 /**
  * @param {HarvestFindManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Harvest[]>}
  */
-function findMany(params) {
-  return prisma.harvest.findMany(params);
+function findMany(params, tx = prisma) {
+  return tx.harvest.findMany(params);
 }
 
 /**
  * @param {HarvestFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Harvest | null>}
  */
-function findUnique(params) {
-  return prisma.harvest.findUnique(params);
+function findUnique(params, tx = prisma) {
+  return tx.harvest.findUnique(params);
 }
 
 /**
  * @param {HarvestUpdateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Harvest>}
  */
-function update(params) {
-  return prisma.harvest.update(params);
+function update(params, tx = prisma) {
+  return tx.harvest.update(params);
 }
 
 /**
  * @param {HarvestUpsertArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<Harvest>}
  */
-function upsert(params) {
-  return prisma.harvest.upsert(params);
+function upsert(params, tx = prisma) {
+  return tx.harvest.upsert(params);
 }
 
 module.exports = {

@@ -7,7 +7,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -32,7 +32,7 @@ describe('[users]: Test update users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
   });
   describe('Update', () => {
     describe('As admin', () => {

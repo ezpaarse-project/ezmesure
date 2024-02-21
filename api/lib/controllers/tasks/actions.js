@@ -1,4 +1,4 @@
-const harvestJobService = require('../../entities/harvest-job.service');
+const HarvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
 
 /** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
@@ -51,6 +51,8 @@ exports.getAll = async (ctx) => {
     distinct = Array.isArray(distinctFields) ? distinctFields : distinctFields.split(',').map((s) => s.trim());
   }
 
+  const harvestJobService = new HarvestJobService();
+
   ctx.body = await harvestJobService.findMany({
     include: {
       credentials: {
@@ -67,6 +69,8 @@ exports.getAll = async (ctx) => {
 
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
+
+  const harvestJobService = new HarvestJobService();
 
   const task = await harvestJobService.findUnique({
     where: { id: taskId },
@@ -90,6 +94,8 @@ exports.getOne = async (ctx) => {
 
 exports.cancelOne = async (ctx) => {
   const { taskId } = ctx.params;
+
+  const harvestJobService = new HarvestJobService();
 
   let task = await harvestJobService.findUnique({ where: { id: taskId } });
   const job = await harvestQueue.getJob(taskId);
@@ -131,6 +137,7 @@ exports.deleteOne = async (ctx) => {
     await job.remove();
   }
 
+  const harvestJobService = new HarvestJobService();
   await harvestJobService.delete({ where: { id: taskId } });
 
   ctx.status = 204;

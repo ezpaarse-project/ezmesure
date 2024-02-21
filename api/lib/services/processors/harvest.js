@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const config = require('config');
-const { setTimeout } = require('timers/promises');
 
 const busyBackoffDuration = parseInt(config.get('jobs.harvest.busyBackoffDuration'), 10);
 const deferralBackoffDuration = parseInt(config.get('jobs.harvest.deferralBackoffDuration'), 10);
@@ -30,10 +29,10 @@ require('../../hooks');
 
 const { SUSHI_CODES, ERROR_CODES } = sushiService;
 
-const harvestJobService = require('../../entities/harvest-job.service');
-const stepService = require('../../entities/step.service');
-const logService = require('../../entities/log.service');
-const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+const HarvestJobService = require('../../entities/harvest-job.service');
+const StepService = require('../../entities/step.service');
+const LogService = require('../../entities/log.service');
+const SushiEndpointService = require('../../entities/sushi-endpoints.service');
 
 /* eslint-disable max-len */
 /**
@@ -71,15 +70,19 @@ async function deferJob(job, task, timestamp, lockToken, options = {}) {
     timesDelayed += 1;
   }
 
-  if (timesDelayed > maxDeferrals) {
+  await HarvestJobService.$transaction(async (harvestJobService) => {
+    const logService = new LogService(harvestJobService);
+
+    if (timesDelayed <= maxDeferrals) {
+      return harvestJobService.finish(task, { status: 'delayed' });
+    }
+
     await Promise.all([
       harvestJobService.finish(task, { status: 'failed', errorCode: ERROR_CODES.maxDeferralsExceeded }),
       logService.log(task.id, 'error', 'Maximum deferral times exceeded'),
     ]);
     throw new HarvestError('Maximum number of download deferral exceeded');
-  } else {
-    await harvestJobService.finish(task, { status: 'delayed' });
-  }
+  });
 
   await job.updateData({ ...job.data, timesDelayed });
   await job.moveToDelayed(timestamp, lockToken);
@@ -133,6 +136,9 @@ async function importSushiReport(options = {}) {
   let report;
   let reportContent;
   let logs = [];
+
+  const harvestJobService = new HarvestJobService();
+  const stepService = new StepService();
 
   function saveTask() {
     const newLogs = logs;
@@ -695,6 +701,9 @@ async function importSushiReport(options = {}) {
 async function processJob(job, taskData) {
   const task = taskData;
 
+  const logService = new LogService();
+  const harvestJobService = new HarvestJobService();
+
   if (job.attemptsMade > 1) {
     appLogger.verbose(`[Harvest Job #${job?.id}] New attempt (total: ${job.attemptsMade})`);
     await logService.log(job.id, 'info', `New attempt (total: ${job.attemptsMade})`);
@@ -765,11 +774,15 @@ module.exports = async function handle(job, lockToken) {
 
     if (!task) { exit('timeout', 1); }
 
-    // Try to gracefully fail
-    Promise.all([
-      harvestJobService.finish(task, { status: 'failed' }),
-      logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
-    ]).finally(() => { exit('timeout', 1); });
+    HarvestJobService.$transaction(async (harvestJobService) => {
+      const logService = LogService.$transaction(harvestJobService);
+
+      // Try to gracefully fail
+      await Promise.all([
+        harvestJobService.finish(task, { status: 'failed' }),
+        logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
+      ]);
+    }).finally(() => exit('timeout', 1));
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('timeout', 1); }, 3000);
@@ -779,16 +792,24 @@ module.exports = async function handle(job, lockToken) {
     appLogger.debug(`[Harvest Job #${job?.id}] Received SIGTERM, discarding job and exiting with code ${exitCode}`);
 
     // Try to gracefully fail
-    Promise.all([
-      harvestJobService.finish(task, { status: 'cancelled' }),
-      logService.log(task.id, 'error', 'The task was cancelled'),
-    ]).finally(() => { exit('cancel', exitCode); });
+    HarvestJobService.$transaction(async (harvestJobService) => {
+      const logService = new LogService(harvestJobService);
+
+      await Promise.all([
+        harvestJobService.finish(task, { status: 'cancelled' }),
+        logService.log(task.id, 'error', 'The task was cancelled'),
+      ]);
+    }).finally(() => exit('cancel', exitCode));
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('cancel', exitCode); }, 3000);
   };
 
   process.on('SIGTERM', exitHandler);
+
+  const harvestJobService = new HarvestJobService();
+  const sushiEndpointService = new SushiEndpointService();
+  const logService = new LogService();
 
   const { taskId } = job?.data || {};
 
@@ -831,7 +852,7 @@ module.exports = async function handle(job, lockToken) {
   let result;
 
   // Just a little delay to avoid spamming too fast when harvesting a single platform
-  await setTimeout(500);
+  await new Promise((resolve) => { setTimeout(resolve, 500); });
 
   try {
     result = await processJob(job, task);

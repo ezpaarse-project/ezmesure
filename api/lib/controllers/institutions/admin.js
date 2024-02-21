@@ -50,13 +50,16 @@ exports.validateInstitution = async (ctx) => {
 
   const wasValidated = institution.validated;
 
-  const updatedInstitution = await InstitutionsService.update({
+  const usersService = new UsersService();
+  const institutionsService = new InstitutionsService();
+
+  const updatedInstitution = await institutionsService.update({
     where: { id: institution.id },
     data: { validated },
   });
 
   if (!wasValidated && validated === true) {
-    let contacts = await UsersService.findMany({
+    let contacts = await usersService.findMany({
       where: {
         memberships: {
           some: {

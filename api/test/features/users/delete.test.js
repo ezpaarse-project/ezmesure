@@ -6,7 +6,7 @@ const { resetDatabase } = require('../../../lib/services/prisma/utils');
 const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 const usersElastic = require('../../../lib/services/elastic/users');
 
 const adminUsername = config.get('admin.username');
@@ -25,7 +25,7 @@ describe('[users]: Test delete users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     describe(`Delete user [${userTest.username}]`, () => {

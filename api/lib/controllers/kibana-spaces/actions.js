@@ -1,5 +1,5 @@
-const spacesService = require('../../entities/spaces.service');
-const spacePermissionsService = require('../../entities/space-permissions.service');
+const SpacesService = require('../../entities/spaces.service');
+const SpacePermissionsService = require('../../entities/space-permissions.service');
 const {
   upsertSchema: permissionUpsertSchema,
 } = require('../../entities/space-permissions.dto');
@@ -28,6 +28,8 @@ exports.getMany = async (ctx) => {
     };
   }
 
+  const spacesService = new SpacesService();
+
   ctx.type = 'json';
   ctx.body = await spacesService.findMany({ where });
 };
@@ -40,6 +42,8 @@ exports.getOne = async (ctx) => {
 
 exports.upsertOne = async (ctx) => {
   const { body } = ctx.request;
+
+  const spacesService = new SpacesService();
 
   let space;
 
@@ -70,6 +74,8 @@ exports.upsertOne = async (ctx) => {
 
 exports.createOne = async (ctx) => {
   const { body } = ctx.request;
+
+  const spacesService = new SpacesService();
 
   let space;
 
@@ -104,6 +110,8 @@ exports.updateOne = async (ctx) => {
   const { space } = ctx.state;
   const { body } = ctx.request;
 
+  const spacesService = new SpacesService();
+
   let updatedSushiCredentials;
 
   try {
@@ -129,6 +137,7 @@ exports.updateOne = async (ctx) => {
 exports.deleteOne = async (ctx) => {
   const { spaceId } = ctx.params;
 
+  const spacesService = new SpacesService();
   await spacesService.delete({ where: { id: spaceId } });
 
   ctx.status = 204;
@@ -158,7 +167,10 @@ exports.upsertPermission = async (ctx) => {
     },
   };
 
-  const updatedPermissions = await spacePermissionsService.upsert({
+  const spacePermissionsService = new SpacePermissionsService();
+
+  ctx.status = 200;
+  ctx.body = await spacePermissionsService.upsert({
     where: {
       username_spaceId: {
         username,
@@ -168,16 +180,16 @@ exports.upsertPermission = async (ctx) => {
     create: permissionData,
     update: permissionData,
   });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
 };
 
 exports.deletePermission = async (ctx) => {
   const { space } = ctx.state;
   const { username } = ctx.params;
 
-  const updatedPermissions = await spacePermissionsService.delete({
+  const spacePermissionsService = new SpacePermissionsService();
+
+  ctx.status = 200;
+  ctx.body = await spacePermissionsService.delete({
     where: {
       username_spaceId: {
         username,
@@ -185,7 +197,4 @@ exports.deletePermission = async (ctx) => {
       },
     },
   });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
 };

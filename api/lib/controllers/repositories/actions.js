@@ -1,4 +1,4 @@
-const repositoriesService = require('../../entities/repositories.service');
+const RepositoriesService = require('../../entities/repositories.service');
 const { includableFields } = require('../../entities/repositories.dto');
 
 const {
@@ -43,6 +43,8 @@ exports.getMany = async (ctx) => {
     };
   }
 
+  const repositoriesService = new RepositoriesService();
+
   ctx.type = 'json';
   ctx.body = await repositoriesService.findMany({
     take: Number.isInteger(size) && size >= 0 ? size : undefined,
@@ -78,6 +80,8 @@ exports.createOne = async (ctx) => {
     configUpsert.update.institutions = { connect: { id: body?.institutionId } };
   }
 
+  const repositoriesService = new RepositoriesService();
+
   try {
     repository = await repositoriesService.upsert({
       where: { pattern: body.pattern },
@@ -108,6 +112,8 @@ exports.updateOne = async (ctx) => {
 
   let updatedRepository;
 
+  const repositoriesService = new RepositoriesService();
+
   try {
     updatedRepository = await repositoriesService.update({
       where: {
@@ -134,6 +140,8 @@ exports.updateOne = async (ctx) => {
 
 exports.deleteOne = async (ctx) => {
   const { pattern } = ctx.params;
+
+  const repositoriesService = new RepositoriesService();
 
   await repositoriesService.delete({
     where: { pattern },

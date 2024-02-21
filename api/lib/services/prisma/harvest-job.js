@@ -2,6 +2,7 @@
 const { client: prisma, Prisma } = require('./index');
 
 /* eslint-disable max-len */
+/** @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpdateArgs} HarvestJobUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobUpsertArgs} HarvestJobUpsertArgs */
@@ -10,85 +11,95 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindUniqueArgs} HarvestJobFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindFirstArgs} HarvestJobFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobFindManyArgs} HarvestJobFindManyArgs */
-/** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobGroupByArgs} HarvestJobGroupByArgs */
-/** @typedef {import('@prisma/client').Prisma.GetHarvestJobGroupByPayload<{ by: keyof HarvestJob }>} GetHarvestJobGroupByPayload */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobAggregateArgs} HarvestJobAggregateArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobCountArgs} HarvestJobCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestJobCreateArgs} HarvestJobCreateArgs */
 /* eslint-enable max-len */
 
 /**
  * @param {HarvestJobCreateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob>}
  */
-function create(params) {
-  return prisma.harvestJob.create(params);
+function create(params, tx = prisma) {
+  return tx.harvestJob.create(params);
 }
 
 /**
  * @param {HarvestJobFindManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob[]>}
  */
-function findMany(params) {
-  return prisma.harvestJob.findMany(params);
+function findMany(params, tx = prisma) {
+  return tx.harvestJob.findMany(params);
 }
 
 /**
  * @param {HarvestJobFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob | null>}
  */
-function findUnique(params) {
-  return prisma.harvestJob.findUnique(params);
+function findUnique(params, tx = prisma) {
+  return tx.harvestJob.findUnique(params);
 }
 
 /**
  * @param {HarvestJobFindFirstArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob | null>}
  */
-function findFirst(params) {
-  return prisma.harvestJob.findFirst(params);
-}
-
-/**
- * @param {HarvestJobCountArgs} params
- * @returns {Promise<number>}
- */
-function count(params) {
-  return prisma.harvestJob.count(params);
+function findFirst(params, tx = prisma) {
+  return tx.harvestJob.findFirst(params);
 }
 
 /**
  * @param {HarvestJobGroupByArgs} params
- * @returns {Promise<GetHarvestJobGroupByPayload>}
+ * @param {TransactionClient} [tx]
+ * @returns
  */
-function groupBy(params) {
-  return prisma.harvestJob.groupBy(params);
+function groupBy(params, tx = prisma) {
+  // @ts-ignore
+  return tx.harvestJob.groupBy(params);
+}
+
+/**
+ * @param {HarvestJobCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.harvestJob.count(params);
 }
 
 /**
  * @param {HarvestJobUpdateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob>}
  */
-function update(params) {
-  return prisma.harvestJob.update(params);
+function update(params, tx = prisma) {
+  return tx.harvestJob.update(params);
 }
 
 /**
  * @param {HarvestJobUpsertArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob>}
  */
-function upsert(params) {
-  return prisma.harvestJob.upsert(params);
+function upsert(params, tx = prisma) {
+  return tx.harvestJob.upsert(params);
 }
 
 /**
  * @param {HarvestJobDeleteArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<HarvestJob | null>}
  */
-async function remove(params) {
+async function remove(params, tx = prisma) {
   let job;
 
   try {
-    job = await prisma.harvestJob.delete(params);
+    job = await tx.harvestJob.delete(params);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       return null;
@@ -101,10 +112,11 @@ async function remove(params) {
 
 /**
  * @param {HarvestJobDeleteManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<{ count: number }>}
  */
-function removeMany(params) {
-  return prisma.harvestJob.deleteMany(params);
+function removeMany(params, tx = prisma) {
+  return tx.harvestJob.deleteMany(params);
 }
 
 /**
@@ -144,8 +156,8 @@ module.exports = {
   findMany,
   findUnique,
   findFirst,
-  count,
   groupBy,
+  count,
   update,
   upsert,
   remove,

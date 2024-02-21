@@ -1,4 +1,4 @@
-const harvestsService = require('../../entities/harvest.service');
+const HarvestsService = require('../../entities/harvest.service');
 
 /**
   * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
@@ -29,9 +29,9 @@ exports.getHarvests = async (ctx) => {
     options.where.period = { gte: from, lte: to };
   }
 
-  const harvests = await harvestsService.findMany(options);
+  const harvestsService = new HarvestsService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = harvests;
+  ctx.body = await harvestsService.findMany(options);
 };
