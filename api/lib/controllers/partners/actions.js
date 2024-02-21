@@ -44,7 +44,7 @@ const institutionHasReport = async (institutionId) => {
 };
 
 exports.list = async (ctx) => {
-  const institutionService = new InstitutionService(ctx);
+  const institutionService = new InstitutionService();
   const partners = await institutionService.findMany({
     where: {
       validated: true,
