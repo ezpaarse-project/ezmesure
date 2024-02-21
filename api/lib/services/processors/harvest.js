@@ -774,19 +774,15 @@ module.exports = async function handle(job, lockToken) {
 
     if (!task) { exit('timeout', 1); }
 
-    HarvestJobService.$transaction((harvestJobService) => {
+    HarvestJobService.$transaction(async (harvestJobService) => {
       const logService = LogService.$transaction(harvestJobService);
 
       // Try to gracefully fail
-      try {
-        Promise.all([
-          harvestJobService.finish(task, { status: 'failed' }),
-          logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
-        ]);
-      } finally {
-        exit('timeout', 1);
-      }
-    });
+      await Promise.all([
+        harvestJobService.finish(task, { status: 'failed' }),
+        logService.log(task.id, 'error', `Timeout of ${jobTimeout}s exceeded`),
+      ]);
+    }).finally(() => exit('timeout', 1));
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('timeout', 1); }, 3000);
@@ -799,15 +795,11 @@ module.exports = async function handle(job, lockToken) {
     HarvestJobService.$transaction(async (harvestJobService) => {
       const logService = new LogService(harvestJobService);
 
-      try {
-        Promise.all([
-          harvestJobService.finish(task, { status: 'cancelled' }),
-          logService.log(task.id, 'error', 'The task was cancelled'),
-        ]);
-      } finally {
-        exit('cancel', exitCode);
-      }
-    });
+      await Promise.all([
+        harvestJobService.finish(task, { status: 'cancelled' }),
+        logService.log(task.id, 'error', 'The task was cancelled'),
+      ]);
+    }).finally(() => exit('cancel', exitCode));
 
     // Kill process if it's taking too long to gracefully stop
     setTimeout(() => { exit('cancel', exitCode); }, 3000);

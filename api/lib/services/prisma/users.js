@@ -126,7 +126,6 @@ function acceptTerms(username, tx = prisma) {
 
 /**
  * @param {UserUpsertArgs} params
-spacePermissions
  * @param {TransactionClient} [tx]
  * @returns {Promise<User>}
  */
