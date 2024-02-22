@@ -383,6 +383,147 @@
           </v-select>
         </v-col>
       </v-row>
+
+      <template v-if="possibleFiltersSet.has('sushiCredentials')">
+        <v-row class="px-0 mt-8">
+          <v-col style="position: relative;">
+            <v-label class="slider-label slider-label-withicon">
+              {{ $t('institutions.sushi.connectionSuccessful') }}
+            </v-label>
+
+            <v-range-slider
+              :value="credsSuccessRange"
+              :min="0"
+              :max="maxCredentialsStatusCounts.success"
+              color="success"
+              hide-details
+              thumb-label
+              @end="credsSuccessRange = $event"
+            >
+              <template #prepend>
+                <v-icon class="mr-2">
+                  mdi-key
+                </v-icon>
+                <v-text-field
+                  :value="credsSuccessRange[0]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsSuccessRange = [+$event, credsSuccessRange[1]]"
+                />
+              </template>
+
+              <template #append>
+                <v-text-field
+                  :value="credsSuccessRange[1]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsSuccessRange = [credsSuccessRange[0], +$event]"
+                />
+              </template>
+            </v-range-slider>
+          </v-col>
+        </v-row>
+        <v-row class="px-0 mt-8">
+          <v-col style="position: relative;">
+            <v-label class="slider-label slider-label-withicon">
+              {{ $t('institutions.sushi.connectionFailed') }}
+            </v-label>
+
+            <v-range-slider
+              :value="credsUnauthorizedRange"
+              :min="0"
+              :max="maxCredentialsStatusCounts.unauthorized"
+              color="warning"
+              hide-details
+              thumb-label
+              @end="credsUnauthorizedRange = $event"
+            >
+              <template #prepend>
+                <v-icon class="mr-2">
+                  mdi-key-alert
+                </v-icon>
+                <v-text-field
+                  :value="credsUnauthorizedRange[0]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsUnauthorizedRange = [+$event, credsUnauthorizedRange[1]]"
+                />
+              </template>
+
+              <template #append>
+                <v-text-field
+                  :value="credsUnauthorizedRange[1]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsUnauthorizedRange = [credsUnauthorizedRange[0], +$event]"
+                />
+              </template>
+            </v-range-slider>
+          </v-col>
+        </v-row>
+        <v-row class="px-0 mt-8">
+          <v-col style="position: relative;">
+            <v-label class="slider-label slider-label-withicon">
+              {{ $t('institutions.sushi.connectionUnauthorized') }}
+            </v-label>
+
+            <v-range-slider
+              :value="credsFailedRange"
+              :min="0"
+              :max="maxCredentialsStatusCounts.failed"
+              color="error"
+              hide-details
+              thumb-label
+              @end="credsFailedRange = $event"
+            >
+              <template #prepend>
+                <v-icon class="mr-2">
+                  mdi-key-remove
+                </v-icon>
+                <v-text-field
+                  :value="credsFailedRange[0]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsFailedRange = [+$event, credsFailedRange[1]]"
+                />
+              </template>
+
+              <template #append>
+                <v-text-field
+                  :value="credsFailedRange[1]"
+                  :min="0"
+                  class="mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="credsFailedRange = [credsFailedRange[0], +$event]"
+                />
+              </template>
+            </v-range-slider>
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -421,6 +562,14 @@ export default {
     maxSpacesCount: {
       type: Number,
       default: 0,
+    },
+    maxCredentialsStatusCounts: {
+      type: Object,
+      default: () => ({
+        success: 0,
+        unauthorized: 0,
+        failed: 0,
+      }),
     },
   },
   emits: ['input', 'update:show'],
@@ -509,6 +658,52 @@ export default {
       },
       set(val) {
         this.onFilterUpdate('spaces', { value: val.length > 0 ? val : undefined });
+      },
+    },
+
+    credsSuccessRange: {
+      get() {
+        return this.partialToRange(
+          this.value.credsSuccessRange?.value,
+          this.maxCredentialsStatusCounts.success,
+        );
+      },
+      set(val) {
+        this.updateRangeWithPartial(
+          'credsSuccessRange',
+          val,
+          this.maxCredentialsStatusCounts.success,
+        );
+      },
+    },
+    credsUnauthorizedRange: {
+      get() {
+        return this.partialToRange(
+          this.value.credsUnauthorizedRange?.value,
+          this.maxCredentialsStatusCounts.unauthorized,
+        );
+      },
+      set(val) {
+        this.updateRangeWithPartial(
+          'credsUnauthorizedRange',
+          val,
+          this.maxCredentialsStatusCounts.unauthorized,
+        );
+      },
+    },
+    credsFailedRange: {
+      get() {
+        return this.partialToRange(
+          this.value.credsFailedRange?.value,
+          this.maxCredentialsStatusCounts.failed,
+        );
+      },
+      set(val) {
+        this.updateRangeWithPartial(
+          'credsFailedRange',
+          val,
+          this.maxCredentialsStatusCounts.failed,
+        );
       },
     },
   },
