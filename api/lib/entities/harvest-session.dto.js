@@ -45,6 +45,8 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'jobs',
+  'credentials',
+  'institutions',
 ];
 
 /**
