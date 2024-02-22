@@ -80,7 +80,8 @@
                 <template v-else>
                   <v-menu
                     :disabled="!item.status.metrics"
-                    nudge-bottom="5"
+                    transition="slide-y-transition"
+                    nudge-bottom="2"
                     open-on-hover
                     bottom
                     offset-y
