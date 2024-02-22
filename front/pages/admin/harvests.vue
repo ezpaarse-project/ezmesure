@@ -78,7 +78,13 @@
                   </v-chip>
                 </div>
                 <template v-else>
-                  <v-tooltip :disabled="!item.status.metrics" bottom>
+                  <v-menu
+                    :disabled="!item.status.metrics"
+                    nudge-bottom="5"
+                    open-on-hover
+                    bottom
+                    offset-y
+                  >
                     <template #activator="{ attrs, on }">
                       <div style="flex: 1;" v-bind="attrs" v-on="on">
                         <ProgressLinearStack
@@ -88,7 +94,7 @@
                       </div>
                     </template>
 
-                    <v-simple-table dark class="px-4 py-1">
+                    <v-simple-table>
                       <template #default>
                         <tbody>
                           <template
@@ -98,14 +104,23 @@
                               v-if="count > 0"
                               :key="name"
                             >
-                              <td>{{ $t(`harvest.sessions.metrics.${name}`) }}</td>
+                              <td>
+                                <v-icon
+                                  v-if="statusIcons[name]"
+                                  :color="statusIcons[name].color"
+                                  class="mr-2"
+                                >
+                                  {{ statusIcons[name].icon }}
+                                </v-icon>
+                                {{ $t(`harvest.sessions.metrics.${name}`) }}
+                              </td>
                               <td>{{ count }}</td>
                             </tr>
                           </template>
                         </tbody>
                       </template>
                     </v-simple-table>
-                  </v-tooltip>
+                  </v-menu>
 
                   <v-progress-circular
                     v-if="item.status.isActive"
@@ -158,6 +173,14 @@ export default defineComponent({
 
     tables: {},
     openedTooltips: {},
+
+    statusIcons: {
+      success: { icon: 'mdi-check', color: 'green' },
+      failed: { icon: 'mdi-alert-circle-outline', color: 'red' },
+      active: { icon: 'mdi-play', color: 'blue' },
+      delayed: { icon: 'mdi-update', color: 'blue' },
+      pending: { icon: 'mdi-clock-outline' },
+    },
   }),
   computed: {
     sessionItems() {
@@ -345,9 +368,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.v-tooltip__content {
-  padding: 0;
-}
-</style>
