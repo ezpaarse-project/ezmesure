@@ -57,470 +57,165 @@
         </v-col>
 
         <v-col v-if="possibleFiltersSet.has('status')">
-          <v-input
-            prepend-icon="mdi-check-all"
-            hide-details
-            style="padding-top: 12px; margin-top: 4px;"
-          >
-            <v-label class="button-group-label">
-              {{ $t('institutions.institution.status') }}
-            </v-label>
-
-            <v-btn-toggle
-              :value="value.validated?.value"
-              dense
-              rounded
-              color="primary"
-              @change="onFilterUpdate('validated', {value: $event})"
-            >
-              <v-btn :value="true" small outlined>
-                {{ $t('institutions.institution.validated') }}
-              </v-btn>
-
-              <v-btn :value="false" small outlined>
-                {{ $t('institutions.institution.notValidated') }}
-              </v-btn>
-            </v-btn-toggle>
-          </v-input>
+          <BooleanFilter
+            :value="value.validated?.value"
+            :label="$t('institutions.institution.status')"
+            :true-text="$t('institutions.institution.validated')"
+            :false-text="$t('institutions.institution.notValidated')"
+            @input="onFilterUpdate('validated', { value: $event })"
+          />
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('memberships')" class="px-0 mt-8">
         <v-col style="position: relative;">
-          <v-label class="slider-label slider-label-withicon">
-            {{ $t('institutions.institution.members') }}
-          </v-label>
-
-          <v-range-slider
-            :value="membershipsRange"
-            :min="0"
+          <RangeFilter
+            :value="value.membershipsRange?.value"
+            :label="$t('institutions.institution.members')"
             :max="maxMembershipsCount"
-            hide-details
-            thumb-label
-            @end="membershipsRange = $event"
-          >
-            <template #prepend>
-              <v-icon class="mr-2">
-                mdi-account-multiple
-              </v-icon>
-
-              <v-text-field
-                :value="membershipsRange[0]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="membershipsRange = [+$event, membershipsRange[1]]"
-              />
-            </template>
-
-            <template #append>
-              <v-text-field
-                :value="membershipsRange[1]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="membershipsRange = [membershipsRange[0], +$event]"
-              />
-            </template>
-          </v-range-slider>
+            icon="mdi-account-multiple"
+            @input="onFilterUpdate('membershipsRange', { value: $event })"
+          />
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
-          <v-select
-            :value="contactServices"
+          <SelectFilter
+            :value="value.contacts?.value"
             :items="contactItems"
             :label="$t('institutions.members.roles')"
-            prepend-icon="mdi-tag"
+            icon="mdi-tag"
             multiple
-            hide-details
-            @change="contactServices = $event"
+            @input="onFilterUpdate('contacts', { value: $event})"
           >
             <template #append-outer>
-              <v-tooltip top>
-                <template #activator="{attrs, on}">
-                  <v-btn
-                    icon
-                    v-bind="attrs"
-                    @click="onFilterUpdate('contacts', { exclusive: !value.contacts.exclusive })"
-                    v-on="on"
-                  >
-                    {{ value.contacts.exclusive ? '1' : '1..n' }}
-                  </v-btn>
-                </template>
-
-                {{
-                  $t(
-                    value.contacts.exclusive
-                      ? 'institutions.filters.exclusiveHint'
-                      : 'institutions.filters.inclusiveHint'
-                  )
-                }}
-              </v-tooltip>
+              <ExclusiveBtnFilter
+                :value="value.contacts?.exclusive"
+                :exclusive-hint="$t('institutions.filters.exclusiveHint')"
+                :inclusive-hint="$t('institutions.filters.inclusiveHint')"
+                @input="onFilterUpdate('contacts', { exclusive: $event })"
+              />
             </template>
-          </v-select>
+          </SelectFilter>
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('childInstitutions')" class="px-0 mt-8">
         <v-col style="position: relative;">
-          <v-label class="slider-label slider-label-withicon">
-            {{ $t('components.components') }}
-          </v-label>
-
-          <v-range-slider
-            :value="childInstitutionsRange"
-            :min="0"
+          <RangeFilter
+            :value="value.childInstitutionsRange?.value"
+            :label="$t('components.components')"
             :max="maxChildInstitutionsCount"
-            hide-details
-            thumb-label
-            @end="childInstitutionsRange = $event"
-          >
-            <template #prepend>
-              <v-icon class="mr-2">
-                mdi-family-tree
-              </v-icon>
-              <v-text-field
-                :value="childInstitutionsRange[0]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="childInstitutionsRange = [+$event, childInstitutionsRange[1]]"
-              />
-            </template>
-
-            <template #append>
-              <v-text-field
-                :value="childInstitutionsRange[1]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="childInstitutionsRange = [childInstitutionsRange[0], +$event]"
-              />
-            </template>
-          </v-range-slider>
+            icon="mdi-family-tree"
+            @input="onFilterUpdate('childInstitutionsRange', { value: $event })"
+          />
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('repositories')" class="px-0 mt-8">
         <v-col style="position: relative;">
-          <v-label class="slider-label slider-label-withicon">
-            {{ $t('repositories.repositories') }}
-          </v-label>
-
-          <v-range-slider
-            :value="repositoriesRange"
-            :min="0"
+          <RangeFilter
+            :value="value.repositoriesRange?.value"
+            :label="$t('repositories.repositories')"
             :max="maxRepositoriesCount"
-            hide-details
-            thumb-label
-            @end="repositoriesRange = $event"
-          >
-            <template #prepend>
-              <v-icon class="mr-2">
-                mdi-tray-arrow-down
-              </v-icon>
-              <v-text-field
-                :value="repositoriesRange[0]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="repositoriesRange = [+$event, repositoriesRange[1]]"
-              />
-            </template>
-
-            <template #append>
-              <v-text-field
-                :value="repositoriesRange[1]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="repositoriesRange = [repositoriesRange[0], +$event]"
-              />
-            </template>
-          </v-range-slider>
+            icon="mdi-database-outline"
+            @input="onFilterUpdate('repositoriesRange', { value: $event })"
+          />
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
-          <v-select
-            :value="repositoriesServices"
+          <SelectFilter
+            :value="value.repositories?.value"
             :items="repositoryItems"
             :label="$t('repositories.repositories')"
-            prepend-icon="mdi-tray-arrow-down"
+            icon="mdi-database-outline"
             multiple
-            hide-details
-            @change="repositoriesServices = $event"
+            @input="onFilterUpdate('repositories', { value: $event})"
           >
             <template #append-outer>
-              <v-tooltip top>
-                <template #activator="{attrs, on}">
-                  <v-btn
-                    icon
-                    v-bind="attrs"
-                    @click="onFilterUpdate(
-                      'repositories',
-                      { exclusive: !value.repositories.exclusive }
-                    )"
-                    v-on="on"
-                  >
-                    {{ value.repositories.exclusive ? '1' : '1..n' }}
-                  </v-btn>
-                </template>
-
-                {{
-                  $t(
-                    value.repositories.exclusive
-                      ? 'institutions.filters.exclusiveHint'
-                      : 'institutions.filters.inclusiveHint'
-                  )
-                }}
-              </v-tooltip>
+              <ExclusiveBtnFilter
+                :value="value.repositories?.exclusive"
+                :exclusive-hint="$t('institutions.filters.exclusiveHint')"
+                :inclusive-hint="$t('institutions.filters.inclusiveHint')"
+                @input="onFilterUpdate('repositories', { exclusive: $event })"
+              />
             </template>
-          </v-select>
+          </SelectFilter>
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('spaces')" class="px-0 mt-8">
         <v-col style="position: relative;">
-          <v-label class="slider-label slider-label-withicon">
-            {{ $t('spaces.spaces') }}
-          </v-label>
-
-          <v-range-slider
-            :value="spacesRange"
-            :min="0"
+          <RangeFilter
+            :value="value.spacesRange?.value"
+            :label="$t('spaces.spaces')"
             :max="maxSpacesCount"
-            hide-details
-            thumb-label
-            @end="spacesRange = $event"
-          >
-            <template #prepend>
-              <v-icon class="mr-2">
-                mdi-tab
-              </v-icon>
-              <v-text-field
-                :value="spacesRange[0]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="spacesRange = [+$event, spacesRange[1]]"
-              />
-            </template>
-
-            <template #append>
-              <v-text-field
-                :value="spacesRange[1]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="spacesRange = [spacesRange[0], +$event]"
-              />
-            </template>
-          </v-range-slider>
+            icon="mdi-tab"
+            @input="onFilterUpdate('spacesRange', { value: $event })"
+          />
         </v-col>
       </v-row>
 
       <v-row v-if="possibleFiltersSet.has('monitor')" class="mt-0">
         <v-col class="pt-0">
-          <v-select
-            :value="spacesServices"
+          <SelectFilter
+            :value="value.spaces?.value"
             :items="spaceItems"
             :label="$t('spaces.spaces')"
-            prepend-icon="mdi-tab"
+            icon="mdi-tab"
             multiple
-            hide-details
-            @change="spacesServices = $event"
+            @input="onFilterUpdate('spaces', { value: $event})"
           >
             <template #append-outer>
-              <v-tooltip top>
-                <template #activator="{attrs, on}">
-                  <v-btn
-                    icon
-                    v-bind="attrs"
-                    @click="onFilterUpdate('spaces', { exclusive: !value.spaces.exclusive })"
-                    v-on="on"
-                  >
-                    {{ value.spaces.exclusive ? '1' : '1..n' }}
-                  </v-btn>
-                </template>
-
-                {{
-                  $t(
-                    value.spaces.exclusive
-                      ? 'institutions.filters.exclusiveHint'
-                      : 'institutions.filters.inclusiveHint'
-                  )
-                }}
-              </v-tooltip>
+              <ExclusiveBtnFilter
+                :value="value.spaces?.exclusive"
+                :exclusive-hint="$t('institutions.filters.exclusiveHint')"
+                :inclusive-hint="$t('institutions.filters.inclusiveHint')"
+                @input="onFilterUpdate('spaces', { exclusive: $event })"
+              />
             </template>
-          </v-select>
+          </SelectFilter>
         </v-col>
       </v-row>
 
       <template v-if="possibleFiltersSet.has('sushiCredentials')">
         <v-row class="px-0 mt-8">
           <v-col style="position: relative;">
-            <v-label class="slider-label slider-label-withicon">
-              {{ $t('institutions.sushi.connectionSuccessful') }}
-            </v-label>
-
-            <v-range-slider
-              :value="credsSuccessRange"
-              :min="0"
+            <RangeFilter
+              :value="value.credsSuccessRange?.value"
+              :label="$t('institutions.sushi.connectionSuccessful')"
               :max="maxCredentialsStatusCounts.success"
+              icon="mdi-key"
               color="success"
-              hide-details
-              thumb-label
-              @end="credsSuccessRange = $event"
-            >
-              <template #prepend>
-                <v-icon class="mr-2">
-                  mdi-key
-                </v-icon>
-                <v-text-field
-                  :value="credsSuccessRange[0]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsSuccessRange = [+$event, credsSuccessRange[1]]"
-                />
-              </template>
-
-              <template #append>
-                <v-text-field
-                  :value="credsSuccessRange[1]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsSuccessRange = [credsSuccessRange[0], +$event]"
-                />
-              </template>
-            </v-range-slider>
+              @input="onFilterUpdate('credsSuccessRange', { value: $event })"
+            />
           </v-col>
         </v-row>
-        <v-row class="px-0 mt-8">
+        <v-row class="px-0">
           <v-col style="position: relative;">
-            <v-label class="slider-label slider-label-withicon">
-              {{ $t('institutions.sushi.connectionFailed') }}
-            </v-label>
-
-            <v-range-slider
-              :value="credsUnauthorizedRange"
-              :min="0"
+            <RangeFilter
+              :value="value.credsUnauthorizedRange?.value"
+              :label="$t('institutions.sushi.connectionUnauthorized')"
               :max="maxCredentialsStatusCounts.unauthorized"
+              icon="mdi-key-alert"
               color="warning"
-              hide-details
-              thumb-label
-              @end="credsUnauthorizedRange = $event"
-            >
-              <template #prepend>
-                <v-icon class="mr-2">
-                  mdi-key-alert
-                </v-icon>
-                <v-text-field
-                  :value="credsUnauthorizedRange[0]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsUnauthorizedRange = [+$event, credsUnauthorizedRange[1]]"
-                />
-              </template>
-
-              <template #append>
-                <v-text-field
-                  :value="credsUnauthorizedRange[1]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsUnauthorizedRange = [credsUnauthorizedRange[0], +$event]"
-                />
-              </template>
-            </v-range-slider>
+              @input="onFilterUpdate('credsUnauthorizedRange', { value: $event })"
+            />
           </v-col>
         </v-row>
-        <v-row class="px-0 mt-8">
+        <v-row class="px-0">
           <v-col style="position: relative;">
-            <v-label class="slider-label slider-label-withicon">
-              {{ $t('institutions.sushi.connectionUnauthorized') }}
-            </v-label>
-
-            <v-range-slider
-              :value="credsFailedRange"
-              :min="0"
+            <RangeFilter
+              :value="value.credsFailedRange?.value"
+              :label="$t('institutions.sushi.connectionFailed')"
               :max="maxCredentialsStatusCounts.failed"
+              icon="mdi-key-remove"
               color="error"
-              hide-details
-              thumb-label
-              @end="credsFailedRange = $event"
-            >
-              <template #prepend>
-                <v-icon class="mr-2">
-                  mdi-key-remove
-                </v-icon>
-                <v-text-field
-                  :value="credsFailedRange[0]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsFailedRange = [+$event, credsFailedRange[1]]"
-                />
-              </template>
-
-              <template #append>
-                <v-text-field
-                  :value="credsFailedRange[1]"
-                  :min="0"
-                  class="mt-0 pt-0"
-                  hide-details
-                  single-line
-                  type="number"
-                  style="width: 60px"
-                  @change="credsFailedRange = [credsFailedRange[0], +$event]"
-                />
-              </template>
-            </v-range-slider>
+              @input="onFilterUpdate('credsFailedRange', { value: $event })"
+            />
           </v-col>
         </v-row>
       </template>
@@ -529,7 +224,18 @@
 </template>
 
 <script>
+import SelectFilter from '../filters-form/SelectFilter.vue';
+import ExclusiveBtnFilter from '../filters-form/ExclusiveBtnFilter.vue';
+import RangeFilter from '../filters-form/RangeFilter.vue';
+import BooleanFilter from '../filters-form/BooleanFilter.vue';
+
 export default {
+  components: {
+    SelectFilter,
+    ExclusiveBtnFilter,
+    RangeFilter,
+    BooleanFilter,
+  },
   props: {
     value: {
       type: Object,
@@ -588,158 +294,18 @@ export default {
       return new Set(this.selectedTableHeaders);
     },
 
-    membershipsRange: {
-      get() {
-        return this.partialToRange(this.value.membershipsRange?.value, this.maxMembershipsCount);
-      },
-      set(val) {
-        this.updateRangeWithPartial('membershipsRange', val, this.maxMembershipsCount);
-      },
-    },
-
     contactItems() {
-      const isDisabled = this.contactServices.includes('contact:') ?? false;
+      const contactServices = this.value.contacts?.value ?? [];
+      const isDisabled = contactServices.includes('contact:') ?? false;
 
       return [
-        { value: 'contact:', text: this.$t('institutions.members.noCorrespondent'), disabled: !isDisabled && this.contactServices.length > 0 },
+        { value: 'contact:', text: this.$t('institutions.members.noCorrespondent'), disabled: !isDisabled && contactServices.length > 0 },
         { value: 'contact:tech', text: this.$t('institutions.members.technicalCorrespondent'), disabled: isDisabled },
         { value: 'contact:doc', text: this.$t('institutions.members.documentaryCorrespondent'), disabled: isDisabled },
       ];
     },
-    contactServices: {
-      get() {
-        return this.value.contacts?.value ?? [];
-      },
-      set(val) {
-        this.onFilterUpdate('contacts', { value: val.length > 0 ? val : undefined });
-      },
-    },
-
-    childInstitutionsRange: {
-      get() {
-        return this.partialToRange(
-          this.value.childInstitutionsRange?.value,
-          this.maxChildInstitutionsCount,
-        );
-      },
-      set(val) {
-        this.updateRangeWithPartial('childInstitutionsRange', val, this.maxChildInstitutionsCount);
-      },
-    },
-
-    repositoriesRange: {
-      get() {
-        return this.partialToRange(this.value.repositoriesRange?.value, this.maxRepositoriesCount);
-      },
-      set(val) {
-        this.updateRangeWithPartial('repositoriesRange', val, this.maxRepositoriesCount);
-      },
-    },
-    repositoriesServices: {
-      get() {
-        return this.value.repositories?.value ?? [];
-      },
-      set(val) {
-        this.onFilterUpdate('repositories', { value: val.length > 0 ? val : undefined });
-      },
-    },
-
-    spacesRange: {
-      get() {
-        return this.partialToRange(this.value.spacesRange?.value, this.maxSpacesCount);
-      },
-      set(val) {
-        this.updateRangeWithPartial('spacesRange', val, this.maxSpacesCount);
-      },
-    },
-    spacesServices: {
-      get() {
-        return this.value.spaces?.value ?? [];
-      },
-      set(val) {
-        this.onFilterUpdate('spaces', { value: val.length > 0 ? val : undefined });
-      },
-    },
-
-    credsSuccessRange: {
-      get() {
-        return this.partialToRange(
-          this.value.credsSuccessRange?.value,
-          this.maxCredentialsStatusCounts.success,
-        );
-      },
-      set(val) {
-        this.updateRangeWithPartial(
-          'credsSuccessRange',
-          val,
-          this.maxCredentialsStatusCounts.success,
-        );
-      },
-    },
-    credsUnauthorizedRange: {
-      get() {
-        return this.partialToRange(
-          this.value.credsUnauthorizedRange?.value,
-          this.maxCredentialsStatusCounts.unauthorized,
-        );
-      },
-      set(val) {
-        this.updateRangeWithPartial(
-          'credsUnauthorizedRange',
-          val,
-          this.maxCredentialsStatusCounts.unauthorized,
-        );
-      },
-    },
-    credsFailedRange: {
-      get() {
-        return this.partialToRange(
-          this.value.credsFailedRange?.value,
-          this.maxCredentialsStatusCounts.failed,
-        );
-      },
-      set(val) {
-        this.updateRangeWithPartial(
-          'credsFailedRange',
-          val,
-          this.maxCredentialsStatusCounts.failed,
-        );
-      },
-    },
   },
   methods: {
-    /**
-     * Transform a partial range into a full one
-     *
-     * @param {[number | undefined, number | undefined] | undefined} val The partial range
-     * @param {number} max The maximum value of the range
-     *
-     * @returns {[number, number]}
-     */
-    partialToRange(val, max) {
-      return [
-        val?.[0] ?? 0,
-        val?.[1] ?? max,
-      ];
-    },
-    /**
-     * Update a filter with a partial range
-     *
-     * @param {string} field The field
-     * @param {[number | undefined, number | undefined] | undefined} val The partial range
-     * @param {number} max The maximum value of the range
-     */
-    updateRangeWithPartial(field, val, max) {
-      if (
-        !val
-        || (val[0] === 0 && val[1] === max)
-      ) {
-        this.onFilterUpdate(field, { value: undefined });
-        return;
-      }
-
-      this.onFilterUpdate(field, { value: this.partialToRange(val, max) });
-    },
     /**
      * Update filter value and attributes
      *
