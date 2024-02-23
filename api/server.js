@@ -1,4 +1,4 @@
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'dev';
 
 const Koa = require('koa');
 const mount = require('koa-mount');
@@ -9,6 +9,7 @@ const { setTimeout } = require('timers/promises');
 const { STATUS_CODES } = require('http');
 
 const UsersService = require('./lib/entities/users.service');
+const LocalizedError = require('./lib/models/LocalizedError');
 
 const i18n = require('./lib/services/i18n');
 const metrics = require('./lib/services/metrics');
@@ -87,6 +88,9 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (error) {
+    if (error instanceof LocalizedError) {
+      error.message = ctx.$t(error.message, ...error.detail);
+    }
     ctx.status = error.status || 500;
 
     if (error?.name === 'ValidationError') {
@@ -100,9 +104,8 @@ app.use(async (ctx, next) => {
 
     if (ctx.headerSent || !ctx.writable) { return; }
 
-    if (env !== 'development') {
+    if (env !== 'dev') {
       let { message } = error;
-
       if (!error.expose) {
         message = STATUS_CODES[ctx.status] || STATUS_CODES[500];
       }
@@ -119,7 +122,8 @@ app.use(async (ctx, next) => {
     ctx.type = 'json';
     ctx.body = {
       status: ctx.status,
-      error: error.originalError?.message || error.message,
+      error: error.message,
+      originalError: error.originalError?.message,
       detail: error.detail,
       stack: error.stack,
       code: error.code,

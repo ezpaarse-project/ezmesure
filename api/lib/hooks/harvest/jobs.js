@@ -7,6 +7,7 @@ const { appLogger } = require('../../services/logger');
 const { SUSHI_CODES } = require('../../services/sushi');
 
 const HarvestService = require('../../entities/harvest.service');
+const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const queued = createQueue();
 
@@ -26,31 +27,36 @@ const HARVEST_FORMAT = 'yyyy-MM';
 const onHarvestJobUpdate = queued(async (harvestJob) => {
   const now = new Date();
 
-  /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
-  const harvestData = {
-    harvestedAt: now,
-    credentialsId: harvestJob.credentialsId,
-    period: harvestJob.beginDate,
-    reportId: harvestJob.reportType,
-    status: harvestJob.status,
-    insertedItems: harvestJob.result?.inserted || 0,
-    updatedItems: harvestJob.result?.updated || 0,
-    failedItems: harvestJob.result?.failed || 0,
-    errorCode: harvestJob.errorCode,
-    sushiExceptions: harvestJob.sushiExceptions,
-  };
+  await HarvestService.$transaction(async (harvestService) => {
+    const harvestSessionService = new HarvestSessionService(harvestService);
 
-  let coveredPeriods;
-  const periods = eachMonthOfInterval({
-    start: parse(harvestJob.beginDate, HARVEST_FORMAT, now),
-    end: parse(harvestJob.endDate, HARVEST_FORMAT, now),
-  });
-  if (harvestJob.result?.coveredPeriods) {
-    coveredPeriods = new Set(harvestJob.result.coveredPeriods);
-  }
+    const session = await harvestSessionService.findUnique({ where: { id: harvestJob.sessionId } });
+    if (!session) { throw new Error(`session ${harvestJob.sessionId} not found`); }
 
-  await HarvestService.$transaction(
-    (harvestService) => Promise.all(
+    /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
+    const harvestData = {
+      harvestedAt: now,
+      credentialsId: harvestJob.credentialsId,
+      period: session.beginDate,
+      reportId: harvestJob.reportType,
+      status: harvestJob.status,
+      insertedItems: harvestJob.result?.inserted || 0,
+      updatedItems: harvestJob.result?.updated || 0,
+      failedItems: harvestJob.result?.failed || 0,
+      errorCode: harvestJob.errorCode,
+      sushiExceptions: harvestJob.sushiExceptions,
+    };
+
+    let coveredPeriods;
+    const periods = eachMonthOfInterval({
+      start: parse(session.beginDate, HARVEST_FORMAT, now),
+      end: parse(session.endDate, HARVEST_FORMAT, now),
+    });
+    if (harvestJob.result?.coveredPeriods) {
+      coveredPeriods = new Set(harvestJob.result.coveredPeriods);
+    }
+
+    await Promise.all(
       periods.map(async (period) => {
         const periodStr = format(period, HARVEST_FORMAT);
         const harvestStateId = `${harvestJob.credentialsId}-${harvestJob.reportType}-${periodStr}`;
@@ -78,8 +84,8 @@ const onHarvestJobUpdate = queued(async (harvestJob) => {
           appLogger.error(`[harvest][hooks] Harvest state [${harvestStateId}] cannot be updated: ${error.message}`);
         }
       }),
-    ),
-  );
+    );
+  });
 });
 
 registerHook('harvest-job:create', onHarvestJobUpdate, { debounce: false });

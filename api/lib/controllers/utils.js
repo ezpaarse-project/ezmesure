@@ -5,7 +5,7 @@ const { merge } = require('lodash');
  *
  * @param {string[]} props
  * @param {(string[] | Set<string>)?} [includableFields]
- * @returns
+ * @returns {Record<string, any> | undefined}
  */
 const propsToPrismaInclude = (props, includableFields) => {
   if (!Array.isArray(props)) {
@@ -40,7 +40,7 @@ const propsToPrismaInclude = (props, includableFields) => {
  * @param {string} prop
  * @param {'asc'|'desc'} order
  * @param {(string[] | Set<string>)?} [sortableFields]
- * @returns
+ * @returns {Record<string, any> | undefined}
  */
 const propsToPrismaSort = (prop, order, sortableFields) => {
   if (!prop) {
@@ -64,7 +64,25 @@ const propsToPrismaSort = (prop, order, sortableFields) => {
   return { [parent]: value };
 };
 
+/**
+ * Transform a query to a filter
+ * @param {string | string[] | undefined | null} value Value of the query parameter
+ * @returns {{ in: string[] } | undefined} Prisma filter
+ */
+const queryToPrismaFilter = (value) => {
+  if (!value) {
+    return undefined;
+  }
+
+  let filter = value;
+  if (!Array.isArray(value)) {
+    filter = value.split(',').map((s) => s.trim());
+  }
+  return { in: filter };
+};
+
 module.exports = {
   propsToPrismaInclude,
   propsToPrismaSort,
+  queryToPrismaFilter,
 };

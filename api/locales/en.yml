@@ -15,6 +15,9 @@ errors:
     invalidDate: The date [%s] is invalid
     invalidPeriod: The period [from %s to %s] is invalid
     failedToUpdateSupportedReports: Failed to update the list of supported reports
+    sessionNotFound: The session [%s] does not exist
+    updateSessionAfterStart: Impossible to update the session [%s] once started
+    sessionAlreadyRunning: The session [%s] is already running
 
   queue:
     notFound: Queue not found

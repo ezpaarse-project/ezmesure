@@ -722,7 +722,7 @@
     "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
   },
   "harvest": {
-    "requests": {
+    "sessions": {
       "name": "Harvesting from {createdAt}",
       "metrics": {
         "success": "Success",
@@ -734,8 +734,11 @@
       "counts": {
         "institutions": "{n} institution|{n} institutions",
         "endpoints": "{n} endpoint|{n} endpoints",
-        "reportTypes": "{n} report type|{n} report types"
+        "reportTypes": "{n} report type|{n} report types",
+        "credentials": "{n} credentials"
       },
+      "credentialsTooltip": "{harvestable} credentials have been tested but {all} credentials have been requested",
+      "notStarted": "Not started",
       "unableToRetrive": "Unable to retrieve harvests"
     },
     "jobs": {
