@@ -21,6 +21,7 @@
       :loading="refreshing"
       :options.sync="iteratorOptions"
       :server-items-length="sessionsCount"
+      sort-desc
       item-key="id"
       @update:options="refreshHarvests"
     >
@@ -79,9 +80,8 @@
                 </div>
                 <template v-else>
                   <v-menu
-                    :disabled="!item.status.metrics"
+                    :disabled="!item.metrics"
                     transition="slide-y-transition"
-                    nudge-bottom="2"
                     open-on-hover
                     bottom
                     offset-y
@@ -99,7 +99,7 @@
                       <template #default>
                         <tbody>
                           <template
-                            v-for="([name, count]) in Object.entries(item.status.metrics ?? {})"
+                            v-for="([name, count]) in Object.entries(item.metrics ?? {})"
                           >
                             <tr
                               v-if="count > 0"
@@ -132,6 +132,10 @@
                   <div v-else style="width: 32px;" />
                 </template>
               </div>
+
+              <template v-if="item.data._count.jobs <= 0" #actions>
+                <div />
+              </template>
             </v-expansion-panel-header>
 
             <v-expansion-panel-content>
@@ -188,14 +192,17 @@ export default defineComponent({
       return this.sessions.map((item) => {
         const status = this.sessionStatuses[item.id];
 
+        const metrics = this.computeMetrics(item);
+
         return {
           data: item,
           status: status ?? {},
           // eslint-disable-next-line no-underscore-dangle
-          hasStarted: Object.keys(status?._count.jobStatuses ?? {}).length > 0,
+          hasStarted: item._count.jobs > 0,
 
+          metrics,
           counts: this.computeCounts(item),
-          bars: this.computeBars(item),
+          bars: this.computeBars(item, metrics),
 
           createdAtLocale: this.$dateFunctions.format(parseISO(item.createdAt), 'PPPpp'),
 
@@ -219,21 +226,11 @@ export default defineComponent({
             text: `${item.data.beginDate} ~ ${item.data.endDate}`,
           },
           {
-            key: `${item.data.id}-institutions`,
-            icon: 'mdi-domain',
-            text: this.$tc('harvest.sessions.counts.institutions', item.counts.institutions),
-          },
-          {
-            key: `${item.data.id}-endpoints`,
-            icon: 'mdi-web',
-            text: this.$tc('harvest.sessions.counts.endpoints', item.counts.endpoints),
-          },
-          {
             key: `${item.data.id}-credentials`,
             icon: 'mdi-key',
             text: this.$tc(
               'harvest.sessions.counts.credentials',
-              item.counts.credentials.harvestable || item.counts.credentials.total,
+              item.counts.credentials.harvestable || item.counts.credentials.all,
             ),
             tooltip: this.$t('harvest.sessions.credentialsTooltip', item.counts.credentials),
           },
@@ -256,7 +253,7 @@ export default defineComponent({
   methods: {
     computeMetrics(session) {
       // eslint-disable-next-line no-underscore-dangle
-      const { jobStatuses } = this.sessionStatuses[session.id]._count;
+      const { jobStatuses } = this.sessionStatuses[session.id]?._count ?? { jobStatuses: {} };
       return {
         pending: jobStatuses.waiting ?? 0,
         success: jobStatuses.finished ?? 0,
@@ -267,7 +264,7 @@ export default defineComponent({
           + (jobStatuses.cancelled ?? 0),
       };
     },
-    computeBars(session) {
+    computeBars(session, metrics) {
       const status = this.sessionStatuses[session.id];
       if (!status) {
         return [
@@ -279,8 +276,6 @@ export default defineComponent({
           },
         ];
       }
-
-      const metrics = this.computeMetrics(session);
 
       // eslint-disable-next-line no-underscore-dangle
       const getValue = (value) => (value / session._count.jobs);
@@ -319,25 +314,10 @@ export default defineComponent({
     computeCounts(session) {
       const status = this.sessionStatuses[session.id];
 
-      const institutionIds = new Set();
-      const endpointIds = new Set();
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const credential of session.credentials) {
-        institutionIds.add(credential.institutionId);
-        endpointIds.add(credential.endpointId);
-      }
-
       return {
-        institutions: institutionIds.size,
-        endpoints: endpointIds.size,
         reportTypes: session.reportTypes.length,
-        credentials: {
-          // eslint-disable-next-line no-underscore-dangle
-          harvestable: status?._count.harvestableCredentials,
-          // eslint-disable-next-line no-underscore-dangle
-          total: session._count.credentials,
-        },
+        // eslint-disable-next-line no-underscore-dangle
+        credentials: status?._count.credentials ?? {},
       };
     },
 
@@ -345,7 +325,6 @@ export default defineComponent({
       this.refreshing = true;
 
       const params = {
-        include: ['credentials'],
         page: this.iteratorOptions.page,
         size: this.iteratorOptions.itemsPerPage,
         sort: this.iteratorOptions.sortBy[0],
@@ -367,14 +346,17 @@ export default defineComponent({
       }
 
       try {
-        const statuses = await Promise.all(
-          this.sessions.map((session) => this.$axios.get(`/harvests-sessions/${session.id}/status`)),
+        const { data: statuses } = await this.$axios.get(
+          '/harvests-sessions/status',
+          { params: { harvestIds: this.sessions.map((session) => session.id) } },
         );
 
-        this.sessionStatuses = {
-          ...this.sessionStatuses,
-          ...Object.fromEntries(statuses.map(({ data: { id, ...status } }) => [id, status])),
-        };
+        const sessionStatuses = { ...this.sessionStatuses };
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { id, status } of Object.values(statuses)) {
+          sessionStatuses[id] = status;
+        }
+        this.sessionStatuses = statuses;
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('harvest.sessions.unableToRetrive'));
       }

@@ -16,6 +16,7 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
+  credentialsQuery: Joi.object().pattern(Joi.string(), Joi.any()),
   beginDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   endDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   reportTypes: Joi.array().items(Joi.string()),
@@ -26,10 +27,7 @@ const schema = {
   ignoreValidation: Joi.boolean().allow(null),
   params: Joi.object().pattern(Joi.string(), Joi.any()),
 
-  credentials: Joi.array().items(Joi.object()),
   jobs: Joi.array().items(Joi.object()),
-
-  institutions: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -45,17 +43,12 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'jobs',
-  'credentials',
-  'institutions',
 ];
 
 /**
  * Fields that can be populated with related items
  */
 const includableFields = [
-  'credentials',
-  'credentials.institution',
-  'credentials.endpoint',
   'jobs',
   'jobs.credentials',
   'jobs.credentials.institution',
@@ -68,7 +61,7 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['beginDate', 'endDate', 'reportTypes']),
+  requireFields(['credentialsQuery', 'beginDate', 'endDate', 'reportTypes']),
   withDefaults({
     timeout: 600,
     allowFaulty: false,

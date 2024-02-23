@@ -2,21 +2,9 @@ const { includableFields } = require('../../entities/harvest-job.dto');
 const HarvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
 
-const { propsToPrismaSort, propsToPrismaInclude } = require('../utils');
+const { propsToPrismaSort, propsToPrismaInclude, queryToPrismaFilter } = require('../utils');
 
 /** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
-
-const queryToPrisma = (value) => {
-  if (!value) {
-    return undefined;
-  }
-
-  let filter = value;
-  if (!Array.isArray(value)) {
-    filter = value.split(',').map((s) => s.trim());
-  }
-  return { in: filter };
-};
 
 exports.getAll = async (ctx) => {
   ctx.type = 'json';
@@ -41,18 +29,18 @@ exports.getAll = async (ctx) => {
 
   /** @type {HarvestJobWhereInput} */
   const where = {
-    id: queryToPrisma(taskIds),
-    status: queryToPrisma(status),
-    reportType: queryToPrisma(reportType),
-    sessionId: queryToPrisma(sessionId),
-    credentialsId: queryToPrisma(credentialsId),
+    id: queryToPrismaFilter(taskIds),
+    status: queryToPrismaFilter(status),
+    reportType: queryToPrismaFilter(reportType),
+    sessionId: queryToPrismaFilter(sessionId),
+    credentialsId: queryToPrismaFilter(credentialsId),
   };
 
   if (institutionId || endpointId || tags) {
     where.credentials = {
-      endpointId: queryToPrisma(endpointId),
-      institutionId: queryToPrisma(institutionId),
-      tags: tags && { hasSome: queryToPrisma(tags).in },
+      endpointId: queryToPrismaFilter(endpointId),
+      institutionId: queryToPrismaFilter(institutionId),
+      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
     };
   }
 
@@ -90,17 +78,17 @@ exports.getAllMeta = async (ctx) => {
 
   /** @type {HarvestJobWhereInput} */
   const where = {
-    status: queryToPrisma(status),
-    reportType: queryToPrisma(reportType),
-    sessionId: queryToPrisma(sessionId),
-    credentialsId: queryToPrisma(credentialsId),
+    status: queryToPrismaFilter(status),
+    reportType: queryToPrismaFilter(reportType),
+    sessionId: queryToPrismaFilter(sessionId),
+    credentialsId: queryToPrismaFilter(credentialsId),
   };
 
   if (institutionId || endpointId || tags) {
     where.credentials = {
-      endpointId: queryToPrisma(endpointId),
-      institutionId: queryToPrisma(institutionId),
-      tags: tags && { hasSome: queryToPrisma(tags).in },
+      endpointId: queryToPrismaFilter(endpointId),
+      institutionId: queryToPrismaFilter(institutionId),
+      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
     };
   }
 

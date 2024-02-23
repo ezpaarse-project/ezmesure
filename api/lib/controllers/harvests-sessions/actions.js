@@ -2,7 +2,6 @@ const HTTPError = require('../../models/HTTPError');
 
 const HarvestSessionService = require('../../entities/harvest-session.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
-const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 
 const { harvestQueue } = require('../../services/jobs');
 
@@ -32,7 +31,6 @@ exports.getAll = async (ctx) => {
       _count: {
         select: {
           jobs: true,
-          credentials: true,
         },
       },
     },
@@ -61,7 +59,6 @@ exports.getOne = async (ctx) => {
       _count: {
         select: {
           jobs: true,
-          credentials: true,
         },
       },
     },
@@ -76,113 +73,40 @@ exports.getOne = async (ctx) => {
   ctx.body = session;
 };
 
-exports.getOneStatus = async (ctx) => {
+exports.getManyStatus = async (ctx) => {
   ctx.type = 'json';
-  const { harvestId } = ctx.params;
+  const { harvestIds } = ctx.request.query;
 
-  const sessionStatus = await HarvestSessionService.$transaction(
-    async (harvestSessionService) => {
-      /* eslint-disable no-underscore-dangle */
-      const session = await harvestSessionService.findUnique({
-        where: { id: harvestId },
-        include: {
-          credentials: true,
-          _count: {
-            select: {
-              jobs: true,
-            },
-          },
-        },
-      });
-
-      if (!session) {
-        return null;
-      }
-
-      const harvestJobsService = new HarvestJobsService(harvestSessionService);
-
-      // Get count of jobs by status
-      const countsPerStatus = await harvestJobsService.groupBy({
-        where: { sessionId: harvestId },
-        by: ['status'],
-        _count: {
-          _all: true,
-        },
-      });
-      const jobStatuses = new Map(
-        countsPerStatus.map(({ status, _count }) => [status, _count._all]),
-      );
-
-      // Get running time
-      const timings = await harvestJobsService.aggregate({
-        where: { sessionId: harvestId },
-        _min: {
-          startedAt: true,
-        },
-        _max: {
-          updatedAt: true,
-        },
-      });
-      let runningTime;
-      if (timings._max?.updatedAt && timings._min?.startedAt) {
-        runningTime = timings._max.updatedAt - timings._min.startedAt;
-      }
-
-      const activeJobsCount = (jobStatuses.get('pending') ?? 0)
-        || (jobStatuses.get('delayed') ?? 0)
-        || (jobStatuses.get('running') ?? 0);
-
-      return {
-        id: session.id,
-        beginDate: session.beginDate,
-        endDate: session.endDate,
-
-        isActive: activeJobsCount > 0,
-        runningTime,
-
-        _count: {
-          harvestableCredentials: HarvestSessionService.getHarvestableCredentials(session).length,
-          jobStatuses: Object.fromEntries(jobStatuses),
-        },
-      };
-      /* eslint-enable no-underscore-dangle */
-    },
+  const sessionStatusesEntries = await HarvestSessionService.$transaction(
+    (harvestSessionService) => Promise.all(
+      harvestIds.map(async (id) => [id, await harvestSessionService.getStatus({ id })]),
+    ),
   );
 
-  if (!sessionStatus) {
-    ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
-    return;
-  }
-
   ctx.status = 200;
-  ctx.body = sessionStatus;
+  ctx.body = Object.fromEntries(sessionStatusesEntries);
 };
 
-exports.getOneInstitutions = async (ctx) => {
+exports.getOneCredentials = async (ctx) => {
   ctx.type = 'json';
   const { harvestId } = ctx.params;
+  const { type, include } = ctx.request.query;
 
   const harvestSessionService = new HarvestSessionService();
 
-  const session = await harvestSessionService.findUnique({
-    where: { id: harvestId },
-    include: {
-      credentials: {
-        distinct: 'institutionId',
-        include: {
-          institution: true,
-        },
-      },
-    },
-  });
-
+  const session = await harvestSessionService.findUnique({ where: { id: harvestId } });
   if (!session) {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
   }
 
+  const credentials = await harvestSessionService.getCredentials(
+    session,
+    { include: propsToPrismaInclude(include, ['endpoint', 'institution']) },
+  );
+
   ctx.status = 200;
-  ctx.body = session?.credentials.map(({ institution }) => institution) ?? [];
+  ctx.body = type === 'harvestable' ? credentials.harvestable : credentials.all;
 };
 
 exports.createOne = async (ctx) => {
@@ -191,45 +115,23 @@ exports.createOne = async (ctx) => {
   const { body: { institutions, ...body } } = ctx.request;
   const { harvestId } = ctx.params;
 
-  const createdSession = await HarvestSessionService.$transaction(async (harvestSessionService) => {
-    const sushiCredentialsService = new SushiCredentialsService(harvestSessionService);
-
-    // Resolve credentials
-    const credentials = body.credentials ?? [];
-    if (Array.isArray(institutions) && institutions.length > 0) {
-      await Promise.all(
-        institutions.map(async (institution) => {
-          const institutionCredentials = await sushiCredentialsService.findMany({
-            where: { institutionId: institution.id },
-            select: { id: true },
-          });
-          credentials.push(...institutionCredentials);
-        }),
-      );
-    }
-
-    return harvestSessionService.create({
-      data: {
-        ignoreValidation: null,
-        ...body,
-        id: harvestId,
-        credentials: {
-          connect: credentials,
-        },
-      },
-      include: {
-        _count: {
-          select: {
-            jobs: true,
-            credentials: true,
-          },
-        },
-      },
-    });
-  });
+  const harvestSessionService = new HarvestSessionService();
 
   ctx.status = 200;
-  ctx.body = createdSession;
+  ctx.body = await harvestSessionService.create({
+    data: {
+      ignoreValidation: null,
+      ...body,
+      id: harvestId,
+    },
+    include: {
+      _count: {
+        select: {
+          jobs: true,
+        },
+      },
+    },
+  });
 };
 
 exports.upsertOne = async (ctx) => {
@@ -256,45 +158,22 @@ exports.upsertOne = async (ctx) => {
         throw new HTTPError(409, 'errors.harvest.updateSessionAfterStart', [harvestId]);
       }
 
-      const sushiCredentialsService = new SushiCredentialsService(harvestSessionService);
-
-      // Resolve credentials
-      const credentials = body.credentials ?? [];
-      if (Array.isArray(institutions) && institutions.length > 0) {
-        await Promise.all(
-          institutions.map(async (institution) => {
-            const institutionCredentials = await sushiCredentialsService.findMany({
-              where: { institutionId: institution.id },
-              select: { id: true },
-            });
-            credentials.push(...institutionCredentials);
-          }),
-        );
-      }
-
       return harvestSessionService.upsert({
         where: { id: harvestId },
         create: {
           ignoreValidation: null,
           ...body,
           id: harvestId,
-          credentials: {
-            connect: credentials,
-          },
         },
         update: {
           ignoreValidation: null,
           ...body,
           id: harvestId,
-          credentials: {
-            set: credentials,
-          },
         },
         include: {
           _count: {
             select: {
               jobs: true,
-              credentials: true,
             },
           },
         },
@@ -327,7 +206,10 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  const harvestJobs = await harvestSessionService.start(session);
+  const harvestJobs = await harvestSessionService.start(
+    session,
+    { restartAll: ctx.request.body?.restartAll ?? false },
+  );
 
   const now = new Date();
   // Add jobs to queue

@@ -1,4 +1,4 @@
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'dev';
 
 const Koa = require('koa');
 const mount = require('koa-mount');

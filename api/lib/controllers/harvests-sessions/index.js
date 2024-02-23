@@ -15,13 +15,12 @@ const {
 
 const {
   getAll,
-  getOne,
+  getManyStatus,
   createOne,
   startOne,
   deleteOne,
   stopOne,
-  getOneStatus,
-  getOneInstitutions,
+  getOneCredentials,
   upsertOne,
 } = require('./actions');
 
@@ -62,17 +61,14 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:harvestId',
+  path: '/status',
   handler: [
-    getOne,
+    getManyStatus,
   ],
   validate: {
-    params: {
-      harvestId: Joi.string().trim().required(),
-    },
     query: Joi.object({
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+      harvestIds: Joi.array().single().items(Joi.string()),
+    }).rename('harvestIds[]', 'harvestIds'),
   },
 });
 
@@ -111,9 +107,13 @@ router.route({
     startOne,
   ],
   validate: {
+    type: 'json',
     params: {
       harvestId: Joi.string().trim().required(),
     },
+    body: Joi.object({
+      restartAll: Joi.boolean().default(false),
+    }),
   },
 });
 
@@ -132,27 +132,18 @@ router.route({
 
 router.route({
   method: 'GET',
-  path: '/:harvestId/status',
+  path: '/:harvestId/credentials',
   handler: [
-    getOneStatus,
+    getOneCredentials,
   ],
   validate: {
     params: {
       harvestId: Joi.string().trim().required(),
     },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:harvestId/institutions',
-  handler: [
-    getOneInstitutions,
-  ],
-  validate: {
-    params: {
-      harvestId: Joi.string().trim().required(),
-    },
+    query: Joi.object({
+      type: Joi.string().valid('harvestable', 'all'),
+      include: Joi.array().single().items(Joi.string().valid('endpoint', 'institution')),
+    }).rename('include[]', 'include'),
   },
 });
 

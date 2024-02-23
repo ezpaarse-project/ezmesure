@@ -739,6 +739,30 @@
             "format": "date",
             "pattern": "yyyy-MM"
           },
+          "credentialsQuery": {
+            "type": "object",
+            "description": "Query used to get credentials to harvest",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              },
+              "institutionIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              },
+              "endpointIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              }
+            }
+          },
           "reportTypes": {
             "type": "array",
             "items": {
@@ -782,8 +806,55 @@
             "properties": {
               "jobs": {
                 "type": "integer"
-              },
-              "credentials": {
+              }
+            }
+          }
+        }
+      },
+      "HarvestSessionStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "beginDate": {
+            "description": "Begin date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "endDate": {
+            "description": "End date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Is the session active ?"
+          },
+          "runningTime": {
+            "type": "integer",
+            "description": "Running time in milliseconds"
+          },
+          "_count": {
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "all": {
+                  "type": "integer",
+                  "description": "Count of requested credentials"
+                },
+                "harvestable": {
+                  "type": "integer",
+                  "description": "Count of credentials that will be harvested"
+                }
+              }
+            },
+            "jobStatuses": {
+              "type": "object",
+              "description": "Count of jobs with a given status",
+              "additionalProperties": {
                 "type": "integer"
               }
             }
@@ -6196,6 +6267,55 @@
         ]
       }
     },
+    "/harvests-sessions/status": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": "harvestIds",
+          "in": "query",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get status of a harvests sessions",
+        "tags": [
+          "Harvests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/HarvestSessionStatus"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "get-harvests-sessions-status",
+        "description": "Get harvest sessions' status",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/harvests-sessions/{harvestId}": {
       "parameters": [
         {
@@ -6342,6 +6462,23 @@
         "tags": [
           "Harvests"
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restartAll": {
+                    "type": "boolean",
+                    "default": null,
+                    "format": "nullable",
+                    "description": "Restart all jobs, not only the failed ones"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -6411,7 +6548,7 @@
         ]
       }
     },
-    "/harvests-sessions/{harvestId}/status": {
+    "/harvests-sessions/{harvestId}/credentials": {
       "parameters": [
         {
           "schema": {
@@ -6423,110 +6560,7 @@
         }
       ],
       "get": {
-        "summary": "Get status of a harvest session",
-        "tags": [
-          "Harvests"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "$ref": "#/components/schemas/ItemID"
-                    },
-                    "beginDate": {
-                      "description": "Begin date of the period to be harvested",
-                      "type": "string",
-                      "format": "date",
-                      "pattern": "yyyy-MM"
-                    },
-                    "endDate": {
-                      "description": "End date of the period to be harvested",
-                      "type": "string",
-                      "format": "date",
-                      "pattern": "yyyy-MM"
-                    },
-                    "isActive": {
-                      "type": "boolean",
-                      "description": "Is the session active ?"
-                    },
-                    "runningTime": {
-                      "type": "integer",
-                      "description": "Running time in milliseconds"
-                    },
-                    "metrics": {
-                      "success": {
-                        "type": "integer",
-                        "description": "Count of successful jobs"
-                      },
-                      "active": {
-                        "type": "integer",
-                        "description": "Count of active jobs"
-                      },
-                      "delayed": {
-                        "type": "integer",
-                        "description": "Count of delayed jobs"
-                      },
-                      "failed": {
-                        "type": "integer",
-                        "description": "Count of failed jobs"
-                      },
-                      "pending": {
-                        "type": "integer",
-                        "description": "Count of pending jobs"
-                      }
-                    },
-                    "_count": {
-                      "harvestableCredentials": {
-                        "type": "integer",
-                        "description": "Count of credentials that will be harvested"
-                      },
-                      "statuses": {
-                        "type": "object",
-                        "description": "Count of jobs with a given status",
-                        "additionalProperties": {
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          }
-        },
-        "operationId": "get-harvests-sessions-status",
-        "description": "Get harvest session's status",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/harvests-sessions/{harvestId}/institutions": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "harvestId",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "get": {
-        "summary": "Get institutions concerned by an harvest session",
+        "summary": "Get credentials concerned by an harvest session",
         "tags": [
           "Harvests"
         ],
@@ -6538,7 +6572,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Institution"
+                    "$ref": "#/components/schemas/SushiCredentials"
                   }
                 }
               }
@@ -6551,8 +6585,8 @@
             "$ref": "#/components/responses/ForbiddenError"
           }
         },
-        "operationId": "get-harvests-sessions-institutions",
-        "description": "Get institutions concerned by an harvest session",
+        "operationId": "get-harvests-sessions-credentials",
+        "description": "Get credentials concerned by an harvest session",
         "security": [
           {
             "bearerAuth": []

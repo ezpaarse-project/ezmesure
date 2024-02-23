@@ -737,7 +737,7 @@
         "reportTypes": "{n} report type|{n} report types",
         "credentials": "{n} credentials"
       },
-      "credentialsTooltip": "{harvestable} credentials have been tested but {total} credentials have been requested",
+      "credentialsTooltip": "{harvestable} credentials have been tested but {all} credentials have been requested",
       "notStarted": "Not started",
       "unableToRetrive": "Unable to retrieve harvests"
     },
