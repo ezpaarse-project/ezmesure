@@ -41,13 +41,7 @@ Mises à jour établissements ({{ institutions.length }})
 {% if sushi.length -%}
 Mises à jour d'identifiants SUSHI ({{ sushi.length }})
   {% for action in sushi -%}
-  {% if action.action == 'sushi/delete-many' -%}
-  {% for result in action.metadata.sushiDeleteResult -%}
-    [-][{{ action.datetime }}][{{ result.status }}] {{ action.user.name }} / {{ result.vendor or result.id }}
-  {% endfor %}
-  {%- else -%}
-    [{{ "+" if action.action == 'sushi/create' }}{{ "*" if action.action == 'sushi/update' }}{{ "-" if action.action == 'sushi/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.institutionName or action.metadata.institutionId }}
-  {% endif -%}
+    [{{ "+" if action.action == 'sushi/create' }}{{ "*" if action.action == 'sushi/update' }}{{ "-" if action.action == 'sushi/delete' }}][{{ action.datetime }}][{{ action.response.status }}] {{ action.user.name }} / {{ action.metadata.vendor or action.metadata.sushiId }}
   {% endfor %}
 {% endif -%}
 
