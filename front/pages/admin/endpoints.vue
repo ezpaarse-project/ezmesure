@@ -175,19 +175,75 @@
       </template>
 
       <template #[`item.credentials`]="{ item }">
-        <v-chip
-          v-if="Array.isArray(item.credentials)"
-          :outlined="item.credentials?.length <= 0"
-          small
-          class="elevation-1"
-          @click="$refs.credentialsDialog?.display?.(item)"
+        <v-menu
+          :disabled="!Array.isArray(item.credentials) || item.credentials?.length <= 0"
+          transition="slide-y-transition"
+          nudge-bottom="2"
+          open-on-hover
+          bottom
+          offset-y
         >
-          {{ $tc('sushi.credentialsCount', item.credentials.length) }}
+          <template #activator="{ on, attrs }">
+            <v-chip
+              :outlined="item.credentials?.length <= 0"
+              small
+              class="elevation-1"
+              v-bind="attrs"
+              @click="$refs.credentialsDialog?.display?.(item)"
+              v-on="on"
+            >
+              {{ $tc('sushi.credentialsCount', item.credentials?.length) }}
 
-          <v-icon right small>
-            mdi-key
-          </v-icon>
-        </v-chip>
+              <v-icon right small>
+                mdi-key
+              </v-icon>
+            </v-chip>
+          </template>
+
+          <v-card height="150" width="150">
+            <v-card-text class="progress-menu">
+              <ProgressCircularStack
+                :value="credentialsStatuses.get(item.id) ?? []"
+                :labels="[
+                  `${item.id}-success`,
+                  `${item.id}-unauthorized`,
+                  `${item.id}-failed`,
+                ]"
+                size="100"
+              >
+                <template #[`default.${item.id}-success`]="{ value }">
+                  <v-chip color="success" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-check
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template #[`default.${item.id}-unauthorized`]="{ value }">
+                  <v-chip color="warning" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-key-alert-outline
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template #[`default.${item.id}-failed`]="{ value }">
+                  <v-chip color="error" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-alert-circle
+                    </v-icon>
+                  </v-chip>
+                </template>
+              </ProgressCircularStack>
+            </v-card-text>
+          </v-card>
+        </v-menu>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -235,6 +291,7 @@ import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
 import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
 
 export default {
   layout: 'space',
@@ -245,6 +302,7 @@ export default {
     EndpointDetails,
     ConfirmDialog,
     CredentialDialog,
+    ProgressCircularStack,
   },
   data() {
     return {
@@ -280,12 +338,6 @@ export default {
           value: 'tags',
           align: 'center',
           width: '200px',
-        },
-        {
-          text: this.$t('endpoints.validated'),
-          value: 'validated',
-          align: 'right',
-          width: '130px',
         },
         {
           text: this.$t('sushi.credentials'),
@@ -329,6 +381,54 @@ export default {
           callback: this.copyId,
         },
       ];
+    },
+    credentialsStatuses() {
+      const entries = this.endpoints.map(
+        (e) => {
+          const credentials = e.credentials ?? [];
+          const total = credentials.length || 1;
+
+          const statuses = credentials.reduce(
+            (acc, { connection: { status } }) => {
+              if (status) {
+                acc[status] += 1;
+              }
+              return acc;
+            },
+            {
+              success: 0,
+              unauthorized: 0,
+              failed: 0,
+            },
+          );
+
+          return [
+            e.id,
+            [
+              {
+                key: `${e.id}-success`,
+                label: statuses.success,
+                value: statuses.success / total,
+                color: 'success',
+              },
+              {
+                key: `${e.id}-unauthorized`,
+                label: statuses.unauthorized,
+                value: statuses.unauthorized / total,
+                color: 'warning',
+              },
+              {
+                key: `${e.id}-failed`,
+                label: statuses.failed,
+                value: statuses.failed / total,
+                color: 'error',
+              },
+            ],
+          ];
+        },
+      );
+
+      return new Map(entries);
     },
   },
   mounted() {
@@ -463,3 +563,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.progress-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+</style>

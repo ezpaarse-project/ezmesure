@@ -1181,6 +1181,5 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100%;
-  /* position: relative; */
 }
 </style>
