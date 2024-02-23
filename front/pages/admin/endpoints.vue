@@ -1,7 +1,46 @@
 <template>
   <section>
-    <ToolBar :title="$t('endpoints.title', { total: totalEndpoints })">
+    <ToolBar :title="toolbarTitle">
       <v-spacer />
+
+      <v-btn
+        text
+        @click.stop="createEndpoint"
+      >
+        <v-icon left>
+          mdi-plus
+        </v-icon>
+        {{ $t('add') }}
+      </v-btn>
+
+      <v-btn
+        :loading="refreshing"
+        text
+        @click.stop="refreshSushiEndpoints"
+      >
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        {{ $t('refresh') }}
+      </v-btn>
+
+      <v-btn
+        text
+        color="black"
+        @click="showEndpointFiltersDrawer = true"
+      >
+        <v-badge
+          :value="filtersCount > 0"
+          :content="filtersCount"
+          overlap
+          left
+        >
+          <v-icon>
+            mdi-filter
+          </v-icon>
+        </v-badge>
+        {{ $t('filter') }}
+      </v-btn>
 
       <v-text-field
         v-model="search"
@@ -13,29 +52,6 @@
         autocomplete="off"
         style="max-width: 200px"
       />
-
-      <v-btn
-        color="primary"
-        text
-        :loading="refreshing"
-        @click.stop="refreshSushiEndpoints"
-      >
-        <v-icon left>
-          mdi-refresh
-        </v-icon>
-        {{ $t('refresh') }}
-      </v-btn>
-
-      <v-btn
-        color="primary"
-        text
-        @click.stop="createEndpoint"
-      >
-        <v-icon left>
-          mdi-key-plus
-        </v-icon>
-        {{ $t('add') }}
-      </v-btn>
     </ToolBar>
 
     <v-container fluid>
@@ -140,6 +156,7 @@
       single-expand
       item-key="id"
       sort-by="vendor"
+      @pagination="currentItemCount = $event.itemsLength"
     >
       <template #expanded-item="{ headers, item }">
         <td />
@@ -280,6 +297,13 @@
       </template>
     </v-data-table>
 
+    <EndpointsFiltersDrawer
+      v-model="filters"
+      :show.sync="showEndpointFiltersDrawer"
+      :search="search"
+      :max-credentials-count="maxCounts.credentials"
+      :max-credentials-status-counts="maxCounts.credentialsStatuses"
+    />
     <ConfirmDialog ref="confirmDialog" />
     <CredentialDialog ref="credentialsDialog" />
   </section>
@@ -290,6 +314,7 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
 import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
+import EndpointsFiltersDrawer from '~/components/sushis/EndpointsFiltersDrawer.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
 
@@ -303,6 +328,7 @@ export default {
     ConfirmDialog,
     CredentialDialog,
     ProgressCircularStack,
+    EndpointsFiltersDrawer,
   },
   data() {
     return {
@@ -313,15 +339,28 @@ export default {
       validating: false,
       search: '',
       loadingItems: {},
+      currentItemCount: 0,
+
+      filters: {},
+      showEndpointFiltersDrawer: false,
     };
   },
   computed: {
+    toolbarTitle() {
+      if (this.hasSelection) {
+        return this.$t('nSelected', { count: this.selected.length });
+      }
+
+      let count = this.endpoints?.length;
+      if (count != null && this.currentItemCount !== count) {
+        count = `${this.currentItemCount}/${count}`;
+      }
+
+      return this.$t('endpoints.title', { count: count ?? '?' });
+    },
     hasSnackMessages() {
       const messages = this.$store?.state?.snacks?.messages;
       return Array.isArray(messages) && messages.length >= 1;
-    },
-    totalEndpoints() {
-      return this?.endpoints.length || 0;
     },
     availableTags() {
       const tags = new Set(this.endpoints.flatMap((e) => (Array.isArray(e?.tags) ? e.tags : [])));
@@ -344,6 +383,7 @@ export default {
           value: 'credentials',
           align: 'center',
           width: '200px',
+          filter: (_value, _search, item) => this.columnCredentialsFilter(item),
         },
         {
           text: this.$t('actions'),
@@ -430,11 +470,144 @@ export default {
 
       return new Map(entries);
     },
+    /**
+     * Get the count of filters with value
+     *
+     * @returns {number} The count of active filters
+     */
+    filtersCount() {
+      return Object.values(this.filters)
+        .reduce(
+          (prev, filterDesc) => {
+            const filter = filterDesc?.value;
+            // skipping if undefined or empty
+            if (filter == null || filter === '') {
+              return prev;
+            }
+            // skipping if empty array
+            if (Array.isArray(filter) && filter.length <= 0) {
+              return prev;
+            }
+
+            return prev + 1;
+          },
+          0,
+        );
+    },
+    /**
+     * Compute maximum count of properties
+     *
+     * @returns {Record<string, number>}
+     */
+    maxCounts() {
+      const counters = {
+        credentials: 0,
+        credentialsStatuses: {
+          success: 0,
+          unauthorized: 0,
+          failed: 0,
+        },
+      };
+
+      const getCredentialsStatusesCount = (credentials) => {
+        const credentialsStatuses = {
+          success: 0,
+          unauthorized: 0,
+          failed: 0,
+        };
+        // eslint-disable-next-line no-restricted-syntax
+        for (const c of (credentials ?? [])) {
+          const { status } = c.connection;
+          if (status) {
+            credentialsStatuses[status] += 1;
+          }
+        }
+        return credentialsStatuses;
+      };
+
+      const setCounter = (property, endpoint) => {
+        counters[property] = Math.max(counters[property], endpoint[property]?.length);
+      };
+
+      const setCredentialsStatusCounter = (property, statuses) => {
+        counters.credentialsStatuses[property] = Math.max(
+          counters.credentialsStatuses[property],
+          statuses[property],
+        );
+      };
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const endpoint of this.endpoints) {
+        setCounter('credentials', endpoint);
+
+        const statuses = getCredentialsStatusesCount(endpoint.credentials);
+        setCredentialsStatusCounter('success', statuses);
+        setCredentialsStatusCounter('unauthorized', statuses);
+        setCredentialsStatusCounter('failed', statuses);
+      }
+
+      return counters;
+    },
   },
   mounted() {
     return this.refreshSushiEndpoints();
   },
   methods: {
+    /**
+     * Filter for credentials column using filters
+     *
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnCredentialsFilter(item) {
+      return this.columnArrayFilter('credentials', item) && this.columnSushiFilter(item);
+    },
+    /**
+     * Filter for array column using filters
+     *
+     * @param {string} field The filter's field
+     * @param {*} item The item
+     *
+     * @return {boolean} If the item must be showed or not
+     */
+    columnArrayFilter(field, item) {
+      const rangeField = `${field}Range`;
+      const range = this.filters?.[rangeField]?.value;
+      if (range == null || !Array.isArray(item[field])) {
+        return true;
+      }
+
+      const value = item[field].length;
+      return range[0] <= value && value <= range[1];
+    },
+    /**
+     * Apply sushi filters to given item
+     *
+     * @param {*} item The item
+     *
+     * @return {boolean} Should item be shown
+     */
+    columnSushiFilter(item) {
+      const credentials = this.credentialsStatuses.get(item.id);
+      if (!credentials) {
+        return false;
+      }
+
+      const isInRange = (field, value) => {
+        const range = this.filters[field]?.value;
+        if (!range) {
+          return true;
+        }
+        return range[0] <= value && value <= range[1];
+      };
+
+      const [success, unauthorized, failed] = credentials;
+      const isSuccessInRange = isInRange('credsSuccessRange', success.label);
+      const isUnauthorizedInRange = isInRange('credsUnauthorizedRange', unauthorized.label);
+      const isFailedInRange = isInRange('credsFailedRange', failed.label);
+      return isUnauthorizedInRange && isSuccessInRange && isFailedInRange;
+    },
     async copyId(item) {
       if (!navigator.clipboard) {
         this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
@@ -538,27 +711,6 @@ export default {
       const removeDeleted = (endpoint) => !removedIds.some((id) => endpoint.id === id);
       this.endpoints = this.endpoints.filter(removeDeleted);
       this.selected = this.selected.filter(removeDeleted);
-    },
-
-    async setEndpointsValidation(validated) {
-      if (this.selected.length === 0) {
-        return;
-      }
-
-      this.validating = true;
-
-      const requests = this.selected.map(async (item) => {
-        try {
-          await this.$axios.$patch(`/sushi-endpoints/${item.id}`, { validated: !!validated });
-        } catch (e) {
-          this.$store.dispatch('snacks/error', this.$t('cannotUpdateItem', { id: item.vendor || item.id }));
-        }
-      });
-
-      await Promise.all(requests);
-      this.selected = [];
-      this.validating = false;
-      this.refreshSushiEndpoints();
     },
   },
 };

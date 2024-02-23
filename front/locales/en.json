@@ -189,7 +189,7 @@
     }
   },
   "endpoints": {
-    "title": "SUSHI endpoints ({total})",
+    "title": "SUSHI endpoints ({count})",
     "pageDescription": "Here you can manage the list of the available SUSHI endpoints.",
     "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
     "manageNendpoints": "Manage endpoint|Manage {count} endpoints",
@@ -217,7 +217,10 @@
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
     "deleteNbEndpoints": "You are about to delete {number} endpoints.",
     "noEndpointFound": "No endpoint found",
-    "clickToDeclareOne": "Click here to declare one"
+    "clickToDeclareOne": "Click here to declare one",
+    "filters": {
+      "title": "Filters endpoints"
+    }
   },
   "institutions": {
     "toolbarTitle": "Institutions ({count})",
