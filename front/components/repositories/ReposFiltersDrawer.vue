@@ -134,16 +134,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.button-group-label {
-  position: absolute !important;
-  max-width: 133%;
-  transform-origin: top left;
-  transform: translateY(-16px) scale(.75);
-}
-
-.button-group-label + * {
-  transform: translateY(5px)
-}
-</style>
