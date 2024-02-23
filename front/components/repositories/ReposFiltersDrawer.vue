@@ -103,14 +103,6 @@ export default {
         text: this.$t(`spaces.types.${value}`),
       }));
     },
-    institutionsRange: {
-      get() {
-        return this.partialToRange(this.value.institutionsRange?.value, this.maxInstitutionsCount);
-      },
-      set(val) {
-        this.updateRangeWithPartial('institutionsRange', val, this.maxInstitutionsCount);
-      },
-    },
   },
   methods: {
     /**
