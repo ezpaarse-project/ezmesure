@@ -9,7 +9,24 @@
     hide-details
     @change="updateValue($event)"
   >
-    <template #append-outer>
+    <template v-if="$scopedSlots.selection" #selection="selection">
+      <slot name="selection" v-bind="selection" />
+    </template>
+
+    <template #item="item">
+      <slot name="item" v-bind="item">
+        <v-list-item v-bind="item.attrs" v-on="item.on">
+          <v-list-item-title>
+            {{ item.item.text }}
+          </v-list-item-title>
+          <v-list-item-subtitle v-if="item.item.subtext">
+            {{ item.item.subtext }}
+          </v-list-item-subtitle>
+        </v-list-item>
+      </slot>
+    </template>
+
+    <template v-if="$scopedSlots['append-outer']" #append-outer>
       <slot name="append-outer" />
     </template>
   </v-autocomplete>
