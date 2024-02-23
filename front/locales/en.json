@@ -735,7 +735,7 @@
         "institutions": "{n} institution|{n} institutions",
         "endpoints": "{n} endpoint|{n} endpoints",
         "reportTypes": "{n} report type|{n} report types",
-        "credentials": "{n} credential|{n} credentials"
+        "credentials": "{n} credentials"
       },
       "credentialsTooltip": "{harvestable} credentials have been tested but {total} credentials have been requested",
       "notStarted": "Not started",

@@ -209,7 +209,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    */
   async isActive(session) {
     const harvestJobsService = new HarvestJobsService(this.prisma);
-    const activeJobs = await harvestJobsService.findMany({
+    const activeJob = await harvestJobsService.findFirst({
       where: {
         sessionId: session.id,
         status: {
@@ -218,7 +218,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       },
     });
 
-    return activeJobs.length > 0;
+    return !!activeJob;
   }
 
   /**

@@ -109,7 +109,9 @@ exports.getOneStatus = async (ctx) => {
           _all: true,
         },
       });
-      const statuses = new Map(countsPerStatus.map(({ status, _count }) => [status, _count._all]));
+      const jobStatuses = new Map(
+        countsPerStatus.map(({ status, _count }) => [status, _count._all]),
+      );
 
       // Get running time
       const timings = await harvestJobsService.aggregate({
@@ -123,36 +125,24 @@ exports.getOneStatus = async (ctx) => {
       });
       let runningTime;
       if (timings._max?.updatedAt && timings._min?.startedAt) {
-        // eslint-disable-next-line no-underscore-dangle
         runningTime = timings._max.updatedAt - timings._min.startedAt;
       }
 
-      const successCount = statuses.get('finished') || 0;
-      const activeCount = statuses.get('running') || 0;
-      const delayedCount = statuses.get('delayed') || 0;
-      const failedCount = (statuses.get('failed') ?? 0)
-                + (statuses.get('interrupted') ?? 0)
-                + (statuses.get('cancelled') ?? 0);
+      const activeJobsCount = (jobStatuses.get('pending') ?? 0)
+        || (jobStatuses.get('delayed') ?? 0)
+        || (jobStatuses.get('running') ?? 0);
 
       return {
         id: session.id,
         beginDate: session.beginDate,
         endDate: session.endDate,
 
-        isActive: await harvestSessionService.isActive(session),
+        isActive: activeJobsCount > 0,
         runningTime,
 
-        metrics: {
-          success: successCount,
-          active: activeCount,
-          delayed: delayedCount,
-          failed: failedCount,
-          // eslint-disable-next-line no-underscore-dangle
-          pending: session._count.jobs - successCount - activeCount - delayedCount - failedCount,
-        },
         _count: {
           harvestableCredentials: HarvestSessionService.getHarvestableCredentials(session).length,
-          statuses: Object.fromEntries(statuses),
+          jobStatuses: Object.fromEntries(jobStatuses),
         },
       };
       /* eslint-enable no-underscore-dangle */

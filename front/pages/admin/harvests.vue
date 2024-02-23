@@ -192,7 +192,7 @@ export default defineComponent({
           data: item,
           status: status ?? {},
           // eslint-disable-next-line no-underscore-dangle
-          hasStarted: Object.keys(status?._count.statuses ?? {}).length > 0,
+          hasStarted: Object.keys(status?._count.jobStatuses ?? {}).length > 0,
 
           counts: this.computeCounts(item),
           bars: this.computeBars(item),
@@ -254,6 +254,19 @@ export default defineComponent({
     },
   },
   methods: {
+    computeMetrics(session) {
+      // eslint-disable-next-line no-underscore-dangle
+      const { jobStatuses } = this.sessionStatuses[session.id]._count;
+      return {
+        pending: jobStatuses.waiting ?? 0,
+        success: jobStatuses.finished ?? 0,
+        active: jobStatuses.running ?? 0,
+        delayed: jobStatuses.delayed ?? 0,
+        failed: (jobStatuses.failed ?? 0)
+          + (jobStatuses.interrupted ?? 0)
+          + (jobStatuses.cancelled ?? 0),
+      };
+    },
     computeBars(session) {
       const status = this.sessionStatuses[session.id];
       if (!status) {
@@ -267,6 +280,8 @@ export default defineComponent({
         ];
       }
 
+      const metrics = this.computeMetrics(session);
+
       // eslint-disable-next-line no-underscore-dangle
       const getValue = (value) => (value / session._count.jobs);
 
@@ -274,29 +289,29 @@ export default defineComponent({
         {
           key: `${session.id}-success`,
           color: 'success',
-          value: getValue(status.metrics.success),
+          value: getValue(metrics.success),
         },
         {
           key: `${session.id}-failed`,
           color: 'error',
-          value: getValue(status.metrics.failed),
+          value: getValue(metrics.failed),
         },
         {
           key: `${session.id}-active`,
           color: 'blue',
-          value: getValue(status.metrics.active),
+          value: getValue(metrics.active),
         },
         {
           key: `${session.id}-delayed`,
           type: 'buffer',
           color: 'blue',
-          value: getValue(status.metrics.delayed),
+          value: getValue(metrics.delayed),
         },
         {
           key: `${session.id}-pending`,
           type: 'stream',
           color: 'grey',
-          value: getValue(status.metrics.pending),
+          value: getValue(metrics.pending),
         },
       ];
     },
