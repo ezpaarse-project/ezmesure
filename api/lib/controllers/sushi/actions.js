@@ -193,7 +193,7 @@ exports.deleteOne = async (ctx) => {
 
   ctx.metadata = {
     sushiId: sushi?.id,
-    endpointVendor: sushi?.endpoint?.vendor,
+    vendor: sushi?.endpoint?.vendor,
   };
 
   const sushiCredentialsService = new SushiCredentialsService();
