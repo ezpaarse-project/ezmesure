@@ -56,48 +56,13 @@
 
       <v-row class="px-0 mt-8">
         <v-col style="position: relative;">
-          <v-label class="slider-label slider-label-withicon">
-            {{ $t('repositories.institutions') }}
-          </v-label>
-
-          <v-range-slider
-            :value="institutionsRange"
-            :min="0"
+          <RangeFilter
+            :value="value.institutionsRange?.value"
+            :label="$t('repositories.institutions')"
             :max="maxInstitutionsCount"
-            hide-details
-            thumb-label
-            @end="institutionsRange = $event"
-          >
-            <template #prepend>
-              <v-icon class="mr-2">
-                mdi-domain
-              </v-icon>
-
-              <v-text-field
-                :value="institutionsRange[0]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="institutionsRange = [+$event, institutionsRange[1]]"
-              />
-            </template>
-
-            <template #append>
-              <v-text-field
-                :value="institutionsRange[1]"
-                :min="0"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="institutionsRange = [institutionsRange[0], +$event]"
-              />
-            </template>
-          </v-range-slider>
+            icon="mdi-domain"
+            @input="onFilterUpdate('institutionsRange', { value: $event })"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -105,7 +70,10 @@
 </template>
 
 <script>
+import RangeFilter from '../filters-form/RangeFilter.vue';
+
 export default {
+  components: { RangeFilter },
   props: {
     value: {
       type: Object,
@@ -127,17 +95,14 @@ export default {
   emits: ['input', 'update:show'],
   computed: {
     /**
-     * Type list for v-select, with dynamic disabled state and no_permissions item
-     */
+         * Type list for v-select, with dynamic disabled state and no_permissions item
+         */
     typeItems() {
-      return ['ezpaarse', 'counter5'].map(
-        (value) => ({
-          value,
-          text: this.$t(`spaces.types.${value}`),
-        }),
-      );
+      return ['ezpaarse', 'counter5'].map((value) => ({
+        value,
+        text: this.$t(`spaces.types.${value}`),
+      }));
     },
-
     institutionsRange: {
       get() {
         return this.partialToRange(this.value.institutionsRange?.value, this.maxInstitutionsCount);
@@ -149,51 +114,19 @@ export default {
   },
   methods: {
     /**
-     * Transform a partial range into a full one
-     *
-     * @param {[number | undefined, number | undefined] | undefined} val The partial range
-     * @param {number} max The maximum value of the range
-     *
-     * @returns {[number, number]}
-     */
-    partialToRange(val, max) {
-      return [
-        val?.[0] ?? 0,
-        val?.[1] ?? max,
-      ];
-    },
-    /**
-     * Update a filter with a partial range
-     *
-     * @param {string} field The field
-     * @param {[number | undefined, number | undefined] | undefined} val The partial range
-     * @param {number} max The maximum value of the range
-     */
-    updateRangeWithPartial(field, val, max) {
-      if (
-        !val
-        || (val[0] === 0 && val[1] === max)
-      ) {
-        this.onFilterUpdate(field, { value: undefined });
-        return;
-      }
-
-      this.onFilterUpdate(field, { value: this.partialToRange(val, max) });
-    },
-    /**
-     * Update filter value and attributes
-     *
-     * @param {string} field The concerned filter
-     * @param {string} attrs The new attributes of the filter
-     */
+         * Update filter value and attributes
+         *
+         * @param {string} field The concerned filter
+         * @param {string} attrs The new attributes of the filter
+         */
     onFilterUpdate(field, attrs) {
       const filters = { ...this.value };
       filters[field] = { ...(filters[field] ?? {}), ...attrs };
       this.$emit('input', filters);
     },
     /**
-     * Reset all filters
-     */
+         * Reset all filters
+         */
     clearFilters() {
       this.$emit('input', {});
       this.$emit('update:show', false);
