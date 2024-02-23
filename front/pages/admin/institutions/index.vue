@@ -86,6 +86,7 @@
             v-model="selectedTableHeaders"
             :items="availableTableHeaders"
             icon="mdi-table-eye"
+            @input="refreshInstitutions"
           />
         </v-toolbar>
       </template>
@@ -139,7 +140,7 @@
           {{ $tc('repositories.xRepositories', item.repositories.length) }}
 
           <v-icon right small>
-            mdi-tray-arrow-down
+            mdi-database-outline
           </v-icon>
         </v-chip>
       </template>
@@ -158,6 +159,78 @@
             mdi-tab
           </v-icon>
         </v-chip>
+      </template>
+
+      <template #[`item.sushiCredentials`]="{ item }">
+        <v-menu
+          :disabled="!Array.isArray(item.sushiCredentials) || item.sushiCredentials?.length <= 0"
+          transition="slide-y-transition"
+          nudge-bottom="2"
+          open-on-hover
+          bottom
+          offset-y
+        >
+          <template #activator="{ on, attrs }">
+            <v-chip
+              :outlined="item.sushiCredentials?.length <= 0"
+              :to="`/admin/institutions/${item.id}/sushi`"
+              small
+              class="elevation-1"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ $tc('sushi.credentialsCount', item.sushiCredentials?.length) }}
+
+              <v-icon right small>
+                mdi-key
+              </v-icon>
+            </v-chip>
+          </template>
+
+          <v-card height="150" width="150">
+            <v-card-text class="progress-menu">
+              <ProgressCircularStack
+                :value="credentialsStatuses.get(item.id) ?? []"
+                :labels="[
+                  `${item.id}-success`,
+                  `${item.id}-unauthorized`,
+                  `${item.id}-failed`,
+                ]"
+                size="100"
+              >
+                <template #[`default.${item.id}-success`]="{ value }">
+                  <v-chip color="success" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-check
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template #[`default.${item.id}-unauthorized`]="{ value }">
+                  <v-chip color="warning" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-key-alert-outline
+                    </v-icon>
+                  </v-chip>
+                </template>
+
+                <template #[`default.${item.id}-failed`]="{ value }">
+                  <v-chip color="error" small style="margin: 1px 0">
+                    {{ value }}
+
+                    <v-icon right small>
+                      mdi-alert-circle
+                    </v-icon>
+                  </v-chip>
+                </template>
+              </ProgressCircularStack>
+            </v-card-text>
+          </v-card>
+        </v-menu>
       </template>
 
       <template #[`item.status`]="{ item }">
@@ -315,6 +388,7 @@
       :max-child-institutions-count="maxCounts.childInstitutions"
       :max-repositories-count="maxCounts.repositories"
       :max-spaces-count="maxCounts.spaces"
+      :max-credentials-status-counts="maxCounts.sushiCredentialsStatuses"
     />
   </section>
 </template>
@@ -329,6 +403,7 @@ import SubInstitutionsDialog from '~/components/SubInstitutionsDialog.vue';
 import InstitutionsFiltersDrawer from '~/components/institutions/InstitutionsFiltersDrawer.vue';
 import ConfirmPopover from '~/components/ConfirmPopover.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
+import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
 
 const iconDefMap = new Map([
   [
@@ -376,6 +451,7 @@ export default {
     InstitutionsFiltersDrawer,
     ConfirmPopover,
     ConfirmDialog,
+    ProgressCircularStack,
   },
   data() {
     return {
@@ -417,6 +493,10 @@ export default {
         spacesRange: { value: undefined },
 
         validated: { value: undefined },
+
+        credsSuccessRange: { value: undefined },
+        credsUnauthorizedRange: { value: undefined },
+        credsFailedRange: { value: undefined },
       },
       currentItemCount: 0,
     };
@@ -487,6 +567,13 @@ export default {
           filter: (_value, _search, item) => this.columnArrayFilter('spaces', item),
         },
         {
+          text: this.$t('sushi.credentials'),
+          width: '150px',
+          value: 'sushiCredentials',
+          align: 'center',
+          filter: (_value, _search, item) => this.columnSushiFilter(item),
+        },
+        {
           text: this.$t('institutions.institution.status'),
           value: 'status',
           width: '120px',
@@ -550,16 +637,53 @@ export default {
         childInstitutions: 0,
         repositories: 0,
         spaces: 0,
+        sushiCredentials: 0,
+        sushiCredentialsStatuses: {
+          success: 0,
+          unauthorized: 0,
+          failed: 0,
+        },
+      };
+
+      const getCredentialsStatusesCount = (credentials) => {
+        const credentialsStatuses = {
+          success: 0,
+          unauthorized: 0,
+          failed: 0,
+        };
+        // eslint-disable-next-line no-restricted-syntax
+        for (const c of (credentials ?? [])) {
+          const { status } = c.connection;
+          if (status) {
+            credentialsStatuses[status] += 1;
+          }
+        }
+        return credentialsStatuses;
+      };
+
+      const setCounter = (property, endpoint) => {
+        counters[property] = Math.max(counters[property], endpoint[property]?.length);
+      };
+
+      const setCredentialsStatusCounter = (property, statuses) => {
+        counters.sushiCredentialsStatuses[property] = Math.max(
+          counters.sushiCredentialsStatuses[property],
+          statuses[property],
+        );
       };
 
       // eslint-disable-next-line no-restricted-syntax
       for (const institution of this.institutions) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const property of Object.keys(counters)) {
-          if (Array.isArray(institution[property])) {
-            counters[property] = Math.max(counters[property], institution[property].length);
-          }
-        }
+        setCounter('memberships', institution);
+        setCounter('childInstitutions', institution);
+        setCounter('repositories', institution);
+        setCounter('spaces', institution);
+        setCounter('sushiCredentials', institution);
+
+        const statuses = getCredentialsStatusesCount(institution.sushiCredentials);
+        setCredentialsStatusCounter('success', statuses);
+        setCredentialsStatusCounter('unauthorized', statuses);
+        setCredentialsStatusCounter('failed', statuses);
       }
 
       return counters;
@@ -567,10 +691,11 @@ export default {
     /**
      * Compute icons used to monitor quickly institution
      *
-     * @returns {Object[]} Icon definitions
+     * @returns {Map<string, Object[]>} Icon definitions
      */
     servicesIconMap() {
-      if (!this.institutions) {
+      const tableHeaders = new Set(this.tableHeaders.map((h) => h.value));
+      if (!this.institutions || !tableHeaders.has('monitor')) {
         return new Map();
       }
 
@@ -578,85 +703,146 @@ export default {
         (i) => {
           const services = new Set();
 
+          const included = {
+            memberships: i.memberships ?? [],
+            repositories: i.repositories ?? [],
+            spaces: i.spaces ?? [],
+          };
+
+          // Search for contacts
+          const contacts = included.memberships.map(
+            ({ roles }) => {
+              const icons = [];
+              const roleSet = new Set(roles);
+
+              // eslint-disable-next-line no-restricted-syntax
+              for (const roleSuffix of this.membershipsTypes) {
+                const def = iconDefMap.get(roleSuffix);
+                const role = `contact:${roleSuffix}`;
+
+                // skip if no chip definition, or if already found or if member doesnt have role
+                if (!def || services.has(role) || !roleSet.has(role)) {
+                  // eslint-disable-next-line no-continue
+                  continue;
+                }
+
+                services.add(role);
+                icons.push({
+                  key: role,
+                  icon: def.icon,
+                  color: def.color,
+                  label: this.$t(def.i18n),
+                });
+              }
+
+              return icons;
+            },
+          );
+
+          // search for repositories
+          const repositories = included.repositories.map(
+            ({ type }) => {
+              const def = iconDefMap.get(type);
+
+              // skip if no chip definition, or if already found or if member doesnt have role
+              if (!def || services.has(`repository:${type}`)) {
+                // eslint-disable-next-line no-continue
+                return [];
+              }
+
+              services.add(`repository:${type}`);
+              return [
+                {
+                  key: `repository:${type}`,
+                  icon: 'mdi-database-outline',
+                  color: def.color,
+                  label: this.$t(def.i18n),
+                },
+              ];
+            },
+          );
+
+          // Search for spaces
+          const spaces = included.spaces.map(
+            ({ type }) => {
+              const def = iconDefMap.get(type);
+
+              // skip if no chip definition, or if already found or if member doesnt have role
+              if (!def || services.has(`space:${type}`)) {
+                // eslint-disable-next-line no-continue
+                return [];
+              }
+
+              services.add(`space:${type}`);
+              return [
+                {
+                  key: `space:${type}`,
+                  icon: 'mdi-tab',
+                  color: def.color,
+                  label: this.$t(def.i18n),
+                },
+              ];
+            },
+          );
+
+          return [i.id, [...contacts, ...repositories, ...spaces].flat()];
+        },
+      );
+
+      return new Map(entries);
+    },
+    /**
+     * Compute sushi credentials status for institutions
+     *
+     * @returns {Map<string, Object[]>} Status definitions
+     */
+    credentialsStatuses() {
+      const tableHeaders = new Set(this.tableHeaders.map((h) => h.value));
+      if (!this.institutions || !tableHeaders.has('sushiCredentials')) {
+        return new Map();
+      }
+
+      const entries = this.institutions.map(
+        (i) => {
+          const sushiCredentials = i.sushiCredentials ?? [];
+          const total = sushiCredentials.length || 1;
+
+          const statuses = sushiCredentials.reduce(
+            (acc, { connection: { status } }) => {
+              if (status) {
+                acc[status] += 1;
+              }
+              return acc;
+            },
+            {
+              success: 0,
+              unauthorized: 0,
+              failed: 0,
+            },
+          );
+
           return [
             i.id,
             [
-              // search for contacts
-              ...i.memberships.map(
-                ({ roles }) => {
-                  const icons = [];
-                  const roleSet = new Set(roles);
-
-                  // eslint-disable-next-line no-restricted-syntax
-                  for (const roleSuffix of this.membershipsTypes) {
-                    const def = iconDefMap.get(roleSuffix);
-                    const role = `contact:${roleSuffix}`;
-
-                    // skip if no chip definition, or if already found or if member doesnt have role
-                    if (!def || services.has(role) || !roleSet.has(role)) {
-                      // eslint-disable-next-line no-continue
-                      continue;
-                    }
-
-                    services.add(role);
-                    icons.push({
-                      key: role,
-                      icon: def.icon,
-                      color: def.color,
-                      label: this.$t(def.i18n),
-                    });
-                  }
-
-                  return icons;
-                },
-              ),
-
-              // search for repositories
-              ...i.repositories.map(
-                ({ type }) => {
-                  const def = iconDefMap.get(type);
-
-                  // skip if no chip definition, or if already found or if member doesnt have role
-                  if (!def || services.has(`repository:${type}`)) {
-                    // eslint-disable-next-line no-continue
-                    return [];
-                  }
-
-                  services.add(`repository:${type}`);
-                  return [
-                    {
-                      key: `repository:${type}`,
-                      icon: 'mdi-tray-arrow-down',
-                      color: def.color,
-                      label: this.$t(def.i18n),
-                    },
-                  ];
-                },
-              ),
-
-              // search for spaces
-              ...i.spaces.map(
-                ({ type }) => {
-                  const def = iconDefMap.get(type);
-
-                  // skip if no chip definition, or if already found or if member doesnt have role
-                  if (!def || services.has(`space:${type}`)) {
-                    // eslint-disable-next-line no-continue
-                    return [];
-                  }
-
-                  services.add(`space:${type}`);
-                  return [
-                    {
-                      key: `space:${type}`,
-                      icon: 'mdi-tab',
-                      color: def.color,
-                      label: this.$t(def.i18n),
-                    },
-                  ];
-                },
-              ),
-            ].flat(),
+              {
+                key: `${i.id}-success`,
+                label: statuses.success,
+                value: statuses.success / total,
+                color: 'success',
+              },
+              {
+                key: `${i.id}-unauthorized`,
+                label: statuses.unauthorized,
+                value: statuses.unauthorized / total,
+                color: 'warning',
+              },
+              {
+                key: `${i.id}-failed`,
+                label: statuses.failed,
+                value: statuses.failed / total,
+                color: 'error',
+              },
+            ],
           ];
         },
       );
@@ -737,6 +923,33 @@ export default {
         return isName || isAcronym;
       }
       return this.basicStringFilter(field, item[field]);
+    },
+    /**
+     * Apply sushi filters to given item
+     *
+     * @param {*} item The item
+     *
+     * @return {boolean} Should item be shown
+     */
+    columnSushiFilter(item) {
+      const credentials = this.credentialsStatuses.get(item.id);
+      if (!credentials) {
+        return false;
+      }
+
+      const isInRange = (field, value) => {
+        const range = this.filters[field]?.value;
+        if (!range) {
+          return true;
+        }
+        return range[0] <= value && value <= range[1];
+      };
+
+      const [success, unauthorized, failed] = credentials;
+      const isSuccessInRange = isInRange('credsSuccessRange', success.label);
+      const isUnauthorizedInRange = isInRange('credsUnauthorizedRange', unauthorized.label);
+      const isFailedInRange = isInRange('credsFailedRange', failed.label);
+      return isUnauthorizedInRange && isSuccessInRange && isFailedInRange;
     },
     /**
      * Filter for service column
@@ -827,7 +1040,6 @@ export default {
 
       return repositoriesServices.some((s) => contactFilters.has(s));
     },
-
     /**
      * Apply spaces filters to given services
      *
@@ -856,12 +1068,12 @@ export default {
     async refreshInstitutions() {
       this.refreshing = true;
 
+      const includable = ['repositories', 'memberships', 'spaces', 'childInstitutions', 'sushiCredentials'];
+      const tableHeaders = new Set(this.tableHeaders.map((h) => h.value));
+      const include = includable.filter((h) => tableHeaders.has(h));
+
       try {
-        this.institutions = await this.$axios.$get('/institutions', {
-          params: {
-            include: ['repositories', 'memberships', 'spaces', 'childInstitutions'],
-          },
-        });
+        this.institutions = await this.$axios.$get('/institutions', { params: { include } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }
@@ -981,3 +1193,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.progress-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  /* position: relative; */
+}
+</style>
