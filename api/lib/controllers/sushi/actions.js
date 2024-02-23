@@ -136,10 +136,10 @@ exports.getTasks = async (ctx) => {
 exports.addSushi = async (ctx) => {
   ctx.action = 'sushi/create';
   const { body: sushiData } = ctx.request;
-  const { institution } = ctx.state;
+  const { institution, endpoint } = ctx.state;
 
   ctx.metadata = {
-    vendor: sushiData.vendor,
+    vendor: endpoint.vendor,
     institutionId: institution.id,
     institutionName: institution.name,
   };
