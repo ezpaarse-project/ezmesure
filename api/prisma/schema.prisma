@@ -238,6 +238,8 @@ model HarvestSession {
   ignoreValidation    Boolean?
   /// Parameters to pass to jobs
   params              Json?        @default("{}")
+  /// Start date
+  startedAt           DateTime?
   /// Creation date
   createdAt           DateTime     @default(now())
   /// Latest update date

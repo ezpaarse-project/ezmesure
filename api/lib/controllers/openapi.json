@@ -795,6 +795,14 @@
             "default": {},
             "description": "Additional job parameters"
           },
+          "startedAt": {
+            "type": "string",
+            "default": null,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "First start of the session",
+            "readOnly": true
+          },
           "createdAt": {
             "$ref": "#/components/schemas/ItemCreationDate"
           },
@@ -816,18 +824,6 @@
         "properties": {
           "id": {
             "$ref": "#/components/schemas/ItemID"
-          },
-          "beginDate": {
-            "description": "Begin date of the period to be harvested",
-            "type": "string",
-            "format": "date",
-            "pattern": "yyyy-MM"
-          },
-          "endDate": {
-            "description": "End date of the period to be harvested",
-            "type": "string",
-            "format": "date",
-            "pattern": "yyyy-MM"
           },
           "isActive": {
             "type": "boolean",
@@ -6192,6 +6188,30 @@
                     "pattern": "yyyy-MM",
                     "required": true
                   },
+                  "credentialsQuery": {
+                    "type": "object",
+                    "description": "Query used to get credentials to harvest",
+                    "properties": {
+                      "ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "institutionIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "endpointIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      }
+                    }
+                  },
                   "reportTypes": {
                     "type": "array",
                     "items": {
@@ -6352,6 +6372,30 @@
                     "format": "date",
                     "pattern": "yyyy-MM",
                     "required": true
+                  },
+                  "credentialsQuery": {
+                    "type": "object",
+                    "description": "Query used to get credentials to harvest",
+                    "properties": {
+                      "ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "institutionIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "endpointIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      }
+                    }
                   },
                   "reportTypes": {
                     "type": "array",
