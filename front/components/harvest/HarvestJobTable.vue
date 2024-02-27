@@ -39,7 +39,7 @@
       :options.sync="tableOptions"
       :server-items-length="jobsCount"
       item-key="id"
-      sort-by="createdAt"
+      sort-by="startedAt"
       sort-desc
       @update:options="refreshJobs()"
     >
@@ -104,7 +104,11 @@
         </v-menu>
       </template>
 
-      <template #[`item.createdAt`]="{ value }">
+      <template #[`item.startedAt`]="{ value }">
+        <LocalDate v-if="value" :date="value" />
+      </template>
+
+      <template #[`item.updatedAt`]="{ value }">
         <LocalDate v-if="value" :date="value" />
       </template>
     </v-data-table>
@@ -194,8 +198,12 @@ export default defineComponent({
           align: 'center',
         },
         {
-          text: this.$t('harvest.jobs.createdAt'),
-          value: 'createdAt',
+          text: this.$t('harvest.jobs.startedAt'),
+          value: 'startedAt',
+        },
+        {
+          text: this.$t('harvest.jobs.updatedAt'),
+          value: 'updatedAt',
         },
       ];
     },

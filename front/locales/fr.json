@@ -723,7 +723,8 @@
   },
   "harvest": {
     "sessions": {
-      "name": "Moissonnage du {createdAt}",
+      "pendingSession": "Moissonnage en attente...",
+      "name": "Moissonnage du {startedAt}",
       "metrics": {
         "success": "Réussi",
         "failed": "Échoué",
@@ -749,7 +750,8 @@
       "beginDate": "Date de début",
       "endDate": "Date de fin",
       "period": "Période",
-      "createdAt": "Demandé le",
+      "startedAt": "Démarré le",
+      "updatedAt": "Mis à jour le",
       "runningTime": "Durée de traitement",
       "index": "Index d'insertion",
       "coveredPeriods": "Mois concernés",

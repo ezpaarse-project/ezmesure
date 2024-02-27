@@ -723,7 +723,8 @@
   },
   "harvest": {
     "sessions": {
-      "name": "Harvesting from {createdAt}",
+      "pendingSession": "Pending harvest...",
+      "name": "Harvest of {startedAt}",
       "metrics": {
         "success": "Success",
         "failed": "Failed",
@@ -749,7 +750,8 @@
       "beginDate": "Start Date",
       "endDate": "End Date",
       "period": "Period",
-      "createdAt": "Requested on",
+      "startedAt": "Started at",
+      "updatedAt": "Updated at",
       "runningTime": "Processing Time",
       "index": "Insertion Index",
       "coveredPeriods": "Covered Months",

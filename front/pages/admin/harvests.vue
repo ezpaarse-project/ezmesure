@@ -95,8 +95,7 @@ export default defineComponent({
       return this.sessions.map((item) => ({
         item,
         status: this.sessionStatuses[item.id],
-        // eslint-disable-next-line no-underscore-dangle
-        hasStarted: item._count.jobs > 0,
+        hasStarted: !!item.startedAt,
       }));
     },
   },

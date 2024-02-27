@@ -4,7 +4,7 @@
       <v-col>
         <v-row>
           <v-col>
-            {{ $t('harvest.sessions.name', { createdAt }) }}
+            {{ sessionName }}
 
             <span class="text--secondary mx-2" style="font-size: 0.75em;">
               ({{ session.id }})
@@ -141,8 +141,12 @@ export default defineComponent({
     },
   },
   computed: {
-    createdAt() {
-      return this.$dateFunctions.format(parseISO(this.session.createdAt), 'PPPpp');
+    sessionName() {
+      if (this.hasStarted) {
+        const startedAt = this.$dateFunctions.format(parseISO(this.session.startedAt), 'PPPp');
+        return this.$t('harvest.sessions.name', { startedAt });
+      }
+      return this.$t('harvest.sessions.pendingSession');
     },
     runningTime() {
       return this.$dateFunctions.msToLocalDistance(
