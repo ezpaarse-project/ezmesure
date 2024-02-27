@@ -5,7 +5,6 @@
 
       <v-btn
         text
-        color="primary"
         @click="showFiltrerDrawer = true"
       >
         <v-badge
@@ -22,7 +21,6 @@
       </v-btn>
 
       <v-btn
-        color="primary"
         text
         :loading="refreshing"
         @click.stop="refreshJobs()"
