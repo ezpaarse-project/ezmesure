@@ -53,7 +53,7 @@ async function getEzMesureMetrics() {
                   'institutions/delete',
                   'sushi/create',
                   'sushi/update',
-                  'sushi/delete-many',
+                  'sushi/delete',
                 ],
               },
             },
