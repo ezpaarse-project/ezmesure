@@ -35,10 +35,6 @@
         </v-icon>
 
         {{ chipText }}
-
-        <v-icon small right>
-          mdi-chevron-down
-        </v-icon>
       </v-chip>
     </template>
 
