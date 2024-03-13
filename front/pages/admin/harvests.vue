@@ -35,6 +35,12 @@
               disable-icon-rotate
               :style="{ cursor: hasStarted ? undefined : 'default' }"
             >
+              <HarvestSessionHeader
+                :session="item"
+                :status="status"
+                :has-started="hasStarted"
+              />
+
               <template #actions="{ open }">
                 <div v-if="!hasStarted" />
                 <v-btn v-else icon>
@@ -43,12 +49,6 @@
                   </v-icon>
                 </v-btn>
               </template>
-
-              <HarvestSessionHeader
-                :session="item"
-                :status="status"
-                :has-started="hasStarted"
-              />
             </v-expansion-panel-header>
 
             <v-expansion-panel-content>

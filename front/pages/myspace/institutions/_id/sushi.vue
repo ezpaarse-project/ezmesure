@@ -464,6 +464,14 @@
         />
       </template>
 
+      <template #[`item.harvests`]="{ item }">
+        <CredentialHarvestState
+          v-if="item.harvests?.length > 0"
+          :harvests="item.harvests"
+          @click="showHarvestMatrix(item, $event.harvestDate)"
+        />
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
@@ -528,6 +536,7 @@ import SushiForm from '~/components/SushiForm.vue';
 import SushiHistory from '~/components/SushiHistory.vue';
 import SushiFiles from '~/components/SushiFiles.vue';
 import SushiConnectionIcon from '~/components/SushiConnectionIcon.vue';
+import CredentialHarvestState from '~/components/sushis/CredentialHarvestState.vue';
 import ReportsDialog from '~/components/ReportsDialog.vue';
 import HarvestMatrixDialog from '~/components/HarvestMatrixDialog.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
@@ -550,6 +559,7 @@ export default {
     ConfirmDialog,
     LocalDate,
     DropdownSelector,
+    CredentialHarvestState,
     SimpleMetric,
   },
   async asyncData({
@@ -689,6 +699,12 @@ export default {
 
             return this.filters.sushiStatuses.includes(value?.status || 'untested');
           },
+        },
+        {
+          text: this.$t('institutions.sushi.lastHarvest'),
+          value: 'harvests',
+          align: 'right',
+          sortable: false,
         },
         {
           text: this.$t('institutions.sushi.updatedAt'),
@@ -849,8 +865,9 @@ export default {
     showAvailableReports(item) {
       this.$refs.reportsDialog.showReports(item);
     },
-    showHarvestMatrix(item) {
-      this.$refs.harvestMatrixDialog.display(item);
+    showHarvestMatrix(item, date) {
+      const year = date ? date.getFullYear() : undefined;
+      this.$refs.harvestMatrixDialog.display(item, year);
     },
     createSushiItem() {
       this.$refs.sushiForm.createSushiItem(this.institution);
@@ -876,7 +893,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`);
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, { params: { include: ['harvests'] } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }

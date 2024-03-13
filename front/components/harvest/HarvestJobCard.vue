@@ -45,6 +45,7 @@
                   :key="month"
                   outlined
                   small
+                  class="mr-2"
                 >
                   {{ month }}
                 </v-chip>

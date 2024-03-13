@@ -424,6 +424,7 @@
       "validateMyCredentials": "Valider mes identifiants",
       "resumeEntryQuestion": "Reprendre votre saisie ?",
       "resumeEntryDesc": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Souhaitez-vous la reprendre ?",
+      "lastHarvest": "Dernier moissonnage",
       "readyPopup": {
         "inProgress": "Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.",
         "completed": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous."
@@ -546,7 +547,7 @@
     "nInvalidCredentials": "1 identifiant invalide|{count} identifiants invalides",
     "nOperationalCredentials": "1 identifiant fonctionnel|{count} identifiants fonctionnels",
     "nProblematicEndpoints": "1 point d'accès problématique|{count} points d'accès problématiques",
-    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiant indique que le point d'accès est problématique",
+    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiants indiquent que le point d'accès est problématique",
     "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
