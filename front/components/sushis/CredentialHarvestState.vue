@@ -5,13 +5,13 @@
     small
     outlined
     class="white--text"
-    @click="$emit('click', { lastHarvest, harvestDate })"
+    @click="$emit('click', lastHarvest)"
   >
     <v-icon left small>
       {{ chipIcon }}
     </v-icon>
 
-    <LocalDate :date="harvestDate" />
+    <LocalDate :date="lastHarvest.harvestDate" />
   </v-chip>
 </template>
 
@@ -30,8 +30,12 @@ const props = defineProps({
 
 defineEmits(['click']);
 
-const lastHarvest = computed(() => props.harvests.at(0));
-const harvestDate = computed(() => lastHarvest.value && parseISO(lastHarvest.value.harvestedAt));
+const lastHarvest = computed(
+  () => props.harvests
+    .map((harvest) => ({ ...harvest, harvestDate: parseISO(harvest.harvestedAt) }))
+    .sort((a, b) => b.harvestDate - a.harvestDate)
+    .at(0),
+);
 const chipColor = computed(() => lastHarvest.value && colors.get(lastHarvest.value.status));
 const chipIcon = computed(() => lastHarvest.value && icons.get(lastHarvest.value.status));
 </script>
