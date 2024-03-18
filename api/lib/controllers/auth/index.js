@@ -3,7 +3,7 @@ const { Joi } = require('koa-joi-router');
 
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireJwt, requireUser } = require('../../services/auth');
+const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 
 const {
   getToken,
@@ -14,6 +14,7 @@ const {
   getMemberships,
   getReportingToken,
   activate,
+  impersonateUser,
 } = require('./auth');
 
 router.route({
@@ -80,6 +81,19 @@ router.route({
     body: Joi.object({
       password: Joi.string().trim().min(6).required(),
     }),
+  },
+});
+
+router.use(requireAdmin);
+
+router.route({
+  method: 'POST',
+  path: '/:username/_impersonate',
+  handler: impersonateUser,
+  validate: {
+    params: {
+      username: Joi.string().trim().required(),
+    },
   },
 });
 
