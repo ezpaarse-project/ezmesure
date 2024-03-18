@@ -125,7 +125,7 @@ router.route({
   ],
   validate: {
     params: {
-      institutionId: Joi.string().trim().required(), include: ['harvests'],
+      institutionId: Joi.string().trim().required(),
     },
     query: Joi.object({
       include: Joi.array().single().items(Joi.string().valid(...repositoryIncludableFields)),
