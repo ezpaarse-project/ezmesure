@@ -468,7 +468,7 @@
         <CredentialHarvestState
           v-if="item.harvests?.length > 0"
           :harvests="item.harvests"
-          @click="showHarvestMatrix(item, $event.harvestDate)"
+          @harvest:click="(e) => showHarvestMatrix(item, e.harvestDate)"
         />
       </template>
 

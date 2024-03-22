@@ -5,7 +5,7 @@
     small
     outlined
     class="white--text"
-    @click="$emit('click', lastHarvest)"
+    @click="$emit('harvest:click', lastHarvest)"
   >
     <v-icon left small>
       {{ chipIcon }}
@@ -28,7 +28,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['click']);
+defineEmits(['harvest:click']);
 
 const lastHarvest = computed(
   () => props.harvests
