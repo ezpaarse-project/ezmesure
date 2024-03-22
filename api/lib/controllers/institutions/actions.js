@@ -689,6 +689,8 @@ exports.removeInstitutionMember = async (ctx) => {
 };
 
 exports.getSushiData = async (ctx) => {
+  const { include: propsToInclude } = ctx.query;
+
   const sushiCredentialsService = new SushiCredentialsService();
 
   ctx.type = 'json';
@@ -699,6 +701,7 @@ exports.getSushiData = async (ctx) => {
     },
     include: {
       endpoint: true,
+      ...propsToPrismaInclude(propsToInclude, ['harvests']),
     },
   });
 };

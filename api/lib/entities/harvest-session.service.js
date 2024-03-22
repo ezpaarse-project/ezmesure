@@ -146,8 +146,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       return {
         id: session.id,
-        beginDate: session.beginDate,
-        endDate: session.endDate,
 
         isActive: activeJobsCount > 0,
         runningTime,
@@ -478,7 +476,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           }
 
           // Add jobs
-          return Promise.all(
+          const jobs = await Promise.all(
             reportTypes.map(
               async (reportType) => {
                 const data = {
@@ -518,6 +516,15 @@ module.exports = class HarvestSessionService extends BasePrismaService {
               },
             ),
           );
+
+          if (!session.startedAt) {
+            await harvestSessionService.update({
+              where: { id: session.id },
+              data: { startedAt: new Date() },
+            });
+          }
+
+          return jobs;
         }),
       );
     };

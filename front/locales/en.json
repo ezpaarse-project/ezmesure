@@ -426,6 +426,7 @@
       "validateMyCredentials": "Validate my credentials",
       "resumeEntryQuestion": "Resume your entry ?",
       "resumeEntryDesc": "You have declared the completion of your credentials on {date}. Do you want to resume your entry ?",
+      "lastHarvest": "Last harvest",
       "readyPopup": {
         "inProgress": "Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.",
         "completed": "You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below."
@@ -726,7 +727,8 @@
   },
   "harvest": {
     "sessions": {
-      "name": "Harvesting from {createdAt}",
+      "pendingSession": "Pending harvest...",
+      "name": "Harvest of {startedAt}",
       "metrics": {
         "success": "Success",
         "failed": "Failed",
@@ -752,7 +754,8 @@
       "beginDate": "Start Date",
       "endDate": "End Date",
       "period": "Period",
-      "createdAt": "Requested on",
+      "startedAt": "Started at",
+      "updatedAt": "Updated at",
       "runningTime": "Processing Time",
       "index": "Insertion Index",
       "coveredPeriods": "Covered Months",

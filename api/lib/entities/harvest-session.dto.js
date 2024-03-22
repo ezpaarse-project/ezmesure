@@ -15,6 +15,7 @@ const schema = {
   id: Joi.string().trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
+  startedAt: Joi.date(),
 
   credentialsQuery: Joi.object().pattern(Joi.string(), Joi.any()),
   beginDate: Joi.string().regex(/^\d{4}-\d{2}$/),
@@ -42,6 +43,7 @@ const immutableFields = [
   'id',
   'updatedAt',
   'createdAt',
+  'startedAt',
   'jobs',
 ];
 
@@ -61,7 +63,7 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['credentialsQuery', 'beginDate', 'endDate', 'reportTypes']),
+  requireFields(['credentialsQuery', 'reportTypes']),
   withDefaults({
     timeout: 600,
     allowFaulty: false,
@@ -78,6 +80,7 @@ const adminCreateSchema = withModifiers(
 const adminUpdateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  requireFields(['credentialsQuery', 'reportTypes']),
 );
 
 module.exports = {

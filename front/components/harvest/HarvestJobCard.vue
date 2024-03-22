@@ -45,6 +45,7 @@
                   :key="month"
                   outlined
                   small
+                  class="mr-2"
                 >
                   {{ month }}
                 </v-chip>
@@ -137,7 +138,7 @@ export default defineComponent({
           key: 'updated',
           label: this.$t('harvest.jobs.updated'),
           icon: 'mdi-file-replace',
-          color: 'warning',
+          color: 'info',
           value: this.harvest.result.updated.toLocaleString(),
         },
         {

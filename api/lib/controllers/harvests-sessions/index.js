@@ -15,6 +15,7 @@ const {
 
 const {
   getAll,
+  getOne,
   getManyStatus,
   createOne,
   startOne,
@@ -69,6 +70,19 @@ router.route({
     query: Joi.object({
       harvestIds: Joi.array().single().items(Joi.string()),
     }).rename('harvestIds[]', 'harvestIds'),
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:harvestId',
+  handler: [
+    getOne,
+  ],
+  validate: {
+    params: {
+      harvestId: Joi.string().trim().required(),
+    },
   },
 });
 

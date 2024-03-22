@@ -89,6 +89,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    initialYear: {
+      type: Number,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -102,6 +106,10 @@ export default {
     sushiId: {
       immediate: true,
       handler() { this.refreshHarvests(); },
+    },
+    initialYear: {
+      immediate: true,
+      handler(val) { if (val != null) { this.year = val; } },
     },
     year() {
       this.refreshHarvests();
