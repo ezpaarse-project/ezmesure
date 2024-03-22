@@ -1,9 +1,11 @@
-const institutionsService = require('../../entities/institutions.service');
+const InstitutionsService = require('../../entities/institutions.service');
 const { includableFields } = require('../../entities/institutions.dto');
 const { propsToPrismaInclude } = require('../utils');
 
 exports.getSubInstitutions = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
+
+  const institutionsService = new InstitutionsService();
 
   const subInstitutions = await institutionsService.findMany({
     where: { parentInstitutionId: ctx.state.institution.id },
@@ -19,7 +21,11 @@ exports.addSubInstitution = async (ctx) => {
   const { institution } = ctx.state;
   const { subInstitutionId } = ctx.params;
 
-  const newInstitution = await institutionsService.update({
+  const institutionsService = new InstitutionsService();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = await institutionsService.update({
     where: { id: institution.id },
     include: { childInstitutions: true },
     data: {
@@ -29,17 +35,17 @@ exports.addSubInstitution = async (ctx) => {
     },
 
   });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = newInstitution;
 };
 
 exports.removeSubInstitution = async (ctx) => {
   const { institution } = ctx.state;
   const { subInstitutionId } = ctx.params;
 
-  const newInstitution = await institutionsService.update({
+  const institutionsService = new InstitutionsService();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = await institutionsService.update({
     where: { id: institution.id },
     include: { childInstitutions: true },
     data: {
@@ -47,10 +53,5 @@ exports.removeSubInstitution = async (ctx) => {
         disconnect: { id: subInstitutionId },
       },
     },
-
   });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = newInstitution;
 };

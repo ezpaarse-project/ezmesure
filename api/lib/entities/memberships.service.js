@@ -1,6 +1,6 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const membershipsPrisma = require('../services/prisma/memberships');
-const { triggerHooks } = require('../hooks/hookEmitter');
 
 /* eslint-disable max-len */
 /**
@@ -16,14 +16,17 @@ const { triggerHooks } = require('../hooks/hookEmitter');
  */
 /* eslint-enable max-len */
 
-module.exports = class MembershipsService {
+module.exports = class MembershipsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<MembershipsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {MembershipCreateArgs} params
    * @returns {Promise<Membership>}
    */
-  static async create(params) {
-    const membership = await membershipsPrisma.create(params);
-    triggerHooks('membership:upsert', membership);
+  async create(params) {
+    const membership = await membershipsPrisma.create(params, this.prisma);
+    this.triggerHooks('membership:upsert', membership);
     return membership;
   }
 
@@ -31,16 +34,16 @@ module.exports = class MembershipsService {
    * @param {MembershipFindManyArgs} params
    * @returns {Promise<Membership[]>}
    */
-  static findMany(params) {
-    return membershipsPrisma.findMany(params);
+  findMany(params) {
+    return membershipsPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {MembershipFindUniqueArgs} params
    * @returns {Promise<Membership | null>}
    */
-  static findUnique(params) {
-    return membershipsPrisma.findUnique(params);
+  findUnique(params) {
+    return membershipsPrisma.findUnique(params, this.prisma);
   }
 
   /**
@@ -49,17 +52,17 @@ module.exports = class MembershipsService {
    * @param {Object | null} includes
    * @returns {Promise<Membership | null>}
    */
-  static findByID(institutionId, username, includes = null) {
-    return membershipsPrisma.findByID(institutionId, username, includes);
+  findByID(institutionId, username, includes = null) {
+    return membershipsPrisma.findByID(institutionId, username, includes, this.prisma);
   }
 
   /**
    * @param {MembershipUpdateArgs} params
    * @returns {Promise<Membership>}
    */
-  static async update(params) {
-    const membership = await membershipsPrisma.update(params);
-    triggerHooks('membership:upsert', membership);
+  async update(params) {
+    const membership = await membershipsPrisma.update(params, this.prisma);
+    this.triggerHooks('membership:upsert', membership);
     return membership;
   }
 
@@ -67,9 +70,9 @@ module.exports = class MembershipsService {
    * @param {MembershipUpsertArgs} params
    * @returns {Promise<Membership>}
    */
-  static async upsert(params) {
-    const membership = await membershipsPrisma.upsert(params);
-    triggerHooks('membership:upsert', membership);
+  async upsert(params) {
+    const membership = await membershipsPrisma.upsert(params, this.prisma);
+    this.triggerHooks('membership:upsert', membership);
     return membership;
   }
 
@@ -77,8 +80,8 @@ module.exports = class MembershipsService {
    * @param {MembershipDeleteArgs} params
    * @returns {Promise<Membership | null>}
    */
-  static async delete(params) {
-    const result = await membershipsPrisma.remove(params);
+  async delete(params) {
+    const result = await membershipsPrisma.remove(params, this.prisma);
 
     if (!result) {
       return null;
@@ -86,9 +89,9 @@ module.exports = class MembershipsService {
 
     const { deleteResult, membership } = result;
 
-    triggerHooks('membership:delete', membership);
-    membership.repositoryPermissions.forEach((repoPerm) => { triggerHooks('repository_permission:delete', repoPerm); });
-    membership.spacePermissions.forEach((spacePerm) => { triggerHooks('space_permission:delete', spacePerm); });
+    this.triggerHooks('membership:delete', membership);
+    membership.repositoryPermissions.forEach((repoPerm) => { this.triggerHooks('repository_permission:delete', repoPerm); });
+    membership.spacePermissions.forEach((spacePerm) => { this.triggerHooks('space_permission:delete', spacePerm); });
 
     return deleteResult;
   }
@@ -96,24 +99,34 @@ module.exports = class MembershipsService {
   /**
    * @returns {Promise<Array<Membership> | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const memberships = await this.findMany({});
+    /** @param {MembershipsService} service */
+    const transaction = async (service) => {
+      const memberships = await service.findMany({});
 
-    if (memberships.length === 0) { return null; }
+      if (memberships.length === 0) { return null; }
 
-    await Promise.all(memberships.map(async (membership) => {
-      await this.delete({
-        where: {
-          username_institutionId: {
-            username: membership.username,
-            institutionId: membership.institutionId,
-          },
-        },
-      });
-    }));
+      await Promise.all(
+        memberships.map(
+          (membership) => service.delete({
+            where: {
+              username_institutionId: {
+                username: membership.username,
+                institutionId: membership.institutionId,
+              },
+            },
+          }),
+        ),
+      );
 
-    return memberships;
+      return memberships;
+    };
+
+    if (this.currentTransaction) {
+      return transaction(this);
+    }
+    return MembershipsService.$transaction(transaction);
   }
 };

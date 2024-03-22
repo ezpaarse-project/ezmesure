@@ -3,7 +3,7 @@ const { registerHook } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 
-const usersService = require('../../entities/users.service');
+const UsersService = require('../../entities/users.service');
 const { syncUser } = require('../../services/sync/elastic');
 
 /**
@@ -16,6 +16,7 @@ const { syncUser } = require('../../services/sync/elastic');
  * @returns {Promise<void>}
  */
 const onSpacePermissionModified = async (permission) => {
+  const usersService = new UsersService();
   const user = await usersService.findUnique({
     where: {
       username: permission.username,

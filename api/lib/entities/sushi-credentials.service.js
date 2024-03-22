@@ -1,4 +1,5 @@
 // @ts-check
+const BasePrismaService = require('./base-prisma.service');
 const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
 
 /* eslint-disable max-len */
@@ -11,81 +12,94 @@ const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsDeleteArgs} SushiCredentialsDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class SushiCredentialsService {
+module.exports = class SushiCredentialsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<SushiCredentialsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {SushiCredentialsCreateArgs} params
    * @returns {Promise<SushiCredentials>}
    */
-  static create(params) {
-    return sushiCredentialsPrisma.create(params);
+  create(params) {
+    return sushiCredentialsPrisma.create(params, this.prisma);
   }
 
   /**
    * @param {SushiCredentialsFindManyArgs} params
    * @returns {Promise<SushiCredentials[]>}
    */
-  static findMany(params) {
-    return sushiCredentialsPrisma.findMany(params);
+  findMany(params) {
+    return sushiCredentialsPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {SushiCredentialsFindUniqueArgs} params
    * @returns {Promise<SushiCredentials | null>}
    */
-  static findUnique(params) {
-    return sushiCredentialsPrisma.findUnique(params);
+  findUnique(params) {
+    return sushiCredentialsPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {string} id
    * @returns {Promise<SushiCredentials | null>}
    */
-  static findByID(id) {
-    return sushiCredentialsPrisma.findByID(id);
+  findByID(id) {
+    return sushiCredentialsPrisma.findByID(id, this.prisma);
   }
 
   /**
    * @param {SushiCredentialsUpdateArgs} params
    * @returns {Promise<SushiCredentials>}
    */
-  static update(params) {
-    return sushiCredentialsPrisma.update(params);
+  update(params) {
+    return sushiCredentialsPrisma.update(params, this.prisma);
   }
 
   /**
    * @param {SushiCredentialsUpsertArgs} params
    * @returns {Promise<SushiCredentials>}
    */
-  static upsert(params) {
-    return sushiCredentialsPrisma.upsert(params);
+  upsert(params) {
+    return sushiCredentialsPrisma.upsert(params, this.prisma);
   }
 
   /**
    * @param {SushiCredentialsDeleteArgs} params
    * @returns {Promise<SushiCredentials | null>}
    */
-  static delete(params) {
-    return sushiCredentialsPrisma.remove(params);
+  delete(params) {
+    return sushiCredentialsPrisma.remove(params, this.prisma);
   }
 
   /**
    * @returns {Promise<Array<SushiCredentials> | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const sushiCredentials = await this.findMany({});
+    /** @param {SushiCredentialsService} service */
+    const transaction = async (service) => {
+      const sushiCredentials = await service.findMany({});
 
-    if (sushiCredentials.length === 0) { return null; }
+      if (sushiCredentials.length === 0) { return null; }
 
-    await Promise.all(sushiCredentials.map(async (sushiCredential) => {
-      await this.delete({
-        where: {
-          id: sushiCredential.id,
-        },
-      });
-    }));
+      await Promise.all(
+        sushiCredentials.map(
+          (sushiCredential) => service.delete({
+            where: {
+              id: sushiCredential.id,
+            },
+          }),
+        ),
+      );
 
-    return sushiCredentials;
+      return sushiCredentials;
+    };
+
+    if (this.currentTransaction) {
+      return transaction(this);
+    }
+    return SushiCredentialsService.$transaction(transaction);
   }
 };

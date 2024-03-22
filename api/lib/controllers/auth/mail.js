@@ -16,7 +16,7 @@ const { sendMail, generateMail } = require('../../services/mail');
  * @param {string} data.resetLink - Reset recovery password link.
  * @param {string} data.validity - Duration of Recovery link.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
 exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink) {
   return sendMail({
@@ -34,7 +34,7 @@ exports.sendActivateUserMail = function sendActivateUserMail(user, activateLink)
  * @param {string} user.username - Username of user.
  * @param {string} user.email - User email.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
 exports.sendWelcomeMail = function sendWelcomeMail(user) {
   return sendMail({
@@ -55,7 +55,7 @@ exports.sendWelcomeMail = function sendWelcomeMail(user) {
  * @param {string} data.resetLink - Reset recovery password link.
  * @param {string} data.validity - Duration of Recovery link.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
 exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
   return sendMail({
@@ -74,7 +74,7 @@ exports.sendPasswordRecovery = function sendPasswordRecovery(user, data) {
  * @param {Object} data - Mail config.
  * @param {string} data.newUser - Username of user who activated his account.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
 exports.sendNewUserToContacts = function sendNewUserToContacts(receivers, data) {
   return sendMail({

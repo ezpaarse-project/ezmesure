@@ -97,40 +97,8 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="!disabledFiltersSet.has('period') || !disabledFiltersSet.has('tags')">
-        <v-col v-if="!disabledFiltersSet.has('period')">
-          <v-menu
-            :close-on-content-click="false"
-            bottom
-            offset-y
-            transition="fade-transition"
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                :value="dateStr"
-                :label="$t('harvest.jobs.period')"
-                prepend-icon="mdi-calendar-range"
-                clearable
-                hide-details
-                readonly
-                v-bind="attrs"
-                @click:clear="date = []"
-                v-on="on"
-              />
-            </template>
-
-            <v-date-picker
-              v-model="date"
-              :locale="$i18n.locale"
-              type="month"
-              range
-              show-current
-            />
-          </v-menu>
-        </v-col>
-
-        <v-col v-if="!disabledFiltersSet.has('tags')">
+      <v-row v-if="!disabledFiltersSet.has('tags')">
+        <v-col>
           <v-select
             :value="value.tags"
             :items="tagsItems"
@@ -215,33 +183,6 @@ export default defineComponent({
         value,
         text: this.$te(`tasks.status.${value}`) ? this.$tc(`tasks.status.${value}`) : value,
       }));
-    },
-    date: {
-      get() {
-        const { beginDate, endDate } = this.value;
-        const d = [];
-
-        if (beginDate) {
-          d.push(beginDate);
-        }
-        if (endDate) {
-          d.push(endDate);
-        }
-
-        return d;
-      },
-      set(value) {
-        const [beginDate, endDate] = value.slice().sort();
-
-        this.$emit('input', {
-          ...this.value,
-          beginDate,
-          endDate,
-        });
-      },
-    },
-    dateStr() {
-      return this.date.join(' ~ ');
     },
   },
   methods: {

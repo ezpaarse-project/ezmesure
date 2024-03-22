@@ -645,8 +645,31 @@ export default {
         },
       };
 
-      const setCounter = (property, institution) => {
-        counters[property] = Math.max(counters[property], institution[property]?.length);
+      const getCredentialsStatusesCount = (credentials) => {
+        const credentialsStatuses = {
+          success: 0,
+          unauthorized: 0,
+          failed: 0,
+        };
+        // eslint-disable-next-line no-restricted-syntax
+        for (const c of (credentials ?? [])) {
+          const { status } = c.connection;
+          if (status) {
+            credentialsStatuses[status] += 1;
+          }
+        }
+        return credentialsStatuses;
+      };
+
+      const setCounter = (property, endpoint) => {
+        counters[property] = Math.max(counters[property], endpoint[property]?.length);
+      };
+
+      const setCredentialsStatusCounter = (property, statuses) => {
+        counters.sushiCredentialsStatuses[property] = Math.max(
+          counters.sushiCredentialsStatuses[property],
+          statuses[property],
+        );
       };
 
       // eslint-disable-next-line no-restricted-syntax
@@ -657,13 +680,10 @@ export default {
         setCounter('spaces', institution);
         setCounter('sushiCredentials', institution);
 
-        // eslint-disable-next-line no-restricted-syntax
-        for (const credentials of (institution.sushiCredentials ?? [])) {
-          const { status } = credentials.connection;
-          if (status) {
-            counters.sushiCredentialsStatuses[credentials.connection.status] += 1;
-          }
-        }
+        const statuses = getCredentialsStatusesCount(institution.sushiCredentials);
+        setCredentialsStatusCounter('success', statuses);
+        setCredentialsStatusCounter('unauthorized', statuses);
+        setCredentialsStatusCounter('failed', statuses);
       }
 
       return counters;

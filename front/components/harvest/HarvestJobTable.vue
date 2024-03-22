@@ -115,7 +115,7 @@
       v-model="filters"
       :show.sync="showFiltrerDrawer"
       :disabled-filters="disabledFilters"
-      :harvest-ids="meta?.harvestIds ?? []"
+      :session-ids="meta?.sessionIds ?? []"
       :vendors="meta?.vendors ?? []"
       :institutions="meta?.institutions ?? []"
       :report-types="meta?.reportTypes ?? []"
@@ -141,9 +141,9 @@ export default defineComponent({
     HarvestJobFilters,
   },
   props: {
-    harvestId: {
+    sessionId: {
       type: String,
-      required: true,
+      default: '',
     },
     disabledFilters: {
       type: Array,
@@ -153,13 +153,11 @@ export default defineComponent({
   data: () => ({
     showFiltrerDrawer: false,
     filters: {
-      harvestId: undefined,
+      sessionId: undefined,
       vendor: undefined,
       institution: undefined,
       tags: undefined,
       reportType: undefined,
-      beginDate: undefined,
-      endDate: undefined,
       status: undefined,
     },
 
@@ -168,7 +166,6 @@ export default defineComponent({
     jobsCount: 0,
 
     tableOptions: {},
-    currentHarvestId: undefined,
 
     refreshing: false,
   }),
@@ -192,16 +189,6 @@ export default defineComponent({
           value: 'reportType',
           align: 'center',
           width: 0,
-        },
-        {
-          text: this.$t('harvest.jobs.beginDate'),
-          value: 'beginDate',
-          align: 'center',
-        },
-        {
-          text: this.$t('harvest.jobs.endDate'),
-          value: 'endDate',
-          align: 'center',
         },
         {
           text: this.$t('status'),
@@ -279,15 +266,15 @@ export default defineComponent({
         };
       }
 
+      const sessionId = this.sessionId || this.filters.sessionId;
       const params = {
         include: ['credentials.institution', 'credentials.endpoint'],
+        sessionId,
 
-        from: this.filters.beginDate,
-        to: this.filters.endDate,
-        reportType: this.filters.reportType,
-        vendor: this.filters.vendor,
-        institution: this.filters.institution,
         status: this.filters.status,
+        type: this.filters.reportType,
+        credentialsId: this.filters.vendor,
+        institutionId: this.filters.institution,
         tags: this.filters.tags,
 
         page: this.tableOptions.page,
@@ -297,13 +284,13 @@ export default defineComponent({
       };
 
       try {
-        this.meta = await this.$axios.$get(`/harvests-requests/${this.harvestId}/jobs/_meta`);
+        this.meta = await this.$axios.$get('/tasks/_meta', { params: { sessionId } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToRetriveMeta'));
       }
 
       try {
-        const { headers, data } = await this.$axios.get(`/harvests-requests/${this.harvestId}/jobs`, { params });
+        const { headers, data } = await this.$axios.get('/tasks', { params });
 
         this.jobs = data;
         this.jobsCount = Number.parseInt(headers['x-total-count'], 10);
