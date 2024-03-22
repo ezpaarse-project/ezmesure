@@ -189,7 +189,7 @@
     }
   },
   "endpoints": {
-    "title": "Points d'accès SUSHI ({total})",
+    "title": "Points d'accès SUSHI ({count})",
     "pageDescription": "Gérez ici la liste des points d'accès SUSHI disponibles.",
     "pageDescription2": "Seule la version 5 du protocole SUSHI est supportée.",
     "manageNendpoints": "Gérer le point d'accès|Gérer {count} points d'accès",
@@ -217,7 +217,10 @@
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
     "deleteNbEndpoints": "Vous allez supprimer {count} point d'accès.|Vous allez supprimer {count} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
-    "clickToDeclareOne": "Cliquez ici pour en déclarer un"
+    "clickToDeclareOne": "Cliquez ici pour en déclarer un",
+    "filters": {
+      "title": "Filtrer les points d'accès"
+    }
   },
   "institutions": {
     "toolbarTitle": "Établissements ({count})",

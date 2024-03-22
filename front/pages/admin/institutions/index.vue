@@ -167,8 +167,8 @@
           transition="slide-y-transition"
           nudge-bottom="2"
           open-on-hover
-          bottom
-          offset-y
+          left
+          offset-x
         >
           <template #activator="{ on, attrs }">
             <v-chip
@@ -1201,6 +1201,5 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100%;
-  /* position: relative; */
 }
 </style>
