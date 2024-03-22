@@ -62,6 +62,7 @@
             :label="$t('institutions.institution.status')"
             :true-text="$t('institutions.institution.validated')"
             :false-text="$t('institutions.institution.notValidated')"
+            icon="mdi-check-all"
             @input="onFilterUpdate('validated', { value: $event })"
           />
         </v-col>
