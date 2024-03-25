@@ -383,6 +383,7 @@ exports.importInstitutions = async (ctx) => {
             create: {
               ...(membership ?? {}),
               username: undefined,
+              institutionId: undefined,
 
               user: {
                 connect: { username: membership?.username },
