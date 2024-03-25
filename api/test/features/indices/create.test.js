@@ -5,7 +5,7 @@ const ezmesure = require('../../setup/ezmesure');
 const indicesPrisma = require('../../../lib/services/elastic/indices');
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -22,7 +22,7 @@ describe('[indices]: Test create features', () => {
 
   let adminToken;
   beforeAll(async () => {
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     it(`#01 Should create new index [${indexName}]`, async () => {
@@ -51,7 +51,7 @@ describe('[indices]: Test create features', () => {
       // TODO use service
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      userToken = await UsersService.generateToken(userTest.username, userTest.password);
     });
 
     it(`#02 Should not create index [${indexName}]`, async () => {

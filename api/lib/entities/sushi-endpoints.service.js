@@ -1,6 +1,6 @@
 // @ts-check
 const sushiEndpointsPrisma = require('../services/prisma/sushi-endpoints');
-const { triggerHooks } = require('../hooks/hookEmitter');
+const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
@@ -12,85 +12,103 @@ const { triggerHooks } = require('../hooks/hookEmitter');
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs */
 /* eslint-enable max-len */
 
-module.exports = class SushiEndpointsService {
+module.exports = class SushiEndpointsService extends BasePrismaService {
+  /** @type {BasePrismaService.TransactionFnc<SushiEndpointsService>} */
+  static $transaction = super.$transaction;
+
   /**
    * @param {SushiEndpointCreateArgs} params
    * @returns {Promise<SushiEndpoint>}
    */
-  static create(params) {
-    return sushiEndpointsPrisma.create(params);
+  create(params) {
+    return sushiEndpointsPrisma.create(params, this.prisma);
   }
 
   /**
    * @param {SushiEndpointFindManyArgs} params
    * @returns {Promise<SushiEndpoint[]>}
    */
-  static findMany(params) {
-    return sushiEndpointsPrisma.findMany(params);
+  findMany(params) {
+    return sushiEndpointsPrisma.findMany(params, this.prisma);
   }
 
   /**
    * @param {SushiEndpointFindUniqueArgs} params
    * @returns {Promise<SushiEndpoint | null>}
    */
-  static findUnique(params) {
-    return sushiEndpointsPrisma.findUnique(params);
+  findUnique(params) {
+    return sushiEndpointsPrisma.findUnique(params, this.prisma);
   }
 
   /**
    * @param {string} id
    * @returns {Promise<SushiEndpoint | null>}
    */
-  static findByID(id) {
-    return sushiEndpointsPrisma.findByID(id);
+  findByID(id) {
+    return sushiEndpointsPrisma.findByID(id, this.prisma);
   }
 
   /**
    * @param {SushiEndpointUpdateArgs} params
    * @returns {Promise<SushiEndpoint>}
    */
-  static update(params) {
-    return sushiEndpointsPrisma.update(params);
+  update(params) {
+    return sushiEndpointsPrisma.update(params, this.prisma);
   }
 
   /**
    * @param {SushiEndpointUpsertArgs} params
    * @returns {Promise<SushiEndpoint>}
    */
-  static upsert(params) {
-    return sushiEndpointsPrisma.upsert(params);
+  upsert(params) {
+    return sushiEndpointsPrisma.upsert(params, this.prisma);
   }
 
   /**
    * @param {SushiEndpointDeleteArgs} params
    * @returns {Promise<SushiEndpoint | null>}
    */
-  static async delete(params) {
-    const { deleteResult, deletedEndpoint } = await sushiEndpointsPrisma.remove(params);
+  async delete(params) {
+    const result = await sushiEndpointsPrisma.remove(params, this.prisma);
+    if (!result) {
+      return null;
+    }
 
-    triggerHooks('sushi_endpoint:delete', deletedEndpoint);
-    deletedEndpoint.credentials.forEach((credentials) => { triggerHooks('sushi_credentials:delete', credentials); });
+    const { deleteResult, deletedEndpoint } = result;
+
+    this.triggerHooks('sushi_endpoint:delete', deletedEndpoint);
+    deletedEndpoint.credentials.forEach((credentials) => { this.triggerHooks('sushi_credentials:delete', credentials); });
     return deleteResult;
   }
 
   /**
    * @returns {Promise<Array<SushiEndpoint> | null>}
    */
-  static async removeAll() {
+  async removeAll() {
     if (process.env.NODE_ENV !== 'dev') { return null; }
 
-    const sushiEndpoints = await this.findMany({});
+    /** @param {SushiEndpointsService} service */
+    const transaction = async (service) => {
+      const sushiEndpoints = await service.findMany({});
 
-    if (sushiEndpoints.length === 0) { return null; }
+      if (sushiEndpoints.length === 0) { return null; }
 
-    await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
-      await this.delete({
-        where: {
-          id: sushiEndpoint.id,
-        },
-      });
-    }));
+      await Promise.all(
+        sushiEndpoints.map(
+          (sushiEndpoint) => service.delete({
+            where: {
+              id: sushiEndpoint.id,
+            },
+          }),
+        ),
+      );
 
-    return sushiEndpoints;
+      return sushiEndpoints;
+    };
+
+    if (this.currentTransaction) {
+      return transaction(this);
+    }
+    return SushiEndpointsService.$transaction(transaction);
   }
 };

@@ -99,6 +99,16 @@
             }
           }
         }
+      },
+      "ConflictError": {
+        "description": "Action is conflicted with the current state of the resource",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -663,18 +673,6 @@
             "type": "integer",
             "readOnly": true
           },
-          "beginDate": {
-            "description": "Begin date of the period to be harvested",
-            "type": "string",
-            "format": "date",
-            "pattern": "yyyy-MM"
-          },
-          "endDate": {
-            "description": "End date of the period to be harvested",
-            "type": "string",
-            "format": "date",
-            "pattern": "yyyy-MM"
-          },
           "reportType": {
             "description": "The report type that should be harvested",
             "type": "string",
@@ -687,24 +685,6 @@
           "index": {
             "description": "Target index where report will be inserted",
             "type": "string"
-          },
-          "timeout": {
-            "type": "number",
-            "description": "Maximum job duration in seconds"
-          },
-          "forceDownload": {
-            "type": "boolean",
-            "default": false,
-            "description": "Whether to download the report even if a local copy exists"
-          },
-          "ignoreValidation": {
-            "type": "boolean",
-            "default": false,
-            "description": "Try to import the report even if validation fails"
-          },
-          "params": {
-            "description": "Additionnal job parameters",
-            "type": "object"
           },
           "errorCode": {
             "description": "The error code, if a fatal exception was encountered",
@@ -737,6 +717,142 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Step"
+            }
+          }
+        }
+      },
+      "HarvestSession": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "beginDate": {
+            "description": "Begin date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "endDate": {
+            "description": "End date of the period to be harvested",
+            "type": "string",
+            "format": "date",
+            "pattern": "yyyy-MM"
+          },
+          "credentialsQuery": {
+            "type": "object",
+            "description": "Query used to get credentials to harvest",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              },
+              "institutionIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              },
+              "endpointIds": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ItemID"
+                }
+              }
+            }
+          },
+          "reportTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowFaulty": {
+            "type": "boolean",
+            "default": false,
+            "description": "Allow faulty endpoints to be harvested"
+          },
+          "timeout": {
+            "type": "number",
+            "default": 600,
+            "description": "Maximum job duration in seconds"
+          },
+          "forceDownload": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to download the report even if a local copy exists"
+          },
+          "ignoreValidation": {
+            "type": "boolean",
+            "default": null,
+            "format": "nullable",
+            "description": "Try to import the report even if validation fails"
+          },
+          "params": {
+            "type": "object",
+            "default": {},
+            "description": "Additional job parameters"
+          },
+          "startedAt": {
+            "type": "string",
+            "default": null,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "First start of the session",
+            "readOnly": true
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "_count": {
+            "type": "object",
+            "properties": {
+              "jobs": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "HarvestSessionStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Is the session active ?"
+          },
+          "runningTime": {
+            "type": "integer",
+            "description": "Running time in milliseconds"
+          },
+          "_count": {
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "all": {
+                  "type": "integer",
+                  "description": "Count of requested credentials"
+                },
+                "harvestable": {
+                  "type": "integer",
+                  "description": "Count of credentials that will be harvested"
+                }
+              }
+            },
+            "jobStatuses": {
+              "type": "object",
+              "description": "Count of jobs with a given status",
+              "additionalProperties": {
+                "type": "integer"
+              }
             }
           }
         }
@@ -5965,10 +6081,10 @@
         ]
       }
     },
-    "/harvests-requests": {
+    "/harvests-sessions": {
       "parameters": [],
       "get": {
-        "summary": "Get harvest requests",
+        "summary": "Get harvest sessions",
         "tags": [
           "Harvests"
         ],
@@ -6025,46 +6141,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "string" },
-                      "isActive": { "type": "boolean" },
-                      "beginDate": { "type": "string" },
-                      "endDate": { "type": "string" },
-                      "runningTime": { "type": "integer" },
-                      "statuses": {
-                        "type": "object",
-                        "properties": {
-                          "waiting": { "type": "integer" },
-                          "running": { "type": "integer" },
-                          "delayed": { "type": "integer" },
-                          "finished": { "type": "integer" },
-                          "failed": { "type": "integer" },
-                          "cancelled": { "type": "integer" },
-                          "interrupted": { "type": "integer" }
-                        }
-                      },
-                      "metrics": {
-                        "type": "object",
-                        "properties": {
-                          "success": { "type": "integer" },
-                          "failed": { "type": "integer" },
-                          "active": { "type": "integer" },
-                          "pending": { "type": "integer" }
-                        }
-                      },
-                      "counts": {
-                        "type": "object",
-                        "properties": {
-                          "jobs": { "type": "integer" },
-                          "reportTypes": { "type": "integer" },
-                          "endpoints": { "type": "integer" },
-                          "institutions": { "type": "integer" }
-                        }
-                      },
-                      "createdAt": { "type": "string" },
-                      "updatedAt": { "type": "string" }
-                    }
+                    "$ref": "#/components/schemas/HarvestSession"
                   }
                 }
               }
@@ -6077,8 +6154,132 @@
             "$ref": "#/components/responses/ForbiddenError"
           }
         },
-        "operationId": "get-harvests-requests",
-        "description": "Get harvest requests",
+        "operationId": "get-harvests-sessions",
+        "description": "Get harvest sessions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a new harvest session",
+        "tags": [
+          "Harvests"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "beginDate": {
+                    "description": "Begin date of the period to be harvested",
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "yyyy-MM",
+                    "required": true
+                  },
+                  "endDate": {
+                    "description": "End date of the period to be harvested",
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "yyyy-MM",
+                    "required": true
+                  },
+                  "credentialsQuery": {
+                    "type": "object",
+                    "description": "Query used to get credentials to harvest",
+                    "properties": {
+                      "ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "institutionIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "endpointIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      }
+                    }
+                  },
+                  "reportTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "required": true
+                  },
+                  "allowFaulty": {
+                    "type": "boolean",
+                    "description": "Allow faulty endpoints to be harvested",
+                    "default": false
+                  },
+                  "timeout": {
+                    "type": "number",
+                    "description": "Maximum job duration in seconds",
+                    "default": 600
+                  },
+                  "forceDownload": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to download the report even if a local copy exists"
+                  },
+                  "ignoreValidation": {
+                    "type": "boolean",
+                    "default": null,
+                    "format": "nullable",
+                    "description": "Try to import the report even if validation fails"
+                  },
+                  "params": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Additional job parameters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HarvestSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "description": "Action is forbidden for the authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-harvests-sessions",
+        "description": "Create harvest session",
         "security": [
           {
             "bearerAuth": []
@@ -6086,22 +6287,290 @@
         ]
       }
     },
-    "/harvests-requests/{harvestId}": {
-      "parameters": [],
-      "delete": {
-        "summary": "Delete an harvest request",
+    "/harvests-sessions/status": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": "harvestIds",
+          "in": "query",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get status of a harvests sessions",
         "tags": [
           "Harvests"
         ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "name": "harvestId",
-            "in": "path",
-            "required": true
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/HarvestSessionStatus"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
           }
+        },
+        "operationId": "get-harvests-sessions-status",
+        "description": "Get harvest sessions' status",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-sessions/{harvestId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "harvestId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Upsert a new harvest session",
+        "tags": [
+          "Harvests"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "beginDate": {
+                    "description": "Begin date of the period to be harvested",
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "yyyy-MM",
+                    "required": true
+                  },
+                  "endDate": {
+                    "description": "End date of the period to be harvested",
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "yyyy-MM",
+                    "required": true
+                  },
+                  "credentialsQuery": {
+                    "type": "object",
+                    "description": "Query used to get credentials to harvest",
+                    "properties": {
+                      "ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "institutionIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      },
+                      "endpointIds": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ItemID"
+                        }
+                      }
+                    }
+                  },
+                  "reportTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "required": true
+                  },
+                  "allowFaulty": {
+                    "type": "boolean",
+                    "description": "Allow faulty endpoints to be harvested",
+                    "default": false
+                  },
+                  "timeout": {
+                    "type": "number",
+                    "description": "Maximum job duration in seconds",
+                    "default": 600
+                  },
+                  "forceDownload": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to download the report even if a local copy exists"
+                  },
+                  "ignoreValidation": {
+                    "type": "boolean",
+                    "default": null,
+                    "format": "nullable",
+                    "description": "Try to import the report even if validation fails"
+                  },
+                  "params": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Additional job parameters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HarvestSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "put-harvests-sessions",
+        "description": "Upsert harvest session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an harvest session and stop jobs under it",
+        "tags": [
+          "Harvests"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "operationId": "delete-harvests-sessions",
+        "description": "Delete an harvest session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-sessions/{harvestId}/_start": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "harvestId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Start a harvest session",
+        "tags": [
+          "Harvests"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restartAll": {
+                    "type": "boolean",
+                    "default": null,
+                    "format": "nullable",
+                    "description": "Restart all jobs, not only the failed ones"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HarvestJob"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "419": {
+            "$ref": "#/components/responses/ConflictError"
+          }
+        },
+        "operationId": "post-harvests-sessions-_start",
+        "description": "Start harvest session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/harvests-sessions/{harvestId}/_stop": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "harvestId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Stop a harvest session and cancel jobs under it",
+        "tags": [
+          "Harvests"
         ],
         "responses": {
           "204": {
@@ -6114,8 +6583,8 @@
             "$ref": "#/components/responses/ForbiddenError"
           }
         },
-        "operationId": "delete-harvests-requests",
-        "description": "Delete an harvest request",
+        "operationId": "post-harvests-sessions-_stop",
+        "description": "Stop harvest session",
         "security": [
           {
             "bearerAuth": []
@@ -6123,194 +6592,31 @@
         ]
       }
     },
-    "/harvests-requests/{harvestId}/jobs": {
-      "parameters": [],
+    "/harvests-sessions/{harvestId}/credentials": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "harvestId",
+          "in": "path",
+          "required": true
+        }
+      ],
       "get": {
-        "summary": "Get jobs of an harvest request",
+        "summary": "Get credentials concerned by an harvest session",
         "tags": [
           "Harvests"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "name": "harvestId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "from",
-            "description": "Start date of the period",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "pattern": "[0-9]{4}-[0-9]{2}"
-            }
-          },
-          {
-            "name": "to",
-            "description": "End date of the period",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "pattern": "[0-9]{4}-[0-9]{2}"
-            }
-          },
-          {
-            "name": "reportType",
-            "description": "Filter by report type",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "tr"
-            }
-          },
-          {
-            "name": "vendor",
-            "description": "Filter by endpoint ID",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "810083d0-a564-11ec-90fa-59b27aa8d341"
-            }
-          },
-          {
-            "name": "institution",
-            "description": "Filter by institution ID",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "abba8400-1216-11eb-af77-ff33b5dd411e"
-            }
-          },
-          {
-            "name": "status",
-            "description": "Filter by job status",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "failed"
-            }
-          },
-          {
-            "name": "tags",
-            "description": "Filter by credentials tags",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "INSB"
-            }
-          },
-          {
-            "name": "size",
-            "description": "Number of harvests to get. Defaults to all.",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "page",
-            "description": "Result page",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "sort",
-            "description": "A field to sort on",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "order",
-            "description": "Sort order",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "default": "asc"
-            }
-          },
-          {
-            "name": "include",
-            "description": "Fields to include",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
         ],
         "responses": {
           "200": {
             "description": "OK",
-            "headers": {
-              "X-Total-Count": {
-                "schema": { "type": "integer" },
-                "description": "Number of items available"
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "string" },
-                      "credentialsId": { "type": "string" },
-                      "createdAt": { "type": "string" },
-                      "updatedAt": { "type": "string" },
-                      "startedAt": { "type": "string" },
-                      "beginDate": { "type": "string" },
-                      "endDate": { "type": "string" },
-                      "status": { "type": "string" },
-                      "reportType": { "type": "string" },
-                      "harvestId": { "type": "string" },
-                      "index": { "type": "string" },
-                      "runningTime": { "type": "integer" },
-                      "timeout": { "type": "integer" },
-                      "forceDownload": { "type": "boolean" },
-                      "ignoreValidation": { "type": "boolean" },
-                      "params": { "type": "object" },
-                      "result": { "type": "object" },
-                      "errorCode": { "type": "string" },
-                      "sushiExceptions": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "description": "The exception code",
-                              "type": "string",
-                              "example": "3030"
-                            },
-                            "severity": {
-                              "description": "The exception severity",
-                              "type": "string",
-                              "enum": [
-                                "info",
-                                "warning",
-                                "error"
-                              ]
-                            },
-                            "message": {
-                              "description": "The exception message",
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
+                    "$ref": "#/components/schemas/SushiCredentials"
                   }
                 }
               }
@@ -6323,93 +6629,8 @@
             "$ref": "#/components/responses/ForbiddenError"
           }
         },
-        "operationId": "get-harvests-requests-harvestId-jobs",
-        "description": "Get jobs of an harvest request",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/harvests-requests/{harvestId}/jobs/_meta": {
-      "parameters": [],
-      "get": {
-        "summary": "Get metadata about jobs of an harvest request",
-        "tags": [
-          "Harvests"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "name": "harvestId",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "vendors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "string" },
-                          "vendor": { "type": "string" }
-                        }
-                      }
-                    },
-                    "institutions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "string" },
-                          "name": { "type": "string" },
-                          "acronym": { "type": "string" }
-                        }
-                      }
-                    },
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "reportTypes": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "statuses": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          }
-        },
-        "operationId": "get-harvests-requests-harvestId-jobs-meta",
-        "description": "Get metadata about jobs of an harvest request",
+        "operationId": "get-harvests-sessions-credentials",
+        "description": "Get credentials concerned by an harvest session",
         "security": [
           {
             "bearerAuth": []
@@ -6879,112 +7100,6 @@
         "tags": [
           "Sushi"
         ]
-      }
-    },
-    "/sushi/{id}/_harvest": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true
-        }
-      ],
-      "post": {
-        "summary": "Initiate a Sushi harvest",
-        "operationId": "post-sushi-id-_harvest",
-        "responses": {
-          "200": {
-            "description": "Harvest initiated. Returns an array of task objects (one per month of the requested period) that can be requested in order to follow the status of the processes.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HarvestJob"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          }
-        },
-        "tags": [
-          "Sushi"
-        ],
-        "description": "Initiate a Sushi harvest. Downloads the latest COUNTER report, validate it, and import items into a given index.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "target": {
-                    "type": "string",
-                    "description": "The index where the report should be imported"
-                  },
-                  "reportType": {
-                    "type": "array",
-                    "description": "The report types that should be harvested. If it contains 'all', every available reports will be harvested.",
-                    "items": {
-                      "type": "string",
-                      "example": "tr",
-                      "default": "tr"
-                    }
-                  },
-                  "beginDate": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}$",
-                    "example": "2020-12",
-                    "description": "Start of the report period"
-                  },
-                  "endDate": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}$",
-                    "example": "2020-12",
-                    "description": "End of the report period"
-                  },
-                  "harvestId": {
-                    "type": "string",
-                    "description": "An identifier used to group tasks from a same harvest batch"
-                  },
-                  "forceDownload": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Whether to download the report even if a local copy exists"
-                  },
-                  "ignoreValidation": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Try to import the report even if validation fails"
-                  },
-                  "timeout": {
-                    "type": "integer",
-                    "description": "Maximum job duration in seconds",
-                    "minimum": 10,
-                    "default": 600
-                  }
-                },
-                "required": [
-                  "target"
-                ]
-              }
-            }
-          },
-          "description": ""
-        }
       }
     },
     "/sushi/{id}/_check_connection": {

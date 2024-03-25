@@ -1,5 +1,5 @@
-const repositoriesService = require('../../entities/repositories.service');
-const repoPermissionsService = require('../../entities/repository-permissions.service');
+const RepositoriesService = require('../../entities/repositories.service');
+const RepoPermissionsService = require('../../entities/repository-permissions.service');
 const {
   upsertSchema: permissionUpsertSchema,
 } = require('../../entities/repository-permissions.dto');
@@ -39,7 +39,10 @@ exports.upsertRepositoryPermission = async (ctx) => {
     },
   };
 
-  const updatedPermissions = await repoPermissionsService.upsert({
+  const repoPermissionsService = new RepoPermissionsService();
+
+  ctx.status = 200;
+  ctx.body = await repoPermissionsService.upsert({
     where: {
       username_institutionId_repositoryPattern: {
         username,
@@ -50,16 +53,16 @@ exports.upsertRepositoryPermission = async (ctx) => {
     create: permissionData,
     update: permissionData,
   });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
 };
 
 exports.deleteRepositoryPermission = async (ctx) => {
   const { repository, institution } = ctx.state;
   const { username } = ctx.params;
 
-  const updatedPermissions = await repoPermissionsService.delete({
+  const repoPermissionsService = new RepoPermissionsService();
+
+  ctx.status = 200;
+  ctx.body = await repoPermissionsService.delete({
     where: {
       username_institutionId_repositoryPattern: {
         username,
@@ -68,14 +71,13 @@ exports.deleteRepositoryPermission = async (ctx) => {
       },
     },
   });
-
-  ctx.status = 200;
-  ctx.body = updatedPermissions;
 };
 
 exports.removeRepository = async (ctx) => {
   const { repository } = ctx.state;
   const { pattern, institutionId } = ctx.params;
+
+  const repositoriesService = new RepositoriesService();
 
   if (repository.institutions.length >= 2) {
     await repositoriesService.disconnectInstitution(pattern, institutionId);
@@ -95,6 +97,9 @@ exports.addRepository = async (ctx) => {
     ctx.throw(409, ctx.$t('errors.repository.typeMismatch', repository.pattern));
   }
 
+  const repositoriesService = new RepositoriesService();
+
+  ctx.status = repository ? 200 : 201;
   ctx.body = await repositoriesService.upsert({
     where: { pattern },
     create: {
@@ -114,6 +119,4 @@ exports.addRepository = async (ctx) => {
       },
     },
   });
-
-  ctx.status = repository ? 200 : 201;
 };

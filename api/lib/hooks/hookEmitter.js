@@ -56,7 +56,7 @@ const hookEmitter = new EventEmitter();
  * @param {string} event The event name
  * @param {*} payload The payload of the event
  *
- * @returns Returns `true` if the event had listeners, `false` otherwise.
+ * @returns {boolean} Returns `true` if the event had listeners, `false` otherwise.
  */
 const triggerHooks = (event, ...payload) => {
   appLogger.verbose(`[hooks] "${event}" triggered`);
@@ -73,7 +73,7 @@ const triggerHooks = (event, ...payload) => {
  * @param {(payload) => string | number} [opts.uniqueResolver]
  * @param {boolean} [opts.queue] Should the hook be queued
  *
- * @returns Returns a reference to the EventEmitter
+ * @returns {EventEmitter} Returns a reference to the EventEmitter
  */
 const registerHook = (event, handler, opts = {}) => {
   let fnc = (key, payload) => handler(payload);

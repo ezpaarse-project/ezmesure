@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const usersService = require('../../entities/users.service');
+const UsersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
 const { activateUserLink } = require('../auth/password');
@@ -22,6 +22,7 @@ exports.getUser = async (ctx) => {
   const { username } = ctx.params;
   const { user: connectedUser } = ctx.state;
 
+  const usersService = new UsersService();
   const user = await usersService.findUnique({
     select: connectedUser.isAdmin ? null : { fullName: true, username: true },
     where: { username },
@@ -57,6 +58,7 @@ exports.list = async (ctx) => {
     include = propsToPrismaInclude(propsToInclude, includableFields);
   }
 
+  const usersService = new UsersService();
   const users = await usersService.findMany({
     take: Number.isInteger(size) && size >= 0 ? size : undefined,
     skip: Number.isInteger(size) ? size * (page - 1) : undefined,
@@ -78,6 +80,7 @@ exports.createOrReplaceUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
+  const usersService = new UsersService();
   const userExists = !!(await usersService.findUnique({ where: { username } }));
 
   const user = await usersService.upsert({
@@ -126,7 +129,11 @@ exports.importUsers = async (ctx) => {
     });
   };
 
-  const importItem = async (itemData = {}) => {
+  /**
+   * @param {UsersService} usersService
+   * @param {*} itemData
+   */
+  const importItem = async (usersService, itemData = {}) => {
     const { value: item, error } = adminImportSchema.validate(itemData);
 
     if (error) {
@@ -205,15 +212,18 @@ exports.importUsers = async (ctx) => {
     addResponseItem(user, 'created');
   };
 
-  for (let i = 0; i < body.length; i += 1) {
-    const userData = body[i] || {};
+  await UsersService.$transaction(async (usersService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const userData = body[i] || {};
 
-    try {
-      await importItem(userData); // eslint-disable-line no-await-in-loop
-    } catch (e) {
-      addResponseItem(userData, 'error', e.message);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(usersService, userData);
+      } catch (e) {
+        addResponseItem(userData, 'error', e.message);
+      }
     }
-  }
+  });
 
   ctx.type = 'json';
   ctx.body = response;
@@ -223,6 +233,7 @@ exports.updateUser = async (ctx) => {
   const { username } = ctx.params;
   const { body } = ctx.request;
 
+  const usersService = new UsersService();
   const userExists = !!(await usersService.findUnique({ where: { username } }));
 
   if (!userExists) {
@@ -242,6 +253,7 @@ exports.updateUser = async (ctx) => {
 exports.deleteUser = async (ctx) => {
   const { username } = ctx.request.params;
 
+  const usersService = new UsersService();
   const found = !!(await usersService.delete({ where: { username } }));
   appLogger.verbose(`User [${username}] is deleted`);
 
@@ -252,6 +264,7 @@ exports.deleteUser = async (ctx) => {
 exports.impersonateUser = async (ctx) => {
   const { username } = ctx.params;
 
+  const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
 
   if (!user) {

@@ -8,7 +8,7 @@ const {
 
 /**
  * Base schema
- * @type import('joi').SchemaLike
+ * @type {import('joi').SchemaLike}
  */
 const schema = {
   updatedAt: Joi.date(),

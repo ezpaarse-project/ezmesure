@@ -347,7 +347,7 @@ export default {
     },
 
     async checkSingleConnection(sushiItem) {
-      this.$set(this.loadingItems, sushiItem.id, true);
+      this.$set(this.loadingItems, sushiItem.id, 'loading');
 
       try {
         const data = await this.$axios.$post(`/sushi/${sushiItem.id}/_check_connection`);
@@ -365,6 +365,11 @@ export default {
       const selected = this.selected.slice();
 
       this.selected = [];
+
+      // Set loading state
+      for (let i = 0; i < selected.length; i += 1) {
+        this.$set(this.loadingItems, selected[i].id, 'queued');
+      }
 
       for (let i = 0; i < selected.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop

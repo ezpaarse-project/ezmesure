@@ -9,7 +9,7 @@ const {
 
 /**
  * Base schema
- * @type import('joi').SchemaLike
+ * @type {import('joi').SchemaLike}
  */
 const schema = {
   username: Joi.string().trim(),

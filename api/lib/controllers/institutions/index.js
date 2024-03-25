@@ -92,10 +92,11 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
     },
-    query: {
+    query: Joi.object({
       latestImportTask: Joi.boolean().default(false),
       connection: Joi.string().valid('working', 'faulty', 'untested'),
-    },
+      include: Joi.array().single().items(Joi.string().valid('harvests')),
+    }).rename('include[]', 'include'),
   },
 });
 

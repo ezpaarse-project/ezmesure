@@ -4,7 +4,7 @@ const { appLogger } = require('../logger');
 const kibana = require('../kibana');
 const assets = require('../assets');
 
-const repositoriesService = require('../../entities/repositories.service');
+const RepositoriesService = require('../../entities/repositories.service');
 const SpacesService = require('../../entities/spaces.service');
 
 const {
@@ -48,6 +48,7 @@ const getSpaceLogo = async (space) => {
  * @param {Space} space - The space we want to sync index patterns
  */
 const syncIndexPatterns = async (space) => {
+  const repositoriesService = new RepositoriesService();
   const repositories = await repositoriesService.findMany({
     where: {
       type: space.type,
@@ -155,7 +156,8 @@ const syncSpace = async (space) => {
  * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncSpaces = async () => {
-  const spaces = await SpacesService.findMany({});
+  const spacesService = new SpacesService();
+  const spaces = await spacesService.findMany({});
 
   const executors = spaces.map((space) => () => syncSpace(space));
 

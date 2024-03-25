@@ -7,7 +7,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const authCookie = config.get('auth.cookie');
@@ -44,6 +44,7 @@ describe('[users]: Test impersonation features', () => {
     await usersPrisma.create({ data: regularUser });
     await usersElastic.createUser(regularUser);
 
+    const usersService = new UsersService();
     adminToken = await usersService.generateToken(adminUsername);
     regularUserToken = await usersService.generateToken(regularUser.username);
   });

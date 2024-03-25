@@ -13,7 +13,7 @@
  * @param {(() => Promise<any>)[]} executors The executors
  * @param {((error: Error) => void)} errorHook Hook trigger when an executor fails.
  * @param {number} concurrence Count of "parallel" requests
- * @returns {ThrottledPromisesResult}
+ * @returns {Promise<ThrottledPromisesResult>}
  */
 exports.execThrottledPromises = async (
   executors,

@@ -19,7 +19,7 @@
           @click="disagree"
         >
           <v-icon v-if="disagreeIcon" left>
-            {{ agreeIcon }}
+            {{ disagreeIcon }}
           </v-icon>
 
           {{ disagreeText || $t('cancel') }}

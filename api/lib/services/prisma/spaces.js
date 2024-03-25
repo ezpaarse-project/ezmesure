@@ -3,6 +3,7 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
  * @typedef {import('@prisma/client').Space} Space
  * @typedef {import('@prisma/client').Prisma.SpaceUpdateArgs} SpaceUpdateArgs
  * @typedef {import('@prisma/client').Prisma.SpaceUpsertArgs} SpaceUpsertArgs
@@ -11,111 +12,124 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs
  * @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
- * @typedef {{deleteResult: Space, deletedSpace: Space }} SpaceRemoved
+ *
+ * @typedef {import('@prisma/client').SpacePermission} SpacePermission
+ *
+ * @typedef {import('@prisma/client').Space & { permissions: SpacePermission[] }} OldSpace
+ * @typedef {{deleteResult: Space, deletedSpace: OldSpace }} SpaceRemoved
  */
 /* eslint-enable max-len */
 
 /**
-   * @param {SpaceCreateArgs} params
-   * @returns {Promise<Space>}
-   */
-function create(params) {
-  return prisma.space.create(params);
+ * @param {SpaceCreateArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space>}
+ */
+function create(params, tx = prisma) {
+  return tx.space.create(params);
 }
 
 /**
-   * @param {SpaceFindManyArgs} params
-   * @returns {Promise<Space[]>}
-   */
-function findMany(params) {
-  return prisma.space.findMany(params);
+ * @param {SpaceFindManyArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space[]>}
+ */
+function findMany(params, tx = prisma) {
+  return tx.space.findMany(params);
 }
 
 /**
-   * @param {SpaceFindUniqueArgs} params
-   * @returns {Promise<Space | null>}
-   */
-function findUnique(params) {
-  return prisma.space.findUnique(params);
+ * @param {SpaceFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space | null>}
+ */
+function findUnique(params, tx = prisma) {
+  return tx.space.findUnique(params);
 }
 
 /**
-   * @param {string} id
-   * @returns {Promise<Space | null>}
-   */
-function findByID(id) {
-  return prisma.space.findUnique({ where: { id } });
+ * @param {string} id
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space | null>}
+ */
+function findByID(id, tx = prisma) {
+  return tx.space.findUnique({ where: { id } });
 }
 
 /**
-   * @param {SpaceUpdateArgs} params
-   * @returns {Promise<Space>}
-   */
-function update(params) {
-  return prisma.space.update(params);
+ * @param {SpaceUpdateArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space>}
+ */
+function update(params, tx = prisma) {
+  return tx.space.update(params);
 }
 
 /**
-   * @param {SpaceUpsertArgs} params
-   * @returns {Promise<Space>}
-   */
-function upsert(params) {
-  return prisma.space.upsert(params);
+ * @param {SpaceUpsertArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Space>}
+ */
+function upsert(params, tx = prisma) {
+  return tx.space.upsert(params);
 }
 
 /**
-   * @param {SpaceDeleteArgs} params
-   * @returns {Promise<SpaceRemoved | null>}
-   */
-async function remove(params) {
-  const { deleteResult, deletedSpace } = await prisma.$transaction(async (tx) => {
-    const space = await tx.space.findUnique({
-      where: params.where,
-      include: {
-        permissions: true,
-      },
-    });
-
-    if (!space) {
-      return [null, null];
-    }
-
-    await tx.spacePermission.deleteMany({
-      where: { spaceId: space.id },
-    });
-
-    return {
-      deleteResult: await tx.space.delete(params),
-      deletedSpace: space,
-    };
+ * @param {SpaceDeleteArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<SpaceRemoved | null>}
+ */
+async function remove(params, tx = prisma) {
+  const space = await tx.space.findUnique({
+    where: params.where,
+    include: {
+      permissions: true,
+    },
   });
 
-  if (!deletedSpace) {
+  if (!space) {
     return null;
   }
 
-  return { deleteResult, deletedSpace };
+  return {
+    deleteResult: await tx.space.delete(params),
+    deletedSpace: space,
+  };
 }
 
 /**
-   * @returns {Promise<Array<Space> | null>}
-   */
-async function removeAll() {
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<Array<Space> | null>}
+ */
+async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
-  const spaces = await findMany({});
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const spaces = await findMany({}, txx);
 
-  if (spaces.length === 0) { return null; }
+    if (spaces.length === 0) { return null; }
 
-  await Promise.all(spaces.map(async (space) => {
-    await remove({
-      where: {
-        id: space.id,
-      },
-    });
-  }));
+    await Promise.all(
+      spaces.map(
+        (space) => remove(
+          {
+            where: {
+              id: space.id,
+            },
+          },
+          txx,
+        ),
+      ),
+    );
 
-  return spaces;
+    return spaces;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {

@@ -6,7 +6,7 @@ const { resetDatabase } = require('../../../lib/services/prisma/utils');
 const { resetElastic } = require('../../../lib/services/elastic/utils');
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 const sushiEndpointsPrisma = require('../../../lib/services/prisma/sushi-endpoints');
 
 const adminUsername = config.get('admin.username');
@@ -43,7 +43,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     beforeEach(async () => {
@@ -108,7 +108,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
       await usersPrisma.create({ data: userTest });
       await usersPrisma.acceptTerms(userTest.username);
       await usersElastic.createUser(userTest);
-      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      userToken = await UsersService.generateToken(userTest.username, userTest.password);
     });
 
     beforeEach(async () => {

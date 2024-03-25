@@ -1,7 +1,14 @@
 const config = require('config');
-const { propsToPrismaInclude } = require('../utils');
-const institutionsService = require('../../entities/institutions.service');
-const usersService = require('../../entities/users.service');
+
+const { sendMail, generateMail } = require('../../services/mail');
+const { appLogger } = require('../../services/logger');
+const InstitutionsService = require('../../entities/institutions.service');
+const UsersService = require('../../entities/users.service');
+const ImagesService = require('../../services/images');
+const SushiCredentialsService = require('../../entities/sushi-credentials.service');
+const MembershipsService = require('../../entities/memberships.service');
+const RepositoriesService = require('../../entities/repositories.service');
+const SpacesService = require('../../entities/spaces.service');
 
 /* eslint-disable max-len */
 /**
@@ -34,13 +41,7 @@ const {
   includableFields: spaceIncludableFields,
 } = require('../../entities/repositories.dto');
 
-const imagesService = require('../../services/images');
-const { sendMail, generateMail } = require('../../services/mail');
-const { appLogger } = require('../../services/logger');
-const sushiCredentialsService = require('../../entities/sushi-credentials.service');
-const membershipsService = require('../../entities/memberships.service');
-const repositoriesService = require('../../entities/repositories.service');
-const spacesService = require('../../entities/spaces.service');
+const { propsToPrismaInclude } = require('../utils');
 
 const {
   PERMISSIONS,
@@ -120,10 +121,10 @@ exports.getInstitutions = async (ctx) => {
     };
   }
 
-  const institution = await institutionsService.findMany(options);
+  const institutionsService = new InstitutionsService();
 
   ctx.type = 'json';
-  ctx.body = institution;
+  ctx.body = await institutionsService.findMany(options);
 };
 
 exports.getInstitution = async (ctx) => {
@@ -136,6 +137,8 @@ exports.getInstitution = async (ctx) => {
   if (ctx.state?.user?.isAdmin) {
     include = propsToPrismaInclude(propsToInclude, includableFields);
   }
+
+  const institutionsService = new InstitutionsService();
 
   ctx.type = 'json';
   ctx.status = 200;
@@ -173,8 +176,10 @@ exports.createInstitution = async (ctx) => {
     };
   }
 
+  const institutionsService = new InstitutionsService();
+
   if (body?.logo) {
-    institutionData.logoId = await imagesService.storeLogo(body.logo);
+    institutionData.logoId = await ImagesService.storeLogo(body.logo);
   }
 
   const institution = await institutionsService.create({
@@ -213,8 +218,11 @@ exports.updateInstitution = async (ctx) => {
   const oldLogoId = institution.logoId;
   const wasSushiReady = institution.sushiReadySince;
 
+  const institutionsService = new InstitutionsService();
+  const membershipsService = new MembershipsService();
+
   if (institutionData.logo) {
-    institutionData.logoId = await imagesService.storeLogo(institutionData.logo);
+    institutionData.logoId = await ImagesService.storeLogo(institutionData.logo);
   }
 
   // FIXME: handle admin restricted fields
@@ -228,7 +236,7 @@ exports.updateInstitution = async (ctx) => {
   appLogger.verbose(`Institution [${institution.id}] is updated`);
 
   if (institutionData.logo && oldLogoId) {
-    await imagesService.remove(oldLogoId);
+    await ImagesService.remove(oldLogoId);
   }
 
   if (!wasValidated && institutionData.validated === true) {
@@ -303,7 +311,12 @@ exports.importInstitutions = async (ctx) => {
     });
   };
 
-  const importItem = async (itemData = {}) => {
+  /**
+   * @param {InstitutionsService} institutionsService
+   * @param {*} itemData
+   * @returns
+   */
+  const importItem = async (institutionsService, itemData = {}) => {
     const { value: item, error } = adminImportSchema.validate(itemData);
 
     if (error) {
@@ -326,7 +339,7 @@ exports.importInstitutions = async (ctx) => {
     const institutionData = {
       ...item,
       logo: undefined,
-      logoId: item.logo ? await imagesService.storeLogo(item.logo) : item.logoId,
+      logoId: item.logo ? await ImagesService.storeLogo(item.logo) : item.logoId,
 
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
@@ -370,6 +383,7 @@ exports.importInstitutions = async (ctx) => {
             create: {
               ...(membership ?? {}),
               username: undefined,
+              institutionId: undefined,
 
               user: {
                 connect: { username: membership?.username },
@@ -420,15 +434,18 @@ exports.importInstitutions = async (ctx) => {
     addResponseItem(institution, 'created');
   };
 
-  for (let i = 0; i < body.length; i += 1) {
-    const institutionData = body[i] || {};
+  await InstitutionsService.$transaction(async (institutionsService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const institutionData = body[i] || {};
 
-    try {
-      await importItem(institutionData); // eslint-disable-line no-await-in-loop
-    } catch (e) {
-      addResponseItem(institutionData, 'error', e.message);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(institutionsService, institutionData);
+      } catch (e) {
+        addResponseItem(institutionData, 'error', e.message);
+      }
     }
-  }
+  });
 
   ctx.type = 'json';
   ctx.body = response;
@@ -445,6 +462,8 @@ exports.deleteInstitution = async (ctx) => {
     institutionName: institution.name,
   };
 
+  const institutionsService = new InstitutionsService();
+
   const data = await institutionsService.delete({ where: { id: institutionId } });
   appLogger.verbose(`Institution [${institution?.id}] is deleted`);
 
@@ -454,6 +473,8 @@ exports.deleteInstitution = async (ctx) => {
 
 exports.getInstitutionRepositories = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
+
+  const repositoriesService = new RepositoriesService();
 
   const repositories = await repositoriesService.findMany({
     where: { institutions: { some: { id: ctx.state.institution.id } } },
@@ -469,6 +490,8 @@ exports.getInstitutionRepositories = async (ctx) => {
 exports.getInstitutionSpaces = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
 
+  const spacesService = new SpacesService();
+
   const spaces = await spacesService.findMany({
     where: { institutionId: ctx.state.institution.id },
     include: propsToPrismaInclude(propsToInclude, spaceIncludableFields),
@@ -483,6 +506,8 @@ exports.getInstitutionSpaces = async (ctx) => {
 exports.getInstitutionMember = async (ctx) => {
   const { institutionId, username } = ctx.params;
   const { include: propsToInclude } = ctx.query;
+
+  const membershipsService = new MembershipsService();
 
   const membership = await membershipsService.findUnique({
     where: {
@@ -503,6 +528,8 @@ exports.getInstitutionMember = async (ctx) => {
 
 exports.getInstitutionMembers = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
+
+  const membershipsService = new MembershipsService();
 
   const memberships = await membershipsService.findMany({
     where: { institutionId: ctx.state.institution.id },
@@ -549,6 +576,9 @@ exports.addInstitutionMember = async (ctx) => {
     institutionName,
     username,
   };
+
+  const usersService = new UsersService();
+  const membershipsService = new MembershipsService();
 
   const user = await usersService.findUnique({
     where: { username },
@@ -617,6 +647,9 @@ exports.removeInstitutionMember = async (ctx) => {
     username,
   };
 
+  const usersService = new UsersService();
+  const membershipsService = new MembershipsService();
+
   const user = await usersService.findUnique({
     where: { username },
     select: {
@@ -657,21 +690,28 @@ exports.removeInstitutionMember = async (ctx) => {
 };
 
 exports.getSushiData = async (ctx) => {
-  const sushiItems = await sushiCredentialsService.findMany({
+  const { include: propsToInclude } = ctx.query;
+
+  const sushiCredentialsService = new SushiCredentialsService();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = await sushiCredentialsService.findMany({
     where: {
       institutionId: ctx.state.institution.id,
     },
     include: {
       endpoint: true,
+      ...propsToPrismaInclude(propsToInclude, ['harvests']),
     },
   });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = sushiItems;
 };
 
 exports.requestMembership = async (ctx) => {
+  ctx.action = 'institutions/requestMembership';
+
+  const institutionsService = new InstitutionsService();
+
   const members = await institutionsService.getContacts(ctx.state.institution.id);
   const emails = members.map((member) => member.user.email);
   const link = `${ctx.request.header.origin}/institutions/${ctx.state.institution.id}/members`;
