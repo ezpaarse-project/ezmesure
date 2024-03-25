@@ -8422,6 +8422,52 @@
           }
         ]
       }
+    },
+    "/users/{username}/_impersonate": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Impersonate a user",
+        "description": "Login on behalf of a given user. Requires admin privileges.",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "operationId": "post-users-username-impersonate",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   }
 }
