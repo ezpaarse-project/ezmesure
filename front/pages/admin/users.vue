@@ -452,7 +452,7 @@ export default {
     },
     async impersonateUser(item) {
       try {
-        await this.$axios.$post(`/profile/${item.username}/_impersonate`);
+        await this.$axios.$post(`/users/${item.username}/_impersonate`);
         await this.$auth.fetchUser();
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));

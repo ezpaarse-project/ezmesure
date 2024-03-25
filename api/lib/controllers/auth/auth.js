@@ -150,20 +150,6 @@ exports.elasticLogin = async (ctx) => {
   ctx.status = 200;
 };
 
-exports.impersonateUser = async (ctx) => {
-  const { username } = ctx.params;
-
-  const user = await usersService.findUnique({ where: { username } });
-
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.user.notFound'));
-  }
-
-  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
-  ctx.body = user;
-  ctx.status = 200;
-};
-
 exports.activate = async (ctx) => {
   const { body } = ctx.request;
   const { password } = body;

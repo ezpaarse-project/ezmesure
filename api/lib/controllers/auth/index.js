@@ -14,7 +14,6 @@ const {
   getMemberships,
   getReportingToken,
   activate,
-  impersonateUser,
 } = require('./auth');
 
 router.route({
@@ -81,19 +80,6 @@ router.route({
     body: Joi.object({
       password: Joi.string().trim().min(6).required(),
     }),
-  },
-});
-
-router.use(requireAdmin);
-
-router.route({
-  method: 'POST',
-  path: '/:username/_impersonate',
-  handler: impersonateUser,
-  validate: {
-    params: {
-      username: Joi.string().trim().required(),
-    },
   },
 });
 
