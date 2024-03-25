@@ -68,7 +68,7 @@ router.route({
   ],
   validate: {
     query: Joi.object({
-      harvestIds: Joi.array().single().items(Joi.string()),
+      harvestIds: Joi.array().single().items(Joi.string()).required(),
     }).rename('harvestIds[]', 'harvestIds'),
   },
 });
