@@ -150,6 +150,7 @@ async function importSushiReport(options = {}) {
       where: { id: task.id },
       data: {
         ...task,
+        updatedAt: undefined,
         session: undefined,
         logs: { createMany: { data: newLogs } },
         result: task.result || undefined,
@@ -738,6 +739,7 @@ async function processJob(job, taskData) {
     where: { id: task.id },
     data: {
       ...task,
+      updatedAt: undefined,
       session: undefined,
       result: task.result || undefined,
       credentials: undefined,
