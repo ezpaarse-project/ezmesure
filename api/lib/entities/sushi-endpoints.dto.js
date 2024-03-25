@@ -18,20 +18,24 @@ const schema = {
 
   sushiUrl: Joi.string().uri(),
   vendor: Joi.string().min(1),
-  description: Joi.string().allow(''),
-  counterVersion: Joi.string().allow(''),
-  technicalProvider: Joi.string().allow(''),
+  description: Joi.string().allow('').empty(null),
+  counterVersion: Joi.string().allow('').empty(null),
+  technicalProvider: Joi.string().allow('').empty(null),
   requireCustomerId: Joi.boolean(),
   requireRequestorId: Joi.boolean(),
   requireApiKey: Joi.boolean(),
   ignoreReportValidation: Joi.boolean(),
-  defaultCustomerId: Joi.string().allow(''),
-  defaultRequestorId: Joi.string().allow(''),
-  defaultApiKey: Joi.string().allow(''),
-  paramSeparator: Joi.string().allow(''),
+  defaultCustomerId: Joi.string().allow('').empty(null),
+  defaultRequestorId: Joi.string().allow('').empty(null),
+  defaultApiKey: Joi.string().allow('').empty(null),
+  paramSeparator: Joi.string().allow('').empty(null),
   tags: Joi.array().items(Joi.string()),
 
   credentials: Joi.array().items(Joi.object()),
+
+  disabledUntil: Joi.date().allow(null),
+  supportedReports: Joi.array().items(Joi.string().trim()),
+  supportedReportsUpdatedAt: Joi.date().allow(null),
 
   params: Joi.array().items(Joi.object({
     name: Joi.string().trim(),
