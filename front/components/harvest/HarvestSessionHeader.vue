@@ -255,6 +255,7 @@ export default defineComponent({
           key: `${this.session.id}-reports`,
           icon: 'mdi-file',
           text: this.$tc('harvest.sessions.counts.reportTypes', this.counts.reportTypes),
+          tooltip: this.session.reportTypes.join(', ').toUpperCase(),
         },
         {
           key: `${this.session.id}-runningTime`,
