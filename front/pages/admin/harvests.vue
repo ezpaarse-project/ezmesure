@@ -124,20 +124,22 @@ export default defineComponent({
         table.refreshJobs();
       }
 
-      try {
-        const { data: statuses } = await this.$axios.get(
-          '/harvests-sessions/status',
-          { params: { harvestIds: this.sessions.map((session) => session.id) } },
-        );
+      if (Array.isArray(this.sessions) && this.sessions.length > 0) {
+        try {
+          const { data: statuses } = await this.$axios.get(
+            '/harvests-sessions/status',
+            { params: { harvestIds: this.sessions.map((session) => session.id) } },
+          );
 
-        const sessionStatuses = { ...this.sessionStatuses };
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { id, status } of Object.values(statuses)) {
-          sessionStatuses[id] = status;
+          const sessionStatuses = { ...this.sessionStatuses };
+          // eslint-disable-next-line no-restricted-syntax
+          for (const { id, status } of Object.values(statuses)) {
+            sessionStatuses[id] = status;
+          }
+          this.sessionStatuses = statuses;
+        } catch (e) {
+          this.$store.dispatch('snacks/error', this.$t('harvest.sessions.unableToRetrive'));
         }
-        this.sessionStatuses = statuses;
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('harvest.sessions.unableToRetrive'));
       }
 
       this.refreshing = false;
