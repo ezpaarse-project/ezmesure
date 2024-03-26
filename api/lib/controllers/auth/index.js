@@ -3,7 +3,7 @@ const { Joi } = require('koa-joi-router');
 
 const { bodyParser } = require('@koa/bodyparser');
 
-const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
+const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
   getToken,
