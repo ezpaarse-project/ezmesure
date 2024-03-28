@@ -1,9 +1,22 @@
+const jwt = require('jsonwebtoken');
+const config = require('config');
+
 const UsersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
 const { activateUserLink } = require('../auth/password');
 const { adminImportSchema, includableFields } = require('../../entities/users.dto');
 const { propsToPrismaInclude } = require('../utils');
+
+const secret = config.get('auth.secret');
+const cookie = config.get('auth.cookie');
+
+function generateToken(user) {
+  if (!user) { return null; }
+
+  const { username, email } = user;
+  return jwt.sign({ username, email }, secret);
+}
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
@@ -246,4 +259,19 @@ exports.deleteUser = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = { found };
+};
+
+exports.impersonateUser = async (ctx) => {
+  const { username } = ctx.params;
+
+  const usersService = new UsersService();
+  const user = await usersService.findUnique({ where: { username } });
+
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.user.notFound'));
+  }
+
+  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
+  ctx.body = user;
+  ctx.status = 200;
 };

@@ -131,6 +131,17 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item @click="impersonateUser(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-login</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('authenticate.impersonate') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
       </template>
@@ -433,6 +444,16 @@ export default {
     },
     createUser() {
       this.$refs.userForm.createUser({ addAsMember: false });
+    },
+    async impersonateUser(item) {
+      try {
+        await this.$axios.$post(`/users/${item.username}/_impersonate`);
+        await this.$auth.fetchUser();
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));
+        return;
+      }
+      this.$router.push('/myspace');
     },
     async deleteUsers(items) {
       const users = items || this.selected;

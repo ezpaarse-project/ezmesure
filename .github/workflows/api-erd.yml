@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - postgres # temporary
     paths:
       - '.github/workflows/api-erd.yml'
       - 'api/prisma/schema.prisma'
@@ -22,12 +21,13 @@ env:
 
 jobs:
   generate-db-doc:
-    permissions: write-all
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Generate ERD
         run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_ERD_PATH }}" ${{ env.ERD_WS }}/erd/'
@@ -36,7 +36,7 @@ jobs:
         run: 'curl -X POST -d "$(cat ${{ env.PRISMA_SCHEMA }})" -H "Content-Type: text/plain" -H "X-Api-Key: ${{ env.ERD_WS_KEY }}" -o "${{ env.OUT_DIC_PATH }}" ${{ env.ERD_WS }}/dict/\?name\=${{ env.DIC_NAME }}'
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
 
       - name: Commit files
         run: |

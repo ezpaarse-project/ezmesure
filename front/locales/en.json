@@ -594,7 +594,8 @@
     "logIn": "Log in",
     "logInWithProvider": "Log in via your identity provider.",
     "loginFailed": "The information transmitted did not allow you to authenticate",
-    "failed": "An error occurred"
+    "failed": "An error occurred",
+    "impersonate": "Impersonate"
   },
   "password": {
     "forgot": "Forgout your password ?",

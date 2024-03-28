@@ -15,6 +15,7 @@ const {
   updateUser,
   deleteUser,
   importUsers,
+  impersonateUser,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -93,6 +94,18 @@ router.route({
       overwrite: Joi.boolean().default(false),
     },
     body: Joi.array(),
+  },
+});
+
+
+router.route({
+  method: 'POST',
+  path: '/:username/_impersonate',
+  handler: impersonateUser,
+  validate: {
+    params: {
+      username: Joi.string().trim().required(),
+    },
   },
 });
 
