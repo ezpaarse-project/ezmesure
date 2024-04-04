@@ -66,7 +66,7 @@
               />
             </v-col>
 
-            <v-col colds="4">
+            <v-col cols="4">
               <v-text-field
                 v-model="endpointForm.counterVersion"
                 :label="$t('endpoints.counterVersion')"
