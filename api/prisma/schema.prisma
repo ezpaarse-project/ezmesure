@@ -412,6 +412,8 @@ model SushiEndpoint {
   supportedReports          String[]
   /// Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
+  /// Report used when testing endpoint
+  testedReport              String?
   /// SUSHI credentials associated with the endpoint
   credentials               SushiCredentials[]
   /// Additionnal default parameters. Each param has a name, a value, and a scope.

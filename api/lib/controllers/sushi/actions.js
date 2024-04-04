@@ -408,7 +408,7 @@ exports.checkSushiConnection = async (ctx) => {
     endpoint,
     beginDate: threeMonthAgo,
     endDate: threeMonthAgo,
-    reportType: 'pr',
+    reportType: endpoint.testedReport || 'pr',
   };
 
   const reportPath = sushiService.getReportPath(sushiData);

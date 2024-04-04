@@ -1154,6 +1154,13 @@
               "null"
             ]
           },
+          "testedReport": {
+            "description": "Report used when testing endpoint",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "tags": {
             "description": "Tags associated with the endpoint",
             "type": "array",
