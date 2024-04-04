@@ -55,13 +55,27 @@
             required
           />
 
-          <v-text-field
-            v-model="endpointForm.counterVersion"
-            :label="$t('endpoints.counterVersion')"
-            :rules="counterVersionRules"
-            outlined
-            required
-          />
+          <v-row>
+            <v-col cols="8">
+              <v-combobox
+                v-model="endpointForm.testedReport"
+                :label="$t('endpoints.testedReport')"
+                :items="supportedReports"
+                placeholder="pr"
+                outlined
+              />
+            </v-col>
+
+            <v-col colds="4">
+              <v-text-field
+                v-model="endpointForm.counterVersion"
+                :label="$t('endpoints.counterVersion')"
+                :rules="counterVersionRules"
+                outlined
+                required
+              />
+            </v-col>
+          </v-row>
 
           <v-textarea
             v-model="endpointForm.description"
@@ -69,25 +83,43 @@
             outlined
           />
 
-          <v-checkbox
-            v-model="endpointForm.requireCustomerId"
-            :label="$t('endpoints.requireCustomerId')"
-            hide-details
-          />
-          <v-checkbox
-            v-model="endpointForm.requireRequestorId"
-            :label="$t('endpoints.requireRequestorId')"
-            hide-details
-          />
-          <v-checkbox
-            v-model="endpointForm.requireApiKey"
-            :label="$t('endpoints.requireApiKey')"
-            hide-details
-          />
-          <v-checkbox
-            v-model="endpointForm.ignoreReportValidation"
-            :label="$t('endpoints.ignoreReportValidation')"
-          />
+          <v-row>
+            <v-col cols="6">
+              <v-checkbox
+                v-model="endpointForm.requireRequestorId"
+                :label="$t('endpoints.requireRequestorId')"
+                hide-details
+                style="flex: 1"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-checkbox
+                v-model="endpointForm.requireCustomerId"
+                :label="$t('endpoints.requireCustomerId')"
+                hide-details
+                style="flex: 1"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="6">
+              <v-checkbox
+                v-model="endpointForm.requireApiKey"
+                :label="$t('endpoints.requireApiKey')"
+                hide-details
+                style="flex: 1"
+              />
+            </v-col>
+            <v-col cols="6">
+              <v-checkbox
+                v-model="endpointForm.ignoreReportValidation"
+                :label="$t('endpoints.ignoreReportValidation')"
+                style="flex: 1"
+              />
+            </v-col>
+          </v-row>
         </v-form>
       </v-card-text>
 
@@ -196,6 +228,8 @@ export default {
       valid: false,
       formTitle: '',
 
+      supportedReports: [],
+
       endpointForm: {
         id: null,
         params: [],
@@ -206,6 +240,7 @@ export default {
         technicalProvider: '',
         counterVersion: '',
         paramSeparator: '',
+        testedReport: '',
         requireCustomerId: false,
         requireRequestorId: false,
         requireApiKey: false,
@@ -237,6 +272,8 @@ export default {
         this.$refs.form.resetValidation();
       }
 
+      this.supportedReports = Array.isArray(data.supportedReports) ? data.supportedReports : [];
+
       this.endpointForm.id = data.id;
       this.endpointForm.params = Array.isArray(data.params) ? data.params : [];
       this.endpointForm.tags = Array.isArray(data.tags) ? data.tags : [];
@@ -247,6 +284,7 @@ export default {
       this.endpointForm.technicalProvider = data.technicalProvider || '';
       this.endpointForm.counterVersion = data.counterVersion || '';
       this.endpointForm.paramSeparator = data.paramSeparator || '';
+      this.endpointForm.testedReport = data.testedReport || '';
 
       this.endpointForm.requireCustomerId = !!data.requireCustomerId;
       this.endpointForm.requireRequestorId = !!data.requireRequestorId;

@@ -205,6 +205,7 @@
     "tags": "Tags",
     "technicalProvider": "Technical provider",
     "counterVersion": "COUNTER version",
+    "testedReport": "Report used to test connection",
     "requireCustomerId": "Customer ID is required",
     "requireRequestorId": "Requestor ID is required",
     "requireApiKey": "An API key is required",
