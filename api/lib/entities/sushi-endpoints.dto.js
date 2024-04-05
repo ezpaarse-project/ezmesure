@@ -29,6 +29,7 @@ const schema = {
   defaultRequestorId: Joi.string().allow('').empty(null),
   defaultApiKey: Joi.string().allow('').empty(null),
   paramSeparator: Joi.string().allow('').empty(null),
+  testedReport: Joi.string().allow('').empty(null).lowercase(),
   tags: Joi.array().items(Joi.string()),
 
   credentials: Joi.array().items(Joi.object()),
@@ -74,6 +75,7 @@ const adminCreateSchema = withModifiers(
     requireRequestorId: false,
     requireApiKey: false,
     ignoreReportValidation: false,
+    testedReport: null,
   }),
 );
 
