@@ -75,6 +75,7 @@ describe('[sushi]: Test read sushi credential features', () => {
     requestorId: 'requestorId test',
     apiKey: 'apikey test',
     comment: 'comment test',
+    packages: [],
     tags: [],
     params: [],
   };
@@ -128,7 +129,7 @@ describe('[sushi]: Test read sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-          expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+          expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
           expect(sushiFromResponse?.endpoint).not.toBeNull();
         });
@@ -183,7 +184,7 @@ describe('[sushi]: Test read sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-          expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+          expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
           expect(sushiFromResponse?.endpoint).not.toBeNull();
         });
@@ -294,7 +295,7 @@ describe('[sushi]: Test read sushi credential features', () => {
             expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-            expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+            expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
             expect(sushiFromResponse?.endpoint).not.toBeNull();
           });
@@ -345,7 +346,7 @@ describe('[sushi]: Test read sushi credential features', () => {
             expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-            expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+            expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
             expect(sushiFromResponse?.endpoint).not.toBeNull();
           });

@@ -74,6 +74,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
     requestorId: 'requestorId test',
     apiKey: 'apikey test',
     comment: 'comment test',
+    packages: [],
     tags: [],
     params: [],
   };
@@ -227,6 +228,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+          expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
           expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
         });
@@ -328,6 +330,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -404,6 +407,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -456,6 +460,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -517,6 +522,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+          expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
           expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
         });

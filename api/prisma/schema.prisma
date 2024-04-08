@@ -440,6 +440,8 @@ model SushiCredentials {
   apiKey        String?
   /// Abritrary comment about the credentials
   comment       String?
+  /// Packages (profiles, accounts, funds...) that include the credentials
+  packages      String[]
   /// Abritrary tag list associated to the credentials
   tags          String[]
   /// Additionnal parameters. Each param has a name, a value, and a scope.

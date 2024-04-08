@@ -23,6 +23,7 @@ exports.getAll = async (ctx) => {
     endpointId,
     institutionId,
     tags,
+    packages,
     distinct: distinctFields,
     include: propsToInclude,
   } = query;
@@ -36,11 +37,12 @@ exports.getAll = async (ctx) => {
     credentialsId: queryToPrismaFilter(credentialsId),
   };
 
-  if (institutionId || endpointId || tags) {
+  if (institutionId || endpointId || tags || packages) {
     where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
       institutionId: queryToPrismaFilter(institutionId),
       tags: tags && { hasSome: queryToPrismaFilter(tags).in },
+      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
     };
   }
 
@@ -72,6 +74,7 @@ exports.getAllMeta = async (ctx) => {
     endpointId,
     institutionId,
     tags,
+    packages,
   } = ctx.request.query;
 
   const harvestJobService = new HarvestJobService();
@@ -84,11 +87,12 @@ exports.getAllMeta = async (ctx) => {
     credentialsId: queryToPrismaFilter(credentialsId),
   };
 
-  if (institutionId || endpointId || tags) {
+  if (institutionId || endpointId || tags || packages) {
     where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
       institutionId: queryToPrismaFilter(institutionId),
       tags: tags && { hasSome: queryToPrismaFilter(tags).in },
+      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
     };
   }
 
@@ -111,6 +115,7 @@ exports.getAllMeta = async (ctx) => {
     reportTypes: new Set(),
     statuses: new Set(),
     tags: new Set(),
+    packages: new Set(),
   };
 
   // eslint-disable-next-line no-restricted-syntax
@@ -124,6 +129,10 @@ exports.getAllMeta = async (ctx) => {
     for (const tag of job.credentials.tags) {
       data.tags.add(tag);
     }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const pkg of job.credentials.packages) {
+      data.packages.add(pkg);
+    }
   }
 
   ctx.status = 200;
@@ -134,6 +143,7 @@ exports.getAllMeta = async (ctx) => {
     reportTypes: Array.from(data.reportTypes),
     statuses: Array.from(data.statuses),
     tags: Array.from(data.tags),
+    packages: Array.from(data.packages),
   };
 };
 
