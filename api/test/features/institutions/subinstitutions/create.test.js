@@ -47,11 +47,11 @@ describe('[institutions - subinstitution]: Test create features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
 
     await usersPrisma.create({ data: userTest });
     await usersElastic.createUser(userTest);
-    userToken = await UsersService.generateToken(userTest.username, userPassword);
+    userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
 
     await usersPrisma.create({ data: anotherUserTest });
     await usersElastic.createUser(anotherUserTest);

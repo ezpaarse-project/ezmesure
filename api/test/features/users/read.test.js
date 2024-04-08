@@ -26,7 +26,7 @@ describe('[users]: Test read users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     describe('Get all users', () => {
@@ -106,7 +106,7 @@ describe('[users]: Test read users features', () => {
     beforeEach(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
 
     describe('Get all users', () => {

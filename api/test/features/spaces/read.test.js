@@ -41,7 +41,7 @@ describe('[space]: Test read spaces features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
     spaceConfig.institutionId = institutionId;
@@ -89,7 +89,7 @@ describe('[space]: Test read spaces features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
 
     describe(`Get space [${spaceConfig.type}] for institution [${institutionTest.name}]`, () => {

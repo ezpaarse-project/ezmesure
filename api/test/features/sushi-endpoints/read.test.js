@@ -43,7 +43,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     beforeEach(async () => {
@@ -108,7 +108,7 @@ describe('[sushi-endpoint]: Test read sushi-endpoints features', () => {
       await usersPrisma.create({ data: userTest });
       await usersPrisma.acceptTerms(userTest.username);
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
 
     beforeEach(async () => {

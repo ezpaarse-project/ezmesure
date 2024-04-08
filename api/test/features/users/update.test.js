@@ -32,7 +32,7 @@ describe('[users]: Test update users features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('Update', () => {
     describe('As admin', () => {
