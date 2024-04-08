@@ -76,9 +76,10 @@
           />
 
           <v-combobox
-            v-model="sushiForm.tags"
-            :items="availableTags"
-            :hint="$t('institutions.sushi.tagsDescription')"
+            v-model="sushiForm.packages"
+            :items="availablePackages"
+            :hint="$t('institutions.sushi.packagesDescription')"
+            :label="$t('institutions.sushi.packages')"
             item-text="name"
             hide-selected
             return-object
@@ -88,24 +89,7 @@
             deletable-chips
             persistent-hint
             outlined
-          >
-            <template #label>
-              {{ $t('institutions.sushi.tags') }}
-
-              <v-tooltip top>
-                <template #activator="{ on, attrs }">
-                  <v-icon
-                    small
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    mdi-help-circle
-                  </v-icon>
-                </template>
-                <span>{{ $t('institutions.sushi.tagsHint') }}</span>
-              </v-tooltip>
-            </template>
-          </v-combobox>
+          />
 
           <v-row>
             <v-col cols="6">
@@ -222,7 +206,7 @@ export default {
     SushiParam,
   },
   props: {
-    availableTags: {
+    availablePackages: {
       type: Array,
       default: () => [],
     },
@@ -285,6 +269,7 @@ export default {
 
       this.institutionId = institution?.id;
       this.sushiForm.tags = Array.isArray(sushiData.tags) ? sushiData.tags : [];
+      this.sushiForm.packages = Array.isArray(sushiData.packages) ? sushiData.packages : [];
       this.sushiForm.requestorId = sushiData.requestorId || '';
       this.sushiForm.customerId = sushiData.customerId || '';
       this.sushiForm.apiKey = sushiData.apiKey || '';

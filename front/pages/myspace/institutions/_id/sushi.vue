@@ -152,7 +152,7 @@
     <SushiForm
       ref="sushiForm"
       :endpoints="endpoints"
-      :available-tags="availableTags"
+      :available-packages="availablePackages"
       @update="onSushiUpdate"
     />
 
@@ -399,7 +399,7 @@
         {{ header.text }}
       </template>
 
-      <template #[`header.tags`]="{ header }">
+      <template #[`header.packages`]="{ header }">
         <v-btn
           icon
           small
@@ -410,7 +410,7 @@
           </v-icon>
         </v-btn>
 
-        {{ $t('institutions.sushi.tags') }}
+        {{ $t('institutions.sushi.packages') }}
 
         <v-tooltip top>
           <template #activator="{ on, attrs }">
@@ -422,7 +422,7 @@
               mdi-help-circle
             </v-icon>
           </template>
-          <span>{{ $t('institutions.sushi.tagsHint') }}</span>
+          <span>{{ $t('institutions.sushi.packagesHint') }}</span>
         </v-tooltip>
       </template>
 
@@ -442,16 +442,16 @@
         <LocalDate :date="item.updatedAt" />
       </template>
 
-      <template #[`item.tags`]="{ item }">
+      <template #[`item.packages`]="{ item }">
         <v-chip
-          v-for="(tag, index) in item.tags"
+          v-for="(pkg, index) in item.packages"
           :key="index"
           small
           label
           class="mr-1"
           color="secondary"
         >
-          {{ tag }}
+          {{ pkg }}
         </v-chip>
       </template>
 
@@ -662,11 +662,11 @@ export default {
         { text: this.$t('error'), value: 'failed', order: 1 },
       ];
     },
-    availableTags() {
-      const tags = new Set(
-        this.sushiItems?.flatMap?.((s) => (Array.isArray(s?.tags) ? s.tags : [])),
+    availablePackages() {
+      const packages = new Set(
+        this.sushiItems?.flatMap?.((s) => (Array.isArray(s?.packages) ? s.packages : [])),
       );
-      return Array.from(tags);
+      return Array.from(packages);
     },
     tableHeaders() {
       return [
@@ -676,8 +676,8 @@ export default {
           sort: (a, b) => a?.localeCompare?.(b, this.$i18n.locale, { sensitivity: 'base' }),
         },
         {
-          text: this.$t('institutions.sushi.tags'),
-          value: 'tags',
+          text: this.$t('institutions.sushi.packages'),
+          value: 'packages',
           align: 'right',
           width: 'auto',
         },
@@ -826,15 +826,15 @@ export default {
           value: 'endpoint.vendor',
         },
         {
-          text: this.$t('institutions.sushi.tags'),
-          value: 'tags',
+          text: this.$t('institutions.sushi.packages'),
+          value: 'packages',
         },
       ];
     },
     customGroup() {
       switch (this.tableOptions?.groupBy?.at(0)) {
-        case 'tags':
-          return this.groupByTags;
+        case 'packages':
+          return this.groupByPackage;
         case 'endpoint.vendor':
           return this.groupByVendor;
 
@@ -1096,26 +1096,26 @@ export default {
     updateGroupDesc(value) {
       this.$set(this.tableOptions, 'groupDesc', value ? [value] : []);
     },
-    groupByTags(sushiItems) {
-      const itemsByTag = {};
+    groupByPackage(sushiItems) {
+      const itemsByPackage = {};
 
       // eslint-disable-next-line no-restricted-syntax
       for (const item of sushiItems) {
         // eslint-disable-next-line no-restricted-syntax
-        for (const tag of (item?.tags ?? [])) {
-          if (!itemsByTag[tag]) {
-            itemsByTag[tag] = [];
+        for (const pkg of (item?.packages ?? [])) {
+          if (!itemsByPackage[pkg]) {
+            itemsByPackage[pkg] = [];
           }
 
-          itemsByTag[tag].push(item);
+          itemsByPackage[pkg].push(item);
         }
       }
 
-      return Object.entries(itemsByTag).map(
+      return Object.entries(itemsByPackage).map(
         ([name, items]) => ({
           depth: 0,
-          id: `root_tags_${name}`,
-          key: 'tags',
+          id: `root_packages_${name}`,
+          key: 'packages',
           name,
           items,
           type: 'group',
