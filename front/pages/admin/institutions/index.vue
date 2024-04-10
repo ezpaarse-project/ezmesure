@@ -264,7 +264,7 @@
 
       <template #[`item.monitor`]="{ item }">
         <template v-for="icon in (servicesIconMap.get(item.id) ?? [])">
-          <v-divider v-if="icon.spacer" :key="icon.key" vertical class="mx-1" />
+          <v-divider v-if="icon.spacer" :key="`${icon.key}-divider`" vertical class="mx-1" />
 
           <v-tooltip
             v-else
@@ -653,7 +653,7 @@ export default {
         };
         // eslint-disable-next-line no-restricted-syntax
         for (const c of (credentials ?? [])) {
-          const { status } = c.connection;
+          const { status } = c.connection ?? {};
           if (status) {
             credentialsStatuses[status] += 1;
           }
@@ -808,7 +808,8 @@ export default {
           const total = sushiCredentials.length || 1;
 
           const statuses = sushiCredentials.reduce(
-            (acc, { connection: { status } }) => {
+            (acc, { connection }) => {
+              const { status } = connection ?? {};
               if (status) {
                 acc[status] += 1;
               }
