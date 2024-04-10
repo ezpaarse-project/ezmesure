@@ -28,7 +28,7 @@ describe('[users]: Test create users features', () => {
       let adminToken;
 
       beforeAll(async () => {
-        adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+        adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
       });
 
       it(`#01 Should create new user [${userTest.username}]`, async () => {

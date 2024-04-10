@@ -85,7 +85,7 @@ describe('[sushi]: Test read sushi credential features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
     const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
   });
@@ -207,7 +207,7 @@ describe('[sushi]: Test read sushi credential features', () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
       await usersPrisma.acceptTerms(userTest.username);
-      userToken = await UsersService.generateToken(userTest.username, userPassword);
+      userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
     });
 
     describe('Institution created by admin', () => {

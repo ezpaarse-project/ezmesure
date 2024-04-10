@@ -23,7 +23,7 @@ describe('[indices]: Test delete features', () => {
 
   let adminToken;
   beforeAll(async () => {
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     beforeEach(async () => {
@@ -53,7 +53,7 @@ describe('[indices]: Test delete features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
     beforeEach(async () => {
       await indicesPrisma.create(indexName, null, { ignore: [404] });

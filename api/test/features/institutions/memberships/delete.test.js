@@ -55,7 +55,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
 
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
@@ -130,7 +130,7 @@ describe('[institutions - memberships]: Test delete memberships features', () =>
       await usersPrisma.create({ data: userManagerTest });
       await usersElastic.createUser(userManagerTest);
 
-      userManagerToken = await usersService
+      userManagerToken = await (new UsersService())
         .generateToken(userManagerTest.username, userManagerPassword);
     });
     describe(`With permission [${allPermission}]`, () => {

@@ -66,7 +66,7 @@ describe('[repository permission]: Test update features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+      adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
     });
 
     describe('Institution created by admin', () => {
