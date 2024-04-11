@@ -97,6 +97,20 @@
         </v-col>
       </v-row>
 
+      <v-row v-if="!disabledFiltersSet.has('packages')">
+        <v-col>
+          <v-select
+            :value="value.packages"
+            :items="packageItems"
+            :label="$t('institutions.sushi.packages')"
+            prepend-icon="mdi-tag"
+            clearable
+            hide-details
+            @change="updateFilter('packages', $event)"
+          />
+        </v-col>
+      </v-row>
+
       <v-row v-if="!disabledFiltersSet.has('tags')">
         <v-col>
           <v-select
@@ -151,6 +165,10 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    packages: {
+      type: Array,
+      default: () => [],
+    },
     statuses: {
       type: Array,
       default: () => [],
@@ -177,6 +195,9 @@ export default defineComponent({
     },
     tagsItems() {
       return this.tags.map((value) => ({ value, text: value }));
+    },
+    packageItems() {
+      return this.packages.map((value) => ({ value, text: value }));
     },
     statusesItems() {
       return this.statuses.map((value) => ({

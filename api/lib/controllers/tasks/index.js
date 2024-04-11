@@ -44,6 +44,7 @@ router.route({
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       tags: stringOrArray,
+      packages: stringOrArray,
       distinct: stringOrArray,
       include: Joi.array().single().items(Joi.string().valid(...includableFields)),
     }).rename('include[]', 'include'),
@@ -63,6 +64,7 @@ router.route({
       endpointId: stringOrArray,
       institutionId: stringOrArray,
       tags: stringOrArray,
+      packages: stringOrArray,
     },
   },
 });

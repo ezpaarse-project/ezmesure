@@ -545,6 +545,7 @@ async function importSushiReport(options = {}) {
       X_Sushi_ID: sushi.id,
       X_Institution_ID: sushi.institutionId,
       X_Endpoint_ID: endpoint.id,
+      X_Package: sushi.packages,
       X_Tags: sushi.tags,
       X_Endpoint_Tags: endpoint.tags,
       X_Harvest_ID: harvestId,

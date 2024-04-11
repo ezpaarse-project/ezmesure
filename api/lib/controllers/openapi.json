@@ -1222,6 +1222,13 @@
             "description": "Arbitrary comment about the credentials",
             "type": "string"
           },
+          "packages": {
+            "description": "Packages (profiles, accounts, funds...) that include the credentials",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "tags": {
             "description": "Arbitrary list of tags associated to the credentials",
             "type": "array",
