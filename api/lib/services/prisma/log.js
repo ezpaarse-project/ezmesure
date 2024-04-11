@@ -10,6 +10,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.LogFindUniqueArgs} LogFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.LogFindManyArgs} LogFindManyArgs
  * @typedef {import('@prisma/client').Prisma.LogCreateArgs} LogCreateArgs
+ * @typedef {import('@prisma/client').Prisma.LogCountArgs} LogCountArgs
  */
 /* eslint-enable max-len */
 
@@ -59,6 +60,15 @@ function upsert(params, tx = prisma) {
 }
 
 /**
+ * @param {LogCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.log.count(params);
+}
+
+/**
  * @param {string} jobId - identifier of the associated harvest job
  * @param {string} level - log level
  * @param {string} message - log message
@@ -75,5 +85,6 @@ module.exports = {
   findUnique,
   update,
   upsert,
+  count,
   log,
 };
