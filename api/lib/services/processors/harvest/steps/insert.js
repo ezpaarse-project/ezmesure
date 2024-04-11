@@ -164,6 +164,7 @@ module.exports = async function process(params) {
       X_Sushi_ID: credentials.id,
       X_Institution_ID: credentials.institutionId,
       X_Endpoint_ID: credentials.endpoint.id,
+      X_Package: credentials.packages,
       X_Tags: credentials.tags,
       X_Endpoint_Tags: credentials.endpoint.tags,
       X_Harvest_ID: sessionId,

@@ -529,15 +529,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       );
     };
 
-    let jobs = [];
-    if (!this.currentTransaction) {
-      // Create transaction
-      jobs = await HarvestSessionService.$transaction(prepareJobs);
-    } else {
-      // Use current transaction
-      jobs = await prepareJobs(this);
-    }
-
+    const jobs = await prepareJobs(this);
     return jobs.flat();
   }
 };
