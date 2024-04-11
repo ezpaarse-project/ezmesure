@@ -49,15 +49,15 @@
         </nuxt-link>
       </template>
 
-      <template #[`item.credentials.tags`]="{ value }">
+      <template #[`item.credentials.packages`]="{ value }">
         <v-chip
-          v-for="(tag, index) in value"
+          v-for="(pkg, index) in value"
           :key="index"
           label
           small
           class="ml-1"
         >
-          {{ tag }}
+          {{ pkg }}
         </v-chip>
       </template>
 
@@ -122,6 +122,7 @@
       :institutions="meta?.institutions ?? []"
       :report-types="meta?.reportTypes ?? []"
       :tags="meta?.tags ?? []"
+      :packages="meta?.packages ?? []"
       :statuses="meta?.statuses ?? []"
       @input="refreshJobs(1)"
     />
@@ -159,6 +160,7 @@ export default defineComponent({
       vendor: undefined,
       institution: undefined,
       tags: undefined,
+      packages: undefined,
       reportType: undefined,
       status: undefined,
     },
@@ -183,8 +185,8 @@ export default defineComponent({
           value: 'credentials.institution.name',
         },
         {
-          text: this.$t('endpoints.tags'),
-          value: 'credentials.tags',
+          text: this.$t('institutions.sushi.packages'),
+          value: 'credentials.packages',
         },
         {
           text: this.$t('harvest.jobs.reportType'),
@@ -282,6 +284,7 @@ export default defineComponent({
         credentialsId: this.filters.vendor,
         institutionId: this.filters.institution,
         tags: this.filters.tags,
+        packages: this.filters.packages,
 
         page: this.tableOptions.page,
         size: this.tableOptions.itemsPerPage,

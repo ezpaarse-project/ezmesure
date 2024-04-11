@@ -4,7 +4,7 @@
       <div>
         {{ $t('sushi.harvestState') }}
         <div class="caption">
-          {{ sushiVendor }} - {{ sushiTags }}
+          {{ sushiVendor }} - {{ sushiPackages }}
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export default {
   computed: {
     sushiId() { return this.sushiItem?.id; },
     sushiVendor() { return this.sushiItem?.endpoint?.vendor; },
-    sushiTags() { return this.sushiItem?.tags?.join?.(', '); },
+    sushiPackages() { return this.sushiItem?.packages?.join?.(', '); },
     harvestsByType() {
       const harvestsByType = this.harvests.reduce((acc, harvest) => {
         const reportId = harvest.reportId?.toUpperCase?.();
