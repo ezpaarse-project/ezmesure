@@ -325,7 +325,8 @@ export default {
     queryEndpoints: debounce(async function queryEndpoints() {
       this.loadingEndpoints = true;
       try {
-        this.availableEndpoints = await this.$axios.$get('/sushi-endpoints', { params: { q: this.endpointSearch } });
+        const endpoints = await this.$axios.$get('/sushi-endpoints', { params: { q: this.endpointSearch } });
+        this.availableEndpoints = endpoints.sort((a, b) => a.vendor.localeCompare(b.vendor));
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetrivePlatforms'));
       }
