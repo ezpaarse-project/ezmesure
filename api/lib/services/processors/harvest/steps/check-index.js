@@ -14,7 +14,7 @@ const HarvestError = require('../HarvestError');
 const waitUntilTaskComplete = (esTaskId, timeout) => {
   let timeoutId;
   let lastProgress;
-  const ms = 5000;
+  const intervalMs = 5000;
 
   return new Promise((resolve) => {
     const handler = async () => {
@@ -31,7 +31,7 @@ const waitUntilTaskComplete = (esTaskId, timeout) => {
         return;
       }
 
-      timeoutId = setTimeout(handler, ms);
+      timeoutId = setTimeout(handler, intervalMs);
 
       const progress = task.status.deleted || 0;
       if (progress === lastProgress) {
@@ -42,7 +42,7 @@ const waitUntilTaskComplete = (esTaskId, timeout) => {
       timeout.reset();
     };
 
-    timeoutId = setTimeout(handler, ms);
+    timeoutId = setTimeout(handler, intervalMs);
   });
 };
 
