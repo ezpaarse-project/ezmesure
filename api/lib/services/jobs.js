@@ -9,7 +9,7 @@ const harvestConcurrency = Number.parseInt(config.get('jobs.harvest.concurrency'
 const redisConfig = config.get('redis');
 const logPrefix = '[Harvest Queue]';
 
-const workerFile = path.resolve(__dirname, 'processors', 'harvest.js');
+const workerFile = path.resolve(__dirname, 'processors', 'harvest', 'index.js');
 
 const harvestQueue = new Queue('sushi-harvest', { connection: redisConfig });
 const harvestWorker = new Worker('sushi-harvest', workerFile, {
