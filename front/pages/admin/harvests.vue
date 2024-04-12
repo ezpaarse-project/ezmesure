@@ -48,6 +48,27 @@
                     {{ open ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                   </v-icon>
                 </v-btn>
+
+                <v-menu>
+                  <template #activator="{ attrs, on }">
+                    <v-btn icon class="ml-2" v-bind="attrs" v-on="on">
+                      <v-icon>mdi-dots-horizontal</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item @click="copyId(item)">
+                      <v-list-item-icon>
+                        <v-icon>mdi-identifier</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ $t('copyId') }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </template>
             </v-expansion-panel-header>
 
@@ -143,6 +164,19 @@ export default defineComponent({
       }
 
       this.refreshing = false;
+    },
+    async copyId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(item.id);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('idCopied'));
     },
   },
 });
