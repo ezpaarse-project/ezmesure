@@ -137,11 +137,11 @@ module.exports = async function prepareTask(job) {
     return null;
   }
 
-  const save = async (logs) => {
-    const newLogs = logs;
+  const save = async (logManager) => {
+    const newLogs = [...logManager.data];
 
     // eslint-disable-next-line no-param-reassign
-    logs = [];
+    logManager.data = [];
 
     try {
       await harvestJobsService.update({
@@ -168,7 +168,7 @@ module.exports = async function prepareTask(job) {
     get data() {
       return task;
     },
-    save: () => save(logs.data),
+    save: () => save(logs),
     logs,
     steps: prepareSteps(task),
   };
