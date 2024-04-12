@@ -765,7 +765,9 @@
       "updated": "Éléments mis à jour",
       "failed": "Éléments non récupérés",
       "unableToRetrive": "Impossible de récupérer les tâches de moissonnage",
-      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage"
+      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage",
+      "unableToStop": "Impossible de stopper la tâche de moissonnage",
+      "unableToDelete": "Impossible de supprimer la tâche de moissonnage"
     }
   },
   "sync": {
