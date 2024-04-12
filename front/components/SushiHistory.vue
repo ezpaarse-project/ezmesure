@@ -5,7 +5,7 @@
         <v-toolbar-title>
           {{ $t('tasks.history') }}
           <div class="caption">
-            {{ sushiVendor }} - {{ sushiTags }}
+            {{ sushiVendor }} - {{ sushiPackages }}
           </div>
         </v-toolbar-title>
 
@@ -128,7 +128,7 @@ export default {
       return !!this.sushi?.id;
     },
     sushiVendor() { return this.sushi?.endpoint?.vendor; },
-    sushiTags() { return this.sushi?.tags?.join?.(', '); },
+    sushiPackages() { return this.sushi?.packages?.join?.(', '); },
     tableHeaders() {
       return [
         {

@@ -74,6 +74,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
     requestorId: 'requestorId test',
     apiKey: 'apikey test',
     comment: 'comment test',
+    packages: [],
     tags: [],
     params: [],
   };
@@ -84,7 +85,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
     const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
   });
@@ -185,7 +186,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
       await usersPrisma.acceptTerms(userTest.username);
-      userToken = await UsersService.generateToken(userTest.username, userPassword);
+      userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
     });
 
     describe('Institution created by admin', () => {
@@ -227,6 +228,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+          expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
           expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
         });
@@ -328,6 +330,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -404,6 +407,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -456,6 +460,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
             expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+            expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
             expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
           });
@@ -517,6 +522,7 @@ describe('[sushi]: Test delete sushi credential features', () => {
           expect(sushiFromService).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromService).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromService).toHaveProperty('comment', sushiTest?.comment);
+          expect(sushiFromService).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromService).toHaveProperty('tags', sushiTest?.tags);
           expect(sushiFromService).toHaveProperty('params', sushiTest?.params);
         });

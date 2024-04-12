@@ -429,7 +429,8 @@ export default {
           const total = credentials.length || 1;
 
           const statuses = credentials.reduce(
-            (acc, { connection: { status } }) => {
+            (acc, { connection }) => {
+              const { status } = connection ?? {};
               if (status) {
                 acc[status] += 1;
               }
@@ -517,7 +518,7 @@ export default {
         };
         // eslint-disable-next-line no-restricted-syntax
         for (const c of (credentials ?? [])) {
-          const { status } = c.connection;
+          const { status } = c.connection ?? {};
           if (status) {
             credentialsStatuses[status] += 1;
           }

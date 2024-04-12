@@ -42,7 +42,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
   });
   describe('As admin', () => {
     describe('Delete sushi-endpoint', () => {
@@ -81,7 +81,7 @@ describe('[sushi-endpoint]: Test update sushi-endpoints features', () => {
     beforeAll(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
 
     describe('Delete sushi-endpoint', () => {

@@ -14,6 +14,49 @@
 
         <v-row>
           <v-col>
+            <v-menu
+              :disabled="counts.credentials.all <= 0"
+              transition="slide-y-transition"
+              min-width="800"
+              bottom
+              offset-y
+            >
+              <template #activator="{ attrs, on }">
+                <v-chip
+                  :color="counts.credentials.harvestable > 0 ? 'success' : 'error'"
+                  small
+                  class="mr-2"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon left small>
+                    mdi-key
+                  </v-icon>
+
+                  {{
+                    $tc(
+                      'harvest.sessions.counts.credentials',
+                      counts.credentials.harvestable ?? counts.credentials.all,
+                    )
+                  }}
+                </v-chip>
+              </template>
+
+              <v-card>
+                <v-card-title>
+                  {{ credentialsTitle }}
+                </v-card-title>
+
+                <v-card-subtitle v-if="counts.credentials.harvestable !== counts.credentials.all">
+                  {{ $t('harvest.sessions.credentialsTooltip', counts.credentials) }}
+                </v-card-subtitle>
+
+                <v-card-text>
+                  <HarvestCredentialsTable :session-id="session.id" />
+                </v-card-text>
+              </v-card>
+            </v-menu>
+
             <template v-for="tag in chips">
               <v-tooltip
                 v-if="!tag.hide"
@@ -113,6 +156,7 @@
 import { defineComponent } from 'vue';
 import { parseISO } from 'date-fns';
 import ProgressLinearStack from '~/components/ProgressLinearStack.vue';
+import HarvestCredentialsTable from '~/components/harvest/HarvestCredentialsTable.vue';
 
 const STATUS_ICONS = {
   success: { icon: 'mdi-check', color: 'green' },
@@ -125,6 +169,7 @@ const STATUS_ICONS = {
 export default defineComponent({
   components: {
     ProgressLinearStack,
+    HarvestCredentialsTable,
   },
   props: {
     session: {
@@ -243,15 +288,6 @@ export default defineComponent({
           text: `${this.session.beginDate} ~ ${this.session.endDate}`,
         },
         {
-          key: `${this.session.id}-credentials`,
-          icon: 'mdi-key',
-          text: this.$tc(
-            'harvest.sessions.counts.credentials',
-            this.counts.credentials.harvestable ?? this.counts.credentials.all,
-          ),
-          tooltip: this.$t('harvest.sessions.credentialsTooltip', this.counts.credentials),
-        },
-        {
           key: `${this.session.id}-reports`,
           icon: 'mdi-file',
           text: this.$tc('harvest.sessions.counts.reportTypes', this.counts.reportTypes),
@@ -264,6 +300,13 @@ export default defineComponent({
           text: this.runningTime,
         },
       ];
+    },
+    credentialsTitle() {
+      let total = this.counts.credentials.harvestable;
+      if (this.counts.credentials.harvestable !== this.counts.credentials.all) {
+        total = `${total}/${this.counts.credentials.all}`;
+      }
+      return this.$t('institutions.sushi.title', { total });
     },
   },
 });

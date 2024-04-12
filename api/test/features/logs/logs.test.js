@@ -31,7 +31,7 @@ describe('[logs]: Test insert features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await UsersService.generateToken(adminUsername, adminPassword);
+      adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     describe(`Add [wiley.csv] in [${indexName}] index`, () => {
@@ -71,7 +71,7 @@ describe('[logs]: Test insert features', () => {
     beforeEach(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await UsersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
     // TODO create roles
     describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {

@@ -45,8 +45,8 @@ describe('[users]: Test impersonation features', () => {
     await usersElastic.createUser(regularUser);
 
     const usersService = new UsersService();
-    adminToken = await usersService.generateToken(adminUsername);
-    regularUserToken = await usersService.generateToken(regularUser.username);
+    adminToken = await (new UsersService()).generateToken(adminUsername);
+    regularUserToken = await (new UsersService()).generateToken(regularUser.username);
   });
 
   describe('An admin', () => {

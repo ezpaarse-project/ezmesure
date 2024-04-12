@@ -17,7 +17,11 @@ const schema = {
   createdAt: Joi.date(),
   startedAt: Joi.date(),
 
-  credentialsQuery: Joi.object().pattern(Joi.string(), Joi.any()),
+  credentialsQuery: Joi.object({
+    sushiIds: Joi.array().items(Joi.string()),
+    institutionIds: Joi.array().items(Joi.string()),
+    endpointIds: Joi.array().items(Joi.string()),
+  }),
   beginDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   endDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   reportTypes: Joi.array().items(Joi.string()),
