@@ -9,6 +9,7 @@ const logPrisma = require('../services/prisma/log');
 /** @typedef {import('@prisma/client').Prisma.LogFindUniqueArgs} LogFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.LogFindManyArgs} LogFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.LogCreateArgs} LogCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.LogCountArgs} LogCountArgs */
 /* eslint-enable max-len */
 
 module.exports = class LogsService extends BasePrismaService {
@@ -53,6 +54,14 @@ module.exports = class LogsService extends BasePrismaService {
    */
   upsert(params) {
     return logPrisma.upsert(params, this.prisma);
+  }
+
+  /**
+   * @param {LogCountArgs} params
+   * @returns {Promise<number>}
+   */
+  count(params) {
+    return logPrisma.count(params, this.prisma);
   }
 
   /**

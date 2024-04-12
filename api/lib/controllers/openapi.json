@@ -68,6 +68,9 @@
       "name": "Tasks"
     },
     {
+      "name": "Logs"
+    },
+    {
       "name": "Users"
     }
   ],
@@ -8127,6 +8130,137 @@
         "description": "Cancel a task, and interrupt the associated job if it's active.",
         "tags": [
           "Tasks"
+        ]
+      }
+    },
+    "/task-logs": {
+      "get": {
+        "summary": "List task logs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "description": "A log message",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/components/schemas/ItemID"
+                      },
+                      "date": {
+                        "description": "The date of the message",
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "level": {
+                        "description": "The message level",
+                        "type": "string",
+                        "enum": [
+                          "error",
+                          "warn",
+                          "info",
+                          "verbose",
+                          "debug"
+                        ]
+                      },
+                      "message": {
+                        "description": "The content of the message",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "operation-id": "get-task-logs",
+        "description": "List task logs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "query",
+            "name": "size",
+            "description": "maximum number of logs to get"
+          },
+          {
+            "name": "page",
+            "description": "Result page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "description": "A field to sort on",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "description": "Sort order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "jobId",
+            "description": "filter logs by their job"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "level",
+            "description": "filter logs by their level"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "from",
+            "description": "filter logs by their date"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "to",
+            "description": "filter logs by their date"
+          }
+        ],
+        "tags": [
+          "Logs"
         ]
       }
     },
