@@ -111,6 +111,59 @@
       <template #[`item.updatedAt`]="{ value }">
         <LocalDate v-if="value" :date="value" />
       </template>
+
+      <template #[`item.actions`]="{ item }">
+        <v-menu>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>
+                mdi-cog
+              </v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item :disabled="!cancellableStatus.has(item.status)" @click="cancelJob(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-cancel</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('cancel') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item :disabled="!cancellableStatus.has(item.status)" @click="deleteJob(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('delete') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider />
+
+            <v-list-item @click="copyId(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-identifier</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('copyId') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
     </v-data-table>
 
     <HarvestJobFilters
@@ -126,11 +179,15 @@
       :statuses="meta?.statuses ?? []"
       @input="refreshJobs(1)"
     />
+
+    <ConfirmDialog ref="confirmDialog" />
   </section>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
+
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import HarvestJobCard from '~/components/harvest/HarvestJobCard.vue';
 import LocalDate from '~/components/LocalDate.vue';
@@ -142,6 +199,7 @@ export default defineComponent({
     LocalDate,
     HarvestJobCard,
     HarvestJobFilters,
+    ConfirmDialog,
   },
   props: {
     sessionId: {
@@ -172,6 +230,8 @@ export default defineComponent({
     tableOptions: {},
 
     refreshing: false,
+
+    cancellableStatus: new Set(['waiting', 'running', 'delayed']),
   }),
   computed: {
     tableHeaders() {
@@ -206,6 +266,11 @@ export default defineComponent({
         {
           text: this.$t('harvest.jobs.updatedAt'),
           value: 'updatedAt',
+        },
+        {
+          text: this.$t('actions'),
+          value: 'actions',
+          width: 0,
         },
       ];
     },
@@ -308,6 +373,62 @@ export default defineComponent({
       }
 
       this.refreshing = false;
+    },
+    async cancelJob(item) {
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        agreeText: this.$t('cancel'),
+        agreeIcon: 'mdi-cancel',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.refreshing = true;
+      try {
+        const { data } = await this.$axios.post(`/tasks/${item.id}/_cancel`, {});
+        if (data.status === item.status) {
+          throw new Error("Cancellation wasn't successful");
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToStop'));
+      }
+
+      this.refreshJobs();
+    },
+    async deleteJob(item) {
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.refreshing = true;
+      try {
+        await this.$axios.delete(`/tasks/${item.id}`, {});
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToDelete'));
+      }
+
+      this.refreshJobs();
+    },
+    async copyId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(item.id);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('idCopied'));
     },
   },
 });

@@ -765,7 +765,9 @@
       "updated": "Items Updated",
       "failed": "Items Not Retrieved",
       "unableToRetrive": "Unable to retrieve harvesting tasks",
-      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks"
+      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks",
+      "unableToStop": "Unable to stop the harvesting task",
+      "unableToDelete": "Unable to delete the harvesting task"
     }
   },
   "sync": {
