@@ -70,21 +70,6 @@ function prepareSteps(task) {
   });
 
   /**
-   * Update a step
-   *
-   * @param {Step} step The step to update
-   *
-   * @returns A promise with the updated step
-   */
-  const update = (step) => stepService.update({
-    where: { id: step.id },
-    data: {
-      status: 'running',
-      runningTime: 0,
-    },
-  });
-
-  /**
    * End a step
    *
    * @param {Step} stepData The step to update
@@ -95,16 +80,19 @@ function prepareSteps(task) {
   const end = (stepData, opts = {}) => {
     const { success = true } = opts;
 
-    return update({
-      ...stepData,
-      runningTime: Date.now() - stepData.startedAt.getTime(),
-      status: success ? 'finished' : 'failed',
+    return stepService.update({
+      where: { id: stepData.id },
+      // @ts-ignore
+      data: {
+        ...stepData,
+        runningTime: Date.now() - stepData.startedAt.getTime(),
+        status: success ? 'finished' : 'failed',
+      },
     });
   };
 
   return {
     create,
-    update,
     end,
   };
 }
