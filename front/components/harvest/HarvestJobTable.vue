@@ -138,7 +138,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :disabled="!cancellableStatus.has(item.status)" @click="deleteJob(item)">
+            <v-list-item @click="deleteJob(item)">
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
