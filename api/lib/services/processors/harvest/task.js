@@ -21,11 +21,14 @@ const { appLogger } = require('../../logger');
 /* eslint-enable max-len */
 
 function prepareLogs() {
-  const logs = [];
+  let logs = [];
 
   return {
     get data() {
       return logs;
+    },
+    set data(value) {
+      logs = value;
     },
     /**
      * Add a log to the list of logs
