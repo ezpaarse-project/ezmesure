@@ -292,7 +292,7 @@ module.exports = async function process(params) {
 
       if ((Date.now() - lastSaveDate) > 5000) {
         // eslint-disable-next-line no-await-in-loop
-        await saveTask();
+        await steps.update(insertStep);
         lastSaveDate = Date.now();
         timeout.reset();
       }

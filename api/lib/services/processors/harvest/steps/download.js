@@ -151,7 +151,7 @@ module.exports = async function process(params) {
       // We must not wait for the task to be saved, otherwise the download
       // may be finished before we register listeners.
       await Promise.all([
-        saveTask(),
+        steps.update(downloadStep),
 
         new Promise((resolve, reject) => {
           download.on('error', reject);
@@ -272,6 +272,7 @@ module.exports = async function process(params) {
     });
     timeout.reset();
 
+    await steps.update(downloadStep);
     await saveTask();
 
     if (endpointIsBusy) {
