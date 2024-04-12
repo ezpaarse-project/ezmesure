@@ -1,10 +1,22 @@
 const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
-const { bodyParser } = require('@koa/bodyparser');
 
 const { getAll } = require('./actions');
 
-router.use(bodyParser());
+const {
+  requireJwt,
+  requireUser,
+  requireTermsOfUse,
+  requireAdmin,
+} = require('../../services/auth');
+
+router.use(
+  requireJwt,
+  requireUser,
+  requireTermsOfUse,
+  requireAdmin,
+);
+
 router.route({
   method: 'GET',
   path: '/',
