@@ -138,7 +138,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :disabled="!deletableStatus.has(item.status)" @click="deleteJob(item)">
+            <v-list-item :disabled="unDeletableStatus.has(item.status)" @click="deleteJob(item)">
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
@@ -232,7 +232,7 @@ export default defineComponent({
     refreshing: false,
 
     cancellableStatus: new Set(['waiting', 'running', 'delayed']),
-    deletableStatus: new Set(['running']),
+    unDeletableStatus: new Set(['running']),
   }),
   computed: {
     tableHeaders() {
