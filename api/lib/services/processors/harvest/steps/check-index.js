@@ -84,73 +84,73 @@ module.exports = async function process(param) {
   }
   timeout.reset();
 
-  if (indexExists) {
-    let esTaskId;
+  if (!indexExists) {
     try {
-      const response = await elastic.deleteByQuery({
+      await elastic.indices.create({
         index,
-        wait_for_completion: false,
-        body: {
-          query: {
-            bool: {
-              filter: [
-                {
-                  range: {
-                    X_Date_Month: {
-                      gte: beginDate,
-                      lte: endDate,
-                      format: 'date_optional_time',
-                    },
-                  },
-                },
-                {
-                  term: {
-                    X_Sushi_ID: task.credentialsId,
-                  },
-                },
-                {
-                  term: {
-                    'Report_Header.Report_ID': task.reportType.toUpperCase(),
-                  },
-                },
-              ],
-            },
-          },
-        },
+        body: publisherIndexTemplate,
       });
-
-      if (!response.body.task) {
-        throw new Error('No task id in response');
-      }
-
-      esTaskId = response.body.task;
     } catch (e) {
-      throw new HarvestError(`Failed to start cleaning of data of index [${index}]`, { cause: e });
+      throw new HarvestError(`Failed to create index [${index}]`, { cause: e });
     }
     timeout.reset();
-
-    try {
-      const esTask = await waitUntilTaskComplete(esTaskId, timeout);
-      if (esTask.status.deleted !== esTask.status.total) {
-        throw new Error('Completed but not all data was deleted');
-      }
-    } catch (e) {
-      throw new HarvestError(`Failed to clean data of index [${index}]`, { cause: e });
-    }
 
     await steps.end(indexStep);
     return;
   }
 
+  let esTaskId;
   try {
-    await elastic.indices.create({
+    const response = await elastic.deleteByQuery({
       index,
-      body: publisherIndexTemplate,
+      wait_for_completion: false,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                range: {
+                  X_Date_Month: {
+                    gte: beginDate,
+                    lte: endDate,
+                    format: 'date_optional_time',
+                  },
+                },
+              },
+              {
+                term: {
+                  X_Sushi_ID: task.credentialsId,
+                },
+              },
+              {
+                term: {
+                  'Report_Header.Report_ID': task.reportType.toUpperCase(),
+                },
+              },
+            ],
+          },
+        },
+      },
     });
+
+    if (!response.body.task) {
+      throw new Error('No task id in response');
+    }
+
+    esTaskId = response.body.task;
   } catch (e) {
-    throw new HarvestError(`Failed to create index [${index}]`, { cause: e });
+    throw new HarvestError(`Failed to start cleaning of data of index [${index}]`, { cause: e });
   }
   timeout.reset();
+
+  try {
+    const esTask = await waitUntilTaskComplete(esTaskId, timeout);
+    if (esTask.status.deleted !== esTask.status.total) {
+      throw new Error('Completed but not all data was deleted');
+    }
+  } catch (e) {
+    throw new HarvestError(`Failed to clean data of index [${index}]`, { cause: e });
+  }
 
   await steps.end(indexStep);
 };
