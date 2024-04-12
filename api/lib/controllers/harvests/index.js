@@ -46,7 +46,7 @@ router.route({
       institutionId: stringOrArray,
       tags: stringOrArray,
       packages: stringOrArray,
-      size: Joi.number().min(0),
+      size: Joi.number().min(0).default(10),
       page: Joi.number().min(1),
       sort: Joi.string(),
       order: Joi.string().valid('asc', 'desc'),
