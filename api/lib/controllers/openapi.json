@@ -6022,6 +6022,24 @@
             }
           },
           {
+            "name": "harvestedBefore",
+            "description": "Maximum date of harvest",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "harvestedAfter",
+            "description": "Minimum date of harvest",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
             "name": "reportId",
             "description": "Filter by report ID",
             "in": "query",
@@ -6032,7 +6050,7 @@
           },
           {
             "name": "size",
-            "description": "Number of harvests to get. Defaults to all.",
+            "description": "Number of harvests to get. Defaults to 10. Set to 0 to get all.",
             "in": "query",
             "schema": {
               "type": "integer"
@@ -6066,6 +6084,72 @@
               ],
               "default": "asc"
             }
+          },
+          {
+            "schema": {
+              "type": "array",
+              "pattern": "[A-Za-z,]+"
+            },
+            "in": "query",
+            "name": "status",
+            "description": "filter harvests by status"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "pattern": "[A-Za-z_:]+"
+            },
+            "in": "query",
+            "name": "errorCode",
+            "description": "filter harvests by error code"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "institutionId",
+            "description": "filter harvests by institution ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "credentialsId",
+            "description": "filter harvests by ID of SUSHI credentials"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "endpointId",
+            "description": "filter harvests by endpoint ID"
+          },
+          {
+            "schema": {
+              "type": "array"
+            },
+            "in": "query",
+            "name": "distinct",
+            "description": "a combination of fields that should be distinct"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "credentials",
+                  "credentials.institution",
+                  "credentials.endpoint"
+                ]
+              }
+            },
+            "name": "include",
+            "in": "query",
+            "description": "Relations that should be included in the response"
           }
         ],
         "responses": {
