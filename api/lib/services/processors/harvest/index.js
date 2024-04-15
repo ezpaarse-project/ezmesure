@@ -205,17 +205,14 @@ module.exports = async function handle(job, lockToken) {
   } catch (err) {
     timeout.end();
 
-    const harvestJobService = new HarvestJobService();
-    const logService = new LogService();
-
     await handleErrorTypes(job, task.data, err, lockToken);
 
     appLogger.error(`Failed to import sushi report [${task.data.credentials?.id}]`);
-    await logService.log(job.id || '', 'error', err.message);
+    task.logs.add('error', err.message);
 
     if (err instanceof HarvestError) {
       if (err.cause instanceof Error) {
-        await logService.log(job.id || '', 'error', err.cause.message);
+        task.logs.add('error', err.cause.message);
         appLogger.error(err.cause.message);
         appLogger.error(err.cause.stack);
       }
@@ -225,7 +222,7 @@ module.exports = async function handle(job, lockToken) {
     }
 
     try {
-      await harvestJobService.finish(task.data, { status: 'failed' });
+      await task.finish({ status: 'failed' });
     } catch (e) {
       appLogger.error(`Failed to save sushi task ${task.id}`);
       appLogger.error(e.message);

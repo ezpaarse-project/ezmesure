@@ -135,11 +135,13 @@ module.exports = async function prepareTask(job) {
     return null;
   }
 
-  const save = async (logManager) => {
-    const newLogs = [...logManager.data];
+  const logs = prepareLogs();
+
+  const save = async () => {
+    const newLogs = [...logs.data];
 
     // eslint-disable-next-line no-param-reassign
-    logManager.data = [];
+    logs.data = [];
 
     try {
       await harvestJobsService.update({
@@ -160,13 +162,18 @@ module.exports = async function prepareTask(job) {
     }
   };
 
-  const logs = prepareLogs();
+  const finish = async (options = {}) => {
+    await save();
+
+    await harvestJobsService.finish(task, options);
+  };
 
   return {
     get data() {
       return task;
     },
-    save: () => save(logs),
+    save,
+    finish,
     logs,
     steps: prepareSteps(task),
   };
