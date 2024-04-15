@@ -278,7 +278,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       const format = 'yyyy-MM';
       const period = HarvestSessionService.parsePeriod(beginDate, endDate, format);
       props.create.beginDate = formatDate(period.beginDate, format);
-      props.create.endDate = formatDate(period.beginDate, format);
+      props.create.endDate = formatDate(period.endDate, format);
     }
 
     const session = await harvestSessionPrisma.upsert(props);
