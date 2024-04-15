@@ -4,6 +4,8 @@ const sushiService = require('../../../sushi');
 
 const HarvestError = require('../HarvestError');
 
+const { ERROR_CODES } = sushiService;
+
 /**
  * Download SUSHI report and check for exceptions
  *
@@ -57,6 +59,7 @@ module.exports = async function process(params) {
     }
 
     if (!ignoreReportValidation) {
+      task.errorCode = ERROR_CODES.invalidReport;
       throw new HarvestError('The report is not valid');
     } else {
       logs.add('info', 'Ignoring report validation');
