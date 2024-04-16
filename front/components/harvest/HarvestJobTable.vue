@@ -347,7 +347,7 @@ export default defineComponent({
 
         status: this.filters.status,
         type: this.filters.reportType,
-        credentialsId: this.filters.vendor,
+        endpointId: this.filters.vendor,
         institutionId: this.filters.institution,
         tags: this.filters.tags,
         packages: this.filters.packages,
