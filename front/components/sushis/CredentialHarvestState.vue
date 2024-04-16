@@ -2,24 +2,25 @@
   <v-chip
     v-if="lastHarvest"
     :color="chipColor"
+    :class="[chipColor && 'white--text']"
     small
     outlined
-    class="white--text"
     @click="$emit('harvest:click', lastHarvest)"
   >
     <v-icon left small>
       {{ chipIcon }}
     </v-icon>
 
-    <LocalDate :date="lastHarvest.harvestDate.getTime()" />
+    <LocalDate :date="lastHarvest.harvestDate.getTime()" format="PPPp" />
   </v-chip>
 </template>
 
 <script setup>
 import { computed } from 'vue';
 import { parseISO } from 'date-fns';
-import { colors, icons } from '../harvest/state';
 import LocalDate from '../LocalDate.vue';
+
+const activeState = new Set(['waiting', 'running', 'delayed']);
 
 const props = defineProps({
   harvests: {
@@ -36,6 +37,18 @@ const lastHarvest = computed(
     .sort((a, b) => b.harvestDate - a.harvestDate)
     .at(0),
 );
-const chipColor = computed(() => lastHarvest.value && colors.get(lastHarvest.value.status));
-const chipIcon = computed(() => lastHarvest.value && icons.get(lastHarvest.value.status));
+const chipColor = computed(() => {
+  const activeHarvest = props.harvests.find((h) => activeState.has(h.status));
+  if (!activeHarvest) {
+    return undefined;
+  }
+  return 'blue';
+});
+const chipIcon = computed(() => {
+  const activeHarvest = props.harvests.find((h) => activeState.has(h.status));
+  if (!activeHarvest) {
+    return undefined;
+  }
+  return 'mdi-play';
+});
 </script>
