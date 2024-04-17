@@ -170,11 +170,10 @@ module.exports = async function handle(job, lockToken) {
     return job.remove(); // throw error ?!
   }
 
+  await delayIfEndpointDisabled(job, task.data, lockToken);
+
   const timeout = prepareTimeout(job, task);
   timeout.start();
-
-  await delayIfEndpointDisabled(job, task.data, lockToken);
-  timeout.reset();
 
   // Just a little delay to avoid spamming too fast when harvesting a single platform
   await new Promise((resolve) => { setTimeout(resolve, 500); });
