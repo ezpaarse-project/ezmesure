@@ -67,7 +67,7 @@ const triggerHooks = (event, ...payload) => {
  * Register a hook
  *
  * @param {string} event The event name
- * @param {(payload: any) => void} handler The handled of the hook
+ * @param {(payload: any) => void | Promise<void>} handler The handled of the hook
  * @param {Object} opts Options of the hook
  * @param {boolean} [opts.debounce] Should the hook be debounced
  * @param {(payload) => string | number} [opts.uniqueResolver]
@@ -76,18 +76,26 @@ const triggerHooks = (event, ...payload) => {
  * @returns {EventEmitter} Returns a reference to the EventEmitter
  */
 const registerHook = (event, handler, opts = {}) => {
-  let fnc = (key, payload) => handler(payload);
+  const safeHandler = async (...params) => {
+    try {
+      await handler(...params);
+    } catch (error) {
+      appLogger.error(`[hooks] "${event}" encountered an error: ${error.message}`);
+    }
+  };
+
+  let fnc = (key, payload) => safeHandler(payload);
 
   if (opts.debounce !== false) {
-    fnc = memoizeDebounce(handler, 250, {});
+    fnc = memoizeDebounce(safeHandler, 250, {});
   }
 
   if (opts.queue) {
     const queued = createQueue();
-    fnc = (key, payload) => queued(handler)(payload);
+    fnc = (key, payload) => queued(safeHandler)(payload);
   }
 
-  const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload.id);
+  const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload?.id);
 
   appLogger.verbose(`[hooks] "${event}" registered with options "${JSON.stringify(opts)}"`);
   return hookEmitter.on(
