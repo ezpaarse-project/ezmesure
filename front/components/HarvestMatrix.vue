@@ -103,17 +103,15 @@ export default {
     };
   },
   watch: {
-    sushiId: {
-      immediate: true,
-      handler() { this.refreshHarvests(); },
-    },
     initialYear: {
       immediate: true,
       handler(val) { if (val != null) { this.year = val; } },
     },
-    year() {
-      this.refreshHarvests();
+    sushiId: {
+      immediate: true,
+      handler() { this.refreshHarvests(); },
     },
+    year() { this.refreshHarvests(); },
   },
   computed: {
     sushiId() { return this.sushiItem?.id; },

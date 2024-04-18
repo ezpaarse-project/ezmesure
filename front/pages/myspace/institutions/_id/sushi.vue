@@ -468,7 +468,7 @@
         <CredentialHarvestState
           v-if="item.harvests?.length > 0"
           :harvests="item.harvests"
-          @harvest:click="(e) => showHarvestMatrix(item, e.harvestDate)"
+          @harvest:click="(e) => showHarvestMatrix(item, e.period)"
         />
       </template>
 
@@ -865,9 +865,9 @@ export default {
     showAvailableReports(item) {
       this.$refs.reportsDialog.showReports(item);
     },
-    showHarvestMatrix(item, date) {
-      const year = date ? date.getFullYear() : undefined;
-      this.$refs.harvestMatrixDialog.display(item, year);
+    showHarvestMatrix(item, period) {
+      const year = period ? period.split('-')?.[0] : undefined;
+      this.$refs.harvestMatrixDialog.display(item, year && Number.parseInt(year, 10));
     },
     createSushiItem() {
       this.$refs.sushiForm.createSushiItem(this.institution);

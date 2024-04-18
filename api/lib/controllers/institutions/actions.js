@@ -66,16 +66,17 @@ function sendValidateInstitution(receivers, data) {
   });
 }
 
-function sendNewContact(receiver) {
+function sendNewContact(receiver, institutionName) {
   const data = {
     contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
+    institution: institutionName,
   };
 
   return sendMail({
     from: sender,
     to: receiver,
     cc: supportRecipients,
-    subject: 'Vous êtes correspondant de votre établissement',
+    subject: `Vous êtes correspondant de ${institutionName}`,
     ...generateMail('new-contact', { data }),
   });
 }
@@ -582,7 +583,7 @@ exports.addInstitutionMember = async (ctx) => {
 
   const user = await usersService.findUnique({
     where: { username },
-    select: {
+    include: {
       memberships: {
         where: { institutionId },
       },
@@ -622,9 +623,9 @@ exports.addInstitutionMember = async (ctx) => {
   });
   appLogger.info(`Membership between user [${username}] and institution [${institutionId}] is upserted`);
 
-  if (!memberIsContact && memberBecomesContact) {
+  if (user.email && !memberIsContact && memberBecomesContact) {
     try {
-      await sendNewContact(user.email);
+      await sendNewContact(user.email, institutionName);
     } catch (err) {
       appLogger.error(`Failed to send new contact mail: ${err}`);
     }

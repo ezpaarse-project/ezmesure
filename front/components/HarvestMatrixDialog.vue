@@ -33,7 +33,11 @@ export default {
     };
   },
   methods: {
-    display(sushi, year) {
+    async display(sushi, year) {
+      // Force update of the matrix
+      this.sushi = null;
+      await this.$nextTick();
+
       this.sushi = sushi;
       this.year = year;
       this.show = true;

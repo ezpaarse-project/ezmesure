@@ -744,7 +744,7 @@
         "reportTypes": "{n} type de rapport|{n} types de rapport",
         "credentials": "{n} identifiant|{n} identifiants"
       },
-      "credentialsTooltip": "{harvestable} identifiants ont été testés alors que {all} identifiants on été demandés",
+      "credentialsTooltip": "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés",
       "notStarted": "Pas encore lancé",
       "unableToRetrive": "Impossible de récupérer les moissonnages"
     },

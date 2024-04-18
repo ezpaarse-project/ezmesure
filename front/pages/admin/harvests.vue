@@ -20,6 +20,7 @@
       :loading="refreshing"
       :options.sync="iteratorOptions"
       :server-items-length="sessionsCount"
+      sort-by="createdAt"
       sort-desc
       item-key="id"
       @update:options="refreshHarvests"
