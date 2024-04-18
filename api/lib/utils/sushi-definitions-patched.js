@@ -22,7 +22,7 @@ const optionalHeaderFields = new Set(['Created', 'Created_By', 'Report_Name', 'R
 // Remove some required header fields and allow them to be null
 optionalHeaderFields.forEach((field) => {
   reportHeader.required = reportHeader.required.filter((f) => f !== field);
-  reportHeader.properties[field] = { anyOf: [reportHeader.properties[field], { type: 'null' }] };
+  reportHeader.properties[field] = nullable(reportHeader.properties[field]);
 });
 
 // Remove some required item fields and allow them to be null
