@@ -16,11 +16,20 @@ const { appLogger } = require('../services/logger');
  */
 
 /**
+ * @type {Map<string, { fn: AnyFunc, args: any[] }>}
+ */
+const queues = new Map();
+
+/**
  * Create a queue that can be used to enqueue the calls of one or more functions
+ * @param {string} key - The key of the queue
  * @returns {QueueFunction} the queued function
  */
-const createQueue = () => {
-  const queue = [];
+const createQueue = (key) => {
+  const queue = queues.get(key) ?? [];
+  if (!queues.has(key)) {
+    queues.set(key, queue);
+  }
 
   const callNext = async () => {
     if (queue.length === 0) { return; }
@@ -71,7 +80,7 @@ const triggerHooks = (event, ...payload) => {
  * @param {Object} opts Options of the hook
  * @param {boolean} [opts.debounce] Should the hook be debounced
  * @param {(payload) => string | number} [opts.uniqueResolver]
- * @param {boolean} [opts.queue] Should the hook be queued
+ * @param {string} [opts.queue] Should the hook be queued with a given key
  *
  * @returns {EventEmitter} Returns a reference to the EventEmitter
  */
@@ -86,12 +95,12 @@ const registerHook = (event, handler, opts = {}) => {
 
   let fnc = (key, payload) => safeHandler(payload);
 
-  if (opts.debounce !== false) {
+  if (opts.debounce !== false || !opts.queue) {
     fnc = memoizeDebounce(safeHandler, 250, {});
   }
 
   if (opts.queue) {
-    const queued = createQueue();
+    const queued = createQueue(opts.queue);
     fnc = (key, payload) => queued(safeHandler)(payload);
   }
 
@@ -110,5 +119,4 @@ const registerHook = (event, handler, opts = {}) => {
 module.exports = {
   triggerHooks,
   registerHook,
-  createQueue,
 };
