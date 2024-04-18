@@ -165,16 +165,8 @@
         </td>
       </template>
 
-      <template #[`item.validated`]="{ item }">
-        <v-chip
-          v-if="item.validated"
-          label
-          small
-          color="success"
-          outlined
-        >
-          {{ $t('endpoints.validated') }}
-        </v-chip>
+      <template #[`item.disabledUntil`]="{ item }">
+        <EndpointDisabledIcon :endpoint="item" />
       </template>
 
       <template #[`item.tags`]="{ item }">
@@ -317,6 +309,7 @@ import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
 import EndpointsFiltersDrawer from '~/components/sushis/EndpointsFiltersDrawer.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
+import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
 
 export default {
   layout: 'space',
@@ -329,6 +322,7 @@ export default {
     CredentialDialog,
     ProgressCircularStack,
     EndpointsFiltersDrawer,
+    EndpointDisabledIcon,
   },
   data() {
     return {
@@ -375,6 +369,12 @@ export default {
         {
           text: this.$t('endpoints.tags'),
           value: 'tags',
+          align: 'center',
+          width: '200px',
+        },
+        {
+          text: this.$t('endpoints.disabledUntil'),
+          value: 'disabledUntil',
           align: 'center',
           width: '200px',
         },

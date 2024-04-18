@@ -219,6 +219,7 @@
     "deleteNbEndpoints": "Vous allez supprimer {count} point d'accès.|Vous allez supprimer {count} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un",
+    "disabledUntil": "Désactivé jusqu'au",
     "filters": {
       "title": "Filtrer les points d'accès"
     }
