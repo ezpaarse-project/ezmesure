@@ -219,6 +219,7 @@
     "deleteNbEndpoints": "You are about to delete {number} endpoints.",
     "noEndpointFound": "No endpoint found",
     "clickToDeclareOne": "Click here to declare one",
+    "disabledUntil": "Disabled until",
     "filters": {
       "title": "Filter endpoints"
     }

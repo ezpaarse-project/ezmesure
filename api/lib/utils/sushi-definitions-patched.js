@@ -6,17 +6,41 @@ const {
   COUNTER_database_usage: databaseUsage,
   COUNTER_title_usage: titleUsage,
   COUNTER_item_usage: itemUsage,
+  SUSHI_report_header: reportHeader,
 } = defSchema.definitions;
 
-// Remove Publisher from required fields
-databaseUsage.required = databaseUsage.required.filter((field) => field !== 'Publisher');
-titleUsage.required = titleUsage.required.filter((field) => field !== 'Publisher');
-itemUsage.required = itemUsage.required.filter((field) => field !== 'Publisher');
+/**
+ * Take a type and make it nullable
+ * @param {object} type - type of the property
+ * @returns {object}
+ */
+const nullable = (type) => ({ anyOf: [type, { type: 'null' }] });
 
-// Allow Publisher to be null
-databaseUsage.properties.Publisher = { anyOf: [databaseUsage.properties.Publisher, { type: 'null' }] };
-titleUsage.properties.Publisher = { anyOf: [titleUsage.properties.Publisher, { type: 'null' }] };
-itemUsage.properties.Publisher = { anyOf: [itemUsage.properties.Publisher, { type: 'null' }] };
+const optionalItemFields = new Set(['Platform', 'Title', 'Publisher', 'Database']);
+const optionalHeaderFields = new Set(['Created', 'Created_By', 'Report_Name', 'Release', 'Institution_Name']);
+
+// Remove some required header fields and allow them to be null
+optionalHeaderFields.forEach((field) => {
+  reportHeader.required = reportHeader.required.filter((f) => f !== field);
+  reportHeader.properties[field] = nullable(reportHeader.properties[field]);
+});
+
+// Remove some required item fields and allow them to be null
+optionalItemFields.forEach((field) => {
+  databaseUsage.required = databaseUsage.required.filter((f) => f !== field);
+  titleUsage.required = titleUsage.required.filter((f) => f !== field);
+  itemUsage.required = itemUsage.required.filter((f) => f !== field);
+
+  if (databaseUsage.properties[field]) {
+    databaseUsage.properties[field] = nullable(databaseUsage.properties[field]);
+  }
+  if (titleUsage.properties[field]) {
+    titleUsage.properties[field] = nullable(titleUsage.properties[field]);
+  }
+  if (itemUsage.properties[field]) {
+    itemUsage.properties[field] = nullable(itemUsage.properties[field]);
+  }
+});
 
 // Remove Severity from required fields
 errorSchema.required = errorSchema.required.filter((field) => field !== 'Severity');

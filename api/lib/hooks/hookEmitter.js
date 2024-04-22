@@ -16,11 +16,20 @@ const { appLogger } = require('../services/logger');
  */
 
 /**
+ * @type {Map<string, { fn: AnyFunc, args: any[] }>}
+ */
+const queues = new Map();
+
+/**
  * Create a queue that can be used to enqueue the calls of one or more functions
+ * @param {string} key - The key of the queue
  * @returns {QueueFunction} the queued function
  */
-const createQueue = () => {
-  const queue = [];
+const createQueue = (key) => {
+  const queue = queues.get(key) ?? [];
+  if (!queues.has(key)) {
+    queues.set(key, queue);
+  }
 
   const callNext = async () => {
     if (queue.length === 0) { return; }
@@ -67,27 +76,35 @@ const triggerHooks = (event, ...payload) => {
  * Register a hook
  *
  * @param {string} event The event name
- * @param {(payload: any) => void} handler The handled of the hook
+ * @param {(payload: any) => void | Promise<void>} handler The handled of the hook
  * @param {Object} opts Options of the hook
  * @param {boolean} [opts.debounce] Should the hook be debounced
  * @param {(payload) => string | number} [opts.uniqueResolver]
- * @param {boolean} [opts.queue] Should the hook be queued
+ * @param {string} [opts.queue] Should the hook be queued with a given key
  *
  * @returns {EventEmitter} Returns a reference to the EventEmitter
  */
 const registerHook = (event, handler, opts = {}) => {
-  let fnc = (key, payload) => handler(payload);
+  const safeHandler = async (...params) => {
+    try {
+      await handler(...params);
+    } catch (error) {
+      appLogger.error(`[hooks] "${event}" encountered an error: ${error.message}`);
+    }
+  };
 
-  if (opts.debounce !== false) {
-    fnc = memoizeDebounce(handler, 250, {});
+  let fnc = (key, payload) => safeHandler(payload);
+
+  if (opts.debounce !== false || !opts.queue) {
+    fnc = memoizeDebounce(safeHandler, 250, {});
   }
 
   if (opts.queue) {
-    const queued = createQueue();
-    fnc = (key, payload) => queued(handler)(payload);
+    const queued = createQueue(opts.queue);
+    fnc = (key, payload) => queued(safeHandler)(payload);
   }
 
-  const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload.id);
+  const uniqueResolver = opts.uniqueResolver ?? ((payload) => payload?.id);
 
   appLogger.verbose(`[hooks] "${event}" registered with options "${JSON.stringify(opts)}"`);
   return hookEmitter.on(
@@ -102,5 +119,4 @@ const registerHook = (event, handler, opts = {}) => {
 module.exports = {
   triggerHooks,
   registerHook,
-  createQueue,
 };
