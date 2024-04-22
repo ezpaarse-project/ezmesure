@@ -8,7 +8,7 @@ const {
 
 /**
  * Base schema
- * @type import('joi').SchemaLike
+ * @type {import('joi').SchemaLike}
  */
 const schema = {
   id: Joi.string().trim(),
@@ -20,6 +20,7 @@ const schema = {
   apiKey: Joi.string().trim().allow(''),
   comment: Joi.string().trim().allow(''),
 
+  packages: Joi.array().items(Joi.string()),
   tags: Joi.array().items(Joi.string()),
 
   institutionId: Joi.string().trim(),

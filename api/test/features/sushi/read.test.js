@@ -8,7 +8,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 const institutionsPrisma = require('../../../lib/services/prisma/institutions');
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 const sushiEndpointsPrisma = require('../../../lib/services/prisma/sushi-endpoints');
 const sushiCredentialsPrisma = require('../../../lib/services/prisma/sushi-credentials');
 const membershipsPrisma = require('../../../lib/services/prisma/memberships');
@@ -75,6 +75,7 @@ describe('[sushi]: Test read sushi credential features', () => {
     requestorId: 'requestorId test',
     apiKey: 'apikey test',
     comment: 'comment test',
+    packages: [],
     tags: [],
     params: [],
   };
@@ -85,7 +86,7 @@ describe('[sushi]: Test read sushi credential features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
     const sushiEndpoint = await sushiEndpointsPrisma.create({ data: sushiEndpointTest });
     sushiEndpointId = sushiEndpoint.id;
   });
@@ -128,7 +129,7 @@ describe('[sushi]: Test read sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-          expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+          expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
           expect(sushiFromResponse?.endpoint).not.toBeNull();
         });
@@ -183,7 +184,7 @@ describe('[sushi]: Test read sushi credential features', () => {
           expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
           expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
           expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-          expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+          expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
           expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
           expect(sushiFromResponse?.endpoint).not.toBeNull();
         });
@@ -207,7 +208,7 @@ describe('[sushi]: Test read sushi credential features', () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
       await usersPrisma.acceptTerms(userTest.username);
-      userToken = await usersService.generateToken(userTest.username, userPassword);
+      userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
     });
 
     describe('Institution created by admin', () => {
@@ -294,7 +295,7 @@ describe('[sushi]: Test read sushi credential features', () => {
             expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-            expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+            expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
             expect(sushiFromResponse?.endpoint).not.toBeNull();
           });
@@ -345,7 +346,7 @@ describe('[sushi]: Test read sushi credential features', () => {
             expect(sushiFromResponse).toHaveProperty('requestorId', sushiTest?.requestorId);
             expect(sushiFromResponse).toHaveProperty('apiKey', sushiTest?.apiKey);
             expect(sushiFromResponse).toHaveProperty('comment', sushiTest?.comment);
-            expect(sushiFromResponse).toHaveProperty('tags', sushiTest?.tags);
+            expect(sushiFromResponse).toHaveProperty('packages', sushiTest?.packages);
             expect(sushiFromResponse).toHaveProperty('params', sushiTest?.params);
             expect(sushiFromResponse?.endpoint).not.toBeNull();
           });

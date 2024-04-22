@@ -4,7 +4,7 @@
     scrollable
     width="1400"
   >
-    <HarvestMatrix :sushi-item="sushi">
+    <HarvestMatrix :sushi-item="sushi" :initial-year="year">
       <template #actions>
         <v-card-actions>
           <v-spacer />
@@ -28,12 +28,18 @@ export default {
   data() {
     return {
       show: false,
+      year: null,
       sushi: null,
     };
   },
   methods: {
-    display(sushi) {
+    async display(sushi, year) {
+      // Force update of the matrix
+      this.sushi = null;
+      await this.$nextTick();
+
       this.sushi = sushi;
+      this.year = year;
       this.show = true;
     },
   },

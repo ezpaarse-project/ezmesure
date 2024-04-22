@@ -7,10 +7,15 @@ const reportingUsers = require('../ezreeport/reportingUsers');
 
 const { appLogger } = require('../logger');
 
-const institutionsService = require('../../entities/institutions.service');
-const usersService = require('../../entities/users.service');
+const InstitutionsService = require('../../entities/institutions.service');
+const UsersService = require('../../entities/users.service');
 
 const { syncSchedule } = config.get('ezreeport');
+
+/**
+ * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('@prisma/client').Membership} Membership
+ */
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
@@ -27,6 +32,7 @@ const { syncSchedule } = config.get('ezreeport');
  * @returns {Promise<EzrSyncResult<'users'>>}
  */
 async function syncUsers() {
+  const usersService = new UsersService();
   const users = await usersService.findMany({});
 
   appLogger.verbose(`[ezreeport] Synchronizing ${users?.length} users`);
@@ -60,6 +66,9 @@ async function syncUsers() {
  * @returns {Promise<EzrSyncResult<'namespaces' | 'memberships'>>}
  */
 async function syncNamespaces() {
+  const institutionsService = new InstitutionsService();
+  /** @type {(Institution & { memberships: Membership[] })[]} */
+  // @ts-ignore
   const institutions = await institutionsService.findMany({
     include: { memberships: true },
     where: { validated: true },

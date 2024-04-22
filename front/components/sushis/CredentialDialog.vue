@@ -125,16 +125,16 @@
             </v-btn>
           </template>
 
-          <template #[`item.tags`]="{ item }">
+          <template #[`item.packages`]="{ item }">
             <v-chip
-              v-for="(tag, index) in item.tags"
+              v-for="(pkg, index) in item.packages"
               :key="index"
               small
               label
               class="mr-1"
               color="secondary"
             >
-              {{ tag }}
+              {{ pkg }}
             </v-chip>
           </template>
 
@@ -223,8 +223,8 @@ export default {
           value: 'institution.name',
         },
         {
-          text: this.$t('institutions.sushi.tags'),
-          value: 'tags',
+          text: this.$t('institutions.sushi.packages'),
+          value: 'packages',
           sortable: false,
           width: 'auto',
         },
@@ -328,8 +328,8 @@ export default {
 
       const isInName = isSearchIn(institution?.name);
       const isInAcronym = isSearchIn(institution?.acronym);
-      const isInTag = item.tags.some(isSearchIn);
-      return isInName || isInAcronym || isInTag;
+      const isInPackages = item.packages.some(isSearchIn);
+      return isInName || isInAcronym || isInPackages;
     },
 
     customSort(items) {
@@ -347,7 +347,7 @@ export default {
     },
 
     async checkSingleConnection(sushiItem) {
-      this.$set(this.loadingItems, sushiItem.id, true);
+      this.$set(this.loadingItems, sushiItem.id, 'loading');
 
       try {
         const data = await this.$axios.$post(`/sushi/${sushiItem.id}/_check_connection`);
@@ -365,6 +365,11 @@ export default {
       const selected = this.selected.slice();
 
       this.selected = [];
+
+      // Set loading state
+      for (let i = 0; i < selected.length; i += 1) {
+        this.$set(this.loadingItems, selected[i].id, 'queued');
+      }
 
       for (let i = 0; i < selected.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop

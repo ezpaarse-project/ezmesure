@@ -69,44 +69,26 @@
         </v-col>
 
         <v-col>
-          <v-input
-            prepend-icon="mdi-security"
-            hide-details
-            style="padding-top: 12px; margin-top: 4px;"
-          >
-            <v-label class="button-group-label">
-              {{ $t('users.user.isAdmin') }}
-            </v-label>
-
-            <v-btn-toggle
-              :value="value.isAdmin"
-              dense
-              rounded
-              color="primary"
-              @change="onFilterUpdate('isAdmin', $event)"
-            >
-              <v-btn :value="true" small outlined>
-                {{ $t('yes') }}
-              </v-btn>
-
-              <v-btn :value="false" small outlined>
-                {{ $t('no') }}
-              </v-btn>
-            </v-btn-toggle>
-          </v-input>
+          <BooleanFilter
+            :value="value.isAdmin"
+            :label="$t('users.user.isAdmin')"
+            :true-text="$t('yes')"
+            :false-text="$t('no')"
+            icon="mdi-security"
+            @input="onFilterUpdate('isAdmin', $event)"
+          />
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.permissions"
             :items="permissionsItems"
             :label="$t('users.user.permissions')"
-            prepend-icon="mdi-key"
+            icon="mdi-key"
             multiple
-            hide-details
-            @change="onFilterUpdate('permissions', $event)"
+            @input="onFilterUpdate('permissions', $event)"
           >
             <template #selection="{ item }">
               <UserTagChip v-if="item.value" :tag="item.value" />
@@ -114,20 +96,19 @@
                 {{ item.text }}
               </template>
             </template>
-          </v-select>
+          </SelectFilter>
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.roles"
             :items="rolesItems"
             :label="$t('users.user.roles')"
-            prepend-icon="mdi-tag"
+            icon="mdi-tag"
             multiple
-            hide-details
-            @change="onFilterUpdate('roles', $event)"
+            @input="onFilterUpdate('roles', $event)"
           >
             <template #selection="{ item }">
               <UserTagChip v-if="item.value" :tag="item.value" />
@@ -135,22 +116,21 @@
                 {{ item.text }}
               </template>
             </template>
-          </v-select>
+          </SelectFilter>
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.institutions"
             :items="institutionItems"
             :label="$t('users.user.memberships')"
-            prepend-icon="mdi-domain"
+            icon="mdi-domain"
             multiple
-            hide-details
-            @change="onFilterUpdate('institutions', $event)"
+            @input="onFilterUpdate('institutions', $event)"
           >
-            <template #selection="{item}">
+            <template #selection="{ item }">
               <v-chip v-if="item.value" small>
                 {{ item.text }}
               </v-chip>
@@ -158,7 +138,18 @@
                 {{ item.text }}
               </template>
             </template>
-          </v-select>
+
+            <template #item="{ item, on, attrs }">
+              <v-list-item v-bind="attrs" v-on="on">
+                <v-list-item-title style="flex-basis: 300%;">
+                  {{ item.text }}
+                </v-list-item-title>
+                <v-list-item-subtitle v-if="item.subtext">
+                  {{ item.subtext }}
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+          </SelectFilter>
         </v-col>
       </v-row>
     </v-container>
@@ -167,10 +158,14 @@
 
 <script>
 import UserTagChip from './UserTagChip.vue';
+import SelectFilter from '../filters-form/SelectFilter.vue';
+import BooleanFilter from '../filters-form/BooleanFilter.vue';
 
 export default {
   components: {
     UserTagChip,
+    SelectFilter,
+    BooleanFilter,
   },
   props: {
     value: {
@@ -205,11 +200,15 @@ export default {
      */
     permissionsItems() {
       const isDisabled = this.value.permissions?.includes('');
-      const permissions = this.permissions.map((p) => ({
-        value: p,
-        text: p,
-        disabled: isDisabled,
-      }));
+      const permissions = this.permissions.map((p) => {
+        const [feature, scope] = p.split(':');
+        return {
+          value: p,
+          text: this.$t(`institutions.members.featureLabels.${feature}`),
+          subtext: scope ? this.$t(`permissions.${scope}`) : '',
+          disabled: isDisabled,
+        };
+      });
 
       return [
         {
@@ -218,7 +217,7 @@ export default {
           text: this.$t('users.user.no_permissions'),
           disabled: !isDisabled && this.value.permissions?.length > 0,
         },
-        ...permissions,
+        ...permissions.sort((a, b) => a.value.localeCompare(b.value)),
       ];
     },
     /**
@@ -228,7 +227,7 @@ export default {
       const isDisabled = this.value.roles?.includes('');
       const roles = this.roles.map((r) => ({
         value: r,
-        text: r,
+        text: this.$t(`institutions.members.roleNames.${r}`),
         disabled: isDisabled,
       }));
 
@@ -250,7 +249,8 @@ export default {
       const isDisabled = this.value.institutions?.includes('');
       const institutions = this.institutions.map((v) => ({
         value: v.id,
-        text: v.acronym || v.name,
+        text: v.name,
+        subtext: v.acronym,
         disabled: isDisabled,
       }));
 
@@ -278,16 +278,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.button-group-label {
-  position: absolute !important;
-  max-width: 133%;
-  transform-origin: top left;
-  transform: translateY(-16px) scale(.75);
-}
-
-.button-group-label + * {
-  transform: translateY(5px)
-}
-</style>

@@ -74,7 +74,9 @@ const syncRepository = async (repo) => {
     appLogger.error(`[elastic] Role [${allRole}] cannot be upserted:\n${error}`);
   }
 
-  const spacesOfSameType = await SpacesService.findMany({
+  const spacesService = new SpacesService();
+
+  const spacesOfSameType = await spacesService.findMany({
     where: {
       type: repo.type,
       institution: {
@@ -95,7 +97,8 @@ const syncRepository = async (repo) => {
  * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncRepositories = async () => {
-  const repositories = await RepositoriesService.findMany({});
+  const repositoriesService = new RepositoriesService();
+  const repositories = await repositoriesService.findMany({});
 
   const executors = repositories.map((repo) => () => syncRepository(repo));
 
@@ -128,7 +131,8 @@ const syncUser = async (user) => {
  * @returns {Promise<ThrottledPromisesResult>}
  */
 const syncUsers = async () => {
-  const users = await UsersService.findMany({});
+  const usersService = new UsersService();
+  const users = await usersService.findMany({});
 
   const executors = users.map(
     (user) => async () => syncUser(user),

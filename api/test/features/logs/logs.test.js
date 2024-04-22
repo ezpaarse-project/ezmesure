@@ -10,7 +10,7 @@ const { resetElastic } = require('../../../lib/services/elastic/utils');
 const indicesPrisma = require('../../../lib/services/elastic/indices');
 const usersPrisma = require('../../../lib/services/prisma/users');
 const usersElastic = require('../../../lib/services/elastic/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const logDir = path.resolve(__dirname, '..', '..', 'sources', 'log');
 
@@ -31,7 +31,7 @@ describe('[logs]: Test insert features', () => {
     beforeAll(async () => {
       await resetDatabase();
       await resetElastic();
-      adminToken = await usersService.generateToken(adminUsername, adminPassword);
+      adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
       await indicesPrisma.create(indexName, null, { ignore: [404] });
     });
     describe(`Add [wiley.csv] in [${indexName}] index`, () => {
@@ -71,7 +71,7 @@ describe('[logs]: Test insert features', () => {
     beforeEach(async () => {
       await usersPrisma.create({ data: userTest });
       await usersElastic.createUser(userTest);
-      userToken = await usersService.generateToken(userTest.username, userTest.password);
+      userToken = await (new UsersService()).generateToken(userTest.username, userTest.password);
     });
     // TODO create roles
     describe(`Add [wiley.csv] in [${indexName}] index who has roles`, () => {

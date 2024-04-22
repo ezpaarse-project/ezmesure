@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn :href="userListMailLink" target="_blank" rel="noopener noreferrer" text>
+        <v-btn target="_blank" rel="noopener noreferrer" text @click="copyMailList">
           <v-icon left>
             mdi-email-multiple
           </v-icon>
@@ -128,6 +128,17 @@
               <v-list-item-content>
                 <v-list-item-title>
                   {{ $t('modify') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item @click="impersonateUser(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-login</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('authenticate.impersonate') }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
@@ -257,11 +268,6 @@ export default {
         roles: [...data.roles],
         institutions: [...data.institutions.values()],
       };
-    },
-    userListMailLink() {
-      const addresses = this.selected.map((user) => user.email).join(',');
-      const teamMail = this.$config.supportMail;
-      return `mailto:${teamMail}?bcc=${addresses}`;
     },
     filtersCount() {
       return Object.values(this.filters)
@@ -439,6 +445,16 @@ export default {
     createUser() {
       this.$refs.userForm.createUser({ addAsMember: false });
     },
+    async impersonateUser(item) {
+      try {
+        await this.$axios.$post(`/users/${item.username}/_impersonate`);
+        await this.$auth.fetchUser();
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));
+        return;
+      }
+      this.$router.push('/myspace');
+    },
     async deleteUsers(items) {
       const users = items || this.selected;
       if (users.length === 0) {
@@ -513,6 +529,20 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('idCopied'));
+    },
+    async copyMailList() {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      const addresses = this.selected.map((user) => user.email).join('; ');
+      try {
+        await navigator.clipboard.writeText(addresses);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('emailsCopied'));
     },
     clearSelection() {
       this.selected = [];

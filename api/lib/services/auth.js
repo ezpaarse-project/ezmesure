@@ -1,9 +1,9 @@
 const { auth } = require('config');
 const jwt = require('koa-jwt');
-const institutionsService = require('../entities/institutions.service');
-const sushiEndpointService = require('../entities/sushi-endpoints.service');
-const sushiCredentialsService = require('../entities/sushi-credentials.service');
-const usersService = require('../entities/users.service');
+const InstitutionsService = require('../entities/institutions.service');
+const SushiEndpointService = require('../entities/sushi-endpoints.service');
+const SushiCredentialsService = require('../entities/sushi-credentials.service');
+const UsersService = require('../entities/users.service');
 const RepositoriesService = require('../entities/repositories.service');
 const SpacesService = require('../entities/spaces.service');
 
@@ -24,6 +24,8 @@ const requireUser = async (ctx, next) => {
     ctx.throw(401, ctx.$t('errors.auth.noUsername'));
     return;
   }
+
+  const usersService = new UsersService();
 
   const user = await usersService.findUnique({ where: { username } });
 
@@ -103,7 +105,8 @@ function fetchModel(modelName, opts = {}) {
     };
 
     switch (modelName) {
-      case 'institution':
+      case 'institution': {
+        const institutionsService = new InstitutionsService();
         item = modelId && (await institutionsService.findUnique({
           where: { id: modelId },
           include: {
@@ -113,23 +116,32 @@ function fetchModel(modelName, opts = {}) {
           },
         }));
         break;
+      }
 
-      case 'sushi-endpoint':
+      case 'sushi-endpoint': {
+        const sushiEndpointService = new SushiEndpointService();
         item = modelId && await sushiEndpointService.findUnique(findOptions);
         break;
+      }
 
-      case 'sushi':
+      case 'sushi': {
+        const sushiCredentialsService = new SushiCredentialsService();
         item = modelId && await sushiCredentialsService.findUnique(findOptions);
         break;
+      }
 
-      case 'repository':
+      case 'repository': {
+        const repositoriesService = new RepositoriesService();
         findOptions.where = { pattern: modelId };
-        item = modelId && await RepositoriesService.findUnique(findOptions);
+        item = modelId && await repositoriesService.findUnique(findOptions);
         break;
+      }
 
-      case 'space':
-        item = modelId && await SpacesService.findUnique(findOptions);
+      case 'space': {
+        const spacesService = new SpacesService();
+        item = modelId && await spacesService.findUnique(findOptions);
         break;
+      }
 
       default:
     }

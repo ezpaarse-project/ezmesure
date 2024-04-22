@@ -8,7 +8,7 @@ const { resetElastic } = require('../../../../lib/services/elastic/utils');
 const institutionsPrisma = require('../../../../lib/services/prisma/institutions');
 const usersPrisma = require('../../../../lib/services/prisma/users');
 const usersElastic = require('../../../../lib/services/elastic/users');
-const usersService = require('../../../../lib/entities/users.service');
+const UsersService = require('../../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -47,11 +47,11 @@ describe('[institutions - subinstitution]: Test read features', () => {
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
 
     await usersPrisma.create({ data: userTest });
     await usersElastic.createUser(userTest);
-    userToken = await usersService.generateToken(userTest.username, userPassword);
+    userToken = await (new UsersService()).generateToken(userTest.username, userPassword);
 
     await usersPrisma.create({ data: anotherUserTest });
     await usersElastic.createUser(anotherUserTest);

@@ -4,7 +4,7 @@
       <div>
         {{ $t('sushi.harvestState') }}
         <div class="caption">
-          {{ sushiVendor }} - {{ sushiTags }}
+          {{ sushiVendor }} - {{ sushiPackages }}
         </div>
       </div>
 
@@ -89,6 +89,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    initialYear: {
+      type: Number,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -99,18 +103,20 @@ export default {
     };
   },
   watch: {
+    initialYear: {
+      immediate: true,
+      handler(val) { if (val != null) { this.year = val; } },
+    },
     sushiId: {
       immediate: true,
       handler() { this.refreshHarvests(); },
     },
-    year() {
-      this.refreshHarvests();
-    },
+    year() { this.refreshHarvests(); },
   },
   computed: {
     sushiId() { return this.sushiItem?.id; },
     sushiVendor() { return this.sushiItem?.endpoint?.vendor; },
-    sushiTags() { return this.sushiItem?.tags?.join?.(', '); },
+    sushiPackages() { return this.sushiItem?.packages?.join?.(', '); },
     harvestsByType() {
       const harvestsByType = this.harvests.reduce((acc, harvest) => {
         const reportId = harvest.reportId?.toUpperCase?.();

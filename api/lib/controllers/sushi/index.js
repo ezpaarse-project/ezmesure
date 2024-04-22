@@ -25,7 +25,6 @@ const {
   getOne,
   updateSushi,
   addSushi,
-  harvestSushi,
   importSushiItems,
   downloadReport,
   getFileList,
@@ -313,32 +312,6 @@ router.route({
     query: {
       beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
-    },
-  },
-});
-
-router.route({
-  method: 'POST',
-  path: '/:sushiId/_harvest',
-  handler: [
-    fetchSushi({ include: { endpoint: true, institution: true } }),
-    harvestSushi,
-  ],
-  validate: {
-    type: 'json',
-    params: {
-      sushiId: Joi.string().trim().required(),
-    },
-    body: {
-      target: Joi.string().trim(),
-      harvestId: Joi.string().trim(),
-      beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
-      endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
-      forceDownload: Joi.boolean().default(false),
-      downloadUnsupported: Joi.boolean().default(false),
-      reportType: Joi.array().min(1).single().items(Joi.string().trim().lowercase()),
-      ignoreValidation: Joi.boolean(),
-      timeout: Joi.number().integer().min(10).default(600),
     },
   },
 });

@@ -189,7 +189,7 @@
     }
   },
   "endpoints": {
-    "title": "SUSHI endpoints ({total})",
+    "title": "SUSHI endpoints ({count})",
     "pageDescription": "Here you can manage the list of the available SUSHI endpoints.",
     "pageDescription2": "Only version 5 of the SUSHI protocol is supported.",
     "manageNendpoints": "Manage endpoint|Manage {count} endpoints",
@@ -205,6 +205,7 @@
     "tags": "Tags",
     "technicalProvider": "Technical provider",
     "counterVersion": "COUNTER version",
+    "testedReport": "Report used to test connection",
     "requireCustomerId": "Customer ID is required",
     "requireRequestorId": "Requestor ID is required",
     "requireApiKey": "An API key is required",
@@ -217,7 +218,11 @@
     "pleaseEnterParams": "If requests to the endpoint require additional parameters in the querystring, enter them below.",
     "deleteNbEndpoints": "You are about to delete {number} endpoints.",
     "noEndpointFound": "No endpoint found",
-    "clickToDeclareOne": "Click here to declare one"
+    "clickToDeclareOne": "Click here to declare one",
+    "disabledUntil": "Disabled until",
+    "filters": {
+      "title": "Filter endpoints"
+    }
   },
   "institutions": {
     "toolbarTitle": "Institutions ({count})",
@@ -376,11 +381,11 @@
       "unabletToRetriveSushiInformations": "Unable to retrieve information from sushi platforms",
       "label": "Label",
       "tags": "Tags",
-      "tagsHint": "Profiles, accounts, funds, antennas, etc.",
-      "tagsDescription": "The tags defined here will be usable in your dashboards, using the X_Tags field",
+      "packages": "Packages",
+      "packagesHint": "Profiles, accounts, funds, antennas, etc. that include the credentials.",
+      "packagesDescription": "Profiles, accounts, funds, antennas, etc. that include the credentials. The packages will be usable in your dashboards, using the X_Package field",
       "unableToRetriveSushiData": "Unable to retrieve sushi information",
       "endpoint": "Endpoint",
-      "package": "Package",
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "API key",
@@ -423,6 +428,7 @@
       "validateMyCredentials": "Validate my credentials",
       "resumeEntryQuestion": "Resume your entry ?",
       "resumeEntryDesc": "You have declared the completion of your credentials on {date}. Do you want to resume your entry ?",
+      "lastHarvest": "Last harvest",
       "readyPopup": {
         "inProgress": "Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.",
         "completed": "You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below."
@@ -590,7 +596,8 @@
     "logIn": "Log in",
     "logInWithProvider": "Log in via your identity provider.",
     "loginFailed": "The information transmitted did not allow you to authenticate",
-    "failed": "An error occurred"
+    "failed": "An error occurred",
+    "impersonate": "Impersonate"
   },
   "password": {
     "forgot": "Forgout your password ?",
@@ -659,7 +666,7 @@
     "newUser": "New user",
     "doesNotExist": "The user you are trying to access is not registered.",
     "unableToFetchInformations": "Unable to retrieve institution information",
-    "createMailUserList": "New grouped mail",
+    "createMailUserList": "Copy emails",
     "filters": {
       "title": "Filter users",
       "searchHint": "This field is overriden by the search bar"
@@ -722,8 +729,9 @@
     "deleteSpace": "You are about to delete \"{spaceName}\", which will delete the dashboards included in this space. This action cannot be undone."
   },
   "harvest": {
-    "requests": {
-      "name": "Harvesting from {createdAt}",
+    "sessions": {
+      "pendingSession": "Pending harvest...",
+      "name": "Harvest of {startedAt}",
       "metrics": {
         "success": "Success",
         "failed": "Failed",
@@ -734,8 +742,11 @@
       "counts": {
         "institutions": "{n} institution|{n} institutions",
         "endpoints": "{n} endpoint|{n} endpoints",
-        "reportTypes": "{n} report type|{n} report types"
+        "reportTypes": "{n} report type|{n} report types",
+        "credentials": "{n} credentials"
       },
+      "credentialsTooltip": "{harvestable} harvestable credentials out of {all} declared credentials",
+      "notStarted": "Not started",
       "unableToRetrive": "Unable to retrieve harvests"
     },
     "jobs": {
@@ -746,7 +757,8 @@
       "beginDate": "Start Date",
       "endDate": "End Date",
       "period": "Period",
-      "createdAt": "Requested on",
+      "startedAt": "Started at",
+      "updatedAt": "Updated at",
       "runningTime": "Processing Time",
       "index": "Insertion Index",
       "coveredPeriods": "Covered Months",
@@ -754,7 +766,9 @@
       "updated": "Items Updated",
       "failed": "Items Not Retrieved",
       "unableToRetrive": "Unable to retrieve harvesting tasks",
-      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks"
+      "unableToRetriveMeta": "Unable to retrieve information about harvesting tasks",
+      "unableToStop": "Unable to stop the harvesting task",
+      "unableToDelete": "Unable to delete the harvesting task"
     }
   },
   "sync": {
@@ -798,6 +812,7 @@
   "copyId": "Copy ID",
   "unableToCopyId": "Unable to copy in the clipboard",
   "idCopied": "ID copied in the clipboard",
+  "emailsCopied": "Emails copied in the clipboard",
   "advancedSettings": "Advanced settings",
   "actions": "Actions",
   "name": "Name",

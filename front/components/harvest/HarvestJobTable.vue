@@ -5,7 +5,6 @@
 
       <v-btn
         text
-        color="primary"
         @click="showFiltrerDrawer = true"
       >
         <v-badge
@@ -22,7 +21,6 @@
       </v-btn>
 
       <v-btn
-        color="primary"
         text
         :loading="refreshing"
         @click.stop="refreshJobs()"
@@ -41,7 +39,7 @@
       :options.sync="tableOptions"
       :server-items-length="jobsCount"
       item-key="id"
-      sort-by="createdAt"
+      sort-by="startedAt"
       sort-desc
       @update:options="refreshJobs()"
     >
@@ -51,15 +49,15 @@
         </nuxt-link>
       </template>
 
-      <template #[`item.credentials.tags`]="{ value }">
+      <template #[`item.credentials.packages`]="{ value }">
         <v-chip
-          v-for="(tag, index) in value"
+          v-for="(pkg, index) in value"
           :key="index"
           label
           small
           class="ml-1"
         >
-          {{ tag }}
+          {{ pkg }}
         </v-chip>
       </template>
 
@@ -106,8 +104,65 @@
         </v-menu>
       </template>
 
-      <template #[`item.createdAt`]="{ value }">
+      <template #[`item.startedAt`]="{ value }">
         <LocalDate v-if="value" :date="value" />
+      </template>
+
+      <template #[`item.updatedAt`]="{ value }">
+        <LocalDate v-if="value" :date="value" />
+      </template>
+
+      <template #[`item.actions`]="{ item }">
+        <v-menu>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>
+                mdi-cog
+              </v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item :disabled="!cancellableStatus.has(item.status)" @click="cancelJob(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-cancel</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('cancel') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item :disabled="unDeletableStatus.has(item.status)" @click="deleteJob(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('delete') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider />
+
+            <v-list-item @click="copyId(item)">
+              <v-list-item-icon>
+                <v-icon>mdi-identifier</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('copyId') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
     </v-data-table>
 
@@ -115,19 +170,24 @@
       v-model="filters"
       :show.sync="showFiltrerDrawer"
       :disabled-filters="disabledFilters"
-      :harvest-ids="meta?.harvestIds ?? []"
+      :session-ids="meta?.sessionIds ?? []"
       :vendors="meta?.vendors ?? []"
       :institutions="meta?.institutions ?? []"
       :report-types="meta?.reportTypes ?? []"
       :tags="meta?.tags ?? []"
+      :packages="meta?.packages ?? []"
       :statuses="meta?.statuses ?? []"
       @input="refreshJobs(1)"
     />
+
+    <ConfirmDialog ref="confirmDialog" />
   </section>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
+
+import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import HarvestJobCard from '~/components/harvest/HarvestJobCard.vue';
 import LocalDate from '~/components/LocalDate.vue';
@@ -139,11 +199,12 @@ export default defineComponent({
     LocalDate,
     HarvestJobCard,
     HarvestJobFilters,
+    ConfirmDialog,
   },
   props: {
-    harvestId: {
+    sessionId: {
       type: String,
-      required: true,
+      default: '',
     },
     disabledFilters: {
       type: Array,
@@ -153,13 +214,12 @@ export default defineComponent({
   data: () => ({
     showFiltrerDrawer: false,
     filters: {
-      harvestId: undefined,
+      sessionId: undefined,
       vendor: undefined,
       institution: undefined,
       tags: undefined,
+      packages: undefined,
       reportType: undefined,
-      beginDate: undefined,
-      endDate: undefined,
       status: undefined,
     },
 
@@ -168,9 +228,11 @@ export default defineComponent({
     jobsCount: 0,
 
     tableOptions: {},
-    currentHarvestId: undefined,
 
     refreshing: false,
+
+    cancellableStatus: new Set(['waiting', 'running', 'delayed']),
+    unDeletableStatus: new Set(['running']),
   }),
   computed: {
     tableHeaders() {
@@ -184,8 +246,8 @@ export default defineComponent({
           value: 'credentials.institution.name',
         },
         {
-          text: this.$t('endpoints.tags'),
-          value: 'credentials.tags',
+          text: this.$t('institutions.sushi.packages'),
+          value: 'credentials.packages',
         },
         {
           text: this.$t('harvest.jobs.reportType'),
@@ -194,23 +256,22 @@ export default defineComponent({
           width: 0,
         },
         {
-          text: this.$t('harvest.jobs.beginDate'),
-          value: 'beginDate',
-          align: 'center',
-        },
-        {
-          text: this.$t('harvest.jobs.endDate'),
-          value: 'endDate',
-          align: 'center',
-        },
-        {
           text: this.$t('status'),
           value: 'status',
           align: 'center',
         },
         {
-          text: this.$t('harvest.jobs.createdAt'),
-          value: 'createdAt',
+          text: this.$t('harvest.jobs.startedAt'),
+          value: 'startedAt',
+        },
+        {
+          text: this.$t('harvest.jobs.updatedAt'),
+          value: 'updatedAt',
+        },
+        {
+          text: this.$t('actions'),
+          value: 'actions',
+          width: 0,
         },
       ];
     },
@@ -279,16 +340,17 @@ export default defineComponent({
         };
       }
 
+      const sessionId = this.sessionId || this.filters.sessionId;
       const params = {
         include: ['credentials.institution', 'credentials.endpoint'],
+        sessionId,
 
-        from: this.filters.beginDate,
-        to: this.filters.endDate,
-        reportType: this.filters.reportType,
-        vendor: this.filters.vendor,
-        institution: this.filters.institution,
         status: this.filters.status,
+        type: this.filters.reportType,
+        endpointId: this.filters.vendor,
+        institutionId: this.filters.institution,
         tags: this.filters.tags,
+        packages: this.filters.packages,
 
         page: this.tableOptions.page,
         size: this.tableOptions.itemsPerPage,
@@ -297,13 +359,13 @@ export default defineComponent({
       };
 
       try {
-        this.meta = await this.$axios.$get(`/harvests-requests/${this.harvestId}/jobs/_meta`);
+        this.meta = await this.$axios.$get('/tasks/_meta', { params: { sessionId } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToRetriveMeta'));
       }
 
       try {
-        const { headers, data } = await this.$axios.get(`/harvests-requests/${this.harvestId}/jobs`, { params });
+        const { headers, data } = await this.$axios.get('/tasks', { params });
 
         this.jobs = data;
         this.jobsCount = Number.parseInt(headers['x-total-count'], 10);
@@ -312,6 +374,62 @@ export default defineComponent({
       }
 
       this.refreshing = false;
+    },
+    async cancelJob(item) {
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        agreeText: this.$t('cancel'),
+        agreeIcon: 'mdi-cancel',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.refreshing = true;
+      try {
+        const { data } = await this.$axios.post(`/tasks/${item.id}/_cancel`, {});
+        if (data.status === item.status) {
+          throw new Error("Cancellation wasn't successful");
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToStop'));
+      }
+
+      this.refreshJobs();
+    },
+    async deleteJob(item) {
+      const confirmed = await this.$refs.confirmDialog?.open({
+        title: this.$t('areYouSure'),
+        agreeText: this.$t('delete'),
+        agreeIcon: 'mdi-delete',
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.refreshing = true;
+      try {
+        await this.$axios.delete(`/tasks/${item.id}`, {});
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToDelete'));
+      }
+
+      this.refreshJobs();
+    },
+    async copyId(item) {
+      if (!navigator.clipboard) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(item.id);
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
+        return;
+      }
+      this.$store.dispatch('snacks/info', this.$t('idCopied'));
     },
   },
 });

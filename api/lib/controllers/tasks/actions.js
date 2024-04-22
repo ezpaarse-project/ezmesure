@@ -1,5 +1,8 @@
-const harvestJobService = require('../../entities/harvest-job.service');
+const { includableFields } = require('../../entities/harvest-job.dto');
+const HarvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
+
+const { propsToPrismaSort, propsToPrismaInclude, queryToPrismaFilter } = require('../utils');
 
 /** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
 
@@ -9,41 +12,38 @@ exports.getAll = async (ctx) => {
   const { query = {} } = ctx.request;
   const {
     size,
+    sort,
+    order = 'asc',
+    page = 1,
     id: taskIds,
     status,
-    type,
-    harvestId,
+    type: reportType,
+    sessionId,
     credentialsId,
     endpointId,
     institutionId,
+    tags,
+    packages,
     distinct: distinctFields,
+    include: propsToInclude,
   } = query;
 
   /** @type {HarvestJobWhereInput} */
-  const where = {};
+  const where = {
+    id: queryToPrismaFilter(taskIds),
+    status: queryToPrismaFilter(status),
+    reportType: queryToPrismaFilter(reportType),
+    sessionId: queryToPrismaFilter(sessionId),
+    credentialsId: queryToPrismaFilter(credentialsId),
+  };
 
-  if (taskIds) {
-    where.id = { in: Array.isArray(taskIds) ? taskIds : taskIds.split(',').map((s) => s.trim()) };
-  }
-  if (status) {
-    where.status = { in: Array.isArray(status) ? status : status.split(',').map((s) => s.trim()) };
-  }
-  if (type) {
-    where.reportType = { in: Array.isArray(type) ? type : type.split(',').map((s) => s.trim()) };
-  }
-  if (institutionId) {
-    where.institutionId = { in: Array.isArray(institutionId) ? institutionId : institutionId.split(',').map((s) => s.trim()) };
-  }
-  if (credentialsId) {
-    where.credentialsId = { in: Array.isArray(credentialsId) ? credentialsId : credentialsId.split(',').map((s) => s.trim()) };
-  }
-  if (endpointId) {
+  if (institutionId || endpointId || tags || packages) {
     where.credentials = {
-      endpointId: { in: Array.isArray(endpointId) ? endpointId : endpointId.split(',').map((s) => s.trim()) },
+      endpointId: queryToPrismaFilter(endpointId),
+      institutionId: queryToPrismaFilter(institutionId),
+      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
+      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
     };
-  }
-  if (harvestId) {
-    where.harvestId = { in: Array.isArray(harvestId) ? harvestId : harvestId.split(',').map((s) => s.trim()) };
   }
 
   let distinct;
@@ -51,23 +51,106 @@ exports.getAll = async (ctx) => {
     distinct = Array.isArray(distinctFields) ? distinctFields : distinctFields.split(',').map((s) => s.trim());
   }
 
+  const harvestJobService = new HarvestJobService();
+
+  ctx.set('X-Total-Count', await harvestJobService.count({ where }));
   ctx.body = await harvestJobService.findMany({
+    include: propsToPrismaInclude(propsToInclude, includableFields),
+    where,
+    distinct,
+    orderBy: propsToPrismaSort(sort, order),
+    take: Number.isInteger(size) && size > 0 ? size : undefined,
+    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
+  });
+};
+
+exports.getAllMeta = async (ctx) => {
+  ctx.type = 'json';
+  const {
+    status,
+    type: reportType,
+    sessionId,
+    credentialsId,
+    endpointId,
+    institutionId,
+    tags,
+    packages,
+  } = ctx.request.query;
+
+  const harvestJobService = new HarvestJobService();
+
+  /** @type {HarvestJobWhereInput} */
+  const where = {
+    status: queryToPrismaFilter(status),
+    reportType: queryToPrismaFilter(reportType),
+    sessionId: queryToPrismaFilter(sessionId),
+    credentialsId: queryToPrismaFilter(credentialsId),
+  };
+
+  if (institutionId || endpointId || tags || packages) {
+    where.credentials = {
+      endpointId: queryToPrismaFilter(endpointId),
+      institutionId: queryToPrismaFilter(institutionId),
+      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
+      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
+    };
+  }
+
+  const jobs = await harvestJobService.findMany({
+    where,
     include: {
       credentials: {
         include: {
           endpoint: true,
+          institution: true,
         },
       },
     },
-    where,
-    distinct,
-    take: size,
   });
+
+  const data = {
+    sessionIds: new Set(),
+    vendors: new Map(),
+    institutions: new Map(),
+    reportTypes: new Set(),
+    statuses: new Set(),
+    tags: new Set(),
+    packages: new Set(),
+  };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const job of jobs) {
+    data.sessionIds.add(job.sessionId);
+    data.reportTypes.add(job.reportType);
+    data.statuses.add(job.status);
+    data.vendors.set(job.credentials.endpointId, job.credentials.endpoint);
+    data.institutions.set(job.credentials.institutionId, job.credentials.institution);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const tag of job.credentials.tags) {
+      data.tags.add(tag);
+    }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const pkg of job.credentials.packages) {
+      data.packages.add(pkg);
+    }
+  }
+
+  ctx.status = 200;
+  ctx.body = {
+    sessionIds: Array.from(data.sessionIds),
+    vendors: Array.from(data.vendors.values()),
+    institutions: Array.from(data.institutions.values()),
+    reportTypes: Array.from(data.reportTypes),
+    statuses: Array.from(data.statuses),
+    tags: Array.from(data.tags),
+    packages: Array.from(data.packages),
+  };
 };
 
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
 
+  const harvestJobService = new HarvestJobService();
   const task = await harvestJobService.findUnique({
     where: { id: taskId },
     include: {
@@ -91,6 +174,7 @@ exports.getOne = async (ctx) => {
 exports.cancelOne = async (ctx) => {
   const { taskId } = ctx.params;
 
+  const harvestJobService = new HarvestJobService();
   let task = await harvestJobService.findUnique({ where: { id: taskId } });
   const job = await harvestQueue.getJob(taskId);
 
@@ -110,7 +194,7 @@ exports.cancelOne = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.task.notFound'));
   }
 
-  if (task && !harvestJobService.isDone(task)) {
+  if (task && !HarvestJobService.isDone(task)) {
     task = await harvestJobService.cancel(task);
   }
 
@@ -131,6 +215,7 @@ exports.deleteOne = async (ctx) => {
     await job.remove();
   }
 
+  const harvestJobService = new HarvestJobService();
   await harvestJobService.delete({ where: { id: taskId } });
 
   ctx.status = 204;

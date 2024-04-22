@@ -189,7 +189,7 @@
     }
   },
   "endpoints": {
-    "title": "Points d'accès SUSHI ({total})",
+    "title": "Points d'accès SUSHI ({count})",
     "pageDescription": "Gérez ici la liste des points d'accès SUSHI disponibles.",
     "pageDescription2": "Seule la version 5 du protocole SUSHI est supportée.",
     "manageNendpoints": "Gérer le point d'accès|Gérer {count} points d'accès",
@@ -205,8 +205,9 @@
     "tags": "Étiquettes",
     "technicalProvider": "Prestataire technique",
     "counterVersion": "Version de COUNTER",
-    "requireCustomerId": "un customer ID est nécessaire",
-    "requireRequestorId": "un requestor ID est nécessaire",
+    "testedReport": "Rapport utilisé pour le test de connexion",
+    "requireCustomerId": "Un customer ID est nécessaire",
+    "requireRequestorId": "Un requestor ID est nécessaire",
     "requireApiKey": "Une clé d'API est nécessaire",
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
     "ignoreReportValidation": "Ignorer la validation du rapport",
@@ -217,7 +218,11 @@
     "pleaseEnterParams": "Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.",
     "deleteNbEndpoints": "Vous allez supprimer {count} point d'accès.|Vous allez supprimer {count} points d'accès.",
     "noEndpointFound": "Aucun point d'accès trouvé",
-    "clickToDeclareOne": "Cliquez ici pour en déclarer un"
+    "clickToDeclareOne": "Cliquez ici pour en déclarer un",
+    "disabledUntil": "Désactivé jusqu'au",
+    "filters": {
+      "title": "Filtrer les points d'accès"
+    }
   },
   "institutions": {
     "toolbarTitle": "Établissements ({count})",
@@ -377,11 +382,11 @@
       "unabletToRetriveSushiInformations": "Impossible de récupérer les informations des plateformes sushi",
       "label": "Libellé",
       "tags": "Étiquettes",
-      "tagsHint": "Profils, comptes, fonds, antennes, etc.",
-      "tagsDescription": "Les étiquettes définies ici pourront être utilisées dans vos tableaux de bord, à travers le champ X_Tags",
+      "packages": "Packages",
+      "packagesHint": "Profils, comptes, fonds, antennes, etc. dont font partie les identifiants.",
+      "packagesDescription": "Profils, comptes, fonds, antennes, etc. dont font partie les identifiants. Les packages peuvent être utilisés dans vos tableaux de bord, à travers le champ X_Package.",
       "unableToRetriveSushiData": "Impossible de récupérer les informations sushi",
       "endpoint": "Point d'accès",
-      "package": "Package",
       "requestorId": "Requestor ID",
       "customerId": "Customer ID",
       "apiKey": "Clé d'API",
@@ -424,6 +429,7 @@
       "validateMyCredentials": "Valider mes identifiants",
       "resumeEntryQuestion": "Reprendre votre saisie ?",
       "resumeEntryDesc": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Souhaitez-vous la reprendre ?",
+      "lastHarvest": "Dernier moissonnage",
       "readyPopup": {
         "inProgress": "Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.",
         "completed": "Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous."
@@ -546,7 +552,7 @@
     "nInvalidCredentials": "1 identifiant invalide|{count} identifiants invalides",
     "nOperationalCredentials": "1 identifiant fonctionnel|{count} identifiants fonctionnels",
     "nProblematicEndpoints": "1 point d'accès problématique|{count} points d'accès problématiques",
-    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiant indique que le point d'accès est problématique",
+    "nErrsCredentials": "1 identifiant indique que le point d'accès est problématique|{count} identifiants indiquent que le point d'accès est problématique",
     "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
@@ -591,7 +597,8 @@
     "logIn": "Se connecter",
     "logInWithProvider": "Connectez-vous via votre fournisseur d'identité.",
     "loginFailed": "Les informations transmises n'ont pas permis de vous authentifier",
-    "failed": "Une erreur est survenue"
+    "failed": "Une erreur est survenue",
+    "impersonate": "Emprunter l'identité"
   },
   "password": {
     "forgot": "Mot de passe oublié ?",
@@ -659,7 +666,7 @@
     "newUser": "Nouvel utilisateur",
     "doesNotExist": "L'utilisateur auquel vous essayez d'accéder n'est pas référencé",
     "unableToFetchInformations": "Impossible de récupérer les informations d'utilisateur",
-    "createMailUserList": "Nouveau mail groupé",
+    "createMailUserList": "Copier les adresses mails",
     "filters": {
       "title": "Filtrer les utilisateurs",
       "searchHint": "Ce champ est remplacé par la barre de recherche"
@@ -722,8 +729,9 @@
     "deleteSpace": "Vous allez supprimer l'espace \"{spaceName}\", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible."
   },
   "harvest": {
-    "requests": {
-      "name": "Moissonnage du {createdAt}",
+    "sessions": {
+      "pendingSession": "Moissonnage en attente...",
+      "name": "Moissonnage du {startedAt}",
       "metrics": {
         "success": "Réussi",
         "failed": "Échoué",
@@ -734,8 +742,11 @@
       "counts": {
         "institutions": "{n} établissement|{n} établissements",
         "endpoints": "{n} point d'accès|{n} points d'accès",
-        "reportTypes": "{n} type de rapport|{n} types de rapport"
+        "reportTypes": "{n} type de rapport|{n} types de rapport",
+        "credentials": "{n} identifiant|{n} identifiants"
       },
+      "credentialsTooltip": "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés",
+      "notStarted": "Pas encore lancé",
       "unableToRetrive": "Impossible de récupérer les moissonnages"
     },
     "jobs": {
@@ -746,7 +757,8 @@
       "beginDate": "Date de début",
       "endDate": "Date de fin",
       "period": "Période",
-      "createdAt": "Demandé le",
+      "startedAt": "Démarré le",
+      "updatedAt": "Mis à jour le",
       "runningTime": "Durée de traitement",
       "index": "Index d'insertion",
       "coveredPeriods": "Mois concernés",
@@ -754,7 +766,9 @@
       "updated": "Éléments mis à jour",
       "failed": "Éléments non récupérés",
       "unableToRetrive": "Impossible de récupérer les tâches de moissonnage",
-      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage"
+      "unableToRetriveMeta": "Impossible de récupérer les informations à propos des tâches de moissonnage",
+      "unableToStop": "Impossible de stopper la tâche de moissonnage",
+      "unableToDelete": "Impossible de supprimer la tâche de moissonnage"
     }
   },
   "sync": {
@@ -798,6 +812,7 @@
   "copyId": "Copier l'ID",
   "unableToCopyId": "Impossible de copier dans le presse-papier",
   "idCopied": "ID copié dans le presse-papier",
+  "emailsCopied": "Emails copiés dans le presse-papier",
   "advancedSettings": "Paramètres avancés",
   "actions": "Actions",
   "name": "Nom",

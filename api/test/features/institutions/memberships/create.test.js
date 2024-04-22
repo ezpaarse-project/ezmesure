@@ -6,7 +6,7 @@ const institutionsPrisma = require('../../../../lib/services/prisma/institutions
 const membershipsPrisma = require('../../../../lib/services/prisma/memberships');
 const usersPrisma = require('../../../../lib/services/prisma/users');
 const usersElastic = require('../../../../lib/services/elastic/users');
-const usersService = require('../../../../lib/entities/users.service');
+const UsersService = require('../../../../lib/entities/users.service');
 
 const { resetDatabase } = require('../../../../lib/services/prisma/utils');
 const { resetElastic } = require('../../../../lib/services/elastic/utils');
@@ -51,7 +51,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
   beforeAll(async () => {
     await resetDatabase();
     await resetElastic();
-    adminToken = await usersService.generateToken(adminUsername, adminPassword);
+    adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
 
     const institution = await institutionsPrisma.create({ data: institutionTest });
     institutionId = institution.id;
@@ -150,7 +150,7 @@ describe('[institutions - memberships]: Test create memberships features', () =>
       await usersPrisma.create({ data: userManagerTest });
       await usersElastic.createUser(userManagerTest);
 
-      userManagerToken = await usersService
+      userManagerToken = await (new UsersService())
         .generateToken(userManagerTest.username, userManagerPassword);
     });
     describe(`With permission [${allPermission}]`, () => {

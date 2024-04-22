@@ -1,5 +1,5 @@
 const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
-const sushiEndpointService = require('../../entities/sushi-endpoints.service');
+const SushiEndpointService = require('../../entities/sushi-endpoints.service');
 const { propsToPrismaInclude } = require('../utils');
 
 exports.getAll = async (ctx) => {
@@ -39,6 +39,8 @@ exports.getAll = async (ctx) => {
     };
   }
 
+  const sushiEndpointService = new SushiEndpointService();
+
   ctx.type = 'json';
   ctx.status = 200;
   ctx.body = await sushiEndpointService.findMany({ where, include });
@@ -59,6 +61,8 @@ exports.addEndpoint = async (ctx) => {
     vendor: body.vendor,
   };
 
+  const sushiEndpointService = new SushiEndpointService();
+
   const endpoint = await sushiEndpointService.create({ data: body });
 
   ctx.metadata.endpointId = endpoint.id;
@@ -76,13 +80,13 @@ exports.updateEndpoint = async (ctx) => {
     vendor: body.vendor || endpoint.vendor,
   };
 
-  const updatedEndpoint = await sushiEndpointService.update({
+  const sushiEndpointService = new SushiEndpointService();
+
+  ctx.status = 200;
+  ctx.body = await sushiEndpointService.update({
     where: { id: endpoint.id },
     data: body,
   });
-
-  ctx.status = 200;
-  ctx.body = updatedEndpoint;
 };
 
 exports.deleteOne = async (ctx) => {
@@ -94,6 +98,8 @@ exports.deleteOne = async (ctx) => {
     endpointId: endpoint.id,
     endpointVendor: endpoint.vendor,
   };
+
+  const sushiEndpointService = new SushiEndpointService();
 
   await sushiEndpointService.delete({ where: { id: endpointId } });
 
@@ -124,7 +130,11 @@ exports.importEndpoints = async (ctx) => {
     });
   };
 
-  const importItem = async (endpointData = {}) => {
+  /**
+   * @param {SushiEndpointService} sushiEndpointService
+   * @param {*} endpointData
+   */
+  const importItem = async (sushiEndpointService, endpointData = {}) => {
     const { value: item, error } = adminImportSchema.validate(endpointData);
 
     if (error) {
@@ -150,15 +160,18 @@ exports.importEndpoints = async (ctx) => {
     addResponseItem(endpoint, 'created');
   };
 
-  for (let i = 0; i < body.length; i += 1) {
-    const endpointData = body[i] || {};
+  await SushiEndpointService.$transaction(async (sushiEndpointService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const endpointData = body[i] || {};
 
-    try {
-      await importItem(endpointData); // eslint-disable-line no-await-in-loop
-    } catch (e) {
-      addResponseItem(endpointData, 'error', e.message);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(sushiEndpointService, endpointData);
+      } catch (e) {
+        addResponseItem(endpointData, 'error', e.message);
+      }
     }
-  }
+  });
 
   ctx.type = 'json';
   ctx.body = response;

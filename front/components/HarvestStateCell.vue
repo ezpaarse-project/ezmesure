@@ -70,26 +70,7 @@
 
 <script>
 import LogsPreview from '~/components/LogsPreview.vue';
-
-const colors = new Map([
-  ['waiting', 'grey'],
-  ['running', 'blue'],
-  ['finished', 'green'],
-  ['failed', 'red'],
-  ['interrupted', 'red'],
-  ['cancelled', 'red'],
-  ['delayed', 'blue'],
-]);
-
-const icons = new Map([
-  ['waiting', 'mdi-clock-outline'],
-  ['running', 'mdi-play'],
-  ['finished', 'mdi-check'],
-  ['failed', 'mdi-exclamation'],
-  ['interrupted', 'mdi-progress-close'],
-  ['cancelled', 'mdi-cancel'],
-  ['delayed', 'mdi-update'],
-]);
+import { colors, icons } from './harvest/state';
 
 export default {
   components: {

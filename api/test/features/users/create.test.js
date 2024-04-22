@@ -6,7 +6,7 @@ const { resetDatabase } = require('../../../lib/services/prisma/utils');
 const { resetElastic } = require('../../../lib/services/elastic/utils');
 
 const usersPrisma = require('../../../lib/services/prisma/users');
-const usersService = require('../../../lib/entities/users.service');
+const UsersService = require('../../../lib/entities/users.service');
 
 const adminUsername = config.get('admin.username');
 const adminPassword = config.get('admin.password');
@@ -28,7 +28,7 @@ describe('[users]: Test create users features', () => {
       let adminToken;
 
       beforeAll(async () => {
-        adminToken = await usersService.generateToken(adminUsername, adminPassword);
+        adminToken = await (new UsersService()).generateToken(adminUsername, adminPassword);
       });
 
       it(`#01 Should create new user [${userTest.username}]`, async () => {

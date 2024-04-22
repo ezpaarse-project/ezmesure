@@ -3,119 +3,124 @@ const { client: prisma } = require('./index');
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
  * @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint
+ * @typedef {import('@prisma/client').SushiCredentials} SushiCredentials
  * @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs
  * @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs
  * @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs
  * @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs
  * @typedef {import('@prisma/client').Prisma.SushiEndpointDeleteArgs} SushiEndpointDeleteArgs
- * @typedef {{deleteResult: SushiEndpoint, deletedEndpoint: SushiEndpoint }} SushiEndpointRemoved
+ * @typedef {{deleteResult: SushiEndpoint, deletedEndpoint: (SushiEndpoint & { credentials: SushiCredentials[] }) }} SushiEndpointRemoved
  */
 
 /* eslint-enable max-len */
 
 /**
  * @param {SushiEndpointCreateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint>}
  */
-function create(params) {
-  return prisma.sushiEndpoint.create(params);
+function create(params, tx = prisma) {
+  return tx.sushiEndpoint.create(params);
 }
 
 /**
  * @param {SushiEndpointFindManyArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint[]>}
  */
-function findMany(params) {
-  return prisma.sushiEndpoint.findMany(params);
+function findMany(params, tx = prisma) {
+  return tx.sushiEndpoint.findMany(params);
 }
 
 /**
  * @param {SushiEndpointFindUniqueArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint | null>}
  */
-function findUnique(params) {
-  return prisma.sushiEndpoint.findUnique(params);
+function findUnique(params, tx = prisma) {
+  return tx.sushiEndpoint.findUnique(params);
 }
 
 /**
  * @param {string} id
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint | null>}
  */
-function findByID(id) {
-  return prisma.sushiEndpoint.findUnique({ where: { id } });
+function findByID(id, tx = prisma) {
+  return tx.sushiEndpoint.findUnique({ where: { id } });
 }
 
 /**
  * @param {SushiEndpointUpdateArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint>}
  */
-function update(params) {
-  return prisma.sushiEndpoint.update(params);
+function update(params, tx = prisma) {
+  return tx.sushiEndpoint.update(params);
 }
 
 /**
  * @param {SushiEndpointUpsertArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpoint>}
  */
-function upsert(params) {
-  return prisma.sushiEndpoint.upsert(params);
+function upsert(params, tx = prisma) {
+  return tx.sushiEndpoint.upsert(params);
 }
 
 /**
  * @param {SushiEndpointDeleteArgs} params
+ * @param {TransactionClient} [tx]
  * @returns {Promise<SushiEndpointRemoved | null>}
  */
-async function remove(params) {
-  const { deleteResult, deletedEndpoint } = await prisma.$transaction(async (tx) => {
-    const endpoint = await tx.sushiEndpoint.findUnique({
-      where: params.where,
-      include: {
-        credentials: true,
-      },
-    });
-
-    if (!endpoint) {
-      return [null, null];
-    }
-
-    await tx.sushiCredentials.deleteMany({
-      where: { endpointId: endpoint.id },
-    });
-
-    return {
-      deleteResult: await tx.sushiEndpoint.delete(params),
-      deletedEndpoint: endpoint,
-    };
+async function remove(params, tx = prisma) {
+  const endpoint = await tx.sushiEndpoint.findUnique({
+    where: params.where,
+    include: {
+      credentials: true,
+    },
   });
 
-  if (!deletedEndpoint) {
+  if (!endpoint) {
     return null;
   }
 
-  return { deleteResult, deletedEndpoint };
+  return {
+    deleteResult: await tx.sushiEndpoint.delete(params),
+    deletedEndpoint: endpoint,
+  };
 }
 
 /**
- * @returns {Promise<Array<SushiEndpoint> | null>}
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<SushiEndpoint[] | null>}
  */
-async function removeAll() {
+async function removeAll(tx) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
 
-  const sushiEndpoints = await findMany({});
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const sushiEndpoints = await findMany({}, txx);
 
-  if (sushiEndpoints.length === 0) { return null; }
+    if (sushiEndpoints.length === 0) { return null; }
 
-  await Promise.all(sushiEndpoints.map(async (sushiEndpoint) => {
-    await remove({
-      where: {
-        id: sushiEndpoint.id,
-      },
-    });
-  }));
+    await Promise.all(
+      sushiEndpoints.map((sushiEndpoint) => remove(
+        { where: { id: sushiEndpoint.id } },
+        txx,
+      )),
+    );
 
-  return sushiEndpoints;
+    return sushiEndpoints;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
 }
 
 module.exports = {
