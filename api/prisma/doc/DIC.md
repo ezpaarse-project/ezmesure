@@ -144,33 +144,49 @@ Represent the actions that are triggered
 | type        | `String`       | The action type (ex: commentInstitution, createSpace)                         |            |          |
 | data        | `Json`         | Arbitrary data associated with the action (comment message, old/new state...) |            | `{}`     |
 
+### HarvestSession
+
+Represent a harvest session
+
+| Property            | Type           | Description                                                                         | Attributes | Default  |
+|---------------------|----------------|-------------------------------------------------------------------------------------|------------|----------|
+| id                  | `String`       | ID of the session                                                                   | Id         | `cuid()` |
+| beginDate           | `String`       | Beginning of the requested period                                                   |            |          |
+| endDate             | `String`       | End of the requested period                                                         |            |          |
+| credentialsQuery    | `Json`         | Query to get sushi credentials                                                      |            |          |
+| jobs                | `HarvestJob[]` | Jobs created after request                                                          |            |          |
+| reportTypes         | `String[]`     | IDs of the requested reports (ex: tr_j1)                                            |            |          |
+| timeout             | `Int`          | Maximum execution time of a job                                                     |            | `600`    |
+| allowFaulty         | `Boolean`      | Whether the reports should be fetched even if credentials aren't verified or wrong  |            | `false`  |
+| downloadUnsupported | `Boolean`      | Whether the reports should be downloaded even if not supported by the endpoint      |            | `false`  |
+| forceDownload       | `Boolean`      | Whether the reports should be downloaded even if a local copy already exists        |            | `false`  |
+| ignoreValidation    | `Boolean?`     | Whether the reports should be inserted even if it does not pass the validation step |            |          |
+| params              | `Json?`        | Parameters to pass to jobs                                                          |            | `{}`     |
+| startedAt           | `DateTime?`    | Start date                                                                          |            |          |
+| createdAt           | `DateTime`     | Creation date                                                                       |            | `now()`  |
+| updatedAt           | `DateTime`     | Latest update date                                                                  |            |          |
+
 ### HarvestJob
 
 Represent the execution of a harvest job
 
-| Property         | Type               | Description                                                                                             | Attributes | Default  |
-|------------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|----------|
-| id               | `String`           | ID of the job                                                                                           | Id         | `cuid()` |
-| credentials      | `SushiCredentials` | SUSHI credentials used to harvest                                                                       |            |          |
-| createdAt        | `DateTime`         | Creation date                                                                                           |            | `now()`  |
-| updatedAt        | `DateTime`         | Latest update date                                                                                      |            |          |
-| startedAt        | `DateTime?`        | Start date (when the job moved from waiting to running)                                                 |            |          |
-| beginDate        | `String`           | Beginning of the harvested period                                                                       |            |          |
-| endDate          | `String`           | End of the harvested period                                                                             |            |          |
-| status           | `HarvestJobStatus` | Job status                                                                                              |            |          |
-| reportType       | `String`           | ID of the harvested report (ex: tr_j1)                                                                  |            |          |
-| harvestId        | `String`           | ID of the harvest session                                                                               |            |          |
-| index            | `String`           | Index where the harvested data should be inserted                                                       |            |          |
-| runningTime      | `Int?`             | Job running time                                                                                        |            |          |
-| timeout          | `Int`              | Maximum execution time of the job                                                                       |            |          |
-| forceDownload    | `Boolean`          | Whether the report should be downloaded even if a local copy already exists                             |            | `false`  |
-| ignoreValidation | `Boolean`          | Whether the report should be inserted even if it does not pass the validation step                      |            | `false`  |
-| params           | `Json?`            | Job parameters                                                                                          |            | `{}`     |
-| result           | `Json?`            | Job result                                                                                              |            |          |
-| errorCode        | `String?`          | Error code, if a fatal exception was encountered                                                        |            |          |
-| sushiExceptions  | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
-| logs             | `Log[]`            | Job logs                                                                                                |            |          |
-| steps            | `Step[]`           | Job steps                                                                                               |            |          |
+| Property        | Type               | Description                                                                                             | Attributes | Default  |
+|-----------------|--------------------|---------------------------------------------------------------------------------------------------------|------------|----------|
+| id              | `String`           | ID of the job                                                                                           | Id         | `cuid()` |
+| credentials     | `SushiCredentials` | SUSHI credentials used to harvest                                                                       |            |          |
+| createdAt       | `DateTime`         | Creation date                                                                                           |            | `now()`  |
+| updatedAt       | `DateTime`         | Latest update date                                                                                      |            |          |
+| startedAt       | `DateTime?`        | Start date (when the job moved from waiting to running)                                                 |            |          |
+| status          | `HarvestJobStatus` | Job status                                                                                              |            |          |
+| reportType      | `String`           | ID of the harvested report (ex: tr_j1)                                                                  |            |          |
+| session         | `HarvestSession`   | Session that created the job                                                                            |            |          |
+| index           | `String`           | Index where the harvested data should be inserted                                                       |            |          |
+| runningTime     | `Int?`             | Job running time                                                                                        |            |          |
+| result          | `Json?`            | Job result                                                                                              |            |          |
+| errorCode       | `String?`          | Error code, if a fatal exception was encountered                                                        |            |          |
+| sushiExceptions | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
+| logs            | `Log[]`            | Job logs                                                                                                |            |          |
+| steps           | `Step[]`           | Job steps                                                                                               |            |          |
 
 ### Harvest
 
@@ -243,6 +259,7 @@ A SUSHI endpoint
 | paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|") |            |          |
 | supportedReports          | `String[]`           | List report IDs that are supported by the endpoint                                      |            |          |
 | supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                            |            |          |
+| testedReport              | `String?`            | Report used when testing endpoint                                                       |            |          |
 | credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                          |            |          |
 | params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.            |            |          |
 
@@ -259,6 +276,7 @@ A set of SUSHI credentials, associated to a SUSHI endpoint
 | requestorId | `String?`       | Value of the requestor_id parameter                                                                      |            |          |
 | apiKey      | `String?`       | Value of the api_key parameter                                                                           |            |          |
 | comment     | `String?`       | Abritrary comment about the credentials                                                                  |            |          |
+| packages    | `String[]`      | Packages (profiles, accounts, funds...) that include the credentials                                     |            |          |
 | tags        | `String[]`      | Abritrary tag list associated to the credentials                                                         |            |          |
 | params      | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope.                                     |            |          |
 | institution | `Institution`   | Institution that owns the credentials                                                                    |            |          |
