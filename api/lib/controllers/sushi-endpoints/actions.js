@@ -1,56 +1,40 @@
-const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
+const { schema, adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
 const SushiEndpointService = require('../../entities/sushi-endpoints.service');
-const { propsToPrismaInclude } = require('../utils');
+const { prepareStandardQueryParams } = require('../std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['vendor'],
+});
+exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
-  const {
-    include: propsToInclude,
-    requireCustomerId,
-    requireRequestorId,
-    requireApiKey,
-    isSushiCompliant,
-    tags,
-    q: search,
-  } = ctx.query;
-
-  let include;
-
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  const where = {
-    requireCustomerId,
-    requireRequestorId,
-    requireApiKey,
-    isSushiCompliant,
-  };
-
-  if (tags) {
-    where.tags = {
-      hasSome: Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim()),
-    };
-  }
-
-  if (search) {
-    where.vendor = {
-      contains: search,
-      mode: 'insensitive',
-    };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   const sushiEndpointService = new SushiEndpointService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiEndpointService.findMany({ where, include });
+  ctx.body = await sushiEndpointService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
-  const { endpoint } = ctx.state;
+  const { endpointId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+  prismaQuery.where.id = endpointId;
+
+  const sushiEndpointService = new SushiEndpointService();
 
   ctx.status = 200;
-  ctx.body = endpoint;
+  ctx.body = await sushiEndpointService.findUnique(prismaQuery);
 };
 
 exports.addEndpoint = async (ctx) => {
