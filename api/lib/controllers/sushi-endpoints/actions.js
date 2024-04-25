@@ -1,6 +1,7 @@
 const { schema, adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
 const SushiEndpointService = require('../../entities/sushi-endpoints.service');
-const { prepareStandardQueryParams } = require('../std-query');
+
+const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -19,22 +20,28 @@ exports.getAll = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 200;
+  ctx.set('X-Total-Count', await sushiEndpointService.count({ where: prismaQuery.where }));
   ctx.body = await sushiEndpointService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
   const { endpointId } = ctx.params;
 
-  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx);
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: endpointId });
   if (!ctx.state?.user?.isAdmin) {
     prismaQuery.include = undefined;
   }
-  prismaQuery.where.id = endpointId;
 
   const sushiEndpointService = new SushiEndpointService();
+  const endpoint = await sushiEndpointService.findUnique(prismaQuery);
+
+  if (!endpoint) {
+    ctx.throw(404, ctx.$t('errors.sushi-endpoint.notFound'));
+    return;
+  }
 
   ctx.status = 200;
-  ctx.body = await sushiEndpointService.findUnique(prismaQuery);
+  ctx.body = endpoint;
 };
 
 exports.addEndpoint = async (ctx) => {
@@ -46,7 +53,6 @@ exports.addEndpoint = async (ctx) => {
   };
 
   const sushiEndpointService = new SushiEndpointService();
-
   const endpoint = await sushiEndpointService.create({ data: body });
 
   ctx.metadata.endpointId = endpoint.id;

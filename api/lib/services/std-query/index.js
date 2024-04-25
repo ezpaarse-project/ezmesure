@@ -2,76 +2,34 @@
 
 const { Joi } = require('koa-joi-router');
 
+const { arrayOrString, stringOrArray } = require('../utils');
+
 const {
-  propsToPrismaInclude,
-  propsToPrismaSort,
-  stringOrArray,
-  arrayOrString,
-} = require('./utils');
+  stringOrArrayValidation,
+
+  stringJoiAndFilter,
+  booleanJoiAndFilter,
+  arrayJoiAndFilter,
+  numberJoiAndFilter,
+  dateJoiAndFilter,
+} = require('./filters');
+const { propsToPrismaInclude, propsToPrismaSort } = require('./prisma-query');
 
 /**
  * @typedef {import('joi').SchemaLike} JoiSchemaLike
  * @typedef {import('joi').AnySchema} JoiAnySchema
  * @typedef {import('joi').ObjectSchema} JoiObjectSchema
  *
- * @typedef {Object} JoiAndFilters
- * @prop {Record<string, JoiAnySchema>} validations
+ * @typedef {object} JoiAndFilters
+ * @prop {JoiObjectSchema} validations
  * @prop {Record<string, (value: any) => any>} filters
  *
- * @typedef {Object} StandardQueryParams
+ * @typedef {object} StandardQueryParams
  * @prop {JoiObjectSchema} manyValidation
- * @prop {(ctx: import('koa').Context) => Object} getPrismaManyQuery
+ * @prop {(ctx: import('koa').Context) => object} getPrismaManyQuery
  * @prop {JoiObjectSchema} oneValidation
- * @prop {(ctx: import('koa').Context) => Object} getPrismaOneQuery
+ * @prop {(ctx: import('koa').Context, where: object) => object} getPrismaOneQuery
  */
-
-const stringOrArrayValidation = Joi.alternatives().try(
-  Joi.string().trim().min(0),
-  Joi.array().items(Joi.string().trim().min(1)).min(1),
-);
-
-const stringJoiAndFilter = (key) => ({
-  validation: Joi.string().allow(''),
-  filter: (value) => {
-    if (!value) {
-      return { [key]: value };
-    }
-    return { OR: [{ [key]: null }, { [key]: '' }] };
-  },
-});
-
-const booleanJoiAndFilter = (key) => ({
-  validation: Joi.boolean().allow(''),
-  filter: stringJoiAndFilter(key).filter,
-});
-
-const arrayJoiAndFilter = (key, subtypes) => {
-  // Preventing arrays of objects and arrays of arrays
-  if (subtypes.includes('object') || subtypes.includes('array')) {
-    return {};
-  }
-
-  return {
-    validation: stringOrArrayValidation,
-    filter: (value) => {
-      const values = stringOrArray(value ?? '');
-      if (values.length <= 0) {
-        return { [key]: { isEmpty: true } };
-      }
-      return { [key]: { hasEvery: values } };
-    },
-  };
-};
-
-const dateJoiAndFilter = (key, operator) => ({
-  validation: Joi.string().isoDate(),
-  filter: (value) => ({ [key]: { [operator]: value } }),
-});
-
-const numberJoiAndFilter = (key, operator) => ({
-  validation: Joi.number(),
-  filter: dateJoiAndFilter(key, operator).filter,
-});
 
 /**
  * Transform a DTO schema to a query validation to be used with Joi and
@@ -86,6 +44,7 @@ const prepareJoiAndFilters = (schema) => {
   const validations = {};
   /** @type {Record<string, any>} */
   const filters = {};
+  const arrayFields = [];
 
   // eslint-disable-next-line no-restricted-syntax, camelcase
   for (const [key, { type, $_terms: terms }] of Object.entries(schema)) {
@@ -100,6 +59,7 @@ const prepareJoiAndFilters = (schema) => {
         break;
       case 'array':
         ({ validation, filter } = arrayJoiAndFilter(key, terms.items?.map((i) => i.type) ?? []));
+        arrayFields.push(key);
         break;
 
       case 'number': {
@@ -130,12 +90,22 @@ const prepareJoiAndFilters = (schema) => {
         break;
     }
 
-    if (validation) { validations[key] = validation; }
-    if (filter) { filters[key] = filter; }
+    if (validation) {
+      validations[key] = validation;
+    }
+    if (filter) {
+      filters[key] = filter;
+    }
+  }
+
+  let joiValidation = Joi.object(validations);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key of arrayFields) {
+    joiValidation = joiValidation.rename(`${key}[]`, key);
   }
 
   return {
-    validations,
+    validations: joiValidation,
     filters,
   };
 };
@@ -165,12 +135,30 @@ const applyPrismaFilters = (query, fieldsFilters) => {
 };
 
 /**
+ * Apply prisma search
+ *
+ * @param {string[]} queryFields Fields to search
+ * @param {string} search The search
+ *
+ * @returns {Record<string, any>} Prisma search
+ */
+const applyPrismaSearch = (queryFields, search) => ({
+  OR: queryFields.map((field) => ({
+    [field]: {
+      contains: search,
+      mode: 'insensitive',
+    },
+  })),
+});
+
+/**
  * Prepare standard query validation to be used with Joi and a method to get a Prisma query with
  * predefined filters and pagination.
  *
  * @param {Object} dto The DTO
  * @param {Object} dto.schema The DTO schema
  * @param {string[]} [dto.includableFields] The fields that can be included in the query
+ * @param {string[]} [dto.sourcableFields] The fields that can be sourced in the query
  * @param {string[]} [dto.queryFields] The fields used to do a search
  *
  * @returns {StandardQueryParams} An object containing the validation and a method
@@ -178,7 +166,7 @@ const applyPrismaFilters = (query, fieldsFilters) => {
  */
 const prepareStandardQueryParams = ({
   schema,
-  includableFields,
+  includableFields = undefined,
   queryFields = ['name'],
 }) => {
   const allowedIncludes = includableFields ? Joi.string().valid(...includableFields) : Joi.string();
@@ -193,8 +181,10 @@ const prepareStandardQueryParams = ({
     sort: Joi.string(),
     order: Joi.string().valid('asc', 'desc'),
     distinct: stringOrArrayValidation,
-    q: queryFields?.length > 0 ? Joi.string() : undefined,
   };
+  if (queryFields?.length > 0) {
+    paginationValidation.q = Joi.string().trim();
+  }
 
   const {
     validations: fieldsValidations,
@@ -202,7 +192,7 @@ const prepareStandardQueryParams = ({
   } = prepareJoiAndFilters(schema);
 
   return {
-    manyValidation: baseValidation.append(paginationValidation).append(fieldsValidations),
+    manyValidation: baseValidation.append(paginationValidation).concat(fieldsValidations),
     getPrismaManyQuery: (ctx) => {
       const {
         sort,
@@ -228,24 +218,22 @@ const prepareStandardQueryParams = ({
 
       // Apply the search
       if (queryFields?.length > 0 && search) {
-        query.where.OR = queryFields.map((field) => ({
-          [field]: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        }));
+        query.where = {
+          ...query.where,
+          ...applyPrismaSearch(queryFields, arrayOrString(search)),
+        };
       }
 
       return query;
     },
 
     oneValidation: baseValidation,
-    getPrismaOneQuery: (ctx) => {
+    getPrismaOneQuery: (ctx, where = {}) => {
       const { include: propsToInclude } = ctx.query;
 
       return {
         include: propsToPrismaInclude(stringOrArray(propsToInclude ?? ''), includableFields),
-        where: {},
+        where,
       };
     },
   };
