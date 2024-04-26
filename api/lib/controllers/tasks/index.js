@@ -8,6 +8,8 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getAll,
   getAllMeta,
   getOne,
@@ -15,14 +17,7 @@ const {
   cancelOne,
 } = require('./actions');
 
-const {
-  includableFields,
-} = require('../../entities/harvest-job.dto');
-
-const stringOrArray = Joi.alternatives().try(
-  Joi.string().trim().min(1),
-  Joi.array().items(Joi.string().trim().min(1)).min(1),
-);
+const { stringOrArrayValidation } = require('../../services/std-query');
 
 router.use(requireJwt, requireUser, requireAdmin);
 
@@ -31,23 +26,11 @@ router.route({
   path: '/',
   handler: getAll,
   validate: {
-    query: Joi.object({
-      size: Joi.number().min(-1),
-      page: Joi.number().min(1),
-      sort: Joi.string(),
-      order: Joi.string().valid('asc', 'desc'),
-      id: stringOrArray,
-      status: stringOrArray,
-      type: stringOrArray,
-      sessionId: stringOrArray,
-      credentialsId: stringOrArray,
-      endpointId: stringOrArray,
-      institutionId: stringOrArray,
-      tags: stringOrArray,
-      packages: stringOrArray,
-      distinct: stringOrArray,
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.manyValidation.append({
+      credentialsId: stringOrArrayValidation,
+      endpointId: stringOrArrayValidation,
+      institutionId: stringOrArrayValidation,
+    }),
   },
 });
 
@@ -56,16 +39,12 @@ router.route({
   path: '/_meta',
   handler: getAllMeta,
   validate: {
-    query: {
-      status: stringOrArray,
-      type: stringOrArray,
-      sessionId: stringOrArray,
-      credentialsId: stringOrArray,
-      endpointId: stringOrArray,
-      institutionId: stringOrArray,
-      tags: stringOrArray,
-      packages: stringOrArray,
-    },
+    query: standardQueryParams.manyValidation.append({
+      credentialsId: stringOrArrayValidation,
+      endpointId: stringOrArrayValidation,
+      institutionId: stringOrArrayValidation,
+      include: Joi.forbidden(),
+    }),
   },
 });
 
@@ -77,6 +56,7 @@ router.route({
     params: {
       taskId: Joi.string().trim().required(),
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 
