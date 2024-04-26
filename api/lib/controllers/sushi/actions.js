@@ -15,8 +15,7 @@ const SushiCredentialsService = require('../../entities/sushi-credentials.servic
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
 
-const { includableFields } = require('../../entities/sushi-credentials.dto');
-const { propsToPrismaInclude } = require('../utils');
+const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
 
 /* eslint-disable max-len */
 /**
@@ -25,40 +24,26 @@ const { propsToPrismaInclude } = require('../utils');
  */
 /* eslint-enable max-len */
 
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: [],
+});
+exports.standardQueryParams = standardQueryParams;
+
 exports.getAll = async (ctx) => {
-  const {
-    id: sushiIds,
-    institutionId,
-    endpointId,
-    include: propsToInclude,
-    connection,
-    q: query,
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-  } = ctx.query;
+  const { connection, q: query } = ctx.query;
 
-  let include;
-
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  /** @type {SushiCredentialsFindManyArgs} */
-  const options = {
-    include,
-    take: Number.isInteger(size) ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    where: {},
-  };
-
-  if (sort) {
-    options.orderBy = { [sort]: order };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   if (query) {
-    options.where = {
+    prismaQuery.where = {
+      ...prismaQuery.where,
       OR: [
         { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
         { institution: { name: { contains: query, mode: 'insensitive' } } },
@@ -66,33 +51,16 @@ exports.getAll = async (ctx) => {
     };
   }
 
-  if (sushiIds) {
-    options.where.id = Array.isArray(sushiIds)
-      ? { in: sushiIds }
-      : { equals: sushiIds };
-  }
-  if (institutionId) {
-    options.where.institutionId = Array.isArray(institutionId)
-      ? { in: institutionId }
-      : { equals: institutionId };
-  }
-  if (endpointId) {
-    options.where.endpointId = Array.isArray(endpointId)
-      ? { in: endpointId }
-      : { equals: endpointId };
-  }
-
   if (connection) {
-    options.where.connection = {};
     switch (connection) {
       case 'working':
-        options.where.connection = { path: ['status'], equals: 'success' };
+        prismaQuery.where.connection = { path: ['status'], equals: 'success' };
         break;
       case 'faulty':
-        options.where.connection = { path: ['status'], equals: 'failed' };
+        prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
         break;
       case 'untested':
-        options.where.connection = { equals: {} };
+        prismaQuery.where.connection = { equals: {} };
         break;
 
       default:
@@ -104,11 +72,25 @@ exports.getAll = async (ctx) => {
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiCredentialsService.findMany(options);
+  ctx.set('X-Total-Count', await sushiCredentialsService.count({ where: prismaQuery.where }));
+  ctx.body = await sushiCredentialsService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
-  const { sushi } = ctx.state;
+  const { sushiId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: sushiId });
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+
+  const sushiCredentialsService = new SushiCredentialsService();
+  const sushi = await sushiCredentialsService.findUnique(prismaQuery);
+
+  if (!sushi) {
+    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
+    return;
+  }
 
   ctx.status = 200;
   ctx.body = sushi;
