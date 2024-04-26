@@ -9,16 +9,26 @@ const stringOrArrayValidation = Joi.alternatives().try(
   Joi.array().items(Joi.string().trim().min(1)).min(1),
 );
 
-const stringJoiAndFilter = (key) => ({
-  validation: stringOrArrayValidation,
-  filter: (value) => {
-    const values = stringToArray(value ?? '');
-    if (values.length > 0) {
-      return { [key]: { in: values } };
-    }
-    return { OR: [{ [key]: null }, { [key]: '' }] };
-  },
-});
+const stringJoiAndFilter = (key, regex = undefined) => {
+  let strValidation = Joi.string().trim();
+  if (regex) {
+    strValidation = strValidation.regex(regex);
+  }
+
+  return {
+    validation: Joi.alternatives().try(
+      strValidation.min(0),
+      Joi.array().items(strValidation.min(1)).min(1),
+    ),
+    filter: (value) => {
+      const values = stringToArray(value ?? '');
+      if (values.length > 0) {
+        return { [key]: { in: values } };
+      }
+      return { OR: [{ [key]: null }, { [key]: '' }] };
+    },
+  };
+};
 
 const booleanJoiAndFilter = (key, isNullable) => {
   let validation = Joi.boolean();

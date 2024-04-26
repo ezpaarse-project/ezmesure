@@ -48,15 +48,18 @@ const prepareJoiAndFilters = (schema) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, def] of Object.entries(schema)) {
+    /* eslint-disable no-underscore-dangle */
     // @ts-ignore
-    // eslint-disable-next-line no-underscore-dangle
     const isNullable = def._valids?.has?.(null) || false;
+    // @ts-ignore
+    const regex = def._rules.find((r) => r.name === 'pattern')?.args?.regex;
+    /* eslint-enable no-underscore-dangle */
 
     let validation;
     let filter;
     switch (def.type) {
       case 'string':
-        ({ validation, filter } = stringJoiAndFilter(key));
+        ({ validation, filter } = stringJoiAndFilter(key, regex));
         arrayFields.push(key);
         break;
       case 'boolean':
