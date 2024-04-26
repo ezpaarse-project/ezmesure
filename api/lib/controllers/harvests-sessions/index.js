@@ -2,7 +2,6 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
-  includableFields,
   adminCreateSchema,
   adminUpdateSchema,
 } = require('../../entities/harvest-session.dto');
@@ -14,6 +13,8 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getAll,
   getOne,
   getManyStatus,
@@ -38,13 +39,7 @@ router.route({
     getAll,
   ],
   validate: {
-    query: Joi.object({
-      size: Joi.number().min(-1),
-      page: Joi.number().min(1),
-      sort: Joi.string(),
-      order: Joi.string().valid('asc', 'desc'),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.manyValidation,
   },
 });
 
@@ -83,6 +78,7 @@ router.route({
     params: {
       harvestId: Joi.string().trim().required(),
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 
