@@ -19,15 +19,22 @@ const stringJoiAndFilter = (key) => ({
   },
 });
 
-const booleanJoiAndFilter = (key) => ({
-  validation: Joi.boolean().allow(''),
-  filter: (value) => {
-    if (value) {
+const booleanJoiAndFilter = (key, isNullable) => {
+  let validation = Joi.boolean();
+  if (isNullable) {
+    validation = validation.allow('');
+  }
+
+  return {
+    validation,
+    filter: (value) => {
+      if (isNullable && !value) {
+        return { [key]: null };
+      }
       return { [key]: value };
-    }
-    return { [key]: null };
-  },
-});
+    },
+  };
+};
 
 const arrayJoiAndFilter = (key, subtypes) => {
   // Preventing arrays of objects and arrays of arrays

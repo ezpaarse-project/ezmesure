@@ -47,21 +47,25 @@ const prepareJoiAndFilters = (schema) => {
   const arrayFields = [];
 
   // eslint-disable-next-line no-restricted-syntax, camelcase
-  for (const [key, { type, $_terms: terms }] of Object.entries(schema)) {
+  for (const [key, def] of Object.entries(schema)) {
     let validation;
     let filter;
-    switch (type) {
+    switch (def.type) {
       case 'string':
         ({ validation, filter } = stringJoiAndFilter(key));
         arrayFields.push(key);
         break;
       case 'boolean':
-        ({ validation, filter } = booleanJoiAndFilter(key));
+        // @ts-ignore
+        // eslint-disable-next-line no-underscore-dangle
+        ({ validation, filter } = booleanJoiAndFilter(key, def._valids?.has?.(null) || false));
         break;
-      case 'array':
-        ({ validation, filter } = arrayJoiAndFilter(key, terms.items?.map((i) => i.type) ?? []));
+      case 'array': {
+        const subtypes = def.$_terms.items?.map((i) => i.type) ?? [];
+        ({ validation, filter } = arrayJoiAndFilter(key, subtypes));
         arrayFields.push(key);
         break;
+      }
 
       case 'number': {
         const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, 'gte');
