@@ -24,6 +24,7 @@ const SpacesService = require('../../entities/spaces.service');
 /* eslint-enable max-len */
 
 const {
+  schema: institutionSchema,
   adminCreateSchema,
   adminUpdateSchema,
   createSchema,
@@ -41,7 +42,14 @@ const {
   includableFields: spaceIncludableFields,
 } = require('../../entities/repositories.dto');
 
-const { propsToPrismaInclude } = require('../utils');
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema: institutionSchema,
+  includableFields,
+});
+exports.standardQueryParams = standardQueryParams;
 
 const {
   PERMISSIONS,
@@ -82,71 +90,38 @@ function sendNewContact(receiver, institutionName) {
 }
 
 exports.getInstitutions = async (ctx) => {
-  const {
-    include: propsToInclude,
-    q: query,
-    validated,
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-  } = ctx.query;
-
-  let include;
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  /** @type {InstitutionFindManyArgs} */
-  const options = {
-    include,
-    take: Number.isInteger(size) && size >= 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    where: {},
-  };
-
-  if (sort) {
-    options.orderBy = { [sort]: order };
-  }
-
-  if (query) {
-    options.where.name = {
-      contains: query,
-      mode: 'insensitive',
-    };
-  }
-
-  if (validated != null) {
-    options.where.validated = {
-      equals: validated,
-    };
-  }
-
-  const institutionsService = new InstitutionsService();
-
-  ctx.type = 'json';
-  ctx.body = await institutionsService.findMany(options);
-};
-
-exports.getInstitution = async (ctx) => {
-  const {
-    include: propsToInclude,
-  } = ctx.query;
-  const { institutionId } = ctx.params;
-
-  let include;
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   const institutionsService = new InstitutionsService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await institutionsService.findUnique({
-    where: { id: institutionId },
-    include,
-  });
+  ctx.set('X-Total-Count', await institutionsService.count({ where: prismaQuery.where }));
+  ctx.body = await institutionsService.findMany(prismaQuery);
+};
+
+exports.getInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId });
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+
+  const institutionsService = new InstitutionsService();
+  const institution = await institutionsService.findUnique(prismaQuery);
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = institution;
 };
 
 exports.createInstitution = async (ctx) => {
@@ -703,7 +678,7 @@ exports.getSushiData = async (ctx) => {
     },
     include: {
       endpoint: true,
-      ...propsToPrismaInclude(propsToInclude, ['harvests']),
+      ...(propsToPrismaInclude(propsToInclude, ['harvests']) ?? {}),
     },
   });
 };
