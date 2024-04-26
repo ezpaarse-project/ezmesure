@@ -1074,7 +1074,7 @@ export default {
       const include = includable.filter((h) => tableHeaders.has(h));
 
       try {
-        this.institutions = await this.$axios.$get('/institutions', { params: { include } });
+        this.institutions = await this.$axios.$get('/institutions', { params: { include, size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.unableToRetriveInformations'));
       }

@@ -424,7 +424,7 @@ export default {
       try {
         this.users = await this.$axios.$get('/users', {
           params: {
-            size: 10000,
+            size: 0,
             source: '*',
             include: 'memberships.institution',
           },

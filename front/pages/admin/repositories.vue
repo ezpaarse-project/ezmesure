@@ -354,6 +354,7 @@ export default {
         this.repos = await this.$axios.$get('/repositories', {
           params: {
             include: ['institutions'],
+            size: 0,
           },
         });
       } catch (e) {
