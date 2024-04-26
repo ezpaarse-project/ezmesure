@@ -53,6 +53,7 @@ const prepareJoiAndFilters = (schema) => {
     switch (type) {
       case 'string':
         ({ validation, filter } = stringJoiAndFilter(key));
+        arrayFields.push(key);
         break;
       case 'boolean':
         ({ validation, filter } = booleanJoiAndFilter(key));

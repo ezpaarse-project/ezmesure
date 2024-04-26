@@ -10,10 +10,10 @@ const stringOrArrayValidation = Joi.alternatives().try(
 );
 
 const stringJoiAndFilter = (key) => ({
-  validation: Joi.string().allow(''),
+  validation: stringOrArrayValidation,
   filter: (value) => {
-    if (value) {
-      return { [key]: value };
+    if (value?.length > 0) {
+      return { [key]: { in: value } };
     }
     return { OR: [{ [key]: null }, { [key]: '' }] };
   },
@@ -21,7 +21,12 @@ const stringJoiAndFilter = (key) => ({
 
 const booleanJoiAndFilter = (key) => ({
   validation: Joi.boolean().allow(''),
-  filter: stringJoiAndFilter(key).filter,
+  filter: (value) => {
+    if (value) {
+      return { [key]: value };
+    }
+    return { [key]: null };
+  },
 });
 
 const arrayJoiAndFilter = (key, subtypes) => {
