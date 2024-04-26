@@ -29,8 +29,8 @@ exports.getHarvests = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   if (institutionId || endpointId || tags || packages) {
     prismaQuery.where.credentials = {
-      endpointId,
-      institutionId,
+      endpointId: queryToPrismaFilter(endpointId),
+      institutionId: queryToPrismaFilter(institutionId),
       tags: tags && { hasSome: queryToPrismaFilter(tags).in },
       packages: packages && { hasSome: queryToPrismaFilter(packages).in },
     };

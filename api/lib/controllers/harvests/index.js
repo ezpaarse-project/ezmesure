@@ -28,10 +28,11 @@ router.route({
   ],
   validate: {
     query: standardQueryParams.manyValidation.append({
+      period: Joi.forbidden(),
       'period:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
       'period:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
-      endpointId: Joi.string().trim(),
-      institutionId: Joi.string().trim(),
+      endpointId: stringOrArrayValidation,
+      institutionId: stringOrArrayValidation,
       tags: stringOrArrayValidation,
       packages: stringOrArrayValidation,
     }),
