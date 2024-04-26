@@ -27,9 +27,10 @@ router.route({
   handler: getAll,
   validate: {
     query: standardQueryParams.manyValidation.append({
-      credentialsId: stringOrArrayValidation,
       endpointId: stringOrArrayValidation,
       institutionId: stringOrArrayValidation,
+      tags: stringOrArrayValidation,
+      packages: stringOrArrayValidation,
     }),
   },
 });
@@ -40,9 +41,10 @@ router.route({
   handler: getAllMeta,
   validate: {
     query: standardQueryParams.manyValidation.append({
-      credentialsId: stringOrArrayValidation,
       endpointId: stringOrArrayValidation,
       institutionId: stringOrArrayValidation,
+      tags: stringOrArrayValidation,
+      packages: stringOrArrayValidation,
       include: Joi.forbidden(),
     }),
   },
