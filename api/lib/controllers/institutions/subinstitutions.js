@@ -1,6 +1,7 @@
 const InstitutionsService = require('../../entities/institutions.service');
 const { includableFields } = require('../../entities/institutions.dto');
-const { propsToPrismaInclude } = require('../utils');
+
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
 exports.getSubInstitutions = async (ctx) => {
   const { include: propsToInclude } = ctx.query;

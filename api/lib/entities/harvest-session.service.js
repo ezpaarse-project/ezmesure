@@ -19,7 +19,8 @@ const RepositoriesService = require('./repositories.service');
 const SushiEndpointsService = require('./sushi-endpoints.service');
 const SushiCredentialsService = require('./sushi-credentials.service');
 const HTTPError = require('../models/HTTPError');
-const { queryToPrismaFilter } = require('../controllers/utils');
+
+const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
 
 /* eslint-disable max-len */
 /** @typedef {import('@prisma/client').HarvestSession} HarvestSession */
