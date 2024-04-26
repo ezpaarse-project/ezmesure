@@ -5,12 +5,12 @@
  *
  * @returns {string[]} The resulting array
  */
-const stringOrArray = (value) => {
-  if (!value) {
-    return [];
-  }
+const stringToArray = (value) => {
   if (Array.isArray(value)) {
     return value;
+  }
+  if (!value || typeof value !== 'string') {
+    return [];
   }
   return value.split(',').map((s) => s.trim());
 };
@@ -22,14 +22,14 @@ const stringOrArray = (value) => {
  *
  * @returns {string} The resulting string
  */
-const arrayOrString = (value) => {
+const arrayToString = (value) => {
   if (Array.isArray(value)) {
-    return value.map((s) => s.trim()).join(',');
+    return value.map((s) => s.trim?.()).join(',');
   }
   return value;
 };
 
 module.exports = {
-  stringOrArray,
-  arrayOrString,
+  stringToArray,
+  arrayToString,
 };

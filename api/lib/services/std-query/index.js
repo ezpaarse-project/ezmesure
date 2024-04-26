@@ -2,7 +2,7 @@
 
 const { Joi } = require('koa-joi-router');
 
-const { arrayOrString, stringOrArray } = require('../utils');
+const { arrayToString, stringToArray } = require('../utils');
 
 const {
   stringOrArrayValidation,
@@ -33,7 +33,7 @@ const { propsToPrismaInclude, propsToPrismaSort } = require('./prisma-query');
 
 /**
  * Transform a DTO schema to a query validation to be used with Joi and
- * a method to get a Prisma query
+ * methods to get a Prisma filters
  *
  * @param {Record<string, JoiAnySchema>} schema The DTO schema
  *
@@ -46,8 +46,12 @@ const prepareJoiAndFilters = (schema) => {
   const filters = {};
   const arrayFields = [];
 
-  // eslint-disable-next-line no-restricted-syntax, camelcase
+  // eslint-disable-next-line no-restricted-syntax
   for (const [key, def] of Object.entries(schema)) {
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const isNullable = def._valids?.has?.(null) || false;
+
     let validation;
     let filter;
     switch (def.type) {
@@ -56,9 +60,7 @@ const prepareJoiAndFilters = (schema) => {
         arrayFields.push(key);
         break;
       case 'boolean':
-        // @ts-ignore
-        // eslint-disable-next-line no-underscore-dangle
-        ({ validation, filter } = booleanJoiAndFilter(key, def._valids?.has?.(null) || false));
+        ({ validation, filter } = booleanJoiAndFilter(key, isNullable));
         break;
       case 'array': {
         const subtypes = def.$_terms.items?.map((i) => i.type) ?? [];
@@ -68,8 +70,8 @@ const prepareJoiAndFilters = (schema) => {
       }
 
       case 'number': {
-        const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, 'gte');
-        const { validation: toV, filter: toF } = numberJoiAndFilter(key, 'lte');
+        const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, isNullable, 'gte');
+        const { validation: toV, filter: toF } = numberJoiAndFilter(key, isNullable, 'lte');
 
         validations[`${key}:from`] = fromV;
         validations[`${key}:to`] = toV;
@@ -80,8 +82,8 @@ const prepareJoiAndFilters = (schema) => {
       }
 
       case 'date': {
-        const { validation: fromV, filter: fromF } = dateJoiAndFilter(key, 'gte');
-        const { validation: toV, filter: toF } = dateJoiAndFilter(key, 'lte');
+        const { validation: fromV, filter: fromF } = dateJoiAndFilter(key, isNullable, 'gte');
+        const { validation: toV, filter: toF } = dateJoiAndFilter(key, isNullable, 'lte');
 
         validations[`${key}:from`] = fromV;
         validations[`${key}:to`] = toV;
@@ -163,7 +165,6 @@ const applyPrismaSearch = (queryFields, search) => ({
  * @param {Object} dto The DTO
  * @param {Object} dto.schema The DTO schema
  * @param {string[]} [dto.includableFields] The fields that can be included in the query
- * @param {string[]} [dto.sourcableFields] The fields that can be sourced in the query
  * @param {string[]} [dto.queryFields] The fields used to do a search
  *
  * @returns {StandardQueryParams} An object containing the validation and a method
@@ -206,17 +207,17 @@ const prepareStandardQueryParams = ({
         include: propsToInclude,
       } = ctx.query;
 
-      const size = Number.parseInt(arrayOrString(ctx.query.size ?? '10'), 10);
-      const page = Number.parseInt(arrayOrString(ctx.query.page ?? '1'), 10);
-      const order = arrayOrString(ctx.query.order ?? 'asc');
+      const size = Number.parseInt(arrayToString(ctx.query.size ?? '10'), 10);
+      const page = Number.parseInt(arrayToString(ctx.query.page ?? '1'), 10);
+      const order = arrayToString(ctx.query.order ?? 'asc');
 
       const query = {
-        include: propsToPrismaInclude(stringOrArray(propsToInclude ?? ''), includableFields),
-        orderBy: propsToPrismaSort(arrayOrString(sort ?? ''), order === 'asc' ? 'asc' : 'desc'),
+        include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFields),
+        orderBy: propsToPrismaSort(arrayToString(sort ?? ''), order === 'asc' ? 'asc' : 'desc'),
         take: Number.isInteger(size) && size > 0 ? size : undefined,
         skip: Number.isInteger(size) ? size * (page - 1) : undefined,
 
-        distinct: distinctFields && stringOrArray(distinctFields),
+        distinct: distinctFields && stringToArray(distinctFields),
 
         where: applyPrismaFilters(ctx.query, fieldsFilters),
       };
@@ -225,7 +226,7 @@ const prepareStandardQueryParams = ({
       if (queryFields?.length > 0 && search) {
         query.where = {
           ...query.where,
-          ...applyPrismaSearch(queryFields, arrayOrString(search)),
+          ...applyPrismaSearch(queryFields, arrayToString(search)),
         };
       }
 
@@ -237,7 +238,7 @@ const prepareStandardQueryParams = ({
       const { include: propsToInclude } = ctx.query;
 
       return {
-        include: propsToPrismaInclude(stringOrArray(propsToInclude ?? ''), includableFields),
+        include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFields),
         where,
       };
     },

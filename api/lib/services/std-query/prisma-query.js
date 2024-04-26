@@ -2,7 +2,7 @@
 
 const { merge } = require('lodash');
 
-const { stringOrArray } = require('../utils');
+const { stringToArray } = require('../utils');
 
 /**
  * Transform props to include into a valid prisma `include` field
@@ -80,7 +80,7 @@ const propsToPrismaSort = (prop, order, sortableFields) => {
  * @param {string | string[] | undefined | null} value Value of the query parameter
  * @returns {{ in: string[] } | undefined} Prisma filter
  */
-const queryToPrismaFilter = (value) => (value ? { in: stringOrArray(value) } : undefined);
+const queryToPrismaFilter = (value) => (value ? { in: stringToArray(value) } : undefined);
 
 module.exports = {
   propsToPrismaInclude,

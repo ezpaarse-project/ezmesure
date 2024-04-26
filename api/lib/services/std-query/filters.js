@@ -2,7 +2,7 @@
 
 const { Joi } = require('koa-joi-router');
 
-const { stringOrArray } = require('../utils');
+const { stringToArray } = require('../utils');
 
 const stringOrArrayValidation = Joi.alternatives().try(
   Joi.string().trim().min(0),
@@ -12,8 +12,9 @@ const stringOrArrayValidation = Joi.alternatives().try(
 const stringJoiAndFilter = (key) => ({
   validation: stringOrArrayValidation,
   filter: (value) => {
-    if (value?.length > 0) {
-      return { [key]: { in: value } };
+    const values = stringToArray(value ?? '');
+    if (values.length > 0) {
+      return { [key]: { in: values } };
     }
     return { OR: [{ [key]: null }, { [key]: '' }] };
   },
@@ -28,7 +29,7 @@ const booleanJoiAndFilter = (key, isNullable) => {
   return {
     validation,
     filter: (value) => {
-      if (isNullable && !value) {
+      if (isNullable && typeof value !== 'boolean') {
         return { [key]: null };
       }
       return { [key]: value };
@@ -45,7 +46,7 @@ const arrayJoiAndFilter = (key, subtypes) => {
   return {
     validation: stringOrArrayValidation,
     filter: (value) => {
-      const values = stringOrArray(value ?? '');
+      const values = stringToArray(value ?? '');
       if (values.length <= 0) {
         return { [key]: { isEmpty: true } };
       }
@@ -54,15 +55,39 @@ const arrayJoiAndFilter = (key, subtypes) => {
   };
 };
 
-const dateJoiAndFilter = (key, operator) => ({
-  validation: Joi.string().isoDate(),
-  filter: (value) => ({ [key]: { [operator]: value } }),
-});
+const dateJoiAndFilter = (key, isNullable, operator) => {
+  let validation = Joi.string().isoDate();
+  if (isNullable) {
+    validation = validation.allow('');
+  }
 
-const numberJoiAndFilter = (key, operator) => ({
-  validation: Joi.number(),
-  filter: dateJoiAndFilter(key, operator).filter,
-});
+  return {
+    validation,
+    filter: (value) => {
+      if (isNullable && value === '') {
+        return { [key]: null };
+      }
+      return { [key]: { [operator]: value } };
+    },
+  };
+};
+
+const numberJoiAndFilter = (key, isNullable, operator) => {
+  let validation = Joi.number();
+  if (isNullable) {
+    validation = validation.allow('');
+  }
+
+  return {
+    validation,
+    filter: (value) => {
+      if (isNullable && typeof value !== 'number') {
+        return { [key]: null };
+      }
+      return { [key]: { [operator]: value } };
+    },
+  };
+};
 
 module.exports = {
   stringOrArrayValidation,
