@@ -31,6 +31,6 @@ const disabledUntil = computed(() => {
 const isDisabled = computed(
   () => disabledUntil.value
     && isValid(disabledUntil.value)
-    && !isFuture(disabledUntil.value),
+    && isFuture(disabledUntil.value),
 );
 </script>
