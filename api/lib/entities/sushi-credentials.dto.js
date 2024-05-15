@@ -64,6 +64,8 @@ const immutableFields = [
 const includableFields = [
   'endpoint',
   'institution',
+  'institution.memberships',
+  'institution.memberships.user',
   'harvests',
   'connection',
 ];
