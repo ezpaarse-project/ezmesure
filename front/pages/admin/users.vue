@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn target="_blank" rel="noopener noreferrer" text @click="copyMailList">
+        <v-btn text @click="copyMailList">
           <v-icon left>
             mdi-email-multiple
           </v-icon>
