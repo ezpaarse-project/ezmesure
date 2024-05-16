@@ -32,6 +32,9 @@ const schema = {
   testedReport: Joi.string().allow('').empty(null).lowercase(),
   tags: Joi.array().items(Joi.string()),
 
+  ignoredReports: Joi.array().items(Joi.string().lowercase()),
+  additionalReports: Joi.array().items(Joi.string().lowercase()),
+
   credentials: Joi.array().items(Joi.object()),
 
   disabledUntil: Joi.date().allow(null),
