@@ -210,6 +210,11 @@
     "requireRequestorId": "Un requestor ID est nécessaire",
     "requireApiKey": "Une clé d'API est nécessaire",
     "isSushiCompliant": "Le point d'accès est conforme SUSHI",
+    "harvestedReports": "Rapports moissonnés",
+    "ignoredReportsDesc": "Les rapports saisis ci-dessous seront considérés comme non-supportés, même s'ils sont présents dans la liste fournie par le point d'accès.",
+    "ignoredReports": "Rapports ignorés",
+    "additionalReportsDesc": "Les rapports saisis ci-dessous seront considérés comme supportés, même s'ils ne se trouvent pas dans la liste fournie par le point d'accès.",
+    "additionalReports": "Rapports additionnels",
     "ignoreReportValidation": "Ignorer la validation du rapport",
     "description": "Description",
     "paramSeparatorDesc": "ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.",
@@ -584,6 +589,7 @@
     "checkCredentials": "Vérifier les identifiants",
     "supportedReports": "Rapports supportés",
     "supportedReportsOnPlatform": "Rapports supportés par la plateforme éditeur",
+    "supportedReportsUnavailable": "La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.",
     "failedToFetchReports": "Impossible de récupérer la liste des rapports disponibles",
     "onlyShowMasterReports": "Afficher uniquement les rapports maîtres"
   },
@@ -870,5 +876,7 @@
   "invalidate": "Invalider",
   "reason": "Raison : {reason}",
   "groupBy": "Regrouper par",
-  "indeterminate": "indéterminée"
+  "indeterminate": "indéterminée",
+  "noMatchFor": "Aucune correspondance pour \"{search}\". Appuyez sur {key} pour l'ajouter.",
+  "enterKey": "entrée"
 }
