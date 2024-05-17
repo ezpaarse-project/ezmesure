@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -w server.js -w config/ -w lib/ server.js",
+    "dev": "nodemon server.js",
     "start": "node server.js",
     "lint": "eslint --ext .js .",
     "test": "jest --runInBand --verbose",
