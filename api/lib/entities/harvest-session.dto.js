@@ -24,7 +24,7 @@ const schema = {
   }),
   beginDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   endDate: Joi.string().regex(/^\d{4}-\d{2}$/),
-  reportTypes: Joi.array().items(Joi.string()),
+  reportTypes: Joi.array().items(Joi.string().lowercase().trim()),
   timeout: Joi.number(),
   allowFaulty: Joi.boolean(),
   downloadUnsupported: Joi.boolean(),

@@ -410,6 +410,10 @@ model SushiEndpoint {
   paramSeparator            String?
   /// List report IDs that are supported by the endpoint
   supportedReports          String[]
+  /// List of report IDs that should be ignored, even if the endpoint indicates that they are supported
+  ignoredReports            String[]
+  /// Additional report IDs to be added to the list of supported reports provided by the endpoint
+  additionalReports         String[]
   /// Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
   /// Report used when testing endpoint

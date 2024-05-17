@@ -63,7 +63,38 @@
                 :items="supportedReports"
                 placeholder="pr"
                 outlined
-              />
+              >
+                <template #prepend-item>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-subtitle>
+                        {{ $t('reports.supportedReportsOnPlatform') }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+
+                <template #no-data>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title v-if="supportedReportsSearch">
+                        <i18n path="noMatchFor">
+                          <template #search>
+                            <strong>{{ supportedReportsSearch }}</strong>
+                          </template>
+
+                          <template #key>
+                            <kbd>{{ $t('enterKey') }}</kbd>
+                          </template>
+                        </i18n>
+                      </v-list-item-title>
+                      <v-list-item-title v-else>
+                        {{ $t('reports.supportedReportsUnavailable') }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-combobox>
             </v-col>
 
             <v-col cols="4">
@@ -121,6 +152,73 @@
             </v-col>
           </v-row>
         </v-form>
+      </v-card-text>
+
+      <v-divider />
+
+      <v-card-title>
+        {{ $t('endpoints.harvestedReports') }}
+      </v-card-title>
+
+      <v-card-text>
+        <p>{{ $t('endpoints.ignoredReportsDesc') }}</p>
+
+        <v-combobox
+          v-model="endpointForm.ignoredReports"
+          :search-input.sync="supportedReportsSearch"
+          :items="supportedReports"
+          :label="$t('endpoints.ignoredReports')"
+          multiple
+          small-chips
+          deletable-chips
+          outlined
+        >
+          <template #prepend-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-subtitle>
+                  {{ $t('reports.supportedReportsOnPlatform') }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+
+          <template #no-data>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title v-if="supportedReportsSearch">
+                  <i18n path="noMatchFor">
+                    <template #search>
+                      <strong>{{ supportedReportsSearch }}</strong>
+                    </template>
+
+                    <template #key>
+                      <kbd>{{ $t('enterKey') }}</kbd>
+                    </template>
+                  </i18n>
+                </v-list-item-title>
+                <v-list-item-title v-else>
+                  {{ $t('reports.supportedReportsUnavailable') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-combobox>
+
+        <p>{{ $t('endpoints.additionalReportsDesc') }}</p>
+
+        <v-combobox
+          v-model="endpointForm.additionalReports"
+          :label="$t('endpoints.additionalReports')"
+          multiple
+          small-chips
+          deletable-chips
+          outlined
+        >
+          <template #append>
+            <div />
+          </template>
+        </v-combobox>
       </v-card-text>
 
       <v-divider />
@@ -227,6 +325,7 @@ export default {
       saving: false,
       valid: false,
       formTitle: '',
+      supportedReportsSearch: '',
 
       supportedReports: [],
 
@@ -234,6 +333,8 @@ export default {
         id: null,
         params: [],
         tags: [],
+        ignoredReports: [],
+        additionalReports: [],
         vendor: '',
         sushiUrl: '',
         description: '',
@@ -277,6 +378,12 @@ export default {
       this.endpointForm.id = data.id;
       this.endpointForm.params = Array.isArray(data.params) ? data.params : [];
       this.endpointForm.tags = Array.isArray(data.tags) ? data.tags : [];
+      this.endpointForm.ignoredReports = (
+        Array.isArray(data.ignoredReports) ? data.ignoredReports : []
+      );
+      this.endpointForm.additionalReports = (
+        Array.isArray(data.additionalReports) ? data.additionalReports : []
+      );
 
       this.endpointForm.vendor = data.vendor || '';
       this.endpointForm.sushiUrl = data.sushiUrl || '';
