@@ -436,6 +436,7 @@
       }
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
+    "unableToRetrivePlatforms": "Impossible de récupérer les informations d'établissement", 
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
