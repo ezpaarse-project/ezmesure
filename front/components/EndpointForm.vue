@@ -63,7 +63,38 @@
                 :items="supportedReports"
                 placeholder="pr"
                 outlined
-              />
+              >
+                <template #prepend-item>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-subtitle>
+                        {{ $t('reports.supportedReportsOnPlatform') }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+
+                <template #no-data>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title v-if="supportedReportsSearch">
+                        <i18n path="noMatchFor">
+                          <template #search>
+                            <strong>{{ supportedReportsSearch }}</strong>
+                          </template>
+
+                          <template #key>
+                            <kbd>{{ $t('enterKey') }}</kbd>
+                          </template>
+                        </i18n>
+                      </v-list-item-title>
+                      <v-list-item-title v-else>
+                        {{ $t('reports.supportedReportsUnavailable') }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-combobox>
             </v-col>
 
             <v-col cols="4">
@@ -183,7 +214,11 @@
           small-chips
           deletable-chips
           outlined
-        />
+        >
+          <template #append>
+            <div />
+          </template>
+        </v-combobox>
       </v-card-text>
 
       <v-divider />
