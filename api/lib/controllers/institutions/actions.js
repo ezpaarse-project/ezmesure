@@ -197,8 +197,8 @@ exports.updateInstitution = async (ctx) => {
   const institutionsService = new InstitutionsService();
   const membershipsService = new MembershipsService();
 
-  if (institutionData.logo) {
-    institutionData.logoId = await ImagesService.storeLogo(institutionData.logo);
+  if (body.logo) {
+    institutionData.logoId = await ImagesService.storeLogo(body.logo);
   }
 
   // FIXME: handle admin restricted fields

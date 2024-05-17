@@ -261,9 +261,12 @@ const defaultLogo = require('@/static/images/logo-etab.png');
 
 const toBase64 = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader();
-  reader.readAsBinaryString(file);
-  reader.onload = () => resolve(btoa(reader.result));
+  reader.onload = () => {
+    const b64 = reader.result.replace(/^data:.*?;base64,/i, '');
+    resolve(b64);
+  };
   reader.onerror = (error) => reject(error);
+  reader.readAsDataURL(file);
 });
 
 export default {
@@ -359,19 +362,22 @@ export default {
       this.draggingFile = false;
     },
     async updateLogo(file) {
-      const maxSize = 2 * 1024 * 1024; // 2mb
-
       if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
         this.logoErrorMessage = this.$t('institutions.institution.invalidImageFile');
         this.logoHasError = true;
-      } else if (file.size > maxSize) {
+        return;
+      }
+
+      const maxSize = 2 * 1024 * 1024; // 2mb
+      if (file.size > maxSize) {
         this.logoErrorMessage = this.$t('institutions.institution.imageTooLarge');
         this.logoHasError = true;
-      } else {
-        const base64logo = await toBase64(file);
-        this.institution.logo = base64logo;
-        this.logoPreview = URL.createObjectURL(file);
+        return;
       }
+
+      const base64logo = await toBase64(file);
+      this.institution.logo = base64logo;
+      this.logoPreview = URL.createObjectURL(file);
     },
     removeLogo() {
       this.logoPreview = null;
@@ -411,7 +417,7 @@ export default {
 
       try {
         if (this.institution.id) {
-          await this.$axios.$put(`/institutions/${this.institution.id}`, this.institution);
+          await this.$axios.$put(`/institutions/${this.institution.id}`, { ...this.institution });
         } else {
           const params = { addAsMember: this.addAsMember };
           await this.$axios.$post('/institutions', this.institution, { params });
