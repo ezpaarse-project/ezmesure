@@ -192,7 +192,7 @@ const prepareStandardQueryParams = ({
   const paginationValidation = {
     size: Joi.number().min(0).default(10),
     page: Joi.number().min(1),
-    sort: Joi.string().valid(...Object.keys(schema)),
+    sort: Joi.string(),
     order: Joi.string().valid('asc', 'desc'),
     distinct: stringOrArrayValidation,
   };
