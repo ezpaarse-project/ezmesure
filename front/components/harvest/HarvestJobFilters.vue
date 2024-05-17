@@ -31,13 +31,11 @@
     <v-container>
       <v-row v-if="!disabledFiltersSet.has('harvestId')">
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.harvestId"
             :items="harvestIdsItems"
             :label="$t('harvest.jobs.harvestId')"
-            prepend-icon="mdi-key"
-            clearable
-            hide-details
+            icon="mdi-key"
             @change="updateFilter('harvestId', $event)"
           />
         </v-col>
@@ -45,13 +43,11 @@
 
       <v-row v-if="!disabledFiltersSet.has('vendor')">
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.vendor"
             :items="vendorsItems"
             :label="$t('endpoints.vendor')"
-            prepend-icon="mdi-web"
-            clearable
-            hide-details
+            icon="mdi-web"
             @change="updateFilter('vendor', $event)"
           />
         </v-col>
@@ -59,13 +55,11 @@
 
       <v-row v-if="!disabledFiltersSet.has('institution')">
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.institution"
             :items="institutionsItems"
             :label="$t('institutions.title')"
-            prepend-icon="mdi-domain"
-            clearable
-            hide-details
+            icon="mdi-domain"
             @change="updateFilter('institution', $event)"
           />
         </v-col>
@@ -99,13 +93,11 @@
 
       <v-row v-if="!disabledFiltersSet.has('packages')">
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.packages"
             :items="packageItems"
             :label="$t('institutions.sushi.packages')"
-            prepend-icon="mdi-tag"
-            clearable
-            hide-details
+            icon="mdi-tag"
             @change="updateFilter('packages', $event)"
           />
         </v-col>
@@ -113,13 +105,11 @@
 
       <v-row v-if="!disabledFiltersSet.has('tags')">
         <v-col>
-          <v-select
+          <SelectFilter
             :value="value.tags"
             :items="tagsItems"
             :label="$t('endpoints.tags')"
-            prepend-icon="mdi-tag"
-            clearable
-            hide-details
+            icon="mdi-tag"
             @change="updateFilter('tags', $event)"
           />
         </v-col>
@@ -130,8 +120,12 @@
 
 <script>
 import { defineComponent } from 'vue';
+import SelectFilter from '../filters-form/SelectFilter.vue';
 
 export default defineComponent({
+  components: {
+    SelectFilter,
+  },
   props: {
     value: {
       type: Object,
@@ -182,22 +176,30 @@ export default defineComponent({
       return this.harvestIds.map((value) => ({ value, text: value }));
     },
     vendorsItems() {
-      return this.vendors.map(({ id, vendor }) => ({ value: id, text: vendor }));
+      return this.vendors
+        .map(({ id, vendor }) => ({ value: id, text: vendor }))
+        .sort((a, b) => a.text.localeCompare(b.text));
     },
     institutionsItems() {
-      return this.institutions.map(({ id, name, acronym }) => ({
-        value: id,
-        text: `${name}${acronym ? ` (${acronym})` : ''}`,
-      }));
+      return this.institutions.map(
+        ({ id, name, acronym }) => ({
+          value: id,
+          text: `${name}${acronym ? ` (${acronym})` : ''}`,
+        }),
+      ).sort((a, b) => a.text.localeCompare(b.text));
     },
     reportTypesItems() {
       return this.reportTypes.map((value) => ({ value, text: value.toUpperCase() }));
     },
     tagsItems() {
-      return this.tags.map((value) => ({ value, text: value }));
+      return this.tags
+        .map((value) => ({ value, text: value }))
+        .sort((a, b) => a.text.localeCompare(b.text));
     },
     packageItems() {
-      return this.packages.map((value) => ({ value, text: value }));
+      return this.packages
+        .map((value) => ({ value, text: value }))
+        .sort((a, b) => a.text.localeCompare(b.text));
     },
     statusesItems() {
       return this.statuses.map((value) => ({

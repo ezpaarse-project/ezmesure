@@ -255,6 +255,10 @@ export default {
           value: 'username',
         },
         {
+          text: this.$t('users.user.email'),
+          value: 'user.email',
+        },
+        {
           text: this.$t('institutions.members.accessRights'),
           value: 'repositoryPermissions',
         },
@@ -262,19 +266,17 @@ export default {
           text: this.$t('institutions.members.roles'),
           value: 'roles',
         },
-      ];
-
-      if (!this.isReadonly) {
-        headers.push({
+        {
           text: this.$t('actions'),
           value: 'actions',
           sortable: false,
           width: '85px',
           align: 'center',
-        });
-      }
+          visible: !this.isReadonly,
+        },
+      ];
 
-      return headers;
+      return headers.filter((h) => h.visible !== false);
     },
   },
   mounted() {

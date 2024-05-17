@@ -73,8 +73,8 @@ const prepareJoiAndFilters = (schema) => {
       }
 
       case 'number': {
-        const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, isNullable, 'gte');
-        const { validation: toV, filter: toF } = numberJoiAndFilter(key, isNullable, 'lte');
+        const { validation: fromV, filter: fromF } = numberJoiAndFilter(key, 'gte', isNullable);
+        const { validation: toV, filter: toF } = numberJoiAndFilter(key, 'lte', isNullable);
 
         validations[`${key}:from`] = fromV;
         validations[`${key}:to`] = toV;
@@ -85,8 +85,8 @@ const prepareJoiAndFilters = (schema) => {
       }
 
       case 'date': {
-        const { validation: fromV, filter: fromF } = dateJoiAndFilter(key, isNullable, 'gte');
-        const { validation: toV, filter: toF } = dateJoiAndFilter(key, isNullable, 'lte');
+        const { validation: fromV, filter: fromF } = dateJoiAndFilter(key, 'gte', isNullable);
+        const { validation: toV, filter: toF } = dateJoiAndFilter(key, 'lte', isNullable);
 
         validations[`${key}:from`] = fromV;
         validations[`${key}:to`] = toV;
@@ -184,21 +184,21 @@ const prepareStandardQueryParams = ({
     include: Joi.array().single().items(allowedIncludes),
   }).rename('include[]', 'include');
 
+  const {
+    validations: fieldsValidations,
+    filters: fieldsFilters,
+  } = prepareJoiAndFilters(schema);
+
   const paginationValidation = {
     size: Joi.number().min(0).default(10),
     page: Joi.number().min(1),
-    sort: Joi.string(),
+    sort: Joi.string().valid(...Object.keys(schema)),
     order: Joi.string().valid('asc', 'desc'),
     distinct: stringOrArrayValidation,
   };
   if (queryFields?.length > 0) {
     paginationValidation.q = Joi.string().trim();
   }
-
-  const {
-    validations: fieldsValidations,
-    filters: fieldsFilters,
-  } = prepareJoiAndFilters(schema);
 
   return {
     manyValidation: baseValidation.append(paginationValidation).concat(fieldsValidations),

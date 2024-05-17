@@ -56,6 +56,8 @@ function list2object(list, opts = {}) {
  * @param {import('..').ProcessorStepParam} params
  */
 module.exports = async function process(params) {
+  const now = new Date();
+
   const {
     task: {
       data: task,
@@ -166,6 +168,8 @@ module.exports = async function process(params) {
       X_Endpoint_ID: credentials.endpoint.id,
       X_Package: credentials.packages,
       X_Tags: credentials.tags,
+      X_Harvested_At: now,
+      X_Endpoint_Name: credentials.endpoint.vendor,
       X_Endpoint_Tags: credentials.endpoint.tags,
       X_Harvest_ID: sessionId,
 

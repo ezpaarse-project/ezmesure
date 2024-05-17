@@ -7,6 +7,7 @@
     :return-object="returnObject"
     :multiple="multiple"
     hide-details
+    clearable
     @change="updateValue($event)"
   >
     <template v-if="$scopedSlots.selection" #selection="selection">
