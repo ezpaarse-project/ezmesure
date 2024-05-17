@@ -6,6 +6,7 @@ const repositoriesPrisma = require('../services/prisma/repositories');
 /** @typedef {import('@prisma/client').Repository} Repository */
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.RepositoryCountArgs} RepositoryCountArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs */
 /** @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs */
@@ -88,6 +89,14 @@ module.exports = class RepositoriesService extends BasePrismaService {
     const repository = await repositoriesPrisma.upsert(params, this.prisma);
     this.triggerHooks('repository:upsert', repository);
     return repository;
+  }
+
+  /**
+   * @param {RepositoryCountArgs} params
+   * @returns {Promise<number>}
+   */
+  async count(params) {
+    return repositoriesPrisma.count(params, this.prisma);
   }
 
   /**

@@ -8,6 +8,8 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getMany,
   getOne,
   createOne,
@@ -18,7 +20,6 @@ const {
 const {
   adminCreateSchema,
   adminUpdateSchema,
-  includableFields,
 } = require('../../entities/repositories.dto');
 
 router.use(requireJwt, requireUser, requireAdmin);
@@ -28,23 +29,22 @@ router.get('/', {
   path: '/',
   handler: getMany,
   validate: {
-    query: Joi.object({
-      size: Joi.number().integer().min(-1),
-      q: Joi.string(),
-      type: Joi.string(),
-      institutionId: Joi.string(),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.manyValidation.append({
+      institutionId: Joi.string().trim(),
+    }),
   },
 });
 
 router.route({
   method: 'GET',
   path: '/:pattern',
-  handler: [
-    fetchRepository(),
-    getOne,
-  ],
+  handler: getOne,
+  validate: {
+    query: standardQueryParams.oneValidation,
+    params: {
+      pattern: Joi.string().trim().required(),
+    },
+  },
 });
 
 router.route({

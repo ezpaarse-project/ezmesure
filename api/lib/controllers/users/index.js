@@ -4,11 +4,12 @@ const { Joi } = require('koa-joi-router');
 const {
   adminUpdateSchema,
   adminCreateSchema,
-  includableFields,
 } = require('../../entities/users.dto');
 
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
+  standardQueryParams,
+
   list,
   getUser,
   createOrReplaceUser,
@@ -25,12 +26,9 @@ router.route({
   path: '/',
   handler: list,
   validate: {
-    query: {
-      q: Joi.string().trim(),
-      size: Joi.number().integer().min(-1),
+    query: standardQueryParams.manyValidation.append({
       source: Joi.string().trim(),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    },
+    }),
   },
 });
 
@@ -42,6 +40,7 @@ router.route({
     params: {
       username: Joi.string().trim().required(),
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 
@@ -96,7 +95,6 @@ router.route({
     body: Joi.array(),
   },
 });
-
 
 router.route({
   method: 'POST',

@@ -1,103 +1,70 @@
-const { includableFields } = require('../../entities/harvest-job.dto');
 const HarvestJobService = require('../../entities/harvest-job.service');
 const { harvestQueue } = require('../../services/jobs');
 
-const { propsToPrismaSort, propsToPrismaInclude, queryToPrismaFilter } = require('../utils');
-
 /** @typedef {import('@prisma/client').Prisma.HarvestJobWhereInput} HarvestJobWhereInput */
 
+const { schema, includableFields } = require('../../entities/harvest-job.dto');
+const { stringOrArray } = require('../../services/utils');
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { queryToPrismaFilter } = require('../../services/std-query/prisma-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: [],
+});
+exports.standardQueryParams = standardQueryParams;
+
 exports.getAll = async (ctx) => {
-  ctx.type = 'json';
-  ctx.status = 200;
-  const { query = {} } = ctx.request;
   const {
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-    id: taskIds,
-    status,
-    type: reportType,
-    sessionId,
-    credentialsId,
     endpointId,
     institutionId,
     tags,
     packages,
-    distinct: distinctFields,
-    include: propsToInclude,
-  } = query;
+  } = ctx.query;
 
-  /** @type {HarvestJobWhereInput} */
-  const where = {
-    id: queryToPrismaFilter(taskIds),
-    status: queryToPrismaFilter(status),
-    reportType: queryToPrismaFilter(reportType),
-    sessionId: queryToPrismaFilter(sessionId),
-    credentialsId: queryToPrismaFilter(credentialsId),
-  };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
   if (institutionId || endpointId || tags || packages) {
-    where.credentials = {
+    prismaQuery.where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
       institutionId: queryToPrismaFilter(institutionId),
-      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
-      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
+      tags: tags && { hasSome: stringOrArray(tags) },
+      packages: packages && { hasSome: stringOrArray(packages) },
     };
-  }
-
-  let distinct;
-  if (distinctFields) {
-    distinct = Array.isArray(distinctFields) ? distinctFields : distinctFields.split(',').map((s) => s.trim());
   }
 
   const harvestJobService = new HarvestJobService();
 
-  ctx.set('X-Total-Count', await harvestJobService.count({ where }));
-  ctx.body = await harvestJobService.findMany({
-    include: propsToPrismaInclude(propsToInclude, includableFields),
-    where,
-    distinct,
-    orderBy: propsToPrismaSort(sort, order),
-    take: Number.isInteger(size) && size > 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-  });
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await harvestJobService.count({ where: prismaQuery.where }));
+  ctx.body = await harvestJobService.findMany(prismaQuery);
 };
 
 exports.getAllMeta = async (ctx) => {
-  ctx.type = 'json';
   const {
-    status,
-    type: reportType,
-    sessionId,
-    credentialsId,
     endpointId,
     institutionId,
     tags,
     packages,
-  } = ctx.request.query;
+  } = ctx.query;
 
-  const harvestJobService = new HarvestJobService();
-
-  /** @type {HarvestJobWhereInput} */
-  const where = {
-    status: queryToPrismaFilter(status),
-    reportType: queryToPrismaFilter(reportType),
-    sessionId: queryToPrismaFilter(sessionId),
-    credentialsId: queryToPrismaFilter(credentialsId),
-  };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
   if (institutionId || endpointId || tags || packages) {
-    where.credentials = {
+    prismaQuery.where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
       institutionId: queryToPrismaFilter(institutionId),
-      tags: tags && { hasSome: queryToPrismaFilter(tags).in },
-      packages: packages && { hasSome: queryToPrismaFilter(packages).in },
+      tags: tags && { hasSome: stringOrArray(tags) },
+      packages: packages && { hasSome: stringOrArray(packages) },
     };
   }
 
+  const harvestJobService = new HarvestJobService();
+
   const jobs = await harvestJobService.findMany({
-    where,
+    ...prismaQuery,
     include: {
       credentials: {
         include: {
@@ -135,6 +102,7 @@ exports.getAllMeta = async (ctx) => {
     }
   }
 
+  ctx.type = 'json';
   ctx.status = 200;
   ctx.body = {
     sessionIds: Array.from(data.sessionIds),
@@ -150,17 +118,10 @@ exports.getAllMeta = async (ctx) => {
 exports.getOne = async (ctx) => {
   const { taskId } = ctx.params;
 
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: taskId });
+
   const harvestJobService = new HarvestJobService();
-  const task = await harvestJobService.findUnique({
-    where: { id: taskId },
-    include: {
-      credentials: {
-        include: {
-          endpoint: true,
-        },
-      },
-    },
-  });
+  const task = await harvestJobService.findUnique(prismaQuery);
 
   if (!task) {
     ctx.throw(404, ctx.$t('errors.task.notFound'));

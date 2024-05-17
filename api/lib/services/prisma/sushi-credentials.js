@@ -6,6 +6,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs */
@@ -67,6 +68,15 @@ function upsert(params, tx = prisma) {
 }
 
 /**
+ * @param {SushiCredentialsCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.sushiCredentials.count(params);
+}
+
+/**
  * @param {SushiCredentialsDeleteArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<SushiCredentials | null>}
@@ -116,6 +126,7 @@ module.exports = {
   findByID,
   update,
   upsert,
+  count,
   remove,
   removeAll,
 };

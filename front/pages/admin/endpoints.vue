@@ -640,7 +640,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials.institution'] } });
+        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials.institution'], size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
       }

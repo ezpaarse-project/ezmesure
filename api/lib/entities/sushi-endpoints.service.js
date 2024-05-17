@@ -6,6 +6,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointUpdateArgs} SushiEndpointUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointUpsertArgs} SushiEndpointUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.SushiEndpointCountArgs} SushiEndpointCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointFindUniqueArgs} SushiEndpointFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointFindManyArgs} SushiEndpointFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiEndpointCreateArgs} SushiEndpointCreateArgs */
@@ -62,6 +63,14 @@ module.exports = class SushiEndpointsService extends BasePrismaService {
    */
   upsert(params) {
     return sushiEndpointsPrisma.upsert(params, this.prisma);
+  }
+
+  /**
+   * @param {SushiEndpointCountArgs} params
+   * @returns {Promise<number>}
+   */
+  count(params) {
+    return sushiEndpointsPrisma.count(params, this.prisma);
   }
 
   /**

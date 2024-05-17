@@ -4,13 +4,7 @@ const { Joi } = require('koa-joi-router');
 const {
   adminUpdateSchema,
   adminCreateSchema,
-  includableFields,
 } = require('../../entities/sushi-endpoints.dto');
-
-const stringOrArray = Joi.alternatives().try(
-  Joi.string().trim().min(1),
-  Joi.array().items(Joi.string().trim().min(1)).min(1),
-);
 
 const {
   requireJwt,
@@ -21,6 +15,7 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
   getAll,
   getOne,
   deleteOne,
@@ -42,15 +37,7 @@ router.route({
     getAll,
   ],
   validate: {
-    query: Joi.object({
-      requireCustomerId: Joi.boolean(),
-      requireRequestorId: Joi.boolean(),
-      requireApiKey: Joi.boolean(),
-      isSushiCompliant: Joi.boolean(),
-      tags: stringOrArray,
-      q: Joi.string(),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.manyValidation,
   },
 });
 
@@ -58,13 +45,13 @@ router.route({
   method: 'GET',
   path: '/:endpointId',
   handler: [
-    fetchSushiEndpoint(),
     getOne,
   ],
   validate: {
     params: {
       endpointId: Joi.string().trim().required(),
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 

@@ -1,44 +1,34 @@
 const HarvestsService = require('../../entities/harvest.service');
-const { includableFields } = require('../../entities/harvest.dto');
+const { schema, includableFields } = require('../../entities/harvest.dto');
 
-const { propsToPrismaSort, propsToPrismaInclude, queryToPrismaFilter } = require('../utils');
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { queryToPrismaFilter } = require('../../services/std-query/prisma-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: [],
+});
+exports.standardQueryParams = standardQueryParams;
 
 /**
-  * @typedef {import('@prisma/client').Prisma.HarvestWhereInput} HarvestWhereInput
+  * @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs
  */
 
 exports.getHarvests = async (ctx) => {
   const {
-    from,
-    to,
-    harvestedBefore,
-    harvestedAfter,
-    reportId,
-    credentialsId,
+    'period:from': from,
+    'period:to': to,
     endpointId,
     institutionId,
-    status,
-    errorCode,
     tags,
     packages,
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-    distinct: distinctFields,
-    include: propsToInclude,
   } = ctx.request.query;
 
-  /** @type {HarvestWhereInput} */
-  const where = {
-    reportId: queryToPrismaFilter(reportId),
-    credentialsId: queryToPrismaFilter(credentialsId),
-    status: queryToPrismaFilter(status),
-    errorCode: queryToPrismaFilter(errorCode),
-  };
-
+  /** @type {HarvestFindManyArgs} */
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   if (institutionId || endpointId || tags || packages) {
-    where.credentials = {
+    prismaQuery.where.credentials = {
       endpointId: queryToPrismaFilter(endpointId),
       institutionId: queryToPrismaFilter(institutionId),
       tags: tags && { hasSome: queryToPrismaFilter(tags).in },
@@ -47,29 +37,13 @@ exports.getHarvests = async (ctx) => {
   }
 
   if (from || to) {
-    where.period = { gte: from, lte: to };
-  }
-  if (harvestedBefore || harvestedAfter) {
-    where.harvestedAt = { gte: harvestedAfter, lte: harvestedBefore };
-  }
-
-  let distinct;
-  if (distinctFields) {
-    distinct = Array.isArray(distinctFields) ? distinctFields : distinctFields.split(',').map((s) => s.trim());
+    prismaQuery.where.period = { gte: from, lte: to };
   }
 
   const harvestsService = new HarvestsService();
 
-  ctx.set('X-Total-Count', await harvestsService.count({ where }));
-
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await harvestsService.findMany({
-    include: propsToPrismaInclude(propsToInclude, includableFields),
-    where,
-    distinct,
-    orderBy: propsToPrismaSort(sort, order),
-    take: Number.isInteger(size) && size > 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-  });
+  ctx.set('X-Total-Count', await harvestsService.count({ where: prismaQuery.where }));
+  ctx.body = await harvestsService.findMany(prismaQuery);
 };

@@ -7,6 +7,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Repository} Repository
  * @typedef {import('@prisma/client').Prisma.RepositoryUpdateArgs} RepositoryUpdateArgs
  * @typedef {import('@prisma/client').Prisma.RepositoryUpsertArgs} RepositoryUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.RepositoryCountArgs} RepositoryCountArgs
  * @typedef {import('@prisma/client').Prisma.RepositoryFindUniqueArgs} RepositoryFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.RepositoryFindFirstArgs} RepositoryFindFirstArgs
  * @typedef {import('@prisma/client').Prisma.RepositoryFindManyArgs} RepositoryFindManyArgs
@@ -83,6 +84,15 @@ function update(params, tx = prisma) {
  */
 function upsert(params, tx = prisma) {
   return tx.repository.upsert(params);
+}
+
+/**
+ * @param {RepositoryCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.repository.count(params);
 }
 
 /**
@@ -215,6 +225,7 @@ module.exports = {
   findByPattern,
   update,
   upsert,
+  count,
   connectInstitution,
   disconnectInstitution,
   remove,

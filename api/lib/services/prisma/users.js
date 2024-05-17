@@ -16,6 +16,7 @@ const {
  * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.UserCountArgs} UserCountArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
@@ -134,6 +135,15 @@ function upsert(params, tx = prisma) {
 }
 
 /**
+ * @param {UserCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.user.count(params);
+}
+
+/**
  * @param {UserDeleteArgs} params
  * @param {TransactionClient} [tx]
  *
@@ -210,6 +220,7 @@ module.exports = {
   update,
   acceptTerms,
   upsert,
+  count,
   remove,
   removeByUsername,
   removeAll,

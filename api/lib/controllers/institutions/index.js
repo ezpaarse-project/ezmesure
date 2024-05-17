@@ -2,9 +2,6 @@ const router = require('koa-joi-router')();
 const { Joi } = require('koa-joi-router');
 
 const {
-  includableFields,
-} = require('../../entities/institutions.dto');
-const {
   includableFields: membershipIncludableFields,
   FEATURES,
 } = require('../../entities/memberships.dto');
@@ -26,6 +23,8 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getInstitutions,
   createInstitution,
   deleteInstitution,
@@ -68,15 +67,7 @@ router.route({
   path: '/',
   handler: getInstitutions,
   validate: {
-    query: Joi.object({
-      q: Joi.string().min(0),
-      validated: Joi.boolean(),
-      size: Joi.number().min(-1),
-      page: Joi.number().min(1),
-      sort: Joi.string(),
-      order: Joi.string().valid('asc', 'desc'),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.manyValidation,
   },
 });
 
@@ -108,9 +99,7 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
     },
-    query: Joi.object({
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    }).rename('include[]', 'include'),
+    query: standardQueryParams.oneValidation,
   },
 
 });
