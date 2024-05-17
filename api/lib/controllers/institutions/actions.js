@@ -40,7 +40,7 @@ const {
 } = require('../../entities/repositories.dto');
 const {
   includableFields: spaceIncludableFields,
-} = require('../../entities/repositories.dto');
+} = require('../../entities/spaces.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
