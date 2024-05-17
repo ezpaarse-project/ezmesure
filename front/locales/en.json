@@ -214,7 +214,7 @@
     "ignoredReportsDesc": "The reports listed below will be considered as unsupported, even if they are present in the list provided by the endpoint.",
     "ignoredReports": "Ignored reports",
     "additionalReportsDesc": "The reports listed below will be considered as supported, even if they are not present in the list provided by the endpoint.",
-    "additionalReports": "Rapports additionnels",
+    "additionalReports": "Additional reports",
     "ignoreReportValidation": "Ignore report validation",
     "description": "Description",
     "paramSeparatorDesc": "ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.",
