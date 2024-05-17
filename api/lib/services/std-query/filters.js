@@ -4,11 +4,25 @@ const { Joi } = require('koa-joi-router');
 
 const { stringToArray } = require('../utils');
 
+/**
+ * @typedef {((value: any) => object) | undefined} PreparePrismaFilter
+ * @typedef {{ validation: any | undefined, filter: PreparePrismaFilter }} ValidationAndFilter
+ */
+
+// Joi validation for supporting both an array and a string
 const stringOrArrayValidation = Joi.alternatives().try(
   Joi.string().trim().min(0),
   Joi.array().items(Joi.string().trim().min(1)).min(1),
 );
 
+/**
+ * Prepare Joi validation and filter for a string
+ *
+ * @param {string} key The name of the field
+ * @param {RegExp} [regex] The regex for the validation
+ *
+ * @returns {ValidationAndFilter} The validation and filter
+ */
 const stringJoiAndFilter = (key, regex = undefined) => {
   let strValidation = Joi.string().trim();
   if (regex) {
@@ -30,6 +44,14 @@ const stringJoiAndFilter = (key, regex = undefined) => {
   };
 };
 
+/**
+ * Prepare Joi validation and filter for a boolean
+ *
+ * @param {string} key The name of the field
+ * @param {boolean} [isNullable] Is field nullable
+ *
+ * @returns {ValidationAndFilter} The validation and filter
+ */
 const booleanJoiAndFilter = (key, isNullable) => {
   let validation = Joi.boolean();
   if (isNullable) {
@@ -47,10 +69,22 @@ const booleanJoiAndFilter = (key, isNullable) => {
   };
 };
 
+/**
+ * Prepare Joi validation and filter for a array
+ *
+ * Arrays of objects and arrays of arrays are not supported
+ *
+ * @param {string} key The name of the field
+ * @param {string[]} [subtypes] Subtypes of the array
+ *
+ * @returns {ValidationAndFilter} The validation and filter
+ */
 const arrayJoiAndFilter = (key, subtypes) => {
-  // Preventing arrays of objects and arrays of arrays
-  if (subtypes.includes('object') || subtypes.includes('array')) {
-    return {};
+  if (subtypes?.includes('object') || subtypes?.includes('array')) {
+    return {
+      validation: undefined,
+      filter: undefined,
+    };
   }
 
   return {
@@ -65,7 +99,16 @@ const arrayJoiAndFilter = (key, subtypes) => {
   };
 };
 
-const dateJoiAndFilter = (key, isNullable, operator) => {
+/**
+ * Prepare Joi validation and filter for a date
+ *
+ * @param {string} key The name of the field
+ * @param {'gte' | 'gt' | 'eq' | 'lte' | 'lt'} operator The operator
+ * @param {boolean} [isNullable] Is field nullable
+ *
+ * @returns {ValidationAndFilter} The validation and filter
+ */
+const dateJoiAndFilter = (key, operator, isNullable) => {
   let validation = Joi.string().isoDate();
   if (isNullable) {
     validation = validation.allow('');
@@ -82,7 +125,16 @@ const dateJoiAndFilter = (key, isNullable, operator) => {
   };
 };
 
-const numberJoiAndFilter = (key, isNullable, operator) => {
+/**
+ * Prepare Joi validation and filter for a number
+ *
+ * @param {string} key The name of the field
+ * @param {'gte' | 'gt' | 'eq' | 'lte' | 'lt'} operator The operator
+ * @param {boolean} [isNullable] Is field nullable
+ *
+ * @returns {ValidationAndFilter} The validation and filter
+ */
+const numberJoiAndFilter = (key, operator, isNullable) => {
   let validation = Joi.number();
   if (isNullable) {
     validation = validation.allow('');
