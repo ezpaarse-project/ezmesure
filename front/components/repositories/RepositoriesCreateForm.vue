@@ -181,13 +181,13 @@ export default {
         { type: this.repositoryType },
       );
 
-      if (this.permissions.length <= 0) {
-        return repository;
-      }
-
       await this.$axios.$put(
         `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}/permissions`,
-        this.permissions,
+        this.permissions.map((permission) => ({
+          username: permission.username,
+          readonly: permission.readonly,
+          locked: permission.locked,
+        })),
       );
 
       return repository;

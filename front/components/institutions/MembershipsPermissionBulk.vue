@@ -192,20 +192,20 @@ export default defineComponent({
         return;
       }
 
+      const permissionsWithoutCurrent = this.value.filter((p) => p.username !== username);
+
       if (value === 'none') {
         // Remove only if exists, cause v-on:change can be called when component is redrawn
         if (this.valueMap[username]) {
-          this.$emit('input', this.value.filter((p) => p.username !== username));
+          this.$emit('input', permissionsWithoutCurrent);
         }
         return;
       }
 
       // Update only if changed, cause v-on:change can be called when component is redrawn
       if (this.valueMap[username] !== value) {
-        this.$emit(
-          'input',
-          [...this.value, { username, readonly: value === 'read' }],
-        );
+        permissionsWithoutCurrent.push({ username, readonly: value === 'read' });
+        this.$emit('input', permissionsWithoutCurrent);
       }
     },
   },
