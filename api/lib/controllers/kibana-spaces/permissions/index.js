@@ -21,6 +21,42 @@ const {
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
+
+router.route({
+  method: 'GET',
+  path: '/',
+  handler: [
+    fetchSpace(),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.space?.institutionId }),
+    requireMemberPermissions(FEATURES.memberships.read),
+    getSpacePermissions,
+  ],
+  validate: {
+    params: {
+      spaceId: Joi.string().trim().required(),
+    },
+    query: standardQueryParams.manyValidation,
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/',
+  handler: [
+    fetchSpace(),
+    fetchInstitution({ getId: (ctx) => ctx?.state?.space?.institutionId }),
+    requireMemberPermissions(FEATURES.memberships.write),
+    upsertSpaceAllPermission,
+  ],
+  validate: {
+    type: 'json',
+    params: {
+      spaceId: Joi.string().trim().required(),
+    },
+    body: Joi.array().items(Joi.object()),
+  },
+});
+
 router.route({
   method: 'PUT',
   path: '/:username',

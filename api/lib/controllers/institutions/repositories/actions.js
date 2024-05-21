@@ -50,33 +50,54 @@ exports.upsertRepositoryAllPermission = async (ctx) => {
     return permission;
   });
 
-  const repositoriesService = new RepositoriesService();
+  const newRepository = RepositoriesService.$transaction(async (repositoriesService) => {
+    await repositoriesService.update({
+      where: {
+        pattern: repository.pattern,
+        institutions: { some: { id: institution.id } },
+      },
+      data: {
+        permissions: {
+          deleteMany: {
+            repositoryPattern: repository.pattern,
+            institutionId: institution.id,
+          },
+        },
+      },
+    });
+
+    return repositoriesService.update({
+      where: {
+        pattern: repository.pattern,
+        institutions: { some: { id: institution.id } },
+      },
+      data: {
+        permissions: {
+          upsert: permissions.map((permission) => ({
+            where: {
+              username_institutionId_repositoryPattern: {
+                username: permission.username,
+                institutionId: institution.id,
+                repositoryPattern: repository.pattern,
+              },
+            },
+            create: {
+              ...permission,
+              institutionId: institution.id,
+            },
+            update: {
+              ...permission,
+              institutionId: institution.id,
+            },
+          })),
+        },
+      },
+    });
+  });
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await repositoriesService.update({
-    where: {
-      pattern: repository.pattern,
-      institutions: { some: { id: institution.id } },
-    },
-    data: {
-      permissions: {
-        connectOrCreate: permissions.map((permission) => ({
-          where: {
-            username_institutionId_repositoryPattern: {
-              username: permission.username,
-              institutionId: institution.id,
-              repositoryPattern: repository.pattern,
-            },
-          },
-          create: {
-            ...permission,
-            institutionId: institution.id,
-          },
-        })),
-      },
-    },
-  });
+  ctx.body = newRepository;
 };
 
 exports.upsertRepositoryPermission = async (ctx) => {
