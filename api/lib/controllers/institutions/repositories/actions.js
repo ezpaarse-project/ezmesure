@@ -1,14 +1,42 @@
-const RepositoriesService = require('../../entities/repositories.service');
-const RepoPermissionsService = require('../../entities/repository-permissions.service');
+const { prepareStandardQueryParams } = require('../../../services/std-query');
+
+const RepositoriesService = require('../../../entities/repositories.service');
+const RepoPermissionsService = require('../../../entities/repository-permissions.service');
+
 const {
+  schema,
+  includableFields,
+} = require('../../../entities/repositories.dto');
+
+const {
+  createSchema: permissionCreateSchema,
   upsertSchema: permissionUpsertSchema,
-} = require('../../entities/repository-permissions.dto');
+} = require('../../../entities/repository-permissions.dto');
 
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
 */
 /* eslint-enable max-len */
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['pattern'],
+});
+exports.standardQueryParams = standardQueryParams;
+
+exports.getInstitutionRepositories = async (ctx) => {
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where.institutions = { some: { id: ctx.state.institution.id } };
+
+  const repositoriesService = new RepositoriesService();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await repositoriesService.count({ where: prismaQuery.where }));
+  ctx.body = await repositoriesService.findMany(prismaQuery);
+};
 
 exports.upsertRepositoryPermission = async (ctx) => {
   const { repository, institution } = ctx.state;

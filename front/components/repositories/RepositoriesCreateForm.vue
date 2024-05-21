@@ -136,7 +136,15 @@ export default {
     queryRepositories: debounce(async function queryRepositories() {
       this.loadingRepositories = true;
       try {
-        this.availableRepositories = await this.$axios.$get('/repositories', { params: { q: this.repositoryPattern } });
+        this.availableRepositories = await this.$axios.$get(
+          '/repositories',
+          {
+            params: {
+              q: this.repositoryPattern,
+              size: 0,
+            },
+          },
+        );
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('searchFailed'));
       }
