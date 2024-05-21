@@ -11,6 +11,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs
  * @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs
  * @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.SpaceCountArgs} SpaceCountArgs
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
@@ -72,6 +73,15 @@ function update(params, tx = prisma) {
  */
 function upsert(params, tx = prisma) {
   return tx.space.upsert(params);
+}
+
+/**
+ * @param {SpaceCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.space.count(params);
 }
 
 /**
@@ -139,6 +149,7 @@ module.exports = {
   findByID,
   update,
   upsert,
+  count,
   remove,
   removeAll,
 };

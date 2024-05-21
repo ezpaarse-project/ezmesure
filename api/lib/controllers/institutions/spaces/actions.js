@@ -20,7 +20,7 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 exports.getInstitutionSpaces = async (ctx) => {
-  const prismaQuery = standardQueryParams(ctx);
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where.institutionId = ctx.state.institution.id;
 
   const spacesService = new SpacesService();
