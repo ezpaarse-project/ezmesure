@@ -6,6 +6,7 @@ const { client: prisma, Prisma } = require('./index');
 /** @typedef {import('@prisma/client').SpacePermission} SpacePermission */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpdateArgs} SpacePermissionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpsertArgs} SpacePermissionUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.SpacePermissionCountArgs} SpacePermissionCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionFindUniqueArgs} SpacePermissionFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionFindManyArgs} SpacePermissionFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionCreateArgs} SpacePermissionCreateArgs */
@@ -58,6 +59,15 @@ function upsert(params, tx = prisma) {
 }
 
 /**
+ * @param {SpacePermissionCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.spacePermission.count(params);
+}
+
+/**
  * @param {SpacePermissionDeleteArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<SpacePermission | null>}
@@ -83,5 +93,6 @@ module.exports = {
   findUnique,
   update,
   upsert,
+  count,
   remove,
 };

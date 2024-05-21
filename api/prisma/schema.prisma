@@ -147,7 +147,7 @@ model SpacePermission {
   /// ID of the space
   spaceId       String
   /// The space
-  space         Space      @relation(fields: [spaceId], references: [id])
+  space         Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   /// Whether the member has a readonly access to the space
   readonly      Boolean    @default(false)
   /// Whether the permission can be modified or not
