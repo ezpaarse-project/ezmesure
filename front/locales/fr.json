@@ -717,7 +717,9 @@
     "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts.",
     "filters": {
       "title": "Filtrer les entrepôts"
-    }
+    },
+    "givePermissions": "Attribuer les permissions",
+    "nPermissions": "{count} accès"
   },
   "spaces": {
     "spaces": "Espaces",
