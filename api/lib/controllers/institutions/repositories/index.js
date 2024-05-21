@@ -10,12 +10,14 @@ const {
   fetchInstitution,
   fetchRepository,
   requireMemberPermissions,
+  requireAdmin,
 } = require('../../../services/auth');
 
 const {
   standardQueryParams,
 
   getInstitutionRepositories,
+  upsertRepositoryAllPermission,
   upsertRepositoryPermission,
   deleteRepositoryPermission,
   removeRepository,
@@ -44,6 +46,7 @@ router.route({
   method: 'DELETE',
   path: '/:pattern',
   handler: [
+    requireAdmin,
     fetchInstitution(),
     fetchRepository({ include: { institutions: true } }),
     removeRepository,
@@ -60,6 +63,7 @@ router.route({
   method: 'PUT',
   path: '/:pattern',
   handler: [
+    requireAdmin,
     fetchInstitution(),
     fetchRepository({ ignoreNotFound: true }),
     addRepository,
@@ -71,6 +75,25 @@ router.route({
       institutionId: Joi.string().trim().required(),
       pattern: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'PUT',
+  path: '/:pattern/permissions',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.memberships.write),
+    fetchRepository(),
+    upsertRepositoryAllPermission,
+  ],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+      pattern: Joi.string().trim().required(),
+    },
+    body: Joi.array().items(Joi.object()),
   },
 });
 
