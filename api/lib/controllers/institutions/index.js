@@ -4,10 +4,6 @@ const { Joi } = require('koa-joi-router');
 const { FEATURES } = require('../../entities/memberships.dto');
 
 const {
-  includableFields: spaceIncludableFields,
-} = require('../../entities/repositories.dto');
-
-const {
   requireJwt,
   requireUser,
   fetchInstitution,
@@ -25,11 +21,11 @@ const {
   getInstitution,
   updateInstitution,
   getSushiData,
-  getInstitutionSpaces,
 } = require('./actions');
 
 const memberships = require('./memberships');
 const repositories = require('./repositories');
+const spaces = require('./spaces');
 
 const {
   getSubInstitutions,
@@ -43,6 +39,7 @@ const {
 } = require('./admin');
 
 router.use(repositories.prefix('/:institutionId/repositories').middleware());
+router.use(spaces.prefix('/:institutionId/spaces').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
 
 router.use(requireJwt, requireUser);
@@ -84,24 +81,6 @@ router.route({
       latestImportTask: Joi.boolean().default(false),
       connection: Joi.string().valid('working', 'faulty', 'untested'),
       include: Joi.array().single().items(Joi.string().valid('harvests')),
-    }).rename('include[]', 'include'),
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:institutionId/spaces',
-  handler: [
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.memberships.read),
-    getInstitutionSpaces,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    query: Joi.object({
-      include: Joi.array().single().items(Joi.string().valid(...spaceIncludableFields)),
     }).rename('include[]', 'include'),
   },
 });

@@ -6,7 +6,6 @@ const InstitutionsService = require('../../entities/institutions.service');
 const ImagesService = require('../../services/images');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const MembershipsService = require('../../entities/memberships.service');
-const SpacesService = require('../../entities/spaces.service');
 
 /* eslint-disable max-len */
 /**
@@ -30,9 +29,6 @@ const {
   adminImportSchema,
   includableFields,
 } = require('../../entities/institutions.dto');
-const {
-  includableFields: spaceIncludableFields,
-} = require('../../entities/spaces.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
@@ -420,22 +416,6 @@ exports.deleteInstitution = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = data;
-};
-
-exports.getInstitutionSpaces = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const spacesService = new SpacesService();
-
-  const spaces = await spacesService.findMany({
-    where: { institutionId: ctx.state.institution.id },
-    include: propsToPrismaInclude(propsToInclude, spaceIncludableFields),
-  });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(spaces) ? spaces : [];
 };
 
 exports.getSushiData = async (ctx) => {
