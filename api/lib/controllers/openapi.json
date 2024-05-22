@@ -3546,15 +3546,6 @@
             "name": "include",
             "in": "query",
             "description": "Relations that should be included in the response"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "description": "Username of the member"
           }
         ],
         "responses": {
@@ -3875,6 +3866,168 @@
           "description": "ID of the institution"
         }
       ]
+    },
+    "/institutions/{id}/repositories/{pattern}": {
+      "delete": {
+        "summary": "Unlink a repository from an institution",
+        "operationId": "delete-institutions-id-repositories-pattern",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Link a repository to an institution",
+        "operationId": "put-institutions-id-repositories-pattern",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repositories/{pattern}/permissions": {
+      "put": {
+        "summary": "Set repository permissions",
+        "operationId": "put-institutions-id-repositories-pattern-permissions",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "readonly": {
+                      "description": "Whether the user has read of read/write access to the space",
+                      "type": "boolean"
+                    },
+                    "locked": {
+                      "description": "Whether the permission can be modified by admins only",
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repositories/{pattern}/permissions/{username}": {
+      "delete": {
+        "summary": "Remove repository permission",
+        "operationId": "delete-institutions-id-repositories-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update repository permission",
+        "operationId": "put-institutions-id-repositories-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryPermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
     },
     "/institutions/{id}/state": {
       "parameters": [
@@ -5441,108 +5594,6 @@
         ]
       }
     },
-    "/repositories/{id}/permissions/{username}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "description": "ID of the repository"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "username",
-          "in": "path",
-          "required": true,
-          "description": "username of the member"
-        }
-      ],
-      "put": {
-        "summary": "Set repository permissions for a user",
-        "description": "Set repository permissions for a user",
-        "operationId": "put-repositories-id-permissions-username",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryPermission"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "tags": [
-          "Repositories"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RepositoryPermission"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete repository permissions for a user",
-        "description": "Delete repository permissions for a user, so that he cannot access it anymore",
-        "operationId": "delete-repository-id-permissions-username",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryPermission"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Repositories"
-        ]
-      }
-    },
     "/roles": {
       "get": {
         "summary": "Get Kibana roles",
@@ -5711,29 +5762,137 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "name": "q",
-            "in": "query",
-            "description": "A query, for search"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "schema": {
-              "type": "string"
-            },
-            "name": "type",
-            "in": "query",
-            "example": "counter5",
-            "description": "Filter spaces by type"
+            "$ref": "#/components/parameters/page"
           },
           {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
             "schema": {
-              "type": "string"
-            },
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
             "name": "institutionId",
             "in": "query",
-            "description": "Filter spaces by institution ID"
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "initials",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
@@ -5837,6 +5996,23 @@
           "Administration",
           "Kibana"
         ],
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5939,6 +6115,191 @@
         "tags": [
           "Administration",
           "Kibana"
+        ]
+      }
+    },
+    "/kibana-spaces/{id}/permissions": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get space permissions",
+        "operationId": "get-kibana-spaces-id-permissions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "spaceId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "readonly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "locked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpacePermission"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Get space permissions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Set space permissions",
+        "operationId": "put-kibana-spaces-id-permissions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "readonly": {
+                      "description": "Whether the user has read of read/write access to the space",
+                      "type": "boolean"
+                    },
+                    "locked": {
+                      "description": "Whether the permission can be modified by admins only",
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Space"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Get space permissions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },
