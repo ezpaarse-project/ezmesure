@@ -718,7 +718,9 @@
     "deleteNbRepositories": "You are about to delete {number} repositories",
     "filters": {
       "title": "Filter repositories"
-    }
+    },
+    "givePermissions": "Give permissions",
+    "nPermissions": "{count} access"
   },
   "spaces": {
     "spaces": "Spaces",

@@ -290,7 +290,10 @@ export default {
 
       try {
         this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`, {
-          params: { include: ['user', 'repositoryPermissions'] },
+          params: {
+            include: ['user', 'repositoryPermissions'],
+            size: 0,
+          },
         });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));

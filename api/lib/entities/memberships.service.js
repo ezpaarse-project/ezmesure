@@ -5,12 +5,13 @@ const membershipsPrisma = require('../services/prisma/memberships');
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Membership} Membership
- * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
  * @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
  * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipCountArgs} MembershipCountArgs
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  */
@@ -74,6 +75,14 @@ module.exports = class MembershipsService extends BasePrismaService {
     const membership = await membershipsPrisma.upsert(params, this.prisma);
     this.triggerHooks('membership:upsert', membership);
     return membership;
+  }
+
+  /**
+   * @param {MembershipCountArgs} params
+   * @returns {Promise<number>}
+   */
+  async count(params) {
+    return membershipsPrisma.count(params, this.prisma);
   }
 
   /**

@@ -11,6 +11,7 @@ const spacesPrisma = require('../services/prisma/spaces');
 /** @typedef {import('@prisma/client').Prisma.SpaceFindManyArgs} SpaceFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceCreateArgs} SpaceCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpaceDeleteArgs} SpaceDeleteArgs */
+/** @typedef {import('@prisma/client').Prisma.SpaceCountArgs} SpaceCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs */
 /* eslint-enable max-len */
 
@@ -70,6 +71,14 @@ module.exports = class SpacesService extends BasePrismaService {
     const space = await spacesPrisma.upsert(params, this.prisma);
     this.triggerHooks('space:upsert', space);
     return space;
+  }
+
+  /**
+   * @param {SpaceCountArgs} params
+   * @returns {Promise<number>}
+   */
+  async count(params) {
+    return spacesPrisma.count(params, this.prisma);
   }
 
   /**

@@ -1,43 +1,49 @@
 const SpacesService = require('../../entities/spaces.service');
-const SpacePermissionsService = require('../../entities/space-permissions.service');
+
 const {
-  upsertSchema: permissionUpsertSchema,
-} = require('../../entities/space-permissions.dto');
+  schema,
+  includableFields,
+} = require('../../entities/spaces.dto');
 
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
 
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['id'],
+});
+exports.standardQueryParams = standardQueryParams;
+
 exports.getMany = async (ctx) => {
-  const {
-    type,
-    institutionId,
-    q: search,
-  } = ctx.query;
-
-  const where = {
-    type,
-    institutionId,
-  };
-
-  if (search) {
-    where.id = {
-      contains: search,
-      mode: 'insensitive',
-    };
-  }
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
   const spacesService = new SpacesService();
 
   ctx.type = 'json';
-  ctx.body = await spacesService.findMany({ where });
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await spacesService.count({ where: prismaQuery.where }));
+  ctx.body = await spacesService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: ctx.params.spaceId });
+
+  const spacesService = new SpacesService();
+  const space = await spacesService.findUnique(prismaQuery);
+
+  if (!space) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+    return;
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = ctx.state.space;
+  ctx.body = space;
 };
 
 exports.upsertOne = async (ctx) => {
@@ -141,60 +147,4 @@ exports.deleteOne = async (ctx) => {
   await spacesService.delete({ where: { id: spaceId } });
 
   ctx.status = 204;
-};
-
-exports.upsertPermission = async (ctx) => {
-  const { space } = ctx.state;
-  const { username } = ctx.params;
-
-  const { value: body } = permissionUpsertSchema.validate({
-    ...ctx.request.body,
-    institutionId: space.institutionId,
-    spaceId: space.id,
-    username,
-  });
-
-  const permissionData = {
-    ...body,
-    space: { connect: { id: space.id } },
-    membership: {
-      connect: {
-        username_institutionId: {
-          username,
-          institutionId: space.institutionId,
-        },
-      },
-    },
-  };
-
-  const spacePermissionsService = new SpacePermissionsService();
-
-  ctx.status = 200;
-  ctx.body = await spacePermissionsService.upsert({
-    where: {
-      username_spaceId: {
-        username,
-        spaceId: space.id,
-      },
-    },
-    create: permissionData,
-    update: permissionData,
-  });
-};
-
-exports.deletePermission = async (ctx) => {
-  const { space } = ctx.state;
-  const { username } = ctx.params;
-
-  const spacePermissionsService = new SpacePermissionsService();
-
-  ctx.status = 200;
-  ctx.body = await spacePermissionsService.delete({
-    where: {
-      username_spaceId: {
-        username,
-        spaceId: space.id,
-      },
-    },
-  });
 };
