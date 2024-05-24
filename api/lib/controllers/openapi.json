@@ -7704,6 +7704,7 @@
                 "enum": [
                   "endpoint",
                   "institution",
+                  "institution.memberships.user",
                   "harvests",
                   "connection"
                 ]
@@ -8123,23 +8124,6 @@
           "name": "id",
           "in": "path",
           "required": true
-        },
-        {
-          "name": "include",
-          "description": "",
-          "in": "query",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "endpoint",
-                "institution",
-                "harvests",
-                "connection"
-              ]
-            }
-          }
         }
       ],
       "patch": {
@@ -8191,6 +8175,27 @@
       "get": {
         "summary": "Get a SUSHI item",
         "operationId": "get-sushi-id",
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "endpoint",
+                  "institution",
+                  "institution.memberships",
+                  "institution.memberships.user",
+                  "harvests",
+                  "connection"
+                ]
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",

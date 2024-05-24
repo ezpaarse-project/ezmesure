@@ -441,6 +441,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           const oneMonthAgo = subMonths(new Date(), 1);
 
           let supportedReports = [];
+          if (Array.isArray(endpoint.supportedReports)) {
+            supportedReports = endpoint.supportedReports;
+          }
+
           if (
             !supportedReportsUpdatedAt
             || !isValidDate(supportedReportsUpdatedAt)

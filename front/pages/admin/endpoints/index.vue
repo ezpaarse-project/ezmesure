@@ -195,10 +195,10 @@
           <template #activator="{ on, attrs }">
             <v-chip
               :outlined="item.credentials?.length <= 0"
+              :to="`/admin/endpoints/${item.id}/sushi`"
               small
               class="elevation-1"
               v-bind="attrs"
-              @click="$refs.credentialsDialog?.display?.(item)"
               v-on="on"
             >
               {{ $tc('sushi.credentialsCount', item.credentials?.length) }}
@@ -297,7 +297,6 @@
       :max-credentials-status-counts="maxCounts.credentialsStatuses"
     />
     <ConfirmDialog ref="confirmDialog" />
-    <CredentialDialog ref="credentialsDialog" />
   </section>
 </template>
 
@@ -305,11 +304,10 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
-import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
-import EndpointsFiltersDrawer from '~/components/sushis/EndpointsFiltersDrawer.vue';
+import EndpointsFiltersDrawer from '~/components/endpoints/EndpointsFiltersDrawer.vue';
+import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
-import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
 
 export default {
   layout: 'space',
@@ -319,7 +317,6 @@ export default {
     EndpointForm,
     EndpointDetails,
     ConfirmDialog,
-    CredentialDialog,
     ProgressCircularStack,
     EndpointsFiltersDrawer,
     EndpointDisabledIcon,
@@ -640,7 +637,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials.institution'], size: 0 } });
+        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials'], size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
       }
