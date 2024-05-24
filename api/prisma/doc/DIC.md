@@ -237,31 +237,33 @@ A job step
 
 A SUSHI endpoint
 
-| Property                  | Type                 | Description                                                                             | Attributes | Default  |
-|---------------------------|----------------------|-----------------------------------------------------------------------------------------|------------|----------|
-| id                        | `String`             | ID of the endpoint                                                                      | Id         | `cuid()` |
-| createdAt                 | `DateTime`           | Creation date                                                                           |            | `now()`  |
-| updatedAt                 | `DateTime`           | Latest update date                                                                      |            |          |
-| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                           |            |          |
-| vendor                    | `String`             | Vendor name of the endpoint                                                             |            |          |
-| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                           |            |          |
-| description               | `String?`            | Description of the endpoint                                                             |            |          |
-| counterVersion            | `String?`            | Counter version of the SUSHI service                                                    |            |          |
-| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                         |            |          |
-| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                             |            | `false`  |
-| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                            |            | `false`  |
-| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                |            | `false`  |
-| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                      |            | `false`  |
-| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                          |            |          |
-| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                             |            |          |
-| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                            |            |          |
-| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                 |            |          |
-| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|") |            |          |
-| supportedReports          | `String[]`           | List report IDs that are supported by the endpoint                                      |            |          |
-| supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                            |            |          |
-| testedReport              | `String?`            | Report used when testing endpoint                                                       |            |          |
-| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                          |            |          |
-| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.            |            |          |
+| Property                  | Type                 | Description                                                                                       | Attributes | Default  |
+|---------------------------|----------------------|---------------------------------------------------------------------------------------------------|------------|----------|
+| id                        | `String`             | ID of the endpoint                                                                                | Id         | `cuid()` |
+| createdAt                 | `DateTime`           | Creation date                                                                                     |            | `now()`  |
+| updatedAt                 | `DateTime`           | Latest update date                                                                                |            |          |
+| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                                     |            |          |
+| vendor                    | `String`             | Vendor name of the endpoint                                                                       |            |          |
+| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                                     |            |          |
+| description               | `String?`            | Description of the endpoint                                                                       |            |          |
+| counterVersion            | `String?`            | Counter version of the SUSHI service                                                              |            |          |
+| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                   |            |          |
+| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                                       |            | `false`  |
+| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                                      |            | `false`  |
+| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                          |            | `false`  |
+| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                                |            | `false`  |
+| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                                    |            |          |
+| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                                       |            |          |
+| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                                      |            |          |
+| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                           |            |          |
+| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")           |            |          |
+| supportedReports          | `String[]`           | List report IDs that are supported by the endpoint                                                |            |          |
+| ignoredReports            | `String[]`           | List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
+| additionalReports         | `String[]`           | Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
+| supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                                      |            |          |
+| testedReport              | `String?`            | Report used when testing endpoint                                                                 |            |          |
+| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                    |            |          |
+| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                      |            |          |
 
 ### SushiCredentials
 

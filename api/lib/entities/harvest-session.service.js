@@ -42,6 +42,7 @@ const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
 /* eslint-enable max-len */
 
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
+const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) => r.toLowerCase());
 
 module.exports = class HarvestSessionService extends BasePrismaService {
   /** @type {BasePrismaService.TransactionFnc<HarvestSessionService>} */
@@ -368,7 +369,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       }
 
       // Get report types
-      let reportTypes = Array.from(new Set(session.reportTypes));
+      let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
 
       /** @type {(SushiCredentials & { endpoint: SushiEndpoint, institution: Institution })[]} */
       let credentialsToHarvest = [];
@@ -431,10 +432,19 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           }
 
           // Get supported reports
-          const { supportedReportsUpdatedAt } = endpoint;
+          const {
+            supportedReportsUpdatedAt,
+            ignoredReports,
+            additionalReports,
+          } = endpoint;
+
           const oneMonthAgo = subMonths(new Date(), 1);
 
           let supportedReports = [];
+          if (Array.isArray(endpoint.supportedReports)) {
+            supportedReports = endpoint.supportedReports;
+          }
+
           if (
             !supportedReportsUpdatedAt
             || !isValidDate(supportedReportsUpdatedAt)
@@ -466,14 +476,26 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           }
 
           if (reportTypes.includes('all')) {
-            reportTypes = Array.from(DEFAULT_HARVESTED_REPORTS);
+            reportTypes = defaultHarvestedReports;
           }
 
-          const supportedReportsSet = new Set(supportedReports);
+          const supportedReportsSet = new Set([
+            // If there's no support list available, assume the default list is supported
+            ...(supportedReports.length > 0 ? supportedReports : defaultHarvestedReports),
+            ...additionalReports,
+          ]);
+          const ignoredReportsSet = new Set(ignoredReports);
 
-          // Filter supported report based on session params
-          if (!session.downloadUnsupported && supportedReportsSet.size > 0) {
-            reportTypes = reportTypes.filter((reportId) => supportedReportsSet.has(reportId));
+          if (!session.downloadUnsupported) {
+            // Filter supported reports based on session params
+            if (supportedReportsSet.size > 0) {
+              reportTypes = reportTypes.filter((reportId) => supportedReportsSet.has(reportId));
+            }
+
+            // Remove reports that should be ignored
+            if (ignoredReportsSet.size > 0) {
+              reportTypes = reportTypes.filter((reportId) => !ignoredReportsSet.has(reportId));
+            }
           }
 
           // Add jobs

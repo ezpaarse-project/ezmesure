@@ -197,7 +197,7 @@ const prepareStandardQueryParams = ({
     distinct: stringOrArrayValidation,
   };
   if (queryFields?.length > 0) {
-    paginationValidation.q = Joi.string().trim();
+    paginationValidation.q = Joi.string().trim().allow('');
   }
 
   return {

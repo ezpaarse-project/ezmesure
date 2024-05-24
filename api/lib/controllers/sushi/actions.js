@@ -473,6 +473,7 @@ exports.checkSushiConnection = async (ctx) => {
   ctx.body = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
+      updatedAt: sushi.updatedAt,
       connection: {
         date: Date.now(),
         status: status || 'failed',
@@ -494,6 +495,7 @@ exports.deleteSushiConnection = async (ctx) => {
   await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
+      updatedAt: sushi.updatedAt,
       connection: {},
     },
   });

@@ -40,6 +40,7 @@ services:
     image: node:18.18.2-alpine3.18
     ports:
       - 3000:3000
+      - 9229:9229 # Debug port
     volumes:
       - "./api:/usr/src/app"
       - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"

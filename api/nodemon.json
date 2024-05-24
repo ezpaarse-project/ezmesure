@@ -1,0 +1,11 @@
+{
+  "watch": [
+    "server.js",
+    "config/",
+    "lib/"
+  ],
+  "execMap": {
+    "js": "node --inspect=0.0.0.0:9229"
+  },
+  "ext": "js,json"
+}
