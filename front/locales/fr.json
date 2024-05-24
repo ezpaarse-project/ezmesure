@@ -249,6 +249,7 @@
     "askToJoinAnInstitution": "Demander à rejoindre un établissement",
     "joinInstitution": "Vous souhaitez rejoindre {institution} ?",
     "joinInstitutionEmail": "Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.",
+    "createMailContactList": "Copier les adresses mails des correspondants",
     "reports": {
       "reports": "Rapports"
     },

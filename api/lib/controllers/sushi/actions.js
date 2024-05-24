@@ -47,25 +47,27 @@ exports.getAll = async (ctx) => {
       OR: [
         { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
         { institution: { name: { contains: query, mode: 'insensitive' } } },
+        { institution: { acronym: { contains: query, mode: 'insensitive' } } },
       ],
     };
   }
 
-  if (connection) {
-    switch (connection) {
-      case 'working':
-        prismaQuery.where.connection = { path: ['status'], equals: 'success' };
-        break;
-      case 'faulty':
-        prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
-        break;
-      case 'untested':
-        prismaQuery.where.connection = { equals: {} };
-        break;
+  switch (connection) {
+    case 'working':
+      prismaQuery.where.connection = { path: ['status'], equals: 'success' };
+      break;
+    case 'unauthorized':
+      prismaQuery.where.connection = { path: ['status'], equals: 'unauthorized' };
+      break;
+    case 'faulty':
+      prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
+      break;
+    case 'untested':
+      prismaQuery.where.connection = { equals: {} };
+      break;
 
-      default:
-        break;
-    }
+    default:
+      break;
   }
 
   const sushiCredentialsService = new SushiCredentialsService();
