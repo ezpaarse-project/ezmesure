@@ -16,27 +16,11 @@ const {
   getInstitutionMembers,
   addInstitutionMember,
   removeInstitutionMember,
-  getInstitutionContacts,
   getInstitutionMember,
   requestMembership,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
-
-router.route({
-  method: 'GET',
-  path: '/contacts',
-  handler: [
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.memberships.read),
-    getInstitutionContacts,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
 
 router.route({
   method: 'POST',

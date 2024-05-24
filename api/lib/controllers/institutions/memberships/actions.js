@@ -56,15 +56,6 @@ exports.getInstitutionMembers = async (ctx) => {
   ctx.body = await membershipsService.findMany(prismaQuery);
 };
 
-exports.getInstitutionContacts = async (ctx) => {
-  const members = await ctx.state.institution.getContacts();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(members) ? members : [];
-};
-
 exports.getInstitutionMember = async (ctx) => {
   const { institutionId, username } = ctx.params;
 
