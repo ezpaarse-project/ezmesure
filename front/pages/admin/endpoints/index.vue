@@ -165,16 +165,8 @@
         </td>
       </template>
 
-      <template #[`item.validated`]="{ item }">
-        <v-chip
-          v-if="item.validated"
-          label
-          small
-          color="success"
-          outlined
-        >
-          {{ $t('endpoints.validated') }}
-        </v-chip>
+      <template #[`item.disabledUntil`]="{ item }">
+        <EndpointDisabledIcon :endpoint="item" />
       </template>
 
       <template #[`item.tags`]="{ item }">
@@ -313,6 +305,7 @@ import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
 import EndpointsFiltersDrawer from '~/components/endpoints/EndpointsFiltersDrawer.vue';
+import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
 
@@ -326,6 +319,7 @@ export default {
     ConfirmDialog,
     ProgressCircularStack,
     EndpointsFiltersDrawer,
+    EndpointDisabledIcon,
   },
   data() {
     return {
@@ -372,6 +366,12 @@ export default {
         {
           text: this.$t('endpoints.tags'),
           value: 'tags',
+          align: 'center',
+          width: '200px',
+        },
+        {
+          text: this.$t('endpoints.disabledUntil'),
+          value: 'disabledUntil',
           align: 'center',
           width: '200px',
         },
