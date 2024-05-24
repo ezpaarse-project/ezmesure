@@ -61,9 +61,9 @@
         />
       </div>
 
-      <v-toolbar flat :dark="selectedInstitutions.length > 0">
-        <template v-if="selectedInstitutions.length > 0">
-          <v-btn icon @click="selectedInstitutions = []">
+      <v-toolbar flat :dark="selectedInstitutionsIds.length > 0">
+        <template v-if="selectedInstitutionsIds.length > 0">
+          <v-btn icon @click="selectedInstitutionsIds = []">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
@@ -74,7 +74,16 @@
 
         <v-spacer />
 
-        <div v-if="selectedInstitutions.length > 0" class="d-flex align-center">
+        <div v-if="selectedInstitutionsIds.length > 0" class="d-flex align-center">
+          <v-tooltip top>
+            <template #activator="{ on }">
+              <v-btn icon class="mr-2" @click="checkSelectedInstitutionCredentials" v-on="on">
+                <v-icon>mdi-connection</v-icon>
+              </v-btn>
+            </template>
+            {{ $t('institutions.sushi.checkCredentials') }}
+          </v-tooltip>
+
           <v-tooltip top>
             <template #activator="{ on }">
               <v-btn icon class="mr-2" @click="copyMailList" v-on="on">
@@ -152,7 +161,7 @@
 
       <v-treeview
         ref="treeView"
-        :value="selectedInstitutions"
+        :value="selectedInstitutionsIds"
         :items="institutionsItems"
         hoverable
         dense
@@ -208,7 +217,7 @@ import EndpointInstitutionAppend from '~/components/endpoints/EndpointInstitutio
 
 export default {
   layout: 'space',
-  middleware: ['auth', 'terms'],
+  middleware: ['auth', 'terms', 'isAdmin'],
   components: {
     SimpleMetric,
     ToolBar,
@@ -223,14 +232,10 @@ export default {
   },
   async asyncData({
     $axios,
-    $store,
-    $auth,
-    $t,
     params,
   }) {
     let endpoint = null;
     let failedToFetch = false;
-    let lockStatus = false;
 
     try {
       endpoint = await $axios.$get(`/sushi-endpoints/${params.id}`);
@@ -239,22 +244,13 @@ export default {
         failedToFetch = true;
       }
     }
-
-    try {
-      const status = await $axios.$get('/sushi/_lock');
-      lockStatus = status.locked && !$auth.hasScope('superuser');
-    } catch (e) {
-      $store.dispatch('snacks/error', $t('sushi.unableToGetLockStatus'));
-    }
-
     return {
       failedToFetch,
       loadingItems: {},
       refreshing: false,
-      lockStatus,
 
       search: '',
-      selectedInstitutions: [],
+      selectedInstitutionsIds: [],
       credentialsToCheck: [],
 
       endpoint,
@@ -280,10 +276,10 @@ export default {
       return this.credentials.filter((c) => !c.connection?.status);
     },
     selectedState() {
-      if (this.selectedInstitutions.length <= 0) {
+      if (this.selectedInstitutionsIds.length <= 0) {
         return 'empty';
       }
-      if (this.selectedInstitutions.length === this.institutions.size) {
+      if (this.selectedInstitutionsIds.length === this.institutions.size) {
         return 'full';
       }
       return 'partial';
@@ -292,8 +288,8 @@ export default {
       return Object.keys(this.loadingItems).length > 0;
     },
     toolbarTitle() {
-      if (this.selectedInstitutions.length > 0) {
-        return this.$t('nSelected', { count: this.selectedInstitutions.length });
+      if (this.selectedInstitutionsIds.length > 0) {
+        return this.$t('nSelected', { count: this.selectedInstitutionsIds.length });
       }
 
       let count = this.credentials?.length;
@@ -349,27 +345,22 @@ export default {
       this.$refs.endpointForm.editEndpoint(this.endpoint);
     },
 
-    async invertSort() {
-      this.tableOptions.groupDesc = [!this.tableOptions.groupDesc?.[0]];
-      await this.refreshCredentials();
-    },
-
     toggleSelection(item) {
-      const selected = new Set(this.selectedInstitutions);
+      const selected = new Set(this.selectedInstitutionsIds);
       if (selected.has(item)) {
         selected.delete(item);
       } else {
         selected.add(item);
       }
-      this.selectedInstitutions = Array.from(selected);
+      this.selectedInstitutionsIds = Array.from(selected);
     },
 
     selectAllInstitutions() {
       if (this.selectedState === 'full') {
-        this.selectedInstitutions = [];
+        this.selectedInstitutionsIds = [];
         return;
       }
-      this.selectedInstitutions = Array.from(this.institutions.keys());
+      this.selectedInstitutionsIds = Array.from(this.institutions.keys());
     },
 
     async checkFirstConnection() {
@@ -405,6 +396,19 @@ export default {
       this.checkFirstConnection();
     },
 
+    checkSelectedInstitutionCredentials() {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const id of this.selectedInstitutionsIds) {
+        const item = this.institutions.get(id);
+        if (item) {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const credentials of item.children) {
+            this.addCredentialsToCheck(credentials);
+          }
+        }
+      }
+    },
+
     checkUntestedItems() {
       if (this.untestedItems.length <= 0) {
         return;
@@ -424,7 +428,7 @@ export default {
 
       const addresses = [];
       // eslint-disable-next-line no-restricted-syntax
-      for (const id of this.selectedInstitutions) {
+      for (const id of this.selectedInstitutionsIds) {
         const institution = this.institutions.get(id);
         if (institution) {
           addresses.push(
@@ -449,14 +453,7 @@ export default {
       try {
         this.endpoint = await this.$axios.$get(`/sushi-endpoints/${this.endpoint.id}`);
       } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('sushi.unableToGetLockStatus'));
-      }
-
-      try {
-        const status = await this.$axios.$get('/sushi/_lock');
-        this.lockStatus = status.locked && !this.$auth.hasScope('superuser');
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('sushi.unableToGetLockStatus'));
+        this.$store.dispatch('snacks/error', this.$t('endpoints.noEndpointFound'));
       }
       this.refreshing = false;
     },
