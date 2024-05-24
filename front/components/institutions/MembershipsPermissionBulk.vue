@@ -44,13 +44,13 @@
       bench="5"
     >
       <template #default="{ item }">
-        <v-list-item :key="item.id">
+        <v-list-item :key="item.id" three-line>
           <v-list-item-content>
             <v-list-item-title>{{ item.user.fullName }}</v-list-item-title>
 
             <v-list-item-subtitle>{{ item.user.email }}</v-list-item-subtitle>
 
-            <v-list-item-subtitle v-if="item.roles">
+            <v-list-item-subtitle>
               <v-chip
                 v-for="role in item.roles"
                 :key="role"
@@ -66,7 +66,7 @@
 
           <v-list-item-action>
             <v-btn-toggle
-              :value="valueMap[item.username]"
+              :value="permissionLevelMap[item.username]"
               color="primary"
               mandatory
               dense
@@ -119,7 +119,7 @@ export default defineComponent({
         { text: this.$t('permissions.write'), value: 'write' },
       ];
     },
-    valueMap() {
+    permissionLevelMap() {
       const map = {};
 
       // eslint-disable-next-line no-restricted-syntax
@@ -196,14 +196,14 @@ export default defineComponent({
 
       if (value === 'none') {
         // Remove only if exists, cause v-on:change can be called when component is redrawn
-        if (this.valueMap[username]) {
+        if (this.permissionLevelMap[username]) {
           this.$emit('input', permissionsWithoutCurrent);
         }
         return;
       }
 
       // Update only if changed, cause v-on:change can be called when component is redrawn
-      if (this.valueMap[username] !== value) {
+      if (this.permissionLevelMap[username] !== value) {
         permissionsWithoutCurrent.push({ username, readonly: value === 'read' });
         this.$emit('input', permissionsWithoutCurrent);
       }
