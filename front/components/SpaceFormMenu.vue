@@ -44,7 +44,10 @@
               <v-text-field
                 v-model="spaceId"
                 :label="`${$t('identifier')} *`"
-                :rules="[v => !!v || $t('fieldIsRequired')]"
+                :rules="[
+                  v => !!v || $t('fieldIsRequired'),
+                  v => /^[a-z-]+$/i.test(v) || $t('invalidFormat'),
+                ]"
                 :disabled="editMode"
                 :suffix="suffix"
                 outlined

@@ -20,7 +20,10 @@
           :value="selectedRepository"
           :items="availableRepositories"
           :label="`${$t('repositories.pattern')} *`"
-          :rules="[v => !!v || $t('fieldIsRequired')]"
+          :rules="[
+            v => !!v || $t('fieldIsRequired'),
+            v => /^[a-z*-]+$/i.test(v) || $t('invalidFormat'),
+          ]"
           :search-input.sync="repositoryPattern"
           :loading="loadingRepositories"
           item-text="pattern"

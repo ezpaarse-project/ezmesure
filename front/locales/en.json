@@ -868,6 +868,7 @@
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
   "invalidDate": "Invalid date",
+  "invalidFormat": "Invalid format",
   "areYouSure": "Are you sure ?",
   "fieldIsRequired": "This field is required",
   "fieldMustMatch": "This field must match : {pattern}",
