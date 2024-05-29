@@ -249,6 +249,7 @@
       :items-per-page="50"
       :options.sync="tableOptions"
       :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
+      :item-class="(item) => !item?.active && 'grey lighten-3 grey--text'"
       show-select
       show-expand
       single-expand
@@ -472,6 +473,37 @@
         />
       </template>
 
+      <template #[`item.active`]="{ item }">
+        <v-tooltip left open-on-hover>
+          <template #activator="{ on, attrs }">
+            <div
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-switch
+                :input-value="item.active"
+                :label="item.active
+                  ? $t('endpoints.active')
+                  : $t('endpoints.inactive')"
+                :loading="activeLoadingMap[item.id]"
+                hide-details
+                role="switch"
+                class="mt-0"
+                dense
+                style="transform: scale(0.8);"
+                @change="toggleEndpointActiveState(item)"
+              />
+            </div>
+          </template>
+
+          <i18n :path="`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`" tag="span">
+            <template #date>
+              <LocalDate :date="item.activeUpdatedAt" />
+            </template>
+          </i18n>
+        </v-tooltip>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ on, attrs }">
@@ -610,6 +642,7 @@ export default {
       showSushiReadyPopup: false,
       loadingSushiReady: false,
       loadingItems: {},
+      activeLoadingMap: {},
       tableOptions: {},
       locked: lockStatus?.locked && !$auth.hasScope('superuser'),
       lockReason: lockStatus?.reason,
@@ -711,6 +744,12 @@ export default {
           value: 'updatedAt',
           align: 'right',
           width: '230px',
+        },
+        {
+          text: this.$t('endpoints.active'),
+          value: 'active',
+          align: 'center',
+          width: '130px',
         },
         {
           text: this.$t('actions'),
@@ -1084,6 +1123,22 @@ export default {
 
       this.refreshSushiItems();
       this.deleting = false;
+    },
+
+    async toggleEndpointActiveState(item) {
+      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: true };
+
+      const active = !item.active;
+
+      await this.$axios.$patch(`/sushi/${item.id}`, { active });
+
+      const index = this.sushiItems.findIndex((i) => i.id === item.id);
+
+      if (index >= 0) {
+        this.sushiItems.splice(index, 1, { ...item, active });
+      }
+
+      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: false };
     },
 
     goToInstitutionPage() {

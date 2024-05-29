@@ -203,6 +203,10 @@
     "url": "URL",
     "vendor": "Vendor",
     "tags": "Tags",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activeSince": "Active since {date}",
+    "inactiveSince": "Inactive since {date}",
     "technicalProvider": "Technical provider",
     "counterVersion": "COUNTER version",
     "testedReport": "Report used to test connection",
@@ -441,7 +445,7 @@
       }
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
-    "unableToRetrivePlatforms": "Unable to retrieve plateform information", 
+    "unableToRetrivePlatforms": "Unable to retrieve plateform information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
