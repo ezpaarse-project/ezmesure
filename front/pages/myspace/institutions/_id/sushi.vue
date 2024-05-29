@@ -439,6 +439,18 @@
         />
       </template>
 
+      <template #[`header.active`]="{ header }">
+        {{ header.text }}
+
+        <DropdownSelector
+          v-model="filters.activeStates"
+          :items="availableActiveStates"
+          icon="mdi-filter"
+          icon-button
+          badge
+        />
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
@@ -634,6 +646,7 @@ export default {
       selected: [],
       filters: {
         sushiStatuses: [],
+        activeStates: [],
       },
       refreshing: false,
       deleting: false,
@@ -695,6 +708,12 @@ export default {
         { text: this.$t('error'), value: 'failed', order: 1 },
       ];
     },
+    availableActiveStates() {
+      return [
+        { text: this.$t('endpoints.active'), value: true, order: 0 },
+        { text: this.$t('endpoints.inactive'), value: false, order: 1 },
+      ];
+    },
     availablePackages() {
       const packages = new Set(
         this.sushiItems?.flatMap?.((s) => (Array.isArray(s?.packages) ? s.packages : [])),
@@ -750,6 +769,13 @@ export default {
           value: 'active',
           align: 'center',
           width: '130px',
+          filter: (value) => {
+            if (this.filters.activeStates.length === 0) {
+              return true;
+            }
+
+            return this.filters.activeStates.includes(value);
+          },
         },
         {
           text: this.$t('actions'),
