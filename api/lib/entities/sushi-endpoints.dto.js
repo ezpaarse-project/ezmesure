@@ -21,10 +21,15 @@ const schema = {
   description: Joi.string().allow('').empty(null),
   counterVersion: Joi.string().allow('').empty(null),
   technicalProvider: Joi.string().allow('').empty(null),
+
+  active: Joi.boolean(),
+  activeUpdatedAt: Joi.date(),
+
   requireCustomerId: Joi.boolean(),
   requireRequestorId: Joi.boolean(),
   requireApiKey: Joi.boolean(),
   ignoreReportValidation: Joi.boolean(),
+
   defaultCustomerId: Joi.string().allow('').empty(null),
   defaultRequestorId: Joi.string().allow('').empty(null),
   defaultApiKey: Joi.string().allow('').empty(null),

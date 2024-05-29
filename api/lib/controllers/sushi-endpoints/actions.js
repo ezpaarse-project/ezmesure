@@ -64,6 +64,7 @@ exports.updateEndpoint = async (ctx) => {
   ctx.action = 'endpoint/update';
   const { endpoint } = ctx.state;
   const { body } = ctx.request;
+  const data = { ...body };
 
   ctx.metadata = {
     endpointId: endpoint.id,
@@ -72,10 +73,20 @@ exports.updateEndpoint = async (ctx) => {
 
   const sushiEndpointService = new SushiEndpointService();
 
+  if (typeof body.active === 'boolean') {
+    if (Object.keys(body).length === 1) {
+      // If only the active state is toggled, no need to change update date
+      data.updatedAt = endpoint.updatedAt;
+    }
+    if (endpoint.active !== body.active) {
+      data.activeUpdatedAt = new Date();
+    }
+  }
+
   ctx.status = 200;
   ctx.body = await sushiEndpointService.update({
     where: { id: endpoint.id },
-    data: body,
+    data,
   });
 };
 

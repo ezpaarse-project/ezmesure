@@ -138,6 +138,7 @@ exports.updateSushi = async (ctx) => {
   ctx.action = 'sushi/update';
   const { sushi, institution } = ctx.state;
   const { body } = ctx.request;
+  const data = { ...body, connection: {} };
 
   ctx.metadata = {
     sushiId: sushi.id,
@@ -146,13 +147,21 @@ exports.updateSushi = async (ctx) => {
     institutionName: institution.name,
   };
 
+  if (typeof body.active === 'boolean') {
+    if (Object.keys(body).length === 1) {
+      // If only the active state is toggled, no need to change update date
+      data.updatedAt = sushi.updatedAt;
+      data.connection = undefined;
+    }
+    if (sushi.active !== body.active) {
+      data.activeUpdatedAt = new Date();
+    }
+  }
+
   const sushiCredentialsService = new SushiCredentialsService();
   const updatedSushiCredentials = await sushiCredentialsService.update({
     where: { id: sushi.id },
-    data: {
-      ...body,
-      connection: {},
-    },
+    data,
   });
 
   ctx.status = 200;
