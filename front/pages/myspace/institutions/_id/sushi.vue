@@ -1168,12 +1168,16 @@ export default {
 
       const active = !item.active;
 
-      await this.$axios.$patch(`/sushi/${item.id}`, { active });
+      try {
+        await this.$axios.$patch(`/sushi/${item.id}`, { active });
 
-      const index = this.sushiItems.findIndex((i) => i.id === item.id);
+        const index = this.sushiItems.findIndex((i) => i.id === item.id);
 
-      if (index >= 0) {
-        this.sushiItems.splice(index, 1, { ...item, active });
+        if (index >= 0) {
+          this.sushiItems.splice(index, 1, { ...item, active });
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('sushi.unableToUpdate'));
       }
 
       this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: false };
