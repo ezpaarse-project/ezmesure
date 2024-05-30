@@ -568,6 +568,8 @@
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",
     "harvestState": "Harvest state",
     "harvestedAt": "Harvested on {date}",
+    "inactive": "Inactive credentials",
+    "inactiveDescription": "Institution made theses credentials inactive and will not be harvested.",
     "report": "Report",
     "openHelpPage": "Open help page",
     "insertedItems": "{count} report items have been inserted.",
