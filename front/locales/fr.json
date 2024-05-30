@@ -205,6 +205,7 @@
     "tags": "Étiquettes",
     "active": "Actif",
     "inactive": "Inactif",
+    "inactiveDescription": "Les administrateurs ont rendus ce point d'accès inactif et ne sera donc pas moissonné.",
     "activeSince": "Actif depuis le {date}",
     "inactiveSince": "Inactif depuis le {date}",
     "technicalProvider": "Prestataire technique",

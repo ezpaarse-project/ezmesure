@@ -451,6 +451,18 @@
         />
       </template>
 
+      <template #[`item.endpoint.vendor`]="{ item }">
+        <div>{{ item.endpoint.vendor }}</div>
+
+        <div v-if="!item.endpoint.active" class="d-flex align-center text-caption warning--text">
+          <v-icon color="warning" small class="mr-1">
+            mdi-api-off
+          </v-icon>
+
+          {{ $t('endpoints.inactiveDescription') }}
+        </div>
+      </template>
+
       <template #[`item.updatedAt`]="{ item }">
         <LocalDate :date="item.updatedAt" />
       </template>
@@ -478,11 +490,22 @@
       </template>
 
       <template #[`item.harvests`]="{ item }">
+        <!-- <template v-if="item.endpoint.active"> -->
         <CredentialHarvestState
           v-if="item.harvests?.length > 0"
           :harvests="item.harvests"
           @harvest:click="(e) => showHarvestMatrix(item, e.period)"
         />
+        <!-- </template>
+        <v-tooltip v-else top>
+          <template #activator="{ on, attrs }">
+            <span class="black--text" v-bind="attrs" v-on="on">
+              {{ $t('endpoints.inactiveLong') }}
+            </span>
+          </template>
+
+          {{ $t('endpoints.inactiveDescription') }}
+        </v-tooltip> -->
       </template>
 
       <template #[`item.active`]="{ item }">

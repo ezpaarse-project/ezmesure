@@ -44,6 +44,14 @@
     </ToolBar>
 
     <v-card-text style="position: relative;">
+      <v-alert v-if="!endpoint.active" type="warning" text>
+        <div class="text-h6">
+          {{ $t('endpoints.inactive') }}
+        </div>
+
+        {{ $t('endpoints.inactiveDescription') }}
+      </v-alert>
+
       <v-alert v-if="counts.status.failed > 0" type="error" prominent>
         {{ $tc('sushi.nErrsCredentials', counts.status.failed) }}
       </v-alert>
