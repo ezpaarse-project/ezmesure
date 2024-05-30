@@ -35,6 +35,7 @@ const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
 /** @typedef {import('@prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs */
 /** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsInclude} SushiCredentialsInclude */
+/** @typedef {import('@prisma/client').Prisma.SushiCredentialsWhereInput} SushiCredentialsWhereInput */
 /** @typedef {import('@prisma/client').HarvestJobStatus} HarvestJobStatus */
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
 /** @typedef {import('@prisma/client').Institution} Institution */
@@ -182,10 +183,15 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       throw new HTTPError(400, 'errors.harvest.invalidQuery', [session.id]);
     }
 
+    /** @type {SushiCredentialsWhereInput} */
     const where = {
       id: queryToPrismaFilter(session.credentialsQuery.sushiIds?.toString()),
       institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
       endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
+      active: true,
+      endpoint: {
+        active: true,
+      },
     };
 
     const sushiCredentialsService = new SushiCredentialsService(this);

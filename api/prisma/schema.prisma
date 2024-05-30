@@ -390,6 +390,10 @@ model SushiEndpoint {
   counterVersion            String?
   /// Technical provider of the endpoint (ex: Atypon)
   technicalProvider         String?
+  /// Whether the endpoint is active and can be harvested
+  active                    Boolean            @default(true)
+  /// Date on which the active status was last modified
+  activeUpdatedAt           DateTime           @default(now())
   /// Whether the endpoint requires a customer ID
   requireCustomerId         Boolean            @default(false)
   /// Whether the endpoint requires a requestor ID
@@ -427,37 +431,41 @@ model SushiEndpoint {
 /// A set of SUSHI credentials, associated to a SUSHI endpoint
 model SushiCredentials {
   /// ID of the SUSHI credentials
-  id            String        @id @default(cuid())
+  id              String        @id @default(cuid())
   /// Creation date
-  createdAt     DateTime      @default(now())
+  createdAt       DateTime      @default(now())
   /// Latest update date
-  updatedAt     DateTime      @updatedAt
+  updatedAt       DateTime      @updatedAt
   /// ID of the institution that owns the credentials
-  institutionId String
+  institutionId   String
   /// ID of the SUSHI endpoint
-  endpointId    String
+  endpointId      String
   /// Value of the customer_id parameter
-  customerId    String?
+  customerId      String?
   /// Value of the requestor_id parameter
-  requestorId   String?
+  requestorId     String?
   /// Value of the api_key parameter
-  apiKey        String?
+  apiKey          String?
   /// Abritrary comment about the credentials
-  comment       String?
+  comment         String?
+  /// Whether the credentials are active and can be harvested
+  active          Boolean       @default(true)
+  /// Date on which the active status was last modified
+  activeUpdatedAt DateTime      @default(now())
   /// Packages (profiles, accounts, funds...) that include the credentials
-  packages      String[]
+  packages        String[]
   /// Abritrary tag list associated to the credentials
-  tags          String[]
+  tags            String[]
   /// Additionnal parameters. Each param has a name, a value, and a scope.
-  params        Json[]
+  params          Json[]
   /// Institution that owns the credentials
-  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution     Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// The SUSHI endpoint
-  endpoint      SushiEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  endpoint        SushiEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   /// The harvest jobs associated to the credentials
-  harvestJobs   HarvestJob[]
+  harvestJobs     HarvestJob[]
   /// The harvest states associated to the credentials
-  harvests      Harvest[]
+  harvests        Harvest[]
   /// Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? }
-  connection    Json?
+  connection      Json?
 }

@@ -3,6 +3,34 @@
     <ToolBar :title="endpoint?.vendor">
       <v-spacer />
 
+      <v-tooltip left open-on-hover>
+        <template #activator="{ on, attrs }">
+          <div
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-switch
+              :input-value="endpoint.active"
+              :label="endpoint.active
+                ? $t('endpoints.active')
+                : $t('endpoints.inactive')"
+              :loading="refreshing"
+              hide-details
+              role="switch"
+              class="mr-2"
+              dense
+              @change="toggleEndpointActiveState()"
+            />
+          </div>
+        </template>
+
+        <i18n :path="`endpoints.${endpoint.active ? 'activeSince' : 'inactiveSince'}`" tag="span">
+          <template #date>
+            <LocalDate :date="endpoint.activeUpdatedAt" />
+          </template>
+        </i18n>
+      </v-tooltip>
+
       <v-btn
         color="primary"
         text
@@ -16,6 +44,14 @@
     </ToolBar>
 
     <v-card-text style="position: relative;">
+      <v-alert v-if="!endpoint.active" type="warning" text>
+        <div class="text-h6">
+          {{ $t('endpoints.inactive') }}
+        </div>
+
+        {{ $t('endpoints.inactiveDescription') }}
+      </v-alert>
+
       <v-alert v-if="counts.status.failed > 0" type="error" prominent>
         {{ $tc('sushi.nErrsCredentials', counts.status.failed) }}
       </v-alert>
@@ -203,6 +239,8 @@
 
 <script>
 import debounce from 'lodash.debounce';
+
+import LocalDate from '~/components/LocalDate.vue';
 import SimpleMetric from '~/components/SimpleMetric.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import DropdownSelector from '~/components/DropdownSelector.vue';
@@ -219,6 +257,7 @@ export default {
   layout: 'space',
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
+    LocalDate,
     SimpleMetric,
     ToolBar,
     DropdownSelector,
@@ -446,6 +485,20 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('emailsCopied'));
+    },
+
+    async toggleEndpointActiveState() {
+      const active = !this.endpoint.active;
+
+      this.refreshing = true;
+      try {
+        await this.$axios.$patch(`/sushi-endpoints/${this.endpoint.id}`, { active });
+      } catch (error) {
+        this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
+      }
+      this.refreshing = false;
+
+      await this.refreshEndpoint();
     },
 
     async refreshEndpoint() {
