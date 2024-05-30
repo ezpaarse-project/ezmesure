@@ -3,6 +3,34 @@
     <ToolBar :title="endpoint?.vendor">
       <v-spacer />
 
+      <v-tooltip left open-on-hover>
+        <template #activator="{ on, attrs }">
+          <div
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-switch
+              :input-value="endpoint.active"
+              :label="endpoint.active
+                ? $t('endpoints.active')
+                : $t('endpoints.inactive')"
+              :loading="refreshing"
+              hide-details
+              role="switch"
+              class="mr-2"
+              dense
+              @change="toggleEndpointActiveState()"
+            />
+          </div>
+        </template>
+
+        <i18n :path="`endpoints.${endpoint.active ? 'activeSince' : 'inactiveSince'}`" tag="span">
+          <template #date>
+            <LocalDate :date="endpoint.activeUpdatedAt" />
+          </template>
+        </i18n>
+      </v-tooltip>
+
       <v-btn
         color="primary"
         text
@@ -203,6 +231,8 @@
 
 <script>
 import debounce from 'lodash.debounce';
+
+import LocalDate from '~/components/LocalDate.vue';
 import SimpleMetric from '~/components/SimpleMetric.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import DropdownSelector from '~/components/DropdownSelector.vue';
@@ -219,6 +249,7 @@ export default {
   layout: 'space',
   middleware: ['auth', 'terms', 'isAdmin'],
   components: {
+    LocalDate,
     SimpleMetric,
     ToolBar,
     DropdownSelector,
@@ -446,6 +477,15 @@ export default {
         return;
       }
       this.$store.dispatch('snacks/info', this.$t('emailsCopied'));
+    },
+
+    async toggleEndpointActiveState() {
+      const active = !this.endpoint.active;
+
+      this.refreshing = true;
+      await this.$axios.$patch(`/sushi-endpoints/${this.endpoint.id}`, { active });
+
+      await this.refreshEndpoint();
     },
 
     async refreshEndpoint() {
