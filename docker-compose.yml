@@ -281,6 +281,7 @@ services:
       - EMAIL_ATTEMPTS_INTERVAL=${EZREEPORT_EMAIL_ATTEMPTS_INTERVAL}
       # common
       - LOG_LEVEL=${EZREEPORT_LOG_LEVEL}
+      - API_URL=https://${EZMESURE_DOMAIN}/report/api
     depends_on:
       redis:
         condition: service_started
