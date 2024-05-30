@@ -490,22 +490,11 @@
       </template>
 
       <template #[`item.harvests`]="{ item }">
-        <!-- <template v-if="item.endpoint.active"> -->
         <CredentialHarvestState
           v-if="item.harvests?.length > 0"
           :harvests="item.harvests"
           @harvest:click="(e) => showHarvestMatrix(item, e.period)"
         />
-        <!-- </template>
-        <v-tooltip v-else top>
-          <template #activator="{ on, attrs }">
-            <span class="black--text" v-bind="attrs" v-on="on">
-              {{ $t('endpoints.inactiveLong') }}
-            </span>
-          </template>
-
-          {{ $t('endpoints.inactiveDescription') }}
-        </v-tooltip> -->
       </template>
 
       <template #[`item.active`]="{ item }">

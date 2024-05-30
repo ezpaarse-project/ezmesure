@@ -491,7 +491,12 @@ export default {
       const active = !this.endpoint.active;
 
       this.refreshing = true;
-      await this.$axios.$patch(`/sushi-endpoints/${this.endpoint.id}`, { active });
+      try {
+        await this.$axios.$patch(`/sushi-endpoints/${this.endpoint.id}`, { active });
+      } catch (error) {
+        this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
+      }
+      this.refreshing = false;
 
       await this.refreshEndpoint();
     },
