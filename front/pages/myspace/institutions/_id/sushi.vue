@@ -452,7 +452,12 @@
       </template>
 
       <template #[`item.endpoint.vendor`]="{ item }">
-        <div>{{ item.endpoint.vendor }}</div>
+        <div>
+          <nuxt-link v-if="isAdmin" :to="`/admin/endpoints/${item.endpoint.id}/sushi`">
+            {{ item.endpoint.vendor }}
+          </nuxt-link>
+          <span v-else>{{ item.endpoint.vendor }}</span>
+        </div>
 
         <div v-if="!item.endpoint.active" class="d-flex align-center text-caption warning--text">
           <v-icon color="warning" small class="mr-1">
