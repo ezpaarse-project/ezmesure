@@ -891,6 +891,7 @@ export default {
           icon: 'mdi-history',
           label: this.$t('tasks.history'),
           callback: this.showSushiItemHistory,
+          hide: !this.isAdmin,
         },
         {
           icon: 'mdi-identifier',
