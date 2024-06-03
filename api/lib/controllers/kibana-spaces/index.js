@@ -33,7 +33,7 @@ router.get('/', {
   path: '/',
   handler: getMany,
   validate: {
-    params: standardQueryParams.manyValidation,
+    query: standardQueryParams.manyValidation,
   },
 });
 
