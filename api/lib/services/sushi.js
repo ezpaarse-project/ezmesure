@@ -1,7 +1,11 @@
 const {
+  startOfMonth,
+  endOfMonth,
   subDays,
   isBefore,
   subMonths,
+  parseISO,
+  isValid: isValidDate,
   format,
 } = require('date-fns');
 
@@ -223,11 +227,12 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   } = endpoint;
 
   const paramSeparator = endpoint.paramSeparator || '|';
+  const dateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
 
   const {
     reportType = DEFAULT_REPORT_TYPE,
-    beginDate,
-    endDate,
+    beginDate: beginDateStr,
+    endDate: endDateStr,
     stream,
   } = options;
 
@@ -254,10 +259,16 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
     }
   });
 
-  const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+  const prevMonth = subMonths(new Date(), 1);
 
-  params.begin_date = beginDate || endDate || prevMonth;
-  params.end_date = endDate || beginDate || prevMonth;
+  let beginDate = parseISO(beginDateStr || endDateStr);
+  let endDate = parseISO(endDateStr || beginDateStr);
+
+  if (!isValidDate(beginDate)) { beginDate = prevMonth; }
+  if (!isValidDate(endDate)) { endDate = prevMonth; }
+
+  params.begin_date = format(startOfMonth(beginDate), dateFormat);
+  params.end_date = format(endOfMonth(endDate), dateFormat);
 
   return {
     method: 'get',
