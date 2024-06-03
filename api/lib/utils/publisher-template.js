@@ -75,7 +75,10 @@ module.exports = {
       YOP: {
         type: 'keyword',
         fields: {
-          date: { type: 'date' },
+          date: {
+            type: 'date',
+            ignore_malformed: true,
+          },
         },
       },
 
