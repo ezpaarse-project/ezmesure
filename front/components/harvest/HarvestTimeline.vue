@@ -53,7 +53,9 @@ export default defineComponent({
   },
   computed: {
     steps() {
-      return this.task.steps || [];
+      if (!Array.isArray(this.task.steps)) { return []; }
+
+      return this.task.steps.slice().sort((a, b) => (a?.createdAt < b?.createdAt ? -1 : 1));
     },
     logs() {
       return this.task.logs || [];
