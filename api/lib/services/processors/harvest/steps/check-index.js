@@ -44,7 +44,7 @@ const waitUntilTaskComplete = (esTaskId, step, steps, timeout) => {
       timeoutId = setTimeout(handler, intervalMs);
 
       data.deletedItems = (task.status.deleted || 0);
-      data.progress = (task.status.deleted || 0) / (task.status.total || 0);
+      data.progress = (task.status.deleted || 0) / (task.status.total || 1);
 
       if ((task.status.deleted || 0) === data.deletedItems) {
         return;
