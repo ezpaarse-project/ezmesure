@@ -6,7 +6,7 @@
 export default {
   props: {
     date: {
-      type: [String, Number],
+      type: [String, Number, Date],
       default: () => '',
     },
     format: {
