@@ -7,13 +7,23 @@ const publisherIndexTemplate = require('../../../../utils/publisher-template');
 const HarvestError = require('../HarvestError');
 
 /**
- *
+ * @typedef {Awaited<ReturnType<import('..').ProcessorStepParam['task']['steps']['create']>>} Step
+ */
+
+/**
  * @param {string} esTaskId
+ * @param {Step} step
+ * @param {import('..').ProcessorStepParam['task']['steps']} steps
  * @param {import('..').ProcessorStepParam['timeout']} timeout
  */
-const waitUntilTaskComplete = (esTaskId, timeout) => {
+const waitUntilTaskComplete = (esTaskId, step, steps, timeout) => {
+  const s = step;
+  if (!s.data || !(s.data instanceof Object) || Array.isArray(s.data)) {
+    s.data = {};
+  }
+  const { data } = s;
+
   let timeoutId;
-  let lastProgress;
   const intervalMs = 5000;
 
   return new Promise((resolve) => {
@@ -33,12 +43,13 @@ const waitUntilTaskComplete = (esTaskId, timeout) => {
 
       timeoutId = setTimeout(handler, intervalMs);
 
-      const progress = task.status.deleted || 0;
-      if (progress === lastProgress) {
+      data.deletedItems = (task.status.deleted || 0);
+      data.progress = (task.status.deleted || 0) / (task.status.total || 0);
+
+      if ((task.status.deleted || 0) === data.deletedItems) {
         return;
       }
-
-      lastProgress = progress;
+      steps.update(s); // not awaited to avoid issues with timeout
       timeout.reset();
     };
 
@@ -71,6 +82,10 @@ module.exports = async function process(param) {
   } = task;
 
   const indexStep = await steps.create('index');
+  if (!indexStep.data || !(indexStep.data instanceof Object) || Array.isArray(indexStep.data)) {
+    indexStep.data = {};
+  }
+  indexStep.data.index = index;
   await saveTask();
   logs.add('info', `Ensuring [${index}]`);
   timeout.reset();
@@ -95,7 +110,10 @@ module.exports = async function process(param) {
     }
     timeout.reset();
 
+    logs.add('info', `Created index [${index}]`);
+
     await steps.end(indexStep);
+    await saveTask();
     return;
   }
 
@@ -144,7 +162,11 @@ module.exports = async function process(param) {
   timeout.reset();
 
   try {
-    const esTask = await waitUntilTaskComplete(esTaskId, timeout);
+    const esTask = await waitUntilTaskComplete(esTaskId, indexStep, steps, timeout);
+    logs.add('info', 'Index cleanup completed');
+    logs.add('info', `Items deleted: ${esTask.status.deleted}`);
+    await saveTask();
+
     if (esTask.status.deleted !== esTask.status.total) {
       throw new Error('Completed but not all data was deleted');
     }
