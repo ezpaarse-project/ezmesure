@@ -35,6 +35,11 @@ const waitUntilTaskComplete = (esTaskId, step, steps, timeout) => {
 
       const { task, completed } = body;
 
+      data.deletedItems = (task.status.deleted || 0);
+      data.progress = Math.floor(((task.status.deleted || 0) / (task.status.total || 1)) * 100);
+
+      steps.update(s); // not awaited to avoid issues with timeout
+
       if (completed) {
         clearTimeout(timeoutId);
         resolve(task);
@@ -43,14 +48,9 @@ const waitUntilTaskComplete = (esTaskId, step, steps, timeout) => {
 
       timeoutId = setTimeout(handler, intervalMs);
 
-      data.deletedItems = (task.status.deleted || 0);
-      data.progress = (task.status.deleted || 0) / (task.status.total || 1);
-
-      if ((task.status.deleted || 0) === data.deletedItems) {
-        return;
+      if ((task.status.deleted || 0) !== data.deletedItems) {
+        timeout.reset();
       }
-      steps.update(s); // not awaited to avoid issues with timeout
-      timeout.reset();
     };
 
     timeoutId = setTimeout(handler, intervalMs);
@@ -174,5 +174,6 @@ module.exports = async function process(param) {
     throw new HarvestError(`Failed to clean data of index [${index}]`, { cause: e });
   }
 
+  indexStep.data.progress = 100;
   await steps.end(indexStep);
 };
