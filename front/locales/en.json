@@ -533,17 +533,19 @@
       "title": "Steps",
       "startedOn": "Started on {date}",
       "terminatedIn": "Terminated in {duration}",
+      "deletedItems": "{n} deleted documents",
       "processedItems": "{n} processed items",
       "progress": "Progress: {progress}%",
       "labels": {
         "download": "Report download",
         "validation": "Report validation",
+        "index": "Index preparation",
         "insert": "Insert in Elasticsearch"
       }
     },
     "params": {
       "reportType": "Report type:",
-      "harvestId": "Harvest identifier:",
+      "sessionId": "Session identifier:",
       "period": "Period:",
       "index": "Indice:"
     }

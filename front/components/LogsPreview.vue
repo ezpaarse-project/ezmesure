@@ -56,10 +56,9 @@ export default {
   },
   computed: {
     coloredLogs() {
-      return this.logs.map((log) => ({
-        ...log,
-        color: logColors.get(log[this.logType]) || 'white--text',
-      }));
+      return this.logs
+        .map((log) => ({ ...log, color: logColors.get(log[this.logType]) || 'white--text' }))
+        .sort((a, b) => (a?.[this.logDate] < b?.[this.logDate] ? -1 : 1));
     },
   },
 };

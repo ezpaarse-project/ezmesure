@@ -534,17 +534,19 @@
       "title": "Étapes",
       "startedOn": "Démarrée le {date}",
       "terminatedIn": "Terminée en {duration}",
+      "deletedItems": "{n} documents supprimés",
       "processedItems": "{n} entrées traitées",
       "progress": "Progression : {progress}%",
       "labels": {
         "download": "Téléchargement du rapport",
         "validation": "Validation du rapport",
+        "index": "Préparation de l'index",
         "insert": "Insertion dans Elasticsearch"
       }
     },
     "params": {
       "reportType": "Type de rapport :",
-      "harvestId": "Identifiant de moissonnage :",
+      "sessionId": "Identifiant de session :",
       "period": "Période :",
       "index": "Index :"
     }
