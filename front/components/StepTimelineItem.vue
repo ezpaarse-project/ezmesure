@@ -16,6 +16,9 @@
     <div v-if="data.processedReportItems" class="caption">
       {{ $t('tasks.steps.processedItems', { n: data.processedReportItems }) }}
     </div>
+    <div v-if="data.deletedItems" class="caption">
+      {{ $t('tasks.steps.deletedItems', { n: data.deletedItems }) }}
+    </div>
     <div v-if="data.progress && data.progress < 100" class="caption">
       {{ $t('tasks.steps.progress', { progress: data.progress }) }}
     </div>
@@ -62,17 +65,17 @@ export default {
   },
   computed: {
     isAdmin() {
-      return this.$auth.hasScope('superuser') || this.$auth.hasScope('admin');
+      return this.$auth?.user?.isAdmin;
     },
     duration() {
-      if (!Number.isInteger(this.step?.took)) { return null; }
+      if (!Number.isInteger(this.step?.runningTime)) { return null; }
 
-      return this.$dateFunctions.msToLocalDistance(this.step?.took, {
+      return this.$dateFunctions.msToLocalDistance(this.step?.runningTime, {
         includeSeconds: true,
       });
     },
     date() {
-      const startTime = new Date(this.step?.startTime);
+      const startTime = new Date(this.step?.startedAt);
 
       if (this.$dateFunctions.isValid(startTime)) {
         return this.$dateFunctions.format(startTime, 'PPPpp');

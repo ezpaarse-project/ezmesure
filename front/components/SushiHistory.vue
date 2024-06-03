@@ -54,7 +54,7 @@
                   </div>
                 </v-timeline-item>
 
-                <TaskParams :params="item.params" />
+                <TaskParams :task="item" />
 
                 <v-timeline-item hide-dot>
                   <div class="subtitle-1">
@@ -76,7 +76,7 @@
               </v-timeline-item>
 
               <v-timeline-item hide-dot class="mb-4">
-                <LogsPreview :logs="item.logs" />
+                <LogsPreview :logs="item.logs" log-type="level" />
               </v-timeline-item>
             </v-timeline>
           </td>
@@ -187,7 +187,12 @@ export default {
       this.refreshing = true;
 
       try {
-        this.tasks = await this.$axios.$get(`/sushi/${this.sushi.id}/tasks`);
+        this.tasks = await this.$axios.$get('/tasks', {
+          params: {
+            credentialsId: this.sushi.id,
+            include: ['steps', 'logs', 'session'],
+          },
+        });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('tasks.failedToFetchTasks'));
       }
