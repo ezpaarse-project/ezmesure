@@ -31,6 +31,8 @@ const schema = {
 
   credentials: Joi.object(),
   session: Joi.object(),
+  logs: Joi.array().items(Joi.object()),
+  steps: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -41,6 +43,8 @@ const includableFields = [
   'credentials.institution',
   'credentials.endpoint',
   'session',
+  'logs',
+  'steps',
 ];
 
 module.exports = {
