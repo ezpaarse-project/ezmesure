@@ -105,11 +105,11 @@
       </template>
 
       <template #[`item.startedAt`]="{ value }">
-        <LocalDate v-if="value" :date="value" />
+        <LocalDate v-if="value" :date="value" format="PPPpp" />
       </template>
 
       <template #[`item.updatedAt`]="{ value }">
-        <LocalDate v-if="value" :date="value" />
+        <LocalDate v-if="value" :date="value" format="PPPpp" />
       </template>
 
       <template #[`item.actions`]="{ item }">
