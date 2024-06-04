@@ -1,5 +1,10 @@
 const RepositoriesService = require('../../entities/repositories.service');
-const { schema, includableFields } = require('../../entities/repositories.dto');
+
+const {
+  schema,
+  includableFields,
+  adminImportSchema,
+} = require('../../entities/repositories.dto');
 
 const {
   PrismaErrors,
@@ -146,4 +151,74 @@ exports.deleteOne = async (ctx) => {
   });
 
   ctx.status = 204;
+};
+
+exports.importMany = async (ctx) => {
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {RepositoriesService} repositoriesService
+   * @param {*} endpointData
+   */
+  const importItem = async (repositoriesService, endpointData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(endpointData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.pattern) {
+      const endpoint = await repositoriesService.findUnique({ where: { pattern: item.pattern } });
+
+      if (endpoint && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.repositories.import.alreadyExists', endpoint.pattern));
+        return;
+      }
+    }
+
+    const endpoint = await repositoriesService.upsert({
+      where: { pattern: item?.pattern },
+      create: item,
+      update: item,
+    });
+
+    addResponseItem(endpoint, 'created');
+  };
+
+  await RepositoriesService.$transaction(async (repositoriesService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const endpointData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(repositoriesService, endpointData);
+      } catch (e) {
+        addResponseItem(endpointData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };
