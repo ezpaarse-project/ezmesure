@@ -224,6 +224,54 @@
       <v-divider />
 
       <v-card-title>
+        {{ $t('endpoints.dateFormat') }}
+      </v-card-title>
+
+      <v-card-text>
+        <i18n path="endpoints.dateFormatDesc" tag="p">
+          <template #beginDate>
+            <code>begin_date</code>
+          </template>
+          <template #endDate>
+            <code>end_date</code>
+          </template>
+        </i18n>
+
+        <v-combobox
+          v-model="endpointForm.harvestDateFormat"
+          :search-input.sync="harvestDateFormatSearch"
+          :items="availableHarvestDateFormats"
+          :label="$t('endpoints.dateFormat')"
+          hide-no-data
+          outlined
+        >
+          <template v-if="harvestDateFormatSearch" #append>
+            <LocalDate
+              :format="harvestDateFormatSearch"
+              :date="new Date()"
+            />
+          </template>
+
+          <template #item="{ item }">
+            <v-list-item-content>
+              <v-list-item-title>{{ item }}</v-list-item-title>
+            </v-list-item-content>
+
+            <v-list-item-action>
+              <v-list-item-action-text>
+                <LocalDate
+                  :format="item"
+                  :date="new Date()"
+                />
+              </v-list-item-action-text>
+            </v-list-item-action>
+          </template>
+        </v-combobox>
+      </v-card-text>
+
+      <v-divider />
+
+      <v-card-title>
         {{ $t('endpoints.queryParameters') }}
       </v-card-title>
 
@@ -307,11 +355,13 @@
 <script>
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import SushiParam from '~/components/SushiParam.vue';
+import LocalDate from '~/components/LocalDate.vue';
 
 export default {
   components: {
     ConfirmDialog,
     SushiParam,
+    LocalDate,
   },
   props: {
     availableTags: {
@@ -326,6 +376,7 @@ export default {
       valid: false,
       formTitle: '',
       supportedReportsSearch: '',
+      harvestDateFormatSearch: '',
 
       supportedReports: [],
 
@@ -342,11 +393,17 @@ export default {
         counterVersion: '',
         paramSeparator: '',
         testedReport: '',
+        harvestDateFormat: '',
         requireCustomerId: false,
         requireRequestorId: false,
         requireApiKey: false,
         ignoreReportValidation: false,
       },
+
+      availableHarvestDateFormats: [
+        'yyyy-MM',
+        'yyyy-MM-dd',
+      ],
 
       counterVersionRules: [
         (value) => {
@@ -392,6 +449,7 @@ export default {
       this.endpointForm.counterVersion = data.counterVersion || '';
       this.endpointForm.paramSeparator = data.paramSeparator || '';
       this.endpointForm.testedReport = data.testedReport || '';
+      this.endpointForm.harvestDateFormat = data.harvestDateFormat || '';
 
       this.endpointForm.requireCustomerId = !!data.requireCustomerId;
       this.endpointForm.requireRequestorId = !!data.requireRequestorId;
@@ -436,6 +494,13 @@ export default {
       this.saving = true;
 
       this.endpointForm.params = this.endpointForm.params.filter((param) => param.name);
+
+      /**
+       * Workaround
+       * Combobox sets model to null when the input is cleared, and null is ignored by the API
+       */
+      this.endpointForm.testedReport = this.endpointForm.testedReport || '';
+      this.endpointForm.harvestDateFormat = this.endpointForm.harvestDateFormat || '';
 
       try {
         if (this.endpointForm.id) {

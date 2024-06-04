@@ -420,6 +420,8 @@ model SushiEndpoint {
   additionalReports         String[]
   /// Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
+  /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
+  harvestDateFormat         String?
   /// Report used when testing endpoint
   testedReport              String?
   /// SUSHI credentials associated with the endpoint

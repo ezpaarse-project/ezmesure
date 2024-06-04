@@ -205,6 +205,8 @@
     "tags": "Étiquettes",
     "active": "Actif",
     "inactive": "Inactif",
+    "dateFormat": "Format de date",
+    "dateFormatDesc": "Le format de date ci-dessous sera utilisé pour remplir les champs {beginDate} et {endDate} lors du moissonnage.",
     "unableToUpdate": "Impossible de modifier le point d'accès",
     "inactiveDescription": "Les administrateurs ont rendus ce point d'accès inactif et ne sera donc pas moissonné.",
     "activeSince": "Actif depuis le {date}",

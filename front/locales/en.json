@@ -205,6 +205,8 @@
     "tags": "Tags",
     "active": "Active",
     "inactive": "Inactive",
+    "dateFormat": "Date format",
+    "dateFormatDesc": "The date format below will be used to fill the {beginDate} and {endDate} fields during harvesting.",
     "unableToUpdate": "Unable to update the endpoint",
     "inactiveDescription": "Administrators have deactivated this endpoint and it will not be harvested.",
     "activeSince": "Active since {date}",
