@@ -193,7 +193,7 @@ exports.importMany = async (ctx) => {
       const repo = await repositoriesService.findUnique({ where: { pattern: item.pattern } });
 
       if (repo && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.repositories.import.alreadyExists', repo.pattern));
+        addResponseItem(item, 'conflict', ctx.$t('errors.repository.alreadyExists', repo.pattern));
         return;
       }
     }

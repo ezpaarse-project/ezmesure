@@ -196,7 +196,7 @@ exports.importMany = async (ctx) => {
       const endpoint = await spacesService.findUnique({ where: { id: item.id } });
 
       if (endpoint && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.space.import.alreadyExists', endpoint.id));
+        addResponseItem(item, 'conflict', ctx.$t('errors.space.alreadyExists', endpoint.id));
         return;
       }
     }
