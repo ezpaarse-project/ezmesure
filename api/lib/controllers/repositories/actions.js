@@ -13,6 +13,7 @@ const {
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Prisma.RepositoryCreateInput} RepositoryCreateInput
  * @typedef {import('@prisma/client').Prisma.RepositoryWhereInput} RepositoryWhereInput
 */
 /* eslint-enable max-len */
@@ -189,32 +190,71 @@ exports.importMany = async (ctx) => {
     }
 
     if (item.pattern) {
-      const endpoint = await repositoriesService.findUnique({ where: { pattern: item.pattern } });
+      const repo = await repositoriesService.findUnique({ where: { pattern: item.pattern } });
 
-      if (endpoint && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.repositories.import.alreadyExists', endpoint.pattern));
+      if (repo && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.repositories.import.alreadyExists', repo.pattern));
         return;
       }
     }
 
-    const endpoint = await repositoriesService.upsert({
-      where: { pattern: item?.pattern },
-      create: item,
-      update: item,
+    /** @type {RepositoryCreateInput} */
+    const data = {
+      ...item,
+      permissions: {
+        connectOrCreate: item.permissions?.map(
+          (permission) => ({
+            where: {
+              username_institutionId_repositoryPattern: {
+                username: permission.username,
+                institutionId: permission.institutionId,
+                repositoryPattern: item.pattern,
+              },
+            },
+            create: {
+              ...permission,
+              username: undefined,
+              institutionId: undefined,
+              repositoryPattern: undefined,
+              membership: {
+                connect: {
+                  username_institutionId: {
+                    username: permission.username,
+                    institutionId: permission.institutionId,
+                  },
+                },
+              },
+            },
+          }),
+        ),
+      },
+      institutions: {
+        connect: item.institutions?.map(
+          (institution) => ({
+            id: institution.id,
+          }),
+        ),
+      },
+    };
+
+    const repo = await repositoriesService.upsert({
+      where: { pattern: item.pattern },
+      create: data,
+      update: data,
     });
 
-    addResponseItem(endpoint, 'created');
+    addResponseItem(repo, 'created');
   };
 
   await RepositoriesService.$transaction(async (repositoriesService) => {
     for (let i = 0; i < body.length; i += 1) {
-      const endpointData = body[i] || {};
+      const repoData = body[i] || {};
 
       try {
         // eslint-disable-next-line no-await-in-loop
-        await importItem(repositoriesService, endpointData);
+        await importItem(repositoriesService, repoData);
       } catch (e) {
-        addResponseItem(endpointData, 'error', e.message);
+        addResponseItem(repoData, 'error', e.message);
       }
     }
   });

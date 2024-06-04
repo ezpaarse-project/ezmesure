@@ -11,6 +11,12 @@ const {
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
 
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.SpaceCreateInput} SpaceCreateInput
+*/
+/* eslint-enable max-len */
+
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -195,10 +201,45 @@ exports.importMany = async (ctx) => {
       }
     }
 
+    /** @type {SpaceCreateInput} */
+    const data = {
+      ...item,
+      institutionId: undefined,
+      institution: {
+        connect: { id: item.institutionId },
+      },
+      permissions: {
+        connectOrCreate: item.permissions?.map(
+          (permission) => ({
+            where: {
+              username_spaceId: {
+                username: permission.username,
+                spaceId: item.id,
+              },
+            },
+            create: {
+              ...permission,
+              username: undefined,
+              institutionId: undefined,
+              spaceId: undefined,
+              membership: {
+                connect: {
+                  username_institutionId: {
+                    username: permission.username,
+                    institutionId: item.institutionId,
+                  },
+                },
+              },
+            },
+          }),
+        ),
+      },
+    };
+
     const endpoint = await spacesService.upsert({
-      where: { id: item?.id },
-      create: item,
-      update: item,
+      where: { id: item.id },
+      create: data,
+      update: data,
     });
 
     addResponseItem(endpoint, 'created');
