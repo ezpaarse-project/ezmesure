@@ -3,6 +3,7 @@ const SpacesService = require('../../entities/spaces.service');
 const {
   schema,
   includableFields,
+  adminImportSchema,
 } = require('../../entities/spaces.dto');
 
 const {
@@ -147,4 +148,75 @@ exports.deleteOne = async (ctx) => {
   await spacesService.delete({ where: { id: spaceId } });
 
   ctx.status = 204;
+};
+
+exports.importMany = async (ctx) => {
+  ctx.action = 'endpoint/import';
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {SpacesService} spacesService
+   * @param {*} endpointData
+   */
+  const importItem = async (spacesService, endpointData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(endpointData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const endpoint = await spacesService.findUnique({ where: { id: item.id } });
+
+      if (endpoint && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.space.import.alreadyExists', endpoint.id));
+        return;
+      }
+    }
+
+    const endpoint = await spacesService.upsert({
+      where: { id: item?.id },
+      create: item,
+      update: item,
+    });
+
+    addResponseItem(endpoint, 'created');
+  };
+
+  await SpacesService.$transaction(async (spacesService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const endpointData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(spacesService, endpointData);
+      } catch (e) {
+        addResponseItem(endpointData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };
