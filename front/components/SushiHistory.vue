@@ -46,39 +46,7 @@
 
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length">
-            <v-timeline align-top dense>
-              <template v-if="item.steps">
-                <v-timeline-item hide-dot>
-                  <div class="subtitle-1">
-                    {{ $t('tasks.parameters') }}
-                  </div>
-                </v-timeline-item>
-
-                <TaskParams :task="item" />
-
-                <v-timeline-item hide-dot>
-                  <div class="subtitle-1">
-                    {{ $t('tasks.steps.title') }}
-                  </div>
-                </v-timeline-item>
-
-                <StepTimelineItem
-                  v-for="(step, index) in item.steps"
-                  :key="index"
-                  :step="step"
-                />
-              </template>
-
-              <v-timeline-item hide-dot>
-                <div class="subtitle-1">
-                  {{ $t('tasks.logs') }}
-                </div>
-              </v-timeline-item>
-
-              <v-timeline-item hide-dot class="mb-4">
-                <LogsPreview :logs="item.logs" log-type="level" />
-              </v-timeline-item>
-            </v-timeline>
+            <HarvestTimeline :task="item" />
           </td>
         </template>
       </v-data-table>
@@ -97,21 +65,17 @@
 </template>
 
 <script>
-import LogsPreview from '~/components/LogsPreview.vue';
 import TaskLabel from '~/components/TaskLabel.vue';
 import LocalDate from '~/components/LocalDate.vue';
 import LocalDuration from '~/components/LocalDuration.vue';
-import StepTimelineItem from '~/components/StepTimelineItem.vue';
-import TaskParams from '~/components/TaskParams.vue';
+import HarvestTimeline from '~/components/harvest/HarvestTimeline.vue';
 
 export default {
   components: {
-    LogsPreview,
     TaskLabel,
     LocalDate,
-    StepTimelineItem,
     LocalDuration,
-    TaskParams,
+    HarvestTimeline,
   },
   data() {
     return {
