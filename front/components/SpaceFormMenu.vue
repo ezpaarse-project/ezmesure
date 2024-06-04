@@ -46,7 +46,7 @@
                 :label="`${$t('identifier')} *`"
                 :rules="[
                   v => !!v || $t('fieldIsRequired'),
-                  v => /^[a-z-]+$/i.test(v) || $t('invalidFormat'),
+                  v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
                 ]"
                 :disabled="editMode"
                 :suffix="suffix"
