@@ -984,10 +984,10 @@ export default {
       this.refreshing = false;
     },
 
-    async onSushiUpdate() {
+    async onSushiUpdate(ignoreReady = false) {
       this.refreshSushiItems();
 
-      if (this.sushiReady) {
+      if (this.sushiReady && !ignoreReady) {
         const resumeEntry = await this.$refs.confirm.open({
           title: this.$t('institutions.sushi.resumeEntryQuestion'),
           message: this.$t('institutions.sushi.resumeEntryDesc', { date: this.sushiReadySince }),
