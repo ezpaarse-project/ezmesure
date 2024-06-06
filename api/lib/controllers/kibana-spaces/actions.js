@@ -157,7 +157,7 @@ exports.deleteOne = async (ctx) => {
 };
 
 exports.importMany = async (ctx) => {
-  ctx.action = 'endpoint/import';
+  ctx.action = 'spaces/import';
   const { body = [] } = ctx.request;
   const { overwrite } = ctx.query;
 
