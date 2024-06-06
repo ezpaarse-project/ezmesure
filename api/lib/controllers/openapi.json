@@ -8115,6 +8115,139 @@
         ]
       }
     },
+    "/sushi/_check_connection": {
+      "post": {
+        "tags": ["Sushi"],
+        "summary": "Check credentials connection",
+        "operationId": "post-sushi-check-connection",
+        "description": "Check the connection to a SUSHI endpoint and update the connection state of the SUSHI credentials if found",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["endpoint"],
+                "properties": {
+                  "endpoint": {
+                    "type": "object",
+                    "required": ["sushiUrl"],
+                    "properties": {
+                      "id": { "type": "string", "nullable": true },
+                      "sushiUrl": { "type": "string" },
+                      "harvestDateFormat": { "type": "string", "nullable": true },
+                      "testedReport": { "type": "string", "nullable": true },
+                      "paramSeparator": { "type": "string", "nullable": true },
+                      "params": { 
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "Parameters that should be added in the query string",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Name of the query parameter"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Value of the query parameter"
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "institution": {
+                    "type": "object",
+                    "required": ["id"],
+                    "properties": {
+                      "id": { "type": "string" }
+                    }
+                  },
+                  "customerId": { "type": "string", "nullable": true },
+                  "requestorId": { "type": "string", "nullable": true },
+                  "apiKey": { "type": "string", "nullable": true },
+                  "params": { 
+                    "type": "array",
+                    "items":  {
+                      "type": "object",
+                      "description": "Parameters that should be added in the query string",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the query parameter"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Value of the query parameter"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "State of the latest connection test",
+                  "readOnly": true,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the connection. Success if the harvest test succeeded, or if exceptions are not related to authentication. Unauthorized if the credentials are invalid. Failed if an error occurred.",
+                      "enum": ["success", "unauthorized", "failed"],
+                      "readOnly": true
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "Date of the latest connection test",
+                      "readOnly": true
+                    },
+                    "exceptions": {
+                      "type": "array",
+                      "description": "Exceptions that was thrown by the latest connection test",
+                      "readOnly": true,
+                      "items": {
+                        "$ref": "#/components/schemas/SushiException"
+                      }
+                    },
+                    "errorCode": {
+                      "description": "The error code, if an exception was encountered",
+                      "type": "string",
+                      "readOnly": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/sushi/{id}": {
       "parameters": [
         {
