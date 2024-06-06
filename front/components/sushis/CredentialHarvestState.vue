@@ -11,7 +11,7 @@
       {{ chipIcon }}
     </v-icon>
 
-    <LocalDate :date="lastHarvest.harvestDate.getTime()" format="PPPp" />
+    <LocalDate :date="lastHarvest.harvestDate.getTime()" />
   </v-chip>
 </template>
 
