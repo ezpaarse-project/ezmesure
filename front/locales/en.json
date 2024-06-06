@@ -233,6 +233,7 @@
     "noEndpointFound": "No endpoint found",
     "clickToDeclareOne": "Click here to declare one",
     "disabledUntil": "Disabled until",
+    "checkEndpoint": "Test endpoint",
     "filters": {
       "title": "Filter endpoints"
     }

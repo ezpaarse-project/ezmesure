@@ -233,6 +233,7 @@
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un",
     "disabledUntil": "Désactivé jusqu'au",
+    "checkEndpoint": "Tester le point d'accès",
     "filters": {
       "title": "Filtrer les points d'accès"
     }
