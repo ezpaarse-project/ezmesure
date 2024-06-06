@@ -658,6 +658,7 @@
     "endpointVendor": "Nom du fournisseur",
     "endpointUrl": "URL du point d'accès SUSHI",
     "pleaseEnterFullVendorName": "Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)",
+    "sushiDetails": "Merci de précisez des identifiants a utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que le point d'accès est fonctionnel est compatible COUNTER5.",
     "endpointDetails": "Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.",
     "additionalInformation": "Informations complémentaires"
   },
