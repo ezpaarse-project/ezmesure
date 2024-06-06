@@ -11,7 +11,7 @@ const {
  * @type {import('joi').SchemaLike}
  */
 const schema = {
-  id: Joi.string().regex(/^[a-z-]+$/i).trim(),
+  id: Joi.string().regex(/^[a-z0-9_-]+$/i).trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
@@ -20,9 +20,10 @@ const schema = {
 
   type: Joi.string().trim().min(1),
   name: Joi.string().trim().min(1),
-  description: Joi.string().trim().allow(''),
-  initials: Joi.string().trim().allow('').max(2),
-  color: Joi.string().trim().allow(''),
+  description: Joi.string().trim().allow('').empty(null),
+  initials: Joi.string().trim().allow('').max(2)
+    .empty(null),
+  color: Joi.string().trim().allow('').empty(null),
 
   indexPatterns: Joi.array().items(Joi.object({
     title: Joi.string().required().min(1),
@@ -74,14 +75,20 @@ const adminUpdateSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator imports multiple spaces
+ * Schema to be applied when an administrator imports multiple repositories
  */
-const adminImportSchema = Joi.array().required().items(schema);
+const adminImportSchema = withModifiers(
+  adminCreateSchema,
+  {
+    id: () => schema.id,
+    permissions: () => schema.permissions,
+  },
+);
 
 module.exports = {
   schema,
   includableFields,
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
-  adminImportSchema,
+  adminImportSchema: Joi.object(adminImportSchema).required(),
 };

@@ -16,7 +16,7 @@ const schema = {
 
   institutions: Joi.array().items(Joi.object()),
 
-  pattern: Joi.string().regex(/^[a-z*-]+$/i).trim().min(1),
+  pattern: Joi.string().regex(/^[a-z0-9*_-]+$/i).trim().min(1),
   type: Joi.string().trim().min(1),
 
   permissions: Joi.array().items(Joi.object()),
@@ -69,7 +69,14 @@ const adminUpdateSchema = withModifiers(
 /**
  * Schema to be applied when an administrator imports multiple repositories
  */
-const adminImportSchema = Joi.array().required().items(adminCreateSchema);
+const adminImportSchema = withModifiers(
+  adminCreateSchema,
+  {
+    pattern: () => schema.pattern,
+    institutions: () => schema.institutions,
+    permissions: () => schema.permissions,
+  },
+);
 
 module.exports = {
   schema,
@@ -77,5 +84,5 @@ module.exports = {
   adminCreateSchema: Joi.object(adminCreateSchema).required(),
   adminCreateOrConnectSchema: Joi.object(adminCreateOrConnectSchema).required(),
   adminUpdateSchema: Joi.object(adminUpdateSchema).required(),
-  adminImportSchema,
+  adminImportSchema: Joi.object(adminImportSchema).required(),
 };
