@@ -23,7 +23,7 @@ export default {
       }
 
       try {
-        return this.$dateFunctions.format(localDate, this.format || 'PPPpp');
+        return this.$dateFunctions.format(localDate, this.format || 'PPPp');
       } catch (e) {
         return this.$t('invalidDate');
       }
