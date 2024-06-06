@@ -179,10 +179,10 @@ exports.importMany = async (ctx) => {
 
   /**
    * @param {RepositoriesService} repositoriesService
-   * @param {*} endpointData
+   * @param {*} repositoryData
    */
-  const importItem = async (repositoriesService, endpointData = {}) => {
-    const { value: item, error } = adminImportSchema.validate(endpointData);
+  const importItem = async (repositoriesService, repositoryData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(repositoryData);
 
     if (error) {
       addResponseItem(item, 'error', error.message);

@@ -182,10 +182,10 @@ exports.importMany = async (ctx) => {
 
   /**
    * @param {SpacesService} spacesService
-   * @param {*} endpointData
+   * @param {*} spaceData
    */
-  const importItem = async (spacesService, endpointData = {}) => {
-    const { value: item, error } = adminImportSchema.validate(endpointData);
+  const importItem = async (spacesService, spaceData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(spaceData);
 
     if (error) {
       addResponseItem(item, 'error', error.message);
@@ -193,10 +193,10 @@ exports.importMany = async (ctx) => {
     }
 
     if (item.id) {
-      const endpoint = await spacesService.findUnique({ where: { id: item.id } });
+      const space = await spacesService.findUnique({ where: { id: item.id } });
 
-      if (endpoint && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.space.alreadyExists', endpoint.id));
+      if (space && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.space.alreadyExists', space.id));
         return;
       }
     }
@@ -236,24 +236,24 @@ exports.importMany = async (ctx) => {
       },
     };
 
-    const endpoint = await spacesService.upsert({
+    const space = await spacesService.upsert({
       where: { id: item.id },
       create: data,
       update: data,
     });
 
-    addResponseItem(endpoint, 'created');
+    addResponseItem(space, 'created');
   };
 
   await SpacesService.$transaction(async (spacesService) => {
     for (let i = 0; i < body.length; i += 1) {
-      const endpointData = body[i] || {};
+      const spaceData = body[i] || {};
 
       try {
         // eslint-disable-next-line no-await-in-loop
-        await importItem(spacesService, endpointData);
+        await importItem(spacesService, spaceData);
       } catch (e) {
-        addResponseItem(endpointData, 'error', e.message);
+        addResponseItem(spaceData, 'error', e.message);
       }
     }
   });
