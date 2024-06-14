@@ -976,7 +976,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, { params: { include: ['harvests'] } });
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, { params: { include: ['endpoint', 'harvests'], size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }
