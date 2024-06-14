@@ -346,7 +346,7 @@ export default defineComponent({
         sessionId,
 
         status: this.filters.status,
-        type: this.filters.reportType,
+        reportType: this.filters.reportType,
         endpointId: this.filters.vendor,
         institutionId: this.filters.institution,
         tags: this.filters.tags,
@@ -359,7 +359,7 @@ export default defineComponent({
       };
 
       try {
-        this.meta = await this.$axios.$get('/tasks/_meta', { params: { sessionId } });
+        this.meta = await this.$axios.$get('/tasks/_meta', { params: { sessionId, size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('harvest.jobs.unableToRetriveMeta'));
       }
