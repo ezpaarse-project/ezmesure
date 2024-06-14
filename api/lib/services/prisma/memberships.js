@@ -5,12 +5,13 @@ const { client: prisma } = require('./index');
 /**
  * @typedef {import('@prisma/client').Prisma.TransactionClient} TransactionClient
  * @typedef {import('@prisma/client').Membership} Membership
- * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
  * @typedef {import('@prisma/client').Prisma.MembershipFindUniqueArgs} MembershipFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.MembershipFindManyArgs} MembershipFindManyArgs
  * @typedef {import('@prisma/client').Prisma.MembershipUpdateArgs} MembershipUpdateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipCreateArgs} MembershipCreateArgs
  * @typedef {import('@prisma/client').Prisma.MembershipDeleteArgs} MembershipDeleteArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipUpsertArgs} MembershipUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.MembershipCountArgs} MembershipCountArgs
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionDeleteManyArgs} RepositoryPermissionDeleteManyArgs
  *
@@ -93,6 +94,15 @@ function upsert(params, tx = prisma) {
 }
 
 /**
+ * @param {MembershipCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.membership.count(params);
+}
+
+/**
  * @param {MembershipDeleteArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<MembershipRemoved | null>}
@@ -171,6 +181,7 @@ module.exports = {
   findByID,
   update,
   upsert,
+  count,
   remove,
   removeAll,
 };

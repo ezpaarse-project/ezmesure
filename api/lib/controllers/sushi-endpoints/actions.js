@@ -1,53 +1,44 @@
-const { adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
+const { schema, adminImportSchema, includableFields } = require('../../entities/sushi-endpoints.dto');
 const SushiEndpointService = require('../../entities/sushi-endpoints.service');
-const { propsToPrismaInclude } = require('../utils');
+
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['vendor'],
+});
+exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
-  const {
-    include: propsToInclude,
-    requireCustomerId,
-    requireRequestorId,
-    requireApiKey,
-    isSushiCompliant,
-    tags,
-    q: search,
-  } = ctx.query;
-
-  let include;
-
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  const where = {
-    requireCustomerId,
-    requireRequestorId,
-    requireApiKey,
-    isSushiCompliant,
-  };
-
-  if (tags) {
-    where.tags = {
-      hasSome: Array.isArray(tags) ? tags : tags.split(',').map((s) => s.trim()),
-    };
-  }
-
-  if (search) {
-    where.vendor = {
-      contains: search,
-      mode: 'insensitive',
-    };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   const sushiEndpointService = new SushiEndpointService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiEndpointService.findMany({ where, include });
+  ctx.set('X-Total-Count', await sushiEndpointService.count({ where: prismaQuery.where }));
+  ctx.body = await sushiEndpointService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
-  const { endpoint } = ctx.state;
+  const { endpointId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: endpointId });
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+
+  const sushiEndpointService = new SushiEndpointService();
+  const endpoint = await sushiEndpointService.findUnique(prismaQuery);
+
+  if (!endpoint) {
+    ctx.throw(404, ctx.$t('errors.sushi-endpoint.notFound'));
+    return;
+  }
 
   ctx.status = 200;
   ctx.body = endpoint;
@@ -62,7 +53,6 @@ exports.addEndpoint = async (ctx) => {
   };
 
   const sushiEndpointService = new SushiEndpointService();
-
   const endpoint = await sushiEndpointService.create({ data: body });
 
   ctx.metadata.endpointId = endpoint.id;
@@ -74,6 +64,7 @@ exports.updateEndpoint = async (ctx) => {
   ctx.action = 'endpoint/update';
   const { endpoint } = ctx.state;
   const { body } = ctx.request;
+  const data = { ...body };
 
   ctx.metadata = {
     endpointId: endpoint.id,
@@ -82,10 +73,20 @@ exports.updateEndpoint = async (ctx) => {
 
   const sushiEndpointService = new SushiEndpointService();
 
+  if (typeof body.active === 'boolean') {
+    if (Object.keys(body).length === 1) {
+      // If only the active state is toggled, no need to change update date
+      data.updatedAt = endpoint.updatedAt;
+    }
+    if (endpoint.active !== body.active) {
+      data.activeUpdatedAt = new Date();
+    }
+  }
+
   ctx.status = 200;
   ctx.body = await sushiEndpointService.update({
     where: { id: endpoint.id },
-    data: body,
+    data,
   });
 };
 

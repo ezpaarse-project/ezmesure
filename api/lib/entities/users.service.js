@@ -13,6 +13,7 @@ const passwordResetValidity = config.get('passwordResetValidity');
 /**
  * @typedef {import('@prisma/client').User} User
  * @typedef {import('@prisma/client').Prisma.UserUpsertArgs} UserUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.UserCountArgs} UserCountArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueArgs} UserFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.UserFindUniqueOrThrowArgs} UserFindUniqueOrThrowArgs
  * @typedef {import('@prisma/client').Prisma.UserFindManyArgs} UserFindManyArgs
@@ -152,6 +153,14 @@ module.exports = class UsersService extends BasePrismaService {
     const user = await usersPrisma.upsert(params, this.prisma);
     this.triggerHooks('user:upsert', user);
     return user;
+  }
+
+  /**
+   * @param {UserCountArgs} params
+   * @returns {Promise<number>}
+   */
+  async count(params) {
+    return usersPrisma.count(params, this.prisma);
   }
 
   /**

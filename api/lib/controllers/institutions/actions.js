@@ -3,12 +3,9 @@ const config = require('config');
 const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
-const UsersService = require('../../entities/users.service');
 const ImagesService = require('../../services/images');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const MembershipsService = require('../../entities/memberships.service');
-const RepositoriesService = require('../../entities/repositories.service');
-const SpacesService = require('../../entities/spaces.service');
 
 /* eslint-disable max-len */
 /**
@@ -24,6 +21,7 @@ const SpacesService = require('../../entities/spaces.service');
 /* eslint-enable max-len */
 
 const {
+  schema: institutionSchema,
   adminCreateSchema,
   adminUpdateSchema,
   createSchema,
@@ -31,17 +29,15 @@ const {
   adminImportSchema,
   includableFields,
 } = require('../../entities/institutions.dto');
-const {
-  includableFields: membershipIncludableFields,
-} = require('../../entities/memberships.dto');
-const {
-  includableFields: repositoryIncludableFields,
-} = require('../../entities/repositories.dto');
-const {
-  includableFields: spaceIncludableFields,
-} = require('../../entities/repositories.dto');
 
-const { propsToPrismaInclude } = require('../utils');
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema: institutionSchema,
+  includableFields,
+});
+exports.standardQueryParams = standardQueryParams;
 
 const {
   PERMISSIONS,
@@ -49,8 +45,6 @@ const {
     docContact: DOC_CONTACT,
     techContact: TECH_CONTACT,
   },
-  upsertSchema: membershipUpsertSchema,
-  adminUpsertSchema: membershipAdminUpsertSchema,
 } = require('../../entities/memberships.dto');
 
 const sender = config.get('notifications.sender');
@@ -66,87 +60,39 @@ function sendValidateInstitution(receivers, data) {
   });
 }
 
-function sendNewContact(receiver, institutionName) {
-  const data = {
-    contactBlogLink: 'https://blog.ezpaarse.org/2022/02/correspondants-ezmesure-votre-nouveau-role/',
-    institution: institutionName,
-  };
-
-  return sendMail({
-    from: sender,
-    to: receiver,
-    cc: supportRecipients,
-    subject: `Vous êtes correspondant de ${institutionName}`,
-    ...generateMail('new-contact', { data }),
-  });
-}
-
 exports.getInstitutions = async (ctx) => {
-  const {
-    include: propsToInclude,
-    q: query,
-    validated,
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-  } = ctx.query;
-
-  let include;
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  /** @type {InstitutionFindManyArgs} */
-  const options = {
-    include,
-    take: Number.isInteger(size) && size >= 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    where: {},
-  };
-
-  if (sort) {
-    options.orderBy = { [sort]: order };
-  }
-
-  if (query) {
-    options.where.name = {
-      contains: query,
-      mode: 'insensitive',
-    };
-  }
-
-  if (validated != null) {
-    options.where.validated = {
-      equals: validated,
-    };
-  }
-
-  const institutionsService = new InstitutionsService();
-
-  ctx.type = 'json';
-  ctx.body = await institutionsService.findMany(options);
-};
-
-exports.getInstitution = async (ctx) => {
-  const {
-    include: propsToInclude,
-  } = ctx.query;
-  const { institutionId } = ctx.params;
-
-  let include;
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   const institutionsService = new InstitutionsService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await institutionsService.findUnique({
-    where: { id: institutionId },
-    include,
-  });
+  ctx.set('X-Total-Count', await institutionsService.count({ where: prismaQuery.where }));
+  ctx.body = await institutionsService.findMany(prismaQuery);
+};
+
+exports.getInstitution = async (ctx) => {
+  const { institutionId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId });
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+
+  const institutionsService = new InstitutionsService();
+  const institution = await institutionsService.findUnique(prismaQuery);
+
+  if (!institution) {
+    ctx.throw(404, ctx.$t('errors.institution.notFound'));
+    return;
+  }
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = institution;
 };
 
 exports.createInstitution = async (ctx) => {
@@ -222,8 +168,8 @@ exports.updateInstitution = async (ctx) => {
   const institutionsService = new InstitutionsService();
   const membershipsService = new MembershipsService();
 
-  if (institutionData.logo) {
-    institutionData.logoId = await ImagesService.storeLogo(institutionData.logo);
+  if (body.logo) {
+    institutionData.logoId = await ImagesService.storeLogo(body.logo);
   }
 
   // FIXME: handle admin restricted fields
@@ -472,224 +418,6 @@ exports.deleteInstitution = async (ctx) => {
   ctx.body = data;
 };
 
-exports.getInstitutionRepositories = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const repositoriesService = new RepositoriesService();
-
-  const repositories = await repositoriesService.findMany({
-    where: { institutions: { some: { id: ctx.state.institution.id } } },
-    include: propsToPrismaInclude(propsToInclude, repositoryIncludableFields),
-  });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(repositories) ? repositories : [];
-};
-
-exports.getInstitutionSpaces = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const spacesService = new SpacesService();
-
-  const spaces = await spacesService.findMany({
-    where: { institutionId: ctx.state.institution.id },
-    include: propsToPrismaInclude(propsToInclude, spaceIncludableFields),
-  });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(spaces) ? spaces : [];
-};
-
-exports.getInstitutionMember = async (ctx) => {
-  const { institutionId, username } = ctx.params;
-  const { include: propsToInclude } = ctx.query;
-
-  const membershipsService = new MembershipsService();
-
-  const membership = await membershipsService.findUnique({
-    where: {
-      username_institutionId: { institutionId, username },
-    },
-    include: propsToPrismaInclude(propsToInclude, membershipIncludableFields),
-  });
-
-  if (!membership) {
-    ctx.throw(404, ctx.$t('errors.member.notFound'));
-  }
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = membership;
-};
-
-exports.getInstitutionMembers = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const membershipsService = new MembershipsService();
-
-  const memberships = await membershipsService.findMany({
-    where: { institutionId: ctx.state.institution.id },
-    include: propsToPrismaInclude(propsToInclude, membershipIncludableFields),
-  });
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(memberships) ? memberships : [];
-};
-
-exports.getInstitutionContacts = async (ctx) => {
-  const members = await ctx.state.institution.getContacts();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-
-  ctx.body = Array.isArray(members) ? members : [];
-};
-
-exports.addInstitutionMember = async (ctx) => {
-  ctx.action = 'institutions/addMember';
-
-  const {
-    institution,
-    user: connectedUser,
-  } = ctx.state;
-  const { username } = ctx.params;
-  const {
-    id: institutionId,
-    name: institutionName,
-  } = institution;
-
-  const schema = connectedUser?.isAdmin ? membershipAdminUpsertSchema : membershipUpsertSchema;
-  const { value: body } = schema.validate({
-    ...ctx.request.body,
-    institutionId,
-    username,
-  });
-
-  ctx.metadata = {
-    institutionId,
-    institutionName,
-    username,
-  };
-
-  const usersService = new UsersService();
-  const membershipsService = new MembershipsService();
-
-  const user = await usersService.findUnique({
-    where: { username },
-    include: {
-      memberships: {
-        where: { institutionId },
-      },
-    },
-  });
-
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.user.notFound'));
-  }
-
-  const { roles } = body;
-  const membership = user.memberships?.[0];
-  const memberIsContact = membership?.roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
-  const memberBecomesContact = roles?.some?.((r) => r === DOC_CONTACT || r === TECH_CONTACT);
-
-  if ((membership?.locked) && !connectedUser?.isAdmin) {
-    ctx.throw(409, ctx.$t('errors.members.notEditable'));
-  }
-
-  const membershipData = {
-    ...body,
-    user: { connect: { username } },
-    institution: { connect: { id: institutionId } },
-  };
-
-  const newMembership = await membershipsService.upsert({
-    where: {
-      username_institutionId: { username, institutionId },
-    },
-    include: {
-      repositoryPermissions: true,
-      spacePermissions: true,
-      user: true,
-    },
-    create: membershipData,
-    update: membershipData,
-  });
-  appLogger.info(`Membership between user [${username}] and institution [${institutionId}] is upserted`);
-
-  if (user.email && !memberIsContact && memberBecomesContact) {
-    try {
-      await sendNewContact(user.email, institutionName);
-    } catch (err) {
-      appLogger.error(`Failed to send new contact mail: ${err}`);
-    }
-  }
-
-  ctx.status = 200;
-  ctx.body = newMembership;
-};
-
-exports.removeInstitutionMember = async (ctx) => {
-  ctx.action = 'institutions/removeMember';
-
-  const { institution, user: connectedUser } = ctx.state;
-  const { username } = ctx.params;
-  const { id: institutionId } = institution;
-
-  ctx.metadata = {
-    institutionId: institution.id,
-    institutionName: institution.name,
-    username,
-  };
-
-  const usersService = new UsersService();
-  const membershipsService = new MembershipsService();
-
-  const user = await usersService.findUnique({
-    where: { username },
-    select: {
-      memberships: {
-        where: { institutionId },
-      },
-    },
-  });
-
-  if (!user) {
-    ctx.throw(404, ctx.$t('errors.user.notFound'));
-  }
-
-  const membership = user.memberships?.[0];
-
-  if ((membership?.locked) && !connectedUser?.isAdmin) {
-    ctx.throw(409, ctx.$t('errors.members.notEditable'));
-  }
-
-  if (!membership) {
-    ctx.status = 200;
-    ctx.body = { message: ctx.$t('nothingToDo') };
-    return;
-  }
-
-  try {
-    await membershipsService.delete({
-      where: {
-        username_institutionId: { username, institutionId },
-      },
-    });
-  } catch (e) {
-    ctx.throw(500, ctx.$t('errors.user.failedToUpdateRoles'));
-  }
-
-  ctx.status = 200;
-  ctx.body = { message: ctx.$t('userUpdated') };
-};
-
 exports.getSushiData = async (ctx) => {
   const { include: propsToInclude } = ctx.query;
 
@@ -703,32 +431,7 @@ exports.getSushiData = async (ctx) => {
     },
     include: {
       endpoint: true,
-      ...propsToPrismaInclude(propsToInclude, ['harvests']),
+      ...(propsToPrismaInclude(propsToInclude, ['harvests']) ?? {}),
     },
   });
-};
-
-exports.requestMembership = async (ctx) => {
-  ctx.action = 'institutions/requestMembership';
-
-  const institutionsService = new InstitutionsService();
-
-  const members = await institutionsService.getContacts(ctx.state.institution.id);
-  const emails = members.map((member) => member.user.email);
-  const link = `${ctx.request.header.origin}/institutions/${ctx.state.institution.id}/members`;
-
-  await sendMail({
-    from: sender,
-    to: emails || supportRecipients,
-    cc: supportRecipients,
-    subject: 'Un utilisateur souhaite rejoindre votre établissement',
-    ...generateMail('request-membership', {
-      user: ctx.state.user.username,
-      institution: ctx.state.institution.name,
-      linkInstitution: link,
-    }),
-  });
-
-  ctx.type = 'json';
-  ctx.status = 204;
 };

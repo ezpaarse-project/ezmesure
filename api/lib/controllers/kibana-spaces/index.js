@@ -5,18 +5,16 @@ const {
   requireUser,
   fetchSpace,
   requireAdmin,
-  requireMemberPermissions,
-  fetchInstitution,
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getMany,
   getOne,
   createOne,
   updateOne,
   deleteOne,
-  upsertPermission,
-  deletePermission,
 } = require('./actions');
 
 const {
@@ -24,57 +22,18 @@ const {
   adminUpdateSchema,
 } = require('../../entities/spaces.dto');
 
-const { FEATURES } = require('../../entities/memberships.dto');
+const permissions = require('./permissions');
 
-router.use(requireJwt, requireUser);
+router.use(permissions.prefix('/:spaceId/permissions').middleware());
 
-router.route({
-  method: 'PUT',
-  path: '/:spaceId/permissions/:username',
-  handler: [
-    fetchSpace(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.space?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    upsertPermission,
-  ],
-  validate: {
-    type: 'json',
-    params: {
-      spaceId: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'DELETE',
-  path: '/:spaceId/permissions/:username',
-  handler: [
-    fetchSpace(),
-    fetchInstitution({ getId: (ctx) => ctx?.state?.space?.institutionId }),
-    requireMemberPermissions(FEATURES.memberships.write),
-    deletePermission,
-  ],
-  validate: {
-    params: {
-      spaceId: Joi.string().trim().required(),
-      username: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.use(requireAdmin);
+router.use(requireJwt, requireUser, requireAdmin);
 
 router.get('/', {
   method: 'GET',
   path: '/',
   handler: getMany,
   validate: {
-    params: {
-      q: Joi.string(),
-      type: Joi.string(),
-      institutionId: Joi.string(),
-    },
+    params: standardQueryParams.manyValidation,
   },
 });
 
@@ -82,9 +41,14 @@ router.route({
   method: 'GET',
   path: '/:spaceId',
   handler: [
-    fetchSpace(),
     getOne,
   ],
+  validate: {
+    params: {
+      spaceId: Joi.string().trim().required(),
+    },
+    query: standardQueryParams.oneValidation,
+  },
 });
 
 router.route({

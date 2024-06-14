@@ -1,4 +1,5 @@
 {
+  "$schema": "https://spec.openapis.org/oas/3.0/schema/2021-09-28",
   "openapi": "3.0.3",
   "info": {
     "title": "API ezMESURE",
@@ -2207,6 +2208,62 @@
           }
         }
       }
+    },
+    "parameters": {
+      "size": {
+        "name": "size",
+        "description": "",
+        "in": "query",
+        "schema": {
+          "type": "number",
+          "default": 10
+        }
+      },
+      "page": {
+        "name": "page",
+        "description": "",
+        "in": "query",
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "sort": {
+        "name": "sort",
+        "description": "",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "order": {
+        "name": "order",
+        "description": "",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": ["asc", "desc"],
+          "default": "asc"
+        }
+      },
+      "distinct": {
+        "name": "distinct",
+        "description": "",
+        "in": "query",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "search": {
+        "name": "q",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
     }
   },
   "paths": {
@@ -2801,6 +2858,219 @@
         "tags": [
           "Institutions"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "parentInstitution",
+                  "memberships",
+                  "spaces",
+                  "historyEntries",
+                  "sushiCredentials",
+                  "childInstitutions",
+                  "repositories"
+                ]
+              }
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "namespace",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "acronym",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "websiteUrl",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "uai",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "sushiReadySince:from",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "sushiReadySince:to",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "logoId",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "validated",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "hidePartner",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "parentInstitutionId",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2946,6 +3216,26 @@
           "name": "id",
           "in": "path",
           "required": true
+        },
+        {
+          "name": "include",
+          "description": "",
+          "in": "query",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "parentInstitution",
+                "memberships",
+                "spaces",
+                "historyEntries",
+                "sushiCredentials",
+                "childInstitutions",
+                "repositories"
+              ]
+            }
+          }
         }
       ],
       "get": {
@@ -3256,15 +3546,6 @@
             "name": "include",
             "in": "query",
             "description": "Relations that should be included in the response"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "description": "Username of the member"
           }
         ],
         "responses": {
@@ -3585,6 +3866,168 @@
           "description": "ID of the institution"
         }
       ]
+    },
+    "/institutions/{id}/repositories/{pattern}": {
+      "delete": {
+        "summary": "Unlink a repository from an institution",
+        "operationId": "delete-institutions-id-repositories-pattern",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Link a repository to an institution",
+        "operationId": "put-institutions-id-repositories-pattern",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repositories/{pattern}/permissions": {
+      "put": {
+        "summary": "Set repository permissions",
+        "operationId": "put-institutions-id-repositories-pattern-permissions",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "readonly": {
+                      "description": "Whether the user has read of read/write access to the space",
+                      "type": "boolean"
+                    },
+                    "locked": {
+                      "description": "Whether the permission can be modified by admins only",
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repositories/{pattern}/permissions/{username}": {
+      "delete": {
+        "summary": "Remove repository permission",
+        "operationId": "delete-institutions-id-repositories-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update repository permission",
+        "operationId": "put-institutions-id-repositories-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repositories"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryPermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
     },
     "/institutions/{id}/state": {
       "parameters": [
@@ -4880,28 +5323,87 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "q",
-            "description": "A query for searching in repository patterns"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "permissions",
+                  "institutions"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "name": "type",
-            "description": "Filter by repository type"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
             "in": "query",
-            "name": "institutionId",
-            "description": "Filter by institution ID"
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ]
       },
@@ -4970,6 +5472,21 @@
           "in": "path",
           "required": true,
           "description": "ID of the repository"
+        },
+        {
+          "name": "include",
+          "description": "",
+          "in": "query",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "permissions",
+                "institutions"
+              ]
+            }
+          }
         }
       ],
       "patch": {
@@ -5056,108 +5573,6 @@
         "responses": {
           "204": {
             "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "Repositories"
-        ]
-      }
-    },
-    "/repositories/{id}/permissions/{username}": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "description": "ID of the repository"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "username",
-          "in": "path",
-          "required": true,
-          "description": "username of the member"
-        }
-      ],
-      "put": {
-        "summary": "Set repository permissions for a user",
-        "description": "Set repository permissions for a user",
-        "operationId": "put-repositories-id-permissions-username",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryPermission"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "tags": [
-          "Repositories"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RepositoryPermission"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete repository permissions for a user",
-        "description": "Delete repository permissions for a user, so that he cannot access it anymore",
-        "operationId": "delete-repository-id-permissions-username",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryPermission"
-                }
-              }
-            }
           },
           "401": {
             "description": "Unauthorized"
@@ -5347,29 +5762,137 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "name": "q",
-            "in": "query",
-            "description": "A query, for search"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "schema": {
-              "type": "string"
-            },
-            "name": "type",
-            "in": "query",
-            "example": "counter5",
-            "description": "Filter spaces by type"
+            "$ref": "#/components/parameters/page"
           },
           {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
             "schema": {
-              "type": "string"
-            },
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
             "name": "institutionId",
             "in": "query",
-            "description": "Filter spaces by institution ID"
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "initials",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
@@ -5473,6 +5996,23 @@
           "Administration",
           "Kibana"
         ],
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5575,6 +6115,188 @@
         "tags": [
           "Administration",
           "Kibana"
+        ]
+      }
+    },
+    "/kibana-spaces/{id}/permissions": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get space permissions",
+        "operationId": "get-kibana-spaces-id-permissions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "membership",
+                  "space"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "spaceId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "readonly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "locked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpacePermission"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Get space permissions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Set space permissions",
+        "operationId": "put-kibana-spaces-id-permissions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "readonly": {
+                      "description": "Whether the user has read of read/write access to the space",
+                      "type": "boolean"
+                    },
+                    "locked": {
+                      "description": "Whether the permission can be modified by admins only",
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "Kibana"
+        ],
+        "description": "Get space permissions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },
@@ -6002,140 +6724,24 @@
         ],
         "parameters": [
           {
-            "name": "from",
-            "description": "Start date of the period",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "pattern": "[0-9]{4}-[0-9]{2}"
-            }
+            "$ref": "#/components/parameters/size"
           },
           {
-            "name": "to",
-            "description": "End date of the period",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "pattern": "[0-9]{4}-[0-9]{2}"
-            }
+            "$ref": "#/components/parameters/page"
           },
           {
-            "name": "harvestedBefore",
-            "description": "Maximum date of harvest",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "$ref": "#/components/parameters/sort"
           },
           {
-            "name": "harvestedAfter",
-            "description": "Minimum date of harvest",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "$ref": "#/components/parameters/order"
           },
           {
-            "name": "reportId",
-            "description": "Filter by report ID",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "tr"
-            }
+            "$ref": "#/components/parameters/distinct"
           },
           {
-            "name": "size",
-            "description": "Number of harvests to get. Defaults to 10. Set to 0 to get all.",
+            "name": "include",
+            "description": "",
             "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "page",
-            "description": "Result page",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "sort",
-            "description": "A field to sort on",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "order",
-            "description": "Sort order",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "default": "asc"
-            }
-          },
-          {
-            "schema": {
-              "type": "array",
-              "pattern": "[A-Za-z,]+"
-            },
-            "in": "query",
-            "name": "status",
-            "description": "filter harvests by status"
-          },
-          {
-            "schema": {
-              "type": "array",
-              "pattern": "[A-Za-z_:]+"
-            },
-            "in": "query",
-            "name": "errorCode",
-            "description": "filter harvests by error code"
-          },
-          {
-            "schema": {
-              "type": "array"
-            },
-            "in": "query",
-            "name": "institutionId",
-            "description": "filter harvests by institution ID"
-          },
-          {
-            "schema": {
-              "type": "array"
-            },
-            "in": "query",
-            "name": "credentialsId",
-            "description": "filter harvests by ID of SUSHI credentials"
-          },
-          {
-            "schema": {
-              "type": "array"
-            },
-            "in": "query",
-            "name": "endpointId",
-            "description": "filter harvests by endpoint ID"
-          },
-          {
-            "schema": {
-              "type": "array"
-            },
-            "in": "query",
-            "name": "distinct",
-            "description": "a combination of fields that should be distinct"
-          },
-          {
             "schema": {
               "type": "array",
               "items": {
@@ -6146,10 +6752,147 @@
                   "credentials.endpoint"
                 ]
               }
-            },
-            "name": "include",
+            }
+          },
+          {
+            "name": "period:from",
+            "description": "Start date of the period",
             "in": "query",
-            "description": "Relations that should be included in the response"
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "name": "period:to",
+            "description": "End date of the period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "[0-9]{4}-[0-9]{2}"
+            }
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "institutionId",
+            "description": "filter harvests by institution ID"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "endpointId",
+            "description": "filter harvests by endpoint ID"
+          },
+          {
+            "name": "harvestedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "harvestedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "credentialsId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "reportId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "errorCode",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "insertedItems:from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "insertedItems:to",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "updatedItems:from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "updatedItems:to",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "failedItems:from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "failedItems:to",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -6191,40 +6934,171 @@
         ],
         "parameters": [
           {
-            "name": "size",
-            "description": "Number of harvests to get. Defaults to all.",
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
             "schema": {
-              "type": "integer"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "jobs",
+                  "jobs.credentials",
+                  "jobs.credentials.institution",
+                  "jobs.credentials.endpoint"
+                ]
+              }
             }
           },
           {
-            "name": "page",
-            "description": "Result page",
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "id",
             "in": "query",
             "schema": {
-              "type": "integer"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
-            "name": "sort",
-            "description": "A field to sort on",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "order",
-            "description": "Sort order",
+            "name": "updatedAt:from",
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "default": "asc"
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "startedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "startedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "beginDate",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}$"
+              }
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}$"
+              }
+            }
+          },
+          {
+            "name": "reportTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "timeout:from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "timeout:to",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "allowFaulty",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "downloadUnsupported",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "forceDownload",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "ignoreValidation",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
             }
           }
         ],
@@ -6446,6 +7320,23 @@
           "name": "harvestId",
           "in": "path",
           "required": true
+        },
+        {
+          "name": "include",
+          "description": "",
+          "in": "query",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "jobs",
+                "jobs.credentials",
+                "jobs.credentials.institution",
+                "jobs.credentials.endpoint"
+              ]
+            }
+          }
         }
       ],
       "put": {
@@ -6788,28 +7679,162 @@
             "description": "filter items depending on connection state"
           },
           {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "description": "filter items by endpoint ID",
-            "name": "endpointId"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "institutionId",
-            "description": "filter items by institution ID"
+            "$ref": "#/components/parameters/page"
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "endpoint",
+                  "institution",
+                  "institution.memberships.user",
+                  "harvests",
+                  "connection"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
             "name": "id",
-            "description": "filter items by ID"
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "requestorId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "comment",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "packages",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "endpointId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ]
       },
@@ -7150,6 +8175,27 @@
       "get": {
         "summary": "Get a SUSHI item",
         "operationId": "get-sushi-id",
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "endpoint",
+                  "institution",
+                  "institution.memberships",
+                  "institution.memberships.user",
+                  "harvests",
+                  "connection"
+                ]
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -7610,52 +8656,266 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "boolean"
-            },
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "credentials",
+                  "credentials.institution",
+                  "credentials.institution.memberships",
+                  "credentials.institution.spaces",
+                  "credentials.institution.repositories"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "sushiUrl",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "vendor",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "counterVersion",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "technicalProvider",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "name": "requireCustomerId",
-            "description": "Filter endpoints by requireCustomerId"
-          },
-          {
+            "in": "query",
             "schema": {
               "type": "boolean"
-            },
-            "in": "query",
+            }
+          },
+          {
             "name": "requireRequestorId",
-            "description": "Filter endpoints by requireRequestorId"
-          },
-          {
+            "in": "query",
             "schema": {
               "type": "boolean"
-            },
-            "in": "query",
+            }
+          },
+          {
             "name": "requireApiKey",
-            "description": "Filter endpoints by requireApiKey"
-          },
-          {
+            "in": "query",
             "schema": {
               "type": "boolean"
-            },
-            "in": "query",
-            "name": "isSushiCompliant",
-            "description": "Filter endpoints by isSushiCompliant"
+            }
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "name": "ignoreReportValidation",
             "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "defaultCustomerId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "defaultRequestorId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "defaultApiKey",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "paramSeparator",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "testedReport",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "name": "tags",
-            "description": "Filter endpoints by tags (comma-separated)"
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "name": "disabledUntil:from",
             "in": "query",
-            "name": "q",
-            "description": "A query for searching"
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "disabledUntil:to",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "supportedReports",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "supportedReportsUpdatedAt:from",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "supportedReportsUpdatedAt:to",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ]
       },
@@ -7871,6 +9131,26 @@
         }
       },
       "get": {
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "credentials",
+                  "credentials.institution",
+                  "credentials.institution.memberships",
+                  "credentials.institution.spaces",
+                  "credentials.institution.repositories"
+                ]
+              }
+            }
+          }
+        ],
         "summary": "Get a SUSHI endpoint",
         "operationId": "get-sushi-endpoint-id",
         "responses": {
@@ -8033,33 +9313,179 @@
         ],
         "parameters": [
           {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
             "schema": {
               "type": "array",
-              "pattern": "[A-Za-z,]+"
-            },
-            "in": "query",
-            "name": "status",
-            "description": "filter tasks by status"
+              "items": {
+                "type": "string",
+                "enum": [
+                  "credentials",
+                  "credentials.institution",
+                  "credentials.endpoint",
+                  "session"
+                ]
+              }
+            }
           },
           {
-            "schema": {
-              "type": "array"
-            },
-            "in": "query",
+            "$ref": "#/components/parameters/search"
+          },
+          {
             "name": "id",
-            "description": "filter tasks by ID"
-          },
-          {
-            "schema": {
-              "type": "array"
-            },
             "in": "query",
-            "name": "type",
-            "description": "filter tasks by type"
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "credentialsId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "startedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "startedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "reportType",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "index",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "runningTime:from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "runningTime:to",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "errorCode",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "schema": {
-              "type": "array"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
             "name": "institutionId",
@@ -8067,15 +9493,10 @@
           },
           {
             "schema": {
-              "type": "array"
-            },
-            "in": "query",
-            "name": "credentialsId",
-            "description": "filter tasks by ID of SUSHI credentials"
-          },
-          {
-            "schema": {
-              "type": "array"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
             "name": "endpointId",
@@ -8083,28 +9504,25 @@
           },
           {
             "schema": {
-              "type": "array"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
-            "name": "harvestId",
-            "description": "filter tasks by harvest ID"
+            "name": "tags",
+            "description": "filter tasks by credentials tags"
           },
           {
             "schema": {
-              "type": "array"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
-            "name": "distinct",
-            "description": "a combination of fields that should be distinct"
-          },
-          {
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "in": "query",
-            "name": "size",
-            "description": "maximum number of tasks to get"
+            "name": "package",
+            "description": "filter tasks by credentials package"
           }
         ]
       }
@@ -8122,6 +9540,25 @@
       ],
       "get": {
         "summary": "Get a task",
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "credentials",
+                  "credentials.institution",
+                  "credentials.endpoint",
+                  "session"
+                ]
+              }
+            }
+          }
+        ],
         "tags": [
           "Tasks"
         ],
@@ -8273,74 +9710,95 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "in": "query",
-            "name": "size",
-            "description": "maximum number of logs to get"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "name": "page",
-            "description": "Result page",
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
             "schema": {
-              "type": "integer"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "job",
+                  "job.credentials",
+                  "job.credentials.institution",
+                  "job.credentials.endpoint"
+                ]
+              }
             }
           },
           {
-            "name": "sort",
-            "description": "A field to sort on",
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "id",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
-            "name": "order",
-            "description": "Sort order",
+            "name": "jobId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "date:from",
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "default": "asc"
+              "format": "date-time"
             }
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "name": "date:to",
             "in": "query",
-            "name": "jobId",
-            "description": "filter logs by their job"
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           },
           {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
             "name": "level",
-            "description": "filter logs by their level"
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
-            "schema": {
-              "type": "string"
-            },
+            "name": "message",
             "in": "query",
-            "name": "from",
-            "description": "filter logs by their date"
-          },
-          {
             "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "to",
-            "description": "filter logs by their date"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "tags": [
@@ -8378,20 +9836,107 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "q",
-            "description": "a query for searching"
+            "$ref": "#/components/parameters/size"
           },
           {
-            "schema": {
-              "type": "number"
-            },
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
             "in": "query",
-            "name": "size",
-            "description": "a query to change users list limit size"
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "memberships",
+                  "memberships.institution",
+                  "historyEntries"
+                ]
+              }
+            }
+          },
+          {
+            "$ref": "#/components/parameters/search"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "fullName",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "isAdmin",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           },
           {
             "schema": {
@@ -8576,6 +10121,24 @@
             "description": "Not Found"
           }
         },
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "memberships",
+                  "memberships.institution",
+                  "historyEntries"
+                ]
+              }
+            }
+          }
+        ],
         "operationId": "get-users-username",
         "description": "Get a user by his username",
         "security": [

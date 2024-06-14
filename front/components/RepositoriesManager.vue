@@ -159,7 +159,15 @@ export default {
       this.errorMessage = '';
 
       try {
-        this.repositories = await this.$axios.$get(`/institutions/${this.institutionId}/repositories`);
+        this.repositories = await this.$axios.$get(
+          `/institutions/${this.institutionId}/repositories`,
+          {
+            params: {
+              size: 0,
+              sort: 'pattern',
+            },
+          },
+        );
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }

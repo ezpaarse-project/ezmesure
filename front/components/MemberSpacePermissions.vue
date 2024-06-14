@@ -129,9 +129,16 @@ export default {
       this.errorMessage = '';
 
       try {
-        this.spaces = await this.$axios.$get(`/institutions/${this.institutionId}/spaces`, {
-          params: { include: ['permissions'] },
-        });
+        this.spaces = await this.$axios.$get(
+          `/institutions/${this.institutionId}/spaces`,
+          {
+            params: {
+              include: ['permissions'],
+              sort: 'name',
+              size: 0,
+            },
+          },
+        );
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }

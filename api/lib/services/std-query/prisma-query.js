@@ -1,10 +1,15 @@
+// @ts-check
+
 const { merge } = require('lodash');
+
+const { stringToArray } = require('../utils');
 
 /**
  * Transform props to include into a valid prisma `include` field
  *
  * @param {string[]} props
  * @param {(string[] | Set<string>)?} [includableFields]
+ *
  * @returns {Record<string, any> | undefined}
  */
 const propsToPrismaInclude = (props, includableFields) => {
@@ -18,9 +23,14 @@ const propsToPrismaInclude = (props, includableFields) => {
     propsToMap = propsToMap.filter((p) => includable.has(p));
   }
 
+  if (propsToMap.length <= 0) {
+    return undefined;
+  }
+
   // sorting props to avoid subfields begin overrode by parents
   propsToMap.sort((a, b) => a.length - b.length);
   return merge(
+    {},
     ...propsToMap.map((prop) => {
       const [parent, ...children] = prop.split('.');
 
@@ -40,6 +50,7 @@ const propsToPrismaInclude = (props, includableFields) => {
  * @param {string} prop
  * @param {'asc'|'desc'} order
  * @param {(string[] | Set<string>)?} [sortableFields]
+ *
  * @returns {Record<string, any> | undefined}
  */
 const propsToPrismaSort = (prop, order, sortableFields) => {
@@ -69,17 +80,7 @@ const propsToPrismaSort = (prop, order, sortableFields) => {
  * @param {string | string[] | undefined | null} value Value of the query parameter
  * @returns {{ in: string[] } | undefined} Prisma filter
  */
-const queryToPrismaFilter = (value) => {
-  if (!value) {
-    return undefined;
-  }
-
-  let filter = value;
-  if (!Array.isArray(value)) {
-    filter = value.split(',').map((s) => s.trim());
-  }
-  return { in: filter };
-};
+const queryToPrismaFilter = (value) => (value ? { in: stringToArray(value) } : undefined);
 
 module.exports = {
   propsToPrismaInclude,

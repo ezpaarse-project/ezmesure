@@ -129,9 +129,16 @@ export default {
       this.errorMessage = '';
 
       try {
-        this.repositories = await this.$axios.$get(`/institutions/${this.institutionId}/repositories`, {
-          params: { include: ['permissions'] },
-        });
+        this.repositories = await this.$axios.$get(
+          `/institutions/${this.institutionId}/repositories`,
+          {
+            params: {
+              include: ['permissions'],
+              sort: 'pattern',
+              size: 0,
+            },
+          },
+        );
       } catch (e) {
         this.errorMessage = e?.response?.data?.error || this.$t('anErrorOccurred');
       }

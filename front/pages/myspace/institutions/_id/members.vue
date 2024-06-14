@@ -255,6 +255,10 @@ export default {
           value: 'username',
         },
         {
+          text: this.$t('users.user.email'),
+          value: 'user.email',
+        },
+        {
           text: this.$t('institutions.members.accessRights'),
           value: 'repositoryPermissions',
         },
@@ -262,19 +266,17 @@ export default {
           text: this.$t('institutions.members.roles'),
           value: 'roles',
         },
-      ];
-
-      if (!this.isReadonly) {
-        headers.push({
+        {
           text: this.$t('actions'),
           value: 'actions',
           sortable: false,
           width: '85px',
           align: 'center',
-        });
-      }
+          visible: !this.isReadonly,
+        },
+      ];
 
-      return headers;
+      return headers.filter((h) => h.visible !== false);
     },
   },
   mounted() {
@@ -288,7 +290,10 @@ export default {
 
       try {
         this.members = await this.$axios.$get(`/institutions/${this.institution.id}/memberships`, {
-          params: { include: ['user', 'repositoryPermissions'] },
+          params: {
+            include: ['user', 'repositoryPermissions'],
+            size: 0,
+          },
         });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.members.unableToRetriveMembers'));

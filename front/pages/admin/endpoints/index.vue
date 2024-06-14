@@ -151,6 +151,7 @@
       :search="search"
       :items-per-page="50"
       :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
+      :item-class="(item) => !item?.active && 'grey lighten-3 grey--text'"
       show-select
       show-expand
       single-expand
@@ -167,6 +168,37 @@
 
       <template #[`item.disabledUntil`]="{ item }">
         <EndpointDisabledIcon :endpoint="item" />
+      </template>
+
+      <template #[`item.active`]="{ item }">
+        <v-tooltip left open-on-hover>
+          <template #activator="{ on, attrs }">
+            <div
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-switch
+                :input-value="item.active"
+                :label="item.active
+                  ? $t('endpoints.active')
+                  : $t('endpoints.inactive')"
+                :loading="activeLoadingMap[item.id]"
+                hide-details
+                role="switch"
+                class="mt-0"
+                dense
+                style="transform: scale(0.8);"
+                @change="toggleEndpointActiveState(item)"
+              />
+            </div>
+          </template>
+
+          <i18n :path="`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`" tag="span">
+            <template #date>
+              <LocalDate :date="item.activeUpdatedAt" />
+            </template>
+          </i18n>
+        </v-tooltip>
       </template>
 
       <template #[`item.tags`]="{ item }">
@@ -195,10 +227,10 @@
           <template #activator="{ on, attrs }">
             <v-chip
               :outlined="item.credentials?.length <= 0"
+              :to="`/admin/endpoints/${item.id}/sushi`"
               small
               class="elevation-1"
               v-bind="attrs"
-              @click="$refs.credentialsDialog?.display?.(item)"
               v-on="on"
             >
               {{ $tc('sushi.credentialsCount', item.credentials?.length) }}
@@ -297,7 +329,6 @@
       :max-credentials-status-counts="maxCounts.credentialsStatuses"
     />
     <ConfirmDialog ref="confirmDialog" />
-    <CredentialDialog ref="credentialsDialog" />
   </section>
 </template>
 
@@ -305,11 +336,11 @@
 import ToolBar from '~/components/space/ToolBar.vue';
 import EndpointForm from '~/components/EndpointForm.vue';
 import EndpointDetails from '~/components/EndpointDetails.vue';
-import CredentialDialog from '~/components/sushis/CredentialDialog.vue';
-import EndpointsFiltersDrawer from '~/components/sushis/EndpointsFiltersDrawer.vue';
+import EndpointsFiltersDrawer from '~/components/endpoints/EndpointsFiltersDrawer.vue';
+import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
-import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
+import LocalDate from '~/components/LocalDate.vue';
 
 export default {
   layout: 'space',
@@ -319,10 +350,10 @@ export default {
     EndpointForm,
     EndpointDetails,
     ConfirmDialog,
-    CredentialDialog,
     ProgressCircularStack,
     EndpointsFiltersDrawer,
     EndpointDisabledIcon,
+    LocalDate,
   },
   data() {
     return {
@@ -332,7 +363,7 @@ export default {
       deleting: false,
       validating: false,
       search: '',
-      loadingItems: {},
+      activeLoadingMap: {},
       currentItemCount: 0,
 
       filters: {},
@@ -384,6 +415,12 @@ export default {
           align: 'center',
           width: '200px',
           filter: (_value, _search, item) => this.columnCredentialsFilter(item),
+        },
+        {
+          text: this.$t('endpoints.active'),
+          value: 'active',
+          align: 'center',
+          width: '130px',
         },
         {
           text: this.$t('actions'),
@@ -640,7 +677,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials.institution'] } });
+        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials'], size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
       }
@@ -650,6 +687,26 @@ export default {
 
     clearSelection() {
       this.selected = [];
+    },
+
+    async toggleEndpointActiveState(item) {
+      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: true };
+
+      const active = !item.active;
+
+      try {
+        await this.$axios.$patch(`/sushi-endpoints/${item.id}`, { active });
+
+        const index = this.endpoints.findIndex((i) => i.id === item.id);
+
+        if (index >= 0) {
+          this.endpoints.splice(index, 1, { ...item, active });
+        }
+      } catch (e) {
+        this.$store.dispatch('snacks/error', this.$t('endpoints.unableToUpdate'));
+      }
+
+      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: false };
     },
 
     async deleteEndpoints(items) {

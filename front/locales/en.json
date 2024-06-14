@@ -203,6 +203,12 @@
     "url": "URL",
     "vendor": "Vendor",
     "tags": "Tags",
+    "active": "Active",
+    "inactive": "Inactive",
+    "unableToUpdate": "Unable to update the endpoint",
+    "inactiveDescription": "Administrators have deactivated this endpoint and it will not be harvested.",
+    "activeSince": "Active since {date}",
+    "inactiveSince": "Inactive since {date}",
     "technicalProvider": "Technical provider",
     "counterVersion": "COUNTER version",
     "testedReport": "Report used to test connection",
@@ -249,6 +255,7 @@
     "askToJoinAnInstitution": "Ask to join an institution",
     "joinInstitution": "Would you join {institution} ?",
     "joinInstitutionEmail": "A message will be sent to the correspondents of this institution to let them know.",
+    "createMailContactList": "Copy the emails of the correspondents",
     "reports": {
       "reports": "Reports"
     },
@@ -440,6 +447,7 @@
       }
     },
     "unableToRetriveInformations": "Unable to retrieve institution information",
+    "unableToRetrivePlatforms": "Unable to retrieve plateform information",
     "notAttachedToAnyInstitution": "You are not attached to any institution, where you have not declared any information about your institution.",
     "reportInstitutionInformation": "Report institution information."
   },
@@ -549,6 +557,7 @@
     "idCopied": "ID copied in the clipboard",
     "importState": "Import state",
     "latestImport": "Latest import",
+    "unableToUpdate": "Unable to update credentials",
     "unableToGetLockStatus": "Failed to retrieve credentials lock status",
     "managementIsLocked": "SUSHI credentials management is currently locked.",
     "nInstitutions": "1 institution use this endpoint|{count} institutions use this endpoint",
@@ -562,6 +571,8 @@
     "unchangeableParam": "Unchangeable parameter defined at the access point level.",
     "harvestState": "Harvest state",
     "harvestedAt": "Harvested on {date}",
+    "inactive": "Inactive credentials",
+    "inactiveDescription": "Institution made theses credentials inactive and will not be harvested.",
     "report": "Report",
     "openHelpPage": "Open help page",
     "insertedItems": "{count} report items have been inserted.",
@@ -716,7 +727,9 @@
     "deleteNbRepositories": "You are about to delete {number} repositories",
     "filters": {
       "title": "Filter repositories"
-    }
+    },
+    "givePermissions": "Give permissions",
+    "nPermissions": "{count} access"
   },
   "spaces": {
     "spaces": "Spaces",
@@ -864,6 +877,7 @@
   "administration": "Administration",
   "informationSubmitted": "Information submitted",
   "invalidDate": "Invalid date",
+  "invalidFormat": "Invalid format",
   "areYouSure": "Are you sure ?",
   "fieldIsRequired": "This field is required",
   "fieldMustMatch": "This field must match : {pattern}",

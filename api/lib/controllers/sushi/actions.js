@@ -15,8 +15,7 @@ const SushiCredentialsService = require('../../entities/sushi-credentials.servic
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
 
-const { includableFields } = require('../../entities/sushi-credentials.dto');
-const { propsToPrismaInclude } = require('../utils');
+const { schema, includableFields } = require('../../entities/sushi-credentials.dto');
 
 /* eslint-disable max-len */
 /**
@@ -25,90 +24,75 @@ const { propsToPrismaInclude } = require('../utils');
  */
 /* eslint-enable max-len */
 
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: [],
+});
+exports.standardQueryParams = standardQueryParams;
+
 exports.getAll = async (ctx) => {
-  const {
-    id: sushiIds,
-    institutionId,
-    endpointId,
-    include: propsToInclude,
-    connection,
-    q: query,
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-  } = ctx.query;
+  const { connection, q: query } = ctx.query;
 
-  let include;
-
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
-  }
-
-  /** @type {SushiCredentialsFindManyArgs} */
-  const options = {
-    include,
-    take: Number.isInteger(size) ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    where: {},
-  };
-
-  if (sort) {
-    options.orderBy = { [sort]: order };
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   if (query) {
-    options.where = {
+    prismaQuery.where = {
+      ...prismaQuery.where,
       OR: [
         { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
         { institution: { name: { contains: query, mode: 'insensitive' } } },
+        { institution: { acronym: { contains: query, mode: 'insensitive' } } },
       ],
     };
   }
 
-  if (sushiIds) {
-    options.where.id = Array.isArray(sushiIds)
-      ? { in: sushiIds }
-      : { equals: sushiIds };
-  }
-  if (institutionId) {
-    options.where.institutionId = Array.isArray(institutionId)
-      ? { in: institutionId }
-      : { equals: institutionId };
-  }
-  if (endpointId) {
-    options.where.endpointId = Array.isArray(endpointId)
-      ? { in: endpointId }
-      : { equals: endpointId };
-  }
+  switch (connection) {
+    case 'working':
+      prismaQuery.where.connection = { path: ['status'], equals: 'success' };
+      break;
+    case 'unauthorized':
+      prismaQuery.where.connection = { path: ['status'], equals: 'unauthorized' };
+      break;
+    case 'faulty':
+      prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
+      break;
+    case 'untested':
+      prismaQuery.where.connection = { equals: {} };
+      break;
 
-  if (connection) {
-    options.where.connection = {};
-    switch (connection) {
-      case 'working':
-        options.where.connection = { path: ['status'], equals: 'success' };
-        break;
-      case 'faulty':
-        options.where.connection = { path: ['status'], equals: 'failed' };
-        break;
-      case 'untested':
-        options.where.connection = { equals: {} };
-        break;
-
-      default:
-        break;
-    }
+    default:
+      break;
   }
 
   const sushiCredentialsService = new SushiCredentialsService();
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = await sushiCredentialsService.findMany(options);
+  ctx.set('X-Total-Count', await sushiCredentialsService.count({ where: prismaQuery.where }));
+  ctx.body = await sushiCredentialsService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
-  const { sushi } = ctx.state;
+  const { sushiId } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: sushiId });
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
+  }
+
+  const sushiCredentialsService = new SushiCredentialsService();
+  const sushi = await sushiCredentialsService.findUnique(prismaQuery);
+
+  if (!sushi) {
+    ctx.throw(404, ctx.$t('errors.sushi.notFound'));
+    return;
+  }
 
   ctx.status = 200;
   ctx.body = sushi;
@@ -154,6 +138,7 @@ exports.updateSushi = async (ctx) => {
   ctx.action = 'sushi/update';
   const { sushi, institution } = ctx.state;
   const { body } = ctx.request;
+  const data = { ...body, connection: {} };
 
   ctx.metadata = {
     sushiId: sushi.id,
@@ -162,13 +147,21 @@ exports.updateSushi = async (ctx) => {
     institutionName: institution.name,
   };
 
+  if (typeof body.active === 'boolean') {
+    if (Object.keys(body).length === 1) {
+      // If only the active state is toggled, no need to change update date
+      data.updatedAt = sushi.updatedAt;
+      data.connection = undefined;
+    }
+    if (sushi.active !== body.active) {
+      data.activeUpdatedAt = new Date();
+    }
+  }
+
   const sushiCredentialsService = new SushiCredentialsService();
   const updatedSushiCredentials = await sushiCredentialsService.update({
     where: { id: sushi.id },
-    data: {
-      ...body,
-      connection: {},
-    },
+    data,
   });
 
   ctx.status = 200;
@@ -489,6 +482,7 @@ exports.checkSushiConnection = async (ctx) => {
   ctx.body = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
+      updatedAt: sushi.updatedAt,
       connection: {
         date: Date.now(),
         status: status || 'failed',
@@ -510,6 +504,7 @@ exports.deleteSushiConnection = async (ctx) => {
   await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
+      updatedAt: sushi.updatedAt,
       connection: {},
     },
   });

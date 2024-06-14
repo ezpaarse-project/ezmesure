@@ -13,7 +13,7 @@
       <template v-if="hasSelection" #default>
         <v-spacer />
 
-        <v-btn target="_blank" rel="noopener noreferrer" text @click="copyMailList">
+        <v-btn text @click="copyMailList">
           <v-icon left>
             mdi-email-multiple
           </v-icon>
@@ -424,7 +424,7 @@ export default {
       try {
         this.users = await this.$axios.$get('/users', {
           params: {
-            size: 10000,
+            size: 0,
             source: '*',
             include: 'memberships.institution',
           },

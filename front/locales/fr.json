@@ -203,6 +203,12 @@
     "url": "URL",
     "vendor": "Fournisseur",
     "tags": "Étiquettes",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "unableToUpdate": "Impossible de modifier le point d'accès",
+    "inactiveDescription": "Les administrateurs ont rendus ce point d'accès inactif et ne sera donc pas moissonné.",
+    "activeSince": "Actif depuis le {date}",
+    "inactiveSince": "Inactif depuis le {date}",
     "technicalProvider": "Prestataire technique",
     "counterVersion": "Version de COUNTER",
     "testedReport": "Rapport utilisé pour le test de connexion",
@@ -249,6 +255,7 @@
     "askToJoinAnInstitution": "Demander à rejoindre un établissement",
     "joinInstitution": "Vous souhaitez rejoindre {institution} ?",
     "joinInstitutionEmail": "Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.",
+    "createMailContactList": "Copier les adresses mails des correspondants",
     "reports": {
       "reports": "Rapports"
     },
@@ -441,6 +448,7 @@
       }
     },
     "unableToRetriveInformations": "Impossible de récupérer les informations d'établissement",
+    "unableToRetrivePlatforms": "Impossible de récupérer les informations d'établissement",
     "notAttachedToAnyInstitution": "Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.",
     "reportInstitutionInformation": "Déclarer des informations d'établissement."
   },
@@ -550,6 +558,7 @@
     "idCopied": "ID copié dans le presse-papier",
     "importState": "État de l'import",
     "latestImport": "Dernier import",
+    "unableToUpdate": "Impossible de modifier l'identifiant",
     "unableToGetLockStatus": "Impossible de récupérer l'état de verrouillage des identifiants",
     "managementIsLocked": "La gestion des identifiants SUSHI est actuellement verrouillée.",
     "nInstitutions": "1 établissement utilise cet endpoint|{count} établissements utilisent cet endpoint",
@@ -561,6 +570,8 @@
     "deleteNbCredentials": "Vous allez supprimer {count} identifiant SUSHI.|Vous allez supprimer {count} identifiants SUSHI.",
     "scope": "Périmètre",
     "unchangeableParam": "Paramètre non modifiable défini au niveau du point d'accès.",
+    "inactive": "Identifiant inactif",
+    "inactiveDescription": "L'établissement à rendu cet identifiant inactif et ne sera donc pas moissonné.",
     "harvestState": "État du moissonnage",
     "harvestedAt": "Moissonné le {date}",
     "report": "Rapport",
@@ -716,7 +727,9 @@
     "deleteNbRepositories": "Vous allez supprimer {count} entrepôt.|Vous allez supprimer {count} entrepôts.",
     "filters": {
       "title": "Filtrer les entrepôts"
-    }
+    },
+    "givePermissions": "Attribuer les permissions",
+    "nPermissions": "{count} accès"
   },
   "spaces": {
     "spaces": "Espaces",
@@ -864,6 +877,7 @@
   "administration": "Administration",
   "informationSubmitted": "Informations transmises",
   "invalidDate": "Date invalide",
+  "invalidFormat": "Format invalide",
   "areYouSure": "Êtes-vous sûr ?",
   "fieldIsRequired": "Ce champ est requis",
   "fieldMustMatch": "Ce champ doit correspondre à : {pattern}",

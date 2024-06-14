@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :width="institutionId ? 600 : undefined">
     <v-card-text>
       <v-alert
         type="error"
@@ -20,7 +20,10 @@
           :value="selectedRepository"
           :items="availableRepositories"
           :label="`${$t('repositories.pattern')} *`"
-          :rules="[v => !!v || $t('fieldIsRequired')]"
+          :rules="[
+            v => !!v || $t('fieldIsRequired'),
+            v => /^[a-z*-]+$/i.test(v) || $t('invalidFormat'),
+          ]"
           :search-input.sync="repositoryPattern"
           :loading="loadingRepositories"
           item-text="pattern"
@@ -55,6 +58,25 @@
           @change="repositoryType = $event"
         />
       </v-form>
+
+      <v-expansion-panels v-if="institutionId" class="permission-expansion" accordion flat>
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            <div class="text-subtitle-2" style="vertical-align: bottom;">
+              <v-icon>mdi-account-lock</v-icon>
+
+              {{ $t('repositories.givePermissions') }}
+            </div>
+
+            <div class="text-right">
+              {{ $t('repositories.nPermissions', { count: permissions.length }) }}
+            </div>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <MembershipsPermissionBulk v-model="permissions" :institution-id="institutionId" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-card-text>
 
     <v-card-actions>
@@ -82,8 +104,12 @@
 
 <script>
 import debounce from 'lodash.debounce';
+import MembershipsPermissionBulk from '~/components/institutions/MembershipsPermissionBulk.vue';
 
 export default {
+  components: {
+    MembershipsPermissionBulk,
+  },
   props: {
     institutionId: {
       type: String,
@@ -102,6 +128,7 @@ export default {
 
     loadingRepositories: false,
     availableRepositories: [],
+    permissions: [],
 
     repositoryTypes: [
       { text: 'ezPAARSE', value: 'ezpaarse' },
@@ -136,12 +163,38 @@ export default {
     queryRepositories: debounce(async function queryRepositories() {
       this.loadingRepositories = true;
       try {
-        this.availableRepositories = await this.$axios.$get('/repositories', { params: { q: this.repositoryPattern } });
+        this.availableRepositories = await this.$axios.$get(
+          '/repositories',
+          {
+            params: {
+              q: this.repositoryPattern,
+              size: 0,
+            },
+          },
+        );
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('searchFailed'));
       }
       this.loadingRepositories = false;
     }, 500),
+
+    async createInstitutionRepository() {
+      const repository = await this.$axios.$put(
+        `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
+        { type: this.repositoryType },
+      );
+
+      await this.$axios.$put(
+        `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}/permissions`,
+        this.permissions.map((permission) => ({
+          username: permission.username,
+          readonly: permission.readonly,
+          locked: permission.locked,
+        })),
+      );
+
+      return repository;
+    },
 
     async createRepository() {
       this.loading = true;
@@ -149,16 +202,13 @@ export default {
 
       try {
         let newRepository;
-        if (this.institutionId) {
-          newRepository = await this.$axios.$put(
-            `/institutions/${this.institutionId}/repositories/${this.repositoryPattern}`,
-            { type: this.repositoryType },
-          );
-        } else {
+        if (!this.institutionId) {
           newRepository = await this.$axios.$post(
             '/repositories',
             { type: this.repositoryType, pattern: this.repositoryPattern },
           );
+        } else {
+          newRepository = await this.createInstitutionRepository();
         }
 
         this.repositoryPattern = '';
@@ -173,6 +223,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+.permission-expansion {
+  margin-top: 1rem;
+  border: thin solid rgba(0,0,0,0.4);
+}
+.permission-expansion .v-expansion-panel-header {
+  padding: 0 12px;
+}
+.permission-expansion::v-deep .v-expansion-panel-content__wrap {
+  padding: 0;
+}
 </style>

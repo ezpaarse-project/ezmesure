@@ -6,6 +6,7 @@ const sushiCredentialsPrisma = require('../services/prisma/sushi-credentials');
 /** @typedef {import('@prisma/client').SushiCredentials} SushiCredentials */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpdateArgs} SushiCredentialsUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsUpsertArgs} SushiCredentialsUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.SushiCredentialsCountArgs} SushiCredentialsCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindUniqueArgs} SushiCredentialsFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsFindManyArgs} SushiCredentialsFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SushiCredentialsCreateArgs} SushiCredentialsCreateArgs */
@@ -62,6 +63,14 @@ module.exports = class SushiCredentialsService extends BasePrismaService {
    */
   upsert(params) {
     return sushiCredentialsPrisma.upsert(params, this.prisma);
+  }
+
+  /**
+   * @param {SushiCredentialsCountArgs} params
+   * @returns {Promise<number>}
+   */
+  count(params) {
+    return sushiCredentialsPrisma.count(params, this.prisma);
   }
 
   /**

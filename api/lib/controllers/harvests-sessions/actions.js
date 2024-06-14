@@ -5,70 +5,59 @@ const HarvestJobsService = require('../../entities/harvest-job.service');
 
 const { harvestQueue } = require('../../services/jobs');
 
-const { propsToPrismaInclude, propsToPrismaSort } = require('../utils');
-
-const { includableFields } = require('../../entities/harvest-session.dto');
+const { schema, includableFields } = require('../../entities/harvest-session.dto');
 const { appLogger } = require('../../services/logger');
 
+const { prepareStandardQueryParams } = require('../../services/std-query');
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['id'],
+});
+exports.standardQueryParams = standardQueryParams;
+
 exports.getAll = async (ctx) => {
-  ctx.type = 'json';
-  const {
-    size,
-    sort,
-    order = 'asc',
-    page = 1,
-    include: propsToInclude,
-  } = ctx.request.query;
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  // eslint-disable-next-line no-underscore-dangle
+  prismaQuery.include = {
+    ...(prismaQuery.include || {}),
+    _count: {
+      select: {
+        jobs: true,
+      },
+    },
+  };
 
   const harvestSessionService = new HarvestSessionService();
 
-  const requests = await harvestSessionService.findMany({
-    orderBy: propsToPrismaSort(sort, order),
-    take: Number.isInteger(size) && size > 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    include: {
-      ...propsToPrismaInclude(propsToInclude, includableFields),
-      _count: {
-        select: {
-          jobs: true,
-        },
-      },
-    },
-  });
-
-  ctx.set('X-Total-Count', await harvestSessionService.count({}));
+  ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = requests;
+  ctx.set('X-Total-Count', await harvestSessionService.count({ where: prismaQuery.where }));
+  ctx.body = await harvestSessionService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
-  ctx.type = 'json';
-  const {
-    include: propsToInclude,
-  } = ctx.query;
   const { harvestId } = ctx.params;
 
-  const harvestSessionService = new HarvestSessionService();
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: harvestId });
+  // eslint-disable-next-line no-underscore-dangle
+  prismaQuery.include._count = {
+    select: {
+      jobs: true,
+    },
+  };
 
-  const session = await harvestSessionService.findUnique({
-    where: {
-      id: harvestId,
-    },
-    include: {
-      ...propsToPrismaInclude(propsToInclude, includableFields),
-      _count: {
-        select: {
-          jobs: true,
-        },
-      },
-    },
-  });
+  const harvestSessionService = new HarvestSessionService();
+  const session = await harvestSessionService.findUnique(prismaQuery);
 
   if (!session) {
     ctx.throw(404, ctx.$t('errors.harvest.sessionNotFound', harvestId));
     return;
   }
 
+  ctx.type = 'json';
   ctx.status = 200;
   ctx.body = session;
 };

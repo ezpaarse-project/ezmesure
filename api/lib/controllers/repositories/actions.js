@@ -1,11 +1,10 @@
 const RepositoriesService = require('../../entities/repositories.service');
-const { includableFields } = require('../../entities/repositories.dto');
+const { schema, includableFields } = require('../../entities/repositories.dto');
 
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
-const { propsToPrismaInclude } = require('../utils');
 
 /* eslint-disable max-len */
 /**
@@ -13,51 +12,50 @@ const { propsToPrismaInclude } = require('../utils');
 */
 /* eslint-enable max-len */
 
-exports.getMany = async (ctx) => {
-  const {
-    include: propsToInclude,
-    size,
-    page = 1,
-    type,
-    institutionId,
-    pattern,
-    q: search,
-  } = ctx.query;
+const { prepareStandardQueryParams } = require('../../services/std-query');
 
-  /** @type {RepositoryWhereInput} */
-  const where = {
-    type,
-    pattern,
-  };
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['pattern'],
+});
+exports.standardQueryParams = standardQueryParams;
+
+exports.getMany = async (ctx) => {
+  const { institutionId } = ctx.query;
+
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
   if (institutionId) {
-    where.institutions = {
+    prismaQuery.where.institutions = {
       some: { id: institutionId },
-    };
-  }
-
-  if (search) {
-    where.pattern = {
-      contains: search,
-      mode: 'insensitive',
     };
   }
 
   const repositoriesService = new RepositoriesService();
 
   ctx.type = 'json';
-  ctx.body = await repositoriesService.findMany({
-    take: Number.isInteger(size) && size >= 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    where,
-    include: propsToPrismaInclude(propsToInclude, includableFields),
-  });
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await repositoriesService.count({ where: prismaQuery.where }));
+  ctx.body = await repositoriesService.findMany(prismaQuery);
 };
 
 exports.getOne = async (ctx) => {
+  const { pattern } = ctx.params;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { pattern });
+
+  const repositoriesService = new RepositoriesService();
+  const repository = await repositoriesService.findUnique(prismaQuery);
+
+  if (!repository) {
+    ctx.throw(404, ctx.$t('errors.repository.notFound'));
+    return;
+  }
+
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = ctx.state.repository;
+  ctx.body = repository;
 };
 
 exports.createOne = async (ctx) => {

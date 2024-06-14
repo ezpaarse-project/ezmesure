@@ -168,7 +168,15 @@ export default {
       try {
         const [institution, spaces] = await Promise.all([
           this.$axios.$get(`/institutions/${this.institutionId}`),
-          this.$axios.$get('/kibana-spaces', { params: { institutionId: this.institutionId } }),
+          this.$axios.$get(
+            '/kibana-spaces',
+            {
+              params: {
+                institutionId: this.institutionId,
+                size: 0,
+              },
+            },
+          ),
         ]);
 
         this.institution = institution;

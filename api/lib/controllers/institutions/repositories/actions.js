@@ -1,14 +1,104 @@
-const RepositoriesService = require('../../entities/repositories.service');
-const RepoPermissionsService = require('../../entities/repository-permissions.service');
+const { prepareStandardQueryParams } = require('../../../services/std-query');
+
+const RepositoriesService = require('../../../entities/repositories.service');
+const RepoPermissionsService = require('../../../entities/repository-permissions.service');
+
 const {
+  schema,
+  includableFields,
+} = require('../../../entities/repositories.dto');
+
+const {
+  createSchema: permissionCreateSchema,
   upsertSchema: permissionUpsertSchema,
-} = require('../../entities/repository-permissions.dto');
+} = require('../../../entities/repository-permissions.dto');
 
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.RepositoryPermissionCreateInput} RepositoryPermissionCreateInput
 */
 /* eslint-enable max-len */
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['pattern'],
+});
+exports.standardQueryParams = standardQueryParams;
+
+exports.getInstitutionRepositories = async (ctx) => {
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where.institutions = { some: { id: ctx.state.institution.id } };
+
+  const repositoriesService = new RepositoriesService();
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await repositoriesService.count({ where: prismaQuery.where }));
+  ctx.body = await repositoriesService.findMany(prismaQuery);
+};
+
+exports.upsertRepositoryAllPermission = async (ctx) => {
+  const { repository, institution } = ctx.state;
+
+  const permissions = ctx.request.body.map((body) => {
+    const { value: permission } = permissionCreateSchema.validate({
+      ...body,
+      institutionId: institution.id,
+      pattern: repository.pattern,
+    });
+    return permission;
+  });
+
+  const newRepository = RepositoriesService.$transaction(async (repositoriesService) => {
+    await repositoriesService.update({
+      where: {
+        pattern: repository.pattern,
+        institutions: { some: { id: institution.id } },
+      },
+      data: {
+        permissions: {
+          deleteMany: {
+            repositoryPattern: repository.pattern,
+            institutionId: institution.id,
+          },
+        },
+      },
+    });
+
+    return repositoriesService.update({
+      where: {
+        pattern: repository.pattern,
+        institutions: { some: { id: institution.id } },
+      },
+      data: {
+        permissions: {
+          upsert: permissions.map((permission) => ({
+            where: {
+              username_institutionId_repositoryPattern: {
+                username: permission.username,
+                institutionId: institution.id,
+                repositoryPattern: repository.pattern,
+              },
+            },
+            create: {
+              ...permission,
+              institutionId: institution.id,
+            },
+            update: {
+              ...permission,
+              institutionId: institution.id,
+            },
+          })),
+        },
+      },
+    });
+  });
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = newRepository;
+};
 
 exports.upsertRepositoryPermission = async (ctx) => {
   const { repository, institution } = ctx.state;

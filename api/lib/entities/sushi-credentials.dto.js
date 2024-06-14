@@ -15,6 +15,9 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
+  active: Joi.boolean(),
+  activeUpdatedAt: Joi.date(),
+
   customerId: Joi.string().trim().allow(''),
   requestorId: Joi.string().trim().allow(''),
   apiKey: Joi.string().trim().allow(''),
@@ -64,6 +67,8 @@ const immutableFields = [
 const includableFields = [
   'endpoint',
   'institution',
+  'institution.memberships',
+  'institution.memberships.user',
   'harvests',
   'connection',
 ];

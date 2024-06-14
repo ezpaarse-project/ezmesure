@@ -15,6 +15,7 @@ const {
  * @typedef {import('@prisma/client').Institution} Institution
  * @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionCountArgs} InstitutionCountArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
@@ -124,6 +125,15 @@ function update(params, tx = prisma) {
  */
 function upsert(params, tx = prisma) {
   return tx.institution.upsert(params);
+}
+
+/**
+ * @param {InstitutionCountArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+function count(params, tx = prisma) {
+  return tx.institution.count(params);
 }
 
 /**
@@ -284,6 +294,7 @@ module.exports = {
   findByID,
   update,
   upsert,
+  count,
   addSubInstitution,
   validate,
   remove,

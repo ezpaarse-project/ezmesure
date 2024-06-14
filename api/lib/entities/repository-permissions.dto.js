@@ -45,6 +45,22 @@ const includableFields = [
 /**
  * Schema to be applied when creating a new repository permission
  */
+const createSchema = withModifiers(
+  schema,
+  requireFields(['username', 'pattern', 'institutionId']),
+  ignoreFields(immutableFields),
+  {
+    username: () => schema.username,
+  },
+  withDefaults({
+    readonly: false,
+    locked: false,
+  }),
+);
+
+/**
+ * Schema to be applied when creating or updating a new repository permission
+ */
 const upsertSchema = withModifiers(
   schema,
   requireFields(['username', 'pattern', 'institutionId']),
@@ -68,6 +84,7 @@ module.exports = {
   allFields: Object.keys(schema),
   immutableFields,
   includableFields,
+  createSchema: Joi.object(createSchema).required(),
   updateSchema: Joi.object(updateSchema).required(),
   upsertSchema: Joi.object(upsertSchema).required(),
 };

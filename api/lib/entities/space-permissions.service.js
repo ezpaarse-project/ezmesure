@@ -7,6 +7,7 @@ const spacePermissionsPrisma = require('../services/prisma/space-permissions');
 /** @typedef {import('@prisma/client').SpacePermission} SpacePermission */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpdateArgs} SpacePermissionUpdateArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionUpsertArgs} SpacePermissionUpsertArgs */
+/** @typedef {import('@prisma/client').Prisma.SpacePermissionCountArgs} SpacePermissionCountArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionFindUniqueArgs} SpacePermissionFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionFindManyArgs} SpacePermissionFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.SpacePermissionCreateArgs} SpacePermissionCreateArgs */
@@ -61,6 +62,14 @@ module.exports = class SpacePermissionsService extends BasePrismaService {
     const spacePermission = await spacePermissionsPrisma.upsert(params, this.prisma);
     this.triggerHooks('space_permission:upsert', spacePermission);
     return spacePermission;
+  }
+
+  /**
+   * @param {SpacePermissionCountArgs} params
+   * @returns {Promise<number>}
+   */
+  async count(params) {
+    return spacePermissionsPrisma.count(params, this.prisma);
   }
 
   /**

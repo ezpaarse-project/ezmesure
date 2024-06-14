@@ -8,6 +8,7 @@ const institutionsPrisma = require('../services/prisma/institutions');
  * @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
+ * @typedef {import('@prisma/client').Prisma.InstitutionCountArgs} InstitutionCountArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
@@ -106,6 +107,14 @@ module.exports = class InstitutionsService extends BasePrismaService {
     const institution = await institutionsPrisma.upsert(params, this.prisma);
     this.triggerHooks('institution:upsert', institution);
     return institution;
+  }
+
+  /**
+   * @param {InstitutionCountArgs} params
+   * @returns {Promise<number>}
+   */
+  count(params) {
+    return institutionsPrisma.count(params, this.prisma);
   }
 
   /**

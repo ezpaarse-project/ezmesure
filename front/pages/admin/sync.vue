@@ -229,7 +229,7 @@ export default defineComponent({
     async refreshExpected() {
       const getData = (url, params = {}) => this.$axios.$get(
         url,
-        { params: { size: -1, ...params } },
+        { params: { size: 0, ...params } },
       );
 
       try {

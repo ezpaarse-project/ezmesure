@@ -5,8 +5,16 @@ const UsersService = require('../../entities/users.service');
 const { sendActivateUserMail } = require('../auth/mail');
 const { appLogger } = require('../../services/logger');
 const { activateUserLink } = require('../auth/password');
-const { adminImportSchema, includableFields } = require('../../entities/users.dto');
-const { propsToPrismaInclude } = require('../utils');
+const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
+
+const { prepareStandardQueryParams } = require('../../services/std-query');
+
+const standardQueryParams = prepareStandardQueryParams({
+  schema,
+  includableFields,
+  queryFields: ['username', 'fullName'],
+});
+exports.standardQueryParams = standardQueryParams;
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -20,16 +28,19 @@ function generateToken(user) {
 
 exports.getUser = async (ctx) => {
   const { username } = ctx.params;
-  const { user: connectedUser } = ctx.state;
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { username });
 
   const usersService = new UsersService();
   const user = await usersService.findUnique({
-    select: connectedUser.isAdmin ? null : { fullName: true, username: true },
-    where: { username },
+    ...prismaQuery,
+    select: ctx.state?.user?.isAdmin ? null : { fullName: true, username: true },
+    include: ctx.state?.user?.isAdmin ? prismaQuery.include : undefined,
   });
 
   if (!user) {
     ctx.throw(404, ctx.$t('errors.user.notFound'));
+    return;
   }
 
   ctx.status = 200;
@@ -38,42 +49,29 @@ exports.getUser = async (ctx) => {
 
 exports.list = async (ctx) => {
   const {
-    q: search = '',
-    size = 10,
-    page = 1,
     source = 'fullName,username',
-    include: propsToInclude,
   } = ctx.query;
 
-  let select = Object.assign(
+  const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+
+  prismaQuery.select = Object.assign(
     {},
     ...source.split(',').map((field) => ({ [field.trim()]: true })),
   );
   if (source === '*') {
-    select = undefined;
+    prismaQuery.select = undefined;
   }
 
-  let include;
-  if (ctx.state?.user?.isAdmin) {
-    include = propsToPrismaInclude(propsToInclude, includableFields);
+  if (!ctx.state?.user?.isAdmin) {
+    prismaQuery.include = undefined;
   }
 
   const usersService = new UsersService();
-  const users = await usersService.findMany({
-    take: Number.isInteger(size) && size >= 0 ? size : undefined,
-    skip: Number.isInteger(size) ? size * (page - 1) : undefined,
-    select,
-    include,
-    where: {
-      OR: [
-        { username: { contains: search, mode: 'insensitive' } },
-        { fullName: { contains: search, mode: 'insensitive' } },
-      ],
-    },
-  });
 
   ctx.type = 'json';
-  ctx.body = users;
+  ctx.status = 200;
+  ctx.set('X-Total-Count', await usersService.count({ where: prismaQuery.where }));
+  ctx.body = await usersService.findMany(prismaQuery);
 };
 
 exports.createOrReplaceUser = async (ctx) => {

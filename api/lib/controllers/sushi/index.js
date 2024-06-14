@@ -5,7 +5,6 @@ const {
   createSchema,
   importSchema,
   updateSchema,
-  includableFields,
 } = require('../../entities/sushi-credentials.dto');
 
 const {
@@ -21,6 +20,8 @@ const {
 } = require('../../services/auth');
 
 const {
+  standardQueryParams,
+
   getAll,
   getOne,
   updateSushi,
@@ -39,10 +40,7 @@ const {
 
 const { FEATURES } = require('../../entities/memberships.dto');
 
-const stringOrArray = Joi.alternatives().try(
-  Joi.string().trim().min(1),
-  Joi.array().items(Joi.string().trim().min(1)).min(1),
-);
+const connectionValidation = Joi.string().valid('working', 'unauthorized', 'faulty', 'untested');
 
 let sushiLocked = false;
 let lockReason;
@@ -104,22 +102,13 @@ router.route({
     getAll,
   ],
   validate: {
-    query: Joi.object({
-      id: stringOrArray,
-      endpointId: stringOrArray,
-      institutionId: stringOrArray,
-      connection: Joi.string().valid('working', 'faulty', 'untested'),
-      q: Joi.string().min(0),
-      size: Joi.number().min(0),
-      page: Joi.number().min(1),
-      sort: Joi.string(),
-      order: Joi.string().valid('asc', 'desc'),
-      include: Joi.array().single().items(Joi.string().valid(...includableFields)),
-    })
-      .rename('include[]', 'include')
-      .rename('id[]', 'id')
-      .rename('endpointId[]', 'endpointId')
-      .rename('institutionId[]', 'institutionId'),
+    query: standardQueryParams.manyValidation.append({
+      connection: Joi.alternatives().try(
+        connectionValidation.min(0),
+        Joi.array().items(connectionValidation.min(1)).min(1),
+      ),
+      q: Joi.string().trim().allow(''),
+    }).rename('connection[]', 'connection'),
   },
 });
 
@@ -181,6 +170,7 @@ router.route({
     params: {
       sushiId: Joi.string().trim().required(),
     },
+    query: standardQueryParams.oneValidation,
   },
 });
 
