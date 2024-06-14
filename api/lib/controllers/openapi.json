@@ -3207,6 +3207,63 @@
         ]
       }
     },
+    "/institutions/{id}/sushiReadySince": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "put": {
+        "summary": "Change sushi readiness state of an institution",
+        "operationId": "put-institutions-id-sushiReadySince",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Change sushi readiness state of an institution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Institutions"
+        ]
+      }
+    },
     "/institutions/{id}": {
       "parameters": [
         {
@@ -4027,179 +4084,6 @@
             "description": "Forbidden"
           }
         }
-      }
-    },
-    "/institutions/{id}/state": {
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "description": "ID of the institution"
-        }
-      ],
-      "get": {
-        "summary": "Get institution state",
-        "tags": [
-          "Institutions",
-          "Administration"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "description": "",
-                  "type": "object",
-                  "x-examples": {
-                    "example-1": {
-                      "space": {
-                        "id": "toulouse",
-                        "name": "toulouse",
-                        "description": "Université Toulouse-II",
-                        "disabledFeatures": []
-                      },
-                      "indices": [
-                        "toulouse",
-                        "toulouse-foo",
-                        "toulouse-foobar"
-                      ],
-                      "indexPatterns": [
-                        {
-                          "id": "902cf200-b97c-11eb-aae3-e9a25566a440",
-                          "title": "toulouse*",
-                          "timeFieldName": "datetime"
-                        },
-                        {
-                          "id": "34a502d0-b391-11e9-8339-63cd4d0c5d94",
-                          "title": "univ-example",
-                          "timeFieldName": "datetime"
-                        }
-                      ],
-                      "roles": {
-                        "base": {
-                          "name": "toulouse",
-                          "exists": true
-                        },
-                        "readonly": {
-                          "name": "toulouse_read_only",
-                          "exists": true
-                        }
-                      }
-                    }
-                  },
-                  "properties": {
-                    "spaces": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Space"
-                      }
-                    },
-                    "indices": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "indexPatterns": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "minItems": 1,
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "title": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "timeFieldName": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "spaceId": {
-                            "type": "string",
-                            "nullable": true
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "title"
-                        ]
-                      }
-                    },
-                    "roles": {
-                      "type": "object",
-                      "required": [
-                        "base",
-                        "readonly"
-                      ],
-                      "properties": {
-                        "base": {
-                          "type": "object",
-                          "required": [
-                            "exists"
-                          ],
-                          "properties": {
-                            "name": {
-                              "type": "string",
-                              "minLength": 1
-                            },
-                            "exists": {
-                              "type": "boolean"
-                            }
-                          }
-                        },
-                        "readonly": {
-                          "type": "object",
-                          "required": [
-                            "exists"
-                          ],
-                          "properties": {
-                            "name": {
-                              "type": "string",
-                              "minLength": 1
-                            },
-                            "exists": {
-                              "type": "boolean"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "required": [
-                    "spaces",
-                    "indices",
-                    "indexPatterns",
-                    "roles"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "operationId": "get-institutions-id-state",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "description": "Get the current state of an institution (list spaces, indices, index patterns and roles)",
-        "x-internal": false
       }
     },
     "/logs": {
