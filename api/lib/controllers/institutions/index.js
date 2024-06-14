@@ -20,10 +20,10 @@ const {
   importInstitutions,
   getInstitution,
   updateInstitution,
-  getSushiData,
 } = require('./actions');
 
 const memberships = require('./memberships');
+const sushi = require('./sushi');
 const repositories = require('./repositories');
 const spaces = require('./spaces');
 
@@ -38,6 +38,7 @@ const {
   validateInstitution,
 } = require('./admin');
 
+router.use(sushi.prefix('/:institutionId/sushi').middleware());
 router.use(repositories.prefix('/:institutionId/repositories').middleware());
 router.use(spaces.prefix('/:institutionId/spaces').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
@@ -62,26 +63,6 @@ router.route({
       institutionId: Joi.string().trim().required(),
     },
     query: standardQueryParams.oneValidation,
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:institutionId/sushi',
-  handler: [
-    fetchInstitution(),
-    requireMemberPermissions(FEATURES.sushi.read),
-    getSushiData,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-    query: Joi.object({
-      latestImportTask: Joi.boolean().default(false),
-      connection: Joi.string().valid('working', 'faulty', 'untested'),
-      include: Joi.array().single().items(Joi.string().valid('harvests')),
-    }).rename('include[]', 'include'),
   },
 });
 
