@@ -20,7 +20,6 @@ exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
-  // eslint-disable-next-line no-underscore-dangle
   prismaQuery.include = {
     ...(prismaQuery.include || {}),
     _count: {
@@ -42,10 +41,12 @@ exports.getOne = async (ctx) => {
   const { harvestId } = ctx.params;
 
   const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: harvestId });
-  // eslint-disable-next-line no-underscore-dangle
-  prismaQuery.include._count = {
-    select: {
-      jobs: true,
+  prismaQuery.include = {
+    ...(prismaQuery.include || {}),
+    _count: {
+      select: {
+        jobs: true,
+      },
     },
   };
 
