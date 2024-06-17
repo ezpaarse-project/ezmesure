@@ -21,7 +21,7 @@ services:
   migrate_reporting:
     image: ghcr.io/ezpaarse-project/ezreeport-report:1.1.0
     entrypoint: ""
-    command: ["/bin/sh", "-c", "npm install prisma && npm run db:migrate"]
+    command: ["/bin/sh", "-c", "npm run db:install && npm run db:migrate"]
     environment:
       - http_proxy
       - https_proxy
