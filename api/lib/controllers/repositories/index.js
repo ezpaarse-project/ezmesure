@@ -13,6 +13,7 @@ const {
   getMany,
   getOne,
   createOne,
+  importMany,
   updateOne,
   deleteOne,
 } = require('./actions');
@@ -32,6 +33,19 @@ router.get('/', {
     query: standardQueryParams.manyValidation.append({
       institutionId: Joi.string().trim(),
     }),
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: importMany,
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

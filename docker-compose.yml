@@ -214,7 +214,7 @@ services:
     restart: unless-stopped
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report:1.2.0
+    image: ghcr.io/ezpaarse-project/ezreeport-report:1.3.0
     environment:
       - http_proxy
       - https_proxy

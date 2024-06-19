@@ -1,6 +1,6 @@
 <template>
   <v-chip v-if="isDisabled" small>
-    <LocalDate :date="disabledUntil" format="PPPp" />
+    <LocalDate :date="disabledUntil" />
 
     <v-icon right small>
       mdi-download-off

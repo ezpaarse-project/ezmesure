@@ -376,6 +376,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       // Get report types
       let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
+      if (reportTypes.includes('all')) {
+        reportTypes = defaultHarvestedReports;
+      }
 
       /** @type {(SushiCredentials & { endpoint: SushiEndpoint, institution: Institution })[]} */
       let credentialsToHarvest = [];
@@ -416,6 +419,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       return Promise.all(
         credentialsToHarvest.map(async (credentials) => {
           const { endpoint, institution } = credentials;
+          let harvestedReportTypes = [...reportTypes];
 
           // Get index for institution
           let index = institutionIndices.get(institution.id) || '';
@@ -481,10 +485,6 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             });
           }
 
-          if (reportTypes.includes('all')) {
-            reportTypes = defaultHarvestedReports;
-          }
-
           const supportedReportsSet = new Set([
             // If there's no support list available, assume the default list is supported
             ...(supportedReports.length > 0 ? supportedReports : defaultHarvestedReports),
@@ -495,18 +495,22 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           if (!session.downloadUnsupported) {
             // Filter supported reports based on session params
             if (supportedReportsSet.size > 0) {
-              reportTypes = reportTypes.filter((reportId) => supportedReportsSet.has(reportId));
+              harvestedReportTypes = harvestedReportTypes.filter(
+                (reportId) => supportedReportsSet.has(reportId),
+              );
             }
 
             // Remove reports that should be ignored
             if (ignoredReportsSet.size > 0) {
-              reportTypes = reportTypes.filter((reportId) => !ignoredReportsSet.has(reportId));
+              harvestedReportTypes = harvestedReportTypes.filter(
+                (reportId) => !ignoredReportsSet.has(reportId),
+              );
             }
           }
 
           // Add jobs
           const jobs = await Promise.all(
-            reportTypes.map(
+            harvestedReportTypes.map(
               async (reportType) => {
                 const data = {
                   /** @type {HarvestJobStatus} */

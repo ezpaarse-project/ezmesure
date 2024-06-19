@@ -4,7 +4,6 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const ImagesService = require('../../services/images');
-const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const MembershipsService = require('../../entities/memberships.service');
 
 /* eslint-disable max-len */
@@ -31,7 +30,6 @@ const {
 } = require('../../entities/institutions.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
-const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema: institutionSchema,
@@ -416,22 +414,4 @@ exports.deleteInstitution = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = data;
-};
-
-exports.getSushiData = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const sushiCredentialsService = new SushiCredentialsService();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = await sushiCredentialsService.findMany({
-    where: {
-      institutionId: ctx.state.institution.id,
-    },
-    include: {
-      endpoint: true,
-      ...(propsToPrismaInclude(propsToInclude, ['harvests']) ?? {}),
-    },
-  });
 };

@@ -13,17 +13,15 @@
 <script>
 export default {
   props: {
-    params: {
+    task: {
       type: Object,
       default: () => ({}),
     },
   },
   computed: {
-    harvestId() { return this.params?.harvestId; },
-    reportType() { return this.params?.reportType?.toUpperCase?.(); },
-    index() { return this.params?.index; },
-    beginDate() { return this.params?.beginDate; },
-    endDate() { return this.params?.endDate; },
+    session() { return this.task?.session; },
+    beginDate() { return this.session?.beginDate; },
+    endDate() { return this.session?.endDate; },
 
     period() {
       if (this.beginDate === this.endDate) {
@@ -35,10 +33,10 @@ export default {
 
     items() {
       return [
-        { label: this.$t('tasks.params.harvestId'), value: this.params?.harvestId },
-        { label: this.$t('tasks.params.reportType'), value: this.params?.reportType?.toUpperCase?.() },
+        { label: this.$t('tasks.params.sessionId'), value: this.task?.sessionId },
+        { label: this.$t('tasks.params.reportType'), value: this.task?.reportType?.toUpperCase?.() },
         { label: this.$t('tasks.params.period'), value: this.period },
-        { label: this.$t('tasks.params.index'), value: this.params?.index },
+        { label: this.$t('tasks.params.index'), value: this.task?.index },
       ].filter((x) => x.value);
     },
   },

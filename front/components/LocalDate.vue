@@ -6,7 +6,7 @@
 export default {
   props: {
     date: {
-      type: [String, Number],
+      type: [String, Number, Date],
       default: () => '',
     },
     format: {
@@ -22,7 +22,11 @@ export default {
         return this.$t('invalidDate');
       }
 
-      return this.$dateFunctions.format(localDate, this.format || 'PPPpp');
+      try {
+        return this.$dateFunctions.format(localDate, this.format || 'PPPp');
+      } catch (e) {
+        return this.$t('invalidDate');
+      }
     },
   },
 };

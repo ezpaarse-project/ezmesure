@@ -13,6 +13,7 @@ const {
   getMany,
   getOne,
   createOne,
+  importMany,
   updateOne,
   deleteOne,
 } = require('./actions');
@@ -33,7 +34,7 @@ router.get('/', {
   path: '/',
   handler: getMany,
   validate: {
-    params: standardQueryParams.manyValidation,
+    query: standardQueryParams.manyValidation,
   },
 });
 
@@ -58,6 +59,19 @@ router.route({
   validate: {
     type: 'json',
     body: adminCreateSchema,
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: importMany,
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

@@ -1,7 +1,11 @@
 const {
+  startOfMonth,
+  endOfMonth,
   subDays,
   isBefore,
   subMonths,
+  parseISO,
+  isValid: isValidDate,
   format,
 } = require('date-fns');
 
@@ -102,60 +106,48 @@ const SUSHI_CODES = {
   requiredFilterMissing: 3070,
 };
 
-const optionalAttributes = new Map([
+const defaultParameters = new Map([
   [
-    'pr', [
-      'Data_Type',
-      'Access_Method',
-    ],
+    'pr', {
+      attributes_to_show: [
+        'Data_Type',
+        'Access_Method',
+      ],
+    },
   ],
   [
-    'dr', [
-      'Data_Type',
-      'Access_Method',
-    ],
+    'dr', {
+      attributes_to_show: [
+        'Data_Type',
+        'Access_Method',
+      ],
+    },
   ],
   [
-    'tr', [
-      'Data_Type',
-      'Section_Type',
-      'YOP',
-      'Access_Type',
-      'Access_Method',
-    ],
+    'tr', {
+      attributes_to_show: [
+        'Data_Type',
+        'Section_Type',
+        'YOP',
+        'Access_Type',
+        'Access_Method',
+      ],
+    },
   ],
   [
-    'ir', [
-      'Authors',
-      'Publication_Date',
-      'Article_Version',
-      'Parent_Title',
-      'Parent_Authors',
-      'Parent_Publication_Date',
-      'Parent_Article_Version',
-      'Parent_Data_Type',
-      'Parent_DOI',
-      'Parent_Proprietary_ID',
-      'Parent_ISBN',
-      'Parent_Print_ISSN',
-      'Parent_Online_ISSN',
-      'Parent_URI',
-      'Component_Title',
-      'Component_Authors',
-      'Component_Publication_Date',
-      'Component_Data_Type',
-      'Component_DOI',
-      'Component_Proprietary_ID',
-      'Component_ISBN',
-      'Component_Print_ISSN',
-      'Component_Online_ISSN',
-      'Component_URI',
-      'Data_Type',
-      'YOP',
-      'Access_Type',
-      'Access_Method',
-
-    ],
+    'ir', {
+      include_parent_details: 'True',
+      include_component_details: 'True',
+      attributes_to_show: [
+        'Authors',
+        'Publication_Date',
+        'Article_Version',
+        'Data_Type',
+        'YOP',
+        'Access_Type',
+        'Access_Method',
+      ],
+    },
   ],
 ]);
 
@@ -235,11 +227,12 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   } = endpoint;
 
   const paramSeparator = endpoint.paramSeparator || '|';
+  const dateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
 
   const {
     reportType = DEFAULT_REPORT_TYPE,
-    beginDate,
-    endDate,
+    beginDate: beginDateStr,
+    endDate: endDateStr,
     stream,
   } = options;
 
@@ -257,17 +250,25 @@ function getReportDownloadConfig(endpoint, sushi, opts = {}) {
   ];
 
   const params = getSushiParams(sushi, allowedScopes);
-
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
+  const defaultParams = defaultParameters.get(reportType) ?? {};
 
-  if (!paramNames.has('attributes_to_show')) {
-    params.attributes_to_show = optionalAttributes.get(reportType)?.join?.(paramSeparator);
-  }
+  Object.entries(defaultParams).forEach(([key, value]) => {
+    if (!paramNames.has(key)) {
+      params[key] = Array.isArray(value) ? value.join(paramSeparator) : value;
+    }
+  });
 
-  const prevMonth = format(subMonths(new Date(), 1), 'yyyy-MM');
+  const prevMonth = subMonths(new Date(), 1);
 
-  params.begin_date = beginDate || endDate || prevMonth;
-  params.end_date = endDate || beginDate || prevMonth;
+  let beginDate = parseISO(beginDateStr || endDateStr);
+  let endDate = parseISO(endDateStr || beginDateStr);
+
+  if (!isValidDate(beginDate)) { beginDate = prevMonth; }
+  if (!isValidDate(endDate)) { endDate = prevMonth; }
+
+  params.begin_date = format(startOfMonth(beginDate), dateFormat);
+  params.end_date = format(endOfMonth(endDate), dateFormat);
 
   return {
     method: 'get',

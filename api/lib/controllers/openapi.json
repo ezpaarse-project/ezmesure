@@ -5462,6 +5462,114 @@
         }
       }
     },
+    "/repositories/_import": {
+      "post": {
+        "summary": "Import repositories items",
+        "operationId": "post-repositories-_import",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/Repository"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Repositories"
+        ],
+        "description": "Import a list of repositories items",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      }
+    },
     "/repositories/{id}": {
       "parameters": [
         {
@@ -5976,6 +6084,114 @@
               }
             }
           }
+        }
+      }
+    },
+    "/kibana-spaces/_import": {
+      "post": {
+        "summary": "Import Kibana spaces",
+        "operationId": "post-kibana-spaces-_import",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/Space"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Kibana"
+        ],
+        "description": "Import a list of Kibana spaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "description": ""
         }
       }
     },
