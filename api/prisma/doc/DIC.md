@@ -263,6 +263,7 @@ A SUSHI endpoint
 | ignoredReports            | `String[]`           | List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
 | additionalReports         | `String[]`           | Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
 | supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                                      |            |          |
+| harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")             |            |          |
 | testedReport              | `String?`            | Report used when testing endpoint                                                                 |            |          |
 | credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                    |            |          |
 | params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                      |            |          |
