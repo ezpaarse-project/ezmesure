@@ -329,6 +329,8 @@
       </v-card-text>
 
       <v-card-actions>
+        <EndpointTestMenu :endpoint="endpointForm" />
+
         <v-spacer />
 
         <v-btn text @click="show = false">
@@ -356,12 +358,14 @@
 import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import SushiParam from '~/components/SushiParam.vue';
 import LocalDate from '~/components/LocalDate.vue';
+import EndpointTestMenu from '~/components/endpoints/EndpointTestMenu.vue';
 
 export default {
   components: {
     ConfirmDialog,
     SushiParam,
     LocalDate,
+    EndpointTestMenu,
   },
   props: {
     availableTags: {

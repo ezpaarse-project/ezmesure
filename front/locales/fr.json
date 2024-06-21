@@ -233,6 +233,7 @@
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un",
     "disabledUntil": "Désactivé jusqu'au",
+    "checkEndpoint": "Tester le point d'accès",
     "filters": {
       "title": "Filtrer les points d'accès"
     }
@@ -659,6 +660,7 @@
     "endpointVendor": "Nom du fournisseur",
     "endpointUrl": "URL du point d'accès SUSHI",
     "pleaseEnterFullVendorName": "Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)",
+    "sushiDetails": "Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.",
     "endpointDetails": "Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.",
     "additionalInformation": "Informations complémentaires"
   },
