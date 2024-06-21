@@ -3,12 +3,19 @@ const SpacesService = require('../../entities/spaces.service');
 const {
   schema,
   includableFields,
+  adminImportSchema,
 } = require('../../entities/spaces.dto');
 
 const {
   PrismaErrors,
   Prisma: { PrismaClientKnownRequestError },
 } = require('../../services/prisma');
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.SpaceCreateInput} SpaceCreateInput
+*/
+/* eslint-enable max-len */
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
@@ -147,4 +154,110 @@ exports.deleteOne = async (ctx) => {
   await spacesService.delete({ where: { id: spaceId } });
 
   ctx.status = 204;
+};
+
+exports.importMany = async (ctx) => {
+  ctx.action = 'spaces/import';
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {SpacesService} spacesService
+   * @param {*} spaceData
+   */
+  const importItem = async (spacesService, spaceData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(spaceData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const space = await spacesService.findUnique({ where: { id: item.id } });
+
+      if (space && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.space.alreadyExists', space.id));
+        return;
+      }
+    }
+
+    /** @type {SpaceCreateInput} */
+    const data = {
+      ...item,
+      institutionId: undefined,
+      institution: {
+        connect: { id: item.institutionId },
+      },
+      permissions: {
+        connectOrCreate: item.permissions?.map(
+          (permission) => ({
+            where: {
+              username_spaceId: {
+                username: permission.username,
+                spaceId: item.id,
+              },
+            },
+            create: {
+              ...permission,
+              username: undefined,
+              institutionId: undefined,
+              spaceId: undefined,
+              membership: {
+                connect: {
+                  username_institutionId: {
+                    username: permission.username,
+                    institutionId: item.institutionId,
+                  },
+                },
+              },
+            },
+          }),
+        ),
+      },
+    };
+
+    const space = await spacesService.upsert({
+      where: { id: item.id },
+      create: data,
+      update: data,
+    });
+
+    addResponseItem(space, 'created');
+  };
+
+  await SpacesService.$transaction(async (spacesService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const spaceData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(spacesService, spaceData);
+      } catch (e) {
+        addResponseItem(spaceData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };

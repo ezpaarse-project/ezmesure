@@ -4,7 +4,6 @@ const { sendMail, generateMail } = require('../../services/mail');
 const { appLogger } = require('../../services/logger');
 const InstitutionsService = require('../../entities/institutions.service');
 const ImagesService = require('../../services/images');
-const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const MembershipsService = require('../../entities/memberships.service');
 
 /* eslint-disable max-len */
@@ -31,7 +30,6 @@ const {
 } = require('../../entities/institutions.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
-const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema: institutionSchema,
@@ -210,6 +208,49 @@ exports.updateInstitution = async (ctx) => {
       }
     }
   }
+
+  const { sushiReadySince } = updatedInstitution;
+  const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
+                         || (!wasSushiReady && sushiReadySince);
+
+  if (sushiReadyChanged) {
+    sendMail({
+      from: sender,
+      to: supportRecipients,
+      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      ...generateMail('sushi-ready-change', {
+        institutionName: institution.name,
+        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        sushiReadySince,
+      }),
+    }).catch((err) => {
+      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    });
+  }
+
+  ctx.status = 200;
+  ctx.body = updatedInstitution;
+};
+
+exports.updateInstitutionSushiReady = async (ctx) => {
+  ctx.action = 'institutions/update';
+  const { institution } = ctx.state;
+  const { body } = ctx.request;
+
+  const origin = ctx.get('origin');
+
+  const wasSushiReady = institution.sushiReadySince;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.name,
+  };
+
+  const updatedInstitution = await (new InstitutionsService()).update({
+    where: { id: institution.id },
+    data: { sushiReadySince: body.value },
+  });
+  appLogger.verbose(`Institution [${institution.id}] is updated`);
 
   const { sushiReadySince } = updatedInstitution;
   const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
@@ -416,22 +457,4 @@ exports.deleteInstitution = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = data;
-};
-
-exports.getSushiData = async (ctx) => {
-  const { include: propsToInclude } = ctx.query;
-
-  const sushiCredentialsService = new SushiCredentialsService();
-
-  ctx.type = 'json';
-  ctx.status = 200;
-  ctx.body = await sushiCredentialsService.findMany({
-    where: {
-      institutionId: ctx.state.institution.id,
-    },
-    include: {
-      endpoint: true,
-      ...(propsToPrismaInclude(propsToInclude, ['harvests']) ?? {}),
-    },
-  });
 };

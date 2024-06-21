@@ -280,6 +280,7 @@
           <v-spacer />
 
           <v-menu
+            v-if="canEdit"
             v-model="showSushiReadyPopup"
             :close-on-content-click="false"
             bottom
@@ -976,7 +977,7 @@ export default {
       this.refreshing = true;
 
       try {
-        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, { params: { include: ['harvests'] } });
+        this.sushiItems = await this.$axios.$get(`/institutions/${this.institution.id}/sushi`, { params: { include: ['endpoint', 'harvests'], size: 0 } });
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('institutions.sushi.unableToRetriveSushiData'));
       }
@@ -1005,10 +1006,10 @@ export default {
       this.loadingSushiReady = true;
       this.showSushiReadyPopup = false;
 
-      const sushiReadySince = this.institution?.sushiReadySince ? null : new Date();
+      const value = this.institution?.sushiReadySince ? null : new Date();
 
       try {
-        const data = await this.$axios.$put(`/institutions/${this.institution.id}`, { sushiReadySince });
+        const data = await this.$axios.$put(`/institutions/${this.institution.id}/sushiReadySince`, { value });
         this.$set(this.institution, 'sushiReadySince', data?.sushiReadySince);
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('errors.generic'));

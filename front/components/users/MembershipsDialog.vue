@@ -32,7 +32,7 @@
                     mdi-lock
                   </v-icon>
 
-                  <nuxt-link :to="`/admin/institutions/${items[0].institution.id}/members`">
+                  <nuxt-link :to="`/admin/institutions/${membership.institution.id}/members`">
                     {{ membership.institution.name }}
                   </nuxt-link>
                 </v-list-item-title>
