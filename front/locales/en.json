@@ -658,7 +658,7 @@
     "endpointVendor": "Vendor name",
     "endpointUrl": "URL of the SUSHI endpoint",
     "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
-    "sushiDetails": "Please provide credentials to use in order to test this endpoint, admin team will use them to confirm if the endpoint is valid and COUNTER5 compatible.",
+    "sushiDetails": "Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.",
     "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.",
     "additionalInformation": "Additional information"
   },
