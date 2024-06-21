@@ -159,6 +159,7 @@ router.route({
   validate: {
     type: 'json',
     body: Joi.object({
+      id: Joi.string().trim().min(1).empty(null),
       endpoint: Joi.object({
         id: Joi.string().trim().empty(null),
         sushiUrl: Joi.string().trim().required(),

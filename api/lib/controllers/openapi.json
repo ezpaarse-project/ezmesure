@@ -8133,6 +8133,7 @@
                 "type": "object",
                 "required": ["endpoint"],
                 "properties": {
+                  "id": { "type": "string", "nullable": true },
                   "endpoint": {
                     "type": "object",
                     "required": ["sushiUrl"],
@@ -8142,7 +8143,7 @@
                       "harvestDateFormat": { "type": "string", "nullable": true },
                       "testedReport": { "type": "string", "nullable": true },
                       "paramSeparator": { "type": "string", "nullable": true },
-                      "params": { 
+                      "params": {
                         "type": "array",
                         "items": {
                           "type": "object",
@@ -8174,7 +8175,7 @@
                   "customerId": { "type": "string", "nullable": true },
                   "requestorId": { "type": "string", "nullable": true },
                   "apiKey": { "type": "string", "nullable": true },
-                  "params": { 
+                  "params": {
                     "type": "array",
                     "items":  {
                       "type": "object",
