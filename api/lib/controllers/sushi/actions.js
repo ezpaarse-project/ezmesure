@@ -384,7 +384,7 @@ exports.downloadFile = async (ctx) => {
 const checkConnection = async (sushi) => {
   const { endpoint } = sushi;
 
-  const threeMonthAgo = format(subMonths(new Date(), 3), endpoint.harvestDateFormat || 'yyyy-MM');
+  const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
 
   const sushiData = {
     sushi,
