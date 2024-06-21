@@ -20,6 +20,7 @@ const {
   importInstitutions,
   getInstitution,
   updateInstitution,
+  updateInstitutionSushiReady,
 } = require('./actions');
 
 const memberships = require('./memberships');
@@ -33,10 +34,7 @@ const {
   removeSubInstitution,
 } = require('./subinstitutions');
 
-const {
-  getInstitutionState,
-  validateInstitution,
-} = require('./admin');
+const { validateInstitution } = require('./admin');
 
 router.use(sushi.prefix('/:institutionId/sushi').middleware());
 router.use(repositories.prefix('/:institutionId/repositories').middleware());
@@ -111,6 +109,25 @@ router.route({
   },
 });
 
+router.route({
+  method: 'PUT',
+  path: '/:institutionId/sushiReadySince',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.sushi.write),
+    updateInstitutionSushiReady,
+  ],
+  validate: {
+    type: 'json',
+    params: {
+      institutionId: Joi.string().trim().required(),
+    },
+    body: {
+      value: Joi.date().allow(null),
+    },
+  },
+});
+
 router.use(requireAdmin);
 
 router.route({
@@ -119,20 +136,6 @@ router.route({
   handler: [
     fetchInstitution(),
     deleteInstitution,
-  ],
-  validate: {
-    params: {
-      institutionId: Joi.string().trim().required(),
-    },
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/:institutionId/state',
-  handler: [
-    fetchInstitution(),
-    getInstitutionState,
   ],
   validate: {
     params: {
