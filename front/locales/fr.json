@@ -470,6 +470,7 @@
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
     "history": "Historique des tâches",
+    "oneHistory": "Historique de la tâche",
     "parameters": "Paramètres",
     "statusDescriptions": {
       "waiting": "Un moissonnage a été programmé. Il sera lancé dès que possible.",

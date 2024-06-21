@@ -32,6 +32,8 @@
       </v-btn>
     </ToolBar>
 
+    <HarvestJobHistory ref="harvestJobHistory" />
+
     <v-data-table
       :headers="tableHeaders"
       :items="jobs"
@@ -151,6 +153,21 @@
 
             <v-divider />
 
+            <v-list-item
+              v-if="$refs.harvestJobHistory"
+              :disabled="item.status === 'waiting'"
+              @click="$refs.harvestJobHistory.open(item)"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-history</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('tasks.oneHistory') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item @click="copyId(item)">
               <v-list-item-icon>
                 <v-icon>mdi-identifier</v-icon>
@@ -191,6 +208,7 @@ import ConfirmDialog from '~/components/ConfirmDialog.vue';
 import ToolBar from '~/components/space/ToolBar.vue';
 import HarvestJobCard from '~/components/harvest/HarvestJobCard.vue';
 import LocalDate from '~/components/LocalDate.vue';
+import HarvestJobHistory from '~/components/harvest/HarvestJobHistory.vue';
 import HarvestJobFilters from '~/components/harvest/HarvestJobFilters.vue';
 
 export default defineComponent({
@@ -199,6 +217,7 @@ export default defineComponent({
     LocalDate,
     HarvestJobCard,
     HarvestJobFilters,
+    HarvestJobHistory,
     ConfirmDialog,
   },
   props: {

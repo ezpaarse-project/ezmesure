@@ -469,6 +469,7 @@
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
     "history": "Tasks history",
+    "oneHistory": "Task history",
     "parameters": "Parameters",
     "statusDescriptions": {
       "waiting": "A harvest has been scheduled. It will be launched as soon as possible.",
