@@ -23,13 +23,12 @@
         :headers="tableHeaders"
         :items="tasks"
         :loading="refreshing"
-        item-key="id"
+        :options.sync="tableOptions"
+        :server-items-length="totalTasks"
+        :expanded="expandedRows"
         show-expand
         single-expand
-        sort-by="createdAt"
-        sort-desc
-        :items-per-page="10"
-        :expanded="expandedRows"
+        @update:options="refreshSushiTasks()"
         @update:expanded="onExpandedChange"
       >
         <template #[`item.createdAt`]="{ item }">
@@ -83,8 +82,14 @@ export default {
       refreshing: false,
       institutionId: null,
       sushi: null,
-      tasks: [],
       expandedRows: [],
+      tasks: [],
+      totalTasks: 0,
+      tableOptions: {
+        itemsPerPage: 10,
+        sortBy: ['createdAt'],
+        sortDesc: [true],
+      },
     };
   },
   computed: {
@@ -107,7 +112,7 @@ export default {
         },
         {
           text: this.$t('type'),
-          value: 'params.reportType',
+          value: 'reportType',
           align: 'right',
           width: '80px',
           cellClass: 'text-uppercase',
@@ -150,13 +155,21 @@ export default {
 
       this.refreshing = true;
 
+      const params = {
+        credentialsId: this.sushi.id,
+        include: ['steps', 'logs', 'session'],
+
+        page: this.tableOptions.page,
+        size: this.tableOptions.itemsPerPage,
+        sort: this.tableOptions.sortBy[0],
+        order: this.tableOptions.sortDesc[0] ? 'desc' : 'asc',
+      };
+
       try {
-        this.tasks = await this.$axios.$get('/tasks', {
-          params: {
-            credentialsId: this.sushi.id,
-            include: ['steps', 'logs', 'session'],
-          },
-        });
+        const { data, headers } = await this.$axios.get('/tasks', { params });
+
+        this.totalTasks = headers['x-total-count'];
+        this.tasks = data;
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('tasks.failedToFetchTasks'));
       }
