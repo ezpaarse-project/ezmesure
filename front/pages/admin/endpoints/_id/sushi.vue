@@ -479,7 +479,7 @@ export default {
       }
 
       try {
-        await navigator.clipboard.writeText(addresses);
+        await navigator.clipboard.writeText(addresses.join('; '));
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
         return;
