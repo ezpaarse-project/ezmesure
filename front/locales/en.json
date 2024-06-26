@@ -63,9 +63,16 @@
     "name": "Name",
     "modified": "Modified",
     "size": "Size",
+    "letAdmin": "Transfer to admin team",
+    "letAdminDesc": "Please note that the upload is not immediate, and will be done as soon as possible",
     "updatingFailed": "Updating the list failed.",
+    "selectIndex": "Select an index",
+    "selectIndexDescription": "Several indices are available in this repository, please select an index where to upload the data.",
+    "affectedIndex": "Affected index",
+    "affectedRepository": "Affected repositories",
     "deletingFailed": "File deletion failed",
     "deleteCompleted": "Delete completed",
+    "loaded": "Loaded",
     "uploaded": "Uploaded",
     "loadingInProgress": "Loading in progress",
     "validatingFile": "Validation of the file...",
@@ -76,8 +83,7 @@
     "fieldIsEmpty": "Line #{lineNumber}: \"{field}\" is blank.",
     "invalidField": "Line #{lineNumber}: \"{field}\" is not valid, has the file been modified ?",
     "depositFiles": {
-      "text": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is {not} immediate, and will be done by us as soon as possible. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
-      "not": "not",
+      "text": "Deposit here the consultation event files that you want to load in ezMESURE. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
       "bestPracticeLink": "best practice rules"
     }
   },
