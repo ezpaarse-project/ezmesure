@@ -656,6 +656,7 @@
     "declareSushiEndpoint": "Déclarer un point d'accès SUSHI",
     "emailIsRequired": "L'adresse électronique est requise",
     "emailMustBeValid": "L'adresse électronique doit être valide",
+    "sushiIsRequired": "Des identifiants SUSHI sont requis",
     "contentIsRequired": "Un message est requis",
     "subjectIsRequired": "L'objet est requis",
     "endpointVendor": "Nom du fournisseur",

@@ -658,6 +658,7 @@
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
     "subjectIsRequired": "Subject is required",
+    "sushiIsRequired": "SUSHI credentials are required",
     "endpointVendor": "Vendor name",
     "endpointUrl": "URL of the SUSHI endpoint",
     "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
