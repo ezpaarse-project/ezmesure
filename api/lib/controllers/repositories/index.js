@@ -16,6 +16,7 @@ const {
   importMany,
   updateOne,
   deleteOne,
+  resolvePattern,
 } = require('./actions');
 
 const {
@@ -23,7 +24,20 @@ const {
   adminUpdateSchema,
 } = require('../../entities/repositories.dto');
 
-router.use(requireJwt, requireUser, requireAdmin);
+router.use(requireJwt, requireUser);
+
+router.route({
+  method: 'GET',
+  path: '/:pattern/_resolve',
+  handler: resolvePattern,
+  validate: {
+    params: {
+      pattern: Joi.string().trim().required(),
+    },
+  },
+});
+
+router.use(requireAdmin);
 
 router.get('/', {
   method: 'GET',
