@@ -11,7 +11,7 @@ const {
  * @type {import('joi').SchemaLike}
  */
 const schema = {
-  id: Joi.string().regex(/^[a-z0-9_-]+$/i).trim(),
+  id: Joi.string().trim(),
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
