@@ -31,6 +31,7 @@ const onHarvestJobUpdate = async (harvestJob) => {
     /** @type {HarvestUncheckedCreateInput & HarvestUncheckedUpdateInput} */
     const harvestData = {
       harvestedAt: now,
+      harvestedBy: harvestJob.id,
       credentialsId: harvestJob.credentialsId,
       period: session.beginDate,
       reportId: harvestJob.reportType,
