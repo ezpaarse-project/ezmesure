@@ -1,0 +1,25 @@
+{
+  "language": "Langue",
+  "menu": {
+    "home": "Accueil",
+    "first": "Première page",
+    "second": "Deuxième page"
+  },
+  "page1": "Texte français pour la première page",
+  "page2": "Texte français pour la deuxième page",
+  "link": "Le gars qui à fait ça <a href=\"{link}\" target=\"_blank\">c'est lui</a>",
+  "theme": {
+    "dark": "Thème sombre",
+    "light": "Thème clair"
+  },
+  "request": {
+    "info": "Vous avez lancé une requête à Github",
+    "success": "La requête a réussi",
+    "error": "Impossible de requêter Github"
+  },
+  "snackbar": {
+    "button": "Ouvrir une snack",
+    "open": "Je suis une snack"
+  },
+  "development": "Développement"
+}

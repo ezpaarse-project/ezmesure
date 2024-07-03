@@ -1,0 +1,25 @@
+{
+  "language": "Language",
+  "menu": {
+    "home": "Home",
+    "first": "First page",
+    "second": "Second page"
+  },
+  "page1": "English text for first page",
+  "page2": "English text for second page",
+  "link": "The guys who did that <a href=\"{githubProfileURL}\" target=\"_blank\">is him</a>",
+  "theme": {
+    "dark": "Dark theme",
+    "light": "Light theme"
+  },
+  "request": {
+    "info": "You start to request Github",
+    "success": "The request was successful",
+    "error": "Cannot request Github"
+  },
+  "snackbar": {
+    "button": "Open snack",
+    "open": "I am snack"
+  },
+  "development": "Development"
+}
