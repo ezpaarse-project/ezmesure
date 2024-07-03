@@ -9,7 +9,11 @@ export default defineNuxtConfig({
     }
   },
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxtjs/i18n'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxtjs/i18n',
+    '@nuxt/eslint'
+  ],
   build: {
     transpile: ['vuetify'],
   },
