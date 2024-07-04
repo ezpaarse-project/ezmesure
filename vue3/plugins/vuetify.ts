@@ -1,7 +1,7 @@
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import colors from 'vuetify/lib/util/colors'
+import colors from 'vuetify/lib/util/colors.mjs'
 
 export default defineNuxtPlugin(nuxtApp => {
   const vuetify = createVuetify({
@@ -12,20 +12,13 @@ export default defineNuxtPlugin(nuxtApp => {
       themes: {
         light: {
           colors: {
-            primary: colors.blue.darken1,
-            secondary: colors.grey.darken4,
-            secondary: colors.grey.darken4,
-          }
-        },
-        dark: {
-          colors: {
-            primary: colors.blue.darken1,
-            accent: colors.grey.darken3,
-            secondary: colors.grey.darken3,
+            primary: colors.purple.base,
+            secondary: colors.grey.darken2,
+            accent: colors.lightBlue.base,
           }
         }
       }
-    }
+    },
   })
 
   nuxtApp.vueApp.use(vuetify)

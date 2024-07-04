@@ -2,11 +2,9 @@
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      environment: process.env.NODE_ENV || 'development',
-      version: process.env.VERSION || 'development',
-      APIHost: process.env.API_HOST || 'https://api.github.com/',
-      githubProfileURL: process.env.GITHUB_PROFILE_URL || 'https://github.com/felixleo22',
-    }
+      shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
+      supportMail: process.env.EZMESURE_SUPPORT_MAIL || 'ezteam@couperin.org',
+      currentInstance: process.env.EZMESURE_INSTANCE,}
   },
   devtools: { enabled: true },
   modules: [
@@ -18,10 +16,9 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
   i18n: {
-    vueI18n: './config/i18n.js'
+    vueI18n: './config/i18n.ts'
   },
   plugins: [
-    '~/plugins/api',
     '~/plugins/vuetify'
   ],
   css: [
