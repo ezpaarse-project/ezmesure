@@ -3,7 +3,7 @@
     <template #activator="{ props }">
       <v-btn v-bind="props">
         {{ currentLang }}
-        <v-icon :icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" end/>
+        <v-icon :icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" end />
       </v-btn>
     </template>
 
@@ -12,11 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { langs } from '@/config/i18n'
+import locales from '@/config/locales';
 
-const { t, locale } = useI18n()
+const { t, locale } = useI18n();
 
 const isOpen = ref(false);
 
-const currentLang = computed(() => langs.find(lang => lang.locale === locale.value)?.language || t('language'));
+const currentLang = computed(() => locales.find((lang) => lang.code === locale.value)?.name || t('language'));
 </script>

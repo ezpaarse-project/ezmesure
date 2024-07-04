@@ -1,20 +1,25 @@
 <template>
   <v-list>
-    <v-list-item 
-      v-for="lang in langs"
-      :key="lang.locale"
-      :title="lang.language"
-      @click="i18n.setLocale(lang.locale)"
+    <v-list-item
+      v-for="lang in locales"
+      :key="lang.code"
+      :title="lang.name"
+      @click="setLocale(lang.code)"
     >
       <template #prepend>
-        <img width="24" class="mr-2" :src="lang.pathImage" :alt="lang.locale" >
+        <img
+          :src="`/images/lang/${lang.code}.png`"
+          :alt="lang.name"
+          width="24"
+          class="mr-2"
+        >
       </template>
     </v-list-item>
   </v-list>
 </template>
 
 <script setup lang="ts">
-import { langs } from '@/config/i18n'
+import locales from '@/config/locales';
 
-const i18n = useI18n()
+const { setLocale } = useI18n();
 </script>

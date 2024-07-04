@@ -2,9 +2,11 @@
   "eslint.workingDirectories": [
     "api",
     "front",
-    "reporting"
+    "reporting",
+    "vue3"
   ],
   "eslint.validate": [
+    "typescript",
     "javascript",
     "javascriptreact",
     "vue"

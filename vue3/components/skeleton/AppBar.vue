@@ -3,7 +3,7 @@
     <template #prepend>
       <NuxtLink
         :title="$t('menu.homepage')"
-        :aria-label="t('menu.homepage')"
+        :aria-label="$t('menu.homepage')"
         to="/"
         class="pl-4"
       >
@@ -32,13 +32,13 @@
         </div>
 
         <v-btn exact to="/partners" variant="text">
-          {{ t('menu.partners') }}
+          {{ $t('menu.partners') }}
         </v-btn>
         <v-btn exact to="/api-reference" variant="text">
-          {{ t('menu.api') }}
+          {{ $t('menu.api') }}
         </v-btn>
         <v-btn exact to="/contact-us" variant="text">
-          {{ t('menu.contact') }}
+          {{ $t('menu.contact') }}
         </v-btn>
       </div>
     </v-app-bar-title>
@@ -61,11 +61,9 @@
 </template>
 
 <script setup lang="ts">
-import logo from '@/static/images/logo.png'
+import logo from '@/static/images/logo.png';
 
 const runtimeConfig = useRuntimeConfig();
-
-const { t } = useI18n();
 
 // const emit = defineEmits<{
 //   (e: 'modelValue:menu'): void
