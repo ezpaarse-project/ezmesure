@@ -6,4 +6,12 @@ module.exports = {
     '@vue/eslint-config-airbnb-with-typescript/allow-js-in-vue',
     '@nuxt/eslint-config',
   ],
+  overrides: [
+    {
+      files: ['store/**'],
+      rules: {
+        'import/prefer-default-export': 'off',
+      },
+    },
+  ],
 };

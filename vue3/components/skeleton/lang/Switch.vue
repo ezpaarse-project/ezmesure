@@ -1,10 +1,11 @@
 <template>
   <v-menu v-model="isOpen" location="bottom">
     <template #activator="{ props }">
-      <v-btn v-bind="props">
-        {{ currentLang }}
-        <v-icon :icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" end />
-      </v-btn>
+      <v-btn
+        :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        :text="currentLang"
+        v-bind="props"
+      />
     </template>
 
     <SkeletonLangList />
