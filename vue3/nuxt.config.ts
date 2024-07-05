@@ -81,4 +81,17 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+
+  devServer: {
+    host: '0.0.0.0',
+    port: 8080,
+  },
+
+  vite: {
+    server: {
+      hmr: {
+        clientPort: 8080,
+      },
+    },
+  },
 });
