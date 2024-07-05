@@ -50,9 +50,9 @@
       <v-btn to="/myspace" variant="text">
         {{ $t('menu.myspace') }}
       </v-btn>
-      <!-- <v-btn v-if="isAdmin" text to="/admin">
+      <v-btn v-if="user?.isAdmin" to="/admin" variant="text">
         {{ $t('administration') }}
-      </v-btn> -->
+      </v-btn>
       <SkeletonLangSwitch />
     </template>
 
@@ -63,13 +63,14 @@
 <script setup lang="ts">
 import logo from '@/static/images/logo.png';
 
-const runtimeConfig = useRuntimeConfig();
+const { public: config } = useRuntimeConfig();
+const { data: user } = useAuthState();
 
 // const emit = defineEmits<{
 //   (e: 'modelValue:menu'): void
 // }>();
 
-const currentInstance = computed(() => runtimeConfig.public.currentInstance);
+const currentInstance = computed(() => config.currentInstance);
 
 // async function updateVisibleMenu() {
 //   emit('modelValue:menu');

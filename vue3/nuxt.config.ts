@@ -13,6 +13,7 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    '@sidebase/nuxt-auth',
   ],
 
   plugins: [
@@ -29,6 +30,33 @@ export default defineNuxtConfig({
 
   pinia: {
     storesDirs: ['./store/**'],
+  },
+
+  auth: {
+    baseURL: '/api/',
+    provider: {
+      type: 'local',
+      endpoints: {
+        signIn: { path: '/login/local', method: 'post' },
+        signOut: { path: '/logout', method: 'get' },
+        getSession: { path: '/profile', method: 'get' },
+      },
+      token: {
+        cookieName: 'eztoken',
+      },
+      sessionDataType: {
+        username: 'string',
+        fullName: 'string',
+        email: 'string',
+        createdAt: 'string',
+        updatedAt: 'string',
+        isAdmin: 'boolean',
+        metadata: '{ acceptedTerms?: boolean }?',
+      },
+      pages: {
+        login: '/authenticate',
+      },
+    },
   },
 
   css: [

@@ -13,6 +13,7 @@
   "devDependencies": {
     "@nuxt/devtools": "1.3.3",
     "@nuxt/eslint-config": "^0.3.13",
+    "@sidebase/nuxt-auth": "^0.7.2",
     "@types/node": "^20.14.7",
     "@vue/eslint-config-airbnb-with-typescript": "^8.0.0",
     "eslint": "^8.57.0",
