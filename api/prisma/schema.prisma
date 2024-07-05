@@ -271,7 +271,7 @@ model HarvestJob {
   /// ID of the SUSHI credentials
   credentialsId   String
   /// SUSHI credentials used to harvest
-  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id])
+  credentials     SushiCredentials @relation(fields: [credentialsId], references: [id], onDelete: Cascade)
   /// Creation date
   createdAt       DateTime         @default(now())
   /// Latest update date
@@ -300,6 +300,8 @@ model HarvestJob {
   logs            Log[]
   /// Job steps
   steps           Step[]
+  /// States affected by current job
+  harvests         Harvest[]
 }
 
 /// Harvest state of a SUSHI item, for a specific month and report ID
@@ -307,7 +309,7 @@ model Harvest {
   /// Date of the harvest
   harvestedAt     DateTime         @default(now())
   /// Id of the job that harvested current state
-  harvestedBy     String           @default("")
+  harvestedById   String?
   /// Identifier of the SUSHI credentials
   credentialsId   String
   /// SUSHI credentials
@@ -328,6 +330,9 @@ model Harvest {
   updatedItems    Int              @default(0)
   /// Number of report items that failed to be inserted into Elasticsearch
   failedItems     Int              @default(0)
+
+  /// Job that harvested current state
+  harvestedBy HarvestJob? @relation(fields: [harvestedById], references: [id])
 
   @@id([credentialsId, reportId, period])
 }

@@ -31,7 +31,7 @@ function cancelPendingHarvest() {
     await Promise.all(
       harvests.map(async (harvest) => {
         // Check if the job is still in the queue
-        const job = await harvestQueue.getJob(harvest.harvestedBy);
+        const job = await harvestQueue.getJob(harvest.harvestedById);
         if (job) {
           appLogger.warn(`[harvest-pending-cancel] ${harvest.status} job (${job.id}) still in queue while started ${formatDistanceToNow(harvest.harvestedAt, { addSuffix: true })}`);
           return;
