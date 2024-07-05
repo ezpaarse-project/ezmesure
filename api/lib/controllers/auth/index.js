@@ -66,7 +66,16 @@ router.route({
 
 router.get('/', getUser);
 router.get('/reporting_token', getReportingToken);
-router.get('/memberships', getMemberships);
+router.route({
+  method: 'GET',
+  path: '/memberships',
+  handler: getMemberships,
+  validate: {
+    query: Joi.object({
+      include: Joi.array().single().items(),
+    }).rename('include[]', 'include'),
+  },
+});
 router.get('/token', getToken);
 router.route({
   method: 'PUT',
