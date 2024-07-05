@@ -1,6 +1,9 @@
 <template>
   <v-app>
     <ClientOnly>
+      <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
+      <SkeletonSnackbar />
+
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
@@ -20,4 +23,15 @@ useHead({
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
   ],
 });
+
+const visible = ref(false);
+
+const emit = defineEmits({
+  updated: () => true,
+});
+
+async function updateVisibleMenu() {
+  visible.value = !visible.value;
+  emit('updated');
+}
 </script>
