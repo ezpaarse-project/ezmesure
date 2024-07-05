@@ -21,11 +21,16 @@ export default defineNuxtConfig({
   ],
 
   i18n: {
-    strategy: 'no_prefix',
+    baseUrl: process.env.APPLI_APACHE_SERVERNAME,
     lazy: true,
+    strategy: 'no_prefix',
     defaultLocale: 'fr',
     langDir: 'locales',
     locales,
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'ezmesure_i18n',
+    },
   },
 
   pinia: {
