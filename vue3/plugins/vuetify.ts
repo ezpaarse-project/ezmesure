@@ -1,6 +1,9 @@
 import { createVuetify } from 'vuetify';
+// eslint-disable-next-line import/no-unresolved
 import * as components from 'vuetify/components';
+// eslint-disable-next-line import/no-unresolved
 import * as directives from 'vuetify/directives';
+// eslint-disable-next-line import/no-unresolved
 import colors from 'vuetify/util/colors';
 
 export default defineNuxtPlugin((nuxtApp) => {

@@ -7,7 +7,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore .",
     "lintfix": "npm run lint --fix"
   },
   "devDependencies": {
@@ -15,7 +15,7 @@
     "@nuxt/eslint-config": "^0.3.13",
     "@sidebase/nuxt-auth": "^0.7.2",
     "@types/node": "^20.14.7",
-    "@vue/eslint-config-airbnb-with-typescript": "^8.0.0",
+    "@vue/eslint-config-airbnb": "^8.0.0",
     "eslint": "^8.57.0",
     "nuxt": "^3.12.2",
     "vue-i18n": "^9.13.1"

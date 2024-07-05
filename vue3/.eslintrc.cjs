@@ -1,9 +1,12 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const path = require('node:path');
+const createAliasSetting = require('@vue/eslint-config-airbnb/createAliasSetting');
+
 module.exports = {
   root: true,
   extends: [
     'plugin:vue/vue3-essential',
-    '@vue/eslint-config-airbnb-with-typescript',
-    '@vue/eslint-config-airbnb-with-typescript/allow-js-in-vue',
+    '@vue/eslint-config-airbnb',
     '@nuxt/eslint-config',
   ],
   overrides: [
@@ -14,4 +17,9 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    ...createAliasSetting({
+      '@': `${path.resolve(__dirname, './')}`,
+    }),
+  },
 };
