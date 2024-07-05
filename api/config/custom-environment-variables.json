@@ -61,7 +61,8 @@
       "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
       "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
       "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION",
-      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION"
+      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION",
+      "cancelSchedule": "EZMESURE_HARVEST_CANCEL_SCHEDULE"
     }
   },
   "counter": {

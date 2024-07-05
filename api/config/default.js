@@ -77,6 +77,7 @@ module.exports = {
       maxDeferrals: 5,
       deferralBackoffDuration: 10 * oneMinute,
       busyBackoffDuration: 10 * oneMinute,
+      cancelSchedule: '0 0 0 * * *',
     },
   },
   counter: {
