@@ -1,13 +1,9 @@
-type Message = {
-  color: string;
-  text: string;
-  timeout?: number;
-};
+import { defineStore, ref } from '#imports';
 
 export const useSnacksStore = defineStore('snacks', () => {
-  const messages = ref<Message[]>([]);
+  const messages = ref([]);
 
-  function addMessage(message?: Message) {
+  function addMessage(message) {
     if (typeof message !== 'object') { return; }
 
     const msg = {
@@ -19,21 +15,22 @@ export const useSnacksStore = defineStore('snacks', () => {
     messages.value.push(msg);
   }
 
-  function error(text: string) {
+  function error(text) {
     addMessage({ text, color: 'error' });
   }
 
-  function info(text: string) {
+  function info(text) {
     addMessage({ text, color: 'info' });
   }
 
-  function success(text: string) {
+  function success(text) {
     addMessage({ text, color: 'success' });
   }
 
   function removeMessage() {
     messages.value.shift();
   }
+
   return {
     messages,
     error,

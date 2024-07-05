@@ -69,7 +69,7 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import logo from '@/static/images/logo-ezMESURE-slogan.png';
 
 const { t } = useI18n();

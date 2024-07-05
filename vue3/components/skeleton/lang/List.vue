@@ -18,7 +18,7 @@
   </v-list>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import locales from '@/config/locales';
 
 const { setLocale } = useI18n();

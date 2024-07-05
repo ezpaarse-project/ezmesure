@@ -20,6 +20,7 @@ module.exports = {
   settings: {
     ...createAliasSetting({
       '@': `${path.resolve(__dirname, './')}`,
+      '#imports': `${path.resolve(__dirname, './.nuxt/imports.d.ts')}`,
     }),
   },
 };

@@ -42,7 +42,7 @@
                     {{ errorMessage }}
                   </v-alert>
 
-                  <v-form v-model="valid" class="mb-4" @submit.prevent="signIn()">
+                  <v-form v-model="valid" class="mb-4" @submit.prevent="login()">
                     <v-text-field
                       v-model="credentials.username"
                       :label="$t('authenticate.user')"
@@ -119,7 +119,7 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script setup>
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
@@ -129,7 +129,7 @@ definePageMeta({
 
 const { public: config } = useRuntimeConfig();
 const { t } = useI18n();
-const auth = useAuth();
+const { signIn } = useAuth();
 const { query } = useRoute();
 
 let provider = config.shibbolethEnabled ? 1 : 0;
@@ -146,11 +146,11 @@ const credentials = ref({
   password: '',
 });
 
-async function signIn() {
+async function login() {
   loading.value = true;
 
   try {
-    await auth.signIn(credentials.value, { callbackUrl: '/myspace' });
+    await signIn(credentials.value, { callbackUrl: '/myspace' });
   } catch (err) {
     if (!(err instanceof Error)) {
       errorMessage.value = t('authenticate.failed');
