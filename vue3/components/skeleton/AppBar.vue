@@ -19,7 +19,7 @@
     </template>
 
     <v-app-bar-title>
-      <div class="d-flex align-center ga-2">
+      <div class="d-flex align-center">
         <div class="mr-4">
           ezMESURE
 
@@ -31,32 +31,9 @@
           </div>
         </div>
 
-        <v-btn exact to="/partners" variant="text">
-          {{ $t('menu.partners') }}
-        </v-btn>
-        <v-btn exact to="/api-reference" variant="text">
-          {{ $t('menu.api') }}
-        </v-btn>
-        <v-btn exact to="/contact-us" variant="text">
-          {{ $t('menu.contact') }}
-        </v-btn>
+        <SkeletonAppMenu class="flex-fill" />
       </div>
     </v-app-bar-title>
-
-    <template #append>
-      <div class="d-flex align-center ga-2 mr-2">
-        <v-btn href="/kibana/" variant="text">
-          {{ $t('menu.dashboard') }}
-        </v-btn>
-        <v-btn to="/myspace" variant="text">
-          {{ $t('menu.myspace') }}
-        </v-btn>
-        <v-btn v-if="user?.isAdmin" to="/admin" variant="text">
-          {{ $t('administration') }}
-        </v-btn>
-        <SkeletonLangSwitch />
-      </div>
-    </template>
   </v-app-bar>
 </template>
 
@@ -64,7 +41,6 @@
 import logo from '@/static/images/logo.png';
 
 const { public: config } = useRuntimeConfig();
-const { data: user } = useAuthState();
 
 const currentInstance = computed(() => config.currentInstance);
 </script>
