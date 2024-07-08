@@ -6,8 +6,8 @@ menu:
   partners: Nos partenaires
   api: API
   navigateTo: Naviguer vers
-  myDeposits: Mes dépots
-  kibanIdentifiers: Identifiants Kibana
+  myDeposits: Mes dépôts
+  credentials: Informations de connexion
   authentificationToken: Token d'authentification
   administration: Administration
   myInstitution: Mon établissement
@@ -110,7 +110,7 @@ token:
       ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
   token: Token
-  unableToRetriveToken: Impossible de récupérer le token d'authentification
+  unableToRetrieveToken: Impossible de récupérer le token d'authentification
   copyFailed: La copie du token a échoué
   clipped: Token copié dans le presse papier
 partners:

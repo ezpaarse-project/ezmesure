@@ -1,6 +1,7 @@
 const path = require('node:path');
 const createAliasSetting = require('@vue/eslint-config-airbnb/createAliasSetting');
 
+/** @type {import('eslint').ESLint.ConfigData} */
 module.exports = {
   root: true,
   extends: [
@@ -29,5 +30,8 @@ module.exports = {
       '@': `${path.resolve(__dirname, './')}`,
       '#imports': `${path.resolve(__dirname, './.nuxt/imports.d.ts')}`,
     }),
+  },
+  globals: {
+    $fetch: 'readonly',
   },
 };

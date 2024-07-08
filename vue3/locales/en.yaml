@@ -7,7 +7,7 @@ menu:
   api: API
   navigateTo: Navigate to
   myDeposits: My deposits
-  kibanIdentifiers: Kibana identifiers
+  credentials: Login information
   authentificationToken: Authentification token
   administration: Administration
   myInstitution: My institution
@@ -88,7 +88,7 @@ files:
     bestPracticeLink: best practice rules
 kibana:
   title: Kibana identifiers
-  passwordLost: Password forgoten
+  passwordLost: Password forgotten
   username: Username
   newPasswordSentByEmail: An email has been sent to you to reset your password.
   resetPassword:
@@ -105,7 +105,7 @@ token:
       header to your HTTP requests: {header}'
     header: 'Authorization: Bearer [insert the token here]'
   token: Token
-  unableToRetriveToken: Unable to retrieve authentication token
+  unableToRetrieveToken: Unable to retrieve authentication token
   copyFailed: The copy of the token failed
   clipped: Clipped in the clipboard
 partners:
