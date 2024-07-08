@@ -2,7 +2,7 @@
   <v-app>
     <ClientOnly>
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
-      <SkeletonSnackbar />
+      <SkeletonSnacks />
 
       <NuxtLayout>
         <NuxtPage />

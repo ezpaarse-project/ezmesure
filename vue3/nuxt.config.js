@@ -1,4 +1,5 @@
-import locales from './config/locales';
+import { defineNuxtConfig } from 'nuxt/config';
+import locales from './lib/locales';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({

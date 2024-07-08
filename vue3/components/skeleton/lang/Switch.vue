@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import locales from '@/config/locales';
+import locales from '@/lib/locales';
 
 const { t, locale } = useI18n();
 

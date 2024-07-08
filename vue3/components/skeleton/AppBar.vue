@@ -19,7 +19,7 @@
     </template>
 
     <v-app-bar-title>
-      <div class="d-flex align-center">
+      <div class="d-flex align-center ga-2">
         <div class="mr-4">
           ezMESURE
 
@@ -44,37 +44,29 @@
     </v-app-bar-title>
 
     <template #append>
-      <v-btn href="/kibana/" variant="text">
-        {{ $t('menu.dashboard') }}
-      </v-btn>
-      <v-btn to="/myspace" variant="text">
-        {{ $t('menu.myspace') }}
-      </v-btn>
-      <v-btn v-if="user?.isAdmin" to="/admin" variant="text">
-        {{ $t('administration') }}
-      </v-btn>
-      <SkeletonLangSwitch />
+      <div class="d-flex align-center ga-2 mr-2">
+        <v-btn href="/kibana/" variant="text">
+          {{ $t('menu.dashboard') }}
+        </v-btn>
+        <v-btn to="/myspace" variant="text">
+          {{ $t('menu.myspace') }}
+        </v-btn>
+        <v-btn v-if="user?.isAdmin" to="/admin" variant="text">
+          {{ $t('administration') }}
+        </v-btn>
+        <SkeletonLangSwitch />
+      </div>
     </template>
-
-    <!-- <v-app-bar-nav-icon dark @click.stop="updateVisibleMenu()" /> -->
   </v-app-bar>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import logo from '@/static/images/logo.png';
 
 const { public: config } = useRuntimeConfig();
 const { data: user } = useAuthState();
 
-// const emit = defineEmits<{
-//   (e: 'modelValue:menu'): void
-// }>();
-
 const currentInstance = computed(() => config.currentInstance);
-
-// async function updateVisibleMenu() {
-//   emit('modelValue:menu');
-// };
 </script>
 
 <style scoped lang="scss">

@@ -4,7 +4,7 @@
     location="bottom right"
     :color="currentMessages?.color"
     :timeout="currentMessages?.timeout"
-    transition="slide-x-transition"
+    transition="slide-y-reverse-transition"
   >
     {{ currentMessages?.text }}
 
@@ -19,7 +19,7 @@
   </v-snackbar>
 </template>
 
-<script setup lang="ts">
+<script setup>
 const snackStore = useSnacksStore();
 
 const visible = ref(false);

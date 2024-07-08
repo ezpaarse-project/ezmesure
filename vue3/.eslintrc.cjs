@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const path = require('node:path');
 const createAliasSetting = require('@vue/eslint-config-airbnb/createAliasSetting');
 
@@ -11,6 +10,14 @@ module.exports = {
   ],
   overrides: [
     {
+      // allow extraneous dependencies for dev files
+      files: ['nuxt.config.js', '.eslintrc.cjs'],
+      rules: {
+        'mport/no-extraneous-dependencies': 'off',
+      },
+    },
+    {
+      // allow non default exports for stores
       files: ['store/**'],
       rules: {
         'import/prefer-default-export': 'off',
