@@ -74,7 +74,9 @@ const includableFields = [
   'user',
   'institution',
   'spacePermissions',
+  'spacePermissions.space',
   'repositoryPermissions',
+  'repositoryPermissions.repository',
 ];
 
 /**

@@ -2,17 +2,25 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { addHours, isBefore, parseISO } = require('date-fns');
 const elastic = require('../../services/elastic');
-const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 
 const usersElastic = require('../../services/elastic/users');
 const ezrUsers = require('../../services/ezreeport/users');
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
+const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
+const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
 const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
+
+const standardMembershipsQueryParams = prepareStandardQueryParams({
+  schema: membershipSchema,
+  includableFields: includableMembershipFields,
+  queryFields: [],
+});
+exports.standardMembershipsQueryParams = standardMembershipsQueryParams;
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -309,22 +317,6 @@ exports.getUser = async (ctx) => {
   const usersService = new UsersService();
   const user = await usersService.findUnique({
     where: { username: ctx.state.user.username },
-    include: {
-      memberships: {
-        include: {
-          repositoryPermissions: {
-            include: {
-              repository: true,
-            },
-          },
-          spacePermissions: {
-            include: {
-              space: true,
-            },
-          },
-        },
-      },
-    },
   });
 
   if (!user) {
@@ -343,14 +335,13 @@ exports.getToken = async (ctx) => {
 
 exports.getMemberships = async (ctx) => {
   const { username } = ctx.state.user;
-  const { include: propsToInclude } = ctx.query;
+
+  const prismaQuery = standardMembershipsQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where.username = username;
 
   ctx.status = 200;
   const membershipsService = new MembershipsService();
-  ctx.body = await membershipsService.findMany({
-    where: { username },
-    include: propsToPrismaInclude(propsToInclude, ['institution', 'repositoryPermissions', 'repositoryPermissions.repository', 'spacePermissions', 'spacePermissions.space']),
-  });
+  ctx.body = await membershipsService.findMany(prismaQuery);
 };
 
 exports.logout = async (ctx) => {
