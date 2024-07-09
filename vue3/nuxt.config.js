@@ -1,5 +1,9 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { defineNuxtConfig } from 'nuxt/config';
-import locales from './lib/locales';
+
+import routerOptions from './app/router.options';
+import authOptions from './app/auth.options';
+import i18nOptions from './app/i18n.options';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -21,49 +25,17 @@ export default defineNuxtConfig({
     '~/plugins/vuetify',
   ],
 
-  i18n: {
-    baseUrl: process.env.APPLI_APACHE_SERVERNAME,
-    lazy: true,
-    strategy: 'no_prefix',
-    defaultLocale: 'fr',
-    langDir: 'locales',
-    locales,
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'ezmesure_i18n',
-    },
+  router: {
+    options: routerOptions,
   },
+
+  i18n: i18nOptions,
 
   pinia: {
     storesDirs: ['./store/**'],
   },
 
-  auth: {
-    baseURL: '/api/',
-    provider: {
-      type: 'local',
-      endpoints: {
-        signIn: { path: '/login/local', method: 'post' },
-        signOut: { path: '/logout', method: 'get' },
-        getSession: { path: '/profile', method: 'get' },
-      },
-      token: {
-        cookieName: 'eztoken',
-      },
-      sessionDataType: {
-        username: 'string',
-        fullName: 'string',
-        email: 'string',
-        createdAt: 'string',
-        updatedAt: 'string',
-        isAdmin: 'boolean',
-        metadata: '{ acceptedTerms?: boolean }?',
-      },
-      pages: {
-        login: '/authenticate',
-      },
-    },
-  },
+  auth: authOptions,
 
   css: [
     'vuetify/lib/styles/main.sass',

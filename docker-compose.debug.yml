@@ -96,6 +96,7 @@ services:
       - EZMESURE_INSTANCE="local"
       - EZMESURE_DISABLE_SHIBBOLETH
       - HOST=0.0.0.0
+    tmpfs: /tmp
     command: npm run dev
     restart: "no"
 
