@@ -245,11 +245,14 @@ endpoints:
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution
+  validateSwitch: Validate/Invalidate
+  validateNbInstitutions: You are about to validate or invalidate {count} institution.
   updateInstitution: Update institution
+  manageInstitutions: Manage institutions|
+    Manage {count} institutions
   deleteNbInstitutions:
     text: You are about to delete {number} institutions. {affected}
-    affected: The associated spaces and roles will be deleted. The associated indices
-      will stay unaffected. This action cannot be undone.
+    affected: The associated spaces and roles will be deleted. The associated indices will stay unaffected. This action cannot be undone.
   newInstitution: New institution
   notMember: You don't belong to an institution yet.
   declareMyInstitution: Declare my institution
@@ -257,13 +260,11 @@ institutions:
   doesNotExist: The institution you are trying to access is not registered.
   noLogo: No logo
   noInstitutions: You're not attached to a institution.
-  institutionFoundDeclareNewInstitution: Your institution is not declared, declare
-    a new institution.
+  institutionFoundDeclareNewInstitution: Your institution is not declared, declare a new institution.
   sendMailToJoin: An email has been sent to the institution's correspondents
   askToJoinAnInstitution: Ask to join an institution
   joinInstitution: Would you join {institution} ?
-  joinInstitutionEmail: A message will be sent to the correspondents of this institution
-    to let them know.
+  joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
   createMailContactList: Copy the emails of the correspondents
   reports:
     reports: Reports
@@ -878,6 +879,7 @@ cannotDeleteItems: Cannot delete {count} item(s)
 cannotDeleteItem: Cannot remove the element {id}
 cannotUpdateItem: Cannot update the element {id}
 itemsDeleted: "{count} element(s) deleted"
+itemsUpdated: "{count} element(s) updated"
 update: Update
 create: Create
 download: Download

@@ -252,26 +252,26 @@ institutions:
   toolbarTitle: Établissements ({count})
   title: Établissement
   updateInstitution: Mettre à jour l'établissement
+  validateSwitch: Valider/Invalider
+  validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
+  manageInstitutions: Gérer les établissements|
+    Gérer {count} établissements
   deleteNbInstitutions:
-    text: Vous allez supprimer {count} établissement. {affected}|Vous allez supprimer
-      {count} établissements. {affected}
-    affected: Les espaces, et rôles associés seront aussi supprimés. Les index, quant
-      à eux, ne seront pas affectés. Cette action est irréversible.
+    text: Vous allez supprimer {count} établissement. {affected}|
+      Vous allez supprimer {count} établissements. {affected}
+    affected: Les espaces, et rôles associés seront aussi supprimés. Les index, quant à eux, ne seront pas affectés. Cette action est irréversible.
   newInstitution: Nouvel établissement
   notMember: Vous n'appartenez pas encore à un établissement.
   declareMyInstitution: Déclarer mon établissement
   declareNewInstitution: Déclarer un nouvel établissement
-  doesNotExist: L'établissement auquel vous essayez d'accéder n'est pas réferencé.
+  doesNotExist: L'établissement auquel vous essayez d'accéder n'est pas référencé.
   noLogo: Pas de logo
   noInstitutions: Vous n'êtes pas attaché à un établissement.
-  institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez
-    un nouvel établissement.
-  sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour
-    les prévenir.
+  institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez un nouvel établissement.
+  sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour les prévenir.
   askToJoinAnInstitution: Demander à rejoindre un établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
-  joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement
-    afin qu'ils puissent vous ajouter.
+  joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
   createMailContactList: Copier les adresses mails des correspondants
   reports:
     reports: Rapports

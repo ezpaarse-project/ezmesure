@@ -1,0 +1,56 @@
+<template>
+  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3">
+    <v-list-item
+      :title="$t('menu.institutions')"
+      to="/admin/institutions"
+      prepend-icon="mdi-domain"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.repositories')"
+      to="/admin/repositories"
+      prepend-icon="mdi-database"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.users')"
+      to="/admin/users"
+      prepend-icon="mdi-account-multiple"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.sushiEndpoints')"
+      to="/admin/endpoints"
+      prepend-icon="mdi-api"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.harvest')"
+      to="/admin/harvests"
+      prepend-icon="mdi-tractor"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.adminReport')"
+      to="/admin/report"
+      prepend-icon="mdi-file-chart-outline"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.sync')"
+      to="/admin/sync"
+      prepend-icon="mdi-sync"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
+      :title="$t('menu.activity')"
+      to="/admin/activity"
+      prepend-icon="mdi-history"
+      class="text-grey-darken-3"
+    />
+  </v-navigation-drawer>
+</template>
+
+<script setup>
+const { isOpen } = storeToRefs(useDrawerStore());
+</script>
