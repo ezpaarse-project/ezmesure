@@ -18,8 +18,6 @@
 </template>
 
 <script setup>
-import { useDrawerStore } from '@/store/drawer';
-
 defineProps({
   title: {
     type: String,

@@ -157,7 +157,6 @@ async function login() {
       return;
     }
 
-    // @ts-ignore
     if (err.statusCode >= 400 && err.statusCode < 500) {
       errorMessage.value = t('authenticate.loginFailed');
     } else {

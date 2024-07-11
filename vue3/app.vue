@@ -3,6 +3,7 @@
     <ClientOnly>
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
       <SkeletonSnacks />
+      <SkeletonConfirmDialog />
 
       <NuxtLayout>
         <NuxtPage />
@@ -35,3 +36,9 @@ async function updateVisibleMenu() {
   emit('updated');
 }
 </script>
+
+<style lang="scss">
+a {
+  color: rgb(var(--v-theme-primary));
+}
+</style>
