@@ -201,12 +201,14 @@
 
                 <v-row>
                   <v-col>
-                    <div class="mx-auto" style="max-width: 500px;">
-                      <v-img
-                        :src="logoSrc"
-                        :aspect-ratio="`${LOGO_RATIO[0]} / ${LOGO_RATIO[1]}`"
-                      />
-                    </div>
+                    <v-img
+                      :src="logoSrc"
+                      max-width="500"
+                      class="mx-auto"
+                      :style="{
+                        aspectRatio: `${LOGO_RATIO[0]}/${LOGO_RATIO[1]}`,
+                      }"
+                    />
                   </v-col>
                 </v-row>
               </template>
@@ -214,7 +216,7 @@
               <v-overlay
                 :model-value="isDraggingLogo"
                 scrim="primary"
-                class="align-center justify-center"
+                class="drop-files-here"
                 contained
               >
                 {{ $t('institutions.institution.dropImageHere') }}
@@ -493,3 +495,11 @@ defineExpose({
   init,
 });
 </script>
+
+<style scoped lang="scss">
+.drop-files-here {
+  align-items: center;
+  justify-content: center;
+  top: 0 !important;
+}
+</style>
