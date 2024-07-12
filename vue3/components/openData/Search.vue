@@ -6,7 +6,7 @@
     :items="items"
     :loading="loading"
     :error="hasError"
-    :error-messages="[$t('institutions.institution.searchFailed')]"
+    :error-messages="hasError ? [$t('institutions.institution.searchFailed')] : []"
     no-data-text="institutions.institution.searchOpenDataHint"
     prepend-icon="mdi-database-search"
     hide-details="auto"

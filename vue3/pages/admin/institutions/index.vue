@@ -18,7 +18,7 @@
       />
 
       <v-text-field
-        v-model="queryOptions.search"
+        v-model="query.search"
         :placeholder="$t('search')"
         append-inner-icon="mdi-magnify"
         variant="outlined"
@@ -32,16 +32,11 @@
 
     <v-data-table-server
       v-model="selectedInstitutions"
-      :items="institutions"
-      :items-length="institutionsLength"
       :headers="headers"
-      :page="queryOptions.page"
-      :items-per-page="queryOptions.itemsPerPage"
-      :sort-by="queryOptions.sortBy"
-      :loading="status === 'pending'"
       show-select
       return-object
-      @update:options="(queryOptions = $event) && refresh()"
+      v-bind="vDataTableOptions"
+      @update:options="refresh()"
     >
       <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/admin/institutions/${item.id}`">
@@ -222,50 +217,33 @@ const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
 const showInstitutionForm = ref(false);
-const institutionsLength = ref(0);
-const totalInstitutionsLength = ref(0);
 const selectedInstitutions = ref([]);
-const queryOptions = ref({
-  page: 1,
-  itemsPerPage: 10,
-  sortBy: [{ key: 'name', order: 'asc' }],
-  search: '',
-});
 
 /** @type {Ref<Object | null>} Vue ref of the institution form */
 const institutionFormRef = ref(null);
 
 const {
-  data: institutions,
-  refresh,
   status,
-} = await useAsyncData(
-  'institutions-list',
-  async () => {
-    try {
-      const res = await $fetch.raw('/api/institutions', {
-        query: {
+  refresh,
+  itemLength,
+  query,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/institutions',
+  },
+  sortMapping: {
+    memberships: 'memberships._count',
+    childInstitutions: 'childInstitutions._count',
+    repositories: 'repositories._count',
+    spaces: 'spaces._count',
+    sushiCredentials: 'sushiCredentials._count',
+  },
+  data: {
+    sortBy: [{ key: 'name', order: 'asc' }],
           include: ['repositories', 'memberships', 'spaces', 'childInstitutions', 'sushiCredentials'],
-          page: queryOptions.value.page,
-          size: Math.max(queryOptions.value.itemsPerPage, 0),
-          sort: queryOptions.value.sortBy?.[0]?.key,
-          order: queryOptions.value.sortBy?.[0]?.order,
-          q: queryOptions.value.search,
         },
       });
-
-      institutionsLength.value = res.headers.get('x-total-count');
-      if (!totalInstitutionsLength.value) {
-        totalInstitutionsLength.value = institutionsLength.value;
-      }
-      // eslint-disable-next-line no-underscore-dangle
-      return res._data;
-    } catch (error) {
-      snacks.error(t('anErrorOccurred'));
-      throw error;
-    }
-  },
-);
 
 /**
  * Table headers
@@ -285,26 +263,31 @@ const headers = computed(() => [
     title: t('institutions.institution.members'),
     value: 'memberships',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('components.components'),
     value: 'childInstitutions',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('repositories.repositories'),
     value: 'repositories',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('spaces.spaces'),
     value: 'spaces',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('sushi.credentials'),
     value: 'sushiCredentials',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('institutions.institution.status'),
@@ -322,9 +305,9 @@ const headers = computed(() => [
  * Toolbar title
  */
 const toolbarTitle = computed(() => {
-  let count = `${institutionsLength.value}`;
-  if (institutionsLength.value !== totalInstitutionsLength.value) {
-    count = `${institutionsLength.value}/${totalInstitutionsLength.value}`;
+  let count = `${itemLength.value.current}`;
+  if (itemLength.value.current !== itemLength.value.total) {
+    count = `${itemLength.value.current}/${itemLength.value.total}`;
   }
   return t('institutions.toolbarTitle', { count: count ?? '?' });
 });
