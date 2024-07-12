@@ -2,6 +2,13 @@
   <div>
     <SkeletonPageBar :title="toolbarTitle">
       <v-btn
+        v-tooltip="$t('add')"
+        icon="mdi-plus"
+        density="comfortable"
+        class="mr-2"
+        @click="showForm()"
+      />
+      <v-btn
         v-tooltip="$t('refresh')"
         :loading="status === 'pending'"
         icon="mdi-reload"
@@ -95,6 +102,7 @@
       <template #[`item.validated`]="{ value, item }">
         <ConfirmPopover
           :title="$t('areYouSure')"
+          :text="$t('institutions.validateNbInstitutions', 1)"
           :agree-text="$t('confirm')"
           :agree="() => activateInstitutions([item])"
           location="bottom start"
@@ -128,6 +136,11 @@
           </template>
 
           <v-list>
+            <v-list-item
+              :title="$t('modify')"
+              prepend-icon="mdi-pencil"
+              @click="showForm(item)"
+            />
             <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
@@ -179,6 +192,19 @@
         />
       </template>
     </SelectionMenu>
+
+    <v-dialog
+      v-model="showInstitutionForm"
+      width="900"
+      scrollable
+      persistent
+    >
+      <InstitutionForm
+        ref="institutionFormRef"
+        v-model:show="showInstitutionForm"
+        @update:institution="refresh()"
+      />
+    </v-dialog>
   </div>
 </template>
 

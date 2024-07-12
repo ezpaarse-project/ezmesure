@@ -308,6 +308,7 @@ institutions:
     domains: Domaines
     general: Général
     logo: Logo
+    logoHint: Ratio {0}:{1}
     links: Liens
     localisation: Localisation
     automations: Automatisations
