@@ -14,7 +14,7 @@ module.exports = {
       // allow extraneous dependencies for dev files
       files: ['nuxt.config.js', '.eslintrc.cjs'],
       rules: {
-        'mport/no-extraneous-dependencies': 'off',
+        'import/no-extraneous-dependencies': 'off',
       },
     },
     {
