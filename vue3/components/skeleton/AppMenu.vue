@@ -15,14 +15,30 @@
         />
       </template>
 
-      <SkeletonLangSwitch />
+      <SkeletonLangMenu>
+        <template #activator="{ props, currentLang, isOpen }">
+          <v-btn
+            :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            :text="currentLang"
+            v-bind="props"
+          />
+        </template>
+      </SkeletonLangMenu>
     </div>
 
     <!-- Mobile menu -->
     <div class="d-flex d-md-none align-center">
       <v-spacer />
 
-      <SkeletonLangSwitch />
+      <SkeletonLangMenu>
+        <template #activator="{ props, currentLang, isOpen }">
+          <v-btn
+            :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            :text="currentLang"
+            v-bind="props"
+          />
+        </template>
+      </SkeletonLangMenu>
 
       <v-bottom-sheet>
         <template #activator="{ props }">

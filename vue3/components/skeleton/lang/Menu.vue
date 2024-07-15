@@ -1,11 +1,7 @@
 <template>
-  <v-menu v-model="isOpen" location="bottom">
+  <v-menu v-model="isOpen">
     <template #activator="{ props }">
-      <v-btn
-        :append-icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        :text="currentLang"
-        v-bind="props"
-      />
+      <slot name="activator" :current-lang="currentLang" :is-open="isOpen" :props="props" />
     </template>
 
     <SkeletonLangList />
