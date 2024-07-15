@@ -124,6 +124,19 @@ const syncSpace = async (space) => {
     await kibana.createSpace(spaceParams);
   }
 
+  try {
+    await kibana.updateSpaceSettings({
+      id: space.id,
+      changes: {
+        'csv:separator': ';',
+        dateFormat: 'DD MM YYYY',
+      },
+    });
+    appLogger.verbose(`[kibana] Default settings set in space [${space.id}]`);
+  } catch (error) {
+    appLogger.verbose(`[kibana] Default settings failed to be applied in space [${space.id}]:\n${error}`);
+  }
+
   await kibana.putRole({
     name: generateRoleNameFromSpace(space, 'readonly'),
     body: {
