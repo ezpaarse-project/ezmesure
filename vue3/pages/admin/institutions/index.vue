@@ -188,18 +188,10 @@
       </template>
     </SelectionMenu>
 
-    <v-dialog
-      v-model="showInstitutionForm"
-      width="900"
-      scrollable
-      persistent
-    >
-      <InstitutionForm
+    <InstitutionFormDialog
         ref="institutionFormRef"
-        v-model:show="showInstitutionForm"
         @update:model-value="refresh()"
       />
-    </v-dialog>
   </div>
 </template>
 
@@ -216,7 +208,6 @@ const { clipboardAvailable, writeClipboard } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
-const showInstitutionForm = ref(false);
 const selectedInstitutions = ref([]);
 
 /** @type {Ref<Object | null>} Vue ref of the institution form */
@@ -323,15 +314,12 @@ const debouncedRefresh = debounce(() => refresh(), 250);
  * @param {Object} [item] The institution to edit
  */
 async function showForm(item) {
-  showInstitutionForm.value = true;
-  await nextTick();
-
   if (item) {
-    institutionFormRef.value?.init(item);
+    institutionFormRef.value?.open(item);
     return;
   }
 
-  institutionFormRef.value?.init(undefined, { addAsMember: false });
+  institutionFormRef.value?.open(undefined, { addAsMember: false });
 }
 
 /**

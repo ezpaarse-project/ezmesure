@@ -275,11 +275,7 @@
     <template #actions>
       <v-spacer />
 
-      <v-btn
-        :text="$t('cancel')"
-        variant="text"
-        @click="$emit('update:show', false)"
-      />
+      <slot name="actions" />
 
       <v-btn
         :text="isEditing ? $t('update') : $t('create')"
@@ -300,7 +296,6 @@ import defaultLogo from '@/static/images/logo-etab.png';
 
 const emit = defineEmits({
   'update:modelValue': (item) => !!item,
-  'update:show': (value) => value != null,
 });
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9_.-]*$/;
@@ -363,8 +358,6 @@ function init(item, opts) {
   if (formRef.value) {
     formRef.value?.validate();
   }
-
-  emit('update:show', true);
 }
 
 /**
@@ -433,7 +426,6 @@ async function save() {
   snacks.success(t('institutions.institution.updated'));
   loading.value = false;
   emit('update:modelValue', institution.value);
-  emit('update:show', false);
 }
 
 /**
