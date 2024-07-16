@@ -15,9 +15,9 @@
     return-object
     @update:search="selectedName !== $event && fetchData()"
   >
-    <template #item="{ item, props: { active, onClick } }">
+    <template #item="{ item: { raw: item }, props: { active, onClick } }">
       <OpenDataSearchItem
-        :item="item.raw"
+        :item="item"
         :active="active"
         @click="onClick"
       />

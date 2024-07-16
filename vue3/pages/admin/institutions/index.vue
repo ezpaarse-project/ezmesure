@@ -197,7 +197,7 @@
       <InstitutionForm
         ref="institutionFormRef"
         v-model:show="showInstitutionForm"
-        @update:institution="refresh()"
+        @update:model-value="refresh()"
       />
     </v-dialog>
   </div>

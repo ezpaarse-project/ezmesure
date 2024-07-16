@@ -299,7 +299,7 @@
 import defaultLogo from '@/static/images/logo-etab.png';
 
 const emit = defineEmits({
-  'update:institution': (item) => !!item,
+  'update:modelValue': (item) => !!item,
   'update:show': (value) => value != null,
 });
 
@@ -432,7 +432,7 @@ async function save() {
 
   snacks.success(t('institutions.institution.updated'));
   loading.value = false;
-  emit('update:institution', institution.value);
+  emit('update:modelValue', institution.value);
   emit('update:show', false);
 }
 

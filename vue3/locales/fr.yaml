@@ -233,15 +233,12 @@ endpoints:
   additionalReports: Rapports additionnels
   ignoreReportValidation: Ignorer la validation du rapport
   description: Description
-  paramSeparatorDesc: ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2}
-    lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard
-    {separator} pour ces champs multivalués, renseignez le séparateur ici.
+  paramSeparatorDesc: ezMESURE ajoute automatiquement les paramètres {0}, {1} et {2} lors du moissonnage. Si le point d'accès n'accepte pas le séparateur standard {separator} pour ces champs multivalués, renseignez le séparateur ici.
   paramSeparator: Séparateur
   queryParameters: Paramètres de la query
-  pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres
-    supplémentaires dans la querystring, saisissez-les ci-dessous.
-  deleteNbEndpoints: Vous allez supprimer {count} point d'accès.|Vous allez supprimer
-    {count} points d'accès.
+  pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.
+  deleteNbEndpoints: Vous allez supprimer {count} point d'accès.|
+    Vous allez supprimer {count} points d'accès.
   noEndpointFound: Aucun point d'accès trouvé
   clickToDeclareOne: Cliquez ici pour en déclarer un
   disabledUntil: Désactivé jusqu'au
@@ -483,8 +480,7 @@ institutions:
         ci-dessous.
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
-  notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous
-    n'avez déclaré aucunes informations sur votre établissement.
+  notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.
   reportInstitutionInformation: Déclarer des informations d'établissement.
 components:
   components: Composantes
@@ -744,7 +740,9 @@ users:
     email: Adresse email
     isAdmin: Est Administrateur ?
     memberships: Établissements
-    membershipsCount: "{count} établissement|{count} établissements"
+    membershipsCount:
+      "1 établissement|
+      {count} établissements"
     roles: Roles
     no_roles: Aucun rôle
     permissions: Permissions
@@ -761,22 +759,32 @@ report:
 repositories:
   repositories: Entrepôts
   toolbarTitle: Entrepôts ({count})
-  xRepositories: 1 entrepôt|{count} entrepôts
+  xRepositories:
+    1 entrepôt|
+    {count} entrepôts
+  manageRepositories:
+    Gérer les entrepôts|
+    Gérer {count} entrepôts
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type
   institutions: Établissements
-  institutionsCount: "{count} établissement|{count} établissements"
+  institutionsCount:
+    "{count} établissement|
+    {count} établissements"
   noInstitutions: Aucun établissement n'utilise cet entrepôt
-  deleteNbRepositories: Vous allez supprimer {count} entrepôt.|Vous allez supprimer
-    {count} entrepôts.
+  deleteNbRepositories:
+    Vous allez supprimer 1 entrepôt.|
+    Vous allez supprimer {count} entrepôts.
   filters:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
 spaces:
   spaces: Espaces
-  xSpaces: 1 espace|{count} espaces
+  xSpaces: 
+    1 espace|
+    {count} espaces
   noSpace: Aucun espace n'est encore attribué
   id: Identifiant
   type: Type
@@ -786,8 +794,7 @@ spaces:
   descriptions:
     ezpaarse: Espace ezPAARSE
     counter5: Espace éditeurs
-  deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les
-    tableaux de bord inclus dans cet espace. Cette action est irréversible.
+  deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
 harvest:
   sessions:
     pendingSession: Moissonnage en attente...
@@ -909,6 +916,7 @@ cannotDeleteItems: Impossible de supprimer {count} élément(s)
 cannotDeleteItem: Impossible de supprimer l'élément {id}
 cannotUpdateItem: Impossible de mettre à jour l'élément {id}
 itemsDeleted: "{count} élement(s) supprimé(s)"
+itemsUpdated: "{count} élement(s) modifié(s)"
 update: Mettre à jour
 create: Créer
 download: Télécharger

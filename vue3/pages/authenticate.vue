@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="fill-height" style="width: 50%;">
     <v-row>
       <v-col>
         <v-card class="elevation-10">

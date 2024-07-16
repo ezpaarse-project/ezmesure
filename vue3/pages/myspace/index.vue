@@ -5,21 +5,17 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-card>
-            <v-card-title class="d-flex">
-              {{ $t('myspace.infos') }}
-
-              <v-spacer />
-
-              <v-btn v-if="refreshShibUrl" :href="refreshShibUrl" variant="text">
+          <v-card :title="$t('myspace.title')">
+            <template v-if="refreshShibUrl" #append>
+              <v-btn :href="refreshShibUrl" variant="text">
                 <v-icon left>
                   mdi-refresh
                 </v-icon>
                 {{ $t('refresh') }}
               </v-btn>
-            </v-card-title>
+            </template>
 
-            <v-card-text>
+            <template #text>
               <v-list>
                 <v-list-item
                   v-for="field in fields"
@@ -29,7 +25,7 @@
                   :subtitle="$t(`myspace.${field.name}`)"
                 />
               </v-list>
-            </v-card-text>
+            </template>
           </v-card>
         </v-col>
       </v-row>
@@ -72,9 +68,7 @@
                           :color="repoColors.get(permission.space.type)"
                           size="x-small"
                           density="comfortable"
-                          rounded="pill"
                           class="ml-2"
-                          style="color: white;"
                         />
                       </template>
                     </v-list-item>
@@ -99,9 +93,7 @@
                           :color="repoColors.get(permission.repository.type)"
                           size="x-small"
                           density="comfortable"
-                          rounded="pill"
                           class="ml-2"
-                          style="color: white;"
                         />
                       </template>
                     </v-list-item>
