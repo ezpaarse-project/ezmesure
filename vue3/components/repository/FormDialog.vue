@@ -1,12 +1,13 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    width="900"
+    width="400"
     scrollable
     persistent
   >
-    <InstitutionForm
-      ref="institutionFormRef"
+    <RepositoryForm
+      ref="repositoryFormRef"
+      :completion="completion"
       @update:model-value="onSave"
     >
       <template #actions>
@@ -16,28 +17,35 @@
           @click="isOpen = false"
         />
       </template>
-    </InstitutionForm>
+    </RepositoryForm>
   </v-dialog>
 </template>
 
 <script setup>
+defineProps({
+  completion: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const emit = defineEmits({
   'update:modelValue': (item) => !!item,
 });
 
 const isOpen = ref(false);
 
-/** @type {Ref<Object | null>} Vue ref of the institution form */
-const institutionFormRef = ref(null);
+/** @type {Ref<object | null>} Vue ref of the repository form */
+const repositoryFormRef = ref(null);
 
-async function open(institution, opts) {
+async function open(opts) {
   isOpen.value = true;
   await nextTick();
-  institutionFormRef.value?.init(institution, opts);
+  repositoryFormRef.value?.init(opts);
 }
 
-function onSave(institution) {
-  emit('update:modelValue', institution);
+function onSave(repository) {
+  emit('update:modelValue', repository);
   isOpen.value = false;
 }
 

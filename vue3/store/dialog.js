@@ -21,8 +21,8 @@ export const useDialogStore = defineStore('dialog', () => {
   const data = ref({});
 
   /**
-   * Open dialog to confirm user action. Returns promise that resolves to true or false depending on
-   * user choice. You can use callbacks too : `true`/`opts.onAgree` when user agrees,
+   * Open dialog to confirm user action. Returns promise that resolves to `true` or `false`
+   * depending on user choice. You can use callbacks too : `true`/`opts.onAgree` when user agrees,
    * `false`/`opts.onDisagree` when user disagrees.
    *
    * Callbacks allow promises, and shows loader while promise is pending.

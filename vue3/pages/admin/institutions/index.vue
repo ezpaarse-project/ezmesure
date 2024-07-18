@@ -2,6 +2,7 @@
   <div>
     <SkeletonPageBar :title="toolbarTitle">
       <v-btn
+        v-if="institutionFormRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         density="comfortable"
@@ -132,6 +133,7 @@
 
           <v-list>
             <v-list-item
+              v-if="institutionFormRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
               @click="showForm(item)"

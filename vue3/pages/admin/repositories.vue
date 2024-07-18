@@ -2,6 +2,14 @@
   <div>
     <SkeletonPageBar :title="toolbarTitle">
       <v-btn
+        v-if="repositoryFormRef"
+        v-tooltip="$t('add')"
+        icon="mdi-plus"
+        density="comfortable"
+        class="mr-2"
+        @click="repositoryFormRef.open()"
+      />
+      <v-btn
         v-tooltip="$t('refresh')"
         :loading="status === 'pending'"
         icon="mdi-reload"
@@ -93,7 +101,12 @@
       </template>
     </SelectionMenu>
 
-    <RepositoriesInstitutionsDialog
+    <RepositoryFormDialog
+      ref="repositoryFormRef"
+      @update:model-value="refresh()"
+    />
+
+    <RepositoryInstitutionsDialog
       ref="repoInstitutionsDialogRef"
       @update:model-value="refresh()"
     />
@@ -115,7 +128,9 @@ const snacks = useSnacksStore();
 
 const selectedRepositories = ref([]);
 
-/** @type {Ref<object | null>} Vue ref of the institution form */
+/** @type {Ref<object | null>} Vue ref of the repository form */
+const repositoryFormRef = ref(null);
+/** @type {Ref<object | null>} Vue ref of the institution list */
 const repoInstitutionsDialogRef = ref(null);
 
 const {
@@ -193,7 +208,7 @@ function deleteRepositories(items) {
   openConfirm({
     title: t('areYouSure'),
     text: t(
-      'institutions.deleteNbRepositories.text',
+      'repositories.deleteNbRepositories',
       toDelete.length,
     ),
     agreeText: t('delete'),
@@ -202,7 +217,7 @@ function deleteRepositories(items) {
       const results = await Promise.all(
         toDelete.map((item) => {
           try {
-            return $fetch(`/repositories/${item.pattern}`, { method: 'DELETE' });
+            return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
           } catch (e) {
             snacks.error(t('cannotDeleteItem', { id: item.pattern }));
             return Promise.resolve(null);
