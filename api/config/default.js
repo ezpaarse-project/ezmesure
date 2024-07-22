@@ -18,6 +18,7 @@ module.exports = {
     password: 'changeme',
     port: 5601,
     host: 'localhost',
+    dateFormat: 'DD MMM YYYY',
     syncSchedule: '0 0 0 * * *',
   },
   redis: {

@@ -13,7 +13,7 @@ const {
 
 const { execThrottledPromises } = require('../promises');
 
-const { syncSchedule } = config.get('ezreeport');
+const { syncSchedule, dateFormat } = config.get('kibana');
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
@@ -129,7 +129,7 @@ const syncSpace = async (space) => {
       id: space.id,
       changes: {
         'csv:separator': ';',
-        dateFormat: 'DD MM YYYY',
+        dateFormat,
       },
     });
     appLogger.verbose(`[kibana] Default settings set in space [${space.id}]`);
