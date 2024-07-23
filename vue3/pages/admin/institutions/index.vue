@@ -55,13 +55,13 @@
         />
       </template>
 
-      <template #[`item.childInstitutions`]="{ value }">
+      <template #[`item.childInstitutions`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           prepend-icon="mdi-family-tree"
           size="small"
-          @click.prevent=""
+          @click.prevent="institutionComponentsDialogRef?.open(value, item)"
         />
       </template>
 
@@ -194,6 +194,11 @@
         ref="institutionFormRef"
         @update:model-value="refresh()"
       />
+
+    <InstitutionComponentsDialog
+      ref="institutionComponentsDialogRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -214,17 +219,22 @@ const selectedInstitutions = ref([]);
 
 /** @type {Ref<Object | null>} Vue ref of the institution form */
 const institutionFormRef = ref(null);
+/** @type {Ref<Object | null>} Vue ref of the components list */
+const institutionComponentsDialogRef = ref(null);
 
 const {
-  status,
-  refresh,
-  itemLength,
-  query,
-  vDataTableOptions,
+  status, // Loading status
+  refresh, // Refresh the data
+  itemLength, // Total number of items
+  query, // Query parameters
+  vDataTableOptions, // Options to pass to v-data-table
 } = await useServerSidePagination({
+  // Fetch options to pass to $fetch
   fetch: {
     url: '/api/institutions',
   },
+  // Mapping between the field in DataTable and the field in the API
+  // used when sorting
   sortMapping: {
     memberships: 'memberships._count',
     childInstitutions: 'childInstitutions._count',
@@ -232,6 +242,8 @@ const {
     spaces: 'spaces._count',
     sushiCredentials: 'sushiCredentials._count',
   },
+  // Initial data for the query, use only static here. If you want
+  // reactivity please use `query.something = myReactiveThingy.value`
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
           include: ['repositories', 'memberships', 'spaces', 'childInstitutions', 'sushiCredentials'],

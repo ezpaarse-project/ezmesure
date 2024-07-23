@@ -4,13 +4,13 @@
     width="600"
     @update:model-value="close()"
   >
-    <v-card :title="$t('repositories.institutions')">
-      <template v-if="repository" #subtitle>
-        {{ repository.pattern }}
+    <v-card :title="$t('components.components')">
+      <template v-if="institution" #subtitle>
+        {{ institution.pattern }}
 
         <v-chip
-          :text="repository.type"
-          :color="repoColors.get(repository.type)"
+          :text="institution.type"
+          :color="repoColors.get(institution.type)"
           size="x-small"
           density="comfortable"
           class="ml-2"
@@ -36,7 +36,7 @@
 
           <v-card>
             <template #text>
-              <InstitutionAutoComplete v-model="institutionToLink" />
+              <InstitutionAutoComplete v-model="componentToLink" />
             </template>
 
             <template #actions>
@@ -49,8 +49,8 @@
               <v-btn
                 color="primary"
                 :loading="isLinkLoading"
-                :disabled="!institutionToLink"
-                @click="linkInstitution()"
+                :disabled="!componentToLink"
+                @click="linkComponent()"
               >
                 {{ $t('add') }}
               </v-btn>
@@ -60,25 +60,25 @@
       </template>
 
       <template #text>
-        <div v-if="institutions.length <= 0" class="text-center text-grey pt-5">
-          {{ $t('repositories.noInstitutions') }}
+        <div v-if="components.length <= 0" class="text-center text-grey pt-5">
+          {{ $t('repositories.noComponents') }}
         </div>
 
         <v-list v-else>
           <v-list-item
-            v-for="institution in institutions"
-            :key="institution.id"
-            :to="`/admin/institutions/${institution.id}`"
-            :prepend-avatar="institution.logoId ? `/api/assets/logos/${institution.logoId}` : undefined"
-            :prepend-icon="!institution.logoId ? 'mdi-office-building' : undefined"
-            :title="institution.name"
-            :subtitle="institution.acronym"
+            v-for="component in components"
+            :key="component.id"
+            :to="`/admin/institutions/${component.id}`"
+            :prepend-avatar="component.logoId ? `/api/assets/logos/${component.logoId}` : undefined"
+            :prepend-icon="!component.logoId ? 'mdi-office-building' : undefined"
+            :title="component.name"
+            :subtitle="component.acronym"
           >
             <template #append>
               <ConfirmPopover
                 :text="$t('areYouSure')"
                 :agree-text="$t('delete')"
-                :agree="() => unlinkInstitution(institution)"
+                :agree="() => unlinkComponent(component)"
                 location="end"
               >
                 <template #activator="{ props }">
@@ -114,7 +114,7 @@
 
 <script setup>
 const emit = defineEmits({
-  'update:modelValue': (institutions) => !!institutions,
+  'update:modelValue': (components) => !!components,
 });
 
 const { t } = useI18n();
@@ -125,32 +125,32 @@ const isSearchOpen = ref(false);
 const isLinkLoading = ref(false);
 const hasChanged = ref(false);
 /** @type {Ref<object|null>} */
-const repository = ref(null);
-const institutions = ref([]);
+const institution = ref(null);
+const components = ref([]);
 /** @type {Ref<object|null>} */
-const institutionToLink = ref(null);
+const componentToLink = ref(null);
 
-function open(items, repo) {
-  repository.value = repo;
-  institutions.value = items;
+function open(items, i) {
+  institution.value = i;
+  components.value = items;
   isOpen.value = true;
   hasChanged.value = false;
 }
 
 function close() {
   if (hasChanged.value) {
-    emit('update:modelValue', institutions.value);
+    emit('update:modelValue', components.value);
   }
   isOpen.value = false;
 }
 
-async function unlinkInstitution(item) {
+async function unlinkComponent(item) {
   try {
-    await $fetch(`/api/institutions/${item.id}/repositories/${repository.value.pattern}`, {
+    await $fetch(`/api/institutions/${institution.value.id}/subinstitutions/${item.id}`, {
       method: 'DELETE',
     });
 
-    institutions.value = institutions.value.filter((i) => i.id !== item.id);
+    components.value = components.value.filter((i) => i.id !== item.id);
 
     hasChanged.value = true;
   } catch (err) {
@@ -158,20 +158,20 @@ async function unlinkInstitution(item) {
   }
 }
 
-async function linkInstitution() {
-  if (!institutionToLink.value || !repository.value) {
+async function linkComponent() {
+  if (!componentToLink.value || !institution.value) {
     return;
   }
 
   isLinkLoading.value = true;
   try {
-    await $fetch(`/api/institutions/${institutionToLink.value.id}/repositories/${repository.value.pattern}`, {
+    await $fetch(`/api/institutions/${institution.value.id}/subinstitutions/${componentToLink.value.id}/`, {
       method: 'PUT',
-      body: { type: repository.value.type },
+      body: { type: institution.value.type },
     });
 
-    institutions.value.push(institutionToLink.value);
-    institutionToLink.value = null;
+    components.value.push(componentToLink.value);
+    componentToLink.value = null;
 
     hasChanged.value = true;
     isSearchOpen.value = false;
