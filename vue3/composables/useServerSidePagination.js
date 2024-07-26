@@ -108,13 +108,13 @@ export default async function useServerSidePagination(params = {}) {
     itemsLength: itemLength.value.current,
     itemsPerPage: query.value.itemsPerPage,
     sortBy: query.value.sortBy,
-    search: query.value.search,
 
     'onUpdate:options': (data) => {
       query.value = {
         ...query.value,
         ...data,
       };
+      return asyncData.refresh();
     },
   }));
 

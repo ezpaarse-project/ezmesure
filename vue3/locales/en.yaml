@@ -735,6 +735,7 @@ repositories:
     0 repository|
     1 repository|
     {count} repositories
+  newRepository: New repository
   manageRepositories:
     Manage repositories|
     Manage {count} repositories

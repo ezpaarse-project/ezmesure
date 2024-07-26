@@ -5,7 +5,9 @@
         v-if="repositoryFormRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
+        variant="tonal"
         density="comfortable"
+        color="green"
         class="mr-2"
         @click="repositoryFormRef.open()"
       />
@@ -13,7 +15,9 @@
         v-tooltip="$t('refresh')"
         :loading="status === 'pending'"
         icon="mdi-reload"
+        variant="tonal"
         density="comfortable"
+        color="primary"
         class="mr-2"
         @click="refresh()"
       />
@@ -53,7 +57,7 @@
           :variant="!value.length ? 'outlined' : undefined"
           prepend-icon="mdi-domain"
           size="small"
-          @click="repoInstitutionsDialogRef?.open(value, item)"
+          @click="repoInstitutionsDialogRef?.open(item)"
         />
       </template>
 

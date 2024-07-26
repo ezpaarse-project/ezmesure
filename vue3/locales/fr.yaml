@@ -251,10 +251,12 @@ institutions:
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
-  manageInstitutions: Gérer les établissements|
+  manageInstitutions: 
+    Gérer les établissements|
     Gérer {count} établissements
   deleteNbInstitutions:
-    text: Vous allez supprimer {count} établissement. {affected}|
+    text: 
+      Vous allez supprimer {count} établissement. {affected}|
       Vous allez supprimer {count} établissements. {affected}
     affected: Les espaces, et rôles associés seront aussi supprimés. Les index, quant à eux, ne seront pas affectés. Cette action est irréversible.
   newInstitution: Nouvel établissement
@@ -765,6 +767,7 @@ repositories:
   manageRepositories:
     Gérer les entrepôts|
     Gérer {count} entrepôts
+  newRepository: Nouveau entrepôt
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type

@@ -8,6 +8,7 @@
     :rules="rules"
     :error="!!error"
     :error-messages="error?.message"
+    no-filter
     item-title="name"
     variant="outlined"
     hide-no-data
@@ -21,12 +22,14 @@
   >
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
-        :prepend-avatar="item.logoId ? `/api/assets/logos/${item.logoId}` : undefined"
-        :prepend-icon="item.logoId ? undefined : 'mdi-office-building'"
         :title="item.name"
         :subtitle="item.city"
         v-bind="listItem"
-      />
+      >
+        <template #prepend>
+          <InstitutionAvatar :institution="item" />
+        </template>
+      </v-list-item>
     </template>
   </v-autocomplete>
 </template>
@@ -60,7 +63,7 @@ const {
   error,
 } = await useFetch('/api/institutions', {
   query: {
-    q: search.value,
+    q: search,
   },
 });
 

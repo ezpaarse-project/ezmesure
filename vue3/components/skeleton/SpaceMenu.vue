@@ -42,7 +42,7 @@
             :title="$t('menu.logout')"
             icon="mdi-logout"
             size="small"
-            color="error"
+            color="red"
             variant="tonal"
             @click="logout()"
           />

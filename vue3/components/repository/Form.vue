@@ -23,7 +23,7 @@
               ]"
               :error="!!error"
               :error-messages="error?.message"
-              :custom-filter="() => true"
+              no-filter
               item-title="pattern"
               prepend-icon="mdi-form-textbox"
               variant="underlined"

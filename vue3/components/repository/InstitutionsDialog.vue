@@ -66,14 +66,16 @@
 
         <v-list v-else>
           <v-list-item
-            v-for="institution in institutions"
+            v-for="institution in sortedInstitutions"
             :key="institution.id"
             :to="`/admin/institutions/${institution.id}`"
-            :prepend-avatar="institution.logoId ? `/api/assets/logos/${institution.logoId}` : undefined"
-            :prepend-icon="!institution.logoId ? 'mdi-office-building' : undefined"
             :title="institution.name"
             :subtitle="institution.acronym"
           >
+            <template #prepend>
+              <InstitutionAvatar :institution="institution" />
+            </template>
+
             <template #append>
               <ConfirmPopover
                 :text="$t('areYouSure')"
@@ -87,7 +89,7 @@
                     variant="tonal"
                     size="small"
                     density="comfortable"
-                    color="error"
+                    color="red"
                     v-bind="props"
                     @click.prevent=""
                   />
@@ -130,9 +132,13 @@ const institutions = ref([]);
 /** @type {Ref<object|null>} */
 const institutionToLink = ref(null);
 
-function open(items, repo) {
+const sortedInstitutions = computed(
+  () => institutions.value.toSorted((a, b) => a.name.localeCompare(b.name)),
+);
+
+function open(repo) {
   repository.value = repo;
-  institutions.value = items;
+  institutions.value = repo.institutions;
   isOpen.value = true;
   hasChanged.value = false;
 }

@@ -5,7 +5,9 @@
         v-if="institutionFormRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
+        variant="tonal"
         density="comfortable"
+        color="green"
         class="mr-2"
         @click="showForm()"
       />
@@ -13,7 +15,9 @@
         v-tooltip="$t('refresh')"
         :loading="status === 'pending'"
         icon="mdi-reload"
+        variant="tonal"
         density="comfortable"
+        color="primary"
         class="mr-2"
         @click="refresh()"
       />
@@ -61,7 +65,7 @@
           :variant="!value.length ? 'outlined' : undefined"
           prepend-icon="mdi-family-tree"
           size="small"
-          @click.prevent="institutionComponentsDialogRef?.open(value, item)"
+          @click="institutionComponentsDialogRef?.open(item)"
         />
       </template>
 

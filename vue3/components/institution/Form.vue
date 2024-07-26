@@ -163,7 +163,7 @@
                   icon="mdi-delete"
                   size="small"
                   variant="tonal"
-                  color="error"
+                  color="red"
                   class="mr-2"
                   @click="removeLogo()"
                 />
