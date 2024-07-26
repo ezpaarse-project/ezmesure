@@ -381,7 +381,7 @@ exports.downloadFile = async (ctx) => {
   });
 };
 
-const checkConnection = async (sushi) => {
+const checkConnection = async (sushi, params) => {
   const { endpoint } = sushi;
 
   const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
@@ -390,8 +390,8 @@ const checkConnection = async (sushi) => {
     sushi,
     institution: sushi.institution,
     endpoint,
-    beginDate: threeMonthAgo,
-    endDate: threeMonthAgo,
+    beginDate: params.beginDate || params.endDate || threeMonthAgo,
+    endDate: params.endDate || params.beginDate || threeMonthAgo,
     reportType: endpoint.testedReport || 'pr',
   };
 
@@ -486,13 +486,16 @@ exports.checkCredentialsConnection = async (ctx) => {
     institution.id = 'tmp';
   }
 
-  const connectionData = await checkConnection({
-    id: uuidv4(),
-    ...body,
-    endpointId: endpoint.id,
-    endpoint,
-    institution,
-  });
+  const connectionData = await checkConnection(
+    {
+      id: uuidv4(),
+      ...body,
+      endpointId: endpoint.id,
+      endpoint,
+      institution,
+    },
+    ctx.query,
+  );
 
   if (body.id) {
     const sushiCredentialsService = new SushiCredentialsService();
@@ -527,7 +530,7 @@ exports.checkSushiConnection = async (ctx) => {
     institutionName: sushi.institution.name,
   };
 
-  const connectionData = await checkConnection(sushi);
+  const connectionData = await checkConnection(sushi, ctx.query);
 
   const sushiCredentialsService = new SushiCredentialsService();
 
