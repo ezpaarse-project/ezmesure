@@ -1,13 +1,14 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    width="400"
+    :width="institution ? 600 : 400"
     scrollable
     persistent
   >
     <RepositoryForm
       ref="repositoryFormRef"
       :completion="completion"
+      :institution="institution"
       @update:model-value="onSave"
     >
       <template #actions>
@@ -34,14 +35,15 @@ const emit = defineEmits({
 });
 
 const isOpen = ref(false);
+/** @type {Ref<object | undefined>} */
+const institution = ref(undefined);
 
 /** @type {Ref<object | null>} Vue ref of the repository form */
 const repositoryFormRef = ref(null);
 
 async function open(opts) {
+  institution.value = opts?.institution;
   isOpen.value = true;
-  await nextTick();
-  repositoryFormRef.value?.init(opts);
 }
 
 function onSave(repository) {

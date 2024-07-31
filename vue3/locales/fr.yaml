@@ -290,8 +290,7 @@ institutions:
     indexCount: Évènements de consultations indexés
     indexPrefix: Préfixe alloué pour les index
     namespace: Espace de nommage
-    namespaceHint: Préfixe ajouté aux entités liées à l'établissement (entrepôts,
-      espaces Kibana)
+    namespaceHint: Préfixe ajouté aux entités liées à l'établissement (entrepôts, espaces Kibana)
     role: Rôle associé
     uai: UAI
     uaiExample: 'ex: 1234567A'
@@ -313,8 +312,7 @@ institutions:
     automations: Automatisations
     monitor: Contrôle
     dropImageHere: Déposez votre image ici
-    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : JPEG,
-      PNG, SVG'
+    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG'
     imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
     noDataFound: Les informations de votre établissement n'ont pas pu être récupérées.
     dataSent: Informations d'établissement transmises
@@ -330,8 +328,7 @@ institutions:
     hidePartner: Ne pas afficher comme partenaire
     failedToUpdateValidation: Impossible de mettre à jour la validation
     attachedDomains: Domaines rattachés
-    noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le
-      moment.
+    noAttachedDomains: Il n'y a pas de domaine rattaché à cet établissement pour le moment.
     associatedIndex: Index associé
     associatedRole: Rôle associé
     associatedSpace: Espace associé
@@ -343,8 +340,7 @@ institutions:
       sushi: Moissonnage SUSHI
     mustMatch: 'Doit correspondre à : {pattern}'
     searchOpenData: Chercher parmi les établissements connus
-    searchOpenDataHint: Chercher un établissement par nom, localité, code UAI, numéro
-      de siret...
+    searchOpenDataHint: Chercher un établissement par nom, localité, code UAI, numéro de siret...
     searchEmpty: Aucun établissement ne correspond à la recherche.
     searchFailed: Oups! La recherche a échoué.
     socialNetworks: Réseaux sociaux
@@ -353,6 +349,7 @@ institutions:
     youtubeUrl: URL Youtube
     facebookUrl: URL Facebook
   members:
+    noMembers: Aucun membre
     title: Membres ({total})
     technical: Technique
     documentary: Documentaire
@@ -381,8 +378,7 @@ institutions:
     removeFromMember: Retirer {name} des membres ?
     changePermissions: Changer les permissions
     permissionsOf: Permissions de {name}
-    readPermDesc: L'utilisateur peut consulter les tableaux de bord Kibana, sans les
-      modifier.
+    readPermDesc: L'utilisateur peut consulter les tableaux de bord Kibana, sans les modifier.
     writePermDesc: L'utilisateur peut consulter et modifier les tableaux de bord Kibana.
     personNotRegistered: Cette personne n'est pas inscrite
     failedToUpdatePerms: La mise à jour des permissions a échoué
@@ -785,6 +781,8 @@ repositories:
   nPermissions: "{count} accès"
 spaces:
   spaces: Espaces
+  newSpace: Nouvel espace
+  editSpace: Mise à jour de l'espace
   xSpaces: 
     1 espace|
     {count} espaces

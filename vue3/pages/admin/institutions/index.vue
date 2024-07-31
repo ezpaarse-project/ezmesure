@@ -41,7 +41,6 @@
       show-select
       return-object
       v-bind="vDataTableOptions"
-      @update:options="refresh()"
     >
       <template #[`item.name`]="{ item }">
         <nuxt-link :to="`/admin/institutions/${item.id}`">
@@ -69,13 +68,13 @@
         />
       </template>
 
-      <template #[`item.repositories`]="{ value }">
+      <template #[`item.repositories`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           prepend-icon="mdi-database-outline"
           size="small"
-          @click.prevent=""
+          @click="institutionRepositoriesDialogRef?.open(item)"
         />
       </template>
 
@@ -203,6 +202,11 @@
       ref="institutionComponentsDialogRef"
       @update:model-value="refresh()"
     />
+
+    <InstitutionRepositoriesDialog
+      ref="institutionRepositoriesDialogRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -225,6 +229,8 @@ const selectedInstitutions = ref([]);
 const institutionFormRef = ref(null);
 /** @type {Ref<Object | null>} Vue ref of the components list */
 const institutionComponentsDialogRef = ref(null);
+/** @type {Ref<Object | null>} Vue ref of the repositories list */
+const institutionRepositoriesDialogRef = ref(null);
 
 const {
   status, // Loading status
@@ -250,7 +256,7 @@ const {
   // reactivity please use `query.something = myReactiveThingy.value`
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-          include: ['repositories', 'memberships', 'spaces', 'childInstitutions', 'sushiCredentials'],
+    include: ['repositories', 'spaces', 'memberships', 'childInstitutions', 'sushiCredentials'],
         },
       });
 

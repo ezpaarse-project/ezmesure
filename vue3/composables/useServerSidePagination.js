@@ -102,7 +102,7 @@ export default async function useServerSidePagination(params = {}) {
    * Options to bind to `v-data-table`
    */
   const vDataTableOptions = computed(() => ({
-    items: asyncData.data.value,
+    items: asyncData.data.value ?? [],
     loading: asyncData.status.value === 'loading',
     page: query.value.page,
     itemsLength: itemLength.value.current,

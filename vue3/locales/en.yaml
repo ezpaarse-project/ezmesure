@@ -339,6 +339,7 @@ institutions:
     youtubeUrl: Youtube URL
     facebookUrl: Facebook URL
   members:
+    noMembers: No members
     title: Members ({total})
     technical: Technical
     documentary: Documentary
@@ -754,6 +755,8 @@ repositories:
   nPermissions: "{count} access"
 spaces:
   spaces: Spaces
+  newSpace: New space
+  editSpace: Edit space
   xSpaces:
     0 space|
     1 space|
