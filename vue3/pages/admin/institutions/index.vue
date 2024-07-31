@@ -78,13 +78,13 @@
         />
       </template>
 
-      <template #[`item.spaces`]="{ value }">
+      <template #[`item.spaces`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           prepend-icon="mdi-tab"
           size="small"
-          @click.prevent=""
+          @click="institutionSpacesDialogRef?.open(item)"
         />
       </template>
 
@@ -207,6 +207,11 @@
       ref="institutionRepositoriesDialogRef"
       @update:model-value="refresh()"
     />
+
+    <InstitutionSpacesDialog
+      ref="institutionSpacesDialogRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -231,6 +236,8 @@ const institutionFormRef = ref(null);
 const institutionComponentsDialogRef = ref(null);
 /** @type {Ref<Object | null>} Vue ref of the repositories list */
 const institutionRepositoriesDialogRef = ref(null);
+/** @type {Ref<Object | null>} Vue ref of the spaces list */
+const institutionSpacesDialogRef = ref(null);
 
 const {
   status, // Loading status
