@@ -2,7 +2,7 @@
   <v-autocomplete
     v-model:search="search"
     :model-value="modelValue"
-    :items="institutions"
+    :items="institutions ?? []"
     :loading="status === 'pending'"
     :label="label"
     :rules="rules"

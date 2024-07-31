@@ -2,7 +2,7 @@
   <v-card
     :loading="loading"
     :title="isEditing ? $t('institutions.updateInstitution') : $t('institutions.newInstitution')"
-    prepend-icon="mdi-office-building"
+    prepend-icon="mdi-office-building-plus"
   >
     <template #text>
       <v-row>
