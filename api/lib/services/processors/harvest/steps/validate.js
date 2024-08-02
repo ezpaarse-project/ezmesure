@@ -54,7 +54,9 @@ module.exports = async function process(params) {
     }
     if (Array.isArray(errors)) {
       // @ts-ignore
-      errors.slice(0, 10).forEach((e) => logs.add('error', e));
+      errors.slice(0, 10).forEach((e) => {
+        logs.add('error', `${e.message} at ${e.instancePath}`);
+      });
       timeout.reset();
     }
 
