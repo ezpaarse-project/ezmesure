@@ -141,7 +141,25 @@
 
           <v-row>
             <v-col cols="12">
-              <!-- params -->
+              <v-card
+                :title="$t('institutions.institution.general')"
+                prepend-icon="mdi-format-list-bulleted"
+                variant="outlined"
+              >
+                <template #text>
+                  <v-row>
+                    <v-col cols="6">
+                      <v-checkbox
+                        v-model="locked"
+                        :label="$t('institutions.members.locked')"
+                        density="comfortable"
+                        hide-details
+                        @update:model-value="save([saveMembership])"
+                      />
+                    </v-col>
+                  </v-row>
+                </template>
+              </v-card>
             </v-col>
           </v-row>
         </v-col>
@@ -305,7 +323,7 @@ function saveMembership() {
     method: 'PUT',
     body: {
       roles: Array.from(roles.value),
-      locked: user.value.isAdmin ? locked.value : undefined,
+      locked: user.value?.isAdmin ? locked.value : undefined,
       permissions: perms.flat(),
     },
   });

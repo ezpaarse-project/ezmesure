@@ -214,7 +214,7 @@
             </v-card>
 
             <v-card
-              v-if="user.isAdmin"
+              v-if="user?.isAdmin"
               :title="$t('administration')"
               prepend-icon="mdi-security"
               variant="outlined"

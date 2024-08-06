@@ -22,7 +22,7 @@
             v-for="({ institution: i }) in user.memberships"
             :key="`${user.username}:member:${i.id}`"
             :title="i.name"
-            :to="currentUser.isAdmin ? `/admin/institutions/${i.id}` : undefined"
+            :to="currentUser?.isAdmin ? `/admin/institutions/${i.id}` : undefined"
           >
             <template #prepend>
               <InstitutionAvatar :institution="i" />
