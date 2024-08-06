@@ -39,13 +39,14 @@
       />
 
       <v-btn
+        v-if="institutionFormRef"
         v-tooltip="$t('modify')"
         icon="mdi-pencil"
         variant="tonal"
         density="comfortable"
         color="blue"
         class="mr-4"
-        @click="() => {}"
+        @click="institutionFormRef.open(institution)"
       />
     </SkeletonPageBar>
 
@@ -104,6 +105,11 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <InstitutionFormDialog
+      ref="institutionFormRef"
+      @update:model-value="refresh()"
+    />
   </div>
 </template>
 
@@ -118,6 +124,9 @@ const { t } = useI18n();
 const snacks = useSnacksStore();
 
 const validatedLoading = ref(false);
+
+/** @type {Ref<Object | null>} Vue ref of the institution form */
+const institutionFormRef = ref(null);
 
 const {
   error,
