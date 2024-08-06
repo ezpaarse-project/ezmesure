@@ -216,11 +216,10 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash';
-
 definePageMeta({
   layout: 'admin',
   middleware: ['auth', 'terms', 'admin'],
+  alias: ['/admin/'],
 });
 
 const { t } = useI18n();

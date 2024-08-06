@@ -1,6 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config';
 
-import routerOptions from './app/router.options';
 import authOptions from './app/auth.options';
 import i18nOptions from './app/i18n.options';
 
@@ -24,10 +23,6 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/vuetify',
   ],
-
-  router: {
-    options: routerOptions,
-  },
 
   i18n: i18nOptions,
 
