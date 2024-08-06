@@ -40,8 +40,6 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash';
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -53,19 +51,18 @@ defineEmits({
   'update:modelValue': (repository) => !!repository,
 });
 
+const pattern = computed(() => props.modelValue?.pattern);
+
 const {
   error,
   refresh,
   data: availableRepositories,
-} = await useAsyncData(
-  '/api/repositories',
-  () => $fetch('/api/repositories', {
-    query: {
-      q: props.modelValue?.pattern,
-      sort: 'pattern',
-    },
-  }),
-);
+} = await useFetch('/api/repositories', {
+  query: {
+    q: pattern,
+    sort: 'pattern',
+  },
+});
 
-const debouncedRefresh = debounce(refresh, 250);
+const debouncedRefresh = useDebounceFn(refresh, 250);
 </script>

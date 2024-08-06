@@ -165,7 +165,7 @@
               prepend-icon="mdi-file-chart-outline"
             />
             <v-list-item
-              v-if="clipboardAvailable"
+              v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
               @click="copyInstitutionId(item)"
@@ -224,7 +224,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { clipboardAvailable, writeClipboard } = useClipboard();
+const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
@@ -337,7 +337,7 @@ const toolbarTitle = computed(() => {
 /**
  * Debounced refresh
  */
-const debouncedRefresh = debounce(() => refresh(), 250);
+const debouncedRefresh = useDebounceFn(refresh, 250);
 
 /**
  * Show creation/update form
@@ -450,11 +450,11 @@ async function copyInstitutionId({ id }) {
   }
 
   try {
-    await writeClipboard(id);
+    await copy(id);
   } catch (e) {
-    snacks.error(t('token.copyFailed'));
+    snacks.error(t('clipboard.copyFailed'));
     return;
   }
-  snacks.info(t('token.clipped'));
+  snacks.info(t('clipboard.textCopied'));
 }
 </script>

@@ -18,7 +18,6 @@
     autofocus
     return-object
     @update:model-value="$emit('update:modelValue', $event)"
-    @update:search="debouncedRefresh()"
   >
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
@@ -35,8 +34,6 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash';
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -55,19 +52,17 @@ defineEmits({
 const { t } = useI18n();
 
 const search = ref('');
+const debouncedSearch = refDebounced(search, 250);
 
 const {
   data: institutions,
   status,
-  refresh,
   error,
 } = await useFetch('/api/institutions', {
   query: {
-    q: search,
+    q: debouncedSearch,
   },
 });
-
-const debouncedRefresh = debounce(() => refresh(), 250);
 
 const label = computed(() => {
   const title = t('institutions.title');

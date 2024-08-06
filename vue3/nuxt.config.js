@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/i18n',
     '@sidebase/nuxt-auth',
+    '@vueuse/nuxt',
   ],
 
   plugins: [

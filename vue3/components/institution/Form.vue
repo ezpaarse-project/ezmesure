@@ -168,22 +168,12 @@
                   @click="removeLogo()"
                 />
                 <v-btn
-                  v-if="logoInputRef"
                   v-tooltip="$t('modify')"
                   icon="mdi-pencil"
                   size="small"
                   variant="tonal"
                   color="primary"
-                  @click="logoInputRef.click()"
-                />
-
-                <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-                <input
-                  ref="logoInputRef"
-                  type="file"
-                  accept="image/png, image/jpeg, image/svg+xml"
-                  style="display: none;"
-                  @change="onLogoChange()"
+                  @click="openFileDialog()"
                 />
               </template>
 
@@ -305,6 +295,9 @@ const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 const { t } = useI18n();
 const { data: user } = useAuthState();
 const snacks = useSnacksStore();
+const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
+  accept: 'image/png, image/jpeg, image/svg+xml',
+});
 
 const namespaceRules = [
   (v) => (!v || ID_PATTERN.test(v)) || t('fieldMustMatch', { pattern: ID_PATTERN.toString() }),
@@ -323,8 +316,6 @@ const addAsMember = ref(false);
 
 /** @type {Ref<Object | null>} */
 const formRef = ref(null);
-/** @type {Ref<HTMLInputElement | null>} */
-const logoInputRef = ref(null);
 
 const isEditing = computed(() => !!institution.value.id);
 const logoSrc = computed(() => {
@@ -450,26 +441,14 @@ async function updateLogo(file) {
 }
 
 /**
- * Update the institution's logo on input change
- */
-function onLogoChange() {
-  if (!logoInputRef.value) {
-    return;
-  }
-
-  updateLogo(logoInputRef.value.files[0]);
-  logoInputRef.value.value = '';
-}
-
-/**
  * Update the institution's logo on drop
  *
  * @param {DragEvent} event
  */
 function onLogoDrop(event) {
-  const files = event?.dataTransfer?.files;
-  if (files?.[0]) {
-    updateLogo(files[0]);
+  const f = event?.dataTransfer?.files;
+  if (f?.[0]) {
+    updateLogo(f[0]);
   }
   isDraggingLogo.value = false;
 }
@@ -482,6 +461,11 @@ async function removeLogo() {
   institution.value.logo = null;
   institution.value.logoId = null;
 }
+
+/**
+ * Update the institution's logo on file dialog change
+ */
+onFilesChange((files) => updateLogo(files[0]));
 
 defineExpose({
   init,

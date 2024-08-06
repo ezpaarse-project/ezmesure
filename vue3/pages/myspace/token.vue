@@ -25,7 +25,7 @@
             readonly
             @click:append-inner="() => (showToken = !showToken)"
           >
-            <template v-if="clipboardAvailable" #append>
+            <template v-if="clipboard" #append>
               <v-btn variant="text" @click="copyTokenToClipboard">
                 <v-icon left>
                   mdi-clipboard-text
@@ -47,7 +47,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { clipboardAvailable, writeClipboard } = useClipboard();
+const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
 const { data: token } = await useFetch('/api/profile/token');
@@ -60,11 +60,11 @@ async function copyTokenToClipboard() {
   }
 
   try {
-    await writeClipboard(token.value);
+    await copy(token.value);
   } catch (e) {
-    snacks.error(t('token.copyFailed'));
+    snacks.error(t('clipboard.copyFailed'));
     return;
   }
-  snacks.info(t('token.clipped'));
+  snacks.info(t('clipboard.textCopied'));
 }
 </script>

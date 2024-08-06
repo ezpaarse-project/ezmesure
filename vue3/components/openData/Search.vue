@@ -30,8 +30,6 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash';
-
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -54,7 +52,7 @@ const selected = computed({
 });
 const selectedName = computed(() => selected.value?.uo_lib_officiel || selected.value?.uo_lib);
 
-const fetchData = debounce(async () => {
+const fetchData = useDebounceFn(async () => {
   if (!search) {
     items.value = [];
   }

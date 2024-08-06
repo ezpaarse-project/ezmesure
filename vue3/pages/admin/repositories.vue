@@ -82,7 +82,7 @@
             <v-divider />
 
             <v-list-item
-              v-if="clipboardAvailable"
+              v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
               @click="copyRepositoryPattern(item)"
@@ -118,15 +118,13 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash';
-
 definePageMeta({
   layout: 'admin',
   middleware: ['auth', 'terms', 'admin'],
 });
 
 const { t } = useI18n();
-const { clipboardAvailable, writeClipboard } = useClipboard();
+const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
@@ -196,7 +194,7 @@ const toolbarTitle = computed(() => {
 /**
  * Debounced refresh
  */
-const debouncedRefresh = debounce(() => refresh(), 250);
+const debouncedRefresh = useDebounceFn(refresh, 250);
 
 /**
  * Delete multiple repositories
@@ -253,11 +251,11 @@ async function copyRepositoryPattern({ pattern }) {
   }
 
   try {
-    await writeClipboard(pattern);
+    await copy(pattern);
   } catch (e) {
-    snacks.error(t('token.copyFailed'));
+    snacks.error(t('clipboard.copyFailed'));
     return;
   }
-  snacks.info(t('token.clipped'));
+  snacks.info(t('clipboard.textCopied'));
 }
 </script>
