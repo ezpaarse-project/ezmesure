@@ -19,7 +19,14 @@
       <v-divider />
     </v-row>
 
-    <v-row>
+    <template v-if="status === 'pending' && !partners">
+      <v-row v-for="row in 3" :key="row">
+        <v-col v-for="col in 3" :key="col" cols="12" sm="6" lg="4">
+          <v-skeleton-loader type="card, paragraph" elevation="1" />
+        </v-col>
+      </v-row>
+    </template>
+    <v-row v-else>
       <v-col
         v-for="partner in filteredPartners"
         :key="partner.id"
@@ -38,13 +45,20 @@ const { t } = useI18n();
 
 const search = ref('');
 
-const { data: partners } = await useFetch('/api/partners');
+const {
+  status,
+  data: partners,
+} = await useFetch('/api/partners', { lazy: true });
 
 function sortByName(a, b) {
   return a.name.localeCompare(b.name);
 }
 
 const filteredPartners = computed(() => {
+  if (!partners.value) {
+    return [];
+  }
+
   const query = search.value.toLowerCase();
   if (!query) {
     return partners.value.slice().sort(sortByName);
@@ -69,6 +83,10 @@ const filteredPartners = computed(() => {
 });
 
 const title = computed(() => {
+  if (!partners.value) {
+    return t('partners.count', { count: '???' });
+  }
+
   if (filteredPartners.value.length === partners.value.length) {
     return t('partners.count', { count: partners.value.length });
   }

@@ -91,20 +91,18 @@ const contacts = computed(
 
         if (roles.has('contact:doc')) {
           return {
+            ...roleColors.get('contact:doc'),
             name: user.fullName,
             type: 'doc',
-            icon: 'mdi-book',
-            color: 'green',
             label: t('partners.documentary'),
           };
         }
 
         if (roles.has('contact:tech')) {
           return {
+            ...roleColors.get('contact:tech'),
             name: user.fullName,
             type: 'tech',
-            icon: 'mdi-wrench',
-            color: 'blue',
             label: t('partners.technical'),
           };
         }
@@ -126,7 +124,7 @@ const services = computed(() => {
 
   const items = [];
   // eslint-disable-next-line no-restricted-syntax
-  for (const [service, color] of servicesColors) {
+  for (const [service, color] of serviceColors) {
     const automated = servicesEnabled[service];
     if (automated) {
       items.push({
