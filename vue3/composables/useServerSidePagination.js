@@ -8,9 +8,12 @@ import {
 
 /**
  * @typedef {import('nitropack').NitroFetchOptions & { url: string }} FetchOptions
+ * @typedef {import('nuxt/app').AsyncDataOptions} AsyncDataOptions
+ *
  * @typedef {object} Params
  * @property {FetchOptions} fetch Params to pass to underlying `$fetch`
  * @property {string} fetch.url URL to fetch
+ * @property {AsyncDataOptions} [async] Params to pass to underlying `useAsyncData`
  * @property {Record<string, string>} [sortMapping] Mapping from Vuetify columns' keys to
  * API sort keys
  * @property {Record<string, any>} [data] Initial query options
@@ -96,6 +99,7 @@ export default async function useServerSidePagination(params = {}) {
         throw error;
       }
     },
+    params.async,
   );
 
   /**
@@ -103,7 +107,7 @@ export default async function useServerSidePagination(params = {}) {
    */
   const vDataTableOptions = computed(() => ({
     items: asyncData.data.value ?? [],
-    loading: asyncData.status.value === 'loading',
+    loading: asyncData.status.value === 'pending',
     page: query.value.page,
     itemsLength: itemLength.value.current,
     itemsPerPage: query.value.itemsPerPage,
