@@ -6,17 +6,36 @@
     color="primary"
     divided
   >
-    <v-btn
-      v-for="level in levels"
-      :key="level.value"
-      v-tooltip="level.text"
-      size="small"
-      variant="outlined"
-    >
-      <v-icon size="x-large">
-        {{ level.icon }}
-      </v-icon>
-    </v-btn>
+    <template v-if="icons">
+      <v-btn
+        v-for="level in levels"
+        :key="level.value"
+        v-tooltip="level.text"
+        :readonly="readonly"
+        size="small"
+        variant="outlined"
+      >
+        <v-icon size="x-large">
+          {{ level.icon }}
+        </v-icon>
+      </v-btn>
+    </template>
+
+    <template v-else>
+      <v-btn
+        v-for="level in levels"
+        :key="level.value"
+        :readonly="readonly"
+        size="small"
+        variant="outlined"
+      >
+        <v-icon size="x-large" class="mr-2">
+          {{ level.icon }}
+        </v-icon>
+
+        {{ level.text }}
+      </v-btn>
+    </template>
   </v-btn-toggle>
 </template>
 
@@ -27,6 +46,14 @@ const props = defineProps({
     default: 'none',
   },
   mandatory: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  icons: {
     type: Boolean,
     default: false,
   },

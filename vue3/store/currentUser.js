@@ -2,6 +2,7 @@ import {
   defineStore,
   ref,
   computed,
+  createError,
 } from '#imports';
 
 export const useCurrentUserStore = defineStore('current-user', () => {
@@ -27,6 +28,24 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     return true;
   }
 
+  function getMembership(institutionId, opts) {
+    const membership = memberships.value.find((m) => m.institution.id === institutionId);
+    if (!membership && opts?.throwOnNoMembership) {
+      throw createError({ statusCode: 403, fatal: true });
+    }
+    return membership;
+  }
+
+  function hasPermission(institutionId, permission, opts) {
+    const membership = getMembership(institutionId, opts);
+    const perms = new Set(membership?.permissions);
+    const has = perms.has(permission);
+    if (!has && opts?.throwOnNoRights) {
+      throw createError({ statusCode: 403, fatal: true });
+    }
+    return has;
+  }
+
   return {
     hasMemberships,
     memberships,
@@ -34,5 +53,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     spacesPermissions,
     reposPermissions,
     fetchMemberships,
+    getMembership,
+    hasPermission,
   };
 });

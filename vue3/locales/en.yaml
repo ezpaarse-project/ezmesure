@@ -341,7 +341,10 @@ institutions:
     facebookUrl: Facebook URL
   members:
     noMembers: No members
-    title: Members ({total})
+    title: Members ({count})
+    createMailList: Copy emails
+    manageN: Manage members|Manage {count} members
+    deleteN: You are about to revoke {count} member's access.|You are about to revoke {count} members' access.
     technical: Technical
     documentary: Documentary
     noCorrespondent: No correspondent

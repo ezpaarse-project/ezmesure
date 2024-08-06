@@ -350,7 +350,10 @@ institutions:
     facebookUrl: URL Facebook
   members:
     noMembers: Aucun membre
-    title: Membres ({total})
+    title: Membres ({count})
+    createMailList: Copier les adresses mails
+    manageN: Gérer les membres|Gérer {count} membres
+    deleteN: Vous allez révoquer l'accès de {count} membre.|Vous allez révoquer l'accès de {count} membres.
     technical: Technique
     documentary: Documentaire
     noCorrespondent: Aucun correspondant

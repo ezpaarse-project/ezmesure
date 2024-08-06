@@ -24,6 +24,7 @@
               <PermissionSwitch
                 v-if="(memberships?.length ?? 0) > 0 && modelValue"
                 v-model="allValue"
+                icons
                 @update:model-value="updateAllPermission($event)"
               />
             </th>
@@ -64,6 +65,7 @@
                 v-if="modelValue"
                 :model-value="modelValue.get(member.username)"
                 mandatory
+                icons
                 @update:model-value="updatePermission(member.username, $event)"
               />
             </td>
