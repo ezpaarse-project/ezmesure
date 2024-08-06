@@ -1,6 +1,11 @@
 <template>
   <div>
-    <SkeletonPageBar :title="toolbarTitle">
+    <SkeletonPageBar
+      v-model:search="query.search"
+      :title="toolbarTitle"
+      show-search
+      @update:search="debouncedRefresh()"
+    >
       <v-btn
         v-if="repositoryFormRef"
         v-tooltip="$t('add')"
@@ -21,17 +26,14 @@
         class="mr-2"
         @click="refresh()"
       />
-
-      <v-text-field
-        v-model="query.search"
-        :placeholder="$t('search')"
-        append-inner-icon="mdi-magnify"
-        variant="outlined"
-        density="compact"
-        hide-details
+      <v-btn
+        v-tooltip="$t('filter')"
+        icon="mdi-filter"
+        variant="tonal"
+        density="comfortable"
+        color="primary"
         class="mr-2"
-        style="max-width: 200px"
-        @update:model-value="debouncedRefresh()"
+        @click="() => {}"
       />
     </SkeletonPageBar>
 

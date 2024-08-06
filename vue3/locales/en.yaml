@@ -243,7 +243,8 @@ institutions:
   validateSwitch: Validate/Invalidate
   validateNbInstitutions: You are about to validate or invalidate {count} institution.
   updateInstitution: Update institution
-  manageInstitutions: Manage institutions|
+  manageN: 
+    Manage institutions|
     Manage {count} institutions
   deleteNbInstitutions:
     text: You are about to delete {number} institutions. {affected}

@@ -1,6 +1,11 @@
 <template>
   <div>
-    <SkeletonPageBar :title="toolbarTitle">
+    <SkeletonPageBar
+      v-model:search="query.search"
+      :title="toolbarTitle"
+      show-search
+      @update:search="debouncedRefresh()"
+    >
       <v-btn
         v-if="institutionFormRef"
         v-tooltip="$t('add')"
@@ -21,17 +26,14 @@
         class="mr-2"
         @click="refresh()"
       />
-
-      <v-text-field
-        v-model="query.search"
-        :placeholder="$t('search')"
-        append-inner-icon="mdi-magnify"
-        variant="outlined"
-        density="compact"
-        hide-details
+      <v-btn
+        v-tooltip="$t('filter')"
+        icon="mdi-filter"
+        variant="tonal"
+        density="comfortable"
+        color="primary"
         class="mr-2"
-        style="max-width: 200px"
-        @update:model-value="debouncedRefresh()"
+        @click="() => {}"
       />
     </SkeletonPageBar>
 
@@ -176,7 +178,7 @@
     </v-data-table-server>
 
     <SelectionMenu
-      :text="$t('institutions.manageInstitutions', selectedInstitutions.length)"
+      :text="$t('institutions.manageN', selectedInstitutions.length)"
       :selected="selectedInstitutions"
     >
       <template #actions>
@@ -194,9 +196,9 @@
     </SelectionMenu>
 
     <InstitutionFormDialog
-        ref="institutionFormRef"
-        @update:model-value="refresh()"
-      />
+      ref="institutionFormRef"
+      @update:model-value="refresh()"
+    />
 
     <InstitutionComponentsDialog
       ref="institutionComponentsDialogRef"
@@ -263,8 +265,8 @@ const {
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
     include: ['repositories', 'spaces', 'memberships', 'childInstitutions', 'sushiCredentials'],
-        },
-      });
+  },
+});
 
 /**
  * Table headers

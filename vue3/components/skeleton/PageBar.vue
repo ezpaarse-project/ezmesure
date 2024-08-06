@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar :title="title" density="comfortable" class="bg-transparent">
+  <v-toolbar density="comfortable" class="bg-transparent">
     <template #prepend>
       <v-btn
         icon="mdi-menu"
@@ -7,12 +7,27 @@
       />
     </template>
 
-    <v-spacer />
+    <template #title>
+      <slot name="title">
+        {{ title }}
+      </slot>
+    </template>
 
-    <slot />
+    <template #append>
+      <slot />
 
-    <template v-if="$slots.extension" #extension="scope">
-      <slot name="extension" v-bind="scope" />
+      <v-text-field
+        v-if="showSearch"
+        :model-value="search"
+        :placeholder="$t('search')"
+        append-inner-icon="mdi-magnify"
+        variant="outlined"
+        density="compact"
+        width="200"
+        hide-details
+        class="mr-2"
+        @update:model-value="$emit('update:search', $event)"
+      />
     </template>
   </v-toolbar>
 </template>
@@ -21,8 +36,20 @@
 defineProps({
   title: {
     type: String,
-    required: true,
+    default: undefined,
   },
+  showSearch: {
+    type: Boolean,
+    default: false,
+  },
+  search: {
+    type: String,
+    default: undefined,
+  },
+});
+
+defineEmits({
+  'update:search': (value) => value != null,
 });
 
 const { toggle } = useDrawerStore();

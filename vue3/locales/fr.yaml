@@ -251,7 +251,7 @@ institutions:
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
-  manageInstitutions: 
+  manageN: 
     Gérer les établissements|
     Gérer {count} établissements
   deleteNbInstitutions:
