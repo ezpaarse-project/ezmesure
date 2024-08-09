@@ -47,32 +47,77 @@
                 return-object
               />
 
-              <template v-if="endpointSubject">
-                <v-text-field
-                  v-model="endpointVendor"
-                  :label="$t('contact.endpointVendor')"
-                  :hint="$t('contact.pleaseEnterFullVendorName')"
-                  :rules="[v => !!v || $t('fieldIsRequired')]"
-                  requried
-                  outlined
-                />
-                <v-text-field
-                  v-model="endpointUrl"
-                  :label="$t('contact.endpointUrl')"
-                  :rules="[v => !!v || $t('fieldIsRequired')]"
-                  requried
-                  outlined
-                />
+              <v-row v-if="endpointSubject" class="mt-2">
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="endpointVendor"
+                    :label="$t('contact.endpointVendor')"
+                    :hint="$t('contact.pleaseEnterFullVendorName')"
+                    :rules="[v => !!v || $t('fieldIsRequired')]"
+                    hide-details="auto"
+                    requried
+                    outlined
+                  />
+                </v-col>
 
-                <p>{{ $t('contact.endpointDetails') }}</p>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="endpointUrl"
+                    :label="$t('contact.endpointUrl')"
+                    :rules="[v => !!v || $t('fieldIsRequired')]"
+                    hide-details="auto"
+                    requried
+                    outlined
+                  />
+                </v-col>
 
-                <v-textarea
-                  v-model="message"
-                  :label="$t('contact.additionalInformation')"
-                  name="message"
-                  outlined
-                />
-              </template>
+                <v-col cols="12">
+                  <p class="mb-0">
+                    {{ $t('contact.sushiDetails') }}
+                  </p>
+                </v-col>
+
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="sushiRequestorId"
+                    :label="$t('institutions.sushi.requestorId')"
+                    :rules="[sushiRule]"
+                    hide-details="auto"
+                    outlined
+                  />
+                </v-col>
+
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="sushiCustomerId"
+                    :label="$t('institutions.sushi.customerId')"
+                    :rules="[sushiRule]"
+                    hide-details="auto"
+                    outlined
+                  />
+                </v-col>
+
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="sushiApiKey"
+                    :label="$t('institutions.sushi.apiKey')"
+                    :rules="[sushiRule]"
+                    hide-details="auto"
+                    outlined
+                  />
+                </v-col>
+
+                <v-col cols="12">
+                  <p>{{ $t('contact.endpointDetails') }}</p>
+
+                  <v-textarea
+                    v-model="message"
+                    :label="$t('contact.additionalInformation')"
+                    name="message"
+                    outlined
+                  />
+                </v-col>
+              </v-row>
 
               <v-textarea
                 v-else
@@ -119,6 +164,9 @@ export default {
       message: '',
       endpointVendor: '',
       endpointUrl: '',
+      sushiRequestorId: '',
+      sushiCustomerId: '',
+      sushiApiKey: '',
       subject: {},
       sendBrowser: true,
       valid: true,
@@ -152,6 +200,7 @@ export default {
     },
     messageRules() { return [(v) => !!v || this.$t('contact.contentIsRequired')]; },
     subjectRules() { return [(v) => !!v || this.$t('contact.subjectIsRequired')]; },
+    sushiRule() { return (!!this.sushiRequestorId || !!this.sushiCustomerId || !!this.sushiApiKey) || this.$t('contact.sushiIsRequired'); },
   },
   methods: {
     async validate() {
@@ -164,11 +213,17 @@ export default {
 
         if (this.endpointSubject) {
           message = [
-            this.$t('contact.endpointVendor'),
+            `${this.$t('contact.endpointVendor')}:`,
             this.endpointVendor,
-            '',
-            this.$t('contact.endpointUrl'),
+            `${this.$t('contact.endpointUrl')}:`,
             this.endpointUrl,
+            '',
+            `${this.$t('institutions.sushi.requestorId')}:`,
+            this.sushiRequestorId,
+            `${this.$t('institutions.sushi.customerId')}:`,
+            this.sushiCustomerId,
+            `${this.$t('institutions.sushi.apiKey')}:`,
+            this.sushiApiKey,
             '',
             message,
           ].join('\n');
@@ -179,7 +234,7 @@ export default {
             email: this.user?.email || this.email,
             subject: this.subject?.text,
             message,
-            browser: this.sendBrowser && this.subject.value === 'bugs' ? navigator.userAgent : null,
+            browser: this.sendBrowser || this.subject.value === 'bugs' ? navigator.userAgent : null,
           });
           this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
 

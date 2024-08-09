@@ -122,6 +122,25 @@ const updateSpace = (opts) => {
 };
 
 /**
+ * Updates kibana settings
+ *
+ * @param {Record<string, any> & { id: string }} opts The kibana settings
+ *
+ * @returns {Promise<AxiosResponse<Record<string, any>>>} The space
+ *
+ * @see https://www.elastic.co/guide/en/kibana/7.17/advanced-options.html
+ */
+const updateSpaceSettings = (opts) => {
+  const { id, changes } = opts || {};
+
+  if (!id) {
+    throw new Error('Missing required parameter: id');
+  }
+
+  return axiosClient.post(`/s/${id}/api/kibana/settings`, { changes });
+};
+
+/**
  * Delete a kibana space
  *
  * @param {string} spaceId The id of the space
@@ -408,6 +427,7 @@ module.exports = {
   getSpace,
   createSpace,
   updateSpace,
+  updateSpaceSettings,
   deleteSpace,
   putRole,
   deleteRole,

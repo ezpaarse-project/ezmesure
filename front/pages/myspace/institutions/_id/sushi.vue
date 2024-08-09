@@ -280,6 +280,7 @@
           <v-spacer />
 
           <v-menu
+            v-if="canEdit"
             v-model="showSushiReadyPopup"
             :close-on-content-click="false"
             bottom
@@ -984,10 +985,10 @@ export default {
       this.refreshing = false;
     },
 
-    async onSushiUpdate() {
+    async onSushiUpdate(ignoreReady = false) {
       this.refreshSushiItems();
 
-      if (this.sushiReady) {
+      if (this.sushiReady && !ignoreReady) {
         const resumeEntry = await this.$refs.confirm.open({
           title: this.$t('institutions.sushi.resumeEntryQuestion'),
           message: this.$t('institutions.sushi.resumeEntryDesc', { date: this.sushiReadySince }),
@@ -1005,10 +1006,10 @@ export default {
       this.loadingSushiReady = true;
       this.showSushiReadyPopup = false;
 
-      const sushiReadySince = this.institution?.sushiReadySince ? null : new Date();
+      const value = this.institution?.sushiReadySince ? null : new Date();
 
       try {
-        const data = await this.$axios.$put(`/institutions/${this.institution.id}`, { sushiReadySince });
+        const data = await this.$axios.$put(`/institutions/${this.institution.id}/sushiReadySince`, { value });
         this.$set(this.institution, 'sushiReadySince', data?.sushiReadySince);
       } catch (e) {
         this.$store.dispatch('snacks/error', this.$t('errors.generic'));

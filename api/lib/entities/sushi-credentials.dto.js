@@ -79,6 +79,7 @@ const includableFields = [
 const createSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
+  { connection: () => schema.connection },
   requireFields(['endpointId']),
 );
 

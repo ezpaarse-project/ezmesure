@@ -16,7 +16,7 @@ const schema = {
 
   institutions: Joi.array().items(Joi.object()),
 
-  pattern: Joi.string().regex(/^[a-z0-9*_-]+$/i).trim().min(1),
+  pattern: Joi.string().trim().min(1),
   type: Joi.string().trim().min(1),
 
   permissions: Joi.array().items(Joi.object()),

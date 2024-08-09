@@ -13,7 +13,7 @@ const {
 
 const { execThrottledPromises } = require('../promises');
 
-const { syncSchedule } = config.get('ezreeport');
+const { syncSchedule, dateFormat } = config.get('kibana');
 
 /**
  * @typedef {import('../promises').ThrottledPromisesResult} ThrottledPromisesResult
@@ -122,6 +122,19 @@ const syncSpace = async (space) => {
     await kibana.updateSpace(spaceParams);
   } else {
     await kibana.createSpace(spaceParams);
+  }
+
+  try {
+    await kibana.updateSpaceSettings({
+      id: space.id,
+      changes: {
+        'csv:separator': ';',
+        dateFormat,
+      },
+    });
+    appLogger.verbose(`[kibana] Default settings set in space [${space.id}]`);
+  } catch (error) {
+    appLogger.verbose(`[kibana] Default settings failed to be applied in space [${space.id}]:\n${error}`);
   }
 
   await kibana.putRole({

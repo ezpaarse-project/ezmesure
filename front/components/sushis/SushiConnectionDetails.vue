@@ -1,84 +1,84 @@
 <template>
-  <v-menu
-    v-model="showPopover"
-    open-on-hover
-    offset-x
-    :close-on-content-click="false"
-    bottom
-    left
-    nudge-width="300"
-    max-width="600"
-  >
-    <template #activator="{ on, attrs }">
-      <v-chip
-        small
-        outlined
-        :color="color"
-        v-bind="attrs"
-        v-on="on"
-        @click="() => !loading && !disabled && $emit('checkConnection')"
+  <v-card>
+    <v-list>
+      <v-list-item>
+        <v-list-item-avatar>
+          <v-icon :color="color">
+            {{ icon }}
+          </v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ $t(`institutions.sushi.${titleKey}`) }}
+          </v-list-item-title>
+
+          <v-list-item-subtitle v-if="date">
+            {{ $t('institutions.sushi.testedOn', { date: localDate }) }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+
+    <v-divider />
+
+    <v-card-text>
+      {{ $t(`institutions.sushi.${titleKey}Desc`) }}
+    </v-card-text>
+
+    <v-card-text v-if="error">
+      <div class="subtitle-2">
+        {{ $t('reason', { reason: error || $t('indeterminate') }) }}
+      </div>
+      <div>{{ errorMeaning }}</div>
+    </v-card-text>
+
+    <v-card-text v-if="hasExceptions">
+      <p>{{ $t('sushi.messagesFromEndpoint') }}</p>
+      <LogsPreview
+        :logs="exceptions"
+        log-type="Severity"
+        log-message="Message"
       >
-        <v-avatar v-if="loading" left>
-          <v-icon v-if="state === 'queued'" small>
-            mdi-dots-horizontal
-          </v-icon>
-          <v-progress-circular
-            v-else
-            indeterminate
-            size="14"
-            width="2"
-          />
-        </v-avatar>
+        <template #message="{ log }">
+          <span>{{ log.Message }}</span>
+          <span v-if="log.Data" class="grey--text">({{ log.Data }})</span>
+          <v-btn
+            v-if="log.Help_URL"
+            :href="log.Help_URL"
+            target="_blank"
+            color="accent"
+            x-small
+          >
+            {{ $t('sushi.openHelpPage') }}
+            <v-icon right>
+              mdi-open-in-new
+            </v-icon>
+          </v-btn>
+        </template>
+      </LogsPreview>
+    </v-card-text>
 
-        <v-icon v-else small left>
-          {{ icon }}
-        </v-icon>
-
-        {{ chipText }}
-      </v-chip>
-    </template>
-
-    <SushiConnectionDetails :connection="connection">
-      <template #actions>
-        <v-spacer />
-        <v-btn
-          small
-          color="primary"
-          text
-          :disabled="disabled"
-          :loading="loading"
-          @click="$emit('checkConnection')"
-        >
-          <v-icon left>
-            mdi-connection
-          </v-icon>
-          {{ $t('institutions.sushi.checkCredentials') }}
-        </v-btn>
-      </template>
-    </SushiConnectionDetails>
-  </v-menu>
+    <v-card-actions v-if="$slots.actions">
+      <slot name="actions" />
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
-import SushiConnectionDetails from '~/components/sushis/SushiConnectionDetails.vue';
+import { defineComponent } from 'vue';
 
-export default {
+import LogsPreview from '~/components/LogsPreview.vue';
+
+export default defineComponent({
   props: {
     connection: {
       type: Object,
       default: () => ({}),
     },
-    state: {
-      type: String,
-      default: () => undefined,
-    },
-    disabled: {
-      type: Boolean,
-      default: () => false,
-    },
   },
   components: {
-    SushiConnectionDetails,
+    LogsPreview,
   },
   data() {
     return {
@@ -86,7 +86,6 @@ export default {
     };
   },
   computed: {
-    loading() { return ['loading', 'queued'].includes(this.state); },
     untested() { return !this.connection; },
     status() { return this.connection?.status; },
     success() { return this.status === 'success'; },
@@ -140,5 +139,9 @@ export default {
       return 'connectionUntested';
     },
   },
-};
+});
 </script>
+
+<style scoped>
+
+</style>

@@ -63,9 +63,16 @@
     "name": "Name",
     "modified": "Modified",
     "size": "Size",
+    "letAdmin": "Transfer to admin team",
+    "letAdminDesc": "Please note that the upload is not immediate, and will be done as soon as possible",
     "updatingFailed": "Updating the list failed.",
+    "selectIndex": "Select an index",
+    "selectIndexDescription": "Several indices are available in this repository, please select an index where to upload the data.",
+    "affectedIndex": "Affected index",
+    "affectedRepository": "Affected repositories",
     "deletingFailed": "File deletion failed",
     "deleteCompleted": "Delete completed",
+    "loaded": "Loaded",
     "uploaded": "Uploaded",
     "loadingInProgress": "Loading in progress",
     "validatingFile": "Validation of the file...",
@@ -76,8 +83,7 @@
     "fieldIsEmpty": "Line #{lineNumber}: \"{field}\" is blank.",
     "invalidField": "Line #{lineNumber}: \"{field}\" is not valid, has the file been modified ?",
     "depositFiles": {
-      "text": "Deposit here the consultation event files that you want to load in ezMESURE. Please note that the upload is {not} immediate, and will be done by us as soon as possible. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
-      "not": "not",
+      "text": "Deposit here the consultation event files that you want to load in ezMESURE. We invite you to read our {bestPracticeLink} in order to facilitate the process, and to get in touch with the team if you wish to know more about the automation of loading. Loaded data is not accessible to other filers.",
       "bestPracticeLink": "best practice rules"
     }
   },
@@ -233,6 +239,7 @@
     "noEndpointFound": "No endpoint found",
     "clickToDeclareOne": "Click here to declare one",
     "disabledUntil": "Disabled until",
+    "checkEndpoint": "Test endpoint",
     "filters": {
       "title": "Filter endpoints"
     }
@@ -407,7 +414,9 @@
       "pleaseSelectEndpoint": "Please select an endpoint",
       "enterLabel": "Please enter a label.",
       "enterPackage": "Please enter a package",
+      "createdAt": "Creation date",
       "updatedAt": "Last updated",
+      "testedAt": "Last tested",
       "sushiUrl": "Sushi URL",
       "enterUrl": "Please enter an URL",
       "enterRequestorId": "Please enter a Requestor Id.",
@@ -466,6 +475,7 @@
     "failedToFetchTasks": "Failed to fetch tasks list",
     "logs": "Logs",
     "history": "Tasks history",
+    "oneHistory": "Task history",
     "parameters": "Parameters",
     "statusDescriptions": {
       "waiting": "A harvest has been scheduled. It will be launched as soon as possible.",
@@ -654,9 +664,11 @@
     "emailMustBeValid": "The email address must be valid",
     "contentIsRequired": "A message is required",
     "subjectIsRequired": "Subject is required",
+    "sushiIsRequired": "SUSHI credentials are required",
     "endpointVendor": "Vendor name",
     "endpointUrl": "URL of the SUSHI endpoint",
     "pleaseEnterFullVendorName": "Please enter the full name (possibly with its acronym)",
+    "sushiDetails": "Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.",
     "endpointDetails": "If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.",
     "additionalInformation": "Additional information"
   },

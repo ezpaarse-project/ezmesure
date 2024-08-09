@@ -232,6 +232,49 @@ exports.updateInstitution = async (ctx) => {
   ctx.body = updatedInstitution;
 };
 
+exports.updateInstitutionSushiReady = async (ctx) => {
+  ctx.action = 'institutions/update';
+  const { institution } = ctx.state;
+  const { body } = ctx.request;
+
+  const origin = ctx.get('origin');
+
+  const wasSushiReady = institution.sushiReadySince;
+
+  ctx.metadata = {
+    institutionId: institution.id,
+    institutionName: institution.name,
+  };
+
+  const updatedInstitution = await (new InstitutionsService()).update({
+    where: { id: institution.id },
+    data: { sushiReadySince: body.value },
+  });
+  appLogger.verbose(`Institution [${institution.id}] is updated`);
+
+  const { sushiReadySince } = updatedInstitution;
+  const sushiReadyChanged = (wasSushiReady && sushiReadySince === null)
+                         || (!wasSushiReady && sushiReadySince);
+
+  if (sushiReadyChanged) {
+    sendMail({
+      from: sender,
+      to: supportRecipients,
+      subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
+      ...generateMail('sushi-ready-change', {
+        institutionName: institution.name,
+        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        sushiReadySince,
+      }),
+    }).catch((err) => {
+      appLogger.error(`Failed to send sushi-ready-change mail: ${err}`);
+    });
+  }
+
+  ctx.status = 200;
+  ctx.body = updatedInstitution;
+};
+
 exports.importInstitutions = async (ctx) => {
   ctx.action = 'institutions/import';
   const { body = [] } = ctx.request;

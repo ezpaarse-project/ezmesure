@@ -63,10 +63,17 @@
     "name": "Nom",
     "modified": "Modifié",
     "size": "Taille",
+    "letAdmin": "Transférer à l'équipe d'administration",
+    "letAdminDesc": "Le chargement n'est pas immédiat et sera effectué dès que possible",
+    "selectIndex": "Sélectionnez un index",
+    "selectIndexDescription": "Plusieurs index sont disponibles dans cet entrepôt, veuillez sélectionner un index où charger les données.",
+    "affectedIndex": "Index affecté",
+    "affectedRepository": "Entrepôt affecté",
     "updatingFailed": "La mise à jour de la liste a échoué",
     "deletingFailed": "La suppression des fichiers a échoué",
     "deleteCompleted": "Supprimer terminés",
-    "uploaded": "Chargé",
+    "loaded": "Chargé",
+    "uploaded": "Téléversé",
     "loadingInProgress": "Chargement en cours",
     "validatingFile": "Validation du fichier...",
     "isWaiting": "En attente",
@@ -76,8 +83,7 @@
     "fieldIsEmpty": "Ligne #{lineNumber}: champ \"{field}\" vide",
     "invalidField": "Ligne #{lineNumber}: champ \"{field}\" invalide, le fichier a-t-il été modifié ?",
     "depositFiles": {
-      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est {not} immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
-      "not": "pas",
+      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
       "bestPracticeLink": "règles de bonnes pratiques"
     }
   },
@@ -233,6 +239,7 @@
     "noEndpointFound": "Aucun point d'accès trouvé",
     "clickToDeclareOne": "Cliquez ici pour en déclarer un",
     "disabledUntil": "Désactivé jusqu'au",
+    "checkEndpoint": "Tester le point d'accès",
     "filters": {
       "title": "Filtrer les points d'accès"
     }
@@ -408,7 +415,9 @@
       "pleaseSelectEndpoint": "Veuillez sélectionner un point d'accès",
       "enterLabel": "Veuillez saisir un libellé.",
       "enterPackage": "Veuillez saisir un package",
+      "createdAt": "Date de création",
       "updatedAt": "Dernière mise à jour",
+      "testedAt": "Dernier test",
       "sushiUrl": "URL Sushi",
       "enterUrl": "Veuillez saisir une URL",
       "enterRequestorId": "Veuillez saisir un Requestor Id.",
@@ -467,6 +476,7 @@
     "failedToFetchTasks": "Impossible de récupérer la liste des tâches",
     "logs": "Logs",
     "history": "Historique des tâches",
+    "oneHistory": "Historique de la tâche",
     "parameters": "Paramètres",
     "statusDescriptions": {
       "waiting": "Un moissonnage a été programmé. Il sera lancé dès que possible.",
@@ -652,11 +662,13 @@
     "declareSushiEndpoint": "Déclarer un point d'accès SUSHI",
     "emailIsRequired": "L'adresse électronique est requise",
     "emailMustBeValid": "L'adresse électronique doit être valide",
+    "sushiIsRequired": "Des identifiants SUSHI sont requis",
     "contentIsRequired": "Un message est requis",
     "subjectIsRequired": "L'objet est requis",
     "endpointVendor": "Nom du fournisseur",
     "endpointUrl": "URL du point d'accès SUSHI",
     "pleaseEnterFullVendorName": "Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)",
+    "sushiDetails": "Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.",
     "endpointDetails": "Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.",
     "additionalInformation": "Informations complémentaires"
   },

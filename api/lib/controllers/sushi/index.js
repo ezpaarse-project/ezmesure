@@ -34,6 +34,7 @@ const {
   getAvailableReports,
   deleteOne,
   getHarvests,
+  checkCredentialsConnection,
   checkSushiConnection,
   deleteSushiConnection,
 } = require('./actions');
@@ -146,6 +147,42 @@ router.route({
   },
 });
 
+router.route({
+  method: 'POST',
+  path: '/_check_connection',
+  handler: [
+    fetchInstitution({ getId: (ctx) => ctx?.request?.body?.institution?.id, ignoreNotFound: true }),
+    requireMemberPermissions(FEATURES.sushi.write),
+    requireValidatedInstitution({ ignoreIfAdmin: true }),
+    checkCredentialsConnection,
+  ],
+  validate: {
+    type: 'json',
+    query: {
+      beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+    },
+    body: Joi.object({
+      id: Joi.string().trim().min(1).empty(null),
+      endpoint: Joi.object({
+        id: Joi.string().trim().empty(null),
+        sushiUrl: Joi.string().trim().required(),
+        harvestDateFormat: Joi.string().allow('').trim().empty(null),
+        testedReport: Joi.string().allow('').trim().empty(null),
+        paramSeparator: Joi.string().allow('').trim().empty(null),
+        params: Joi.array(),
+      }).unknown().required(),
+      institution: Joi.object({
+        id: Joi.string().trim().required(),
+      }).unknown(),
+      customerId: Joi.string().allow('').trim().empty(null),
+      requestorId: Joi.string().allow('').trim().empty(null),
+      apiKey: Joi.string().allow('').trim().empty(null),
+      params: Joi.array(),
+    }).or('customerId', 'requestorId', 'apiKey').unknown(),
+  },
+});
+
 /**
  * Fetch the SUSHI item from the param sushiId
  * Fetch the associated institution
@@ -198,6 +235,10 @@ router.route({
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
     },
   },
 });

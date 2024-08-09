@@ -1,8 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
 const send = require('koa-send');
+const { v4: uuidv4 } = require('uuid');
 const {
   format,
+  formatISO,
   subMonths,
 } = require('date-fns');
 
@@ -379,28 +381,17 @@ exports.downloadFile = async (ctx) => {
   });
 };
 
-exports.checkSushiConnection = async (ctx) => {
-  ctx.action = 'sushi/checkConnection';
-  ctx.type = 'json';
-
-  const { sushi } = ctx.state;
-  const { endpoint, institution } = sushi;
-
-  ctx.metadata = {
-    sushiId: sushi.id,
-    vendor: endpoint.vendor,
-    institutionId: institution.id,
-    institutionName: institution.name,
-  };
+const checkConnection = async (sushi, params) => {
+  const { endpoint } = sushi;
 
   const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
 
   const sushiData = {
     sushi,
-    institution,
+    institution: sushi.institution,
     endpoint,
-    beginDate: threeMonthAgo,
-    endDate: threeMonthAgo,
+    beginDate: params.beginDate || params.endDate || threeMonthAgo,
+    endDate: params.endDate || params.beginDate || threeMonthAgo,
     reportType: endpoint.testedReport || 'pr',
   };
 
@@ -477,18 +468,77 @@ exports.checkSushiConnection = async (ctx) => {
     status = 'success';
   }
 
+  return {
+    date: Date.now(),
+    status: status || 'failed',
+    exceptions: exceptions || null,
+    errorCode: errorCode || null,
+  };
+};
+
+exports.checkCredentialsConnection = async (ctx) => {
+  ctx.type = 'json';
+
+  const { endpoint, institution = {}, ...body } = ctx.request.body;
+
+  endpoint.id = endpoint.id || 'tmp';
+  if (!institution.id) {
+    institution.id = 'tmp';
+  }
+
+  const connectionData = await checkConnection(
+    {
+      id: uuidv4(),
+      ...body,
+      endpointId: endpoint.id,
+      endpoint,
+      institution,
+    },
+    ctx.query,
+  );
+
+  if (body.id) {
+    const sushiCredentialsService = new SushiCredentialsService();
+
+    const sushi = await sushiCredentialsService.findUnique({ where: { id: body.id } });
+
+    await sushiCredentialsService.update({
+      where: { id: sushi.id },
+      data: {
+        updatedAt: sushi.updatedAt,
+        connection: connectionData,
+      },
+    });
+  }
+
+  ctx.body = {
+    ...connectionData,
+    date: formatISO(connectionData.date),
+  };
+};
+
+exports.checkSushiConnection = async (ctx) => {
+  ctx.action = 'sushi/checkConnection';
+  ctx.type = 'json';
+
+  const { sushi } = ctx.state;
+
+  ctx.metadata = {
+    sushiId: sushi.id,
+    vendor: sushi.endpoint.vendor,
+    institutionId: sushi.institution.id,
+    institutionName: sushi.institution.name,
+  };
+
+  const connectionData = await checkConnection(sushi, ctx.query);
+
   const sushiCredentialsService = new SushiCredentialsService();
 
   ctx.body = await sushiCredentialsService.update({
     where: { id: sushi.id },
     data: {
       updatedAt: sushi.updatedAt,
-      connection: {
-        date: Date.now(),
-        status: status || 'failed',
-        exceptions: exceptions || null,
-        errorCode: errorCode || null,
-      },
+      connection: connectionData,
     },
   });
 };

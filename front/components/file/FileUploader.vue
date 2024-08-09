@@ -34,7 +34,10 @@
               <v-layout row align-center>
                 <v-flex shrink>
                   <v-scale-transition origin="center center" mode="out-in">
-                    <v-icon v-if="upload.error" size="50" class="error--text">
+                    <v-icon v-if="!upload.index" size="50">
+                      mdi-dots-horizontal
+                    </v-icon>
+                    <v-icon v-else-if="upload.error" size="50" class="error--text">
                       mdi-alert-circle-outline
                     </v-icon>
                     <v-icon v-else-if="upload.done" size="50" class="success--text">
@@ -65,7 +68,9 @@
                     </span>
 
                     <span v-else-if="upload.done">
-                      {{ $t('files.uploaded') }}
+                      {{ upload.index !== noIndexSymbol
+                        ? $t('files.loaded')
+                        : $t('files.uploaded') }}
                     </span>
 
                     <span v-else-if="upload.progress">
@@ -82,13 +87,51 @@
                   </div>
                 </v-flex>
 
+                <div style="width: 400px;">
+                  <v-scale-transition origin="center center" mode="out-in">
+                    <FileIndexSelectorMenu @update:modelValue="onIndexSelect(upload, $event)">
+                      <template #activator="{ display }">
+                        <v-select
+                          :value="upload.repository"
+                          :label="$t('files.affectedRepository')"
+                          :items="repositoriesItemsOfUser"
+                          :disabled="!!upload.index"
+                          :hint="upload.index === noIndexSymbol
+                            ? $t('files.letAdminDesc')
+                            : upload.index
+                          "
+                          persistent-hint
+                          @change="onRepositorySelect(upload, $event)"
+                        >
+                          <template v-if="upload.repository && !upload.index" #append-outer>
+                            <v-btn
+                              color="error"
+                              small
+                              @click="display(indicesOfRepo[upload.repository] || [])"
+                            >
+                              <v-icon>mdi-database</v-icon>
+                            </v-btn>
+                          </template>
+                        </v-select>
+                      </template>
+                    </FileIndexSelectorMenu>
+                  </v-scale-transition>
+                </div>
+
+                <v-spacer />
+
                 <v-flex shrink>
                   <v-scale-transition origin="center center" mode="out-in">
-                    <v-btn v-if="upload.done" icon ripple @click="removeUpload(upload.id)">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                    <v-btn v-else icon ripple @click="upload.cancel()">
+                    <v-btn
+                      v-if="upload.cancel && !upload.done"
+                      icon
+                      ripple
+                      @click="upload.cancel()"
+                    >
                       <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-btn v-else icon ripple @click="removeUpload(upload.id)">
+                      <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </v-scale-transition>
                 </v-flex>
@@ -107,10 +150,14 @@ import prettyBytes from 'pretty-bytes';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CancelToken, isCancel } from 'axios';
 import FileInput from './FileInput.vue';
+import FileIndexSelectorMenu from './FileIndexSelectorDialog.vue';
+
+const noIndexSymbol = Symbol.for('deposit without index');
 
 export default {
   components: {
     FileInput,
+    FileIndexSelectorMenu,
   },
   props: {
     onUpload: {
@@ -124,10 +171,60 @@ export default {
       uploads: [],
       uploading: false,
       hostedFiles: [],
+      memberships: [],
+      availableIndices: [],
+      indicesOfRepo: {},
       loading: false,
+      noIndexSymbol,
     };
   },
   computed: {
+    institutionsOfUser() {
+      return new Map(this.memberships.map((m) => [m.institutionId, m.institution]));
+    },
+    repositoryPermsOfUser() {
+      return (this.$auth.user?.memberships ?? [])
+        .map((m) => m.repositoryPermissions ?? [])
+        .flat()
+        .filter((p) => !p.readonly && p.repository?.type === 'ezpaarse');
+    },
+    permsOfUserPerInstitution() {
+      const permMap = new Map();
+      // eslint-disable-next-line no-restricted-syntax
+      for (const permission of this.repositoryPermsOfUser) {
+        const repos = permMap.get(permission.institutionId) ?? [];
+        repos.push(permission);
+        permMap.set(permission.institutionId, repos);
+      }
+      return permMap;
+    },
+    repositoriesItemsOfUser() {
+      const items = Array.from(this.permsOfUserPerInstitution.entries())
+        .map(([institutionId, permissions]) => {
+          const institution = this.institutionsOfUser.get(institutionId);
+          let label = 'Unknown';
+          if (institution?.name) {
+            label = institution.name;
+            if (institution.acronym) {
+              label += ` (${institution.acronym})`;
+            }
+          }
+
+          return [
+            { header: label, value: institutionId },
+            ...permissions.map(({ repository }) => ({
+              text: repository.pattern,
+              value: repository.pattern,
+            })),
+          ];
+        })
+        .flat();
+
+      return [
+        { text: this.$t('files.letAdmin'), value: noIndexSymbol },
+        ...items,
+      ];
+    },
     noUploads() {
       return this.uploads.length === 0;
     },
@@ -150,7 +247,27 @@ export default {
       ];
     },
   },
+  mounted() {
+    this.refreshMemberships();
+  },
   methods: {
+    async refreshMemberships() {
+      try {
+        this.memberships = await this.$axios.$get('/profile/memberships');
+      } catch (error) {
+        this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));
+      }
+    },
+
+    async refreshIndicesOfRepo(pattern) {
+      try {
+        const indices = await this.$axios.$get(`/repositories/${pattern}/_resolve`);
+        this.indicesOfRepo[pattern] = indices;
+      } catch (error) {
+        this.$store.dispatch('snacks/error', this.$t('anErrorOccurred'));
+      }
+    },
+
     async addFilesToUpload(files) {
       files.forEach((file) => {
         this.uploads.push({
@@ -160,8 +277,38 @@ export default {
           progress: 0,
           done: false,
           req: null,
+          index: '',
+          repository: '',
         });
       });
+    },
+
+    async onRepositorySelect(upload, pattern) {
+      if (pattern === noIndexSymbol) {
+        this.onIndexSelect(upload, noIndexSymbol);
+        return;
+      }
+
+      upload.repository = pattern || '';
+      if (!pattern) {
+        return;
+      }
+
+      await this.refreshIndicesOfRepo(pattern);
+      const indices = this.indicesOfRepo[pattern] || [];
+      if (indices.length === 0) {
+        this.onIndexSelect(upload, noIndexSymbol);
+      }
+      if (indices.length === 1) {
+        this.onIndexSelect(upload, indices[0]?.name);
+      }
+    },
+
+    async onIndexSelect(upload, index) {
+      upload.index = index || '';
+      if (!index) {
+        return;
+      }
 
       if (!this.uploading) {
         await this.uploadNextFile();
@@ -169,7 +316,7 @@ export default {
     },
 
     async uploadNextFile() {
-      const upload = this.uploads.find((u) => !u.done);
+      const upload = this.uploads.find((u) => !u.done && u.index);
       if (!upload) {
         this.uploading = false;
         this.$emit('upload');
@@ -192,7 +339,14 @@ export default {
         upload.cancel = () => { source.cancel(); };
 
         try {
-          upload.req = this.$axios.put(`/files/${upload.file.name}`, upload.file, {
+          const hasIndex = upload.index !== noIndexSymbol;
+          const method = hasIndex ? 'POST' : 'PUT';
+          const url = hasIndex ? `/logs/${upload.index}` : `/files/${upload.file.name}`;
+
+          upload.req = this.$axios.$request({
+            method,
+            url,
+            data: upload.file,
             cancelToken: source.token,
             onUploadProgress: (event) => {
               if (event.lengthComputable) {

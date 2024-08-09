@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" width="700">
+  <v-dialog v-model="show" :persistant="connectionLoading" width="700">
     <v-card>
       <v-card-title class="headline">
         {{ formTitle }}
@@ -99,6 +99,7 @@
                 :hint="requireRequestorId ? $t('institutions.sushi.necessaryField') : null"
                 :persistent-hint="requireRequestorId && !sushiForm.requestorId"
                 outlined
+                @input="sushiForm.connection = undefined;"
               />
             </v-col>
 
@@ -109,6 +110,7 @@
                 :hint="requireCustomerId ? $t('institutions.sushi.necessaryField') : null"
                 :persistent-hint="requireCustomerId && !sushiForm.customerId"
                 outlined
+                @input="sushiForm.connection = undefined;"
               />
             </v-col>
           </v-row>
@@ -119,6 +121,7 @@
             :hint="requireApiKey ? $t('institutions.sushi.necessaryField') : null"
             :persistent-hint="requireApiKey && !sushiForm.apiKey"
             outlined
+            @input="sushiForm.connection = undefined;"
           />
 
           <v-textarea
@@ -176,9 +179,17 @@
       </v-expansion-panels>
 
       <v-card-actions>
+        <CredentialCheckButton
+          :sushi="sushiForm"
+          :endpoint="endpoint"
+          :valid="valid"
+          :institution-id="institutionId"
+          @update:connection="onConnectionUpdate($event)"
+        />
+
         <v-spacer />
 
-        <v-btn text @click="show = false">
+        <v-btn text :disabled="connectionLoading" @click="show = false">
           {{ $t('close') }}
         </v-btn>
 
@@ -187,7 +198,7 @@
           form="sushiForm"
           color="primary"
           text
-          :disabled="!valid"
+          :disabled="!valid || !sushiForm.connection"
           :loading="saving"
         >
           {{ editMode ? $t('update') : $t('add') }}
@@ -200,10 +211,12 @@
 <script>
 import debounce from 'lodash.debounce';
 import SushiParam from '~/components/SushiParam.vue';
+import CredentialCheckButton from '~/components/sushis/CredentialCheckButton.vue';
 
 export default {
   components: {
     SushiParam,
+    CredentialCheckButton,
   },
   props: {
     availablePackages: {
@@ -229,6 +242,7 @@ export default {
         comment: '',
         id: null,
         params: [],
+        connection: undefined,
       },
     };
   },
@@ -253,6 +267,12 @@ export default {
         ? this.$t('institutions.sushi.updateCredentials')
         : this.$t('institutions.sushi.addCredentials');
     },
+    connectionLoading() {
+      if (!this.sushiForm.connection) {
+        return false;
+      }
+      return this.sushiForm.connection.status === undefined;
+    },
   },
   watch: {
     endpointSearch(newValue) {
@@ -276,6 +296,7 @@ export default {
       this.sushiForm.comment = sushiData.comment || '';
       this.sushiForm.params = sushiData.params;
       this.sushiForm.id = sushiData.id;
+      this.sushiForm.connection = sushiData.connection?.status ? sushiData.connection : undefined;
 
       if (!Array.isArray(this.sushiForm.params)) {
         this.sushiForm.params = [];
@@ -297,14 +318,17 @@ export default {
 
       // workaround to hide vendors list on change
       this.$refs.endpointsBox.isMenuActive = false;
+      this.sushiForm.connection = undefined;
     },
 
     addParam() {
       this.sushiForm.params.unshift({ name: '', value: '', scope: 'all' });
+      this.sushiForm.connection = undefined;
     },
 
     removeParam(index) {
       this.$delete(this.sushiForm.params, index);
+      this.sushiForm.connection = undefined;
     },
 
     queryEndpoints: debounce(async function queryEndpoints() {
@@ -353,6 +377,13 @@ export default {
 
       this.saving = false;
       this.show = false;
+    },
+
+    onConnectionUpdate(state) {
+      this.sushiForm.connection = state;
+      if (state?.status && this.sushiForm.id) {
+        this.$emit('update', true);
+      }
     },
   },
 };
