@@ -187,6 +187,7 @@ Represent the execution of a harvest job
 | sushiExceptions | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
 | logs            | `Log[]`            | Job logs                                                                                                |            |          |
 | steps           | `Step[]`           | Job steps                                                                                               |            |          |
+| harvests        | `Harvest[]`        | States affected by current job                                                                          |            |          |
 
 ### Harvest
 
@@ -204,6 +205,7 @@ Harvest state of a SUSHI item, for a specific month and report ID
 | insertedItems   | `Int`              | Number of report items that were successfuly inserted into Elasticsearch                                |            | `0`     |
 | updatedItems    | `Int`              | Number of report items that were updated in Elasticsearch                                               |            | `0`     |
 | failedItems     | `Int`              | Number of report items that failed to be inserted into Elasticsearch                                    |            | `0`     |
+| harvestedBy     | `HarvestJob?`      | Job that harvested current state                                                                        |            |         |
 
 ### Log
 
