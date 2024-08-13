@@ -16,9 +16,14 @@ const {
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: [],
+  queryFields: ['endpoint.vendor'],
 });
 exports.standardQueryParams = standardQueryParams;
+
+const SUCCESS_FILTER = { path: ['status'], equals: 'success' };
+const UNAUTHORIZED_FILTER = { path: ['status'], equals: 'unauthorized' };
+const FAILED_FILTER = { path: ['status'], equals: 'failed' };
+const UNTESTED_FILTER = { equals: {} };
 
 exports.getAll = async (ctx) => {
   const { connection, q: query } = ctx.query;
@@ -39,16 +44,16 @@ exports.getAll = async (ctx) => {
 
   switch (connection) {
     case 'working':
-      prismaQuery.where.connection = { path: ['status'], equals: 'success' };
+      prismaQuery.where.connection = SUCCESS_FILTER;
       break;
     case 'unauthorized':
-      prismaQuery.where.connection = { path: ['status'], equals: 'unauthorized' };
+      prismaQuery.where.connection = UNAUTHORIZED_FILTER;
       break;
     case 'faulty':
-      prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
+      prismaQuery.where.connection = FAILED_FILTER;
       break;
     case 'untested':
-      prismaQuery.where.connection = { equals: {} };
+      prismaQuery.where.connection = UNTESTED_FILTER;
       break;
 
     default:
@@ -61,4 +66,35 @@ exports.getAll = async (ctx) => {
   ctx.status = 200;
   ctx.set('X-Total-Count', await sushiCredentialsService.count({ where: prismaQuery.where }));
   ctx.body = await sushiCredentialsService.findMany(prismaQuery);
+};
+
+exports.getMetrics = async (ctx) => {
+  const sushiCredentialsService = new SushiCredentialsService();
+
+  const [
+    untested,
+    unauthorized,
+    failed,
+    success,
+  ] = await Promise.all(
+    [UNTESTED_FILTER, UNAUTHORIZED_FILTER, FAILED_FILTER, SUCCESS_FILTER].map(
+      (connection) => sushiCredentialsService.count({
+        where: {
+          connection,
+          institutionId: ctx.state.institution.id,
+        },
+      }),
+    ),
+  );
+
+  ctx.type = 'json';
+  ctx.status = 200;
+  ctx.body = {
+    statuses: {
+      untested,
+      unauthorized,
+      failed,
+      success,
+    },
+  };
 };

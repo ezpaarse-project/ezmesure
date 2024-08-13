@@ -14,6 +14,7 @@ const {
   standardQueryParams,
 
   getAll,
+  getMetrics,
 } = require('./actions');
 
 router.use(requireJwt, requireUser);
@@ -30,8 +31,20 @@ router.route({
     params: {
       institutionId: Joi.string().trim().required(),
     },
-    query: standardQueryParams.manyValidation,
+    query: standardQueryParams.manyValidation.append({
+      connection: Joi.string().allow('working', 'unauthorized', 'faulty', 'untested'),
+    }),
   },
+});
+
+router.route({
+  method: 'GET',
+  path: '/_metrics',
+  handler: [
+    fetchInstitution(),
+    requireMemberPermissions(FEATURES.sushi.read),
+    getMetrics,
+  ],
 });
 
 module.exports = router;
