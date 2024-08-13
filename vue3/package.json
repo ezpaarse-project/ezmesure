@@ -25,8 +25,7 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "@nuxtjs/i18n": "^8.0.0-rc.2",
-    "@pinia/nuxt": "^0.5.1",
+    "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
     "sass": "^1.77.8",
     "vuetify": "^3.6.13"
