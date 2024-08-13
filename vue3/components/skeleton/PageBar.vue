@@ -16,10 +16,34 @@
     <template #append>
       <slot />
 
+      <template v-if="refresh">
+        <v-btn
+          v-if="icons"
+          v-tooltip="$t('refresh')"
+          :loading="loading"
+          icon="mdi-reload"
+          variant="tonal"
+          density="comfortable"
+          color="primary"
+          class="mr-2"
+          @click="refreshWithLoad()"
+        />
+        <v-btn
+          v-else
+          :text="$t('refresh')"
+          :loading="loading"
+          prepend-icon="mdi-reload"
+          variant="tonal"
+          color="primary"
+          class="mr-2"
+          @click="refreshWithLoad()"
+        />
+      </template>
+
       <SkeletonFilterButton
         v-if="$slots['filters-panel']"
         v-model="filtersValue"
-        :icon-btn="filtersIconBtn"
+        :icon="icons"
       >
         <template #panel="panel">
           <slot name="filters-panel" v-bind="panel" />
@@ -55,7 +79,11 @@ const props = defineProps({
     type: [Boolean, String],
     default: false,
   },
-  filtersIconBtn: {
+  refresh: {
+    type: Function,
+    default: undefined,
+  },
+  icons: {
     type: Boolean,
     default: false,
   },
@@ -68,6 +96,8 @@ const emit = defineEmits({
 });
 
 const { toggle } = useDrawerStore();
+
+const loading = ref(false);
 
 const searchValue = computed({
   get: () => {
@@ -93,4 +123,13 @@ const filtersValue = computed({
     emit('update:modelValue', { ...(props.modelValue ?? {}), ...v });
   },
 });
+
+async function refreshWithLoad() {
+  loading.value = true;
+  try {
+    await props.refresh?.();
+  } finally {
+    loading.value = false;
+  }
+}
 </script>

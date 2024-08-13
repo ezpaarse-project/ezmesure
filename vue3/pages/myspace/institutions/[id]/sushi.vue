@@ -9,11 +9,16 @@
   <div v-else>
     <SkeletonPageBar
       v-model="query"
+      :refresh="refresh"
       search
       @update:model-value="debouncedRefresh()"
     >
       <template #title>
         <InstitutionBreadcrumbs :institution="institution" :current="toolbarTitle" />
+      </template>
+
+      <template #filters-panel="props">
+        <SushiFilters v-bind="props" />
       </template>
 
       <v-btn
@@ -25,15 +30,6 @@
         color="green"
         class="mr-2"
         @click="sushiFormRef.open(undefined, { institution })"
-      />
-      <v-btn
-        :text="$t('refresh')"
-        :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
-        variant="tonal"
-        color="primary"
-        class="mr-2"
-        @click="refresh()"
       />
     </SkeletonPageBar>
 

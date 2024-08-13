@@ -9,6 +9,7 @@
   <div v-else>
     <SkeletonPageBar
       v-model="query"
+      :refresh="refresh"
       search
       @update:model-value="debouncedRefresh()"
     >
@@ -32,15 +33,6 @@
           />
         </template>
       </MembershipAddMenu>
-      <v-btn
-        :text="$t('refresh')"
-        :loading="status === 'pending'"
-        prepend-icon="mdi-reload"
-        variant="tonal"
-        color="primary"
-        class="mr-2"
-        @click="refresh()"
-      />
     </SkeletonPageBar>
 
     <v-data-table-server

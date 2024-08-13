@@ -3,8 +3,9 @@
     <SkeletonPageBar
       v-model="query"
       :title="toolbarTitle"
+      :refresh="refresh"
       search
-      filters-icon-btn
+      icons
       @update:model-value="debouncedRefresh()"
     >
       <v-btn
@@ -16,16 +17,6 @@
         color="green"
         class="mr-2"
         @click="repositoryFormRef.open()"
-      />
-      <v-btn
-        v-tooltip="$t('refresh')"
-        :loading="status === 'pending'"
-        icon="mdi-reload"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-2"
-        @click="refresh()"
       />
     </SkeletonPageBar>
 

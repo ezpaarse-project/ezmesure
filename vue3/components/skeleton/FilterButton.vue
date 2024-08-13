@@ -7,7 +7,7 @@
       offset-x="10"
     >
       <v-btn
-        v-if="iconBtn"
+        v-if="icon"
         v-tooltip="$t('filter')"
         icon="mdi-filter"
         variant="tonal"
@@ -50,7 +50,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  iconBtn: {
+  icon: {
     type: Boolean,
     default: false,
   },
