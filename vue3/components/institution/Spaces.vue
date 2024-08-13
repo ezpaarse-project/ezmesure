@@ -109,7 +109,7 @@
 
     <SpaceFormDialog
       ref="spaceFormDialogRef"
-      @update:model-value="onSpaceAdded($event)"
+      @submit="onSpaceAdded($event)"
     />
   </v-card>
 </template>

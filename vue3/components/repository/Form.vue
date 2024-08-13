@@ -94,7 +94,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const types = Array.from(repoColors.keys());
@@ -165,7 +165,7 @@ async function save() {
       newRepository = await create();
     }
 
-    emit('update:modelValue', newRepository);
+    emit('submit', newRepository);
   } catch (err) {
     snacks.error(t('anErrorOccurred'));
   }

@@ -69,7 +69,7 @@
     <RepositoryFormDialog
       ref="repositoryFormDialogRef"
       completion
-      @update:model-value="onRepositoryAdded($event)"
+      @submit="onRepositoryAdded($event)"
     />
   </v-card>
 </template>

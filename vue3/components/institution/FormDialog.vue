@@ -7,7 +7,7 @@
   >
     <InstitutionForm
       ref="institutionFormRef"
-      @update:model-value="onSave"
+      @submit="onSave($event)"
     >
       <template #actions>
         <v-btn
@@ -22,7 +22,7 @@
 
 <script setup>
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const isOpen = ref(false);
@@ -37,7 +37,7 @@ async function open(institution, opts) {
 }
 
 function onSave(institution) {
-  emit('update:modelValue', institution);
+  emit('submit', institution);
   isOpen.value = false;
 }
 

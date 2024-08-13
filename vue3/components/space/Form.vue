@@ -112,7 +112,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const types = Array.from(repoColors.keys());
@@ -151,7 +151,7 @@ const { data: permissions } = await useAsyncData(
   },
 );
 
-const isEditing = computed(() => !!props.modelValue);
+const isEditing = computed(() => !!props.modelValue?.id);
 
 function applyPreset() {
   const spaceDesc = te(`spaces.descriptions.${space.value.type}`) ? t(`spaces.descriptions.${space.value.type}`) : space.value.type;
@@ -183,7 +183,7 @@ async function save() {
       })),
     });
 
-    emit('update:modelValue', newSpace);
+    emit('submit', newSpace);
   } catch (err) {
     snacks.error(t('anErrorOccurred'));
   }

@@ -400,7 +400,7 @@ institutions:
       sushi: Identifiants SUSHI
       reporting: Reporting
   sushi:
-    title: Identifiants SUSHI ({total})
+    title: Identifiants SUSHI ({count})
     pageDescription: Entrez ici les identifiants SUSHI qui serviront à moissonner
       automatiquement vos rapports COUNTER.
     pageDescription2: Seule la version 5 du protocole SUSHI est supportée.
@@ -434,33 +434,34 @@ institutions:
     enterAPIKey: Veuillez saisir une Clé API.
     comment: Commentaire
     credentials: Identifiants Sushi
-    manageNcredentials: Gérer les identifiants|Gérer {count} identifiants
-    pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres
-      supplémentaires dans la querystring, saisissez-les ci-dessous.
+    manageN:
+      Gérer les identifiants|
+      Gérer {count} identifiants
+    activeSwitch: Activer/Désactiver
+    pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.
     checkCredentials: Vérifier les identifiants
     cannotCheckCredentials: Échec de la vérification pour {name}
     resetChecks: Réinitialiser les états de connexion
-    resetNbChecks: Vous allez réinitialiser {count} état de connexion. Les identifiants
-      non testés ne sont pas pris en compte.|Vous allez réinitialiser {count} états
-      de connexion. Les identifiants non testés ne sont pas pris en compte.
+    resetNbChecks: 
+      Vous allez réinitialiser {count} état de connexion. Les identifiants non testés ne sont pas pris en compte.|
+      Vous allez réinitialiser {count} états de connexion. Les identifiants non testés ne sont pas pris en compte.
     cannotResetCheck: Impossible de réinitialiser l'état de connexion pour {name}
     connection: Connexion
     untested: Non testé
     operational: Fonctionnel
     invalidCredentials: Identifiants invalides
-    connectionSuccessful: Connexion réussie
-    connectionSuccessfulDesc: 'Un rapport de test a été téléchargé avec succès, ou
-      a généré des erreurs sans lien avec l''authentification (ex: période indisponible).'
-    connectionFailed: Connexion échouée
-    connectionFailedDesc: Un problème est survenu lors de la communication avec le
-      point d'accès. L'équipe est en contact avec l'éditeur pour en déterminer les
-      raisons.
-    connectionUnauthorized: Identifiants invalides
-    connectionUnauthorizedDesc: Un problème d'authentification a empêché le téléchargement
-      du rapport de test. Vérifiez vos identifiants.
-    connectionUntested: Connexion non testée
-    connectionUntestedDesc: L'authentification au point d'accès n'a pas encore été
-      testée.
+    connectionSuccessful:
+      title: Connexion réussie
+      desc: 'Un rapport de test a été téléchargé avec succès, ou a généré des erreurs sans lien avec l''authentification (ex: période indisponible).'
+    connectionFailed:
+      title: Connexion échouée
+      desc: Un problème est survenu lors de la communication avec le point d'accès. L'équipe est en contact avec l'éditeur pour en déterminer les raisons.
+    connectionUnauthorized:
+      title: Identifiants invalides
+      desc: Un problème d'authentification a empêché le téléchargement du rapport de test. Vérifiez vos identifiants.
+    connectionUntested:
+      title: Connexion non testée
+      desc: L'authentification au point d'accès n'a pas encore été testée.
     testedOn: Testée le {date}
     entryCompleted: Saisie terminée
     entryCompletedOn: Saisie terminée le {date}
@@ -472,13 +473,8 @@ institutions:
       Souhaitez-vous la reprendre ?
     lastHarvest: Dernier moissonnage
     readyPopup:
-      inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers
-        seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant
-        sur le bouton ci-dessous.
-      completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}.
-        Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si
-        des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton
-        ci-dessous.
+      inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.
+      completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
   unableToRetriveInformations: Impossible de récupérer les informations d'établissement
   unableToRetrivePlatforms: Impossible de récupérer les informations d'établissement
   notAttachedToAnyInstitution: Vous n'êtes rattachés à aucun établissement, où vous n'avez déclaré aucunes informations sur votre établissement.
@@ -592,7 +588,11 @@ tasks:
     index: 'Index :'
 sushi:
   credentials: Identifiants
-  credentialsCount: 1 identifiant|{count} identifiants
+  credentialsCount:
+    1 identifiant|
+    {count} identifiants
+  auth: Authentification
+  general: General
   copyId: Copier l'ID
   showFiles: Voir les fichiers
   unableToCopyId: Impossible de copier dans le presse-papier
@@ -602,16 +602,27 @@ sushi:
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants SUSHI est actuellement verrouillée.
-  nInstitutions: 1 établissement utilise cet endpoint|{count} établissements utilisent
-    cet endpoint
-  nUntestedCredentials: 1 identifiant non testé|{count} identifiants non testés
-  nInvalidCredentials: 1 identifiant invalide|{count} identifiants invalides
-  nOperationalCredentials: 1 identifiant fonctionnel|{count} identifiants fonctionnels
-  nProblematicEndpoints: 1 point d'accès problématique|{count} points d'accès problématiques
-  nErrsCredentials: 1 identifiant indique que le point d'accès est problématique|{count}
-    identifiants indiquent que le point d'accès est problématique
-  deleteNbCredentials: Vous allez supprimer {count} identifiant SUSHI.|Vous allez
-    supprimer {count} identifiants SUSHI.
+  nInstitutions: 
+    1 établissement utilise cet endpoint|
+    {count} établissements utilisent cet endpoint
+  nUntestedCredentials:
+    1 identifiant non testé|
+    {count} identifiants non testés
+  nInvalidCredentials:
+    1 identifiant invalide|
+    {count} identifiants invalides
+  nOperationalCredentials:
+    1 identifiant fonctionnel|
+    {count} identifiants fonctionnels
+  nProblematicEndpoints:
+    1 point d'accès problématique|
+    {count} points d'accès problématiques
+  nErrsCredentials:
+    1 identifiant indique que le point d'accès est problématique|
+    {count} identifiants indiquent que le point d'accès est problématique
+  deleteNbCredentials:
+    Vous allez supprimer {count} identifiant SUSHI.|
+    Vous allez supprimer {count} identifiants SUSHI.
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
   inactive: Identifiant inactif
@@ -619,6 +630,7 @@ sushi:
     donc pas moissonné.
   harvestState: État du moissonnage
   harvestedAt: Moissonné le {date}
+  checking: Vérification de la connexion de "{vendor}"
   report: Rapport
   openHelpPage: Ouvrir page d'aide
   insertedItems: "{count} éléments du rapport ont été insérés."

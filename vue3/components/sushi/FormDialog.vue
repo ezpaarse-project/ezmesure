@@ -1,43 +1,46 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    width="1100"
+    width="800"
     scrollable
     persistent
   >
-    <SpaceForm
-      ref="spaceFormRef"
-      :model-value="space"
+    <SushiForm
+      ref="sushiFormRef"
+      :model-value="sushi"
       :institution="institution"
       @submit="onSave($event)"
+      @update:model-value="$emit('update:model-value', $event)"
     >
-      <template #actions>
+      <template #actions="{ loading }">
         <v-btn
           :text="$t('cancel')"
+          :disabled="loading"
           variant="text"
           @click="isOpen = false"
         />
       </template>
-    </SpaceForm>
+    </SushiForm>
   </v-dialog>
 </template>
 
 <script setup>
 const emit = defineEmits({
   submit: (item) => !!item,
+  'update:model-value': (item) => !!item?.connection?.status,
 });
 
 const isOpen = ref(false);
 /** @type {Ref<object | undefined>} */
-const space = ref(undefined);
+const sushi = ref(undefined);
 /** @type {Ref<object | undefined>} */
 const institution = ref(undefined);
 
-/** @type {Ref<object | null>} Vue ref of the space form */
-const spaceFormRef = ref(null);
+/** @type {Ref<Object | null>} Vue ref of the sushi form */
+const sushiFormRef = ref(null);
 
 async function open(s, opts) {
-  space.value = s;
+  sushi.value = s;
   institution.value = opts.institution;
   isOpen.value = true;
 }

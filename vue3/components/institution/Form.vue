@@ -285,7 +285,7 @@
 import defaultLogo from '@/static/images/logo-etab.png';
 
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9_.-]*$/;
@@ -416,7 +416,7 @@ async function save() {
 
   snacks.success(t('institutions.institution.updated'));
   loading.value = false;
-  emit('update:modelValue', institution.value);
+  emit('submit', institution.value);
 }
 
 /**

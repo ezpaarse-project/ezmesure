@@ -1,23 +1,24 @@
 <template>
   <v-combobox
-    :value="modelValue.pattern"
+    :value="modelValue?.pattern"
     :label="`${$t('repositories.pattern')} *`"
     :items="availableRepositories ?? []"
     :rules="[
       () => !!modelValue.pattern || $t('fieldIsRequired'),
       () => /^[a-z0-9*_-]+$/i.test(modelValue.pattern) || $t('invalidFormat'),
     ]"
+    :loading="status === 'pending'"
     :error="!!error"
     :error-messages="error?.message"
-    no-filter
     item-title="pattern"
+    item-value="pattern"
     prepend-icon="mdi-form-textbox"
     variant="underlined"
     hide-details="auto"
+    no-filter
     required
     return-object
-    @update:model-value="$emit('update:modelValue', $event)"
-    @update:search="debouncedRefresh()"
+    @update:model-value="$emit('update:modelValue', $event); debouncedRefresh()"
   >
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
@@ -56,6 +57,7 @@ const pattern = computed(() => props.modelValue?.pattern);
 const {
   error,
   refresh,
+  status,
   data: availableRepositories,
 } = await useFetch('/api/repositories', {
   query: {

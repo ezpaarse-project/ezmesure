@@ -9,7 +9,7 @@
       ref="repositoryFormRef"
       :completion="completion"
       :institution="institution"
-      @update:model-value="onSave"
+      @submit="onSave($event)"
     >
       <template #actions>
         <v-btn
@@ -31,7 +31,7 @@ defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (item) => !!item,
+  submit: (item) => !!item,
 });
 
 const isOpen = ref(false);
@@ -47,7 +47,7 @@ async function open(opts) {
 }
 
 function onSave(repository) {
-  emit('update:modelValue', repository);
+  emit('submit', repository);
   isOpen.value = false;
 }
 

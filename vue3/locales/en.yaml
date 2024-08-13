@@ -390,7 +390,7 @@ institutions:
       memberships: Members
       sushi: SUSHI credentials
   sushi:
-    title: SUSHI credentials ({total})
+    title: SUSHI credentials ({count})
     pageDescription: Here you can enter the SUSHI credentials that will be used to
       automatically harvest your COUNTER reports.
     pageDescription2: Only version 5 of the SUSHI protocol is supported.
@@ -423,30 +423,32 @@ institutions:
     enterAPIKey: Please enter an API Key.
     comment: Comment
     credentials: Sushi credentials
-    manageNcredentials: Manage credentials|Manage {count} credentials
-    pleaseEnterParams: If requests to the Sushi endpoint require additional parameters
-      in the querystring, enter them below.
+    manageN:
+      Manage credentials|
+      Manage {count} credentials
+    activeSwitch: Activate/Deactivate
+    pleaseEnterParams: If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.
     checkCredentials: Check credentials
     cannotCheckCredentials: Failed to check credentials of {name}
     resetChecks: Reset connection status
-    resetNbChecks: You will reset {count} connection states. Untested identifiers
-      are not taken into account.
+    resetNbChecks: You will reset {count} connection states. Untested identifiers are not taken into account.
     cannotResetCheck: Failed to reset connection status for {name}
     connection: Connection
     untested: Untested
     operational: Operational
     invalidCredentials: Invalid credentials
-    connectionSuccessful: Successful connection
-    connectionSuccessfulDesc: 'A test report has been successfuly downloaded, or generated
-      errors that are not related to authentication (ex: unavailable period).'
-    connectionFailed: Connection failed
-    connectionFailedDesc: An error occurred when communicating with the endpoint.
-      The team is in contact with the publisher to find out why.
-    connectionUnauthorized: Invalid credentials
-    connectionUnauthorizedDesc: An authentication issue prevented the test report
-      from being downloaded. Check your credentials.
-    connectionUntested: Connection untested
-    connectionUntestedDesc: Authentication to the endpoint has not been tested yet.
+    connectionSuccessful:
+      title: Successful connection
+      desc: 'A test report has been successfuly downloaded, or generated errors that are not related to authentication (ex: unavailable period).'
+    connectionFailed:
+      title: Connection failed
+      desc: An error occurred when communicating with the endpoint. The team is in contact with the publisher to find out why.
+    connectionUnauthorized:
+      title: Invalid credentials
+      desc: An authentication issue prevented the test report from being downloaded. Check your credentials.
+    connectionUntested:
+      title: Connection untested
+      desc: Authentication to the endpoint has not been tested yet.
     testedOn: Tested on {date}
     entryCompleted: Entry completed
     entryCompletedOn: Entry completed on {date}
@@ -454,20 +456,14 @@ institutions:
     resumeMyEntry: Resume my entry
     validateMyCredentials: Validate my credentials
     resumeEntryQuestion: Resume your entry ?
-    resumeEntryDesc: You have declared the completion of your credentials on {date}.
-      Do you want to resume your entry ?
+    resumeEntryDesc: You have declared the completion of your credentials on {date}. Do you want to resume your entry ?
     lastHarvest: Last harvest
     readyPopup:
-      inProgress: Your credentials are still being entered. When they are ready to
-        be harvested, declare the completion of your entry by clicking on the button
-        below.
-      completed: You have declared the completion of your credentials on {date}. These
-        will be eligible to be included in future harvesting rounds. If adjustments
-        are still needed, please declare it by clicking on the button below.
+      inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
+      completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
   unableToRetriveInformations: Unable to retrieve institution information
   unableToRetrivePlatforms: Unable to retrieve plateform information
-  notAttachedToAnyInstitution: You are not attached to any institution, where you
-    have not declared any information about your institution.
+  notAttachedToAnyInstitution: You are not attached to any institution, where you have not declared any information about your institution.
   reportInstitutionInformation: Report institution information.
 components:
   components: Components
@@ -575,6 +571,8 @@ tasks:
 sushi:
   credentials: Credentials
   credentialsCount: "{count} credentials"
+  auth: Authentication
+  general: General
   copyId: Copy ID
   showFiles: View files
   unableToCopyId: Unable to copy in the clipboard
@@ -584,21 +582,26 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: SUSHI credentials management is currently locked.
-  nInstitutions: 1 institution use this endpoint|{count} institutions use this endpoint
+  nInstitutions:
+    1 institution use this endpoint|
+    {count} institutions use this endpoint
   nUntestedCredentials: "{count} untested credentials"
   nInvalidCredentials: "{count} invalid credentials"
   nOperationalCredentials: "{count} operational credentials"
-  nProblematicEndpoints: 1 problematic endpoint|{count} problematic endpoints
-  nErrsCredentials: 1 credential show that endpoint is problematic|{count} credentials
-    show that endpoint is problematic
+  nProblematicEndpoints: 
+    1 problematic endpoint|
+    {count} problematic endpoints
+  nErrsCredentials:
+    1 credential show that endpoint is problematic|
+    {count} credentials show that endpoint is problematic
   deleteNbCredentials: You are about to delete {number} SUSHI credentials.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
   harvestedAt: Harvested on {date}
   inactive: Inactive credentials
-  inactiveDescription: Institution made theses credentials inactive and will not be
-    harvested.
+  inactiveDescription: Institution made theses credentials inactive and will not be harvested.
+  checking: Checking connection with "{vendor}"
   report: Report
   openHelpPage: Open help page
   insertedItems: "{count} report items have been inserted."

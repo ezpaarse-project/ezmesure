@@ -14,3 +14,10 @@ export const roleColors = new Map([
   ['contact:doc', { color: 'green', icon: 'mdi-book-open-variant' }],
   ['guest', { icon: 'mdi-badge-account' }],
 ]);
+
+export const sushiStatus = new Map([
+  ['success', { color: 'green', icon: 'mdi-check' }],
+  ['failed', { color: 'red', icon: 'mdi-close' }],
+  ['unauthorized', { color: 'orange', icon: 'mdi-key-alert-outline' }],
+  ['untested', { color: 'grey', icon: 'mdi-lan-pending' }],
+]);
