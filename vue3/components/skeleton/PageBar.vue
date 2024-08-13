@@ -16,9 +16,19 @@
     <template #append>
       <slot />
 
+      <SkeletonFilterButton
+        v-if="$slots['filters-panel']"
+        v-model="filtersValue"
+        :icon-btn="filtersIconBtn"
+      >
+        <template #panel="panel">
+          <slot name="filters-panel" v-bind="panel" />
+        </template>
+      </SkeletonFilterButton>
+
       <v-text-field
-        v-if="showSearch"
-        :model-value="search"
+        v-if="search !== false"
+        v-model="searchValue"
         :placeholder="$t('search')"
         append-inner-icon="mdi-magnify"
         variant="outlined"
@@ -26,31 +36,61 @@
         width="200"
         hide-details
         class="mr-2"
-        @update:model-value="$emit('update:search', $event)"
       />
     </template>
   </v-toolbar>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default: () => undefined,
+  },
   title: {
     type: String,
     default: undefined,
   },
-  showSearch: {
+  search: {
+    type: [Boolean, String],
+    default: false,
+  },
+  filtersIconBtn: {
     type: Boolean,
     default: false,
   },
-  search: {
-    type: String,
-    default: undefined,
-  },
 });
 
-defineEmits({
-  'update:search': (value) => value != null,
+const emit = defineEmits({
+  'update:modelValue': (value) => true,
+  'update:search': (value) => value.length >= 0,
+  'update:filters': (value) => !!value,
 });
 
 const { toggle } = useDrawerStore();
+
+const searchValue = computed({
+  get: () => {
+    if (typeof props.search === 'string') {
+      return props.search;
+    }
+    return props.modelValue?.search ?? '';
+  },
+  set: (v) => {
+    emit('update:search', v);
+    emit('update:modelValue', { ...(props.modelValue ?? {}), search: v });
+  },
+});
+
+const filtersValue = computed({
+  get: () => ({
+    ...(props.modelValue ?? {}),
+    page: undefined,
+    sortBy: undefined,
+    include: undefined,
+  }),
+  set: (v) => {
+    emit('update:modelValue', { ...(props.modelValue ?? {}), ...v });
+  },
+});
 </script>

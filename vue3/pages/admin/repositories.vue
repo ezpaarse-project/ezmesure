@@ -1,10 +1,11 @@
 <template>
   <div>
     <SkeletonPageBar
-      v-model:search="query.search"
+      v-model="query"
       :title="toolbarTitle"
-      show-search
-      @update:search="debouncedRefresh()"
+      search
+      filters-icon-btn
+      @update:model-value="debouncedRefresh()"
     >
       <v-btn
         v-if="repositoryFormRef"
@@ -25,15 +26,6 @@
         color="primary"
         class="mr-2"
         @click="refresh()"
-      />
-      <v-btn
-        v-tooltip="$t('filter')"
-        icon="mdi-filter"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-2"
-        @click="() => {}"
       />
     </SkeletonPageBar>
 

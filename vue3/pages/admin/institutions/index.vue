@@ -1,10 +1,11 @@
 <template>
   <div>
     <SkeletonPageBar
-      v-model:search="query.search"
+      v-model="query"
       :title="toolbarTitle"
-      show-search
-      @update:search="debouncedRefresh()"
+      search
+      filters-icon-btn
+      @update:model-value="debouncedRefresh()"
     >
       <v-btn
         v-if="institutionFormRef"
@@ -25,15 +26,6 @@
         color="primary"
         class="mr-2"
         @click="refresh()"
-      />
-      <v-btn
-        v-tooltip="$t('filter')"
-        icon="mdi-filter"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-2"
-        @click="() => {}"
       />
     </SkeletonPageBar>
 
@@ -64,6 +56,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!institutionComponentsDialogRef"
           prepend-icon="mdi-family-tree"
           size="small"
           @click="institutionComponentsDialogRef?.open(item)"
@@ -74,6 +67,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!institutionRepositoriesDialogRef"
           prepend-icon="mdi-database-outline"
           size="small"
           @click="institutionRepositoriesDialogRef?.open(item)"
@@ -84,6 +78,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!institutionSpacesDialogRef"
           prepend-icon="mdi-tab"
           size="small"
           @click="institutionSpacesDialogRef?.open(item)"
@@ -105,7 +100,7 @@
           :title="$t('areYouSure')"
           :text="$t('institutions.validateNbInstitutions', 1)"
           :agree-text="$t('confirm')"
-          :agree="() => activateInstitutions([item])"
+          :agree="() => toggleInstitutions([item])"
           location="bottom start"
         >
           <template #activator="{ props }">
@@ -187,10 +182,13 @@
           prepend-icon="mdi-delete"
           @click="deleteInstitutions()"
         />
+
+        <v-divider />
+
         <v-list-item
           :title="$t('institutions.validateSwitch')"
           prepend-icon="mdi-check"
-          @click="activateInstitutions()"
+          @click="toggleInstitutions()"
         />
       </template>
     </SelectionMenu>
@@ -399,7 +397,7 @@ function deleteInstitutions(items) {
   });
 }
 
-function activateInstitutions(items) {
+function toggleInstitutions(items) {
   const toActivate = items || selectedInstitutions.value;
   if (toActivate.length <= 0) {
     return;

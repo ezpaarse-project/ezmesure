@@ -8,9 +8,9 @@
   />
   <div v-else>
     <SkeletonPageBar
-      v-model:search="query.search"
-      show-search
-      @update:search="debouncedRefresh()"
+      v-model="query"
+      search
+      @update:model-value="debouncedRefresh()"
     >
       <template #title>
         <InstitutionBreadcrumbs :institution="institution" :current="toolbarTitle" />
@@ -23,6 +23,7 @@
         <template #activator="{ props }">
           <v-btn
             :text="$t('add')"
+            :disabled="!canEdit"
             prepend-icon="mdi-plus"
             variant="tonal"
             color="green"
@@ -39,14 +40,6 @@
         color="primary"
         class="mr-2"
         @click="refresh()"
-      />
-      <v-btn
-        :text="$t('filter')"
-        prepend-icon="mdi-filter"
-        variant="tonal"
-        color="primary"
-        class="mr-2"
-        @click="() => {}"
       />
     </SkeletonPageBar>
 
@@ -75,6 +68,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!canEdit || !membershipFormDialogRef"
           prepend-icon="mdi-database-outline"
           size="small"
           @click="membershipFormDialogRef?.open(item, { institution })"
@@ -85,6 +79,7 @@
         <v-chip
           :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!canEdit || !membershipFormDialogRef"
           prepend-icon="mdi-tab"
           size="small"
           @click="membershipFormDialogRef?.open(item, { institution })"
@@ -105,6 +100,7 @@
           <v-list>
             <v-list-item
               :title="$t('revoke')"
+              :disabled="!canEdit"
               prepend-icon="mdi-account-off"
               @click="deleteMembers([item])"
             />
@@ -114,6 +110,7 @@
             <v-list-item
               v-if="membershipFormDialogRef"
               :title="$t('institutions.members.changePermissions')"
+              :disabled="!canEdit"
               prepend-icon="mdi-shield"
               @click="membershipFormDialogRef.open(item, { institution })"
             />
@@ -129,6 +126,7 @@
       <template #actions>
         <v-list-item
           :title="$t('revoke')"
+          :disabled="!canEdit"
           prepend-icon="mdi-account-off"
           @click="deleteMembers()"
         />
@@ -249,9 +247,8 @@ const headers = computed(() => [
     title: t('actions'),
     value: 'actions',
     align: 'center',
-    visible: canEdit.value,
   },
-].filter((h) => h.visible !== false));
+]);
 /**
  * Toolbar title
  */
