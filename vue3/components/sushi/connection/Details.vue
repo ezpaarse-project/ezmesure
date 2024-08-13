@@ -30,7 +30,31 @@
           <p class="text-subtitle-2">
             {{ $t('sushi.messagesFromEndpoint') }}
           </p>
-          <!-- <LogsPreview> -->
+
+          <SushiHarvestLogs
+            :model-value="modelValue?.exceptions"
+            item-value="Severity"
+            item-text="Message"
+          >
+            <template #text="{ item: { raw }, value }">
+              <span>{{ value }}</span>
+
+              <span v-if="raw.Data" class="text-grey">
+                ({{ raw.Data }})
+              </span>
+
+              <v-btn
+                v-if="raw.Help_URL"
+                :href="raw.Help_URL"
+                :text="$('sushi.openHelpPage')"
+                append-icon="mdi-open-in-new"
+                color="accent"
+                size="x-small"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            </template>
+          </SushiHarvestLogs>
         </v-col>
       </v-row>
     </template>
