@@ -8,6 +8,8 @@
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+
+      <SkeletonSushiQueueStatus />
     </ClientOnly>
   </v-app>
 </template>
