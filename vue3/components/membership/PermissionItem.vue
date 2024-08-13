@@ -2,7 +2,7 @@
   <v-list-item :title="feature.text">
     <template #append>
       <v-slide-x-reverse-transition>
-        <v-icon v-if="success" icon="mdi-check" color="success" />
+        <v-icon v-if="success" icon="mdi-check" color="success" start />
       </v-slide-x-reverse-transition>
 
       <PermissionSwitch

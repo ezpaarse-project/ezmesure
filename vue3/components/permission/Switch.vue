@@ -15,9 +15,7 @@
         size="small"
         variant="outlined"
       >
-        <v-icon size="x-large">
-          {{ level.icon }}
-        </v-icon>
+        <v-icon :icon="level.icon" size="x-large" />
       </v-btn>
     </template>
 
@@ -29,9 +27,7 @@
         size="small"
         variant="outlined"
       >
-        <v-icon size="x-large" class="mr-2">
-          {{ level.icon }}
-        </v-icon>
+        <v-icon :icon="level.icon" size="x-large" start />
 
         {{ level.text }}
       </v-btn>
