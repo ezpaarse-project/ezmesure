@@ -87,8 +87,8 @@
     </v-data-table-server>
 
     <SelectionMenu
+      v-model="selectedRepositories"
       :text="$t('repositories.manageRepositories', selectedRepositories.length)"
-      :selected="selectedRepositories"
     >
       <template #actions>
         <v-list-item
@@ -101,7 +101,7 @@
 
     <RepositoryFormDialog
       ref="repositoryFormRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
 
     <RepositoryInstitutionsDialog

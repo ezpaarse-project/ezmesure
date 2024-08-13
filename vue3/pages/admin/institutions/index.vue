@@ -173,8 +173,8 @@
     </v-data-table-server>
 
     <SelectionMenu
+      v-model="selectedInstitutions"
       :text="$t('institutions.manageN', selectedInstitutions.length)"
-      :selected="selectedInstitutions"
     >
       <template #actions>
         <v-list-item

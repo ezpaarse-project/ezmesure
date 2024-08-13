@@ -3,7 +3,7 @@
     <template #activator="{ props: menu }">
       <v-slide-y-reverse-transition>
         <v-btn
-          v-show="selected.length > 0"
+          v-show="modelValue.length > 0"
           :text="text"
           :prepend-icon="open ? 'mdi-chevron-down' : 'mdi-chevron-up'"
           color="primary"
@@ -18,13 +18,21 @@
 
     <v-list>
       <slot name="actions" />
+
+      <v-divider v-if="$slots.actions" />
+
+      <v-list-item
+        :title="$t('deselect')"
+        prepend-icon="mdi-close"
+        @click="$emit('update:modelValue', [])"
+      />
     </v-list>
   </v-menu>
 </template>
 
 <script setup>
 defineProps({
-  selected: {
+  modelValue: {
     type: Array,
     default: () => [],
   },
@@ -32,6 +40,10 @@ defineProps({
     type: String,
     default: '',
   },
+});
+
+defineEmits({
+  'update:modelValue': (selection) => selection.length >= 0,
 });
 
 const open = ref(false);
