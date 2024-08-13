@@ -4,6 +4,7 @@ import {
   useAsyncData,
   useI18n,
   useSnacksStore,
+  useLocalStorage,
 } from '#imports';
 
 /**
@@ -32,6 +33,8 @@ export default async function useServerSidePagination(params = {}) {
 
   const sortMapping = new Map(Object.entries(params.sortMapping ?? {}));
 
+  const itemsPerPage = useLocalStorage('ezm.itemsPerPage', params.data?.itemsPerPage ?? 10);
+
   /**
    * Unpaginated item counts in API
    */
@@ -45,7 +48,6 @@ export default async function useServerSidePagination(params = {}) {
    */
   const query = ref({
     page: 1,
-    itemsPerPage: 10,
     sortBy: [{
       key: 'createdAt',
       order: 'asc',
@@ -66,7 +68,6 @@ export default async function useServerSidePagination(params = {}) {
         const queryKey = fetchOpts.params ? 'params' : 'query';
 
         const {
-          itemsPerPage,
           search,
           sortBy,
           ...queryParams
@@ -78,7 +79,7 @@ export default async function useServerSidePagination(params = {}) {
           ...(fetchOpts?.[queryKey] ?? {}),
           ...queryParams,
           page: query.value.page,
-          size: Math.max(query.value.itemsPerPage, 0),
+          size: Math.max(itemsPerPage.value, 0),
           q: query.value.search,
           order: sortBy?.[0]?.order,
           sort,
@@ -102,6 +103,17 @@ export default async function useServerSidePagination(params = {}) {
     params.async,
   );
 
+  const onDataTableOptionsUpdate = ({ size, ...data }) => {
+    if (Number.isInteger(size)) {
+      itemsPerPage.value = size;
+    }
+    query.value = {
+      ...query.value,
+      ...data,
+    };
+    return asyncData.refresh();
+  };
+
   /**
    * Options to bind to `v-data-table`
    */
@@ -110,16 +122,13 @@ export default async function useServerSidePagination(params = {}) {
     loading: asyncData.status.value === 'pending',
     page: query.value.page,
     itemsLength: itemLength.value.current,
-    itemsPerPage: query.value.itemsPerPage,
+    itemsPerPage: itemsPerPage.value,
     sortBy: query.value.sortBy,
 
-    'onUpdate:options': (data) => {
-      query.value = {
-        ...query.value,
-        ...data,
-      };
-      return asyncData.refresh();
-    },
+    'onUpdate:page': (page) => onDataTableOptionsUpdate({ page }),
+    'onUpdate:sortBy': (sortBy) => onDataTableOptionsUpdate({ sortBy }),
+    'onUpdate:search': (search) => onDataTableOptionsUpdate({ search }),
+    'onUpdate:itemsPerPage': (size) => onDataTableOptionsUpdate({ size }),
   }));
 
   return {
