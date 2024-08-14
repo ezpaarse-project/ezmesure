@@ -598,6 +598,7 @@ sushi:
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
+  harvestStateDescription: This matrix shows the different results of the harvesting of those credentials. Each result can be hovered to get more information, including any errors that may have occurred while retrieving the data.
   harvestedAt: Harvested on {date}
   inactive: Inactive credentials
   inactiveDescription: Institution made theses credentials inactive and will not be harvested.
@@ -608,6 +609,9 @@ sushi:
   updatedItems: "{count} report items have been updated."
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: 'Messages from the endpoint:'
+  noMatrix:
+    title: No harvested report for these credentials on this period
+    description: These credentials have not yet been harvested for this period. Please validate your SUSHI credentials to be harvested in the future by the administration team.
   paramScopes:
     all: All requests to the endpoint
     report_list: Report list

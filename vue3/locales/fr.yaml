@@ -629,6 +629,7 @@ sushi:
   inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera
     donc pas moissonné.
   harvestState: État du moissonnage
+  harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
   harvestedAt: Moissonné le {date}
   checking: Vérification de la connexion de "{vendor}"
   report: Rapport
@@ -637,6 +638,9 @@ sushi:
   updatedItems: "{count} éléments du rapport ont été mis à jour."
   failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  noMatrix:
+    title: Aucun rapport moissonné pour ces identifiants sur cette période
+    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants SUSHI pour être moissonné prochainement par l'équipe d'administration.
   paramScopes:
     all: Toutes les requêtes au point d'accès
     report_list: Listing des rapports

@@ -185,7 +185,7 @@
         <SushiConnectionChip
           :sushi="item"
           :disabled="isLocked"
-          @update:model-value="item.connection = $event"
+          @update:model-value="item.connection = $event; debouncedRefresh()"
         />
       </template>
 
@@ -193,6 +193,7 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
+          @click:harvest="harvestMatrix?.open(item, { period: $event.period })"
         />
       </template>
 
@@ -263,6 +264,12 @@
               @click="resetConnections([item])"
             />
             <v-list-item
+              v-if="harvestMatrix"
+              :title="$t('sushi.harvestState')"
+              prepend-icon="mdi-table-headers-eye"
+              @click="harvestMatrix?.open(item)"
+            />
+            <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
               prepend-icon="mdi-identifier"
@@ -320,6 +327,8 @@
       @submit="refresh()"
       @update:model-value="onSushiUpdate($event)"
     />
+
+    <SushiHarvestMatrixDialog ref="harvestMatrix" />
   </div>
 </template>
 
@@ -344,7 +353,7 @@ const activeLoadingMap = ref(new Map());
 /** @type {Ref<Object | null>} Vue ref of the sushi form */
 const sushiFormRef = ref(null);
 /** @type {Ref<Object | null>} Vue ref of the harvest state */
-const harvestStateRef = ref(null);
+const harvestMatrix = ref(null);
 /** @type {Ref<Object | null>} Vue ref of the report list */
 const reportsRef = ref(null);
 /** @type {Ref<Object | null>} Vue ref of the file list */
@@ -363,7 +372,6 @@ const {
 } = await useFetch('/api/sushi/_lock');
 
 const {
-  status,
   refresh: sushisRefresh,
   itemLength,
   query,
@@ -375,10 +383,6 @@ const {
   },
   async: {
     lazy: true, // Don't block page load
-  },
-  sortMapping: {
-    repositoryPermissions: 'repositoryPermissions._count',
-    spacePermissions: 'spacePermissions._count',
   },
   data: {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
@@ -590,6 +594,7 @@ function checkConnections(items) {
       onComplete: (err, connection) => {
         if (connection) {
           item.connection = connection;
+          debouncedRefresh();
         }
       },
     });

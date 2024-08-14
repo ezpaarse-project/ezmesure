@@ -7,6 +7,12 @@ import {
 } from '#imports';
 
 /**
+ * @typedef {import('date-fns').FormatDateOptions} FormatDateOptions
+ * @typedef {import('date-fns').FormatDistanceOptions} FormatDistanceOptions
+ * @typedef {Date | number | string} DateType
+ */
+
+/**
  * Get the formatted date according to the string of tokens passed in in the current locale.
  *
  * @see https://date-fns.org/docs/format

@@ -21,3 +21,13 @@ export const sushiStatus = new Map([
   ['unauthorized', { color: 'orange', icon: 'mdi-key-alert-outline' }],
   ['untested', { color: 'grey', icon: 'mdi-lan-pending' }],
 ]);
+
+export const harvestStatus = new Map([
+  ['finished', { color: 'green', icon: 'mdi-check' }],
+  ['running', { color: 'blue', icon: 'mdi-play' }],
+  ['delayed', { color: 'blue', icon: 'mdi-update' }],
+  ['failed', { color: 'red', icon: 'mdi-exclamation' }],
+  ['interrupted', { color: 'red', icon: 'mdi-progress-close' }],
+  ['cancelled', { color: 'red', icon: 'mdi-cancel' }],
+  ['waiting', { color: 'grey', icon: 'mdi-clock-outline' }],
+]);

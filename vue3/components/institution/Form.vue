@@ -282,6 +282,7 @@
 </template>
 
 <script setup>
+import { fileToBase64 } from '@/lib/base64';
 import defaultLogo from '@/static/images/logo-etab.png';
 
 const emit = defineEmits({
