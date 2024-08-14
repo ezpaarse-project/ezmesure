@@ -1,13 +1,10 @@
 <template>
   <v-card
     :title="$t('sushi.harvestState')"
+    :loading="status === 'pending'"
     prepend-icon="mdi-table-headers-eye"
   >
     <template #subtitle>
-      <div v-if="institution" class="mb-1">
-        {{ institution.name }}
-      </div>
-
       <div v-if="sushi?.endpoint">
         {{ sushi.endpoint.vendor }}
         -
@@ -26,7 +23,7 @@
     <template #append>
       <v-btn
         :text="$t('refresh')"
-        :loading="status === 'loading'"
+        :loading="status === 'pending'"
         prepend-icon="mdi-reload"
         variant="tonal"
         color="primary"
@@ -47,7 +44,7 @@
       <v-row>
         <v-col class="d-flex justify-center align-center">
           <v-btn
-            :disabled="status === 'loading'"
+            :disabled="status === 'pending'"
             color="primary"
             variant="text"
             density="comfortable"
@@ -60,7 +57,7 @@
           </span>
 
           <v-btn
-            :disabled="status === 'loading' || periodAsYear >= now.getFullYear()"
+            :disabled="status === 'pending' || periodAsYear >= now.getFullYear()"
             color="primary"
             variant="text"
             density="comfortable"
@@ -127,10 +124,6 @@ const props = defineProps({
     default: () => undefined,
   },
   sushi: {
-    type: Object,
-    default: () => undefined,
-  },
-  institution: {
     type: Object,
     default: () => undefined,
   },

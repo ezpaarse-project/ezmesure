@@ -270,6 +270,12 @@
               @click="harvestMatrix?.open(item)"
             />
             <v-list-item
+              v-if="reportsRef"
+              :title="$t('reports.supportedReports')"
+              prepend-icon="mdi-file-search"
+              @click="reportsRef?.open(item)"
+            />
+            <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
               prepend-icon="mdi-identifier"
@@ -329,6 +335,8 @@
     />
 
     <SushiHarvestMatrixDialog ref="harvestMatrix" />
+
+    <SushiReportsDialog ref="reportsRef" />
   </div>
 </template>
 

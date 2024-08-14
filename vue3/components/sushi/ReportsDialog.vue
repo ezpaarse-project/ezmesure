@@ -1,13 +1,10 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    width="1400"
+    width="800"
     scrollable
   >
-    <SushiHarvestMatrix
-      :sushi="sushi"
-      :period="period"
-    >
+    <SushiReports :sushi="sushi">
       <template #actions>
         <v-btn
           :text="$t('close')"
@@ -15,7 +12,7 @@
           @click="isOpen = false"
         />
       </template>
-    </SushiHarvestMatrix>
+    </SushiReports>
   </v-dialog>
 </template>
 
@@ -23,12 +20,9 @@
 const isOpen = ref(false);
 /** @type {Ref<object | undefined>} */
 const sushi = ref(undefined);
-/** @type {Ref<string | undefined>} */
-const period = ref(undefined);
 
-async function open(s, opts) {
+async function open(s) {
   sushi.value = s;
-  period.value = opts?.period;
   isOpen.value = true;
 }
 

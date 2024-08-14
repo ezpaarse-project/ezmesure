@@ -7,7 +7,7 @@
     </v-row>
 
     <v-container class="fill-height">
-      <v-row v-if="status === 'loading'">
+      <v-row v-if="status === 'pending'">
         <v-progress-circular
           size="64"
           color="primary"
