@@ -112,7 +112,7 @@ services:
       - REPORTING_SMTP_REJECT_UNAUTHORIZED
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report:1.0.0
+    image: ghcr.io/ezpaarse-project/ezreeport-report
     ports:
       - 8888:8080
     environment:
@@ -156,7 +156,7 @@ services:
     restart: "no"
 
   reporting-mail:
-    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.0.0
+    image: ghcr.io/ezpaarse-project/ezreeport-mail
     environment:
       # node
       - NODE_ENV

@@ -256,7 +256,7 @@ services:
     restart: unless-stopped
 
   reporting-mail:
-    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.2.1
+    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.2.2
     environment:
       # node
       - NODE_ENV
