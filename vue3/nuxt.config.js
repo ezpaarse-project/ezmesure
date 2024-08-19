@@ -15,11 +15,15 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@pinia/nuxt',
     '@nuxtjs/i18n',
+    'vuetify-nuxt-module',
+    '@pinia/nuxt',
     '@sidebase/nuxt-auth',
     '@vueuse/nuxt',
-    'vuetify-nuxt-module',
+  ],
+
+  plugins: [
+    '~/plugins/vuetify',
   ],
 
   i18n: i18nOptions,
