@@ -9,22 +9,9 @@ module.exports = {
     '@vue/eslint-config-airbnb',
     '@nuxt/eslint-config',
   ],
-  overrides: [
-    {
-      // allow extraneous dependencies for dev files
-      files: ['nuxt.config.js', '.eslintrc.cjs'],
-      rules: {
-        'import/no-extraneous-dependencies': 'off',
-      },
-    },
-    {
-      // allow non default exports for stores
-      files: ['store/**'],
-      rules: {
-        'import/prefer-default-export': 'off',
-      },
-    },
-  ],
+  rules: {
+    'import/no-extraneous-dependencies': 'off',
+  },
   settings: {
     ...createAliasSetting({
       '@': `${path.resolve(__dirname, './')}`,

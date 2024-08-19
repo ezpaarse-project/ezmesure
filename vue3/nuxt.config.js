@@ -2,6 +2,7 @@ import { defineNuxtConfig } from 'nuxt/config';
 
 import authOptions from './app/auth.options';
 import i18nOptions from './app/i18n.options';
+import vuetifyOptions from './app/vuetify.options';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -18,10 +19,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@sidebase/nuxt-auth',
     '@vueuse/nuxt',
-  ],
-
-  plugins: [
-    '~/plugins/vuetify',
+    'vuetify-nuxt-module',
   ],
 
   i18n: i18nOptions,
@@ -32,10 +30,7 @@ export default defineNuxtConfig({
 
   auth: authOptions,
 
-  css: [
-    'vuetify/lib/styles/main.sass',
-    '@mdi/font/css/materialdesignicons.min.css',
-  ],
+  vuetify: vuetifyOptions,
 
   // pageTransition: 'fade-transition',
   // loading: { color: '#3B8070' },
@@ -46,10 +41,6 @@ export default defineNuxtConfig({
 
   ssr: false,
   telemetry: false,
-
-  build: {
-    transpile: ['vuetify'],
-  },
 
   devtools: {
     enabled: true,
