@@ -187,6 +187,7 @@ Represent the execution of a harvest job
 | sushiExceptions | `Json[]`           | SUSHI exceptions returned by the endpoint (format: { code: string, severity: string, message: string }) |            |          |
 | logs            | `Log[]`            | Job logs                                                                                                |            |          |
 | steps           | `Step[]`           | Job steps                                                                                               |            |          |
+| harvests        | `Harvest[]`        | States affected by current job                                                                          |            |          |
 
 ### Harvest
 
@@ -204,6 +205,7 @@ Harvest state of a SUSHI item, for a specific month and report ID
 | insertedItems   | `Int`              | Number of report items that were successfuly inserted into Elasticsearch                                |            | `0`     |
 | updatedItems    | `Int`              | Number of report items that were updated in Elasticsearch                                               |            | `0`     |
 | failedItems     | `Int`              | Number of report items that failed to be inserted into Elasticsearch                                    |            | `0`     |
+| harvestedBy     | `HarvestJob?`      | Job that harvested current state                                                                        |            |         |
 
 ### Log
 
@@ -248,6 +250,8 @@ A SUSHI endpoint
 | description               | `String?`            | Description of the endpoint                                                                       |            |          |
 | counterVersion            | `String?`            | Counter version of the SUSHI service                                                              |            |          |
 | technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                   |            |          |
+| active                    | `Boolean`            | Whether the endpoint is active and can be harvested                                               |            | `true`   |
+| activeUpdatedAt           | `DateTime`           | Date on which the active status was last modified                                                 |            | `now()`  |
 | requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                                       |            | `false`  |
 | requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                                      |            | `false`  |
 | requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                          |            | `false`  |
@@ -261,6 +265,7 @@ A SUSHI endpoint
 | ignoredReports            | `String[]`           | List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
 | additionalReports         | `String[]`           | Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
 | supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                                      |            |          |
+| harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")             |            |          |
 | testedReport              | `String?`            | Report used when testing endpoint                                                                 |            |          |
 | credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                    |            |          |
 | params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                      |            |          |
@@ -269,20 +274,22 @@ A SUSHI endpoint
 
 A set of SUSHI credentials, associated to a SUSHI endpoint
 
-| Property    | Type            | Description                                                                                              | Attributes | Default  |
-|-------------|-----------------|----------------------------------------------------------------------------------------------------------|------------|----------|
-| id          | `String`        | ID of the SUSHI credentials                                                                              | Id         | `cuid()` |
-| createdAt   | `DateTime`      | Creation date                                                                                            |            | `now()`  |
-| updatedAt   | `DateTime`      | Latest update date                                                                                       |            |          |
-| customerId  | `String?`       | Value of the customer_id parameter                                                                       |            |          |
-| requestorId | `String?`       | Value of the requestor_id parameter                                                                      |            |          |
-| apiKey      | `String?`       | Value of the api_key parameter                                                                           |            |          |
-| comment     | `String?`       | Abritrary comment about the credentials                                                                  |            |          |
-| packages    | `String[]`      | Packages (profiles, accounts, funds...) that include the credentials                                     |            |          |
-| tags        | `String[]`      | Abritrary tag list associated to the credentials                                                         |            |          |
-| params      | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope.                                     |            |          |
-| institution | `Institution`   | Institution that owns the credentials                                                                    |            |          |
-| endpoint    | `SushiEndpoint` | The SUSHI endpoint                                                                                       |            |          |
-| harvestJobs | `HarvestJob[]`  | The harvest jobs associated to the credentials                                                           |            |          |
-| harvests    | `Harvest[]`     | The harvest states associated to the credentials                                                         |            |          |
-| connection  | `Json?`         | Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? } |            |          |
+| Property        | Type            | Description                                                                                              | Attributes | Default  |
+|-----------------|-----------------|----------------------------------------------------------------------------------------------------------|------------|----------|
+| id              | `String`        | ID of the SUSHI credentials                                                                              | Id         | `cuid()` |
+| createdAt       | `DateTime`      | Creation date                                                                                            |            | `now()`  |
+| updatedAt       | `DateTime`      | Latest update date                                                                                       |            |          |
+| customerId      | `String?`       | Value of the customer_id parameter                                                                       |            |          |
+| requestorId     | `String?`       | Value of the requestor_id parameter                                                                      |            |          |
+| apiKey          | `String?`       | Value of the api_key parameter                                                                           |            |          |
+| comment         | `String?`       | Abritrary comment about the credentials                                                                  |            |          |
+| active          | `Boolean`       | Whether the credentials are active and can be harvested                                                  |            | `true`   |
+| activeUpdatedAt | `DateTime`      | Date on which the active status was last modified                                                        |            | `now()`  |
+| packages        | `String[]`      | Packages (profiles, accounts, funds...) that include the credentials                                     |            |          |
+| tags            | `String[]`      | Abritrary tag list associated to the credentials                                                         |            |          |
+| params          | `Json[]`        | Additionnal parameters. Each param has a name, a value, and a scope.                                     |            |          |
+| institution     | `Institution`   | Institution that owns the credentials                                                                    |            |          |
+| endpoint        | `SushiEndpoint` | The SUSHI endpoint                                                                                       |            |          |
+| harvestJobs     | `HarvestJob[]`  | The harvest jobs associated to the credentials                                                           |            |          |
+| harvests        | `Harvest[]`     | The harvest states associated to the credentials                                                         |            |          |
+| connection      | `Json?`         | Last connection test. Format: { date: DateTime, status: String, exceptions: Json[], errorCode: String? } |            |          |
