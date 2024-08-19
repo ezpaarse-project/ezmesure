@@ -276,6 +276,12 @@
               @click="reportsRef?.open(item)"
             />
             <v-list-item
+              v-if="filesRef"
+              :title="$t('sushi.showFiles')"
+              prepend-icon="mdi-file-tree"
+              @click="filesRef?.open(item)"
+            />
+            <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
               prepend-icon="mdi-identifier"
@@ -336,7 +342,9 @@
 
     <SushiHarvestMatrixDialog ref="harvestMatrix" />
 
-    <SushiReportsDialog ref="reportsRef" />
+    <SushiReportsDialog v-if="user?.isAdmin" ref="reportsRef" />
+
+    <SushiFilesDialog v-if="user?.isAdmin" ref="filesRef" />
   </div>
 </template>
 
