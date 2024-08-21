@@ -342,7 +342,7 @@
 
     <SushiHarvestMatrixDialog ref="harvestMatrix" />
 
-    <SushiReportsDialog v-if="user?.isAdmin" ref="reportsRef" />
+    <SushiHarvestFilesDialog v-if="user?.isAdmin" ref="filesRef" />
 
     <SushiFilesDialog v-if="user?.isAdmin" ref="filesRef" />
   </div>

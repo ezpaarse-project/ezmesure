@@ -4,7 +4,7 @@
     width="800"
     scrollable
   >
-    <SushiFiles :sushi="sushi">
+    <SushiHarvestFiles :sushi="sushi">
       <template #actions>
         <v-btn
           :text="$t('close')"
@@ -12,7 +12,7 @@
           @click="isOpen = false"
         />
       </template>
-    </SushiFiles>
+    </SushiHarvestFiles>
   </v-dialog>
 </template>
 
