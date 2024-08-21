@@ -14,7 +14,7 @@
           </slot>
 
           <slot v-if="entry.value" name="value" :item="entry" :value="entry.value">
-            <span :class="`text-${entry.color} mr-1`">{{ entry.value }}:</span>
+            <span :class="`text-${entry.color} mx-1`">{{ entry.value }}:</span>
           </slot>
 
           <slot v-if="entry.text" name="text" :item="entry" :value="entry.text">

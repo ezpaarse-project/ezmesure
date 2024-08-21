@@ -1,0 +1,131 @@
+<template>
+  <v-card
+    :title="$t('tasks.history')"
+    :loading="status === 'pending'"
+    prepend-icon="mdi-history"
+  >
+    <template #subtitle>
+      <div v-if="sushi?.endpoint">
+        {{ sushi.endpoint.vendor }}
+        -
+        <v-chip
+          v-for="(pkg, index) in sushi.packages"
+          :key="index"
+          :text="pkg"
+          size="small"
+          density="compact"
+          label
+          class="mr-1"
+        />
+      </div>
+    </template>
+
+    <template #append>
+      <v-btn
+        :text="$t('refresh')"
+        :loading="status === 'pending'"
+        prepend-icon="mdi-reload"
+        variant="tonal"
+        color="primary"
+        class="mr-2"
+        @click="refresh()"
+      />
+    </template>
+
+    <template #text>
+      <v-data-table-server
+        :headers="headers"
+        :items="tasks"
+        :loading="status === 'pending'"
+        show-expand
+        single-expand
+        v-bind="vDataTableOptions"
+      >
+        <template #[`item.createdAt`]="{ item }">
+          <LocalDate :model-value="item.createdAt" />
+        </template>
+
+        <template #[`item.runningTime`]="{ item }">
+          <LocalDuration :model-value="item.runningTime" />
+        </template>
+
+        <template #[`item.status`]="{ item }">
+          <SushiHarvestTaskChip :model-value="item" />
+        </template>
+
+        <template #expanded-row="{ columns, item }">
+          <tr>
+            <td :colspan="columns.length">
+              <SushiHarvestTaskTimeline :model-value="item" />
+            </td>
+          </tr>
+        </template>
+      </v-data-table-server>
+    </template>
+
+    <template v-if="$slots.actions" #actions>
+      <v-spacer />
+      <slot name="actions" />
+    </template>
+  </v-card>
+</template>
+
+<script setup>
+const props = defineProps({
+  sushi: {
+    type: Object,
+    required: true,
+  },
+});
+
+const { t } = useI18n();
+
+const {
+  refresh,
+  status,
+  data: tasks,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/tasks',
+  },
+  async: {
+    lazy: true,
+  },
+  data: {
+    credentialsId: props.sushi.id,
+    sortBy: [{ key: 'createdAt', order: 'desc' }],
+    include: ['steps', 'logs', 'session'],
+    search: undefined,
+  },
+});
+
+const headers = computed(() => [
+  {
+    title: t('date'),
+    value: 'createdAt',
+    align: 'start',
+    sortable: true,
+  },
+  {
+    title: t('duration'),
+    value: 'runningTime',
+    align: 'start',
+    sortable: true,
+  },
+  {
+    title: t('type'),
+    value: 'reportType',
+    align: 'end',
+    sortable: true,
+    width: '80px',
+    cellProps: { class: ['text-uppercase'] },
+  },
+  {
+    title: t('status'),
+    value: 'status',
+    align: 'start',
+    width: '150px',
+  },
+]);
+</script>

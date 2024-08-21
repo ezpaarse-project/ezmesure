@@ -282,6 +282,12 @@
               @click="filesRef?.open(item)"
             />
             <v-list-item
+              v-if="historyRef"
+              :title="$t('tasks.history')"
+              prepend-icon="mdi-history"
+              @click="historyRef?.open(item)"
+            />
+            <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
               prepend-icon="mdi-identifier"
@@ -344,7 +350,9 @@
 
     <SushiHarvestFilesDialog v-if="user?.isAdmin" ref="filesRef" />
 
-    <SushiFilesDialog v-if="user?.isAdmin" ref="filesRef" />
+    <SushiHarvestHistoryDialog v-if="user?.isAdmin" ref="historyRef" />
+
+    <SushiReportsDialog ref="reportsRef" />
   </div>
 </template>
 
