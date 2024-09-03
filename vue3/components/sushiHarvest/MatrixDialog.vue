@@ -7,6 +7,7 @@
     <SushiHarvestMatrix
       :sushi="sushi"
       :period="period"
+      show-sushi
     >
       <template #actions>
         <v-btn

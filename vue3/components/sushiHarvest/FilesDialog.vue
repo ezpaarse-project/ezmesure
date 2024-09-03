@@ -4,7 +4,7 @@
     width="800"
     scrollable
   >
-    <SushiHarvestFiles :sushi="sushi">
+    <SushiHarvestFiles :sushi="sushi" show-sushi>
       <template #actions>
         <v-btn
           :text="$t('close')"

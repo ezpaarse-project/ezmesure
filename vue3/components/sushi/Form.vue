@@ -4,6 +4,10 @@
     :title="isEditing ? $t('institutions.sushi.updateCredentials') : $t('institutions.sushi.addCredentials')"
     prepend-icon="mdi-key-plus"
   >
+    <template v-if="showSushi" #subtitle>
+      <SushiSubtitle :model-value="modelValue" />
+    </template>
+
     <template #text>
       <v-row>
         <v-col>
@@ -183,6 +187,10 @@ const props = defineProps({
   institution: {
     type: Object,
     required: true,
+  },
+  showSushi: {
+    type: Boolean,
+    default: false,
   },
 });
 

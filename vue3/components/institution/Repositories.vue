@@ -1,9 +1,9 @@
 <template>
-  <v-card :title="$t('repositories.repositories')" prepend-icon="mdi-database">
-    <template v-if="showInstitution" #subtitle>
-      {{ institution.name }}
-    </template>
-
+  <v-card
+    :title="$t('repositories.repositories')"
+    :subtitle="showInstitution ? institution.name : undefined"
+    prepend-icon="mdi-database"
+  >
     <template #append>
       <v-btn
         v-if="repositoryFormDialogRef"

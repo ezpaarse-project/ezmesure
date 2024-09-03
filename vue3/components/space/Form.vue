@@ -4,6 +4,10 @@
     :title="isEditing ? $t('spaces.editSpace') : $t('spaces.newSpace')"
     prepend-icon="mdi-tab-plus"
   >
+    <template v-if="showSpace" #subtitle>
+      <SpaceSubtitle :model-value="modelValue" />
+    </template>
+
     <template #text>
       <v-row>
         <v-col cols="12" lg="5">
@@ -109,6 +113,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  showSpace: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits({
@@ -151,6 +159,7 @@ const { data: permissions } = await useAsyncData(
   },
 );
 
+const originalTypeChip = computed(() => ({ text: t(`spaces.types.${space.value.type}`), color: repoColors.get(space.value.type) }));
 const isEditing = computed(() => !!props.modelValue?.id);
 
 function applyPreset() {

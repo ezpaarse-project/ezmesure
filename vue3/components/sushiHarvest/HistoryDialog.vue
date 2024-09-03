@@ -4,7 +4,7 @@
     width="1000"
     scrollable
   >
-    <SushiHarvestHistory :sushi="sushi">
+    <SushiHarvestHistory :sushi="sushi" show-sushi>
       <template #actions>
         <v-btn
           :text="$t('close')"

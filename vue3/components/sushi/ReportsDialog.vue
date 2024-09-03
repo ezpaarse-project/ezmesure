@@ -4,7 +4,7 @@
     width="800"
     scrollable
   >
-    <SushiReports :sushi="sushi">
+    <SushiReports :sushi="sushi" show-sushi>
       <template #actions>
         <v-btn
           :text="$t('close')"

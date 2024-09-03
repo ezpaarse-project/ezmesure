@@ -9,6 +9,7 @@
       ref="spaceFormRef"
       :model-value="space"
       :institution="institution"
+      show-space
       @submit="onSave($event)"
     >
       <template #actions>

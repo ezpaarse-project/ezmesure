@@ -4,20 +4,8 @@
     :loading="status === 'pending'"
     prepend-icon="mdi-table-headers-eye"
   >
-    <template #subtitle>
-      <div v-if="sushi?.endpoint">
-        {{ sushi.endpoint.vendor }}
-        -
-        <v-chip
-          v-for="(pkg, index) in sushi.packages"
-          :key="index"
-          :text="pkg"
-          size="small"
-          density="compact"
-          label
-          class="mr-1"
-        />
-      </div>
+    <template v-if="showSushi" #subtitle>
+      <SushiSubtitle :model-value="sushi" />
     </template>
 
     <template #append>
@@ -130,6 +118,10 @@ const props = defineProps({
   period: {
     type: String,
     default: undefined,
+  },
+  showSushi: {
+    type: Boolean,
+    default: false,
   },
 });
 

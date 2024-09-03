@@ -1,9 +1,9 @@
 <template>
-  <v-card :title="$t('spaces.spaces')" prepend-icon="mdi-tab">
-    <template v-if="showInstitution" #subtitle>
-      {{ institution.name }}
-    </template>
-
+  <v-card
+    :title="$t('spaces.spaces')"
+    :subtitle="showInstitution ? institution.name : undefined"
+    prepend-icon="mdi-tab"
+  >
     <template #append>
       <v-btn
         v-if="spaceFormDialogRef"

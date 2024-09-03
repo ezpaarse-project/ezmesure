@@ -9,6 +9,7 @@
       ref="sushiFormRef"
       :model-value="sushi"
       :institution="institution"
+      show-sushi
       @submit="onSave($event)"
       @update:model-value="$emit('update:model-value', $event)"
     >

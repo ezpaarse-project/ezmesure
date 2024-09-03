@@ -7,6 +7,7 @@
   >
     <InstitutionForm
       ref="institutionFormRef"
+      show-institution
       @submit="onSave($event)"
     >
       <template #actions>

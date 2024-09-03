@@ -1,9 +1,9 @@
 <template>
-  <v-card :title="$t('components.components')" prepend-icon="mdi-home-group">
-    <template v-if="showInstitution" #subtitle>
-      {{ institution.name }}
-    </template>
-
+  <v-card
+    :title="$t('components.components')"
+    :subtitle="showInstitution ? institution.name : undefined"
+    prepend-icon="mdi-home-group"
+  >
     <template #append>
       <v-menu
         v-model="isSearchOpen"

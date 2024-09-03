@@ -4,20 +4,8 @@
     :loading="status === 'pending'"
     prepend-icon="mdi-file-tree"
   >
-    <template #subtitle>
-      <div v-if="sushi?.endpoint">
-        {{ sushi.endpoint.vendor }}
-        -
-        <v-chip
-          v-for="(pkg, index) in sushi.packages"
-          :key="index"
-          :text="pkg"
-          size="small"
-          density="compact"
-          label
-          class="mr-1"
-        />
-      </div>
+    <template v-if="showSushi" #subtitle>
+      <SushiSubtitle :model-value="sushi" />
     </template>
 
     <template #append>
@@ -33,7 +21,7 @@
     </template>
 
     <template #text>
-      <v-row v-if="(files?.length ?? 0) < 0">
+      <v-row v-if="(files?.length ?? 0) <= 0">
         <v-col class="text-center">
           <v-empty-state
             icon="mdi-file-hidden"
@@ -98,6 +86,10 @@ const props = defineProps({
   sushi: {
     type: Object,
     required: true,
+  },
+  showSushi: {
+    type: Boolean,
+    default: false,
   },
 });
 

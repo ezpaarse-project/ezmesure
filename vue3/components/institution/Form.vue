@@ -2,6 +2,7 @@
   <v-card
     :loading="loading"
     :title="isEditing ? $t('institutions.updateInstitution') : $t('institutions.newInstitution')"
+    :subtitle="showInstitution ? originalName : undefined"
     prepend-icon="mdi-office-building-plus"
   >
     <template #text>
@@ -285,6 +286,13 @@
 import { fileToBase64 } from '@/lib/base64';
 import defaultLogo from '@/static/images/logo-etab.png';
 
+defineProps({
+  showInstitution: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const emit = defineEmits({
   submit: (item) => !!item,
 });
@@ -306,6 +314,7 @@ const namespaceRules = [
 
 const loading = ref(false);
 const valid = ref(false);
+const originalName = ref(undefined);
 /** @type {Ref<Object>} */
 const institution = ref({ social: {} });
 const logoPreview = ref('');
@@ -334,11 +343,11 @@ const logoSrc = computed(() => {
  * @param {boolean} [opts.addAsMember]
  */
 function init(item, opts) {
+  originalName.value = item?.name;
   institution.value = {
     social: {},
-    ...item,
+    ...(item ?? {}),
   };
-
   logoPreview.value = null;
   logoError.value = null;
   openData.value = null;
