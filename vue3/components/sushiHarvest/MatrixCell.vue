@@ -60,7 +60,7 @@ const props = defineProps({
 
 const { t, te } = useI18n();
 
-const harvestedAt = useDateFormat(props.modelValue?.harvestedAt);
+const harvestedAt = useDateFormat(computed(() => props.modelValue?.harvestedAt));
 
 const icon = computed(() => harvestStatus.get(props.modelValue?.status));
 const counts = computed(() => {

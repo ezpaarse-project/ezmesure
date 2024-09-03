@@ -10,5 +10,5 @@ const props = defineProps({
   },
 });
 
-const timeAgo = useTimeAgo(props.modelValue);
+const timeAgo = useTimeAgo(computed(() => props.modelValue));
 </script>

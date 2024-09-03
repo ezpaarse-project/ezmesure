@@ -77,7 +77,7 @@ const props = defineProps({
 
 const { t, te } = useI18n();
 
-const testedDate = useDateFormat(props.modelValue?.date, 'PPPpp');
+const testedDate = useDateFormat(computed(() => props.modelValue?.date), 'PPPpp');
 
 const status = computed(() => props.modelValue?.status || 'untested');
 const icon = computed(() => sushiStatus.get(status.value));

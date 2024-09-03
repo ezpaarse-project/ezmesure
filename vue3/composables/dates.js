@@ -1,7 +1,8 @@
 import {
-  computed,
   useI18n,
+  ref,
   toValue,
+  watchEffect,
   dateFormat,
   timeAgo,
 } from '#imports';
@@ -18,7 +19,7 @@ import {
  * @see https://date-fns.org/docs/format
  *
  * @param {import('vue').MaybeRefOrGetter<DateType>} date The (reactive) date to format
- * @param {import('vue').MaybeRefOrGetter<string>} [format] The (reactive) combination of tokens
+ * @param {import('vue').MaybeRefOrGetter<string>} [formatStr] The (reactive) combination of tokens
  * to format the date. (Default: PPPp)
  * @param {FormatDateOptions} [options] Options to pass to date-fns
  *
@@ -27,9 +28,13 @@ import {
 export function useDateFormat(date, formatStr, options) {
   const { locale } = useI18n();
 
-  const reactiveValue = computed(() => toValue(date));
+  const formatted = ref('...');
 
-  return computed(() => dateFormat(reactiveValue.value, locale.value, toValue(formatStr), options));
+  watchEffect(() => {
+    formatted.value = dateFormat(toValue(date), locale.value, toValue(formatStr), options);
+  });
+
+  return formatted;
 }
 
 /**
@@ -45,7 +50,11 @@ export function useDateFormat(date, formatStr, options) {
 export function useTimeAgo(date, options) {
   const { locale } = useI18n();
 
-  const reactiveValue = computed(() => toValue(date));
+  const formatted = ref('...');
 
-  return computed(() => timeAgo(reactiveValue.value, locale.value, options));
+  watchEffect(() => {
+    formatted.value = timeAgo(toValue(date), locale.value, options);
+  });
+
+  return formatted;
 }
