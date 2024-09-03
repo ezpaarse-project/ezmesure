@@ -230,7 +230,6 @@ const institutionRepositoriesDialogRef = ref(null);
 const institutionSpacesDialogRef = ref(null);
 
 const {
-  status, // Loading status
   refresh, // Refresh the data
   itemLength, // Total number of items
   query, // Query parameters
@@ -442,7 +441,7 @@ async function copyInstitutionId({ id }) {
   try {
     await copy(id);
   } catch (e) {
-    snacks.error(t('clipboard.copyFailed'));
+    snacks.error(t('clipboard.unableToCopy'));
     return;
   }
   snacks.info(t('clipboard.textCopied'));

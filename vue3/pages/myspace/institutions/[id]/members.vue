@@ -164,7 +164,6 @@ const {
 } = await useFetch(`/api/institutions/${params.id}`);
 
 const {
-  status,
   refresh,
   itemLength,
   query,
@@ -312,7 +311,7 @@ async function copyEmails(items) {
   try {
     await copy(emails.join(';'));
   } catch (e) {
-    snacks.error(t('clipboard.copyFailed'));
+    snacks.error(t('clipboard.unableToCopy'));
     return;
   }
   snacks.info(t('clipboard.textCopied'));

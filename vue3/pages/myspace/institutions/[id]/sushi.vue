@@ -323,7 +323,7 @@
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
           :disabled="!canEdit"
-          prepend-icon="mdi-check"
+          prepend-icon="mdi-toggle-switch"
           @click="toggleActiveStates()"
         />
         <v-list-item
@@ -596,7 +596,7 @@ async function copySushiId({ id }) {
   try {
     await copy(id);
   } catch (e) {
-    snacks.error(t('clipboard.copyFailed'));
+    snacks.error(t('clipboard.unableToCopy'));
     return;
   }
   snacks.info(t('clipboard.textCopied'));

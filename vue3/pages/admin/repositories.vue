@@ -121,7 +121,6 @@ const repositoryFormRef = ref(null);
 const repoInstitutionsDialogRef = ref(null);
 
 const {
-  status,
   refresh,
   itemLength,
   query,
@@ -238,7 +237,7 @@ async function copyRepositoryPattern({ pattern }) {
   try {
     await copy(pattern);
   } catch (e) {
-    snacks.error(t('clipboard.copyFailed'));
+    snacks.error(t('clipboard.unableToCopy'));
     return;
   }
   snacks.info(t('clipboard.textCopied'));
