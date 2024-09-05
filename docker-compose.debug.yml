@@ -85,7 +85,7 @@ services:
     command: npm run dev
 
   front:
-    image: node:18.18.2-alpine3.18
+    image: node:22.8.0-alpine3.20
     ports:
       - 8080:8080
     volumes:

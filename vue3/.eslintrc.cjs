@@ -12,6 +12,14 @@ module.exports = {
   rules: {
     'import/no-extraneous-dependencies': 'off',
   },
+  overrides: [
+    {
+      files: 'store/**/*.js',
+      rules: {
+        'import/prefer-default-export': 'off',
+      },
+    },
+  ],
   settings: {
     ...createAliasSetting({
       '@': `${path.resolve(__dirname, './')}`,
