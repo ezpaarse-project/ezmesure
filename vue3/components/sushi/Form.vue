@@ -80,7 +80,7 @@
             </v-card>
 
             <v-card
-              :title="$t('sushi.general')"
+              :title="$t('general')"
               prepend-icon="mdi-format-list-bulleted"
               variant="outlined"
               class="mt-4"

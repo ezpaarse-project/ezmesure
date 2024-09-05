@@ -186,17 +186,19 @@ activity:
     reporting/delete: Reporting task deletion
     reporting/history: Reporting task history consultation
 endpoints:
-  title: SUSHI endpoints ({count})
+  endpoint: Endpoint
+  toolbarTitle: SUSHI endpoints ({count})
   pageDescription: Here you can manage the list of the available SUSHI endpoints.
   pageDescription2: Only version 5 of the SUSHI protocol is supported.
-  manageNendpoints: Manage endpoint|Manage {count} endpoints
+  manageEndpoints: >
+    Manage endpoint
+    |Manage {count} endpoints
   unableToRetriveEndpoints: Unable to retrieve SUSHI endpoints
-  soapWarning: The URL seems to point to an unsupported SUSHI endpoint (version 4
-    or below)
-  sushiNotRootDetected: It seems that the SUSHI URL does not point to the root of
-    the service. It should not contain /reports, /status ou /member.
+  soapWarning: The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)
+  sushiNotRootDetected: It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.
   validated: Validated
   addEndpoint: Add an endpoint
+  updateEndpoint: Update endpoint
   createdAt: Created at
   updatedAt: Updated at
   url: URL
@@ -205,11 +207,9 @@ endpoints:
   active: Active
   inactive: Inactive
   dateFormat: Date format
-  dateFormatDesc: The date format below will be used to fill the {beginDate} and {endDate}
-    fields during harvesting.
+  dateFormatDesc: The date format below will be used to fill the {beginDate} and {endDate} fields during harvesting.
   unableToUpdate: Unable to update the endpoint
-  inactiveDescription: Administrators have deactivated this endpoint and it will not
-    be harvested.
+  inactiveDescription: Administrators have deactivated this endpoint and it will not be harvested.
   activeSince: Active since {date}
   inactiveSince: Inactive since {date}
   technicalProvider: Technical provider
@@ -234,6 +234,7 @@ endpoints:
   noEndpointFound: No endpoint found
   clickToDeclareOne: Click here to declare one
   disabledUntil: Disabled until
+  disabledUntilDesc: This endpoint is disabled, meaning that every harvest task of this endpoint will be paused until this date.
   checkEndpoint: Test endpoint
   filters:
     title: Filter endpoints
@@ -243,9 +244,9 @@ institutions:
   validateSwitch: Validate/Invalidate
   validateNbInstitutions: You are about to validate or invalidate {count} institution.
   updateInstitution: Update institution
-  manageN: 
-    Manage institutions|
-    Manage {count} institutions
+  manageN: >
+    Manage institutions
+    |Manage {count} institutions
   deleteNbInstitutions:
     text: You are about to delete {number} institutions. {affected}
     affected: The associated spaces and roles will be deleted. The associated indices will stay unaffected. This action cannot be undone.
@@ -423,9 +424,9 @@ institutions:
     enterAPIKey: Please enter an API Key.
     comment: Comment
     credentials: Sushi credentials
-    manageN:
-      Manage credentials|
-      Manage {count} credentials
+    manageN: >
+      Manage credentials
+      |Manage {count} credentials
     activeSwitch: Activate/Deactivate
     pleaseEnterParams: If requests to the Sushi endpoint require additional parameters in the querystring, enter them below.
     checkCredentials: Check credentials
@@ -572,7 +573,6 @@ sushi:
   credentials: Credentials
   credentialsCount: "{count} credentials"
   auth: Authentication
-  general: General
   copyId: Copy ID
   showFiles: View files
   unableToCopyId: Unable to copy in the clipboard
@@ -582,18 +582,18 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: SUSHI credentials management is currently locked.
-  nInstitutions:
-    1 institution use this endpoint|
-    {count} institutions use this endpoint
+  nInstitutions: >
+    1 institution use this endpoint
+    |{count} institutions use this endpoint
   nUntestedCredentials: "{count} untested credentials"
   nInvalidCredentials: "{count} invalid credentials"
   nOperationalCredentials: "{count} operational credentials"
-  nProblematicEndpoints: 
-    1 problematic endpoint|
-    {count} problematic endpoints
-  nErrsCredentials:
-    1 credential show that endpoint is problematic|
-    {count} credentials show that endpoint is problematic
+  nProblematicEndpoints: >
+    1 problematic endpoint
+    |{count} problematic endpoints
+  nErrsCredentials: >
+    1 credential show that endpoint is problematic
+    |{count} credentials show that endpoint is problematic
   deleteNbCredentials: You are about to delete {number} SUSHI credentials.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
@@ -609,6 +609,7 @@ sushi:
   updatedItems: "{count} report items have been updated."
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: 'Messages from the endpoint:'
+  checkBeforeSave: Check credentials before saving
   noMatrix:
     title: No harvested report for these credentials on this period
     description: These credentials have not yet been harvested for this period. Please validate your SUSHI credentials to be harvested in the future by the administration team.
@@ -724,9 +725,9 @@ users:
     email: Email address
     isAdmin: Is Administrator ?
     memberships: Institutions
-    membershipsCount:
-      "{count} institution
-      |{count} institutions"
+    membershipsCount: >
+      {count} institution
+      |{count} institutions
     roles: Roles
     no_roles: No roles
     permissions: Permissions
@@ -743,21 +744,20 @@ report:
 repositories:
   repositories: Repositories
   toolbarTitle: Repositories ({count})
-  xRepositories:
-    0 repository|
-    1 repository|
-    {count} repositories
+  xRepositories: >
+    1 repository
+    |{count} repositories
   newRepository: New repository
-  manageRepositories:
-    Manage repositories|
-    Manage {count} repositories
+  manageRepositories: >
+    Manage repositories
+    |Manage {count} repositories
   noRepository: No repository has been assigned yet
   pattern: Pattern
   type: Type
   institutions: Institutions
-  institutionsCount:
-    "{count} institution|
-    {count} institutions"
+  institutionsCount: >
+    {count} institution
+    |{count} institutions
   noInstitutions: No institutions is using this repository
   deleteNbRepositories: You are about to delete {number} repositories
   filters:
@@ -768,10 +768,9 @@ spaces:
   spaces: Spaces
   newSpace: New space
   editSpace: Edit space
-  xSpaces:
-    0 space|
-    1 space|
-    {count} spaces
+  xSpaces: >
+    1 space
+    |{count} spaces
   noSpace: No space has been assigned yet
   id: Identifier
   type: Type
@@ -925,3 +924,5 @@ groupBy: Group by
 indeterminate: indeterminate
 noMatchFor: No results matching "{search}". Press {key} to add it.
 enterKey: enter
+general: General
+enterValidUrl: Please enter a valid URL

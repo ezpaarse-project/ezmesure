@@ -44,7 +44,7 @@
       </v-list-item>
     </template>
 
-    <template #no-data>
+    <template v-if="showNoData" #no-data>
       <v-list-item
         :title="$t('endpoints.noEndpointFound')"
         :subtitle="$t('endpoints.clickToDeclareOne')"
@@ -60,6 +60,10 @@ defineProps({
   modelValue: {
     type: Object,
     default: () => undefined,
+  },
+  showNoData: {
+    type: Boolean,
+    default: false,
   },
 });
 

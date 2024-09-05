@@ -191,17 +191,19 @@ activity:
     reporting/delete: Suppression d'une tâche de reporting
     reporting/history: Consultation de l'historique d'une tâche de reporting
 endpoints:
-  title: Points d'accès SUSHI ({count})
+  endpoint: Point d'accès
+  toolbarTitle: Points d'accès SUSHI ({count})
   pageDescription: Gérez ici la liste des points d'accès SUSHI disponibles.
   pageDescription2: Seule la version 5 du protocole SUSHI est supportée.
-  manageNendpoints: Gérer le point d'accès|Gérer {count} points d'accès
+  manageEndpoints: >
+    Gérer le point d'accès
+    |Gérer {count} points d'accès
   unableToRetriveEndpoints: Impossible de récupérer les points d'accès
-  soapWarning: L'URL semble pointer vers un service SUSHI non supporté (version 4
-    ou inférieure)
-  sushiNotRootDetected: L'URL SUSHI ne semble pas pointer vers la racine du service.
-    Celle-ci ne devrait pas contenir /reports, /status ou /member.
+  soapWarning: L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)
+  sushiNotRootDetected: L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.
   validated: Validé
   addEndpoint: Ajouter un point d'accès
+  updateEndpoint: Mettre à jour le point d'accès
   createdAt: Créé le
   updatedAt: Mis à jour le
   url: URL
@@ -210,11 +212,9 @@ endpoints:
   active: Actif
   inactive: Inactif
   dateFormat: Format de date
-  dateFormatDesc: Le format de date ci-dessous sera utilisé pour remplir les champs
-    {beginDate} et {endDate} lors du moissonnage.
+  dateFormatDesc: Le format de date ci-dessous sera utilisé pour remplir les champs {beginDate} et {endDate} lors du moissonnage.
   unableToUpdate: Impossible de modifier le point d'accès
-  inactiveDescription: Les administrateurs ont rendus ce point d'accès inactif et
-    ne sera donc pas moissonné.
+  inactiveDescription: Les administrateurs ont rendus ce point d'accès inactif et ne sera donc pas moissonné.
   activeSince: Actif depuis le {date}
   inactiveSince: Inactif depuis le {date}
   technicalProvider: Prestataire technique
@@ -225,11 +225,9 @@ endpoints:
   requireApiKey: Une clé d'API est nécessaire
   isSushiCompliant: Le point d'accès est conforme SUSHI
   harvestedReports: Rapports moissonnés
-  ignoredReportsDesc: Les rapports saisis ci-dessous seront considérés comme non-supportés,
-    même s'ils sont présents dans la liste fournie par le point d'accès.
+  ignoredReportsDesc: Les rapports saisis ci-dessous seront considérés comme non-supportés, même s'ils sont présents dans la liste fournie par le point d'accès.
   ignoredReports: Rapports ignorés
-  additionalReportsDesc: Les rapports saisis ci-dessous seront considérés comme supportés,
-    même s'ils ne se trouvent pas dans la liste fournie par le point d'accès.
+  additionalReportsDesc: Les rapports saisis ci-dessous seront considérés comme supportés, même s'ils ne se trouvent pas dans la liste fournie par le point d'accès.
   additionalReports: Rapports additionnels
   ignoreReportValidation: Ignorer la validation du rapport
   description: Description
@@ -237,11 +235,13 @@ endpoints:
   paramSeparator: Séparateur
   queryParameters: Paramètres de la query
   pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.
-  deleteNbEndpoints: Vous allez supprimer {count} point d'accès.|
+  deleteNbEndpoints: >
+    Vous allez supprimer {count} point d'accès.|
     Vous allez supprimer {count} points d'accès.
   noEndpointFound: Aucun point d'accès trouvé
   clickToDeclareOne: Cliquez ici pour en déclarer un
   disabledUntil: Désactivé jusqu'au
+  disabledUntilDesc: Ce point d'accès est désactivé, ce qui signifie que toutes les tâches de moissonnage de ce point d'accès seront suspendues jusqu'a cette date.
   checkEndpoint: Tester le point d'accès
   filters:
     title: Filtrer les points d'accès
@@ -251,11 +251,11 @@ institutions:
   updateInstitution: Mettre à jour l'établissement
   validateSwitch: Valider/Invalider
   validateNbInstitutions: Vous allez valider ou invalider {count} établissement.
-  manageN: 
+  manageN: >
     Gérer les établissements|
     Gérer {count} établissements
   deleteNbInstitutions:
-    text: 
+    text: >
       Vous allez supprimer {count} établissement. {affected}|
       Vous allez supprimer {count} établissements. {affected}
     affected: Les espaces, et rôles associés seront aussi supprimés. Les index, quant à eux, ne seront pas affectés. Cette action est irréversible.
@@ -434,17 +434,17 @@ institutions:
     enterAPIKey: Veuillez saisir une Clé API.
     comment: Commentaire
     credentials: Identifiants Sushi
-    manageN:
-      Gérer les identifiants|
-      Gérer {count} identifiants
+    manageN: >
+      Gérer les identifiants
+      |Gérer {count} identifiants
     activeSwitch: Activer/Désactiver
     pleaseEnterParams: Si les requêtes vers le point d'accès nécessitent des paramètres supplémentaires dans la querystring, saisissez-les ci-dessous.
     checkCredentials: Vérifier les identifiants
     cannotCheckCredentials: Échec de la vérification pour {name}
     resetChecks: Réinitialiser les états de connexion
-    resetNbChecks: 
-      Vous allez réinitialiser {count} état de connexion. Les identifiants non testés ne sont pas pris en compte.|
-      Vous allez réinitialiser {count} états de connexion. Les identifiants non testés ne sont pas pris en compte.
+    resetNbChecks: >
+      Vous allez réinitialiser {count} état de connexion. Les identifiants non testés ne sont pas pris en compte.
+      |Vous allez réinitialiser {count} états de connexion. Les identifiants non testés ne sont pas pris en compte.
     cannotResetCheck: Impossible de réinitialiser l'état de connexion pour {name}
     connection: Connexion
     untested: Non testé
@@ -588,11 +588,10 @@ tasks:
     index: 'Index :'
 sushi:
   credentials: Identifiants
-  credentialsCount:
-    1 identifiant|
-    {count} identifiants
+  credentialsCount: >
+    1 identifiant
+    |{count} identifiants
   auth: Authentification
-  general: General
   copyId: Copier l'ID
   showFiles: Voir les fichiers
   unableToCopyId: Impossible de copier dans le presse-papier
@@ -602,37 +601,37 @@ sushi:
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants SUSHI est actuellement verrouillée.
-  nInstitutions: 
-    1 établissement utilise cet endpoint|
-    {count} établissements utilisent cet endpoint
-  nUntestedCredentials:
-    1 identifiant non testé|
-    {count} identifiants non testés
-  nInvalidCredentials:
-    1 identifiant invalide|
-    {count} identifiants invalides
-  nOperationalCredentials:
-    1 identifiant fonctionnel|
-    {count} identifiants fonctionnels
-  nProblematicEndpoints:
-    1 point d'accès problématique|
-    {count} points d'accès problématiques
-  nErrsCredentials:
-    1 identifiant indique que le point d'accès est problématique|
-    {count} identifiants indiquent que le point d'accès est problématique
-  deleteNbCredentials:
-    Vous allez supprimer {count} identifiant SUSHI.|
-    Vous allez supprimer {count} identifiants SUSHI.
+  nInstitutions: >
+    1 établissement utilise cet endpoint
+    |{count} établissements utilisent cet endpoint
+  nUntestedCredentials: >
+    1 identifiant non testé
+    |{count} identifiants non testés
+  nInvalidCredentials: >
+    1 identifiant invalide
+    |{count} identifiants invalides
+  nOperationalCredentials: >
+    1 identifiant fonctionnel
+    |{count} identifiants fonctionnels
+  nProblematicEndpoints: >
+    1 point d'accès problématique
+    |{count} points d'accès problématiques
+  nErrsCredentials: >
+    1 identifiant indique que le point d'accès est problématique
+    |{count} identifiants indiquent que le point d'accès est problématique
+  deleteNbCredentials: >
+    Vous allez supprimer {count} identifiant SUSHI.
+    |Vous allez supprimer {count} identifiants SUSHI.
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
   inactive: Identifiant inactif
-  inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera
-    donc pas moissonné.
+  inactiveDescription: L'établissement à rendu cet identifiant inactif et ne sera donc pas moissonné.
   harvestState: État du moissonnage
   harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
   harvestedAt: Moissonné le {date}
   checking: Vérification de la connexion de "{vendor}"
   report: Rapport
+  checkBeforeSave: Vérifier les identifiants avant de sauvegarder
   openHelpPage: Ouvrir page d'aide
   insertedItems: "{count} éléments du rapport ont été insérés."
   updatedItems: "{count} éléments du rapport ont été mis à jour."
@@ -658,8 +657,7 @@ reports:
   checkCredentials: Vérifier les identifiants
   supportedReports: Rapports supportés
   supportedReportsOnPlatform: Rapports supportés par la plateforme éditeur
-  supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible
-    pour cette plateforme éditeur.
+  supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.
   failedToFetchReports: Impossible de récupérer la liste des rapports disponibles
   onlyShowMasterReports: Afficher uniquement les rapports maîtres
 identifier: Identifiant
@@ -757,9 +755,9 @@ users:
     email: Adresse email
     isAdmin: Est Administrateur ?
     memberships: Établissements
-    membershipsCount:
-      "1 établissement|
-      {count} établissements"
+    membershipsCount: >
+      1 établissement
+      |{count} établissements
     roles: Roles
     no_roles: Aucun rôle
     permissions: Permissions
@@ -776,24 +774,24 @@ report:
 repositories:
   repositories: Entrepôts
   toolbarTitle: Entrepôts ({count})
-  xRepositories:
-    1 entrepôt|
-    {count} entrepôts
-  manageRepositories:
-    Gérer les entrepôts|
-    Gérer {count} entrepôts
+  xRepositories: >
+    1 entrepôt
+    |{count} entrepôts
+  manageRepositories: >
+    Gérer les entrepôts
+    |Gérer {count} entrepôts
   newRepository: Nouveau entrepôt
   noRepository: Aucun entrepôt n'est encore attribué
   pattern: Pattern
   type: Type
   institutions: Établissements
-  institutionsCount:
-    "{count} établissement|
-    {count} établissements"
+  institutionsCount: >
+    {count} établissement
+    |{count} établissements
   noInstitutions: Aucun établissement n'utilise cet entrepôt
-  deleteNbRepositories:
-    Vous allez supprimer 1 entrepôt.|
-    Vous allez supprimer {count} entrepôts.
+  deleteNbRepositories: >
+    Vous allez supprimer 1 entrepôt.
+    |Vous allez supprimer {count} entrepôts.
   filters:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
@@ -802,9 +800,9 @@ spaces:
   spaces: Espaces
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
-  xSpaces: 
-    1 espace|
-    {count} espaces
+  xSpaces: >
+    1 espace
+    |{count} espaces
   noSpace: Aucun espace n'est encore attribué
   id: Identifiant
   type: Type
@@ -959,3 +957,5 @@ groupBy: Regrouper par
 indeterminate: indéterminée
 noMatchFor: Aucune correspondance pour "{search}". Appuyez sur {key} pour l'ajouter.
 enterKey: entrée
+general: General
+enterValidUrl: Veuillez saisir une URL valide

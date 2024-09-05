@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <SushiDetailsField
+      <DetailsField
         v-for="field in fields"
         :key="field.label"
         :value="field.value"
@@ -9,7 +9,7 @@
         :cols="field.cols"
       />
 
-      <SushiDetailsField
+      <DetailsField
         v-if="modelValue?.params?.length > 0"
         :label="$t('advancedSettings')"
         cols="12"
@@ -28,9 +28,9 @@
           {{ $t(`sushi.scope`) }}:
           <b>{{ $t(`sushi.paramScopes.${param.scope}`) }}</b>
         </v-tooltip>
-      </SushiDetailsField>
+      </DetailsField>
 
-      <SushiDetailsField
+      <DetailsField
         v-if="credentialUrl"
         :label="$t('institutions.sushi.sushiUrl')"
         cols="12"
@@ -47,9 +47,9 @@
             class="ml-1"
           />
         </a>
-      </SushiDetailsField>
+      </DetailsField>
 
-      <SushiDetailsField
+      <DetailsField
         v-if="modelValue.comment"
         :value="modelValue.comment"
         :label="$t('institutions.sushi.comment')"
