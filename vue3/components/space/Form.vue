@@ -199,4 +199,8 @@ async function save() {
 
   loading.value = false;
 }
+
+onMounted(() => {
+  formRef.value?.validate();
+});
 </script>

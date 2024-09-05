@@ -34,7 +34,7 @@
         <v-row>
           <v-col cols="12">
             <v-select
-              :model-value="param.scope"
+              :model-value="param.scope || 'all'"
               :label="$t('sushi.scope')"
               :items="scopes"
               :disabled="readonly"

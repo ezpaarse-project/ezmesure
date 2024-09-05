@@ -477,6 +477,10 @@ async function removeLogo() {
  */
 onFilesChange((files) => updateLogo(files[0]));
 
+onMounted(() => {
+  formRef.value?.validate();
+});
+
 defineExpose({
   init,
 });

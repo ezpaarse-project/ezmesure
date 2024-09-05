@@ -60,6 +60,7 @@
 </template>
 
 <script setup>
+import urlJoin from 'url-join';
 import {
   subMonths,
   format,
@@ -97,7 +98,7 @@ const credentialUrl = computed(() => {
   const testedReport = endpoint.testedReport || 'pr';
   const harvestDateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
 
-  const url = new URL(`reports/${testedReport}`, sushiUrl);
+  const url = new URL(urlJoin(sushiUrl, `reports/${testedReport}`));
 
   const threeMonthAgo = subMonths(new Date(), 3);
   url.search = new URLSearchParams(
@@ -124,6 +125,7 @@ const fields = computed(() => [
   { value: formatDate(props.modelValue.createdAt) || '-', label: t('institutions.sushi.createdAt'), cols: 4 },
   { value: formatDate(props.modelValue.updatedAt) || '-', label: t('institutions.sushi.updatedAt'), cols: 4 },
   { value: formatDate(props.modelValue.connection?.date) || '-', label: t('institutions.sushi.testedAt'), cols: 4 },
+
   { value: props.modelValue.requestorId, label: t('institutions.sushi.requestorId'), cols: 4 },
   { value: props.modelValue.customerId, label: t('institutions.sushi.customerId'), cols: 4 },
   { value: props.modelValue.apiKey, label: t('institutions.sushi.apiKey'), cols: 4 },

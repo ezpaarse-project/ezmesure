@@ -455,4 +455,8 @@ function toggleRole(role) {
 mapPermissions(props.modelValue?.permissions ?? [], permissions.value);
 mapRepoPermissions(props.modelValue?.repositoryPermissions ?? [], repositoryPermissions.value);
 mapSpacePermissions(props.modelValue?.spacePermissions ?? [], spacePermissions.value);
+
+onMounted(() => {
+  formRef.value?.validate();
+});
 </script>

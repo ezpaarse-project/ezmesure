@@ -19,6 +19,7 @@
           >
             <SushiEndpointSelect
               v-model="sushi.endpoint"
+              show-no-data
               @update:model-value="onEndpointChange($event)"
             />
 
@@ -87,6 +88,7 @@
               <template #text>
                 <v-row>
                   <v-col cols="12">
+                    <!-- TODO: completion -->
                     <v-combobox
                       v-model="sushi.packages"
                       :label="$t('institutions.sushi.packages')"
@@ -165,6 +167,7 @@
       <slot name="actions" :loading="loading || saving" />
 
       <v-btn
+        v-tooltip="sushi.connection ? undefined : $t('sushi.checkBeforeSave')"
         :text="!isEditing ? $t('add') : $t('save')"
         :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
         :disabled="!valid || !sushi.connection"
@@ -288,7 +291,7 @@ async function checkConnection() {
       emit('update:modelValue', sushi.value);
     }
   } catch (e) {
-    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: sushi.endpoint?.vendor }));
+    snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: sushi.value.endpoint?.vendor }));
   }
 
   loading.value = false;
