@@ -193,7 +193,7 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
-          @click:harvest="harvestMatrix?.open(item, { period: $event.period })"
+          @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
       </template>
 
@@ -264,10 +264,10 @@
               @click="resetConnections([item])"
             />
             <v-list-item
-              v-if="harvestMatrix"
+              v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
               prepend-icon="mdi-table-headers-eye"
-              @click="harvestMatrix?.open(item)"
+              @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
@@ -346,7 +346,7 @@
       @update:model-value="onSushiUpdate($event)"
     />
 
-    <SushiHarvestMatrixDialog ref="harvestMatrix" />
+    <SushiHarvestMatrixDialog ref="harvestMatrixRef" />
 
     <SushiHarvestFilesDialog v-if="user?.isAdmin" ref="filesRef" />
 
@@ -374,16 +374,11 @@ const snacks = useSnacksStore();
 const selectedSushi = ref([]);
 const activeLoadingMap = ref(new Map());
 
-/** @type {Ref<Object | null>} Vue ref of the sushi form */
-const sushiFormRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the harvest state */
-const harvestMatrix = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the report list */
-const reportsRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the file list */
-const filesRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the task history */
-const historyRef = ref(null);
+const sushiFormRef = useTemplateRef('sushiFormRef');
+const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
+const reportsRef = useTemplateRef('reportsRef');
+const filesRef = useTemplateRef('filesRef');
+const historyRef = useTemplateRef('historyRef');
 
 const {
   error,
@@ -577,7 +572,7 @@ async function toggleSushiReady() {
       body: { value },
     });
     return institutionRefresh();
-  } catch (e) {
+  } catch {
     snacks.error(t('errors.generic'));
   }
   return Promise.resolve();
@@ -595,7 +590,7 @@ async function copySushiId({ id }) {
 
   try {
     await copy(id);
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }
@@ -655,7 +650,7 @@ async function toggleActiveStates(items) {
         item.active = active;
         activeLoadingMap.value.set(item.id, false);
         return item;
-      } catch (e) {
+      } catch {
         snacks.error(t('sushi.unableToUpdate'));
         activeLoadingMap.value.set(item.id, false);
         return null;
@@ -699,7 +694,7 @@ async function resetConnections(items) {
         toReset.map((item) => {
           try {
             return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch (e) {
+          } catch {
             snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }));
             return Promise.resolve(null);
           }
@@ -739,7 +734,7 @@ async function deleteSushis(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotDeleteItems', { id: item.name || item.id }));
             return Promise.resolve(null);
           }

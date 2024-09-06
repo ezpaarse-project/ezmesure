@@ -9,14 +9,14 @@
       @update:model-value="debouncedRefresh()"
     >
       <v-btn
-        v-if="repositoryFormRef"
+        v-if="repositoryFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="repositoryFormRef.open()"
+        @click="repositoryFormDialogRef.open()"
       />
     </SkeletonPageBar>
 
@@ -91,7 +91,7 @@
     </SelectionMenu>
 
     <RepositoryFormDialog
-      ref="repositoryFormRef"
+      ref="repositoryFormDialogRef"
       @submit="refresh()"
     />
 
@@ -115,10 +115,8 @@ const snacks = useSnacksStore();
 
 const selectedRepositories = ref([]);
 
-/** @type {Ref<object | null>} Vue ref of the repository form */
-const repositoryFormRef = ref(null);
-/** @type {Ref<object | null>} Vue ref of the institution list */
-const repoInstitutionsDialogRef = ref(null);
+const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
+const repoInstitutionsDialogRef = useTemplateRef('repoInstitutionsDialogRef');
 
 const {
   refresh,
@@ -204,7 +202,7 @@ function deleteRepositories(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotDeleteItem', { id: item.pattern }));
             return Promise.resolve(null);
           }
@@ -236,7 +234,7 @@ async function copyRepositoryPattern({ pattern }) {
 
   try {
     await copy(pattern);
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }

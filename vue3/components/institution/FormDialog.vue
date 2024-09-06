@@ -28,8 +28,7 @@ const emit = defineEmits({
 
 const isOpen = ref(false);
 
-/** @type {Ref<Object | null>} Vue ref of the institution form */
-const institutionFormRef = ref(null);
+const institutionFormRef = useTemplateRef('institutionFormRef');
 
 async function open(institution, opts) {
   isOpen.value = true;

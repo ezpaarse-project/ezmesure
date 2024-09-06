@@ -61,7 +61,7 @@ async function copyTokenToClipboard() {
 
   try {
     await copy(token.value);
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }

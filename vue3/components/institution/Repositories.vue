@@ -93,8 +93,7 @@ const emit = defineEmits({
 /** @type {Ref<object[]>} */
 const repositories = ref(props.institution.repositories || []);
 
-/** @type {Ref<object | null>} Vue ref of the repository form */
-const repositoryFormDialogRef = ref(null);
+const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
 
 const sortedRepositories = computed(
   () => repositories.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
@@ -114,7 +113,7 @@ async function removeRepository(item) {
     repositories.value = repositories.value.filter((i) => i.pattern !== item.pattern);
 
     emit('update:modelValue', repositories.value);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 }

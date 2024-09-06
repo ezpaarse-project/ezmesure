@@ -9,7 +9,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <v-btn
-        v-if="institutionFormRef"
+        v-if="institutionFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
@@ -124,7 +124,7 @@
 
           <v-list>
             <v-list-item
-              v-if="institutionFormRef"
+              v-if="institutionFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
               @click="showForm(item)"
@@ -185,7 +185,7 @@
     </SelectionMenu>
 
     <InstitutionFormDialog
-      ref="institutionFormRef"
+      ref="institutionFormDialogRef"
       @update:model-value="refresh()"
     />
 
@@ -220,14 +220,10 @@ const snacks = useSnacksStore();
 
 const selectedInstitutions = ref([]);
 
-/** @type {Ref<Object | null>} Vue ref of the institution form */
-const institutionFormRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the components list */
-const institutionComponentsDialogRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the repositories list */
-const institutionRepositoriesDialogRef = ref(null);
-/** @type {Ref<Object | null>} Vue ref of the spaces list */
-const institutionSpacesDialogRef = ref(null);
+const institutionFormDialogRef = useTemplateRef('institutionFormDialogRef');
+const institutionComponentsDialogRef = useTemplateRef('institutionComponentsDialogRef');
+const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
+const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
 
 const {
   refresh, // Refresh the data
@@ -335,11 +331,11 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
  */
 async function showForm(item) {
   if (item) {
-    institutionFormRef.value?.open(item);
+    institutionFormDialogRef.value?.open(item);
     return;
   }
 
-  institutionFormRef.value?.open(undefined, { addAsMember: false });
+  institutionFormDialogRef.value?.open(undefined, { addAsMember: false });
 }
 
 /**
@@ -367,7 +363,7 @@ function deleteInstitutions(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/institutions/${item.id}`, { method: 'DELETE' });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotDeleteItem', { id: item.name || item.id }));
             return Promise.resolve(null);
           }
@@ -408,7 +404,7 @@ function toggleInstitutions(items) {
               method: 'PUT',
               body: { value },
             });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotUpdateItem', { id: item.name || item.id }));
             return Promise.resolve(null);
           }
@@ -440,7 +436,7 @@ async function copyInstitutionId({ id }) {
 
   try {
     await copy(id);
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }

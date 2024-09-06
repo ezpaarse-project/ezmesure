@@ -159,7 +159,7 @@ async function unlinkInstitution(item) {
     institutions.value = institutions.value.filter((i) => i.id !== item.id);
 
     hasChanged.value = true;
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 }
@@ -181,7 +181,7 @@ async function linkInstitution() {
 
     hasChanged.value = true;
     isSearchOpen.value = false;
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
   isLinkLoading.value = false;

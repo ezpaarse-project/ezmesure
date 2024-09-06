@@ -400,7 +400,7 @@ async function save(actions) {
   try {
     await Promise.all(toDo.map((action) => action()));
     emit('update:modelValue', props.modelValue);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 

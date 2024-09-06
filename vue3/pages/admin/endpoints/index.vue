@@ -9,14 +9,14 @@
       @update:model-value="debouncedRefresh()"
     >
       <v-btn
-        v-if="endpointFormRef"
+        v-if="endpointFormDialogRef"
         v-tooltip="$t('add')"
         icon="mdi-plus"
         variant="tonal"
         density="comfortable"
         color="green"
         class="mr-2"
-        @click="endpointFormRef.open()"
+        @click="endpointFormDialogRef.open()"
       />
     </SkeletonPageBar>
 
@@ -85,16 +85,16 @@
 
           <v-list>
             <v-list-item
-              v-if="endpointFormRef"
+              v-if="endpointFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
-              @click="endpointFormRef?.open(item)"
+              @click="endpointFormDialogRef?.open(item)"
             />
             <v-list-item
-              v-if="endpointFormRef"
+              v-if="endpointFormDialogRef"
               :title="$t('duplicate')"
               prepend-icon="mdi-content-copy"
-              @click="endpointFormRef?.open({ ...item, id: null })"
+              @click="endpointFormDialogRef?.open({ ...item, id: null })"
             />
             <v-list-item
               :title="$t('delete')"
@@ -145,7 +145,7 @@
     </SelectionMenu>
 
     <SushiEndpointFormDialog
-      ref="endpointFormRef"
+      ref="endpointFormDialogRef"
       @submit="refresh()"
     />
   </div>
@@ -165,8 +165,7 @@ const snacks = useSnacksStore();
 const selectedEndpoints = ref([]);
 const activeLoadingMap = ref(new Map());
 
-/** @type {Ref<object | null>} Vue ref of the endpoint form */
-const endpointFormRef = ref(null);
+const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
 
 const {
   refresh,
@@ -267,7 +266,7 @@ async function toggleActiveStates(items) {
         item.active = active;
         activeLoadingMap.value.set(item.id, false);
         return item;
-      } catch (e) {
+      } catch {
         snacks.error(t('endpoints.unableToUpdate'));
         activeLoadingMap.value.set(item.id, false);
         return null;
@@ -304,7 +303,7 @@ function deleteEndpoints(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/sushi-endpoints/${item.id}`, { method: 'DELETE' });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotDeleteItem', { id: item.id }));
             return Promise.resolve(null);
           }
@@ -336,7 +335,7 @@ async function copyEndpointId({ id }) {
 
   try {
     await copy(id);
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }

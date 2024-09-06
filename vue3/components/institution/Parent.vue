@@ -126,7 +126,7 @@ async function unlinkParent(item) {
     parent.value = undefined;
 
     emit('update:modelValue', parent.value);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 }
@@ -148,7 +148,7 @@ async function linkParent() {
 
     emit('update:modelValue', parent.value);
     isSearchOpen.value = false;
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
   isLinkLoading.value = false;

@@ -6,7 +6,6 @@
     persistent
   >
     <SpaceForm
-      ref="spaceFormRef"
       :model-value="space"
       :institution="institution"
       show-space
@@ -33,9 +32,6 @@ const isOpen = ref(false);
 const space = ref(undefined);
 /** @type {Ref<object | undefined>} */
 const institution = ref(undefined);
-
-/** @type {Ref<object | null>} Vue ref of the space form */
-const spaceFormRef = ref(null);
 
 async function open(s, opts) {
   space.value = s;

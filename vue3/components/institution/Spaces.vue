@@ -136,8 +136,7 @@ const snacks = useSnacksStore();
 /** @type {Ref<object[]>} */
 const spaces = ref(props.institution.spaces || []);
 
-/** @type {Ref<object | null>} Vue ref of the repository form */
-const spaceFormDialogRef = ref(null);
+const spaceFormDialogRef = useTemplateRef('spaceFormDialogRef');
 
 const sortedSpaces = computed(
   () => spaces.value.toSorted((a, b) => a.name.localeCompare(b.name)),
@@ -162,7 +161,7 @@ async function removeSpace(item) {
     spaces.value = spaces.value.filter((i) => i.id !== item.id);
 
     emit('update:modelValue', spaces.value);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 }

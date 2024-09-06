@@ -46,7 +46,7 @@ const props = defineProps({
 });
 
 defineEmits({
-  'update:modelValue': (institution) => true,
+  'update:modelValue': (institution) => institution === undefined || !!institution,
 });
 
 const { t } = useI18n();

@@ -426,7 +426,7 @@ async function save() {
       });
     }
     emit('submit', newEndpoint);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 

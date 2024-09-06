@@ -5,7 +5,6 @@
     @update:model-value="close()"
   >
     <InstitutionSpaces
-      ref="institutionSpacesRef"
       :institution="institution"
       show-institution
       @update:model-value="hasChanged = true"
@@ -31,9 +30,6 @@ const isOpen = ref(false);
 const hasChanged = ref(false);
 /** @type {Ref<object|null>} */
 const institution = ref(null);
-
-/** @type {Ref<Object | null>} Vue ref of the component list */
-const institutionSpacesRef = ref(null);
 
 function open(i) {
   institution.value = i;

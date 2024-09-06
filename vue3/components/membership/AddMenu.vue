@@ -107,7 +107,7 @@ async function addMember(user) {
     });
     emit('update:model-value', membership);
     isOpen.value = false;
-  } catch (e) {
+  } catch {
     snacks.error(t('institutions.members.cannotAddMember'));
   }
 }

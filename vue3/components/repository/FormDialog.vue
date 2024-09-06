@@ -6,7 +6,6 @@
     persistent
   >
     <RepositoryForm
-      ref="repositoryFormRef"
       :completion="completion"
       :institution="institution"
       @submit="onSave($event)"
@@ -37,9 +36,6 @@ const emit = defineEmits({
 const isOpen = ref(false);
 /** @type {Ref<object | undefined>} */
 const institution = ref(undefined);
-
-/** @type {Ref<object | null>} Vue ref of the repository form */
-const repositoryFormRef = ref(null);
 
 async function open(opts) {
   institution.value = opts?.institution;

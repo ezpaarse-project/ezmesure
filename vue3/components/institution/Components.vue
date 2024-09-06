@@ -136,7 +136,7 @@ async function unlinkComponent(item) {
     components.value = components.value.filter((i) => i.id !== item.id);
 
     emit('update:modelValue', components.value);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 }
@@ -162,7 +162,7 @@ async function linkComponent() {
 
     emit('update:modelValue', components.value);
     isSearchOpen.value = false;
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
   isLinkLoading.value = false;

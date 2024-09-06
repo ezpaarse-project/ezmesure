@@ -6,7 +6,6 @@
     persistent
   >
     <MembershipForm
-      ref="membershipFormRef"
       :model-value="membership"
       :institution="institution"
       @update:model-value="onSave"
@@ -32,9 +31,6 @@ const isOpen = ref(false);
 const membership = ref(undefined);
 /** @type {Ref<object | undefined>} */
 const institution = ref(undefined);
-
-/** @type {Ref<object | null>} Vue ref of the membership form */
-const membershipFormRef = ref(null);
 
 async function open(m, opts) {
   membership.value = m;

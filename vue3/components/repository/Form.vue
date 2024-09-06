@@ -166,7 +166,7 @@ async function save() {
     }
 
     emit('submit', newRepository);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 

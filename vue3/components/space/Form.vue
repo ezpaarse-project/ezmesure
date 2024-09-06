@@ -159,7 +159,6 @@ const { data: permissions } = await useAsyncData(
   },
 );
 
-const originalTypeChip = computed(() => ({ text: t(`spaces.types.${space.value.type}`), color: repoColors.get(space.value.type) }));
 const isEditing = computed(() => !!props.modelValue?.id);
 
 function applyPreset() {
@@ -193,7 +192,7 @@ async function save() {
     });
 
     emit('submit', newSpace);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 

@@ -290,7 +290,7 @@ async function checkConnection() {
     if (sushi.value.endpoint?.id === props.modelValue?.endpoint?.id) {
       emit('update:modelValue', sushi.value);
     }
-  } catch (e) {
+  } catch {
     snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: sushi.value.endpoint?.vendor }));
   }
 
@@ -324,7 +324,7 @@ async function save() {
       });
     }
     emit('submit', newSushi);
-  } catch (err) {
+  } catch {
     snacks.error(t('anErrorOccurred'));
   }
 

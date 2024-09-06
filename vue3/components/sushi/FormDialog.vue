@@ -6,7 +6,6 @@
     persistent
   >
     <SushiForm
-      ref="sushiFormRef"
       :model-value="sushi"
       :institution="institution"
       show-sushi
@@ -36,9 +35,6 @@ const isOpen = ref(false);
 const sushi = ref(undefined);
 /** @type {Ref<object | undefined>} */
 const institution = ref(undefined);
-
-/** @type {Ref<Object | null>} Vue ref of the sushi form */
-const sushiFormRef = ref(null);
 
 async function open(s, opts) {
   sushi.value = s;

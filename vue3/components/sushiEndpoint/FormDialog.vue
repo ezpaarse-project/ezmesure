@@ -6,7 +6,6 @@
     persistent
   >
     <SushiEndpointForm
-      ref="endpointFormRef"
       :model-value="endpoint"
       show-endpoint
       @submit="onSave($event)"
@@ -33,9 +32,6 @@ const emit = defineEmits({
 const isOpen = ref(false);
 /** @type {Ref<object | undefined>} */
 const endpoint = ref(undefined);
-
-/** @type {Ref<Object | null>} Vue ref of the endpoint form */
-const endpointFormRef = ref(null);
 
 async function open(e) {
   endpoint.value = e;

@@ -170,7 +170,7 @@ async function checkConnection() {
         endpoint: props.endpoint,
       },
     });
-  } catch (e) {
+  } catch {
     snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: endpoint.value?.vendor }));
   }
 

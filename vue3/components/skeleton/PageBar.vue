@@ -90,7 +90,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'update:modelValue': (value) => true,
+  'update:modelValue': (value) => !!value,
   'update:search': (value) => value.length >= 0,
   'update:filters': (value) => !!value,
 });

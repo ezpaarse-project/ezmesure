@@ -155,8 +155,7 @@ const snacks = useSnacksStore();
 
 const selectedMembers = ref([]);
 
-/** @type {Ref<object | null>} Vue ref of the membership form */
-const membershipFormDialogRef = ref(null);
+const membershipFormDialogRef = useTemplateRef('membershipFormDialogRef');
 
 const {
   error,
@@ -282,7 +281,7 @@ function deleteMembers(items) {
             return $fetch(`/api/institutions/${institution.value.id}/memberships/${item.username}`, {
               method: 'DELETE',
             });
-          } catch (e) {
+          } catch {
             snacks.error(t('cannotDeleteItem', { id: item.name || item.id }));
             return Promise.resolve(null);
           }
@@ -310,7 +309,7 @@ async function copyEmails(items) {
 
   try {
     await copy(emails.join(';'));
-  } catch (e) {
+  } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;
   }

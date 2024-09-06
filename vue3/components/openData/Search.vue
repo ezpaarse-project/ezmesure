@@ -65,7 +65,7 @@ const fetchData = useDebounceFn(async () => {
         q: search.value,
       },
     });
-  } catch (err) {
+  } catch {
     hasError.value = true;
   }
 
