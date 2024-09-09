@@ -88,13 +88,13 @@
               v-if="endpointFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
-              @click="endpointFormDialogRef?.open(item)"
+              @click="endpointFormDialogRef.open(item)"
             />
             <v-list-item
               v-if="endpointFormDialogRef"
               :title="$t('duplicate')"
               prepend-icon="mdi-content-copy"
-              @click="endpointFormDialogRef?.open({ ...item, id: null })"
+              @click="endpointFormDialogRef.open({ ...item, id: null })"
             />
             <v-list-item
               :title="$t('delete')"
@@ -136,6 +136,11 @@
 
         <v-divider />
 
+        <v-list-item
+          :title="$t('institutions.sushi.credentials')"
+          :to="`/admin/endpoints/${item.id}`"
+          prepend-icon="mdi-key"
+        />
         <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
           prepend-icon="mdi-toggle-switch"
