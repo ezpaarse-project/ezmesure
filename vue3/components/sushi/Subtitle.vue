@@ -12,6 +12,19 @@
       class="mr-1"
     />
   </div>
+  <div v-else-if="modelValue?.institution">
+    {{ modelValue.institution.name }}
+    -
+    <v-chip
+      v-for="(pkg, index) in modelValue.packages"
+      :key="index"
+      :text="pkg"
+      size="small"
+      density="compact"
+      label
+      class="mr-1"
+    />
+  </div>
 </template>
 
 <script setup>

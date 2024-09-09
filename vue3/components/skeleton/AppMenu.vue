@@ -7,8 +7,9 @@
 
         <v-btn
           v-else
-          :key="item.key || item.to"
+          :key="item.key || item.to || item.href"
           :to="item.to"
+          :href="item.href"
           :text="item.text"
           :exact="item.exact"
           variant="text"
@@ -55,8 +56,9 @@
 
             <v-list-item
               v-else
-              :key="item.to || item.key"
+              :key="item.key || item.to || item.href"
               :to="item.to"
+              :href="item.href"
               :text="item.text"
               :exact="item.exact"
             />
@@ -78,7 +80,7 @@ const items = computed(() => [
 
   { separator: true, key: 'menu-separator' },
 
-  { text: t('menu.dashboard'), to: '/kibana/', exact: true },
+  { text: t('menu.dashboard'), href: '/kibana/', exact: true },
   { text: t('menu.myspace'), to: '/myspace/' },
   { text: t('administration'), to: '/admin/', hide: !user.value?.isAdmin },
 ].filter((item) => !item.hide));

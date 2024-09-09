@@ -59,6 +59,8 @@
                   v-if="item.href"
                   v-tooltip="$t('download')"
                   :href="item.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   icon="mdi-download"
                   color="primary"
                   variant="flat"

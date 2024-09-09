@@ -67,14 +67,14 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 const checkQueue = useSushiCheckQueueStore();
-const { idsInQueue, currentlyTesting } = storeToRefs(checkQueue);
+const { idsInQueue, currentlyTesting, isTesting } = storeToRefs(checkQueue);
 
 const status = computed(() => props.sushi?.connection?.status || 'untested');
 const checkState = computed(() => {
   if (idsInQueue.value.has(props.sushi?.id)) {
     return 'queued';
   }
-  if (currentlyTesting.value?.id === props.sushi?.id) {
+  if (currentlyTesting.value?.id === props.sushi?.id && isTesting.value) {
     return 'loading';
   }
   return undefined;

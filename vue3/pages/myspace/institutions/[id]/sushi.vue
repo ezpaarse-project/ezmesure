@@ -104,6 +104,7 @@
     <v-data-table-server
       v-model="selectedSushi"
       :headers="headers"
+      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
       density="comfortable"
       show-select
       show-expand
@@ -153,7 +154,7 @@
 
       <template #[`item.endpoint.vendor`]="{ item }">
         <div>
-          <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`">
+          <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
             {{ item.endpoint.vendor }}
           </nuxt-link>
           <span v-else>{{ item.endpoint.vendor }}</span>
@@ -183,7 +184,7 @@
 
       <template #[`item.connection`]="{ item }">
         <SushiConnectionChip
-          :sushi="item"
+          :sushi="{ ...item, institution }"
           :disabled="isLocked"
           @update:model-value="item.connection = $event; debouncedRefresh()"
         />
@@ -458,6 +459,7 @@ const headers = computed(() => [
     title: t('institutions.sushi.lastHarvest'),
     value: 'harvests',
     align: 'center',
+    width: '230px',
   },
   {
     title: t('institutions.sushi.updatedAt'),
@@ -609,7 +611,7 @@ function checkConnections(items) {
   }
   // eslint-disable-next-line no-restricted-syntax
   for (const item of toCheck) {
-    addToCheck(item, {
+    addToCheck({ ...item, institution: institution.value }, {
       onComplete: (err, connection) => {
         if (connection) {
           item.connection = connection;

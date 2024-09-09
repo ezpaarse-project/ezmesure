@@ -10,7 +10,11 @@
           position="fixed"
           location="bottom right"
           size="large"
-          style="bottom: 1rem; right: 1rem;"
+          :style="{
+            bottom: hasSnackMessages ? '4rem' : '1rem',
+            right: '1rem',
+            transition: 'bottom .3s ease',
+          }"
           v-bind="menu"
         />
       </v-slide-y-reverse-transition>
@@ -47,4 +51,7 @@ defineEmits({
 });
 
 const open = ref(false);
+const snacks = useSnacksStore();
+
+const hasSnackMessages = computed(() => snacks.messages.length > 0);
 </script>
