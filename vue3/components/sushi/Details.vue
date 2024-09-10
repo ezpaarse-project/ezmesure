@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import urlJoin from 'url-join';
+import { joinURL } from 'ufo'; // ufo is used by $fetch (https://nuxt.com/docs/api/composables/use-fetch#usage)
 import {
   subMonths,
   format,
@@ -98,7 +98,7 @@ const credentialUrl = computed(() => {
   const testedReport = endpoint.testedReport || 'pr';
   const harvestDateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
 
-  const url = new URL(urlJoin(sushiUrl, `reports/${testedReport}`));
+  const url = new URL(joinURL(sushiUrl, `reports/${testedReport}`));
 
   const threeMonthAgo = subMonths(new Date(), 3);
   url.search = new URLSearchParams(
