@@ -214,7 +214,7 @@ endpoints:
   dateFormat: Format de date
   dateFormatDesc: Le format de date ci-dessous sera utilisé pour remplir les champs {beginDate} et {endDate} lors du moissonnage.
   unableToUpdate: Impossible de modifier le point d'accès
-  inactiveDescription: Les administrateurs ont rendus ce point d'accès inactif et ne sera donc pas moissonné.
+  inactiveDescription: Ce point d'accès a été rendu inactif par les administrateurs et ne sera donc pas moissonné.
   activeSince: Actif depuis le {date}
   inactiveSince: Inactif depuis le {date}
   technicalProvider: Prestataire technique
@@ -622,6 +622,7 @@ sushi:
   deleteNbCredentials: >
     Vous allez supprimer {count} identifiant SUSHI.
     |Vous allez supprimer {count} identifiants SUSHI.
+  problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
   inactive: Identifiant inactif
@@ -629,7 +630,7 @@ sushi:
   harvestState: État du moissonnage
   harvestStateDescription: Cette matrice présente les différents résultats du moissonnage de ces identifiants. Chaque résultat peut être survolé pour obtenir plus d'informations, notamment quelles erreurs ont pu survenir lors de la récupération des données.
   harvestedAt: Moissonné le {date}
-  checking: Vérification de la connexion de "{vendor}"
+  checking: Vérification de la connexion de {vendor} pour {name}
   report: Rapport
   checkBeforeSave: Vérifier les identifiants avant de sauvegarder
   openHelpPage: Ouvrir page d'aide
@@ -736,10 +737,11 @@ clipboard:
   textCopied: Texte copié dans le presse-papier
 users:
   toolbarTitle: Utilisateurs ({count})
+  manageUsers: >
+    Gérer les utilisateurs
+    |Gérer {count} utilisateurs
   updateUser: Mettre à jour l'utilisateur
-  deleteNbUsers: Vous allez supprimer {count} utilisateur. Les index, espaces, et
-    rôles associés ne seront pas affectés.|Vous allez supprimer {count} utilisateurs.
-    Les index, espaces, et rôles associés ne seront pas affectés.
+  deleteNbUsers: Vous allez supprimer {count} utilisateur. Les index, espaces, et rôles associés ne seront pas affectés.|Vous allez supprimer {count} utilisateurs. Les index, espaces, et rôles associés ne seront pas affectés.
   newUser: Nouvel utilisateur
   doesNotExist: L'utilisateur auquel vous essayez d'accéder n'est pas référencé
   unableToFetchInformations: Impossible de récupérer les informations d'utilisateur
