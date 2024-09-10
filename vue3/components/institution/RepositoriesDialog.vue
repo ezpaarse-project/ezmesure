@@ -11,11 +11,10 @@
     >
       <template #actions>
         <v-btn
-          text
+          :text="$t('close')"
+          variant="text"
           @click="close()"
-        >
-          {{ $t('close') }}
-        </v-btn>
+        />
       </template>
     </InstitutionRepositories>
   </v-dialog>
@@ -23,7 +22,7 @@
 
 <script setup>
 const emit = defineEmits({
-  'update:modelValue': (repositories) => !!repositories,
+  'update:modelValue': () => true,
 });
 
 const isOpen = ref(false);

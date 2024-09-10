@@ -45,7 +45,7 @@
 
         <v-row v-else>
           <v-col>
-            <v-list>
+            <v-list density="compact">
               <MembershipAddMenuItem
                 v-for="user in users"
                 :key="user.username"

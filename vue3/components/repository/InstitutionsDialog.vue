@@ -64,13 +64,14 @@
           {{ $t('repositories.noInstitutions') }}
         </div>
 
-        <v-list v-else>
+        <v-list v-else density="compact">
           <v-list-item
             v-for="institution in sortedInstitutions"
             :key="institution.id"
             :to="`/admin/institutions/${institution.id}`"
             :title="institution.name"
             :subtitle="institution.acronym"
+            lines="two"
           >
             <template #prepend>
               <InstitutionAvatar :institution="institution" />

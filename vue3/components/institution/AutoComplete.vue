@@ -23,6 +23,7 @@
       <v-list-item
         :title="item.name"
         :subtitle="item.city"
+        lines="two"
         v-bind="listItem"
       >
         <template #prepend>

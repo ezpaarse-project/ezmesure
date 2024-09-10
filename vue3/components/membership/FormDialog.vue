@@ -8,7 +8,7 @@
     <MembershipForm
       :model-value="membership"
       :institution="institution"
-      @update:model-value="onSave"
+      @update:model-value="onSave()"
     >
       <template #actions>
         <v-btn

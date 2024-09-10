@@ -325,7 +325,7 @@ const openData = ref(null);
 const addAsMember = ref(false);
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const isEditing = computed(() => !!institution.value.id);
 const logoSrc = computed(() => {

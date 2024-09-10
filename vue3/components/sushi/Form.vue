@@ -212,7 +212,7 @@ const isAdvancedOpen = ref(false);
 const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const connectionStatus = computed(() => {

@@ -16,13 +16,14 @@
             </template>
 
             <template #text>
-              <v-list>
+              <v-list density="compact">
                 <v-list-item
                   v-for="field in fields"
                   :key="field.name"
                   :prepend-icon="field.icon"
                   :title="field.value"
                   :subtitle="$t(`myspace.${field.name}`)"
+                  lines="two"
                 />
               </v-list>
             </template>
@@ -49,7 +50,7 @@
 
               <v-row>
                 <v-col v-if="spacesPermissions.length > 0">
-                  <v-list>
+                  <v-list density="compact">
                     <v-list-subheader>{{ $t('myspace.spaces') }}</v-list-subheader>
 
                     <v-list-item
@@ -59,6 +60,7 @@
                       :title="permission.space.name || permission.spaceId"
                       prepend-icon="mdi-tab"
                       append-icon="mdi-arrow-right"
+                      lines="two"
                     >
                       <template #subtitle>
                         {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}
@@ -76,7 +78,7 @@
                 </v-col>
 
                 <v-col v-if="reposPermissions.length > 0">
-                  <v-list>
+                  <v-list density="compact">
                     <v-list-subheader>{{ $t('myspace.repos') }}</v-list-subheader>
 
                     <v-list-item
@@ -84,6 +86,7 @@
                       :key="i"
                       :title="permission.repositoryPattern"
                       prepend-icon="mdi-database-outline"
+                      lines="two"
                     >
                       <template #subtitle>
                         {{ permission.readonly ? $t('permissions.read') : $t('permissions.write') }}

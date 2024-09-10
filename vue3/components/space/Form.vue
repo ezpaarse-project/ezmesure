@@ -133,7 +133,7 @@ const valid = ref(false);
 const space = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const { data: permissions } = await useAsyncData(
   `/api/kibana-spaces/${props.modelValue?.id || '-'}/permissions`,

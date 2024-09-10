@@ -13,19 +13,21 @@
     <v-card-subtitle>{{ institution.acronym }}</v-card-subtitle>
 
     <v-card-text>
-      <v-list>
+      <v-list density="compact">
         <v-list-item
           v-for="field in fields"
           :key="field.name"
           :title="field.value"
           :prepend-icon="field.icon"
           :subtitle="$t(`institutions.institution.${field.name}`)"
+          lines="two"
         />
 
         <v-list-item
           v-if="links.length > 0"
           :subtitle="$t('institutions.institution.links')"
           prepend-icon="mdi-link-variant"
+          lines="two"
         >
           <template #title>
             <v-btn

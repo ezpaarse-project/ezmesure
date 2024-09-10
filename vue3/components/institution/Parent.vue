@@ -53,6 +53,7 @@
           :to="`/admin/institutions/${parent.id}`"
           :title="parent.name"
           :subtitle="parent.acronym"
+          lines="two"
         >
           <template #prepend>
             <InstitutionAvatar :institution="parent" />

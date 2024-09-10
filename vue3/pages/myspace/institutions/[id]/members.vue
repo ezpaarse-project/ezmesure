@@ -46,14 +46,13 @@
         <v-chip
           v-for="role in value"
           :key="role"
+          :text="$t(`institutions.members.roleNames.${role}`)"
           :prepend-icon="roleColors.get(role)?.icon"
           :color="roleColors.get(role)?.color"
           size="small"
           label
           class="mr-1"
-        >
-          {{ $t(`institutions.members.roleNames.${role}`) }}
-        </v-chip>
+        />
       </template>
 
       <template #[`item.repositoryPermissions`]="{ value, item }">

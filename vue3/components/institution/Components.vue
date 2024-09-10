@@ -52,13 +52,14 @@
         {{ $t('components.noComponent') }}
       </div>
 
-      <v-list v-else>
+      <v-list v-else density="compact">
         <v-list-item
           v-for="component in sortedComponents"
           :key="component.id"
           :to="`/admin/institutions/${component.id}`"
           :title="component.name"
           :subtitle="component.acronym"
+          lines="two"
         >
           <template #prepend>
             <InstitutionAvatar :institution="component" />

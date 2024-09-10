@@ -1,5 +1,5 @@
 <template>
-  <v-list-item :title="space.name">
+  <v-list-item :title="space.name" lines="two">
     <template #append>
       <v-slide-x-reverse-transition>
         <v-icon v-if="success" icon="mdi-check" color="success" start />

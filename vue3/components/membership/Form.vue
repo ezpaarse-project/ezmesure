@@ -100,7 +100,7 @@
                 variant="outlined"
               >
                 <template #text>
-                  <v-list>
+                  <v-list density="compact">
                     <MembershipRepositoryPermissionItem
                       v-for="repo in repositories"
                       :key="repo.pattern"
@@ -124,7 +124,7 @@
                 variant="outlined"
               >
                 <template #text>
-                  <v-list>
+                  <v-list density="compact">
                     <MembershipSpacePermissionItem
                       v-for="space in spaces"
                       :key="space.id"
@@ -208,6 +208,8 @@ const permissions = ref(new Map());
 const repositoryPermissions = ref(new Map());
 /** @type {Ref<Map<string, string>>} */
 const spacePermissions = ref(new Map());
+
+const formRef = useTemplateRef('formRef');
 
 /**
  * If current member is locked

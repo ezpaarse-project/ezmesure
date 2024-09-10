@@ -2,7 +2,7 @@
   <v-card
     :title="isEditing ? $t('endpoints.updateEndpoint') : $t('endpoints.addEndpoint')"
     :subtitle="showEndpoint ? modelValue?.vendor : undefined"
-    prepend-icon="mdi-key-plus"
+    prepend-icon="mdi-server-plus"
   >
     <template #text>
       <v-row>
@@ -361,7 +361,7 @@ const isConnectionMenuOpen = ref(false);
 const endpoint = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const looksLikeSoapUrl = computed(() => (endpoint.value.sushiUrl || '').toLowerCase().includes('soap') && t('endpoints.soapWarning'));

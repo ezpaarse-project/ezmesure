@@ -21,11 +21,12 @@
         {{ $t('repositories.noRepository') }}
       </div>
 
-      <v-list v-else>
+      <v-list v-else density="compact">
         <v-list-item
           v-for="repository in sortedRepositories"
           :key="repository.pattern"
           :title="repository.pattern"
+          lines="two"
         >
           <template #subtitle>
             <v-chip

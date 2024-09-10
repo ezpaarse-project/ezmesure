@@ -103,7 +103,7 @@ const sushi = ref({
 });
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const authFields = computed(() => {
   const fields = ['customerId', 'requestorId', 'apiKey'];

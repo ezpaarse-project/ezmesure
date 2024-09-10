@@ -4,6 +4,7 @@
     :title="user.fullName"
     :subtitle="user.email"
     prepend-icon="mdi-account-circle"
+    lines="two"
   >
     <template #append>
       <v-menu open-on-hover>

@@ -50,6 +50,7 @@
         :subtitle="$t('endpoints.clickToDeclareOne')"
         prepend-icon="mdi-plus-circle-outline"
         to="/contact-us"
+        lines="two"
       />
     </template>
   </v-autocomplete>

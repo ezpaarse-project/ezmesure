@@ -3,6 +3,7 @@
     :title="title"
     :subtitle="subtitle"
     :active="active"
+    :lines="title && subtitle ? 'two' : 'one'"
     @click="$emit('click', $event)"
   />
 </template>
