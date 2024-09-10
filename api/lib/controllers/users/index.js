@@ -6,6 +6,8 @@ const {
   adminCreateSchema,
 } = require('../../entities/users.dto');
 
+const memberships = require('./memberships');
+
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   standardQueryParams,
@@ -18,6 +20,8 @@ const {
   importUsers,
   impersonateUser,
 } = require('./actions');
+
+router.use(memberships.prefix('/:username/memberships').middleware());
 
 router.use(requireJwt, requireUser);
 
