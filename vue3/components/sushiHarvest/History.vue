@@ -81,9 +81,6 @@ const {
   fetch: {
     url: '/api/tasks',
   },
-  async: {
-    lazy: true,
-  },
   data: {
     credentialsId: props.sushi.id,
     sortBy: [{ key: 'createdAt', order: 'desc' }],

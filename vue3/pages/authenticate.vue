@@ -123,14 +123,17 @@
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
-    navigateAuthenticatedTo: '/myspace',
   },
 });
 
 const { public: config } = useRuntimeConfig();
 const { t } = useI18n();
-const { signIn } = useAuth();
+const { signIn, status } = useAuth();
 const { query } = useRoute();
+
+if (status.value === 'authenticated') {
+  await navigateTo('/myspace');
+}
 
 let provider = config.shibbolethEnabled ? 1 : 0;
 if (query?.provider === 'kibana') {

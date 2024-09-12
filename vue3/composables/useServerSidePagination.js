@@ -73,7 +73,8 @@ export default async function useServerSidePagination(params = {}) {
           ...queryParams
         } = query.value;
         // try to use sort mapping, fallback to original key
-        const sort = sortMapping.get(sortBy?.[0]?.key) ?? sortBy?.[0]?.key;
+        const sort = sortBy.map(({ key }) => sortMapping.get(key) ?? key);
+        const order = sortBy.map((v) => v.order);
         // transform query params
         fetchOpts[queryKey] = {
           ...(fetchOpts?.[queryKey] ?? {}),
@@ -81,7 +82,7 @@ export default async function useServerSidePagination(params = {}) {
           page: query.value.page,
           size: Math.max(itemsPerPage.value, 0),
           q: query.value.search,
-          order: sortBy?.[0]?.order,
+          order,
           sort,
         };
 
@@ -100,7 +101,10 @@ export default async function useServerSidePagination(params = {}) {
         throw error;
       }
     },
-    params.async,
+    {
+      lazy: true,
+      ...(params.async ?? {}),
+    },
   );
 
   const onDataTableOptionsUpdate = ({ size, ...data }) => {
@@ -113,6 +117,16 @@ export default async function useServerSidePagination(params = {}) {
     };
     return asyncData.refresh();
   };
+
+  /**
+   * Options to bind to `v-pagination`
+   */
+  const vPaginationOptions = computed(() => ({
+    modelValue: query.value.page,
+    length: Math.ceil(itemLength.value.current / itemsPerPage.value),
+
+    'onUpdate:modelValue': (page) => onDataTableOptionsUpdate({ page }),
+  }));
 
   /**
    * Options to bind to `v-data-table`
@@ -135,6 +149,7 @@ export default async function useServerSidePagination(params = {}) {
     ...asyncData,
     itemLength,
     query,
+    vPaginationOptions,
     vDataTableOptions,
   };
 }

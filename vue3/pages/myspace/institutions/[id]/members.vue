@@ -170,9 +170,6 @@ const {
   fetch: {
     url: `/api/institutions/${params.id}/memberships`,
   },
-  async: {
-    lazy: true, // Don't block page load
-  },
   sortMapping: {
     repositoryPermissions: 'repositoryPermissions._count',
     spacePermissions: 'spacePermissions._count',

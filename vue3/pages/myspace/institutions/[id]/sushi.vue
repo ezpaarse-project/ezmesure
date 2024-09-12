@@ -56,48 +56,59 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="sushiMetrics?.statuses" class="justify-space-evenly">
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.statuses.success"
-            title-key="sushi.nOperationalCredentials"
-            icon="mdi-check"
-            color="success"
-          />
-        </v-col>
+      <v-row class="justify-space-evenly">
+        <template v-if="!sushiMetrics?.statuses">
+          <v-col v-for="n in 4" :key="n" cols="2">
+            <v-skeleton-loader
+              height="100"
+              type="paragraph"
+            />
+          </v-col>
+        </template>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.statuses.untested"
-            :action-text="$t('show')"
-            title-key="sushi.nUntestedCredentials"
-            icon="mdi-bell-alert"
-            color="info"
-            @click="query.connection = 'untested'; refresh()"
-          />
-        </v-col>
+        <template v-else>
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.statuses.success"
+              title-key="sushi.nOperationalCredentials"
+              icon="mdi-check"
+              color="success"
+            />
+          </v-col>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.statuses.unauthorized"
-            :action-text="$t('show')"
-            title-key="sushi.nInvalidCredentials"
-            icon="mdi-key-alert-outline"
-            color="warning"
-            @click="query.connection = 'unauthorized'; refresh()"
-          />
-        </v-col>
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.statuses.untested"
+              :action-text="$t('show')"
+              title-key="sushi.nUntestedCredentials"
+              icon="mdi-bell-alert"
+              color="info"
+              @click="query.connection = 'untested'; refresh()"
+            />
+          </v-col>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.statuses.failed"
-            :action-text="$t('show')"
-            title-key="sushi.nProblematicEndpoints"
-            icon="mdi-alert-circle"
-            color="error"
-            @click="query.connection = 'faulty'; refresh()"
-          />
-        </v-col>
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.statuses.unauthorized"
+              :action-text="$t('show')"
+              title-key="sushi.nInvalidCredentials"
+              icon="mdi-key-alert-outline"
+              color="warning"
+              @click="query.connection = 'unauthorized'; refresh()"
+            />
+          </v-col>
+
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.statuses.failed"
+              :action-text="$t('show')"
+              title-key="sushi.nProblematicEndpoints"
+              icon="mdi-alert-circle"
+              color="error"
+              @click="query.connection = 'faulty'; refresh()"
+            />
+          </v-col>
+        </template>
       </v-row>
     </v-container>
 
@@ -392,6 +403,13 @@ const {
 } = await useFetch('/api/sushi/_lock');
 
 const {
+  data: sushiMetrics,
+  refresh: sushiMetricsRefresh,
+} = await useFetch(`/api/institutions/${params.id}/sushi/_metrics`, {
+  lazy: true,
+});
+
+const {
   refresh: sushisRefresh,
   itemLength,
   query,
@@ -401,19 +419,11 @@ const {
   fetch: {
     url: `/api/institutions/${params.id}/sushi`,
   },
-  async: {
-    lazy: true, // Don't block page load
-  },
   data: {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
     include: ['endpoint', 'harvests'],
   },
 });
-
-const {
-  data: sushiMetrics,
-  refresh: sushiMetricsRefresh,
-} = await useFetch(`/api/institutions/${params.id}/sushi/_metrics`);
 
 /**
  * If sushi edition is locked

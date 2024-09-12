@@ -51,7 +51,7 @@
               <v-row>
                 <v-col v-if="spacesPermissions.length > 0">
                   <v-list density="compact">
-                    <v-list-subheader>{{ $t('myspace.spaces') }}</v-list-subheader>
+                    <v-list-subheader :title="$t('myspace.spaces')" />
 
                     <v-list-item
                       v-for="(permission, i) in spacesPermissions"
@@ -79,7 +79,7 @@
 
                 <v-col v-if="reposPermissions.length > 0">
                   <v-list density="compact">
-                    <v-list-subheader>{{ $t('myspace.repos') }}</v-list-subheader>
+                    <v-list-subheader :title="$t('myspace.repos')" />
 
                     <v-list-item
                       v-for="(permission, i) in reposPermissions"

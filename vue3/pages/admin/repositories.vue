@@ -26,7 +26,6 @@
       show-select
       return-object
       v-bind="vDataTableOptions"
-      @update:options="refresh()"
     >
       <template #[`item.type`]="{ value }">
         <v-chip
