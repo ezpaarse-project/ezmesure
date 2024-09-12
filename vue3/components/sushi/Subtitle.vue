@@ -1,20 +1,13 @@
 <template>
-  <div v-if="modelValue?.endpoint">
-    {{ modelValue.endpoint.vendor }}
-    -
-    <v-chip
-      v-for="(pkg, index) in modelValue.packages"
-      :key="index"
-      :text="pkg"
-      size="small"
-      density="compact"
-      label
-      class="mr-1"
-    />
-  </div>
-  <div v-else-if="modelValue?.institution">
-    {{ modelValue.institution.name }}
-    -
+  <div v-if="modelValue?.endpoint || modelValue?.institution">
+    <span v-if="modelValue.endpoint">
+      {{ modelValue.endpoint.vendor }}
+      -
+    </span>
+    <span v-if="modelValue.institution">
+      {{ modelValue.institution.acronym || modelValue.institution.name }}
+      -
+    </span>
     <v-chip
       v-for="(pkg, index) in modelValue.packages"
       :key="index"

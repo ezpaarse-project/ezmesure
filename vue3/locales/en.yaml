@@ -785,22 +785,22 @@ spaces:
     counter5: Publisher space
   deleteSpace: You are about to delete "{spaceName}", which will delete the dashboards included in this space. This action cannot be undone.
 harvest:
+  toolbarTitle: Harvests ({count})
   sessions:
     pendingSession: Pending harvest...
-    name: Harvest of {startedAt}
+    startedAt: Harvest started {date}
     metrics:
-      success: Success
-      failed: Failed
-      active: Active
+      waiting: Pending
+      finished: Success
+      running: Active
       delayed: Delayed
-      pending: Pending
+      failed: Failed
     counts:
       institutions: "{n} institution|{n} institutions"
       endpoints: "{n} endpoint|{n} endpoints"
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
-    credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared
-      credentials"
+    credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
   jobs:

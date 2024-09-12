@@ -1,6 +1,8 @@
 <template>
   <v-col :cols="cols">
     <div class="font-weight-medium">
+      <v-icon v-if="prependIcon" :icon="prependIcon" />
+
       {{ label }}
     </div>
 
@@ -21,6 +23,10 @@ defineProps({
   value: {
     type: String,
     default: '',
+  },
+  prependIcon: {
+    type: String,
+    default: undefined,
   },
   cols: {
     type: [String, Number],

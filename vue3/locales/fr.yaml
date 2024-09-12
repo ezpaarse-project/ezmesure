@@ -816,22 +816,22 @@ spaces:
     counter5: Espace éditeurs
   deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
 harvest:
+  toolbarTitle: Moissonnage ({count})
   sessions:
     pendingSession: Moissonnage en attente...
-    name: Moissonnage du {startedAt}
+    startedAt: Moissonnage lancé le {date}
     metrics:
-      success: Réussi
-      failed: Échoué
-      active: Actif
+      waiting: En attente
+      finished: Réussi
+      running: Actif
       delayed: Reporté
-      pending: En attente
+      failed: Échoué
     counts:
       institutions: "{n} établissement|{n} établissements"
       endpoints: "{n} point d'accès|{n} points d'accès"
       reportTypes: "{n} type de rapport|{n} types de rapport"
       credentials: "{n} identifiant|{n} identifiants"
-    credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants
-      ont été déclarés"
+    credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
   jobs:

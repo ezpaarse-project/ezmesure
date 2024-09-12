@@ -19,7 +19,7 @@
       </div>
       <div>
         <span class="text-subtitle-2">{{ $t('tasks.params.index') }}</span>
-        {{ modelValue.index || '...' }}
+        <code class="ml-1">{{ modelValue.index || '...' }}</code>
       </div>
 
       <div class="text-subtitle-1 mt-4">
