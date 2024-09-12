@@ -192,8 +192,11 @@ const prepareStandardQueryParams = ({
   const paginationValidation = {
     size: Joi.number().min(0).default(10),
     page: Joi.number().min(1),
-    sort: Joi.string(),
-    order: Joi.string().valid('asc', 'desc'),
+    sort: stringOrArrayValidation,
+    order: Joi.alternatives().try(
+      Joi.string().valid('asc', 'desc'),
+      Joi.array().items(Joi.string().valid('asc', 'desc')).min(1),
+    ),
     distinct: stringOrArrayValidation,
   };
   if (queryFields?.length > 0) {
@@ -212,11 +215,11 @@ const prepareStandardQueryParams = ({
 
       const size = Number.parseInt(arrayToString(ctx.query.size ?? '10'), 10);
       const page = Number.parseInt(arrayToString(ctx.query.page ?? '1'), 10);
-      const order = arrayToString(ctx.query.order ?? 'asc');
+      const order = stringToArray(ctx.query.order ?? []);
 
       const query = {
         include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFields),
-        orderBy: propsToPrismaSort(arrayToString(sort ?? ''), order === 'asc' ? 'asc' : 'desc'),
+        orderBy: propsToPrismaSort(stringToArray(sort ?? ''), order),
         take: Number.isInteger(size) && size > 0 ? size : undefined,
         skip: Number.isInteger(size) ? size * (page - 1) : undefined,
 
