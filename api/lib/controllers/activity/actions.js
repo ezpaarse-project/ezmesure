@@ -6,20 +6,21 @@ exports.search = async (ctx) => {
   const {
     size = 10,
     page = 1,
-    sort: sortBy = 'datetime',
-    order: sortOrder = 'desc',
-    date,
-    type,
+    sort = 'datetime',
+    order = 'desc',
+    'datetime:from': datetimeFrom,
+    'datetime:to': datetimeTo,
+    action,
     username,
   } = ctx.query;
 
   const from = (page - 1) * size;
   const filter = [];
 
-  if (type) {
+  if (action) {
     filter.push({
       terms: {
-        action: Array.isArray(type) ? type : type.split(',').map((t) => t.trim()),
+        action: Array.isArray(action) ? action : action.split(',').map((t) => t.trim()),
       },
     });
   }
@@ -31,13 +32,13 @@ exports.search = async (ctx) => {
     });
   }
 
-  if (date) {
+  if (datetimeFrom || datetimeTo) {
     filter.push({
       range: {
         datetime: {
           format: 'date_optional_time',
-          gte: date,
-          lte: date,
+          gte: datetimeFrom,
+          lte: datetimeTo,
         },
       },
     });
@@ -48,7 +49,7 @@ exports.search = async (ctx) => {
     size: size || undefined,
     from,
     body: {
-      sort: [{ [sortBy]: { order: sortOrder } }],
+      sort: [{ [sort]: { order } }],
       query: filter.length ? { bool: { filter } } : { match_all: {} },
     },
   });
