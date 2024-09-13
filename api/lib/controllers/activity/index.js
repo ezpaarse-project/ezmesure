@@ -21,8 +21,8 @@ router.route({
     query: {
       size: Joi.number(),
       page: Joi.number(),
-      sortBy: Joi.string().valid('datetime', 'action', 'user.name'),
-      sortOrder: Joi.string().valid('asc', 'desc'),
+      sort: Joi.string().valid('datetime', 'action', 'user.name'),
+      order: Joi.string().valid('asc', 'desc'),
       type: stringOrArray,
       username: stringOrArray,
       date: Joi.date().iso().raw(),

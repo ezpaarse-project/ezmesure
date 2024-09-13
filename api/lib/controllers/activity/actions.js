@@ -6,8 +6,8 @@ exports.search = async (ctx) => {
   const {
     size = 10,
     page = 1,
-    sortBy = 'datetime',
-    sortOrder = 'desc',
+    sort: sortBy = 'datetime',
+    order: sortOrder = 'desc',
     date,
     type,
     username,
@@ -45,7 +45,7 @@ exports.search = async (ctx) => {
 
   const { body = {} } = await elastic.search({
     index: activityIndex,
-    size,
+    size: size || undefined,
     from,
     body: {
       sort: [{ [sortBy]: { order: sortOrder } }],
