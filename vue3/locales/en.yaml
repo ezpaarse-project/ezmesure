@@ -929,3 +929,4 @@ noMatchFor: No results matching "{search}". Press {key} to add it.
 enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL
+nbOthers: (+{count} others)

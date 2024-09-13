@@ -8,12 +8,15 @@ import {
 } from '#imports';
 
 /**
- * @typedef {import('nitropack').NitroFetchOptions & { url: string }} FetchOptions
+ * @typedef {object} CustomFetchOptions
+ * @property {string} url URL to fetch
+ * @property {(data: any) => any} transform Transform data before return
+ *
+ * @typedef {import('nitropack').NitroFetchOptions & CustomFetchOptions} FetchOptions
  * @typedef {import('nuxt/app').AsyncDataOptions} AsyncDataOptions
  *
  * @typedef {object} Params
  * @property {FetchOptions} fetch Params to pass to underlying `$fetch`
- * @property {string} fetch.url URL to fetch
  * @property {AsyncDataOptions} [async] Params to pass to underlying `useAsyncData`
  * @property {Record<string, string>} [sortMapping] Mapping from Vuetify columns' keys to
  * API sort keys
@@ -94,6 +97,10 @@ export default async function useServerSidePagination(params = {}) {
           itemLength.value.total = itemLength.value.current;
         }
 
+        if (params?.fetch?.transform) {
+          // eslint-disable-next-line no-underscore-dangle
+          return params.fetch.transform(res._data);
+        }
         // eslint-disable-next-line no-underscore-dangle
         return res._data;
       } catch (error) {

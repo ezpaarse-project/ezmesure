@@ -961,3 +961,4 @@ noMatchFor: Aucune correspondance pour "{search}". Appuyez sur {key} pour l'ajou
 enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
+nbOthers: (+{count} autres)
