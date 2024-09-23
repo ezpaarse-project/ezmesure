@@ -3,15 +3,13 @@
     :title="title"
     :subtitle="subtitle"
   >
-    <template #text>
-      <div class="d-flex justify-center pb-2">
-        <ProgressCircularStack
-          :value="loaders"
-          :loading="loading && total === 0"
-          size="100"
-        />
-      </div>
-    </template>
+    <v-card-text class="d-flex justify-center pb-2">
+      <ProgressCircularStack
+        :model-value="loaders"
+        :loading="loading && total === 0"
+        size="100"
+      />
+    </v-card-text>
   </v-card>
 </template>
 

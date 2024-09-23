@@ -77,12 +77,9 @@
       </template>
 
       <template #[`item.sushiCredentials`]="{ value, item }">
-        <v-chip
-          :text="`${value.length}`"
-          :variant="!value.length ? 'outlined' : undefined"
+        <SushiCountChip
+          :model-value="value"
           :to="`/admin/institutions/${item.id}/sushi`"
-          prepend-icon="mdi-key"
-          size="small"
         />
       </template>
 

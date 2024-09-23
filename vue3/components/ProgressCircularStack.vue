@@ -20,12 +20,7 @@
             :label="label"
           >
             <div :class="label.color && `text-${label.color}`">
-              <slot
-                :name="`label.${label.key}`"
-                :value="label.value"
-              >
-                {{ label.value }}
-              </slot>
+              {{ label.value }}
             </div>
           </slot>
         </div>
@@ -36,7 +31,7 @@
 
 <script setup>
 const props = defineProps({
-  value: {
+  modelValue: {
     type: Array,
     required: true,
   },
@@ -79,7 +74,7 @@ const loaders = computed(() => {
     ];
   }
 
-  const items = props.value.filter((loader) => loader.value >= 0.01 || loader.loading);
+  const items = props.modelValue.filter((loader) => loader.value >= 0.01 || loader.loading);
   if (items.length <= 0) {
     return [
       {
@@ -103,6 +98,8 @@ const loaders = computed(() => {
         label: loader.label,
         modelValue: loader.value * 100,
         rotate: -90 + (total * 360),
+
+        originalItem: loader,
       };
       total += loader.value;
       return item;
@@ -121,6 +118,8 @@ const labelsToShow = computed(() => {
         key: loader.key,
         value: loader.label || loader.value,
         color: loader.color,
+
+        originalItem: loader.originalItem,
       };
       total += loader.value;
       return item;
