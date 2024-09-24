@@ -21,6 +21,8 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
+
 const typeChip = computed(() => ({
   text: t(`spaces.types.${props.modelValue?.type}`),
   color: repoColors.get(props.modelValue?.type),

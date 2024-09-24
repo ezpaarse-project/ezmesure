@@ -18,7 +18,7 @@
     no-filter
     required
     return-object
-    @update:model-value="$emit('update:modelValue', $event); debouncedRefresh()"
+    @update:model-value="$emit('update:modelValue', $event);"
   >
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
@@ -53,18 +53,16 @@ defineEmits({
 });
 
 const pattern = computed(() => props.modelValue?.pattern);
+const debouncedPattern = useDebounce(pattern, 250);
 
 const {
   error,
-  refresh,
   status,
   data: availableRepositories,
 } = await useFetch('/api/repositories', {
   query: {
-    q: pattern,
+    q: debouncedPattern,
     sort: 'pattern',
   },
 });
-
-const debouncedRefresh = useDebounceFn(refresh, 250);
 </script>
