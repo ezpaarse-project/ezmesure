@@ -2,7 +2,7 @@
   <v-container class="fill-height" style="width: 50%;">
     <v-row>
       <v-col>
-        <v-card class="elevation-10">
+        <v-card elevation="10">
           <v-card-title class="bg-primary d-flex">
             {{ $t('authenticate.restrictedAccess') }}
 
