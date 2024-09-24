@@ -745,7 +745,9 @@ users:
   newUser: Nouvel utilisateur
   doesNotExist: L'utilisateur auquel vous essayez d'accéder n'est pas référencé
   unableToFetchInformations: Impossible de récupérer les informations d'utilisateur
-  createMailUserList: Copier les adresses mails
+  createMailUserList: >
+    Copier l'adresse mail
+    |Copier les adresses mails
   filters:
     title: Filtrer les utilisateurs
     searchHint: Ce champ est remplacé par la barre de recherche

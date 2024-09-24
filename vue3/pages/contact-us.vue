@@ -23,7 +23,7 @@
                       v => /.+@.+\..+/.test(v) || $t('contact.emailMustBeValid'),
                     ]"
                     prepend-icon="mdi-at"
-                    variant="outlined"
+                    variant="underlined"
                     hide-details="auto"
                     required
                   />
@@ -38,7 +38,7 @@
                       v => !!v || $t('contact.subjectIsRequired'),
                     ]"
                     prepend-icon="mdi-pencil"
-                    variant="outlined"
+                    variant="underlined"
                     hide-details="auto"
                     required
                     @update:model-value="onSubjectChange()"
@@ -64,7 +64,7 @@
                               v => !!v || $t('fieldIsRequired'),
                             ]"
                             prepend-icon="mdi-rename"
-                            variant="outlined"
+                            variant="underlined"
                             hide-details="auto"
                             required
                           />
@@ -79,7 +79,7 @@
                               v => isValidUrl(v) || $t('enterValidUrl'),
                             ]"
                             prepend-icon="mdi-link-variant"
-                            variant="outlined"
+                            variant="underlined"
                             hide-details="auto"
                             required
                           />
@@ -109,7 +109,7 @@
                             :label="$t('institutions.sushi.requestorId')"
                             :error-messages="sushiRule"
                             prepend-icon="mdi-account-arrow-down"
-                            variant="outlined"
+                            variant="underlined"
                             hide-details="auto"
                             required
                           />
@@ -121,7 +121,7 @@
                             :label="$t('institutions.sushi.customerId')"
                             :error-messages="sushiRule"
                             prepend-icon="mdi-account"
-                            variant="outlined"
+                            variant="underlined"
                             hide-details="auto"
                             required
                           />
@@ -133,7 +133,7 @@
                             :label="$t('institutions.sushi.apiKey')"
                             :error-messages="sushiRule"
                             prepend-icon="mdi-key-variant"
-                            variant="outlined"
+                            variant="underlined"
                             hide-details="auto"
                             required
                           />
@@ -149,7 +149,7 @@
                   <v-textarea
                     v-model="message"
                     prepend-icon="mdi-image-text"
-                    variant="outlined"
+                    variant="underlined"
                     hide-details="auto"
                     v-bind="messageArea"
                   />

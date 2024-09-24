@@ -716,7 +716,9 @@ users:
   newUser: New user
   doesNotExist: The user you are trying to access is not registered.
   unableToFetchInformations: Unable to retrieve institution information
-  createMailUserList: Copy emails
+  createMailUserList: >
+    Copy email
+    |Copy emails
   filters:
     title: Filter users
     searchHint: This field is overridden by the search bar

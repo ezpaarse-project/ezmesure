@@ -88,13 +88,17 @@
               <template #text>
                 <v-row>
                   <v-col cols="12">
-                    <!-- TODO: completion -->
                     <v-combobox
                       v-model="sushi.packages"
                       :label="$t('institutions.sushi.packages')"
                       :hint="$t('institutions.sushi.packagesDescription')"
+                      :items="availablePackages ?? []"
+                      :loading="statusPackages === 'pending'"
                       prepend-icon="mdi-tag"
                       variant="underlined"
+                      multiple
+                      chips
+                      closable-chips
                     />
                   </v-col>
 
@@ -213,6 +217,24 @@ const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
+
+const {
+  data: availablePackages,
+  status: statusPackages,
+} = await useAsyncData(`/api/institutions/${props.institution.id}/sushi/packages`, async () => {
+  const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+    query: {
+      size: 0,
+      distinct: 'packages',
+    },
+  });
+
+  // Map sushi items with array of packages as key
+  const itemsPerPackages = Map.groupBy(Object.values(sushiItems), (item) => item.packages);
+  // Merge all packages in one array then make unique
+  const packages = new Set(Array.from(itemsPerPackages.keys()).flat());
+  return Array.from(packages).sort();
+}, { lazy: true });
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const connectionStatus = computed(() => {

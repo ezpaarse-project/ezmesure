@@ -90,7 +90,7 @@
     >
       <template #actions>
         <v-list-item
-          :title="$t('users.createMailUserList')"
+          :title="$t('users.createMailUserList', 2)"
           prepend-icon="mdi-email-multiple"
           @click="copyMailList()"
         />
