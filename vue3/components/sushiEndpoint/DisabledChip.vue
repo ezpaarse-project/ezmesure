@@ -19,7 +19,7 @@ const props = defineProps({
   },
 });
 
-const disabledUntil = useDateFormat(computed(() => props.modelValue.disabledUntil));
+const disabledUntil = useDateFormat(() => props.modelValue.disabledUntil);
 
 const isDisabled = computed(() => {
   const isoDisabledUntil = parseISO(props.modelValue.disabledUntil ?? '');

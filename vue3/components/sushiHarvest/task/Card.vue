@@ -104,7 +104,7 @@ const props = defineProps({
 
 const { t, te } = useI18n();
 
-const runningTime = useTimeAgo(computed(() => props.modelValue.runningTime));
+const runningTime = useTimeAgo(() => props.modelValue.runningTime);
 
 const error = computed(() => {
   const { errorCode } = props.modelValue;

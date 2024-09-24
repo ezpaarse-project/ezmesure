@@ -49,7 +49,7 @@
         :title="$t('endpoints.noEndpointFound')"
         :subtitle="$t('endpoints.clickToDeclareOne')"
         prepend-icon="mdi-plus-circle-outline"
-        to="/contact-us"
+        to="/contact-us?subject=sushi-endpoint"
         lines="two"
       />
     </template>

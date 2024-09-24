@@ -140,15 +140,14 @@ definePageMeta({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const refreshTimeoutId = ref(null);
-
 const {
   data: syncState,
   refresh,
 } = await useFetch('/api/sync');
 
-const startedAt = useDateFormat(computed(() => syncState.value?.data?.startedAt ?? 0));
-const runningTime = useTimeAgo(computed(() => syncState.value?.data?.runningTime ?? 0));
+const startedAt = useDateFormat(() => syncState.value?.data?.startedAt ?? 0);
+const runningTime = useTimeAgo(() => syncState.value?.data?.runningTime ?? 0);
+const autoRefresh = useIntervalFn(refresh, 1000, { immediate: false });
 
 const isSynchronizing = computed(() => syncState.value?.data.status === 'synchronizing');
 
@@ -192,39 +191,26 @@ const statusAlert = computed(() => {
 });
 
 async function startSync() {
-  if (refreshTimeoutId.value) {
+  if (isSynchronizing.value) {
     return;
   }
 
   try {
-    await $fetch('/api/sync/_start', { method: 'POST' });
+    syncState.value.data = await $fetch('/api/sync/_start', { method: 'POST' });
   } catch {
     snacks.error('sync.unableToStart');
   }
-
-  syncState.value.data.status = 'synchronizing';
-}
-
-async function refreshLater() {
-  if (!isSynchronizing.value) {
-    return;
-  }
-
-  await refresh();
-  refreshTimeoutId.value = setTimeout(async () => { refreshLater(); }, 1000);
 }
 
 watch(
   isSynchronizing,
   (value) => {
     if (value) {
-      refreshLater();
-      return;
-    }
-
-    if (refreshTimeoutId.value) {
-      clearTimeout(refreshTimeoutId.value);
-      refreshTimeoutId.value = null;
+      // Auto refresh if synchronizing
+      autoRefresh.resume();
+    } else {
+      // Stop auto refresh if not synchronizing
+      autoRefresh.pause();
     }
   },
   { immediate: true },

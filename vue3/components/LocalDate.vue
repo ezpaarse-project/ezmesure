@@ -14,8 +14,5 @@ const props = defineProps({
   },
 });
 
-const localDate = useDateFormat(
-  computed(() => props.modelValue),
-  computed(() => props.format),
-);
+const localDate = useDateFormat(() => props.modelValue, () => props.format);
 </script>

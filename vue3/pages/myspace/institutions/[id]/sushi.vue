@@ -503,7 +503,7 @@ const toolbarTitle = computed(() => {
 /**
  * Sushi ready formatted date
  */
-const sushiReadySince = useDateFormat(institution.value?.sushiReadySince, 'P');
+const sushiReadySince = useDateFormat(() => institution.value?.sushiReadySince, 'P');
 /**
  * Sushi ready labels
  */

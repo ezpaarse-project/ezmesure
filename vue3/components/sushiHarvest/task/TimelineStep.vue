@@ -62,8 +62,8 @@ const { t, te } = useI18n();
 const { data: user } = useAuthState();
 const { isSupported: clipboard, copy } = useClipboard();
 
-const date = useDateFormat(computed(() => props.modelValue.startedAt), 'PPPpp');
-const duration = useTimeAgo(computed(() => props.modelValue.runningTime));
+const date = useDateFormat(() => props.modelValue.startedAt, 'PPPpp');
+const duration = useTimeAgo(() => props.modelValue.runningTime);
 
 const dot = computed(() => harvestStatus.get(props.modelValue.status) ?? { color: 'grey', icon: 'mdi-progress-question' });
 const label = computed(() => {

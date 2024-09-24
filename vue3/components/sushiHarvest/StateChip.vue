@@ -32,7 +32,7 @@ const lastHarvest = computed(
     .sort((a, b) => b.harvestDate - a.harvestDate)
     .at(0),
 );
-const lastHarvestDate = useDateFormat(lastHarvest.value?.harvestDate);
+const lastHarvestDate = useDateFormat(() => lastHarvest.value?.harvestDate);
 
 const chip = computed(() => {
   const activeHarvest = props.modelValue.find((h) => activeState.has(h.status));

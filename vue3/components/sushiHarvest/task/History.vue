@@ -12,6 +12,7 @@
       <v-data-table-server
         :headers="headers"
         :items="[task]"
+        :items-length="1"
         :expanded="[task.id]"
         item-value="id"
         hide-default-footer
@@ -64,8 +65,8 @@ const props = defineProps({
 
 const { t } = useI18n();
 
-const createdAt = useDateFormat(computed(() => props.task.createdAt));
-const runningTime = useTimeAgo(computed(() => props.task.runningTime));
+const createdAt = useDateFormat(() => props.task.createdAt);
+const runningTime = useTimeAgo(() => props.task.runningTime);
 
 const headers = computed(() => [
   {

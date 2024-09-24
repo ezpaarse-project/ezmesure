@@ -115,7 +115,7 @@ const isCredentialsMenuOpen = ref(false);
 
 // eslint-disable-next-line no-underscore-dangle
 const status = computed(() => props.modelValue._status);
-const runningTime = useTimeAgo(computed(() => status.value?.runningTime ?? 0));
+const runningTime = useTimeAgo(() => status.value?.runningTime ?? 0);
 
 /**
  * Put ID into clipboard

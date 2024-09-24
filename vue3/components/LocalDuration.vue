@@ -8,7 +8,14 @@ const props = defineProps({
     type: [Date, String, Number],
     required: true,
   },
+  includeSeconds: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const timeAgo = useTimeAgo(computed(() => props.modelValue));
+const timeAgo = useTimeAgo(
+  () => props.modelValue,
+  { includeSeconds: props.includeSeconds },
+);
 </script>

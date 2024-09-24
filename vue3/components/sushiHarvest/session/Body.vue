@@ -22,13 +22,13 @@
       </template>
 
       <template #[`item.credentials.endpoint.vendor`]="{ item, value }">
-        <nuxt-link :to="`/admin/endpoints/${item.credentials.endpoint.id}`">
+        <nuxt-link :to="`/admin/endpoints/${item.credentials.endpointId}`">
           {{ value }}
         </nuxt-link>
       </template>
 
       <template #[`item.credentials.institution.name`]="{ item, value }">
-        <nuxt-link :to="`/admin/institutions/${item.credentials.institution.id}/sushi`">
+        <nuxt-link :to="`/admin/institutions/${item.credentials.institutionId}/sushi`">
           {{ value }}
         </nuxt-link>
       </template>
