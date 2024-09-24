@@ -9,7 +9,6 @@ const {
 } = require('../../../entities/repositories.dto');
 
 const {
-  createSchema: permissionCreateSchema,
   upsertSchema: permissionUpsertSchema,
 } = require('../../../entities/repository-permissions.dto');
 
@@ -41,39 +40,39 @@ exports.getInstitutionRepositories = async (ctx) => {
 exports.upsertRepositoryAllPermission = async (ctx) => {
   const { repository, institution } = ctx.state;
 
-  const permissions = ctx.request.body.map((body) => {
-    const { value: permission } = permissionCreateSchema.validate({
-      ...body,
+  const permissions = ctx.request.body;
+
+  const repoPermissionsService = new RepoPermissionsService();
+  // If a permission is not provided, we will delete it
+  const newUsernames = new Set(permissions.map((permission) => permission.username));
+  const oldPermissions = await repoPermissionsService.findMany({
+    where: {
+      repositoryPattern: repository.pattern,
       institutionId: institution.id,
-      pattern: repository.pattern,
-    });
-    return permission;
+    },
   });
+  const permissionsToDelete = oldPermissions.filter((p) => !newUsernames.has(p.username));
 
-  const newRepository = RepositoriesService.$transaction(async (repositoriesService) => {
-    await repositoriesService.update({
-      where: {
-        pattern: repository.pattern,
-        institutions: { some: { id: institution.id } },
-      },
-      data: {
-        permissions: {
-          deleteMany: {
-            repositoryPattern: repository.pattern,
-            institutionId: institution.id,
-          },
-        },
-      },
-    });
+  const newRepository = await RepoPermissionsService.$transaction(
+    async (service) => {
+      const repositoriesService = new RepositoriesService(service);
 
-    return repositoriesService.update({
-      where: {
-        pattern: repository.pattern,
-        institutions: { some: { id: institution.id } },
-      },
-      data: {
-        permissions: {
-          upsert: permissions.map((permission) => ({
+      await Promise.all([
+        // Delete old permissions
+        ...permissionsToDelete.map(
+          (permission) => service.delete({
+            where: {
+              username_institutionId_repositoryPattern: {
+                username: permission.username,
+                institutionId: institution.id,
+                repositoryPattern: repository.pattern,
+              },
+            },
+          }),
+        ),
+        // Upsert new permissions (connect to existing models to avoid creating if doesn't exists)
+        ...permissions.map(
+          (permission) => service.upsert({
             where: {
               username_institutionId_repositoryPattern: {
                 username: permission.username,
@@ -82,18 +81,38 @@ exports.upsertRepositoryAllPermission = async (ctx) => {
               },
             },
             create: {
-              ...permission,
-              institutionId: institution.id,
+              readonly: permission.readonly,
+              locked: permission.locked,
+              repository: {
+                connect: {
+                  pattern: repository.pattern,
+                },
+              },
+              membership: {
+                connect: {
+                  username_institutionId: {
+                    username: permission.username,
+                    institutionId: institution.id,
+                  },
+                },
+              },
             },
             update: {
-              ...permission,
-              institutionId: institution.id,
+              readonly: permission.readonly,
+              locked: permission.locked,
             },
-          })),
+          }),
+        ),
+      ]);
+
+      return repositoriesService.findUnique({
+        where: {
+          pattern: repository.pattern,
+          institutions: { some: { id: institution.id } },
         },
-      },
-    });
-  });
+      });
+    },
+  );
 
   ctx.type = 'json';
   ctx.status = 200;
