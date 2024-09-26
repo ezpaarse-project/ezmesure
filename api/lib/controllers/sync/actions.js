@@ -27,20 +27,20 @@ exports.getSyncStatus = async (ctx) => {
   ctx.type = 'json';
   ctx.status = 200;
 
-  const expectedServices = {
-    users: { service: new UsersService() },
-    institutions: { service: new InstitutionsService(), where: { validated: true } },
-    spaces: { service: new SpacesService() },
-    repositories: { service: new RepositoriesService() },
+  const expectedPromises = {
+    users: new UsersService().count(),
+    institutions: new InstitutionsService().count({ where: { validated: true } }),
+    spaces: new SpacesService().count(),
+    repositories: new RepositoriesService().count(),
   };
 
-  const entries = await Promise.all(
-    Object.entries(expectedServices)
-      .map(([k, { service, where }]) => service.count({ where }).then((v) => [k, v])),
+  const expectedEntries = await Promise.all(
+    Object.entries(expectedPromises)
+      .map(async ([key, promise]) => [key, await promise]),
   );
 
   ctx.body = {
     data: getStatus(),
-    expected: Object.fromEntries(entries),
+    expected: Object.fromEntries(expectedEntries),
   };
 };
