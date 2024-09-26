@@ -8,6 +8,7 @@ const {
 
 const memberships = require('./memberships');
 
+const { stringOrArrayValidation } = require('../../services/std-query');
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   standardQueryParams,
@@ -32,6 +33,8 @@ router.route({
   validate: {
     query: standardQueryParams.manyValidation.append({
       source: Joi.string().trim(),
+      roles: stringOrArrayValidation,
+      permissions: stringOrArrayValidation,
     }),
   },
 });
