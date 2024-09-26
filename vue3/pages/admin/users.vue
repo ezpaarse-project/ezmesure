@@ -4,10 +4,15 @@
       v-model="query"
       :title="toolbarTitle"
       :refresh="refresh"
+      :omit-from-filter-count="['search', 'source']"
       search
       icons
       @update:model-value="debouncedRefresh()"
     >
+      <template #filters-panel="props">
+        <UserFilters v-bind="props" />
+      </template>
+
       <v-btn
         v-if="userFormDialogRef"
         v-tooltip="$t('add')"

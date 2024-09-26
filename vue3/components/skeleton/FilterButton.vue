@@ -37,7 +37,8 @@
         <slot
           name="panel"
           :model-value="modelValue"
-          @update:modelValue="emit('update:modelValue', $event)"
+          @update:modelValue="$emit('update:modelValue', $event)"
+          @update:show="isPanelOpen = $event"
         />
       </v-navigation-drawer>
     </teleport>
@@ -50,13 +51,17 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  omitFromCount: {
+    type: Array,
+    default: () => ['search'],
+  },
   icon: {
     type: Boolean,
     default: false,
   },
 });
 
-const emit = defineEmits({
+defineEmits({
   'update:modelValue': (v) => !!v,
 });
 
@@ -64,9 +69,12 @@ const ready = ref(false);
 const isPanelOpen = ref(false);
 
 const filtersCount = computed(
-  () => Object.entries(props.modelValue)
-    .filter(([k, v]) => v != null && k !== 'search')
-    .length,
+  () => {
+    const omitFromCount = new Set(props.omitFromCount);
+    return Object.entries(props.modelValue)
+      .filter(([k, v]) => v != null && !omitFromCount.has(k))
+      .length;
+  },
 );
 
 onMounted(() => {

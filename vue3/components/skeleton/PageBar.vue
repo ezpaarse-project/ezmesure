@@ -44,6 +44,7 @@
         v-if="$slots['filters-panel']"
         v-model="filtersValue"
         :icon="icons"
+        :omit-from-count="omitFromFilterCount"
       >
         <template #panel="panel">
           <slot name="filters-panel" v-bind="panel" />
@@ -83,6 +84,10 @@ const props = defineProps({
     type: Function,
     default: undefined,
   },
+  omitFromFilterCount: {
+    type: Array,
+    default: () => undefined,
+  },
   icons: {
     type: Boolean,
     default: false,
@@ -120,7 +125,12 @@ const filtersValue = computed({
     include: undefined,
   }),
   set: (v) => {
-    emit('update:modelValue', { ...(props.modelValue ?? {}), ...v });
+    emit('update:modelValue', {
+      ...v,
+      page: props.modelValue.page,
+      sortBy: props.modelValue.sortBy,
+      include: props.modelValue.include,
+    });
   },
 });
 
