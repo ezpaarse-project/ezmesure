@@ -157,6 +157,17 @@
                         @update:model-value="save([saveMembership])"
                       />
                     </v-col>
+
+                    <v-col cols="12">
+                      <v-textarea
+                        v-model="comment"
+                        :label="$t('institutions.sushi.comment')"
+                        :loading="loading && 'primary'"
+                        prepend-icon="mdi-image-text"
+                        variant="underlined"
+                        hide-details="auto"
+                      />
+                    </v-col>
                   </v-row>
                 </template>
               </v-card>
@@ -199,6 +210,7 @@ const { hasPermission } = useCurrentUserStore();
 const snacks = useSnacksStore();
 
 const loading = ref(false);
+const comment = ref(props.modelValue?.comment ?? '');
 const locked = ref(props.modelValue?.locked ?? false);
 /** @type {Ref<Set<string>>} */
 const roles = ref(new Set(props.modelValue?.roles ?? []));
@@ -325,6 +337,7 @@ function saveMembership() {
     method: 'PUT',
     body: {
       roles: Array.from(roles.value),
+      comment: comment.value || undefined,
       locked: user.value?.isAdmin ? locked.value : undefined,
       permissions: perms.flat(),
     },
@@ -457,6 +470,12 @@ function toggleRole(role) {
 mapPermissions(props.modelValue?.permissions ?? [], permissions.value);
 mapRepoPermissions(props.modelValue?.repositoryPermissions ?? [], repositoryPermissions.value);
 mapSpacePermissions(props.modelValue?.spacePermissions ?? [], spacePermissions.value);
+
+watchDebounced(
+  comment,
+  async () => { await save([saveMembership]); },
+  { debounce: 500 },
+);
 
 onMounted(() => {
   formRef.value?.validate();

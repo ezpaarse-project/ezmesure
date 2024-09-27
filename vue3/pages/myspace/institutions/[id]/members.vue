@@ -42,6 +42,21 @@
       return-object
       v-bind="vDataTableOptions"
     >
+      <template #[`item.user.fullName`]="{ value, item }">
+        <div class="d-flex">
+          {{ value }}
+
+          <v-spacer />
+
+          <v-icon
+            v-if="item.comment"
+            v-tooltip:right="{ text: item.comment, maxWidth: 500 }"
+            icon="mdi-information-outline"
+            color="grey-darken-2"
+          />
+        </div>
+      </template>
+
       <template #[`item.roles`]="{ value }">
         <v-chip
           v-for="role in value"
@@ -221,11 +236,13 @@ const headers = computed(() => [
         title: t('repositories.repositories'),
         value: 'repositoryPermissions',
         sortable: true,
+        align: 'center',
       },
       {
         title: t('spaces.spaces'),
         value: 'spacePermissions',
         sortable: true,
+        align: 'center',
       },
     ],
   },
