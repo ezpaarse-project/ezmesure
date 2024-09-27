@@ -24,7 +24,7 @@
 
     <v-container>
       <v-row>
-        <v-col cols="12">
+        <v-col v-if="institution" cols="12">
           <FiltersSelect
             v-model="filters.endpointId"
             :search="filters.search"
@@ -38,7 +38,7 @@
           />
         </v-col>
 
-        <v-col cols="12">
+        <v-col v-if="institution" cols="12">
           <FiltersSelect
             v-model="filters.packages"
             :items="availablePackages"
@@ -81,7 +81,7 @@ const props = defineProps({
   },
   institution: {
     type: Object,
-    required: true,
+    default: undefined,
   },
 });
 
@@ -103,6 +103,10 @@ const loadingPackages = ref(false);
 
 const availableEndpoints = computedAsync(
   async () => {
+    if (!props.institution) {
+      return [];
+    }
+
     const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
       query: {
         size: 0,
@@ -124,6 +128,10 @@ const availableEndpoints = computedAsync(
 
 const availablePackages = computedAsync(
   async () => {
+    if (!props.institution) {
+      return [];
+    }
+
     const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
       query: {
         size: 0,

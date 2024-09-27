@@ -21,6 +21,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="space.id"
+                  :placeholder="institution.namespace"
                   :label="`${$t('spaces.id')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),

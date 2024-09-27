@@ -179,6 +179,7 @@ const {
   },
   sortMapping: {
     institutions: 'institutions._count',
+    credentials: 'credentials._count',
   },
   data: {
     sortBy: [{ key: 'vendor', order: 'asc' }],

@@ -59,22 +59,9 @@ export default function useFilters(data, emit) {
     },
   });
 
-  /**
-   * Shorthand to use filters that are overrode by search
-   *
-   * @param {string} field The field of the filter
-   *
-   * @returns A computed getter and setter
-   */
-  const useFilterWithSearch = (field) => computed({
-    get: () => filters.search || filters[field],
-    set: (value) => { filters[field] = value; },
-  });
-
   return {
     emptySymbol,
     filters,
     resetFilters,
-    useFilterWithSearch,
   };
 }

@@ -24,6 +24,7 @@
               <v-col v-else cols="12">
                 <v-text-field
                   v-model="repository.pattern"
+                  :placeholder="institution?.namespace"
                   :label="`${$t('repositories.pattern')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),

@@ -9,11 +9,15 @@
   <div v-else>
     <SkeletonPageBar
       v-model:search="search"
+      v-model:filters="filters"
       :refresh="refresh"
       :title="endpoint.vendor"
       icons
-      @update:model-value="debouncedRefresh()"
     >
+      <template #filters-panel="props">
+        <SushiFilters v-bind="props" />
+      </template>
+
       <v-switch
         v-tooltip:left="$t(`endpoints.${endpoint.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(endpoint.activeUpdatedAt, locale) })"
         :model-value="endpoint.active"
@@ -41,22 +45,31 @@
 
     <v-container fluid>
       <v-row>
-        <v-col v-if="sushiMetrics.failed > 0" cols="6">
-          <v-alert
-            :title="$t('sushi.problematicEndpoint')"
-            :text="$t('sushi.nErrsCredentials', sushiMetrics.failed)"
-            type="error"
-            prominent
-          >
-            <template #append>
-              <v-btn
-                :text="$t('show')"
-                size="small"
-                variant="outlined"
-                @click="connectionFilter = 'faulty'"
-              />
-            </template>
-          </v-alert>
+        <v-col cols="6">
+          <template v-if="!sushiMetrics">
+            <v-skeleton-loader
+              height="100"
+              type="avatar, paragraph"
+            />
+          </template>
+
+          <template v-else-if="sushiMetrics.failed > 0">
+            <v-alert
+              :title="$t('sushi.problematicEndpoint')"
+              :text="$t('sushi.nErrsCredentials', sushiMetrics.failed)"
+              type="error"
+              prominent
+            >
+              <template #append>
+                <v-btn
+                  :text="$t('show')"
+                  size="small"
+                  variant="outlined"
+                  @click="filters.connection = 'failed'"
+                />
+              </template>
+            </v-alert>
+          </template>
         </v-col>
 
         <v-col v-if="!endpoint.active" cols="6">
@@ -70,43 +83,54 @@
       </v-row>
 
       <v-row class="justify-space-evenly">
-        <v-col cols="2">
-          <SimpleMetric
-            :text="$t('sushi.nInstitutions', institutionsMap.size)"
-            icon="mdi-domain"
-          />
-        </v-col>
+        <template v-if="!sushiMetrics">
+          <v-col v-for="n in 4" :key="n" cols="2">
+            <v-skeleton-loader
+              height="100"
+              type="paragraph"
+            />
+          </v-col>
+        </template>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.success || 0"
-            title-key="sushi.nOperationalCredentials"
-            icon="mdi-check"
-            color="success"
-          />
-        </v-col>
+        <template v-else>
+          <v-col cols="2">
+            <SimpleMetric
+              :text="$t('sushi.nInstitutions', sushiMetrics.institutions)"
+              icon="mdi-domain"
+            />
+          </v-col>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.untested || 0"
-            :action-text="$t('show')"
-            title-key="sushi.nUntestedCredentials"
-            icon="mdi-bell-alert"
-            color="info"
-            @click="connectionFilter = 'untested'"
-          />
-        </v-col>
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.success || 0"
+              title-key="sushi.nOperationalCredentials"
+              icon="mdi-check"
+              color="success"
+            />
+          </v-col>
 
-        <v-col cols="2">
-          <SushiMetric
-            :model-value="sushiMetrics.unauthorized || 0"
-            :action-text="$t('show')"
-            title-key="sushi.nInvalidCredentials"
-            icon="mdi-key-alert-outline"
-            color="warning"
-            @click="connectionFilter = 'unauthorized'"
-          />
-        </v-col>
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.untested || 0"
+              :action-text="$t('show')"
+              title-key="sushi.nUntestedCredentials"
+              icon="mdi-bell-alert"
+              color="info"
+              @click="filters.connection = 'untested'"
+            />
+          </v-col>
+
+          <v-col cols="2">
+            <SushiMetric
+              :model-value="sushiMetrics.unauthorized || 0"
+              :action-text="$t('show')"
+              title-key="sushi.nInvalidCredentials"
+              icon="mdi-key-alert-outline"
+              color="warning"
+              @click="filters.connection = 'unauthorized'"
+            />
+          </v-col>
+        </template>
       </v-row>
     </v-container>
 
@@ -115,7 +139,6 @@
       :headers="headers"
       :group-by="[{ key: 'institution.id' }]"
       :loading="status === 'pending' && 'primary'"
-      :search="search"
       :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
       items-per-page="0"
       density="comfortable"
@@ -335,7 +358,8 @@ const { isSupported: clipboard, copy } = useClipboard();
 const snacks = useSnacksStore();
 
 const search = ref('');
-const connectionFilter = ref(undefined);
+const filters = ref({});
+const sushiMetrics = ref(undefined);
 const loading = ref(false);
 const selectedInstitutions = ref([]);
 
@@ -362,7 +386,8 @@ const {
   params: {
     endpointId: params.id,
     q: debouncedSearch,
-    connection: connectionFilter,
+    connection: computed(() => filters.value.connection),
+    active: computed(() => filters.value.active),
     include: ['harvests', 'institution.memberships.user'],
     sort: 'institution.name',
     order: 'asc',
@@ -421,18 +446,31 @@ const institutionsSelectionStatus = computed(() => {
   return 'partial';
 });
 
-const sushiMetrics = computed(
-  () => Object.fromEntries(
+function calcSushiMetrics() {
+  if (!sushis.value) {
+    sushiMetrics.value = undefined;
+    return;
+  }
+
+  const value = Object.fromEntries(
     Object.entries(
-      Object.groupBy(sushis.value || [], (s) => s.connection?.status ?? 'untested') || {},
+      Object.groupBy(sushis.value, (s) => s.connection?.status ?? 'untested') || {},
     ).map(([k, s]) => [k, s.length]),
-  ),
-);
+  );
+  value.institutions = institutionsMap.value.size;
+
+  sushiMetrics.value = value;
+}
 
 /**
  * Refresh sushis
  */
-const refresh = () => Promise.all([endpointRefresh(), sushisRefresh()]);
+const refresh = async () => {
+  await Promise.all([endpointRefresh(), sushisRefresh()]);
+  if (!search.value) {
+    calcSushiMetrics();
+  }
+};
 
 /**
  * Debounced refresh
@@ -600,4 +638,8 @@ async function resetConnectionsOfInstitutions() {
   await resetConnections(items);
 }
 
+watchOnce(
+  sushis,
+  () => calcSushiMetrics(),
+);
 </script>

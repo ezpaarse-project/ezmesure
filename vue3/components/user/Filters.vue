@@ -25,43 +25,6 @@
     <v-container>
       <v-row>
         <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="fullName"
-            :label="$t('users.user.fullName')"
-            :disabled="!!filters.search"
-            :messages="filters.search ? $t('users.filters.searchHint') : undefined"
-            prepend-icon="mdi-account"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          />
-        </v-col>
-
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="username"
-            :label="$t('users.user.username')"
-            :disabled="!!filters.search"
-            :messages="filters.search ? $t('users.filters.searchHint') : undefined"
-            prepend-icon="mdi-account-outline"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          />
-        </v-col>
-
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="filters.email"
-            :label="$t('users.user.email')"
-            prepend-icon="mdi-email"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          />
-        </v-col>
-
-        <v-col cols="12" sm="6">
           <FiltersButtonsGroup
             v-model="filters.isAdmin"
             :label="$t('users.user.isAdmin')"
@@ -117,12 +80,8 @@ const { t } = useI18n();
 const {
   emptySymbol,
   filters,
-  useFilterWithSearch,
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
-
-const fullName = useFilterWithSearch('fullName');
-const username = useFilterWithSearch('username');
 
 const permissionsItems = computed(() => {
   const scopes = [

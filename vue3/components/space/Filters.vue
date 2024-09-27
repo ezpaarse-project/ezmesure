@@ -25,30 +25,6 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <v-text-field
-            v-model="filters.name"
-            :label="$t('name')"
-            prepend-icon="mdi-form-textbox"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          />
-        </v-col>
-
-        <v-col cols="12">
-          <v-text-field
-            v-model="id"
-            :label="$t('spaces.id')"
-            :disabled="!!filters.search"
-            :messages="filters.search ? $t('users.filters.searchHint') : undefined"
-            prepend-icon="mdi-identifier"
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          />
-        </v-col>
-
-        <v-col cols="12">
           <FiltersSelect
             v-model="filters.type"
             :items="typeItems"
@@ -79,11 +55,8 @@ const { t } = useI18n();
 
 const {
   filters,
-  useFilterWithSearch,
   resetFilters,
 } = useFilters(() => props.modelValue, emit);
-
-const id = useFilterWithSearch('pattern');
 
 const typeItems = computed(() => {
   const types = Array.from(repoColors.keys());

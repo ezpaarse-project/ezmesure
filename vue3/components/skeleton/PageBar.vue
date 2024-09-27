@@ -80,6 +80,10 @@ const props = defineProps({
     type: [Boolean, String],
     default: false,
   },
+  filters: {
+    type: Object,
+    default: () => undefined,
+  },
   refresh: {
     type: Function,
     default: undefined,
@@ -119,17 +123,18 @@ const searchValue = computed({
 
 const filtersValue = computed({
   get: () => ({
-    ...(props.modelValue ?? {}),
+    ...(props.filters ?? props.modelValue ?? {}),
     page: undefined,
     sortBy: undefined,
     include: undefined,
   }),
   set: (v) => {
+    emit('update:filters', v);
     emit('update:modelValue', {
       ...v,
-      page: props.modelValue.page,
-      sortBy: props.modelValue.sortBy,
-      include: props.modelValue.include,
+      page: props.modelValue?.page,
+      sortBy: props.modelValue?.sortBy,
+      include: props.modelValue?.include,
     });
   },
 });
