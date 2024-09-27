@@ -32,7 +32,7 @@ router.route({
       institutionId: Joi.string().trim().required(),
     },
     query: standardQueryParams.manyValidation.append({
-      connection: Joi.string().allow('working', 'unauthorized', 'faulty', 'untested'),
+      connection: Joi.string().allow('working', 'success', 'unauthorized', 'failed', 'faulty', 'untested'),
       q: Joi.string().trim().allow(''),
     }),
   },

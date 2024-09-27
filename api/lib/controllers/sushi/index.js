@@ -41,8 +41,6 @@ const {
 
 const { FEATURES } = require('../../entities/memberships.dto');
 
-const connectionValidation = Joi.string().valid('working', 'unauthorized', 'faulty', 'untested');
-
 let sushiLocked = false;
 let lockReason;
 
@@ -104,10 +102,7 @@ router.route({
   ],
   validate: {
     query: standardQueryParams.manyValidation.append({
-      connection: Joi.alternatives().try(
-        connectionValidation.min(0),
-        Joi.array().items(connectionValidation.min(1)).min(1),
-      ),
+      connection: Joi.string().allow('working', 'success', 'unauthorized', 'failed', 'faulty', 'untested'),
       q: Joi.string().trim().allow(''),
     }).rename('connection[]', 'connection'),
   },

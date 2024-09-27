@@ -56,11 +56,13 @@ exports.getAll = async (ctx) => {
 
   switch (connection) {
     case 'working':
+    case 'success':
       prismaQuery.where.connection = { path: ['status'], equals: 'success' };
       break;
     case 'unauthorized':
       prismaQuery.where.connection = { path: ['status'], equals: 'unauthorized' };
       break;
+    case 'failed':
     case 'faulty':
       prismaQuery.where.connection = { path: ['status'], equals: 'failed' };
       break;
