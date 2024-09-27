@@ -11,7 +11,7 @@
     <v-card
       :title="$t('institutions.members.addMember')"
       :subtitle="institution.name"
-      :loading="status === 'pending'"
+      :loading="status === 'pending' && 'primary'"
       min-height="250"
     >
       <template #append>

@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="loading"
+    :loading="loading && 'primary'"
     :title="$t('repositories.newRepository')"
     prepend-icon="mdi-database-plus"
   >

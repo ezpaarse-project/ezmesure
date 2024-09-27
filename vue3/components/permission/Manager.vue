@@ -2,7 +2,7 @@
   <v-card
     :title="$t('repositories.givePermissions')"
     :subtitle="$t('repositories.nPermissions', modelValue?.size ?? 0)"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-account-lock"
     variant="outlined"
   >

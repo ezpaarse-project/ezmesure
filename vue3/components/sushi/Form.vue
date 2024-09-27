@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="loading"
+    :loading="loading && 'primary'"
     :title="isEditing ? $t('institutions.sushi.updateCredentials') : $t('institutions.sushi.addCredentials')"
     prepend-icon="mdi-key-plus"
   >
@@ -92,8 +92,8 @@
                       v-model="sushi.packages"
                       :label="$t('institutions.sushi.packages')"
                       :hint="$t('institutions.sushi.packagesDescription')"
-                      :items="availablePackages ?? []"
-                      :loading="statusPackages === 'pending'"
+                      :items="availablePackages"
+                      :loading="loadingPackages && 'primary'"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       multiple
@@ -213,28 +213,30 @@ const loading = ref(false);
 const saving = ref(false);
 const valid = ref(false);
 const isAdvancedOpen = ref(false);
+const loadingPackages = ref(false);
 const sushi = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
-const {
-  data: availablePackages,
-  status: statusPackages,
-} = await useAsyncData(`/api/institutions/${props.institution.id}/sushi/packages`, async () => {
-  const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
-    query: {
-      size: 0,
-      distinct: 'packages',
-    },
-  });
+const availablePackages = computedAsync(
+  async () => {
+    const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+      query: {
+        size: 0,
+        distinct: 'packages',
+      },
+    });
 
-  // Map sushi items with array of packages as key
-  const itemsPerPackages = Map.groupBy(Object.values(sushiItems), (item) => item.packages);
-  // Merge all packages in one array then make unique
-  const packages = new Set(Array.from(itemsPerPackages.keys()).flat());
-  return Array.from(packages).sort();
-}, { lazy: true });
+    // Map sushi items with array of packages as key
+    const itemsPerPackages = Map.groupBy(Object.values(sushiItems), (item) => item.packages);
+    // Merge all packages in one array then make unique
+    const packages = new Set(Array.from(itemsPerPackages.keys()).flat());
+    return Array.from(packages).sort();
+  },
+  [],
+  { lazy: true, evaluating: loadingPackages },
+);
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const connectionStatus = computed(() => {

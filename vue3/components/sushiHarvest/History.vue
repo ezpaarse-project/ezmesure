@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('tasks.history')"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-history"
   >
     <template v-if="showSushi" #subtitle>
@@ -24,7 +24,7 @@
       <v-data-table-server
         :headers="headers"
         :items="tasks"
-        :loading="status === 'pending'"
+        :loading="status === 'pending' && 'primary'"
         show-expand
         single-expand
         v-bind="vDataTableOptions"

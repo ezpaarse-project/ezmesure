@@ -10,9 +10,10 @@
       :institution="institution"
       @update:model-value="onSave()"
     >
-      <template #actions>
+      <template #actions="{ loading }">
         <v-btn
           :text="$t('close')"
+          :disabled="loading"
           variant="text"
           @click="isOpen = false"
         />

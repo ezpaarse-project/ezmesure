@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading">
+  <v-card :loading="loading && 'primary'">
     <v-img
       :src="logoSrc"
       :style="{

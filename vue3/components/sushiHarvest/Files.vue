@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('sushi.files.title')"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-file-tree"
   >
     <template v-if="showSushi" #subtitle>

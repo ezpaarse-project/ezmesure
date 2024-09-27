@@ -2,7 +2,7 @@
   <v-card
     :title="$t('users.user.memberships')"
     :subtitle="showUser ? user.fullName : undefined"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-domain"
   >
     <template #append>

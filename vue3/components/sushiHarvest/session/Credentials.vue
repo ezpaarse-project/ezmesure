@@ -2,7 +2,7 @@
   <v-card
     :title="cardTitle"
     :subtitle="cardSubtitle"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
   >
     <template #append>
       <slot name="append" />

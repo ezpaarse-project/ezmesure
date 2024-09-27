@@ -140,7 +140,7 @@ export default async function useServerSidePagination(params = {}) {
    */
   const vDataTableOptions = computed(() => ({
     items: asyncData.data.value ?? [],
-    loading: asyncData.status.value === 'pending',
+    loading: asyncData.status.value === 'pending' && 'primary',
     page: query.value.page,
     itemsLength: itemLength.value.current,
     itemsPerPage: itemsPerPage.value,

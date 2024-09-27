@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="loading"
+    :loading="loading && 'primary'"
     :title="$t('institutions.members.permissionsOf', { name: modelValue.user.fullName })"
     :subtitle="subtitle"
     prepend-icon="mdi-shield"
@@ -95,7 +95,7 @@
             <v-col cols="12">
               <v-card
                 :title="$t('repositories.repositories')"
-                :loading="repoStatus === 'pending'"
+                :loading="repoStatus === 'pending' && 'primary'"
                 prepend-icon="mdi-database"
                 variant="outlined"
               >
@@ -119,7 +119,7 @@
             <v-col cols="12">
               <v-card
                 :title="$t('spaces.spaces')"
-                :loading="spaceStatus === 'pending'"
+                :loading="spaceStatus === 'pending' && 'primary'"
                 prepend-icon="mdi-tab"
                 variant="outlined"
               >
@@ -148,7 +148,7 @@
               >
                 <template #text>
                   <v-row>
-                    <v-col cols="6">
+                    <v-col v-if="user.isAdmin" cols="6">
                       <v-checkbox
                         v-model="locked"
                         :label="$t('institutions.members.locked')"
@@ -169,7 +169,7 @@
     <template #actions>
       <v-spacer />
 
-      <slot name="actions" />
+      <slot name="actions" :loading="loading" />
     </template>
   </v-card>
 </template>

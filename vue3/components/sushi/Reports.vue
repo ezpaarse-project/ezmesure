@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('reports.supportedReportsOnPlatform')"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-file-search"
   >
     <template v-if="showSushi" #subtitle>

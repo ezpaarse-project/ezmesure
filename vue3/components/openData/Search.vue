@@ -4,7 +4,7 @@
     v-model:search="search"
     :label="$t('institutions.institution.searchOpenData')"
     :items="items"
-    :loading="loading"
+    :loading="loading && 'primary'"
     :error="hasError"
     :error-messages="hasError ? [$t('institutions.institution.searchFailed')] : []"
     no-data-text="institutions.institution.searchOpenDataHint"

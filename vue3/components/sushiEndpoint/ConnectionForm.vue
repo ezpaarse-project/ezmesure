@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('endpoints.checkEndpoint')"
-    :loading="loading"
+    :loading="loading && 'primary'"
     prepend-icon="mdi-connection"
   >
     <template #append>

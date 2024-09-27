@@ -121,8 +121,8 @@
                     <v-combobox
                       v-model="endpoint.tags"
                       :label="$t('endpoints.tags')"
-                      :items="availableTags ?? []"
-                      :loading="statusTags === 'pending'"
+                      :items="availableTags"
+                      :loading="loadingTags && 'primary'"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       multiple
@@ -362,28 +362,30 @@ const { openConfirm } = useDialogStore();
 const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
+const loadingTags = ref(false);
 const endpoint = ref({ ...(props.modelValue ?? {}) });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
-const {
-  data: availableTags,
-  status: statusTags,
-} = await useAsyncData('/api/sushi-endpoints/tags', async () => {
-  const endpointItems = await $fetch('/api/sushi-endpoints', {
-    query: {
-      size: 0,
-      distinct: 'tags',
-    },
-  });
+const availableTags = computedAsync(
+  async () => {
+    const endpointItems = await $fetch('/api/sushi-endpoints', {
+      query: {
+        size: 0,
+        distinct: 'tags',
+      },
+    });
 
-  // Map endpoint items with array of tags as key
-  const itemsPerTags = Map.groupBy(Object.values(endpointItems), (item) => item.tags);
-  // Merge all tags in one array then make unique
-  const tags = new Set(Array.from(itemsPerTags.keys()).flat());
-  return Array.from(tags).sort();
-}, { lazy: true });
+    // Map sushi items with array of tags as key
+    const itemsPerTags = Map.groupBy(Object.values(endpointItems), (item) => item.tags);
+    // Merge all tags in one array then make unique
+    const tags = new Set(Array.from(itemsPerTags.keys()).flat());
+    return Array.from(tags).sort();
+  },
+  [],
+  { lazy: true, evaluating: loadingTags },
+);
 
 const isEditing = computed(() => !!props.modelValue?.id);
 const looksLikeSoapUrl = computed(() => (endpoint.value.sushiUrl || '').toLowerCase().includes('soap') && t('endpoints.soapWarning'));

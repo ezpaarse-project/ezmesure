@@ -114,7 +114,7 @@
       :items="sushis ?? []"
       :headers="headers"
       :group-by="[{ key: 'institution.id' }]"
-      :loading="status === 'pending'"
+      :loading="status === 'pending' && 'primary'"
       :search="search"
       :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
       items-per-page="0"

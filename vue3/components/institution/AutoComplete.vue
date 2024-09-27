@@ -3,7 +3,7 @@
     v-model:search="search"
     :model-value="modelValue"
     :items="institutions ?? []"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     :label="label"
     :rules="rules"
     :error="!!error"

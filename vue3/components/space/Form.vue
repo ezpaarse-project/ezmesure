@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="loading"
+    :loading="loading && 'primary'"
     :title="isEditing ? $t('spaces.editSpace') : $t('spaces.newSpace')"
     prepend-icon="mdi-tab-plus"
   >

@@ -5,7 +5,7 @@
     :label="`${$t('institutions.sushi.endpoint')} *`"
     :items="availableEndpoints ?? []"
     :rules="[v => !!v || $t('institutions.sushi.pleaseSelectEndpoint')]"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     :error="!!error"
     :error-messages="error?.message"
     :hide-no-data="!search"

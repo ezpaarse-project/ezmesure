@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :loading="loading"
+    :loading="loading && 'primary'"
     :title="isEditing ? $t('institutions.updateInstitution') : $t('institutions.newInstitution')"
     :subtitle="showInstitution ? originalName : undefined"
     prepend-icon="mdi-office-building-plus"

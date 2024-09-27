@@ -7,7 +7,7 @@
       () => !!modelValue.pattern || $t('fieldIsRequired'),
       () => /^[a-z0-9*_-]+$/i.test(modelValue.pattern) || $t('invalidFormat'),
     ]"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     :error="!!error"
     :error-messages="error?.message"
     item-title="pattern"

@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="$t('sushi.harvestState')"
-    :loading="status === 'pending'"
+    :loading="status === 'pending' && 'primary'"
     prepend-icon="mdi-table-headers-eye"
   >
     <template v-if="showSushi" #subtitle>
