@@ -7,7 +7,11 @@
       search
       icons
       @update:model-value="debouncedRefresh()"
-    />
+    >
+      <template #filters-panel="props">
+        <SpaceFilters v-bind="props" />
+      </template>
+    </SkeletonPageBar>
 
     <v-data-table-server
       v-model="selectedSpaces"

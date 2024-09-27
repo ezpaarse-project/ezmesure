@@ -828,6 +828,8 @@ spaces:
     ezpaarse: Espace ezPAARSE
     counter5: Espace éditeurs
   deleteSpace: Vous allez supprimer l'espace "{spaceName}", ce qui va supprimer les tableaux de bord inclus dans cet espace. Cette action est irréversible.
+  filters:
+    title: Filtrer les espaces
 harvest:
   toolbarTitle: Moissonnage ({count})
   sessions:

@@ -795,6 +795,8 @@ spaces:
     ezpaarse: ezPAARSE space
     counter5: Publisher space
   deleteSpace: You are about to delete "{spaceName}", which will delete the dashboards included in this space. This action cannot be undone.
+  filters:
+    title: Filter spaces
 harvest:
   toolbarTitle: Harvests ({count})
   sessions:

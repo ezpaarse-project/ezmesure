@@ -123,14 +123,20 @@ const emit = defineEmits({
   submit: (item) => !!item,
 });
 
-const types = Array.from(repoColors.keys());
-
 const { t, te } = useI18n();
 const snacks = useSnacksStore();
 
 const loading = ref(false);
 const valid = ref(false);
 const space = ref({ ...(props.modelValue ?? {}) });
+
+const types = computed(() => {
+  const keys = Array.from(repoColors.keys());
+  return keys.map((type) => ({
+    value: type,
+    title: t(`spaces.types.${type}`),
+  }));
+});
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
