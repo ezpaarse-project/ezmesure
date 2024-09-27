@@ -16,7 +16,7 @@ const {
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: ['endpoint.vendor'],
+  queryFields: [],
 });
 exports.standardQueryParams = standardQueryParams;
 
@@ -32,23 +32,18 @@ exports.getAll = async (ctx) => {
   prismaQuery.where.institutionId = ctx.state.institution.id;
 
   if (query) {
-    prismaQuery.where = {
-      ...prismaQuery.where,
-      OR: [
-        { endpoint: { vendor: { contains: query, mode: 'insensitive' } } },
-        { institution: { name: { contains: query, mode: 'insensitive' } } },
-        { institution: { acronym: { contains: query, mode: 'insensitive' } } },
-      ],
-    };
+    prismaQuery.where.endpoint = { vendor: { contains: query, mode: 'insensitive' } };
   }
 
   switch (connection) {
     case 'working':
+    case 'success':
       prismaQuery.where.connection = SUCCESS_FILTER;
       break;
     case 'unauthorized':
       prismaQuery.where.connection = UNAUTHORIZED_FILTER;
       break;
+    case 'failed':
     case 'faulty':
       prismaQuery.where.connection = FAILED_FILTER;
       break;

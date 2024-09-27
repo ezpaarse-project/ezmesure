@@ -33,6 +33,7 @@ router.route({
     },
     query: standardQueryParams.manyValidation.append({
       connection: Joi.string().allow('working', 'unauthorized', 'faulty', 'untested'),
+      q: Joi.string().trim().allow(''),
     }),
   },
 });
