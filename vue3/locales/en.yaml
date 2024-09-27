@@ -24,6 +24,7 @@ menu:
   report: My reports
   adminReport: ezREEPORT
   repositories: Repositories
+  spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
 home:
@@ -774,8 +775,13 @@ repositories:
   nPermissions: "{count} access"
 spaces:
   spaces: Spaces
+  toolbarTitle: Spaces ({count})
   newSpace: New space
   editSpace: Edit space
+  manageSpaces: >
+    Manage spaces
+    |Manage {count} spaces
+  deleteNbRepositories: You are about to delete {number} spaces
   xSpaces: >
     1 space
     |{count} spaces

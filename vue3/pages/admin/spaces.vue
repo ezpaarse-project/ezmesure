@@ -7,21 +7,10 @@
       search
       icons
       @update:model-value="debouncedRefresh()"
-    >
-      <v-btn
-        v-if="repositoryFormDialogRef"
-        v-tooltip="$t('add')"
-        icon="mdi-plus"
-        variant="tonal"
-        density="comfortable"
-        color="green"
-        class="mr-2"
-        @click="repositoryFormDialogRef.open()"
-      />
-    </SkeletonPageBar>
+    />
 
     <v-data-table-server
-      v-model="selectedRepositories"
+      v-model="selectedSpaces"
       :headers="headers"
       show-select
       return-object
@@ -35,14 +24,10 @@
         />
       </template>
 
-      <template #[`item.institutions`]="{ value, item }">
-        <v-chip
-          :text="`${value.length}`"
-          :variant="!value.length ? 'outlined' : undefined"
-          prepend-icon="mdi-domain"
-          size="small"
-          @click="repoInstitutionsDialogRef?.open(item)"
-        />
+      <template #[`item.institution.name`]="{ value, item }">
+        <nuxt-link :to="`/admin/institutions/${item.institutionId}`">
+          {{ value }}
+        </nuxt-link>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -58,18 +43,30 @@
 
           <v-list>
             <v-list-item
+              v-if="spaceFormDialogRef"
+              :title="$t('modify')"
+              prepend-icon="mdi-pencil"
+              @click="spaceFormDialogRef.open(item, { institution: item.institution })"
+            />
+            <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
-              @click="deleteRepositories([item])"
+              @click="deleteSpaces([item])"
             />
 
             <v-divider />
 
             <v-list-item
+              :title="$t('open')"
+              :href="`/kibana/s/${item.id}`"
+              prepend-icon="mdi-open-in-app"
+            />
+
+            <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
-              @click="copyRepositoryPattern(item)"
+              @click="copySpaceId(item)"
             />
           </v-list>
         </v-menu>
@@ -77,26 +74,21 @@
     </v-data-table-server>
 
     <SelectionMenu
-      v-model="selectedRepositories"
-      :text="$t('repositories.manageRepositories', selectedRepositories.length)"
+      v-model="selectedSpaces"
+      :text="$t('spaces.manageSpaces', selectedSpaces.length)"
     >
       <template #actions>
         <v-list-item
           :title="$t('delete')"
           prepend-icon="mdi-delete"
-          @click="deleteRepositories()"
+          @click="deleteSpaces()"
         />
       </template>
     </SelectionMenu>
 
-    <RepositoryFormDialog
-      ref="repositoryFormDialogRef"
+    <SpaceFormDialog
+      ref="spaceFormDialogRef"
       @submit="refresh()"
-    />
-
-    <RepositoryInstitutionsDialog
-      ref="repoInstitutionsDialogRef"
-      @update:model-value="refresh()"
     />
   </div>
 </template>
@@ -112,10 +104,9 @@ const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
-const selectedRepositories = ref([]);
+const selectedSpaces = ref([]);
 
-const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
-const repoInstitutionsDialogRef = useTemplateRef('repoInstitutionsDialogRef');
+const spaceFormDialogRef = useTemplateRef('spaceFormDialogRef');
 
 const {
   refresh,
@@ -124,14 +115,14 @@ const {
   vDataTableOptions,
 } = await useServerSidePagination({
   fetch: {
-    url: '/api/repositories',
+    url: '/api/kibana-spaces',
   },
   sortMapping: {
     institutions: 'institutions._count',
   },
   data: {
-    sortBy: [{ key: 'pattern', order: 'asc' }],
-    include: ['institutions'],
+    sortBy: [{ key: 'name', order: 'asc' }],
+    include: ['institution'],
   },
 });
 
@@ -140,20 +131,24 @@ const {
  */
 const headers = computed(() => [
   {
-    title: t('repositories.pattern'),
-    value: 'pattern',
+    title: t('name'),
+    value: 'name',
     sortable: true,
   },
   {
-    title: t('repositories.type'),
+    title: t('spaces.id'),
+    value: 'id',
+    sortable: true,
+  },
+  {
+    title: t('spaces.type'),
     value: 'type',
     align: 'center',
     sortable: true,
   },
   {
-    title: t('repositories.institutions'),
-    value: 'institutions',
-    align: 'center',
+    title: t('institutions.title'),
+    value: 'institution.name',
     sortable: true,
   },
   {
@@ -170,7 +165,7 @@ const toolbarTitle = computed(() => {
   if (itemLength.value.current !== itemLength.value.total) {
     count = `${itemLength.value.current}/${itemLength.value.total}`;
   }
-  return t('repositories.toolbarTitle', { count: count ?? '?' });
+  return t('spaces.toolbarTitle', { count: count ?? '?' });
 });
 
 /**
@@ -179,12 +174,12 @@ const toolbarTitle = computed(() => {
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
 /**
- * Delete multiple repositories
+ * Delete multiple spaces
  *
  * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
  */
-function deleteRepositories(items) {
-  const toDelete = items || selectedRepositories.value;
+function deleteSpaces(items) {
+  const toDelete = items || selectedSpaces.value;
   if (toDelete.length <= 0) {
     return;
   }
@@ -192,7 +187,7 @@ function deleteRepositories(items) {
   openConfirm({
     title: t('areYouSure'),
     text: t(
-      'repositories.deleteNbRepositories',
+      'spaces.deleteNbSpaces',
       toDelete.length,
     ),
     agreeText: t('delete'),
@@ -201,9 +196,9 @@ function deleteRepositories(items) {
       const results = await Promise.all(
         toDelete.map((item) => {
           try {
-            return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
+            return $fetch(`/api/kibana-spaces/${item.id}`, { method: 'DELETE' });
           } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.pattern }));
+            snacks.error(t('cannotDeleteItem', { id: item.id }));
             return Promise.resolve(null);
           }
         }),
@@ -214,7 +209,7 @@ function deleteRepositories(items) {
       }
 
       if (!items) {
-        selectedRepositories.value = [];
+        selectedSpaces.value = [];
       }
 
       await refresh();
@@ -223,17 +218,17 @@ function deleteRepositories(items) {
 }
 
 /**
- * Put repository ID into clipboard
+ * Put space ID into clipboard
  *
- * @param {object} param0 Repository
+ * @param {object} param0 Space
  */
-async function copyRepositoryPattern({ pattern }) {
+async function copySpaceId({ id }) {
   if (!id) {
     return;
   }
 
   try {
-    await copy(pattern);
+    await copy(id);
   } catch {
     snacks.error(t('clipboard.unableToCopy'));
     return;

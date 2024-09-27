@@ -24,6 +24,7 @@ menu:
   report: Mes rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
+  spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
 home:
@@ -805,8 +806,15 @@ repositories:
   nPermissions: "{count} accès"
 spaces:
   spaces: Espaces
+  toolbarTitle: Espace ({count})
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
+  manageSpaces: >
+    Gérer les espaces
+    |Gérer {count} espaces
+  deleteNbSpaces: >
+    Vous allez supprimer 1 espace.
+    |Vous allez supprimer {count} espaces.
   xSpaces: >
     1 espace
     |{count} espaces

@@ -13,6 +13,12 @@
       class="text-grey-darken-3"
     />
     <v-list-item
+      :title="$t('menu.spaces')"
+      to="/admin/spaces"
+      prepend-icon="mdi-tab"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
       :title="$t('menu.users')"
       to="/admin/users"
       prepend-icon="mdi-account-multiple"
