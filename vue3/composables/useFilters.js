@@ -1,5 +1,4 @@
 import {
-  computed,
   toValue,
 } from '#imports';
 
@@ -13,13 +12,13 @@ export default function useFilters(data, emit) {
   const setFilterValue = (field, value) => {
     let v = value;
 
+    // Keep empty value if we want an empty filter
+    if (value === emptySymbol) {
+      v = '';
+    }
+
     // Cleaning values for string
     if (typeof value === 'string') {
-      // Keep empty value if we want an empty filter
-      if (value === emptySymbol) {
-        v = '';
-      }
-
       // Remove filter if value is empty
       if (value === '') {
         v = undefined;

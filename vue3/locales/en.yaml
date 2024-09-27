@@ -234,6 +234,7 @@ endpoints:
   deleteNbEndpoints: You are about to delete {number} endpoints.
   noEndpointFound: No endpoint found
   clickToDeclareOne: Click here to declare one
+  disabled: Disabled
   disabledUntil: Disabled until
   disabledUntilDesc: This endpoint is disabled, meaning that every harvest task of this endpoint will be paused until this date.
   checkEndpoint: Test endpoint

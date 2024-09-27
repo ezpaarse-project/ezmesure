@@ -241,6 +241,7 @@ endpoints:
     Vous allez supprimer {count} points d'accès.
   noEndpointFound: Aucun point d'accès trouvé
   clickToDeclareOne: Cliquez ici pour en déclarer un
+  disabled: Désactivé
   disabledUntil: Désactivé jusqu'au
   disabledUntilDesc: Ce point d'accès est désactivé, ce qui signifie que toutes les tâches de moissonnage de ce point d'accès seront suspendues jusqu'a cette date.
   checkEndpoint: Tester le point d'accès
