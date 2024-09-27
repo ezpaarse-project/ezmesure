@@ -22,10 +22,6 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
 
-  plugins: [
-    '~/plugins/vuetify',
-  ],
-
   i18n: i18nOptions,
 
   pinia: {

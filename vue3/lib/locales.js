@@ -2,11 +2,11 @@ export default [
   {
     code: 'fr',
     name: 'Français',
-    file: 'fr.yaml',
+    file: 'fr.json',
   },
   {
     code: 'en',
     name: 'English',
-    file: 'en.yaml',
+    file: 'en.json',
   },
 ];

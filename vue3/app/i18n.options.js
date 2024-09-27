@@ -8,7 +8,7 @@ export default {
   lazy: true,
   strategy: 'no_prefix',
   defaultLocale: 'fr',
-  langDir: 'locales',
+  langDir: 'locales/dist',
   locales,
   detectBrowserLanguage: {
     useCookie: true,
