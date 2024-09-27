@@ -35,6 +35,7 @@
         temporary
       >
         <slot
+          v-if="isPanelOpen"
           name="panel"
           :model-value="modelValue"
           @update:modelValue="$emit('update:modelValue', $event)"

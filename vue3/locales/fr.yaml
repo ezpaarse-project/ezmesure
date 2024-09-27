@@ -450,6 +450,7 @@ institutions:
     untested: Non testé
     operational: Fonctionnel
     invalidCredentials: Identifiants invalides
+    invalidCredentialsShort: Invalides
     connectionSuccessful:
       title: Connexion réussie
       desc: 'Un rapport de test a été téléchargé avec succès, ou a généré des erreurs sans lien avec l''authentification (ex: période indisponible).'
@@ -587,6 +588,8 @@ tasks:
     period: 'Période :'
     index: 'Index :'
 sushi:
+  filters:
+    title: Filtrer les identifiants
   credentials: Identifiants
   credentialsCount: >
     1 identifiant

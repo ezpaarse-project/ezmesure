@@ -17,9 +17,9 @@ export const roleColors = new Map([
 
 export const sushiStatus = new Map([
   ['success', { color: 'green', icon: 'mdi-check' }],
-  ['failed', { color: 'red', icon: 'mdi-close' }],
-  ['unauthorized', { color: 'orange', icon: 'mdi-key-alert-outline' }],
   ['untested', { color: 'grey', icon: 'mdi-lan-pending' }],
+  ['unauthorized', { color: 'orange', icon: 'mdi-key-alert-outline' }],
+  ['failed', { color: 'red', icon: 'mdi-close' }],
 ]);
 
 export const harvestStatus = new Map([

@@ -18,7 +18,7 @@
       </template>
 
       <template #filters-panel="props">
-        <SushiFilters v-bind="props" />
+        <SushiFilters :institution="institution" v-bind="props" />
       </template>
 
       <v-btn
@@ -105,7 +105,7 @@
               title-key="sushi.nProblematicEndpoints"
               icon="mdi-alert-circle"
               color="error"
-              @click="query.connection = 'faulty'; refresh()"
+              @click="query.connection = 'failed'; refresh()"
             />
           </v-col>
         </template>

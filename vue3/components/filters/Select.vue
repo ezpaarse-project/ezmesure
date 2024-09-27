@@ -1,14 +1,13 @@
 <template>
-  <v-select
-    :model-value="modelValue === '' ? $t('permissions.none') : modelValue"
+  <v-autocomplete
+    v-model="value"
+    v-model:search="search"
     :items="selectItems"
     variant="outlined"
     density="comfortable"
     hide-details="auto"
-    multiple
-    @update:model-value="$emit('update:modelValue', $event || [])"
   >
-    <template #prepend-item>
+    <template v-if="emptySymbol && !search" #prepend-item>
       <v-list-item
         :title="$t('permissions.none')"
         :disabled="isEmptyDisabled"
@@ -26,7 +25,7 @@
 
       <v-divider class="mb-2" />
     </template>
-  </v-select>
+  </v-autocomplete>
 </template>
 
 <script setup>
@@ -41,12 +40,24 @@ const props = defineProps({
   },
   emptySymbol: {
     type: Symbol,
-    required: true,
+    default: undefined,
   },
 });
 
 const emit = defineEmits({
   'update:modelValue': (v) => Array.isArray(v) || typeof v === 'string' || v === undefined,
+});
+
+const search = ref('');
+
+const value = computed({
+  get: () => {
+    if (props.emptySymbol && props.modelValue === '') {
+      return $t('permissions.none');
+    }
+    return props.modelValue;
+  },
+  set: (v) => emit('update:modelValue', v || []),
 });
 
 const isEmptyActive = computed(
@@ -63,14 +74,24 @@ const selectItems = computed(() => {
     return undefined;
   }
 
-  return props.items.map((item) => ({
-    ...item,
-    props: {
-      disabled: isEmptyActive.value,
-      color: 'primary',
-      ...(item.props ?? {}),
-    },
-  }));
+  return props.items.map((item) => {
+    let i = item;
+    if (typeof item !== 'object') {
+      i = {
+        title: item,
+        value: item,
+      };
+    }
+
+    return {
+      ...i,
+      props: {
+        disabled: props.emptySymbol && isEmptyActive.value,
+        color: 'primary',
+        ...(i.props ?? {}),
+      },
+    };
+  });
 });
 
 function toggle() {

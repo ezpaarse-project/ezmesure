@@ -10,34 +10,29 @@
         :model-value="modelValue"
         color="primary"
         density="comfortable"
+        variant="outlined"
         rounded
         @update:model-value="$emit('update:modelValue', $event)"
       >
-        <v-btn :value="true" size="small" variant="outlined">
-          {{ trueText || $t('yes') }}
-        </v-btn>
-
-        <v-btn :value="false" size="small" variant="outlined">
-          {{ falseText || $t('no') }}
-        </v-btn>
+        <v-btn
+          v-for="btn in buttons"
+          :key="btn.value"
+          v-bind="btn"
+        />
       </v-btn-toggle>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   modelValue: {
-    type: Boolean,
+    type: [Boolean, String, Number],
     default: undefined,
   },
-  trueText: {
-    type: String,
-    default: undefined,
-  },
-  falseText: {
-    type: String,
-    default: undefined,
+  items: {
+    type: Array,
+    default: () => [true, false],
   },
   label: {
     type: String,
@@ -52,6 +47,31 @@ defineProps({
 defineEmits({
   'update:modelValue': (val) => val === undefined || typeof val === 'boolean',
 });
+
+const { t } = useI18n();
+
+const buttons = computed(() => props.items.map(
+  (item) => {
+    let { value, text } = item;
+
+    if (typeof item === 'boolean') {
+      value = item;
+      text = item ? t('yes') : t('no');
+    }
+
+    if (typeof item === 'string' || typeof item === 'number') {
+      value = item;
+      text = `${item}`;
+    }
+
+    return {
+      ...item,
+      value,
+      text,
+      size: 'small',
+    };
+  },
+));
 </script>
 
 <style lang="scss" scoped>

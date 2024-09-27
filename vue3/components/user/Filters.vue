@@ -62,7 +62,7 @@
         </v-col>
 
         <v-col cols="12" sm="6">
-          <FiltersBoolean
+          <FiltersButtonsGroup
             v-model="filters.isAdmin"
             :label="$t('users.user.isAdmin')"
             prepend-icon="mdi-security"
@@ -76,6 +76,9 @@
             :items="permissionsItems"
             :label="$t('users.user.permissions')"
             prepend-icon="mdi-key"
+            chips
+            closable-chips
+            multiple
           />
         </v-col>
 
@@ -86,6 +89,9 @@
             :items="rolesItems"
             :label="$t('users.user.roles')"
             prepend-icon="mdi-tag"
+            chips
+            closable-chips
+            multiple
           />
         </v-col>
       </v-row>
