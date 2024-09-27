@@ -28,8 +28,7 @@
     "pretty-bytes": "^6.1.1",
     "sass": "^1.78.0",
     "vue-i18n": "^9.14.0",
-    "vuetify-nuxt-module": "^0.18.2",
-    "yaml": "^2.5.1"
+    "vuetify-nuxt-module": "^0.18.2"
   },
   "overrides": {
     "vue": "^3.5.0"
