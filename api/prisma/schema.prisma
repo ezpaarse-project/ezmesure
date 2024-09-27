@@ -104,6 +104,8 @@ model Membership {
   repositoryPermissions RepositoryPermission[]
   /// Whether the membership can be modified or not by non-admins
   locked                Boolean                @default(false)
+  /// Abritrary comment about the membership
+  comment         String?
 
   @@id([username, institutionId])
 }

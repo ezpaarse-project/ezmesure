@@ -50,6 +50,7 @@ const schema = {
   )),
 
   locked: Joi.boolean(),
+  comment: Joi.string().allow(''),
 
   spacePermissions: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),
