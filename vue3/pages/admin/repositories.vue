@@ -8,6 +8,10 @@
       icons
       @update:model-value="debouncedRefresh()"
     >
+      <template #filters-panel="props">
+        <RepositoryFilters v-bind="props" />
+      </template>
+
       <v-btn
         v-if="repositoryFormDialogRef"
         v-tooltip="$t('add')"

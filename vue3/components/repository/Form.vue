@@ -97,8 +97,6 @@ const emit = defineEmits({
   submit: (item) => !!item,
 });
 
-const types = Array.from(repoColors.keys());
-
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
@@ -109,6 +107,14 @@ const permissions = ref(new Map());
 
 /** @type {Ref<Object | null>} */
 const formRef = ref(null);
+
+const types = computed(() => {
+  const keys = Array.from(repoColors.keys());
+  return keys.map((type) => ({
+    value: type,
+    title: t(`spaces.types.${type}`),
+  }));
+});
 
 function applyRepository(item) {
   if (!item) {
