@@ -1,7 +1,7 @@
 <template>
-  <v-container class="fill-height" style="width: 50%;">
-    <v-row>
-      <v-col>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
         <v-card elevation="10">
           <v-card-title class="bg-primary d-flex">
             {{ $t('contact.contactUs') }}

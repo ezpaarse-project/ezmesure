@@ -1,7 +1,7 @@
 <template>
-  <v-container class="fill-height" style="width: 50%;">
-    <v-row>
-      <v-col>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
         <v-card elevation="10">
           <v-card-title class="bg-primary d-flex">
             {{ $t('authenticate.restrictedAccess') }}
@@ -17,7 +17,7 @@
                 <v-expansion-panel-title>
                   <div>
                     <img
-                      src="/images/kibana-logo-color-horizontal.svg"
+                      src="/images/kibana_logo.svg"
                       alt="Kibana"
                       height="35"
                     >
@@ -25,61 +25,74 @@
                 </v-expansion-panel-title>
 
                 <v-expansion-panel-text>
-                  <p class="pb-2">
-                    {{ $t('authenticate.kibanaAuth') }}
-                  </p>
+                  <v-row>
+                    <v-col>
+                      <p>
+                        {{ $t('authenticate.kibanaAuth') }}
+                      </p>
+                    </v-col>
+                  </v-row>
 
-                  <v-alert
-                    v-if="errorMessage"
-                    :value="errorMessage"
-                    dismissible
-                    prominent
-                    dense
-                    type="error"
-                    class="mb-4"
-                    @update:model-value="() => (errorMessage = '')"
-                  >
-                    {{ errorMessage }}
-                  </v-alert>
+                  <v-row v-if="errorMessage">
+                    <v-col>
+                      <v-alert
+                        type="error"
+                        density="compact"
+                        closable
+                        @update:model-value="() => (errorMessage = '')"
+                      >
+                        {{ errorMessage }}
+                      </v-alert>
+                    </v-col>
+                  </v-row>
 
-                  <v-form v-model="valid" class="mb-4" @submit.prevent="login()">
-                    <v-text-field
-                      v-model="credentials.username"
-                      :label="$t('authenticate.user')"
-                      :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
-                      prepend-inner-icon="mdi-account"
-                      variant="outlined"
-                      required
-                    />
-
-                    <v-text-field
-                      v-model="credentials.password"
-                      :label="$t('authenticate.password')"
-                      :type="showPassword ? 'text' : 'password'"
-                      :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
-                      prepend-inner-icon="mdi-lock"
-                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      variant="outlined"
-                      required
-                      @click:append="showPassword = !showPassword"
-                    />
+                  <v-form v-model="valid" class="mt-4" @submit.prevent="login()">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                          v-model="credentials.username"
+                          :label="$t('authenticate.user')"
+                          :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
+                          prepend-icon="mdi-account"
+                          variant="underlined"
+                          required
+                        />
+                      </v-col>
+                    </v-row>
 
                     <v-row>
-                      <a href="/password/reset" class="text-left ml-5 mt-2">
-                        {{ $t('password.forgot') }}
-                      </a>
+                      <v-col>
+                        <v-text-field
+                          v-model="credentials.password"
+                          :label="$t('authenticate.password')"
+                          :type="showPassword ? 'text' : 'password'"
+                          :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
+                          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                          prepend-icon="mdi-lock"
+                          variant="underlined"
+                          required
+                          @click:append="showPassword = !showPassword"
+                        />
+                      </v-col>
+                    </v-row>
 
-                      <v-spacer />
+                    <v-row>
+                      <v-col>
+                        <a href="/password/reset" class="text-left">
+                          {{ $t('password.forgot') }}
+                        </a>
+                      </v-col>
 
-                      <v-btn
-                        class="mr-5"
-                        color="primary"
-                        type="submit"
-                        :loading="loading"
-                        :disabled="!valid"
-                      >
-                        {{ $t('authenticate.logIn') }}
-                      </v-btn>
+                      <v-col style="text-align: end;">
+                        <v-btn
+                          color="primary"
+                          type="submit"
+                          :loading="loading"
+                          :disabled="!valid"
+                        >
+                          {{ $t('authenticate.logIn') }}
+                        </v-btn>
+                      </v-col>
                     </v-row>
                   </v-form>
                 </v-expansion-panel-text>
@@ -89,7 +102,7 @@
                 <v-expansion-panel-title>
                   <div>
                     <img
-                      src="/images/shibboleth_logowordmark_color.png"
+                      src="/images/shibboleth_logo.png"
                       alt="Shibboleth"
                       height="40"
                     >
@@ -97,18 +110,26 @@
                 </v-expansion-panel-title>
 
                 <v-expansion-panel-text>
-                  <p>
-                    {{ $t('authenticate.logInWithProvider') }}
-                  </p>
+                  <v-row>
+                    <v-col>
+                      <p>
+                        {{ $t('authenticate.logInWithProvider') }}
+                      </p>
+                    </v-col>
+                  </v-row>
 
-                  <p class="text-center">
-                    <v-btn
-                      color="primary"
-                      :href="`/login?origin=/myspace`"
-                    >
-                      {{ $t('authenticate.logIn') }}
-                    </v-btn>
-                  </p>
+                  <v-row>
+                    <v-col>
+                      <p class="text-center">
+                        <v-btn
+                          color="primary"
+                          :href="`/login?origin=/myspace`"
+                        >
+                          {{ $t('authenticate.logIn') }}
+                        </v-btn>
+                      </p>
+                    </v-col>
+                  </v-row>
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
