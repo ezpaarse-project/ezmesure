@@ -8,6 +8,10 @@
       icons
       @update:model-value="debouncedRefresh()"
     >
+      <template #filters-panel="props">
+        <SushiEndpointFilters v-bind="props" />
+      </template>
+
       <v-btn
         v-if="endpointFormDialogRef"
         v-tooltip="$t('add')"

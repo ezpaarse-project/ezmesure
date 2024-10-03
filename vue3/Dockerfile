@@ -15,6 +15,6 @@ LABEL maintainer="ezTEAM <ezteam@couperin.org>"
 WORKDIR /usr/src/app
 COPY --chown=node:node --from=builder /app/.output .
 
-EXPOSE 8080
+EXPOSE 3000
 
 ENTRYPOINT ["node", "server/index.mjs"]

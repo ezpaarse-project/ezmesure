@@ -418,7 +418,6 @@ async function changeSushiUrl(sushiUrl) {
 
   if (checkReg.test(sushiUrl)) {
     const shouldFixUrl = await openConfirm({
-      title: t('areYouSure'),
       text: t('endpoints.sushiNotRootDetected'),
       agreeText: t('fixIt'),
       disagreeText: t('leaveIt'),

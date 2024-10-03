@@ -7,7 +7,7 @@
     </v-row>
 
     <v-container class="fill-height">
-      <v-row v-if="status === 'pending'">
+      <v-row v-if="loading">
         <v-progress-circular
           size="64"
           color="primary"
@@ -41,7 +41,7 @@ defineProps({
     default: false,
   },
   loading: {
-    type: String,
+    type: Boolean,
     default: undefined,
   },
   error: {

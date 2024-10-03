@@ -280,7 +280,6 @@ function deleteMembers(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'institutions.members.deleteN',
       toDelete.length,

@@ -6,7 +6,7 @@
     @update:model-value="cancel()"
   >
     <v-card
-      :title="dialogStore.data.title"
+      :title="dialogStore.data.title || $t('areYouSure')"
       :text="dialogStore.data.text"
     >
       <template #actions>

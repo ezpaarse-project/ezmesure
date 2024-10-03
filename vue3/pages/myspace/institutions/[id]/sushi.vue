@@ -695,7 +695,6 @@ async function resetConnections(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'institutions.sushi.resetNbChecks',
       toReset.length,
@@ -735,7 +734,6 @@ async function deleteSushis(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'sushi.deleteNbCredentials',
       toDelete.length,

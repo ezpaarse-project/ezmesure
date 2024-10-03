@@ -5,39 +5,42 @@
   >
     <template #text>
       <v-list lines="2" density="compact">
-        <v-list-item :subtitle="$t('users.user.roles')" prepend-icon="mdi-shield">
+        <v-list-item v-if="otherRoles.size > 0" :subtitle="$t('users.user.roles')" prepend-icon="mdi-shield">
           <template #title>
             <v-chip
               v-for="role in otherRoles"
               :key="role"
               :text="role"
               size="small"
+              density="comfortable"
               label
               class="mr-1"
             />
           </template>
         </v-list-item>
 
-        <v-list-item :subtitle="$t('repositories.repositories')" prepend-icon="mdi-database">
+        <v-list-item v-if="repositoryRoles.size > 0" :subtitle="$t('repositories.repositories')" prepend-icon="mdi-database">
           <template #title>
             <v-chip
               v-for="role in repositoryRoles"
               :key="role"
               :text="role"
               size="small"
+              density="comfortable"
               label
               class="mr-1"
             />
           </template>
         </v-list-item>
 
-        <v-list-item :subtitle="$t('spaces.spaces')" prepend-icon="mdi-tab">
+        <v-list-item v-if="spaceRoles.size > 0" :subtitle="$t('spaces.spaces')" prepend-icon="mdi-tab">
           <template #title>
             <v-chip
               v-for="role in spaceRoles"
               :key="role"
               :text="role"
               size="small"
+              density="comfortable"
               label
               class="mr-1"
             />

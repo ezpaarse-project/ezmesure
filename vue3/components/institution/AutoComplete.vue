@@ -8,11 +8,11 @@
     :rules="rules"
     :error="!!error"
     :error-messages="error?.message"
-    no-filter
     item-title="name"
     variant="outlined"
+    hide-details="auto"
+    no-filter
     hide-no-data
-    hide-details
     clearable
     required
     autofocus
@@ -62,6 +62,7 @@ const {
 } = await useFetch('/api/institutions', {
   query: {
     q: debouncedSearch,
+    sort: 'name',
   },
 });
 

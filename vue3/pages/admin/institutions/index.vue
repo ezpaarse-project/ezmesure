@@ -347,7 +347,6 @@ function deleteInstitutions(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'institutions.deleteNbInstitutions.text',
       toDelete.length,
@@ -387,7 +386,6 @@ function toggleInstitutions(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'institutions.validateNbInstitutions',
       toActivate.length,

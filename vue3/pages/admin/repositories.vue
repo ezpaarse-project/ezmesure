@@ -194,7 +194,6 @@ function deleteRepositories(items) {
   }
 
   openConfirm({
-    title: t('areYouSure'),
     text: t(
       'repositories.deleteNbRepositories',
       toDelete.length,
