@@ -261,7 +261,7 @@ institutions:
   noInstitutions: You're not attached to a institution.
   institutionFoundDeclareNewInstitution: Your institution is not declared, declare a new institution.
   sendMailToJoin: An email has been sent to the institution's correspondents
-  askToJoinAnInstitution: Ask to join an institution
+  askToJoinAnInstitution: Join an institution
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
   createMailContactList: Copy the emails of the correspondents

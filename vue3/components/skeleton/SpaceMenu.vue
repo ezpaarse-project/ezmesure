@@ -1,17 +1,13 @@
 <template>
-  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3">
+  <v-navigation-drawer v-model="isOpen" width="300" color="grey-lighten-3">
     <v-list-item
       :title="$t('menu.myDeposits')"
       to="/myspace/files"
       prepend-icon="mdi-file-upload"
       class="text-grey-darken-3"
     />
-    <v-list-item
-      :title="$t('menu.myInstitutions')"
-      to="/myspace/institutions"
-      prepend-icon="mdi-domain"
-      class="text-grey-darken-3"
-    />
+
+    <CurrentUserInstitutionList />
 
     <template v-if="user" #append>
       <v-divider />
@@ -44,7 +40,7 @@
             size="small"
             color="red"
             variant="tonal"
-            @click="logout()"
+            @click.prevent="logout()"
           />
         </template>
       </v-list-item>
@@ -71,7 +67,7 @@ const kibanaProfileUrl = computed(() => {
 
 async function logout() {
   if (config.shibbolethEnabled) {
-    navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
+    await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
     return;
   }
 

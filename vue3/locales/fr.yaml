@@ -270,7 +270,7 @@ institutions:
   noInstitutions: Vous n'êtes pas attaché à un établissement.
   institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez un nouvel établissement.
   sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour les prévenir.
-  askToJoinAnInstitution: Demander à rejoindre un établissement
+  askToJoinAnInstitution: Rejoindre un établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
   createMailContactList: Copier les adresses mails des correspondants
