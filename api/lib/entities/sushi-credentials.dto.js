@@ -44,7 +44,7 @@ const schema = {
     date: Joi.date(),
     status: Joi.string(),
     exceptions: Joi.array().items(Joi.object()),
-    errorCode: Joi.string().allow(null),
+    errorCode: Joi.string().allow('', null),
   }),
 };
 

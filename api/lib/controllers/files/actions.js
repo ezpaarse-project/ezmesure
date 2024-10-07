@@ -84,6 +84,7 @@ function validateFile(filePath, $t) {
 
 exports.upload = async function upload(ctx) {
   let { fileName } = ctx.request.params;
+  const { user } = ctx.state;
 
   ctx.action = 'file/upload';
 
@@ -93,7 +94,6 @@ exports.upload = async function upload(ctx) {
 
   fileName = fileName.replace(/\s/g, '_');
 
-  const { user } = ctx.state;
   const domain = user.email.split('@')[1];
 
   const relativePath = path.join(domain, user.username, fileName);
@@ -117,9 +117,10 @@ exports.upload = async function upload(ctx) {
   if (result instanceof Error) {
     await fse.unlink(filePath);
     ctx.throw(400, result.message);
-  } else {
-    ctx.status = 204;
+    return;
   }
+
+  ctx.status = 204;
 };
 
 exports.list = async function list(ctx) {

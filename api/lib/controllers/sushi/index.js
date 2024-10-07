@@ -153,6 +153,10 @@ router.route({
   ],
   validate: {
     type: 'json',
+    query: {
+      beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+    },
     body: Joi.object({
       id: Joi.string().trim().min(1).empty(null),
       endpoint: Joi.object({
@@ -226,6 +230,10 @@ router.route({
   validate: {
     params: {
       sushiId: Joi.string().trim().required(),
+    },
+    query: {
+      beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
     },
   },
 });

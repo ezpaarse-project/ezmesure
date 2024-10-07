@@ -1,4 +1,5 @@
 const RepositoriesService = require('../../entities/repositories.service');
+const elastic = require('../../services/elastic');
 
 const {
   schema,
@@ -261,4 +262,29 @@ exports.importMany = async (ctx) => {
 
   ctx.type = 'json';
   ctx.body = response;
+};
+
+exports.resolvePattern = async (ctx) => {
+  const { pattern } = ctx.params;
+  /** @type {RepositoryWhereInput} */
+  const where = { pattern };
+  if (!ctx.state.user?.isAdmin) {
+    where.permissions = { some: { username: ctx.state.user.username } };
+  }
+
+  const repositoriesService = new RepositoriesService();
+  const repository = await repositoriesService.findUnique({ where });
+
+  if (!repository) {
+    ctx.throw(404, ctx.$t('errors.repository.notFound'));
+    return;
+  }
+
+  const { body } = await elastic.indices.resolveIndex({ name: repository.pattern });
+
+  ctx.type = 'json';
+  ctx.body = [
+    ...body.indices,
+    ...body.aliases,
+  ];
 };

@@ -63,10 +63,17 @@
     "name": "Nom",
     "modified": "Modifié",
     "size": "Taille",
+    "letAdmin": "Transférer à l'équipe d'administration",
+    "letAdminDesc": "Le chargement n'est pas immédiat et sera effectué dès que possible",
+    "selectIndex": "Sélectionnez un index",
+    "selectIndexDescription": "Plusieurs index sont disponibles dans cet entrepôt, veuillez sélectionner un index où charger les données.",
+    "affectedIndex": "Index affecté",
+    "affectedRepository": "Entrepôt affecté",
     "updatingFailed": "La mise à jour de la liste a échoué",
     "deletingFailed": "La suppression des fichiers a échoué",
     "deleteCompleted": "Supprimer terminés",
-    "uploaded": "Chargé",
+    "loaded": "Chargé",
+    "uploaded": "Téléversé",
     "loadingInProgress": "Chargement en cours",
     "validatingFile": "Validation du fichier...",
     "isWaiting": "En attente",
@@ -76,8 +83,7 @@
     "fieldIsEmpty": "Ligne #{lineNumber}: champ \"{field}\" vide",
     "invalidField": "Ligne #{lineNumber}: champ \"{field}\" invalide, le fichier a-t-il été modifié ?",
     "depositFiles": {
-      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Veuillez noter que le chargement n'est {not} immédiat, et sera effectué par nos soins dès que possible. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
-      "not": "pas",
+      "text": "Déposez ici les fichiers d'événements de consultations que vous souhaitez charger dans ezMESURE. Nous vous invitons à lire nos {bestPracticeLink} afin de faciliter le processus, et à vous rapprocher de l'équipe si vous souhaitez en savoir plus sur l'automatisation des chargements. Les données chargées ne sont pas accessibles aux autres déposants.",
       "bestPracticeLink": "règles de bonnes pratiques"
     }
   },

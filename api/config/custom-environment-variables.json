@@ -14,6 +14,7 @@
     "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
     "host": "EZMESURE_KIBANA_HOST",
+    "dateFormat": "EZMESURE_KIBANA_DATE_FORMAT",
     "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },
   "redis": {
@@ -61,7 +62,8 @@
       "concurrency": "EZMESURE_HARVEST_CONCURRENCY",
       "maxDeferrals": "EZMESURE_MAX_DEFERRALS",
       "deferralBackoffDuration": "EZMESURE_DEFERRAL_BACKOFF_DURATION",
-      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION"
+      "busyBackoffDuration": "EZMESURE_BUSY_BACKOFF_DURATION",
+      "cancelSchedule": "EZMESURE_HARVEST_CANCEL_SCHEDULE"
     }
   },
   "counter": {
