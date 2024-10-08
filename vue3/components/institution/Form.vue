@@ -160,8 +160,8 @@
               <template #append>
                 <v-btn
                   v-if="logoPreview || institution.logoId"
-                  v-tooltip="$t('delete')"
-                  icon="mdi-delete"
+                  :text="$t('delete')"
+                  prepend-icon="mdi-delete"
                   size="small"
                   variant="tonal"
                   color="red"
@@ -169,8 +169,8 @@
                   @click="removeLogo()"
                 />
                 <v-btn
-                  v-tooltip="$t('modify')"
-                  icon="mdi-pencil"
+                  :text="$t('modify')"
+                  prepend-icon="mdi-pencil"
                   size="small"
                   variant="tonal"
                   color="primary"

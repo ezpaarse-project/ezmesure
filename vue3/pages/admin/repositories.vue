@@ -33,7 +33,7 @@
     >
       <template #[`item.type`]="{ value }">
         <v-chip
-          :text="value"
+          :text="$te(`spaces.types.${value}`) ? $t(`spaces.types.${value}`) : value"
           :color="repoColors.get(value)"
           size="small"
         />

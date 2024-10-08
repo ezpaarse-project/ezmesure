@@ -1,13 +1,21 @@
 <template>
   <v-navigation-drawer v-model="isOpen" width="300" color="grey-lighten-3">
     <v-list-item
+      :title="$t('menu.myInstitutions')"
+      to="/myspace"
+      prepend-icon="mdi-domain"
+      class="text-grey-darken-3"
+      exact
+    />
+
+    <CurrentUserInstitutionList />
+
+    <v-list-item
       :title="$t('menu.myDeposits')"
       to="/myspace/files"
       prepend-icon="mdi-file-upload"
       class="text-grey-darken-3"
     />
-
-    <CurrentUserInstitutionList />
 
     <template v-if="user" #append>
       <v-divider />
@@ -29,9 +37,8 @@
         :title="user.fullName"
         :subtitle="user.username"
         lines="two"
-        to="/myspace/"
+        to="/myspace/profile"
         prepend-icon="mdi-account"
-        exact
       >
         <template #append>
           <v-btn

@@ -88,31 +88,31 @@ const links = computed(() => [
     title: t('social.website'),
     icon: 'mdi-web',
     color: '#616161',
-    url: props.institution?.websiteUrl,
+    url: props.institution.websiteUrl,
   },
   {
     title: t('social.twitter'),
     icon: 'mdi-twitter',
     color: '#1da1f2',
-    url: props.institution?.social?.twitterUrl,
+    url: props.institution.social?.twitterUrl,
   },
   {
     title: t('social.linkedin'),
     icon: 'mdi-linkedin',
     color: '#0077b5',
-    url: props.institution?.social?.linkedinUrl,
+    url: props.institution.social?.linkedinUrl,
   },
   {
     title: t('social.youtube'),
     icon: 'mdi-youtube',
     color: '#ff0000',
-    url: props.institution?.social?.youtubeUrl,
+    url: props.institution.social?.youtubeUrl,
   },
   {
     title: t('social.facebook'),
     icon: 'mdi-facebook',
     color: '#1877f2',
-    url: props.institution?.social?.facebookUrl,
+    url: props.institution.social?.facebookUrl,
   },
 ].filter(({ url }) => !!url));
 </script>

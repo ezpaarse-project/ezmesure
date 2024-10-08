@@ -43,7 +43,7 @@
               />
 
               <v-chip
-                :text="space.type"
+                :text="$te(`spaces.types.${space.type}`) ? $t(`spaces.types.${space.type}`) : space.type"
                 :color="repoColors.get(space.type)"
                 size="small"
                 density="comfortable"
@@ -64,6 +64,7 @@
               />
 
               <ConfirmPopover
+                v-if="user.isAdmin"
                 :text="$t('areYouSure')"
                 :agree-text="$t('delete')"
                 :agree="() => removeSpace(space)"
@@ -108,6 +109,7 @@
     </template>
 
     <SpaceFormDialog
+      v-if="user.isAdmin"
       ref="spaceFormDialogRef"
       @submit="onSpaceAdded($event)"
     />
@@ -131,6 +133,7 @@ const emit = defineEmits({
 });
 
 const { t } = useI18n();
+const { data: user } = useAuthState();
 const snacks = useSnacksStore();
 
 /** @type {Ref<object[]>} */

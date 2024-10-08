@@ -56,7 +56,6 @@
           <InstitutionCard
             :institution="institution"
             :loading="status === 'pending'"
-            @update:model-value="refresh()"
           >
             <template #actions>
               <v-switch

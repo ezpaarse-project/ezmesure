@@ -137,11 +137,6 @@
         <v-divider />
 
         <v-list-item
-          :title="$t('institutions.sushi.credentials')"
-          :to="`/admin/endpoints/${item.id}`"
-          prepend-icon="mdi-key"
-        />
-        <v-list-item
           :title="$t('institutions.sushi.activeSwitch')"
           prepend-icon="mdi-toggle-switch"
           @click="toggleActiveStates()"

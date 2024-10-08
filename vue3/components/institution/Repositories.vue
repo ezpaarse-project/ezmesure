@@ -30,14 +30,14 @@
         >
           <template #subtitle>
             <v-chip
-              :text="repository.type"
+              :text="$te(`spaces.types.${repository.type}`) ? $t(`spaces.types.${repository.type}`) : repository.type"
               :color="repoColors.get(repository.type)"
               size="x-small"
               density="comfortable"
             />
           </template>
 
-          <template #append>
+          <template v-if="user.isAdmin" #append>
             <ConfirmPopover
               :text="$t('areYouSure')"
               :agree-text="$t('delete')"
@@ -68,6 +68,7 @@
     </template>
 
     <RepositoryFormDialog
+      v-if="user.isAdmin"
       ref="repositoryFormDialogRef"
       completion
       @submit="onRepositoryAdded($event)"
@@ -90,6 +91,8 @@ const props = defineProps({
 const emit = defineEmits({
   'update:modelValue': (items) => !!items,
 });
+
+const { data: user } = useAuthState();
 
 /** @type {Ref<object[]>} */
 const repositories = ref(props.institution.repositories || []);

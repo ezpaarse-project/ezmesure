@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex pr-4 pr-lg-8">
     <div class="text-truncate">
-      <nuxt-link :to="institutionLink" style="max-width: 10px;">
+      <nuxt-link v-tooltip="institution.name" :to="institutionLink" style="max-width: 10px;">
         {{ institution.name }}
       </nuxt-link>
     </div>

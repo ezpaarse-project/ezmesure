@@ -21,7 +21,7 @@ menu:
   users: Utilisateurs
   logout: Déconnexion
   contact: Contact
-  report: Mes rapports
+  report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
   spaces: Espaces
@@ -32,31 +32,26 @@ home:
   supportedBy: Ce service est soutenu par
   discoverOurPartners: Découvrez nos partenaires
   dynamicOnlineVisualizations: Visualisations dynamiques en ligne
-  dynamicOnlineVisualizationsText: Les tableaux de bord dynamiques propulsés par Kibana
-    facilitent la fouille et l'analyse des données d'usage.
+  dynamicOnlineVisualizationsText: Les tableaux de bord dynamiques propulsés par Kibana facilitent la fouille et l'analyse des données d'usage.
   centralizedRepository: Dépôt centralisé
-  centralizedRepositoryText: ezMESURE est un entrepôt national centralisant les statistiques
-    d'usage de la documentation numérique des établissements de l'enseignement supérieur
-    et de la recherche (ESR).
+  centralizedRepositoryText: ezMESURE est un entrepôt national centralisant les statistiques d'usage de la documentation numérique des établissements de l'enseignement supérieur et de la recherche (ESR).
   dataProducedByEzPAARSE: Données produites par ezPAARSE
-  dataProducedByEzPAARSEText: Les données sont produites par les différentes installations
-    d'ezPAARSE dans les établissements de l'ESR avant d'être agrégées dans ezMESURE.
+  dataProducedByEzPAARSEText: Les données sont produites par les différentes installations d'ezPAARSE dans les établissements de l'ESR avant d'être agrégées dans ezMESURE.
 myspace:
-  title: Mon Profil
+  title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
-  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons
-    à contacter l'équipe ou le correspondant ezMESURE de votre établissement.
+  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.
   name: Nom
   mail: Mail
   idp: IDP
   organization: Organisation
   unit: Unité
-  yourRights: Vos accès
-  whatDoesMemberships: Vos droits d'accès aux données et aux tableaux de bord hébergés
-    sur ezMESURE.
-  infos: Vos informations
-  repos: Vos entrepôts
-  spaces: Vos espaces
+  yourRights: Mes accès
+  whatDoesMemberships: Mes droits d'accès aux données et aux tableaux de bord hébergés sur ezMESURE.
+  infos: Mes informations
+  repos: Mes entrepôts
+  spaces: Mes espaces
+  roles: 'Mes roles :'
 files:
   title: Mes dépots
   count: "{count} sélectionné(s)"
@@ -403,20 +398,16 @@ institutions:
       reporting: Reporting
   sushi:
     title: Identifiants SUSHI ({count})
-    pageDescription: Entrez ici les identifiants SUSHI qui serviront à moissonner
-      automatiquement vos rapports COUNTER.
+    pageDescription: Entrez ici les identifiants SUSHI qui serviront à moissonner automatiquement vos rapports COUNTER.
     pageDescription2: Seule la version 5 du protocole SUSHI est supportée.
     addCredentials: Ajouter des identifiants
     updateCredentials: Mettre à jour des identifiants
-    unabletToRetriveSushiInformations: Impossible de récupérer les informations des
-      plateformes sushi
+    unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi
     label: Libellé
     tags: Étiquettes
     packages: Packages
     packagesHint: Profils, comptes, fonds, antennes, etc. dont font partie les identifiants.
-    packagesDescription: Profils, comptes, fonds, antennes, etc. dont font partie
-      les identifiants. Les packages peuvent être utilisés dans vos tableaux de bord,
-      à travers le champ X_Package.
+    packagesDescription: Profils, comptes, fonds, antennes, etc. dont font partie les identifiants. Les packages peuvent être utilisés dans vos tableaux de bord, à travers le champ X_Package.
     unableToRetriveSushiData: Impossible de récupérer les informations sushi
     endpoint: Point d'accès
     requestorId: Requestor ID
@@ -435,7 +426,7 @@ institutions:
     enterCustomerId: Veuillez saisir un Customer Id.
     enterAPIKey: Veuillez saisir une Clé API.
     comment: Commentaire
-    credentials: Identifiants Sushi
+    credentials: ezCOUNTER
     manageN: >
       Gérer les identifiants
       |Gérer {count} identifiants
@@ -716,13 +707,9 @@ contact:
   subjectIsRequired: L'objet est requis
   endpointVendor: Nom du fournisseur
   endpointUrl: URL du point d'accès SUSHI
-  pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement
-    de son acronyme)
-  sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point
-    d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier
-    est fonctionnel et compatible COUNTER5.
-  endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification
-    requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
+  pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
+  sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.
+  endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
   additionalInformation: Informations complémentaires
 errors:
   '404': La page demandée n'a pas été trouvée
@@ -824,7 +811,7 @@ spaces:
   type: Type
   types:
     ezpaarse: ezPAARSE
-    counter5: COUNTER 5
+    counter5: COUNTER
   descriptions:
     ezpaarse: Espace ezPAARSE
     counter5: Espace éditeurs

@@ -15,7 +15,7 @@
 
     <template #subtitle>
       <v-chip
-        :text="space.type"
+        :text="$te(`spaces.types.${space.type}`) ? $t(`spaces.types.${space.type}`) : space.type"
         :color="repoColors.get(space.type)"
         size="x-small"
         density="comfortable"

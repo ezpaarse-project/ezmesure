@@ -21,7 +21,7 @@ menu:
   users: Users
   logout: Logout
   contact: Contact
-  report: My reports
+  report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
   spaces: Spaces
@@ -32,30 +32,26 @@ home:
   supportedBy: This service is supported by
   discoverOurPartners: Discover our partners
   dynamicOnlineVisualizations: Dynamic online visualizations
-  dynamicOnlineVisualizationsText: Dynamic dashboards powered by Kibana make it easy
-    to search and analyze usage data.
+  dynamicOnlineVisualizationsText: Dynamic dashboards powered by Kibana make it easy to search and analyze usage data.
   centralizedRepository: Centralized repository
-  centralizedRepositoryText: ezMESURE is a national repository centralizing the usage
-    statistics of the digital documentation of higher education and research institutions
-    (HEIs).
+  centralizedRepositoryText: ezMESURE is a national repository centralizing the usage statistics of the digital documentation of higher education and research institutions (HEIs).
   dataProducedByEzPAARSE: Data produced by ezPAARSE
-  dataProducedByEzPAARSEText: Data are produced by the different ezPAARSE facilities
-    in the HEIs before being aggregated in ezMESURE.
+  dataProducedByEzPAARSEText: Data are produced by the different ezPAARSE facilities in the HEIs before being aggregated in ezMESURE.
 myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
-  determineAccessRight: In order to determine your access rights, we invite you to
-    contact the ezMESURE team or the ezMESURE correspondent in your institution.
+  determineAccessRight: In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.
   name: Name
   mail: Mail
   idp: IDP
   organization: Organisation
   unit: Unit
-  yourRights: Your rights
-  whatDoesMemberships: Your access rights to data and dashboards hosted on ezMESURE.
-  infos: Your informations
-  repos: Your repositories
-  spaces: Your spaces
+  yourRights: My rights
+  whatDoesMemberships: My access rights to data and dashboards hosted on ezMESURE.
+  infos: My informations
+  repos: My repositories
+  spaces: My spaces
+  roles: 'My roles:'
 files:
   title: My Deposits
   count: "{count} selected"
@@ -690,10 +686,8 @@ contact:
   endpointVendor: Vendor name
   endpointUrl: URL of the SUSHI endpoint
   pleaseEnterFullVendorName: Please enter the full name (possibly with its acronym)
-  sushiDetails: Please provide credentials to be used to test this endpoint, admin
-    team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
-  endpointDetails: If you have knowledge of other elements (required authentication
-    keys, technical provider, etc.), please indicate them below.
+  sushiDetails: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
+  endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.
   additionalInformation: Additional information
 errors:
   '404': La page demandée n'a pas été trouvée
@@ -791,7 +785,7 @@ spaces:
   type: Type
   types:
     ezpaarse: ezPAARSE
-    counter5: COUNTER 5
+    counter5: COUNTER
   descriptions:
     ezpaarse: ezPAARSE space
     counter5: Publisher space
