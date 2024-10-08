@@ -30,19 +30,6 @@
           </v-card>
         </v-col>
       </v-row>
-
-      <v-row>
-        <v-col>
-          <v-alert
-            v-if="!hasMemberships"
-            :title="$t('myspace.noMemberships')"
-            :text="$t('myspace.determineAccessRight')"
-            type="info"
-            variant="elevated"
-            prominent
-          />
-        </v-col>
-      </v-row>
     </v-container>
   </div>
 </template>
@@ -55,7 +42,6 @@ definePageMeta({
 
 const { public: config } = useRuntimeConfig();
 const { data: user } = useAuthState();
-const { hasMemberships } = storeToRefs(useCurrentUserStore());
 
 const refreshShibUrl = computed(() => {
   if (!config.shibbolethEnabled) {

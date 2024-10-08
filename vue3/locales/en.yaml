@@ -40,7 +40,8 @@ home:
 myspace:
   title: My Profile
   noMemberships: You're not a member of any institution yet.
-  determineAccessRight: In order to determine your access rights, we invite you to contact the ezMESURE team or the ezMESURE correspondent in your institution.
+  determineAccessRight: In order to determine your access rights, we invite you to contact the {team} or the ezMESURE correspondent in your institution, or use the menu to your left to {join}.
+  ezmesureTeam: ezMESURE team
   name: Name
   mail: Mail
   idp: IDP
@@ -258,6 +259,7 @@ institutions:
   institutionFoundDeclareNewInstitution: Your institution is not declared, declare a new institution.
   sendMailToJoin: An email has been sent to the institution's correspondents
   askToJoinAnInstitution: Join an institution
+  searchForInstitution: Look for your institution
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
   createMailContactList: Copy the emails of the correspondents

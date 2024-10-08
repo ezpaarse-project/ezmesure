@@ -40,7 +40,8 @@ home:
 myspace:
   title: Mon profil
   noMemberships: Vous ne faites partie d'aucun établissement.
-  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'équipe ou le correspondant ezMESURE de votre établissement.
+  determineAccessRight: Afin de déterminer vos droits d'accès, nous vous invitons à contacter l'{team} ou le correspondant ezMESURE de votre établissement, ou a utiliser le menu à gauche pour demander à {join}.
+  ezmesureTeam: équipe
   name: Nom
   mail: Mail
   idp: IDP
@@ -266,6 +267,7 @@ institutions:
   institutionFoundDeclareNewInstitution: Votre établissement n'est pas déclaré, déclarez un nouvel établissement.
   sendMailToJoin: Un message sera envoyé aux correspondant de l'établissement pour les prévenir.
   askToJoinAnInstitution: Rejoindre un établissement
+  searchForInstitution: Rechercher votre établissement
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
   createMailContactList: Copier les adresses mails des correspondants
