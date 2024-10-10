@@ -1,4 +1,9 @@
-import { defineNuxtRouteMiddleware, setPageLayout, addRouteMiddleware } from '#imports';
+import {
+  defineNuxtRouteMiddleware,
+  setPageLayout,
+  useAuthState,
+  navigateTo,
+} from '#imports';
 
 const ADMIN_PATH_REGEX = /^\/admin/;
 
@@ -17,6 +22,9 @@ export default defineNuxtRouteMiddleware((route) => {
   }
 
   setPageLayout('admin');
-  addRouteMiddleware('admin');
-  return true;
+  const { data: user } = useAuthState();
+  if (user.value?.isAdmin) {
+    return true;
+  }
+  return navigateTo('/myspace');
 });
