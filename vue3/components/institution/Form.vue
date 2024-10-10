@@ -306,6 +306,8 @@ const { data: user } = useAuthState();
 const snacks = useSnacksStore();
 const { open: openFileDialog, onChange: onFilesChange } = useFileDialog({
   accept: 'image/png, image/jpeg, image/svg+xml',
+  reset: true,
+  multiple: false,
 });
 
 const namespaceRules = [
@@ -436,12 +438,12 @@ async function save() {
  */
 async function updateLogo(file) {
   if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
-    logoError.value = this.$t('institutions.institution.invalidImageFile');
+    logoError.value = t('institutions.institution.invalidImageFile');
     return;
   }
 
   if (file.size > LOGO_MAX_SIZE) {
-    logoError.value = this.$t('institutions.institution.imageTooLarge');
+    logoError.value = t('institutions.institution.imageTooLarge');
     return;
   }
 
@@ -456,9 +458,9 @@ async function updateLogo(file) {
  * @param {DragEvent} event
  */
 function onLogoDrop(event) {
-  const f = event?.dataTransfer?.files;
-  if (f?.[0]) {
-    updateLogo(f[0]);
+  const [file] = event?.dataTransfer?.files ?? [];
+  if (file) {
+    updateLogo(file);
   }
   isDraggingLogo.value = false;
 }
@@ -475,7 +477,12 @@ async function removeLogo() {
 /**
  * Update the institution's logo on file dialog change
  */
-onFilesChange((files) => updateLogo(files[0]));
+onFilesChange((files) => {
+  const [file] = files ?? [];
+  if (file) {
+    updateLogo(file);
+  }
+});
 
 onMounted(() => {
   formRef.value?.validate();
