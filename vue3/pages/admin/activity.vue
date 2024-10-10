@@ -309,36 +309,33 @@ const headers = computed(() => [
 ]);
 
 const availableActions = computed(() => {
-  // There's no way to add "headers", "groups" or "children" into a
-  // VSelect (and other derivate), so old headers are commented
-  // for now and will be removed once they're supported
   const actions = [
-    // { header: 'users' },
+    { header: 'users' },
     'user/register',
     'user/refresh',
     'user/connection',
-    // { header: 'files' },
+    { header: 'files' },
     'file/upload',
     'file/list',
     'file/delete',
     'file/delete-many',
-    // { header: 'institutions' },
+    { header: 'institutions' },
     'institutions/create',
     'institutions/update',
     'institutions/delete',
     'institutions/addMember',
     'institutions/removeMember',
-    // { header: 'exports' },
+    { header: 'exports' },
     'export/aggregate',
     'export/counter5',
     'events/delete',
-    // { header: 'indices' },
+    { header: 'indices' },
     'indices/tops',
     'indices/list',
     'indices/delete',
     'indices/search',
     'indices/insert',
-    // { header: 'sushi' },
+    { header: 'sushi' },
     'sushi/create',
     'sushi/update',
     'sushi/delete',
@@ -347,12 +344,12 @@ const availableActions = computed(() => {
     'sushi/harvest',
     'sushi/import',
     'sushi/check-connection',
-    // { header: 'endpoints' },
+    { header: 'endpoints' },
     'endpoint/create',
     'endpoint/update',
     'endpoint/delete',
     'endpoint/import',
-    // { header: 'reporting' },
+    { header: 'reporting' },
     'reporting/index',
     'reporting/getDashboards',
     'reporting/list',
@@ -364,7 +361,18 @@ const availableActions = computed(() => {
 
   return actions.map((item) => {
     if (item.header) {
-      return { header: t(`activity.actionTypes.${item.header}`) };
+      // There's no way to add "headers", "groups" or "children" into a
+      // VSelect (and other derivate), so headers are items with custom style
+      return {
+        title: t(`activity.actionTypes.${item.header}`),
+        value: item,
+        props: {
+          disabled: true,
+          style: {
+            marginLeft: '-2.8rem',
+          },
+        },
+      };
     }
     return {
       title: t(`activity.actions.${item}`),
