@@ -85,9 +85,7 @@
 
       <template #[`item.validated`]="{ value, item }">
         <ConfirmPopover
-          :title="$t('areYouSure')"
           :text="$t('institutions.validateNbInstitutions', 1)"
-          :agree-text="$t('confirm')"
           :agree="() => toggleInstitutions([item])"
           location="bottom start"
         >

@@ -61,7 +61,6 @@
 
           <template #append>
             <ConfirmPopover
-              :text="$t('areYouSure')"
               :agree-text="$t('delete')"
               :agree="() => unlinkParent(parent)"
               location="end"

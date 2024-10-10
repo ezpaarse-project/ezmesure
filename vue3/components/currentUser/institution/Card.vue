@@ -9,7 +9,9 @@
     />
 
     <v-card-title class="d-flex align-center">
-      {{ institution.name }}
+      <div class="text-truncate">
+        {{ institution.name }}
+      </div>
 
       <template v-if="institution.validated">
         <v-spacer />

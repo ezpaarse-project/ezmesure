@@ -12,7 +12,9 @@
           >
             <v-icon icon="mdi-arrow-top-left-thin" size="large" />
 
-            <span style="transform: translateY(1rem);">{{ $t('institutions.searchForInstitution') }}</span>
+            <span style="transform: translateY(1rem);">
+              {{ $t('institutions.searchForInstitution') }}
+            </span>
           </div>
 
           <!-- Text to explain what to do -->

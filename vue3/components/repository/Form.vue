@@ -107,7 +107,7 @@ const repository = ref({});
 const permissions = ref(new Map());
 
 /** @type {Ref<Object | null>} */
-const formRef = ref(null);
+const formRef = useTemplateRef('formRef');
 
 const types = computed(() => {
   const keys = Array.from(repoColors.keys());

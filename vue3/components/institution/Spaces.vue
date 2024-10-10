@@ -65,7 +65,6 @@
 
               <ConfirmPopover
                 v-if="user.isAdmin"
-                :text="$t('areYouSure')"
                 :agree-text="$t('delete')"
                 :agree="() => removeSpace(space)"
                 location="end"

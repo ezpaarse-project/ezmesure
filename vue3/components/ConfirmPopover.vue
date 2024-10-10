@@ -11,7 +11,7 @@
     </template>
 
     <v-card
-      :title="title"
+      :title="title || $t('areYouSure')"
       :text="text"
     >
       <template #actions>

@@ -79,7 +79,6 @@
 
             <template #append>
               <ConfirmPopover
-                :text="$t('areYouSure')"
                 :agree-text="$t('delete')"
                 :agree="() => unlinkInstitution(institution)"
                 location="end"

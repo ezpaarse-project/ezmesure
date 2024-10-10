@@ -39,7 +39,6 @@
 
           <template v-if="user.isAdmin" #append>
             <ConfirmPopover
-              :text="$t('areYouSure')"
               :agree-text="$t('delete')"
               :agree="() => removeRepository(repository)"
               location="end"
