@@ -4,11 +4,11 @@
       <v-col cols="12" md="8" lg="6">
         <v-card elevation="10">
           <v-card-title class="bg-primary d-flex">
-            {{ $t('account.title') }}
+            {{ $t('password.forgot') }}
 
             <v-spacer />
 
-            <v-icon icon="mdi-text" />
+            <v-icon icon="mdi-lock" />
           </v-card-title>
 
           <v-card-text class="pt-4">
@@ -24,7 +24,7 @@
               </v-col>
             </v-row>
 
-            <v-form v-model="valid" @submit.prevent="activateProfile()">
+            <v-form v-model="valid" @submit.prevent="replacePassword()">
               <v-row>
                 <v-col>
                   <v-text-field
@@ -69,31 +69,8 @@
 
               <v-row>
                 <v-col>
-                  <i18n-t keypath="account.description.text" tag="p">
-                    <template #regulationLink>
-                      <a href="https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2" target="_blank" rel="noopener noreferrer">
-                        {{ $t('account.description.regulationLink') }}
-                      </a>
-                    </template>
-                  </i18n-t>
-                </v-col>
-              </v-row>
-
-              <v-row>
-                <v-col>
-                  <v-checkbox
-                    v-model="accepted"
-                    :label="$t('account.readAndAccept')"
-                    density="compact"
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-
-              <v-row>
-                <v-col>
                   <v-btn
-                    :text="$t('account.activate')"
+                    :text="$t('password.update')"
                     :disabled="!valid"
                     :loading="loading"
                     type="submit"
@@ -113,9 +90,8 @@
 <script setup>
 const { currentRoute, push: goTo } = useRouter();
 const { t } = useI18n();
-const { status: authStatus, refresh: authRefresh } = useAuth();
 
-if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
+if (!currentRoute.value.query?.token) {
   goTo('/');
 }
 
@@ -123,35 +99,23 @@ const valid = ref(false);
 const loading = ref(false);
 const password = ref('');
 const passwordRepeat = ref('');
-const accepted = ref(false);
 const showPassword = ref(false);
 const errorMessage = ref('');
 
-async function activateProfile() {
-  errorMessage.value = '';
-  if (!accepted.value) {
-    errorMessage.value = t('account.acceptTerms');
-    return;
-  }
-
-  const { token, username } = currentRoute.value.query ?? {};
-
+async function replacePassword() {
   loading.value = true;
   try {
-    await $fetch('/api/profile/_activate', {
+    await $fetch('/api/profile/password/_reset', {
       method: 'POST',
       body: {
         password: password.value,
-        acceptTerms: accepted.value,
-        username,
       },
       headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
+        Authorization: `Bearer ${currentRoute.value.query?.token}`,
       },
     });
 
-    await authRefresh();
-    goTo('/myspace');
+    success.value = true;
   } catch (err) {
     if (!(err instanceof Error)) {
       errorMessage.value = t('authenticate.failed');

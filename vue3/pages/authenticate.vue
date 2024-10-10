@@ -36,13 +36,12 @@
                   <v-row v-if="errorMessage">
                     <v-col>
                       <v-alert
+                        :text="errorMessage"
                         type="error"
                         density="compact"
                         closable
                         @update:model-value="() => (errorMessage = '')"
-                      >
-                        {{ errorMessage }}
-                      </v-alert>
+                      />
                     </v-col>
                   </v-row>
 
@@ -76,22 +75,21 @@
                       </v-col>
                     </v-row>
 
-                    <v-row>
+                    <v-row class="align-center">
                       <v-col>
-                        <a href="/password/reset" class="text-left">
+                        <nuxt-link to="/password/reset">
                           {{ $t('password.forgot') }}
-                        </a>
+                        </nuxt-link>
                       </v-col>
 
                       <v-col style="text-align: end;">
                         <v-btn
-                          color="primary"
-                          type="submit"
+                          :text="$t('authenticate.logIn')"
                           :loading="loading"
                           :disabled="!valid"
-                        >
-                          {{ $t('authenticate.logIn') }}
-                        </v-btn>
+                          color="primary"
+                          type="submit"
+                        />
                       </v-col>
                     </v-row>
                   </v-form>
@@ -122,11 +120,10 @@
                     <v-col>
                       <p class="text-center">
                         <v-btn
-                          color="primary"
+                          :text="$t('authenticate.logIn')"
                           :href="`/login?origin=/myspace`"
-                        >
-                          {{ $t('authenticate.logIn') }}
-                        </v-btn>
+                          color="primary"
+                        />
                       </p>
                     </v-col>
                   </v-row>
@@ -191,7 +188,3 @@ async function login() {
   loading.value = false;
 }
 </script>
-
-<style scoped lang="scss">
-
-</style>
