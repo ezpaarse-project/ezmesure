@@ -13,6 +13,10 @@
       </slot>
     </template>
 
+    <template v-if="$slots.extension" #extension>
+      <slot name="extension" />
+    </template>
+
     <template #append>
       <slot />
 
