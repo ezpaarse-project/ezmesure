@@ -9,7 +9,11 @@
 		// npm import autocompletion
 		"christian-kohler.npm-intellisense",
 		// Tools to work with Vue
-		"vue.volar"
+		"vue.volar",
+		// Prisma support
+		"prisma.prisma",
+		// Conventional commits
+		"vivaxy.vscode-conventional-commits",
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [
