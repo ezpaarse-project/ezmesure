@@ -8,13 +8,14 @@ const username = config.get('elasticsearch.user');
 const password = config.get('elasticsearch.password');
 const host = config.get('kibana.host');
 const port = config.get('kibana.port');
+const url = config.get('kibana.url');
 
 const authString = Buffer.from(`${username}:${password}`).toString('base64');
 
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 
 const kibanaProxy = createProxyMiddleware({
-  target: `http://${host}:${port}`,
+  target: url || `http://${host}:${port}`,
   changeOrigin: true,
   pathRewrite: { '^/kibana': '/' },
   logProvider: () => appLogger,
