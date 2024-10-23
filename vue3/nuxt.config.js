@@ -8,9 +8,9 @@ import vuetifyOptions from './app/vuetify.options';
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      shibbolethEnabled: !process.env.EZMESURE_DISABLE_SHIBBOLETH,
-      supportMail: process.env.EZMESURE_SUPPORT_MAIL || 'ezteam@couperin.org',
-      currentInstance: process.env.EZMESURE_INSTANCE,
+      shibbolethDisabled: false,
+      supportMail: 'ezteam@couperin.org',
+      currentInstance: '',
     },
   },
 

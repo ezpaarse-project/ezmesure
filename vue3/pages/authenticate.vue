@@ -96,7 +96,7 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
 
-              <v-expansion-panel v-if="config.shibbolethEnabled">
+              <v-expansion-panel v-if="config.shibbolethDisabled">
                 <v-expansion-panel-title>
                   <div>
                     <img
@@ -153,7 +153,7 @@ if (status.value === 'authenticated') {
   await navigateTo('/myspace');
 }
 
-let provider = config.shibbolethEnabled ? 1 : 0;
+let provider = config.shibbolethDisabled ? 0 : 1;
 if (query?.provider === 'kibana') {
   provider = 0;
 }

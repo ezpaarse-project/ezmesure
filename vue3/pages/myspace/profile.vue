@@ -44,7 +44,7 @@ const { public: config } = useRuntimeConfig();
 const { data: user } = useAuthState();
 
 const refreshShibUrl = computed(() => {
-  if (!config.shibbolethEnabled) {
+  if (config.shibbolethDisabled) {
     return '';
   }
 

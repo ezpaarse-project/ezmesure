@@ -73,7 +73,7 @@ const kibanaProfileUrl = computed(() => {
 });
 
 async function logout() {
-  if (config.shibbolethEnabled) {
+  if (!config.shibbolethDisabled) {
     await navigateTo('/Shibboleth.sso/Logout?return=/logout', { external: true });
     return;
   }
