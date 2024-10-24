@@ -9,6 +9,8 @@ const {
 } = require('date-fns');
 const config = require('config');
 
+const { setTimeout } = require('node:timers/promises');
+
 const harvestSessionPrisma = require('../services/prisma/harvest-session');
 const sushiService = require('../services/sushi');
 const { appLogger } = require('../services/logger');
@@ -42,6 +44,8 @@ const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
 /* eslint-enable max-len */
 
+const JOB_BATCH_SIZE = 100; // Number of jobs to process per batch
+const JOB_BATCH_DELAY = 100; // Time to wait between batches in ms
 const DEFAULT_HARVESTED_REPORTS = new Set(config.get('counter.defaultHarvestedReports'));
 const defaultHarvestedReports = Array.from(DEFAULT_HARVESTED_REPORTS).map((r) => r.toLowerCase());
 
@@ -332,47 +336,43 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   }
 
   /**
-   * Stat a session by creating linked jobs
+   * Start a session by creating linked jobs
    *
    * @param {HarvestSession} session - The session to check
    * @param {object} [options]
    */
-  async start({ id }, options = {}) {
-    /** @param {HarvestSessionService} harvestSessionService */
-    const prepareJobs = async (harvestSessionService) => {
+  async* start({ id }, options = {}) {
+    const session = await this.findUnique({ where: { id } });
+    if (!session) {
+      throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
+    }
+
+    // Create needed services
+    const repositoriesService = new RepositoriesService(this);
+    const endpointsService = new SushiEndpointsService(this);
+    const harvestJobsService = new HarvestJobsService(this);
+
       // TODO: get credentials from service with scroll (maybe later)
-      /**
-       * @type {(
-       *  HarvestSession & {
-       *    jobs: (HarvestJob & {
-       *      credentials: (SushiCredentials & {
-       *        endpoint: SushiEndpoint;
-       *        institution: Institution;
-       *      })
-       *    })[]
-       *  }) | null
-       * }
+    // Get all jobs of session
+    /**
+     * @type {(HarvestJob & {
+     *   credentials: (SushiCredentials & {
+     *     endpoint: SushiEndpoint;
+     *     institution: Institution;
+     *   })
+     * })[]}
        */
-      // @ts-ignore
-      const session = await this.findUnique({
-        where: { id },
-        include: {
-          jobs: {
+    // @ts-expect-error
+    const sessionJobs = harvestJobsService.findMany({
             include: {
               credentials: {
                 include: {
                   endpoint: true,
                   institution: true,
-                },
-              },
             },
           },
         },
       });
-
-      if (!session) {
-        throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
-      }
 
       // Get report types
       let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
@@ -382,14 +382,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
       /** @type {(SushiCredentials & { endpoint: SushiEndpoint, institution: Institution })[]} */
       let credentialsToHarvest = [];
-      if (session.jobs.length > 0) {
+    if (sessionJobs.length > 0) {
         // Get all credentials to harvest
-        credentialsToHarvest = session.jobs.map((job) => job.credentials);
+      credentialsToHarvest = sessionJobs.map((job) => job.credentials);
 
         if (!options.restartAll) {
           // Remove already ended jobs
           const harvestedCredentials = new Set(
-            session.jobs
+          sessionJobs
               .filter((job) => job.status === 'finished')
               .map((job) => job.credentialsId),
           );
@@ -399,7 +399,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         }
       } else {
         // Get harvestable credentials
-        const { harvestable } = await harvestSessionService.getCredentials(
+      const { harvestable } = await this.getCredentials(
           session,
           { include: { endpoint: true, institution: true } },
         );
@@ -407,16 +407,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         credentialsToHarvest = harvestable;
       }
 
-      // Create needed services
-      const repositoriesService = new RepositoriesService(harvestSessionService);
-      const endpointsService = new SushiEndpointsService(harvestSessionService);
-      const harvestJobsService = new HarvestJobsService(harvestSessionService);
-
       // Create index cache
       const institutionIndices = new Map();
 
       // Start harvests jobs
-      return Promise.all(
+    const jobsPerCredential = await Promise.all(
         credentialsToHarvest.map(async (credentials) => {
           const { endpoint, institution } = credentials;
           let harvestedReportTypes = [...reportTypes];
@@ -508,20 +503,28 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             }
           }
 
-          // Add jobs
-          const jobs = await Promise.all(
-            harvestedReportTypes.map(
-              async (reportType) => {
-                const data = {
+        return harvestedReportTypes.map((reportType) => ({
                   /** @type {HarvestJobStatus} */
                   status: 'waiting',
                   credentials: { id: credentials.id },
                   session: { id: session.id },
                   reportType,
                   index,
-                };
+        }));
+      }),
+    );
 
-                const job = await harvestJobsService.findFirst({
+    /**
+     * Create jobs in bulk
+     *
+     * @param {object[]} jobs Jobs to create
+     *
+     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Created jobs
+     */
+    const createJobs = async (jobs) => HarvestJobsService.$transaction(
+      async (service) => Promise.all(
+        jobs.map(async (data) => {
+          const job = await service.findFirst({
                   where: {
                     ...data,
                     status: { not: 'finished' },
@@ -529,13 +532,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
                 });
                 // if job exists, move it into waiting
                 if (job) {
-                  return harvestJobsService.update({
+            return service.update({
                     where: { id: job.id },
                     data: { status: 'waiting' },
                   });
                 }
                 // if not, create new job
-                return harvestJobsService.create({
+          return service.create({
                   data: {
                     ...data,
                     credentials: {
@@ -546,23 +549,31 @@ module.exports = class HarvestSessionService extends BasePrismaService {
                     },
                   },
                 });
-              },
+        }),
             ),
           );
 
-          if (!session.startedAt) {
-            await harvestSessionService.update({
-              where: { id: session.id },
-              data: { startedAt: new Date() },
-            });
-          }
+    let buffer = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const jobToCreate of jobsPerCredential.flat()) {
+      buffer.push(jobToCreate);
+      if (buffer.length < JOB_BATCH_SIZE) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
-          return jobs;
-        }),
-      );
-    };
+      // eslint-disable-next-line no-await-in-loop
+      const createdJobs = await createJobs(buffer);
+      buffer = [];
+      yield* createdJobs;
 
-    const jobs = await prepareJobs(this);
-    return jobs.flat();
+      // eslint-disable-next-line no-await-in-loop
+      await setTimeout(JOB_BATCH_DELAY); // Throttle requests to DB, avoiding connection issues
+    }
+
+    if (buffer.length > 0) {
+      const createdJobs = await createJobs(buffer);
+      yield* createdJobs;
+    }
   }
 };

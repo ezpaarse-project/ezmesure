@@ -196,32 +196,33 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  const harvestJobs = await harvestSessionService.start(
+  const harvestJobs = harvestSessionService.start(
     session,
     { restartAll: ctx.request.body?.restartAll ?? false },
   );
 
   const now = new Date();
+  const jobs = [];
   // Add jobs to queue
-  await Promise.all(
-    harvestJobs.flat().map(
-      async (harvestJob) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const harvestJob of harvestJobs) {
+    jobs.push(harvestJob);
         const job = await harvestQueue.getJob(harvestJob.id);
-        if (!job) {
-          return harvestQueue.add(
+    if (job) {
+      await job.moveToDelayed(now + 100);
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    await harvestQueue.add(
             'harvest',
             { taskId: harvestJob.id, timeout: session.timeout },
             { jobId: harvestJob.id },
           );
         }
 
-        return job.moveToDelayed(now + 100);
-      },
-    ),
-  );
-
   ctx.status = 201;
-  ctx.body = harvestJobs;
+  ctx.body = jobs;
 };
 
 exports.deleteOne = async (ctx) => {
