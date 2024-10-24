@@ -352,7 +352,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const endpointsService = new SushiEndpointsService(this);
     const harvestJobsService = new HarvestJobsService(this);
 
-      // TODO: get credentials from service with scroll (maybe later)
+    // TODO: get credentials from service with scroll (maybe later)
     // Get all jobs of session
     /**
      * @type {(HarvestJob & {
@@ -364,152 +364,152 @@ module.exports = class HarvestSessionService extends BasePrismaService {
        */
     // @ts-expect-error
     const sessionJobs = harvestJobsService.findMany({
-            include: {
-              credentials: {
-                include: {
-                  endpoint: true,
-                  institution: true,
-            },
+      include: {
+        credentials: {
+          include: {
+            endpoint: true,
+            institution: true,
           },
         },
-      });
+      },
+    });
 
-      // Get report types
-      let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
-      if (reportTypes.includes('all')) {
-        reportTypes = defaultHarvestedReports;
-      }
+    // Get report types
+    let reportTypes = Array.from(new Set(session.reportTypes)).map((r) => r?.toLowerCase?.());
+    if (reportTypes.includes('all')) {
+      reportTypes = defaultHarvestedReports;
+    }
 
-      /** @type {(SushiCredentials & { endpoint: SushiEndpoint, institution: Institution })[]} */
-      let credentialsToHarvest = [];
+    /** @type {(SushiCredentials & { endpoint: SushiEndpoint, institution: Institution })[]} */
+    let credentialsToHarvest = [];
     if (sessionJobs.length > 0) {
-        // Get all credentials to harvest
+      // Get all credentials to harvest
       credentialsToHarvest = sessionJobs.map((job) => job.credentials);
 
-        if (!options.restartAll) {
-          // Remove already ended jobs
-          const harvestedCredentials = new Set(
+      if (!options.restartAll) {
+        // Remove already ended jobs
+        const harvestedCredentials = new Set(
           sessionJobs
-              .filter((job) => job.status === 'finished')
-              .map((job) => job.credentialsId),
-          );
-          credentialsToHarvest = credentialsToHarvest.filter(
-            (credential) => !harvestedCredentials.has(credential.id),
-          );
-        }
-      } else {
-        // Get harvestable credentials
-      const { harvestable } = await this.getCredentials(
-          session,
-          { include: { endpoint: true, institution: true } },
+            .filter((job) => job.status === 'finished')
+            .map((job) => job.credentialsId),
         );
-        // @ts-ignore
-        credentialsToHarvest = harvestable;
+        credentialsToHarvest = credentialsToHarvest.filter(
+          (credential) => !harvestedCredentials.has(credential.id),
+        );
       }
+    } else {
+      // Get harvestable credentials
+      const { harvestable } = await this.getCredentials(
+        session,
+        { include: { endpoint: true, institution: true } },
+      );
+        // @ts-ignore
+      credentialsToHarvest = harvestable;
+    }
 
-      // Create index cache
-      const institutionIndices = new Map();
+    // Create index cache
+    const institutionIndices = new Map();
 
-      // Start harvests jobs
+    // Start harvests jobs
     const jobsPerCredential = await Promise.all(
-        credentialsToHarvest.map(async (credentials) => {
-          const { endpoint, institution } = credentials;
-          let harvestedReportTypes = [...reportTypes];
+      credentialsToHarvest.map(async (credentials) => {
+        const { endpoint, institution } = credentials;
+        let harvestedReportTypes = [...reportTypes];
 
-          // Get index for institution
-          let index = institutionIndices.get(institution.id) || '';
-          if (!index) {
-            const repository = await repositoriesService.findFirst({
-              where: {
-                type: 'counter5',
-                institutions: {
-                  some: { id: institution.id },
-                },
+        // Get index for institution
+        let index = institutionIndices.get(institution.id) || '';
+        if (!index) {
+          const repository = await repositoriesService.findFirst({
+            where: {
+              type: 'counter5',
+              institutions: {
+                some: { id: institution.id },
               },
-            });
+            },
+          });
 
-            if (!repository?.pattern) {
-              throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
-            }
-
-            index = repository.pattern.replace(/[*]/g, '');
-            institutionIndices.set(institution.id, index);
+          if (!repository?.pattern) {
+            throw new HTTPError(400, 'errors.harvest.noTarget', [institution.id]);
           }
 
-          // Get supported reports
-          const {
-            supportedReportsUpdatedAt,
-            ignoredReports,
-            additionalReports,
-          } = endpoint;
+          index = repository.pattern.replace(/[*]/g, '');
+          institutionIndices.set(institution.id, index);
+        }
 
-          const oneMonthAgo = subMonths(new Date(), 1);
+        // Get supported reports
+        const {
+          supportedReportsUpdatedAt,
+          ignoredReports,
+          additionalReports,
+        } = endpoint;
 
-          let supportedReports = [];
-          if (Array.isArray(endpoint.supportedReports)) {
-            supportedReports = endpoint.supportedReports;
-          }
+        const oneMonthAgo = subMonths(new Date(), 1);
 
-          if (
-            !supportedReportsUpdatedAt
+        let supportedReports = [];
+        if (Array.isArray(endpoint.supportedReports)) {
+          supportedReports = endpoint.supportedReports;
+        }
+
+        if (
+          !supportedReportsUpdatedAt
             || !isValidDate(supportedReportsUpdatedAt)
             || isBefore(supportedReportsUpdatedAt, oneMonthAgo)
-          ) {
-            appLogger.verbose(`Updating supported SUSHI reports of [${credentials.endpoint.vendor}]`);
+        ) {
+          appLogger.verbose(`Updating supported SUSHI reports of [${credentials.endpoint.vendor}]`);
 
-            const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+          const isValidReport = (report) => (report.Report_ID && report.Report_Name);
 
-            try {
-              const { data } = await sushiService.getAvailableReports(credentials);
+          try {
+            const { data } = await sushiService.getAvailableReports(credentials);
 
-              if (!Array.isArray(data) || !data.every(isValidReport)) {
-                throw new Error('invalid response body');
-              }
-
-              supportedReports = data.map((report) => report.Report_ID.toLowerCase());
-            } catch (e) {
-              appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
+            if (!Array.isArray(data) || !data.every(isValidReport)) {
+              throw new Error('invalid response body');
             }
 
-            await endpointsService.update({
-              where: { id: credentials.endpoint.id },
-              data: {
-                supportedReports,
-                supportedReportsUpdatedAt: new Date(),
-              },
-            });
+            supportedReports = data.map((report) => report.Report_ID.toLowerCase());
+          } catch (e) {
+            appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
           }
 
-          const supportedReportsSet = new Set([
-            // If there's no support list available, assume the default list is supported
-            ...(supportedReports.length > 0 ? supportedReports : defaultHarvestedReports),
-            ...additionalReports,
-          ]);
-          const ignoredReportsSet = new Set(ignoredReports);
+          await endpointsService.update({
+            where: { id: credentials.endpoint.id },
+            data: {
+              supportedReports,
+              supportedReportsUpdatedAt: new Date(),
+            },
+          });
+        }
 
-          if (!session.downloadUnsupported) {
-            // Filter supported reports based on session params
-            if (supportedReportsSet.size > 0) {
-              harvestedReportTypes = harvestedReportTypes.filter(
-                (reportId) => supportedReportsSet.has(reportId),
-              );
-            }
+        const supportedReportsSet = new Set([
+          // If there's no support list available, assume the default list is supported
+          ...(supportedReports.length > 0 ? supportedReports : defaultHarvestedReports),
+          ...additionalReports,
+        ]);
+        const ignoredReportsSet = new Set(ignoredReports);
 
-            // Remove reports that should be ignored
-            if (ignoredReportsSet.size > 0) {
-              harvestedReportTypes = harvestedReportTypes.filter(
-                (reportId) => !ignoredReportsSet.has(reportId),
-              );
-            }
+        if (!session.downloadUnsupported) {
+          // Filter supported reports based on session params
+          if (supportedReportsSet.size > 0) {
+            harvestedReportTypes = harvestedReportTypes.filter(
+              (reportId) => supportedReportsSet.has(reportId),
+            );
           }
+
+          // Remove reports that should be ignored
+          if (ignoredReportsSet.size > 0) {
+            harvestedReportTypes = harvestedReportTypes.filter(
+              (reportId) => !ignoredReportsSet.has(reportId),
+            );
+          }
+        }
 
         return harvestedReportTypes.map((reportType) => ({
-                  /** @type {HarvestJobStatus} */
-                  status: 'waiting',
-                  credentials: { id: credentials.id },
-                  session: { id: session.id },
-                  reportType,
-                  index,
+          /** @type {HarvestJobStatus} */
+          status: 'waiting',
+          credentials: { id: credentials.id },
+          session: { id: session.id },
+          reportType,
+          index,
         }));
       }),
     );
@@ -525,33 +525,33 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       async (service) => Promise.all(
         jobs.map(async (data) => {
           const job = await service.findFirst({
-                  where: {
-                    ...data,
-                    status: { not: 'finished' },
-                  },
-                });
-                // if job exists, move it into waiting
-                if (job) {
+            where: {
+              ...data,
+              status: { not: 'finished' },
+            },
+          });
+          // if job exists, move it into waiting
+          if (job) {
             return service.update({
-                    where: { id: job.id },
-                    data: { status: 'waiting' },
-                  });
-                }
-                // if not, create new job
+              where: { id: job.id },
+              data: { status: 'waiting' },
+            });
+          }
+          // if not, create new job
           return service.create({
-                  data: {
-                    ...data,
-                    credentials: {
-                      connect: data.credentials,
-                    },
-                    session: {
-                      connect: data.session,
-                    },
-                  },
-                });
+            data: {
+              ...data,
+              credentials: {
+                connect: data.credentials,
+              },
+              session: {
+                connect: data.session,
+              },
+            },
+          });
         }),
-            ),
-          );
+      ),
+    );
 
     let buffer = [];
     // eslint-disable-next-line no-restricted-syntax
@@ -574,6 +574,63 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     if (buffer.length > 0) {
       const createdJobs = await createJobs(buffer);
       yield* createdJobs;
+    }
+  }
+
+  /**
+   * Stop a session by cancelling linked jobs
+   *
+   * @param {HarvestSession} session - The session to check
+   */
+  async* stop({ id }) {
+    const harvestJobsService = new HarvestJobsService(this);
+
+    const session = await this.findUnique({ where: { id } });
+    if (!session) {
+      throw new HTTPError(404, 'errors.harvest.sessionNotFound', [id]);
+    }
+
+    // Get jobs to cancel
+    const jobsToCancel = await harvestJobsService.findMany({
+      where: {
+        sessionId: id,
+      },
+    });
+
+    /**
+     * Cancel jobs in bulk
+     *
+     * @param {import('@prisma/client').HarvestJob[]} jobs Jobs to cancel
+     *
+     * @returns {Promise<import('@prisma/client').HarvestJob[]>} Canceled jobs
+     */
+    const cancelJobs = async (jobs) => HarvestJobsService.$transaction(
+      async (service) => Promise.all(
+        jobs.map(async (job) => (!HarvestJobsService.isDone(job) ? service.cancel(job) : job)),
+      ),
+    );
+
+    let buffer = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const job of jobsToCancel) {
+      buffer.push(job);
+      if (buffer.length < JOB_BATCH_SIZE) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      const canceledJob = await cancelJobs(buffer);
+      buffer = [];
+      yield* canceledJob;
+
+      // eslint-disable-next-line no-await-in-loop
+      await setTimeout(JOB_BATCH_DELAY); // Throttle requests to DB, avoiding connection issues
+    }
+
+    if (buffer.length > 0) {
+      const canceledJob = await cancelJobs(buffer);
+      yield* canceledJob;
     }
   }
 };
