@@ -1,6 +1,5 @@
 const { prepareStandardQueryParams } = require('../../../services/std-query');
 
-const SpacesService = require('../../../entities/spaces.service');
 const SpacePermissionsService = require('../../../entities/space-permissions.service');
 
 const {
@@ -37,50 +36,73 @@ exports.getSpacePermissions = async (ctx) => {
 exports.upsertSpaceAllPermission = async (ctx) => {
   const { space } = ctx.state;
 
-  const permissionData = ctx.request.body.map((permission) => ({
-    ...permission,
-    membership: {
-      connect: {
-        username_institutionId: {
-          username: permission.username,
-          institutionId: space.institutionId,
-        },
-      },
+  const permissions = ctx.request.body;
+
+  const spacePermissionsService = new SpacePermissionsService();
+  // If a permission is not provided, we will delete it
+  const newUsernames = new Set(permissions.map((permission) => permission.username));
+  const oldPermissions = await spacePermissionsService.findMany({
+    where: {
+      spaceId: space.id,
     },
-  }));
+  });
+  const permissionsToDelete = oldPermissions.filter((p) => !newUsernames.has(p.username));
 
-  const newSpace = SpacesService.$transaction(async (spacesService) => {
-    await spacesService.update({
-      where: { id: space.id },
-      data: {
-        permissions: {
-          deleteMany: { spaceId: space.id },
-        },
-      },
-    });
-
-    return spacesService.update({
-      where: { id: space.id },
-      data: {
-        permissions: {
-          upsert: permissionData.map(({ username, ...data }) => ({
+  // Do every operation in a single transaction, to avoid race conditions
+  // and revert if something goes wrong
+  await SpacePermissionsService.$transaction(
+    async (service) => {
+      await Promise.all([
+        // Delete old permissions
+        ...permissionsToDelete.map(
+          (permission) => service.delete({
             where: {
               username_spaceId: {
-                username,
+                username: permission.username,
                 spaceId: space.id,
               },
             },
-            create: data,
-            update: data,
-          })),
-        },
-      },
-    });
-  });
+          }),
+        ),
+        // Upsert new permissions (connect to existing models to avoid creating if doesn't exists)
+        ...permissions.map(
+          (permission) => service.upsert({
+            where: {
+              username_spaceId: {
+                username: permission.username,
+                spaceId: space.id,
+              },
+            },
+            create: {
+              readonly: permission.readonly,
+              locked: permission.locked,
+              space: {
+                connect: {
+                  id: space.id,
+                },
+              },
+              membership: {
+                connect: {
+                  username_institutionId: {
+                    username: permission.username,
+                    institutionId: space.institutionId,
+                  },
+                },
+              },
+            },
+            update: {
+              readonly: permission.readonly,
+              locked: permission.locked,
+            },
+          }),
+        ),
+      ]);
+    },
+  );
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = newSpace;
+  ctx.body = space;
 };
 
 exports.upsertPermission = async (ctx) => {
