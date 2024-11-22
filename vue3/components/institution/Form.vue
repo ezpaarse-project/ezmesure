@@ -148,6 +148,86 @@
             </v-card>
 
             <v-card
+              :title="$t('institutions.institution.customProperties')"
+              prepend-icon="mdi-tag-text-outline"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #append>
+                <v-menu
+                  v-model="showCustomPropMenu"
+                  location="left center"
+                  :offset="10"
+                  :close-on-content-click="false"
+                  width="250px"
+                  @update:model-value="customPropKey = ''"
+                >
+                  <template #activator="{ props }">
+                    <v-btn
+                      v-bind="props"
+                      variant="text"
+                      :icon="showCustomPropMenu ? 'mdi-close' : 'mdi-plus'"
+                    />
+                  </template>
+
+                  <v-form class="d-flex align-center ga-3" @submit.prevent="addCustomProp(customPropKey)">
+                    <v-text-field
+                      ref="customPropInput"
+                      v-model="customPropKey"
+                      :label="$t('institutions.institution.propertyName')"
+                      variant="outlined"
+                      autofocus
+                      hide-details
+                      density="compact"
+                      class="flex-grow-1"
+                    />
+
+                    <v-btn
+                      type="submit"
+                      color="primary"
+                      density="compact"
+                      icon="mdi-check"
+                    />
+                  </v-form>
+                </v-menu>
+              </template>
+
+              <template #text>
+                <v-empty-state
+                  v-if="!hasCustomProps"
+                  color="red"
+                  title="Aucune propriété"
+                  text="Ajoutez en une en cliquant sur le + en haut à droite"
+                />
+
+                <div
+                  v-for="(_propValue, propKey) in institution.customProps"
+                  :key="propKey"
+                  class="d-flex align-center ga-3"
+                >
+                  <div class="flex-grow-1">
+                    <v-text-field
+                      :ref="(el) => customPropInputRefs[propKey] = el"
+                      v-model="institution.customProps[propKey]"
+                      :label="propKey"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                    />
+                  </div>
+
+                  <div class="flex-shrink-1">
+                    <v-btn
+                      icon="mdi-delete"
+                      variant="text"
+                      @click="removeCustomProp(propKey)"
+                    />
+                  </div>
+                </div>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('institutions.institution.logo')"
               :subtitle="$t('institutions.institution.logoHint', LOGO_RATIO)"
               prepend-icon="mdi-image"
@@ -327,6 +407,13 @@ const openData = ref(null);
 const addAsMember = ref(false);
 
 /** @type {Ref<Object | null>} */
+const customPropInputRef = useTemplateRef('customPropInput');
+const showCustomPropMenu = ref(false);
+const customPropKey = ref('');
+const customPropInputRefs = ref({});
+const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+
+/** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
 const isEditing = computed(() => !!institution.value.id);
@@ -335,6 +422,29 @@ const logoSrc = computed(() => {
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
 });
+
+watch(showCustomPropMenu, (v) => {
+  if (v) {
+    customPropKey.value = '';
+    nextTick().then(() => { customPropInputRef.value?.focus(); });
+  }
+});
+
+function removeCustomProp(name) {
+  delete institution.value.customProps[name];
+}
+
+function addCustomProp(name) {
+  if (!institution.value.customProps?.[name]) {
+    institution.value.customProps = {
+      ...institution.value.customProps || {},
+      [name]: '',
+    };
+  }
+
+  showCustomPropMenu.value = false;
+  nextTick().then(() => { customPropInputRefs.value[name]?.focus(); });
+}
 
 /**
  * Init the form, if `institution` is provided, pre-populate the form and will

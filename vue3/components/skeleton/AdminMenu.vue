@@ -31,6 +31,12 @@
       class="text-grey-darken-3"
     />
     <v-list-item
+      :title="$t('menu.customFields')"
+      to="/admin/custom-fields"
+      prepend-icon="mdi-tag-outline"
+      class="text-grey-darken-3"
+    />
+    <v-list-item
       :title="$t('menu.harvest')"
       to="/admin/harvests"
       prepend-icon="mdi-tractor"
