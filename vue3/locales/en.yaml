@@ -350,6 +350,8 @@ institutions:
     linkedinUrl: Linkedin URL
     youtubeUrl: Youtube URL
     facebookUrl: Facebook URL
+    customProperties: Custom properties
+    propertyName: Property name
   members:
     noMembers: No members
     title: Members ({count})

@@ -356,6 +356,8 @@ institutions:
     linkedinUrl: URL Linkedin
     youtubeUrl: URL Youtube
     facebookUrl: URL Facebook
+    customProperties: Propriétés personnalisées
+    propertyName: Nom de propriété
   members:
     noMembers: Aucun membre
     title: Membres ({count})
