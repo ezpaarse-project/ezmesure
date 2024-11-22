@@ -27,6 +27,7 @@ menu:
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
+  customFields: Champs personnalisés
 home:
   whatDoesEzMESURE: Qu'est-ce qu'ezMESURE ?
   supportedBy: Ce service est soutenu par
@@ -900,6 +901,21 @@ social:
   linkedin: LinkedIn
   youtube: Youtube
   facebook: Facebook
+customFields:
+  toolbarTitle: Champs personnalisés ({count})
+  newField: Nouveau champ personnalisé
+  editField: Modifier le champ personnalisé
+  deleteNbCustomField: Supprimer 1 champ personnalisé|Supprimer {count} champs personnalisés
+  editableByUsers: Modifiable par les utilisateurs
+  visibleToUsers: Visible par les utilisateurs
+  multivalued: Multivalué
+  helpUrl: URL d'aide
+  itemUrl: URL de la page de l'établissement
+  labelFr: Label en français
+  labelEn: Label en anglais
+  descriptionFr: Description en français
+  descriptionEn: Description en anglais
+  manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -914,6 +930,8 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
+label: Label
+properties: Propriétés
 description: Description
 initials: Initiales
 language: Langue

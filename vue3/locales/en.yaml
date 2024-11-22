@@ -27,6 +27,7 @@ menu:
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
+  customFields: Custom fields
 home:
   whatDoesEzMESURE: What does ezMESURE ?
   supportedBy: This service is supported by
@@ -877,6 +878,22 @@ social:
   linkedin: LinkedIn
   youtube: Youtube
   facebook: Facebook
+customFields:
+  toolbarTitle: Custom fields ({count})
+  newField: New custom field
+  editField: Edit custom field
+  deleteNbCustomField: Delete 1 custom field|Delete {count} custom fields
+  restrictToAdmins: Restrict to administrators
+  editableByUsers: Editable by users
+  visibleToUsers: Visible to users
+  multivalued: Multivalued
+  helpUrl: Help URL
+  itemUrl: URL of the institution page
+  labelFr: French label
+  labelEn: English label
+  descriptionFr: French description
+  descriptionEn: English description
+  manageCustomField: Manage custom field|Manage {count} custom fields
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -891,6 +908,8 @@ value: Value
 status: Status
 date: Date
 duration: Duration
+label: Label
+properties: Properties
 description: Description
 initials: Initials
 language: Language
