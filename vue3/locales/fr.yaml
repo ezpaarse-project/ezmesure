@@ -770,10 +770,11 @@ report:
   title: Mes rapports
   health: État de santé
   admin:
-    taskTab: Gestion des rapports
-    templateTab: Gestion des modèles
-    presetTab: Gestion des prédéfinis
-    adminTab: Administration générale
+    taskTab: Rapports
+    templateTab: Modèles
+    presetTab: Prédéfinis
+    adminTab: Administration
+    activityTab: Activité
 repositories:
   repositories: Entrepôts
   toolbarTitle: Entrepôts ({count})

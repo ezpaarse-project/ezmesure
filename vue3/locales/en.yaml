@@ -752,10 +752,11 @@ report:
   title: My reports
   health: Health status
   admin:
-    taskTab: Reports management
-    templateTab: Template management
-    presetTab: Preset management
-    adminTab: General administration
+    taskTab: Reports
+    templateTab: Template
+    presetTab: Preset
+    adminTab: Administration
+    activityTab: Activity
 repositories:
   repositories: Repositories
   toolbarTitle: Repositories ({count})
