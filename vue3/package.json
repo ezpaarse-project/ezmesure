@@ -32,6 +32,6 @@
     "vuetify-nuxt-module": "^0.18.3"
   },
   "overrides": {
-    "vue": "^3.5.0"
+    "vue": "^3"
   }
 }

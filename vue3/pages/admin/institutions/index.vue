@@ -296,6 +296,7 @@ const headers = computed(() => [
     value: 'validated',
     align: 'center',
     sortable: true,
+    minWidth: '175px',
   },
   {
     title: t('actions'),

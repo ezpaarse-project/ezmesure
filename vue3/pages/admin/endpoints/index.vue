@@ -218,6 +218,7 @@ const headers = computed(() => [
     value: 'active',
     align: 'center',
     sortable: true,
+    minWidth: '175px',
   },
   {
     title: t('actions'),

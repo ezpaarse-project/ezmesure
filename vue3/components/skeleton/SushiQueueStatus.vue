@@ -2,7 +2,7 @@
   <v-snackbar
     :model-value="!!currentlyTesting"
     location="bottom left"
-    color="info"
+    :color="status?.color || 'info'"
     position="fixed"
     width="600"
     timeout="-1"
@@ -22,7 +22,10 @@
     </template>
 
     <template #actions>
-      <v-avatar :icon="status.icon" :color="status.color" border="0" start />
+      <div class="d-flex align-center mr-2" style="width: 32px;">
+        <v-icon v-if="status" :icon="status.icon" />
+        <v-progress-circular v-else indeterminate />
+      </div>
     </template>
   </v-snackbar>
 </template>
@@ -34,7 +37,7 @@ const total = ref(0);
 const last = ref(0);
 const progress = ref(0);
 
-const status = computed(() => sushiStatus.get(currentlyTesting.value?.status) || { icon: 'mdi-key', color: 'info' });
+const status = computed(() => sushiStatus.get(currentlyTesting.value?.status));
 
 watch(idsInQueue, (v) => {
   if (v.size > last.value) {

@@ -54,6 +54,7 @@ export default defineNuxtConfig({
   vite: {
     server: {
       hmr: {
+        protocol: 'ws',
         clientPort: 8080,
       },
     },
