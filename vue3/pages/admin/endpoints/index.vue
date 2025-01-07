@@ -154,7 +154,7 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'terms', 'admin'],
+  middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
 const { t, locale } = useI18n();
