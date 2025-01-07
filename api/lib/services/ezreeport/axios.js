@@ -8,7 +8,7 @@ const {
 } = config.get('ezreeport');
 
 const ezrAxios = Axios.create({
-  baseURL: `http://${host}:${port}/v1`,
+  baseURL: `http://${host}:${port}/v2`,
   headers: { 'X-Api-Key': apiKey },
 });
 

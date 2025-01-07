@@ -68,33 +68,16 @@ async function deleteReportUserFromInstitution(institution) {
  * Sync users used for reporting in Elastic
  *
  * @param {Institution[]} toUpsert institutions to upsert
- * @param {string[]} toDelete ids to to delete
  */
-async function syncReportUsersFromInstitutions(toUpsert, toDelete) {
-  const actions = [];
-
-  // Mapping data to do only 1 upsert and 1 delete at the same time
-  for (let i = 0; i < toUpsert.length; i += 1) {
-    const institutionToUpsert = toUpsert[i];
-    const idToDelete = toDelete[i];
-    actions[i] = { institutionToUpsert, idToDelete };
-  }
-
+async function syncReportUsersFromInstitutions(toUpsert) {
   let settled = [];
   // eslint-disable-next-line no-restricted-syntax
-  for (const { institutionToUpsert, idToDelete } of actions) {
-    const promises = [];
-    if (institutionToUpsert) {
-      promises[0] = upsertReportUserFromInstitutionId(institutionToUpsert.id);
-    }
-    if (idToDelete) {
-      const data = /** @type {Institution} */ ({ id: idToDelete });
-      promises[1] = deleteReportUserFromInstitution(data);
-    }
+  for (const institutionToUpsert of toUpsert) {
+    const promise = upsertReportUserFromInstitutionId(institutionToUpsert.id);
     settled = [
       ...settled,
       // eslint-disable-next-line no-await-in-loop
-      (await Promise.allSettled(promises)),
+      await promise,
     ];
   }
 
