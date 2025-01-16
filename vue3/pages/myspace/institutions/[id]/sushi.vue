@@ -479,7 +479,7 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('status'),
+    title: t('endpoints.active'),
     value: 'active',
     align: 'center',
     width: '130px',
