@@ -11,7 +11,6 @@ const {
   standardQueryParams,
 
   getAll,
-  getAllMeta,
   getOne,
   deleteOne,
   cancelOne,
@@ -31,21 +30,6 @@ router.route({
       institutionId: stringOrArrayValidation,
       tags: stringOrArrayValidation,
       packages: stringOrArrayValidation,
-    }),
-  },
-});
-
-router.route({
-  method: 'GET',
-  path: '/_meta',
-  handler: getAllMeta,
-  validate: {
-    query: standardQueryParams.manyValidation.append({
-      endpointId: stringOrArrayValidation,
-      institutionId: stringOrArrayValidation,
-      tags: stringOrArrayValidation,
-      packages: stringOrArrayValidation,
-      include: Joi.forbidden(),
     }),
   },
 });
