@@ -48,12 +48,14 @@ const emit = defineEmits({
   'update:modelValue': (v) => Array.isArray(v) || typeof v === 'string' || v === undefined,
 });
 
+const { t } = useI18n();
+
 const search = ref('');
 
 const value = computed({
   get: () => {
     if (props.emptySymbol && props.modelValue === '') {
-      return $t('permissions.none');
+      return t('permissions.none');
     }
     return props.modelValue;
   },

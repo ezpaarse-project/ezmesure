@@ -17,6 +17,15 @@
               class="mr-2"
               @click="refresh()"
             />
+
+            <SkeletonFilterButton
+              v-model="filtersValue"
+              icon
+            >
+              <template #panel="panel">
+                <SushiHarvestSessionBodyFilters :session-id="modelValue.id" v-bind="panel" />
+              </template>
+            </SkeletonFilterButton>
           </template>
         </v-toolbar>
       </template>
@@ -128,6 +137,7 @@ const historyRef = useTemplateRef('historyRef');
 
 const {
   status,
+  query,
   refresh,
   vDataTableOptions,
 } = await useServerSidePagination({
@@ -139,6 +149,31 @@ const {
     include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
     sessionId: props.modelValue.id,
     search: undefined, // q parameter is not allowed
+  },
+});
+
+/**
+ * Debounced refresh
+ */
+const debouncedRefresh = useDebounceFn(refresh, 250);
+
+const filtersValue = computed({
+  get: () => ({
+    ...query.value,
+    sessionId: undefined,
+    page: undefined,
+    sortBy: undefined,
+    include: undefined,
+  }),
+  set: (v) => {
+    query.value = {
+      ...v,
+      sessionId: query.value.sessionId,
+      page: query.value.page,
+      sortBy: query.value.sortBy,
+      include: query.value.include,
+    };
+    debouncedRefresh();
   },
 });
 

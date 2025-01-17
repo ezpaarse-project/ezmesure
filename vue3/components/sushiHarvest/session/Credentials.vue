@@ -102,6 +102,6 @@ const endpoints = computed(() => {
     credentials.value
       .map((credential) => [credential.endpointId, credential.endpoint]),
   );
-  return [...map.values()].sort((a, b) => a.vendor.localeCompare(b.name));
+  return [...map.values()].sort((a, b) => a.vendor.localeCompare(b.vendor));
 });
 </script>
