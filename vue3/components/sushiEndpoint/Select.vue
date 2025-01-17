@@ -25,16 +25,16 @@
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
         :title="item.vendor"
+        :subtitle="item.sushiUrl"
         lines="two"
         v-bind="listItem"
       >
-        <template #subtitle>
+        <template #append>
           <v-chip
             v-for="tag in item.tags ?? []"
             :key="tag"
             :text="tag"
             color="accent"
-            size="x-small"
             density="comfortable"
             variant="outlined"
             label
