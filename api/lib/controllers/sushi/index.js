@@ -36,6 +36,7 @@ const {
   getHarvests,
   checkCredentialsConnection,
   checkSushiConnection,
+  validateReport,
   deleteSushiConnection,
 } = require('./actions');
 
@@ -180,6 +181,18 @@ router.route({
       apiKey: Joi.string().allow('').trim().empty(null),
       params: Joi.array(),
     }).or('customerId', 'requestorId', 'apiKey').unknown(),
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_validate_report',
+  handler: [
+    validateReport,
+  ],
+  validate: {
+    type: 'json',
+    body: Joi.any().required(),
   },
 });
 
