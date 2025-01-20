@@ -34,7 +34,7 @@
         </template>
 
         <template #[`item.runningTime`]="{ item }">
-          <LocalDuration :model-value="item.runningTime" />
+          <LocalDuration v-if="item.runningTime" :model-value="item.runningTime" />
         </template>
 
         <template #[`item.status`]="{ item }">
