@@ -11,7 +11,7 @@ const standardQueryParams = prepareStandardQueryParams({
 });
 exports.standardQueryParams = standardQueryParams;
 
-exports.getInstitutionMembers = async (ctx) => {
+exports.getUserMemberships = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
   prismaQuery.where.username = ctx.params.username;
 
