@@ -8,9 +8,36 @@
       }"
     />
 
-    <v-card-title>{{ institution.name }}</v-card-title>
+    <v-card-title class="d-flex align-center">
+      {{ institution.name }}
+    </v-card-title>
 
     <v-card-subtitle>{{ institution.acronym }}</v-card-subtitle>
+
+    <div class="bg-primary">
+      <div class="d-flex justify-space-evenly mt-2 py-2">
+        <v-btn
+          :text="$t('institutions.sushi.credentials')"
+          :to="`/admin/institutions/${institution.id}/sushi`"
+          prepend-icon="mdi-key"
+          variant="text"
+        />
+
+        <v-btn
+          :text="$t('institutions.members.members')"
+          :to="`/admin/institutions/${institution.id}/members`"
+          prepend-icon="mdi-account-multiple"
+          variant="text"
+        />
+
+        <v-btn
+          :text="$t('institutions.reports.reports')"
+          :to="`/admin/institutions/${institution.id}/reports`"
+          prepend-icon="mdi-file-chart-outline"
+          variant="text"
+        />
+      </div>
+    </div>
 
     <v-card-text>
       <v-list density="compact">
