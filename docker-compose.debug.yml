@@ -100,17 +100,6 @@ services:
     command: npm run dev
     restart: "no"
 
-  legacy-reporting:
-    extends:
-      file: docker-compose.yml
-      service: legacy-reporting
-    environment:
-      - REPORTING_SMTP_HOST=maildev
-      - REPORTING_SMTP_PORT=25
-      - REPORTING_SMTP_SECURE=false
-      - REPORTING_SMTP_IGNORE_TLS=true
-      - REPORTING_SMTP_REJECT_UNAUTHORIZED
-
   reporting:
     image: ghcr.io/ezpaarse-project/ezreeport-report
     ports:
