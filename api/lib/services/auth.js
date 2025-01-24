@@ -5,6 +5,7 @@ const SushiEndpointService = require('../entities/sushi-endpoints.service');
 const SushiCredentialsService = require('../entities/sushi-credentials.service');
 const UsersService = require('../entities/users.service');
 const RepositoriesService = require('../entities/repositories.service');
+const RepositoryAliasesService = require('../entities/repository-aliases.service');
 const SpacesService = require('../entities/spaces.service');
 
 const { MEMBER_ROLES } = require('../entities/memberships.dto');
@@ -137,6 +138,13 @@ function fetchModel(modelName, opts = {}) {
         break;
       }
 
+      case 'repository-alias': {
+        const repositoryAliasesService = new RepositoryAliasesService();
+        findOptions.where = { pattern: modelId };
+        item = modelId && await repositoryAliasesService.findUnique(findOptions);
+        break;
+      }
+
       case 'space': {
         const spacesService = new SpacesService();
         item = modelId && await spacesService.findUnique(findOptions);
@@ -231,5 +239,6 @@ module.exports = {
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
   fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'pattern', ...opts }),
+  fetchRepositoryAlias: (opts = {}) => fetchModel('repository-alias', { state: 'repository-alias', params: 'pattern', ...opts }),
   fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };

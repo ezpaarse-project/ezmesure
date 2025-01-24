@@ -3,6 +3,7 @@ const { appLogger } = require('../logger');
 
 const {
   syncRepositories,
+  syncRepositoryAliases,
   syncUsers,
 } = require('./elastic');
 
@@ -23,6 +24,7 @@ const ezr = require('./ezreeport');
  * @typedef {object} SyncResult
  * @property {EntitySyncResult} spaces - Result of spaces synchronization
  * @property {EntitySyncResult} repositories - Result of repositories synchronization
+ * @property {EntitySyncResult} repositoryAliases - Result of repository aliases synchronization
  * @property {EntitySyncResult} users - Result of users synchronization
  * @property {EntitySyncResult} ezreeportUsers - Result of ezreeport's users synchronization
  * @property {EntitySyncResult} ezreeportNamespaces - Result of ezreeport's namespaces sync
@@ -46,6 +48,7 @@ const syncStatus = {
   result: {
     spaces: { errors: 0, synchronized: 0 },
     repositories: { errors: 0, synchronized: 0 },
+    repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
@@ -75,6 +78,7 @@ async function startSync() {
   syncStatus.result = {
     spaces: { errors: 0, synchronized: 0 },
     repositories: { errors: 0, synchronized: 0 },
+    repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
@@ -114,6 +118,15 @@ async function startSync() {
   } catch (e) {
     setSyncResult('repositories', { fulfilled: 0, errors: 1 });
     appLogger.error(`[sync] An error occurred during repositories synchronization: ${e}`);
+  }
+
+  // Sync aliases in Elastic
+  try {
+    appLogger.info('[sync] Synchronizing repository aliases...');
+    setSyncResult('repositoryAliases', await syncRepositoryAliases());
+  } catch (e) {
+    setSyncResult('repositoryAliases', { fulfilled: 0, errors: 1 });
+    appLogger.error(`[sync] An error occurred during repository aliases synchronization: ${e}`);
   }
 
   // Sync users in Elastic
