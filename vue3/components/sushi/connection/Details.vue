@@ -33,10 +33,11 @@
 
           <SushiHarvestLogs
             :model-value="modelValue?.exceptions"
+            :endpoint-url="endpointUrl"
             item-value="Severity"
             item-text="Message"
           >
-            <template #text="{ item: { raw }, value }">
+            <template #text="{ item: { raw, helpUrl }, value }">
               <span>{{ value }}</span>
 
               <span v-if="raw.Data" class="text-grey">
@@ -44,14 +45,15 @@
               </span>
 
               <v-btn
-                v-if="raw.Help_URL"
-                :href="raw.Help_URL"
-                :text="$('sushi.openHelpPage')"
+                v-if="helpUrl"
+                :href="helpUrl"
+                :text="$t('sushi.openHelpPage')"
                 append-icon="mdi-open-in-new"
                 color="accent"
                 size="x-small"
                 target="_blank"
                 rel="noopener noreferrer"
+                class="ml-1"
               />
             </template>
           </SushiHarvestLogs>
@@ -72,6 +74,10 @@ const props = defineProps({
   modelValue: {
     type: Object,
     default: () => undefined,
+  },
+  endpointUrl: {
+    type: String,
+    default: undefined,
   },
 });
 

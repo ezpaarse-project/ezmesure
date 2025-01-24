@@ -33,7 +33,10 @@
       </v-chip>
     </template>
 
-    <SushiConnectionDetails :model-value="sushi?.connection">
+    <SushiConnectionDetails
+      :model-value="sushi?.connection"
+      :endpoint-url="sushi?.endpoint?.sushiUrl"
+    >
       <template #actions>
         <v-btn
           :text="$t('institutions.sushi.checkCredentials')"
