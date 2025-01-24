@@ -60,6 +60,8 @@ model Institution {
   childInstitutions   Institution[]      @relation("ParentInstitution")
   /// Institution repositories
   repositories        Repository[]
+  /// Institution aliases
+  repositoryAliases        RepositoryAlias[]
 }
 
 /// A user
@@ -102,6 +104,8 @@ model Membership {
   spacePermissions      SpacePermission[]
   /// Permissions of the user for the institution repositories
   repositoryPermissions RepositoryPermission[]
+  /// Permissions of the user for the institution aliases
+  repositoryAliasPermissions RepositoryAliasPermission[]
   /// Whether the membership can be modified or not by non-admins
   locked                Boolean                @default(false)
   /// Abritrary comment about the membership
@@ -172,6 +176,8 @@ model Repository {
   type         String                 @db.VarChar(50)
   /// Member permissions associated to this repository
   permissions  RepositoryPermission[]
+  /// Aliases associated to this repository
+  aliases RepositoryAlias[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -192,6 +198,44 @@ model RepositoryPermission {
   locked            Boolean    @default(false)
 
   @@id([username, institutionId, repositoryPattern])
+}
+
+/// A repository alias (alias for a section of elasticsearch)
+model RepositoryAlias {
+  /// The institution this repository is associated to
+  institutions Institution[]
+  /// Creation date
+  createdAt    DateTime               @default(now())
+  /// Latest update date
+  updatedAt    DateTime               @updatedAt
+  /// The alias pattern (ex: b-bibcnrs*)
+  pattern      String                 @id
+  /// The repository's pattern targeted by alias
+  target       String
+  /// The repository
+  repository        Repository @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters      Json?
+  /// Member permissions associated to this alias
+  permissions  RepositoryAliasPermission[]
+}
+
+/// A alias permission (access rights of a member for a specific alias)
+model RepositoryAliasPermission {
+  /// Username of the member
+  username          String
+  /// Institution of the member
+  institutionId     String
+  /// The member
+  membership        Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// Pattern of the alias
+  aliasPattern String
+  /// The alias
+  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the permission can be modified or not
+  locked            Boolean    @default(false)
+
+  @@id([username, institutionId, aliasPattern])
 }
 
 /// Represent the actions that are triggered

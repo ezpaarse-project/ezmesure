@@ -43,6 +43,7 @@ const schema = {
   sushiCredentials: Joi.array().items(Joi.object()),
   childInstitutions: Joi.array().items(Joi.object()),
   repositories: Joi.array().items(Joi.object()),
+  repositoryAliases: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -69,6 +70,7 @@ const immutableFields = [
   'sushiCredentials',
   'childInstitutions',
   'repositories',
+  'repositoryAliases',
 ];
 
 /**
@@ -82,6 +84,7 @@ const includableFields = [
   'sushiCredentials',
   'childInstitutions',
   'repositories',
+  'repositoryAliases',
 ];
 
 /**

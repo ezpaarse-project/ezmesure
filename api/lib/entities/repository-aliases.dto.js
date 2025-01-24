@@ -14,13 +14,22 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  institutions: Joi.array().items(Joi.object()),
-
   pattern: Joi.string().trim().min(1),
-  type: Joi.string().trim().min(1),
+  target: Joi.string().trim().min(1),
 
+  filters: Joi.array().items(Joi.object({
+    field: Joi.string().trim().min(1).required(),
+    isNot: Joi.boolean().default(false),
+    value: Joi.alternatives([
+      // Null values are allowed to check if empty
+      Joi.string().trim().min(1), // Exact match
+      Joi.array().items(Joi.string().trim().min(1)), // One of
+    ]),
+  })),
+
+  institutions: Joi.array().items(Joi.object()),
+  repository: Joi.object(),
   permissions: Joi.array().items(Joi.object()),
-  aliases: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -30,17 +39,17 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'institutions',
+  'repository',
   'permissions',
-  'aliases',
 ];
 
 /**
  * Fields that can be populated with related items
  */
 const includableFields = [
-  'permissions',
-  'aliases',
   'institutions',
+  'repository',
+  'permissions',
 ];
 
 /**
@@ -49,7 +58,7 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['pattern', 'type']),
+  requireFields(['pattern', 'target']),
 );
 
 /**
@@ -58,7 +67,7 @@ const adminCreateSchema = withModifiers(
 const adminCreateOrConnectSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['type']),
+  requireFields(['pattern']),
 );
 
 /**
