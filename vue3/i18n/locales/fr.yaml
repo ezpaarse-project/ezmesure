@@ -870,6 +870,7 @@ sync:
   running: A duré {time}
   spaces: Espaces
   repositories: Entrepôts
+  repositoryAliases: Alias
   users: Utilisateurs
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements

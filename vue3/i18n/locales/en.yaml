@@ -851,6 +851,7 @@ sync:
   running: Ran for {time}
   spaces: Spaces
   repositories: Repositories
+  repositoryAliases: Aliases
   users: Users
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
