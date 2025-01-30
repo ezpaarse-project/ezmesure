@@ -553,6 +553,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       ),
     );
 
+    await this.update({
+      where: { id: session.id },
+      data: { startedAt: new Date() },
+    });
+
     let buffer = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const jobToCreate of jobsPerCredential.flat()) {

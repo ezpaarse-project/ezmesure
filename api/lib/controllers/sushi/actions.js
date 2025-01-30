@@ -476,6 +476,20 @@ const checkConnection = async (sushi, params) => {
   };
 };
 
+exports.validateReport = async (ctx) => {
+  ctx.type = 'json';
+
+  const { body: report } = ctx.request;
+
+  const exceptions = sushiService.getExceptions(report);
+  const validation = sushiService.validateReport(report);
+
+  ctx.body = {
+    exceptions,
+    validation,
+  };
+};
+
 exports.checkCredentialsConnection = async (ctx) => {
   ctx.type = 'json';
 
