@@ -627,6 +627,9 @@ sushi:
   updatedItems: "{count} éléments du rapport ont été mis à jour."
   failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  matrix:
+    unsupported: Rapport non supporté (déclaration éditeur)
+    ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
     description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants SUSHI pour être moissonné prochainement par l'équipe d'administration.

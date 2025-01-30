@@ -79,16 +79,31 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="[report, harvestsOfReport] in harvestsByReports" :key="report">
+              <tr
+                v-for="[reportId, report] in harvestsByReports"
+                :key="reportId"
+                :class="{
+                  'unsupported-row': !report.isSupported,
+                  'ignored-row': report.isIgnored,
+                }"
+              >
                 <td>
-                  {{ report }}
+                  {{ reportId }}
                 </td>
 
-                <td v-for="month in periods" :key="`${report}-${month}`">
-                  <SushiHarvestMatrixCell
-                    :model-value="harvestsOfReport.get(month)"
-                  />
-                </td>
+                <template v-if="report.isSupported && !report.isIgnored">
+                  <td v-for="month in periods" :key="`${reportId}-${month}`">
+                    <SushiHarvestMatrixCell
+                      :model-value="report.harvestsOfReport.get(month)"
+                    />
+                  </td>
+                </template>
+
+                <template v-else>
+                  <td :colspan="periods.length - 1" class="text-center">
+                    {{ report.isIgnored ? $t('sushi.matrix.ignored') : $t('sushi.matrix.unsupported') }}
+                  </td>
+                </template>
               </tr>
             </tbody>
           </v-table>
@@ -105,6 +120,20 @@
 
 <script setup>
 import { parse } from 'date-fns';
+
+// eslint-disable-next-line vue/max-len
+/** * @typedef {{ isSupported: boolean, isIgnored: boolean, harvests: Map<string, object[]> }} ReportDef */
+
+const DEFAULT_REPORTS_IDS = [
+  'DR',
+  'DR_D1',
+  'IR',
+  'PR',
+  'PR_P1',
+  'TR',
+  'TR_B1',
+  'TR_J1',
+];
 
 const props = defineProps({
   modelValue: {
@@ -157,21 +186,47 @@ const {
   },
 });
 
+const supportedReports = computed(
+  () => new Set((props.sushi?.endpoint?.supportedReports ?? []).map((r) => r.toUpperCase())),
+);
+
+const unsupportedReports = computed(
+  () => new Set((props.sushi?.endpoint?.ignoredReports ?? []).map((r) => r.toUpperCase())),
+);
+
 const harvestsByReports = computed(() => {
-  /** @type {Map<string, Map<string, any>>} */
-  const reports = new Map();
+  /** @type {Map<string, ReportDef>} */
+  const reports = new Map(DEFAULT_REPORTS_IDS.map((reportId) => [
+    reportId,
+    { isSupported: supportedReports.value.has(reportId), isIgnored: false, harvests: new Map() },
+  ]));
 
   // eslint-disable-next-line no-restricted-syntax
   for (const harvest of harvests.value) {
     const id = harvest.reportId?.toUpperCase();
     if (id) {
-      const acc = reports.get(id) ?? new Map();
-      acc.set(harvest.period, harvest);
+      const acc = reports.get(id) ?? { isIgnored: false, harvests: new Map() };
+      acc.isSupported = true; // Maybe not really supported, but allow to show harvests
+      acc.harvests.set(harvest.period, harvest);
       reports.set(id, acc);
     }
+  }
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const reportId of unsupportedReports.value) {
+    reports.set(reportId, { isSupported: false, isIgnored: true, harvests: new Map() });
   }
 
   return Array.from(reports.entries())
     .sort((a, b) => a[0].localeCompare(b[0]));
 });
 </script>
+
+<style lang="css" scoped>
+.unsupported-row {
+  color: grey;
+}
+.ignored-row {
+  color: red;
+}
+</style>

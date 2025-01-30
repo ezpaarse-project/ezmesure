@@ -610,6 +610,9 @@ sushi:
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: 'Messages from the endpoint:'
   checkBeforeSave: Check credentials before saving
+  matrix:
+    unsupported: Report not supported (editor declaration)
+    ignored: Report not supported (ezMESURE finding)
   noMatrix:
     title: No harvested report for these credentials on this period
     description: These credentials have not yet been harvested for this period. Please validate your SUSHI credentials to be harvested in the future by the administration team.
