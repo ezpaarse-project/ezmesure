@@ -19,6 +19,17 @@
       min-width="350"
       max-width="500"
     >
+      <template v-if="user?.isAdmin" #append>
+        <v-btn
+          v-tooltip:top="$t('tasks.history')"
+          icon="mdi-history"
+          color="primary"
+          variant="text"
+          density="comfortable"
+          @click="openTaskHistoryFromHarvest()"
+        />
+      </template>
+
       <template #text>
         <v-row>
           <v-col>
@@ -48,6 +59,8 @@
       </template>
     </v-card>
   </v-menu>
+
+  <SushiHarvestTaskHistoryDialog v-if="user?.isAdmin && task" ref="historyRef" :session="task.session" />
 </template>
 
 <script setup>
@@ -59,6 +72,13 @@ const props = defineProps({
 });
 
 const { t, te } = useI18n();
+const { data: user } = useAuthState();
+const snacks = useSnacksStore();
+
+/** @type {Ref<Object | null>} */
+const task = ref();
+
+const historyRef = useTemplateRef('historyRef');
 
 const harvestedAt = useDateFormat(() => props.modelValue?.harvestedAt);
 
@@ -89,4 +109,23 @@ const statusText = computed(() => {
     text: te(textKey) ? t(textKey) : '',
   };
 });
+
+async function openTaskHistoryFromHarvest() {
+  if (!user.value?.isAdmin) {
+    return;
+  }
+
+  try {
+    task.value = await $fetch(`/api/tasks/${props.modelValue.harvestedById}`, {
+      params: {
+        include: ['steps', 'logs', 'session'],
+      },
+    });
+
+    await nextTick(); // Wait for task.value to propagate, allowing ref to be resolved
+    await historyRef.value?.open(task.value);
+  } catch {
+    snacks.error(t('tasks.failedToFetchTasks'));
+  }
+}
 </script>
