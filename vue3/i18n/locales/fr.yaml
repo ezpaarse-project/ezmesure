@@ -24,6 +24,7 @@ menu:
   report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
+  repositoryAliases: Alias d'entrepôts
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
@@ -783,6 +784,18 @@ repositories:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
+repositoryAliases:
+  manageRepositoryAliases: >
+    Gérer les alias
+    |Gérer {count} alias
+  target: Pattern de l'entrepôt
+  filtered: Filtré ?
+  toolbarTitle: Alias d'entrepôts ({count})
+  deleteNbAliases: Vous allez supprimer {number} alias
+  newAlias: Nouvel alias
+  noInstitutions: Aucun établissement n'utilise cet alias
+  filters:
+    title: Filtrer les alias
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})

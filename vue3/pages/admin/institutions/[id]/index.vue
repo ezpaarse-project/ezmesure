@@ -72,6 +72,12 @@
               <InstitutionSpaces :institution="institution" />
             </v-col>
           </v-row>
+
+          <v-row>
+            <v-col>
+              <InstitutionRepositoryAliases :institution="institution" />
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
@@ -104,7 +110,7 @@ const {
   data: institution,
 } = await useFetch(`/api/institutions/${params.id}`, {
   query: {
-    include: ['parentInstitution', 'childInstitutions', 'repositories', 'spaces'],
+    include: ['parentInstitution', 'childInstitutions', 'repositories', 'repositoryAliases.repository', 'spaces'],
   },
 });
 
