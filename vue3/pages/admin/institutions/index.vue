@@ -204,7 +204,7 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'terms', 'admin'],
+  middleware: ['sidebase-auth', 'terms', 'admin'],
   alias: ['/admin/'],
 });
 
@@ -296,6 +296,7 @@ const headers = computed(() => [
     value: 'validated',
     align: 'center',
     sortable: true,
+    minWidth: '175px',
   },
   {
     title: t('actions'),

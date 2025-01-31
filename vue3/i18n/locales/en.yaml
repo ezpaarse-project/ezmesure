@@ -499,13 +499,13 @@ tasks:
     failed: The harvest has failed.
     interrupted: The harvest has been interrupted.
     cancelled: The harvest has been cancelled.
-    delayed: The harvest has been initiated, but the report was not ready yet. A new
-      attempt will be made soon.
+    delayed: The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon.
   status:
     notLaunchedYet: Not launched yet
     waiting: Waiting
     running: Running
     finished: Finished
+    interrupted: Interrupted
     failed: Error
     error: Error
     cancelled: Cancelled
@@ -532,34 +532,21 @@ tasks:
     exceptionMeaning:
       network_error: An issue occurred while communicating with the endpoint.
       unreadable_report: The downloaded report is unreadable.
-      invalid_json: The downloaded report is not in the good format (JSON), or has
-        syntax issues.
+      invalid_json: The downloaded report is not in the good format (JSON), or has syntax issues.
       max_defferals_exceeded: After several attempts, the report was still not ready.
-      unauthorized: Authentication to the endpoint failed. Check that your credentials
-        are entered correctly.
-      invalid_report: The downloaded report is not valid, or include changes that
-        are not SUSHI compliant.
+      unauthorized: Authentication to the endpoint failed. Check that your credentials are entered correctly.
+      invalid_report: The downloaded report is not valid, or include changes that are not SUSHI compliant.
       sushi:1000: The report could not be harvested because the endpoint is unreachable.
-      sushi:1010: The endpoint is unable to provide the report because it's under
-        heavy load.
-      sushi:1020: The endpoint refuses to provide the report because the number of
-        requests is too high.
-      sushi:1030: The endpoint was unable to provide the report due to a lack of information
-        provided with the request.
-      sushi:2000: The endpoint refuses to provide the report because the requestor
-        is not authorized. Check that your credentials are entered correctly.
-      sushi:2010: The endpoint refuses to provide the report because the requestor
-        is not authorized. Check that your credentials are entered correctly.
-      sushi:2020: The endpoint refuses to provide the report because the provided
-        API key is not valid. Check that your credentials are entered correctly.
-      sushi:2030: The endpoint refuses to provide the report because the IP address
-        is not authorized. Make sure that the IP address of ezMESURE is correctly
-        declared to the endpoint.
+      sushi:1010: The endpoint is unable to provide the report because it's under heavy load.
+      sushi:1020: The endpoint refuses to provide the report because the number of requests is too high.
+      sushi:1030: The endpoint was unable to provide the report due to a lack of information provided with the request.
+      sushi:2000: The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.
+      sushi:2010: The endpoint refuses to provide the report because the requestor is not authorized. Check that your credentials are entered correctly.
+      sushi:2020: The endpoint refuses to provide the report because the provided API key is not valid. Check that your credentials are entered correctly.
+      sushi:2030: The endpoint refuses to provide the report because the IP address is not authorized. Make sure that the IP address of ezMESURE is correctly declared to the endpoint.
       sushi:3000: The endpoint is unable to provide the report because it's not supported.
-      sushi:3010: The endpoint is unable to provide the report because the requested
-        version is not supported.
-      sushi:3020: The period requested from the endpoint is invalid. The report may
-        not be available yet.
+      sushi:3010: The endpoint is unable to provide the report because the requested version is not supported.
+      sushi:3020: The period requested from the endpoint is invalid. The report may not be available yet.
       sushi:3030: The report is not available yet for the requested period.
   failedStep:
     download: Download failed
@@ -626,6 +613,9 @@ sushi:
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: 'Messages from the endpoint:'
   checkBeforeSave: Check credentials before saving
+  matrix:
+    unsupported: Report not supported (editor declaration)
+    ignored: Report not supported (ezMESURE finding)
   noMatrix:
     title: No harvested report for these credentials on this period
     description: These credentials have not yet been harvested for this period. Please validate your SUSHI credentials to be harvested in the future by the administration team.
@@ -755,10 +745,11 @@ report:
   title: My reports
   health: Health status
   admin:
-    taskTab: Reports management
-    templateTab: Template management
-    presetTab: Preset management
-    adminTab: General administration
+    taskTab: Reports
+    templateTab: Template
+    presetTab: Preset
+    adminTab: Administration
+    activityTab: Activity
 repositories:
   repositories: Repositories
   toolbarTitle: Repositories ({count})
@@ -830,6 +821,7 @@ harvest:
     filtersTitle: Filter Tasks
     harvestId: Harvesting ID
     reportType: Report Type
+    errorCode: Error Code
     beginDate: Start Date
     endDate: End Date
     period: Period

@@ -6,7 +6,7 @@ const { prepareStandardQueryParams } = require('../../services/std-query');
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: ['vendor'],
+  queryFields: ['vendor', 'sushiUrl'],
 });
 exports.standardQueryParams = standardQueryParams;
 

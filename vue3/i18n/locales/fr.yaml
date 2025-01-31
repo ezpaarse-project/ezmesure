@@ -506,14 +506,14 @@ tasks:
     failed: Le moissonnage a échoué.
     interrupted: Le moissonnage a été interrompu.
     cancelled: Le moissonnage a été annulé.
-    delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt.
-      Une nouvelle tentative aura bientôt lieu.
+    delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
     running: En cours
     finished: Terminé
     failed: Erreur
+    interrupted: Interrompu
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
@@ -537,40 +537,23 @@ tasks:
       sushi:3020: Dates invalides
       sushi:3030: Période indisponible
     exceptionMeaning:
-      network_error: Un problème est survenu lors de la communication avec le point
-        d'accès.
+      network_error: Un problème est survenu lors de la communication avec le point d'accès.
       unreadable_report: Le rapport téléchargé ne peut être lu.
-      invalid_json: Le rapport téléchargé n'est pas au bon format (JSON), ou présente
-        des problèmes de syntaxe.
-      max_defferals_exceeded: Après plusieurs tentatives, le rapport n'était toujours
-        pas prêt.
-      unauthorized: L'identification auprès du point d'accès a échoué. Vérifiez que
-        vos identifiants sont correctement saisis.
-      invalid_report: Le rapport téléchargé n'est pas valide, ou contient des modifications
-        qui ne font pas partie du standard SUSHI.
-      sushi:1000: La rapport n'a pas pu être moissonné car le point d'accès n'est
-        pas accessible.
-      sushi:1010: Le point d'accès est dans l'incapacité de fournir le rapport en
-        raison d'une forte charge.
-      sushi:1020: Le point d'accès refuse de fournir le rapport en raison d'un nombre
-        de requêtes trop élevé.
-      sushi:1030: Le point d'accès n'a pas pu fournir le rapport en raison d'un manque
-        d'informations lors de la demande.
-      sushi:2000: Le point d'accès refuse de fournir le rapport car le demandeur (requestor)
-        n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.
-      sushi:2010: Le point d'accès refuse de fournir le rapport car le demandeur (requestor)
-        n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.
-      sushi:2020: Le point d'accès refuse de fournir le rapport car la clé d'API fournie
-        n'est pas valide. Vérifiez que vos identifiants sont correctement saisis.
-      sushi:2030: Le point d'accès refuse de fournir le rapport car l'adresse IP n'est
-        pas autorisée. Assurez-vous que l'IP d'ezMESURE est bien déclarée auprès du
-        point d'accès.
-      sushi:3000: Le point d'accès est dans l'incapacité de fournir le rapport, car
-        ce dernier n'est pas supporté.
-      sushi:3010: Le point d'accès est dans l'incapacité de fournir le rapport, car
-        la version demandée n'est pas supportée.
-      sushi:3020: La période demandée au point d'accès n'est pas valide. Il est possible
-        que le rapport ne soit pas encore disponible pour cette période.
+      invalid_json: Le rapport téléchargé n'est pas au bon format (JSON), ou présente des problèmes de syntaxe.
+      max_defferals_exceeded: Après plusieurs tentatives, le rapport n'était toujours pas prêt.
+      unauthorized: L'identification auprès du point d'accès a échoué. Vérifiez que vos identifiants sont correctement saisis.
+      invalid_report: Le rapport téléchargé n'est pas valide, ou contient des modifications qui ne font pas partie du standard SUSHI.
+      sushi:1000: La rapport n'a pas pu être moissonné car le point d'accès n'est pas accessible.
+      sushi:1010: Le point d'accès est dans l'incapacité de fournir le rapport en raison d'une forte charge.
+      sushi:1020: Le point d'accès refuse de fournir le rapport en raison d'un nombre de requêtes trop élevé.
+      sushi:1030: Le point d'accès n'a pas pu fournir le rapport en raison d'un manque d'informations lors de la demande.
+      sushi:2000: Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.
+      sushi:2010: Le point d'accès refuse de fournir le rapport car le demandeur (requestor) n'est pas autorisé. Vérifiez que vos identifiants sont correctement saisis.
+      sushi:2020: Le point d'accès refuse de fournir le rapport car la clé d'API fournie n'est pas valide. Vérifiez que vos identifiants sont correctement saisis.
+      sushi:2030: Le point d'accès refuse de fournir le rapport car l'adresse IP n'est pas autorisée. Assurez-vous que l'IP d'ezMESURE est bien déclarée auprès du point d'accès.
+      sushi:3000: Le point d'accès est dans l'incapacité de fournir le rapport, car ce dernier n'est pas supporté.
+      sushi:3010: Le point d'accès est dans l'incapacité de fournir le rapport, car la version demandée n'est pas supportée.
+      sushi:3020: La période demandée au point d'accès n'est pas valide. Il est possible que le rapport ne soit pas encore disponible pour cette période.
       sushi:3030: Le rapport n'est pas disponible pour la période demandée.
   failedStep:
     download: Échec du téléchargement
@@ -647,6 +630,9 @@ sushi:
   updatedItems: "{count} éléments du rapport ont été mis à jour."
   failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  matrix:
+    unsupported: Rapport non supporté (déclaration éditeur)
+    ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
     description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants SUSHI pour être moissonné prochainement par l'équipe d'administration.
@@ -773,10 +759,11 @@ report:
   title: Mes rapports
   health: État de santé
   admin:
-    taskTab: Gestion des rapports
-    templateTab: Gestion des modèles
-    presetTab: Gestion des prédéfinis
-    adminTab: Administration générale
+    taskTab: Rapports
+    templateTab: Modèles
+    presetTab: Prédéfinis
+    adminTab: Administration
+    activityTab: Activité
 repositories:
   repositories: Entrepôts
   toolbarTitle: Entrepôts ({count})
@@ -852,6 +839,7 @@ harvest:
     filtersTitle: Filtrer les tâches
     harvestId: Identifiant de moissonnage
     reportType: Type de rapport
+    errorCode: Code d'erreur
     beginDate: Date de début
     endDate: Date de fin
     period: Période

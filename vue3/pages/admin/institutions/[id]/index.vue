@@ -7,48 +7,7 @@
     @click:refresh="refresh()"
   />
   <div v-else>
-    <SkeletonPageBar :title="institution.name">
-      <v-btn
-        v-tooltip="$t('institutions.reports.reports')"
-        :to="`/admin/institutions/${institution.id}/reports`"
-        icon="mdi-file-chart-outline"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-4"
-      />
-
-      <v-btn
-        v-tooltip="$t('institutions.sushi.credentials')"
-        :to="`/admin/institutions/${institution.id}/sushi`"
-        icon="mdi-key"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-4"
-      />
-
-      <v-btn
-        v-tooltip="$t('institutions.members.members')"
-        :to="`/admin/institutions/${institution.id}/members`"
-        icon="mdi-account-multiple"
-        variant="tonal"
-        density="comfortable"
-        color="primary"
-        class="mr-4"
-      />
-
-      <v-btn
-        v-if="institutionFormDialogRef"
-        v-tooltip="$t('modify')"
-        icon="mdi-pencil"
-        variant="tonal"
-        density="comfortable"
-        color="blue"
-        class="mr-4"
-        @click="institutionFormDialogRef.open(institution)"
-      />
-    </SkeletonPageBar>
+    <SkeletonPageBar :title="institution.name" />
 
     <v-container>
       <v-row>
@@ -69,6 +28,18 @@
                 hide-details
                 class="ml-2"
                 @update:model-value="activateInstitution()"
+              />
+
+              <v-spacer />
+
+              <v-btn
+                v-if="institutionFormDialogRef"
+                v-tooltip="$t('modify')"
+                icon="mdi-pencil"
+                variant="text"
+                density="comfortable"
+                color="blue"
+                @click="institutionFormDialogRef.open(institution)"
               />
             </template>
           </InstitutionCard>
@@ -115,7 +86,7 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'terms', 'admin'],
+  middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
 const { params } = useRoute();

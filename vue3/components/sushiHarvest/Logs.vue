@@ -42,11 +42,15 @@ const props = defineProps({
   },
   itemValue: {
     type: String,
-    default: () => 'type',
+    default: 'type',
   },
   itemText: {
     type: String,
-    default: () => 'message',
+    default: 'message',
+  },
+  endpointUrl: {
+    type: String,
+    default: undefined,
   },
 });
 
@@ -61,6 +65,8 @@ const entries = computed(
         value,
         text,
         color: logColors.get(value) || 'white',
+        // Ensure the help URL is a full URL
+        helpUrl: item.Help_URL ? new URL(item.Help_URL, props.endpointUrl) : undefined,
       };
     })
     .sort((a, b) => (a.date < b.date ? -1 : 1)),

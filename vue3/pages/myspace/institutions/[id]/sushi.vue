@@ -371,7 +371,7 @@
 <script setup>
 definePageMeta({
   layout: 'space',
-  middleware: ['auth', 'terms'],
+  middleware: ['sidebase-auth', 'terms'],
   alias: ['/admin/institutions/:id/sushi'],
 });
 
@@ -479,7 +479,7 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('status'),
+    title: t('endpoints.active'),
     value: 'active',
     align: 'center',
     width: '130px',

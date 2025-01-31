@@ -17,6 +17,15 @@
               class="mr-2"
               @click="refresh()"
             />
+
+            <SkeletonFilterButton
+              v-model="filtersValue"
+              icon
+            >
+              <template #panel="panel">
+                <SushiHarvestSessionBodyFilters :session-id="modelValue.id" v-bind="panel" />
+              </template>
+            </SkeletonFilterButton>
           </template>
         </v-toolbar>
       </template>
@@ -78,13 +87,13 @@
               :title="$t('cancel')"
               :disabled="!cancellableStatus.has(item.status)"
               prepend-icon="mdi-cancel"
-              @click="() => {}"
+              @click="cancelJob(item)"
             />
             <v-list-item
               :disabled="unDeletableStatus.has(item.status)"
               :title="$t('delete')"
               prepend-icon="mdi-delete"
-              @click="() => {}"
+              @click="deleteJob(item)"
             />
 
             <v-divider />
@@ -123,11 +132,14 @@ const unDeletableStatus = new Set(['running']);
 
 const { t } = useI18n();
 const { isSupported: clipboard, copy } = useClipboard();
+const snacks = useSnacksStore();
+const { openConfirm } = useDialogStore();
 
 const historyRef = useTemplateRef('historyRef');
 
 const {
   status,
+  query,
   refresh,
   vDataTableOptions,
 } = await useServerSidePagination({
@@ -139,6 +151,31 @@ const {
     include: ['credentials.institution', 'credentials.endpoint', 'steps', 'logs'],
     sessionId: props.modelValue.id,
     search: undefined, // q parameter is not allowed
+  },
+});
+
+/**
+ * Debounced refresh
+ */
+const debouncedRefresh = useDebounceFn(refresh, 250);
+
+const filtersValue = computed({
+  get: () => ({
+    ...query.value,
+    sessionId: undefined,
+    page: undefined,
+    sortBy: undefined,
+    include: undefined,
+  }),
+  set: (v) => {
+    query.value = {
+      ...v,
+      sessionId: query.value.sessionId,
+      page: query.value.page,
+      sortBy: query.value.sortBy,
+      include: query.value.include,
+    };
+    debouncedRefresh();
   },
 });
 
@@ -204,5 +241,47 @@ async function copyId({ id }) {
     return;
   }
   snacks.info(t('clipboard.textCopied'));
+}
+
+async function cancelJob(job) {
+  const confirmed = await openConfirm({
+    title: t('areYouSure'),
+    agreeText: t('cancel'),
+    agreeIcon: 'mdi-cancel',
+  });
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await $fetch(`/tasks/${job.id}/_cancel`, {
+      method: 'POST',
+    });
+    refresh();
+  } catch {
+    snacks.error(t('harvest.jobs.unableToStop'));
+  }
+}
+
+async function deleteJob(job) {
+  const confirmed = await openConfirm({
+    title: t('areYouSure'),
+    agreeText: t('delete'),
+    agreeIcon: 'mdi-delete',
+  });
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await $fetch(`/tasks/${job.id}`, {
+      method: 'DELETE',
+    });
+    refresh();
+  } catch {
+    snacks.error(t('harvest.jobs.unableToDelete'));
+  }
 }
 </script>

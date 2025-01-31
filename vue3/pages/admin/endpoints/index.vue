@@ -154,7 +154,7 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'terms', 'admin'],
+  middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
 const { t, locale } = useI18n();
@@ -218,6 +218,7 @@ const headers = computed(() => [
     value: 'active',
     align: 'center',
     sortable: true,
+    minWidth: '175px',
   },
   {
     title: t('actions'),

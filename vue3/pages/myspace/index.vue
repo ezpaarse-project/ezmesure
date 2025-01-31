@@ -66,7 +66,7 @@
 <script setup>
 definePageMeta({
   layout: 'space',
-  middleware: ['auth', 'terms'],
+  middleware: ['sidebase-auth', 'terms'],
 });
 
 const currentUser = useCurrentUserStore();

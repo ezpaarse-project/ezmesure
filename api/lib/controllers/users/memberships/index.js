@@ -10,7 +10,7 @@ const {
 const {
   standardQueryParams,
 
-  getInstitutionMembers,
+  getUserMemberships: getInstitutionMembers,
 } = require('./actions');
 
 router.use(requireJwt, requireUser, requireAdmin);

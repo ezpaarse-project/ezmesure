@@ -1,16 +1,16 @@
 import {
   defineNuxtRouteMiddleware,
   setPageLayout,
-  useAuthState,
-  navigateTo,
 } from '#imports';
+
+import adminMiddleware from './admin';
 
 const ADMIN_PATH_REGEX = /^\/admin/;
 
 /**
  * Change the layout to 'admin' if the route is an alias of '/admin'
  */
-export default defineNuxtRouteMiddleware((route) => {
+export default defineNuxtRouteMiddleware((route, from) => {
   if (!route.meta.alias || route.meta.layout === 'admin') {
     return true;
   }
@@ -22,9 +22,5 @@ export default defineNuxtRouteMiddleware((route) => {
   }
 
   setPageLayout('admin');
-  const { data: user } = useAuthState();
-  if (user.value?.isAdmin) {
-    return true;
-  }
-  return navigateTo('/myspace');
+  return adminMiddleware(route, from);
 });

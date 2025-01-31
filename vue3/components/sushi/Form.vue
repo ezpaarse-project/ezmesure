@@ -170,17 +170,18 @@
 
       <slot name="actions" :loading="loading || saving" />
 
-      <v-btn
-        v-tooltip="sushi.connection ? undefined : $t('sushi.checkBeforeSave')"
-        :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
-        :disabled="!valid || !sushi.connection"
-        :loading="saving"
-        type="submit"
-        form="sushiForm"
-        variant="elevated"
-        color="primary"
-      />
+      <div v-tooltip="{ text: $t('sushi.checkBeforeSave'), disabled: !!sushi.connection, location: 'top' }">
+        <v-btn
+          :text="!isEditing ? $t('add') : $t('save')"
+          :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+          :disabled="!valid || !sushi.connection"
+          :loading="saving"
+          type="submit"
+          form="sushiForm"
+          variant="elevated"
+          color="primary"
+        />
+      </div>
     </template>
   </v-card>
 </template>
