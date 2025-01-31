@@ -28,13 +28,19 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 exports.getMany = async (ctx) => {
-  const { institutionId } = ctx.query;
+  const { institutionId, repository, type } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
 
   if (institutionId) {
     prismaQuery.where.institutions = {
       some: { id: institutionId },
+    };
+  }
+  if (repository || type) {
+    prismaQuery.where.repository = {
+      pattern: repository,
+      type,
     };
   }
 

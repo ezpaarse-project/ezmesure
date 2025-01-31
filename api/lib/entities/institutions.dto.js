@@ -85,6 +85,7 @@ const includableFields = [
   'childInstitutions',
   'repositories',
   'repositoryAliases',
+  'repositoryAliases.repository',
 ];
 
 /**

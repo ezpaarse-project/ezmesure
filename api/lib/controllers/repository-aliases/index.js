@@ -32,6 +32,8 @@ router.get('/', {
   validate: {
     query: standardQueryParams.manyValidation.append({
       institutionId: Joi.string().trim(),
+      repository: Joi.string().trim(),
+      type: Joi.string().trim(),
     }),
   },
 });

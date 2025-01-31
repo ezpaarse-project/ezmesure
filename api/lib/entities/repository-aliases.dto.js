@@ -24,8 +24,8 @@ const schema = {
       // Null values are allowed to check if empty
       Joi.string().trim().min(1), // Exact match
       Joi.array().items(Joi.string().trim().min(1)), // One of
-    ]),
-  })),
+    ]).allow(null),
+  })).allow(null),
 
   institutions: Joi.array().items(Joi.object()),
   repository: Joi.object(),
@@ -67,7 +67,7 @@ const adminCreateSchema = withModifiers(
 const adminCreateOrConnectSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['pattern']),
+  requireFields(['target']),
 );
 
 /**

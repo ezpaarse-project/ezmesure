@@ -239,6 +239,6 @@ module.exports = {
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
   fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'pattern', ...opts }),
-  fetchRepositoryAlias: (opts = {}) => fetchModel('repository-alias', { state: 'repository-alias', params: 'pattern', ...opts }),
+  fetchRepositoryAlias: (opts = {}) => fetchModel('repository-alias', { state: 'alias', params: 'pattern', ...opts }),
   fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };
