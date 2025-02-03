@@ -793,8 +793,8 @@ repositoryAliases:
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
   toolbarTitle: Alias d'entrepôts ({count})
-  deleteNbAliases: Vous allez supprimer {number} alias
-  newAlias: Nouvel alias
+  deleteNbAliases: Vous allez supprimer {count} alias.
+  newAlias: Nouvel alias d'entrepôt
   noInstitutions: Aucun établissement n'utilise cet alias
   filters:
     title: Filtrer les alias

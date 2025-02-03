@@ -777,7 +777,7 @@ repositoryAliases:
   noAliases: No repository alias has been assigned yet
   toolbarTitle: Repository aliases ({count})
   deleteNbAliases: You are about to delete {number} aliases
-  newAlias: New alias
+  newAlias: New repository alias
   noInstitutions: No institutions is using this alias
   filters:
     title: Filter aliases

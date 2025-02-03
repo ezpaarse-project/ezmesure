@@ -63,13 +63,13 @@
 
           <v-row>
             <v-col>
-              <InstitutionRepositories :institution="institution" />
+              <InstitutionSpaces :institution="institution" />
             </v-col>
           </v-row>
 
           <v-row>
             <v-col>
-              <InstitutionSpaces :institution="institution" />
+              <InstitutionRepositories :institution="institution" />
             </v-col>
           </v-row>
 

@@ -2,7 +2,7 @@
   <v-card
     :loading="loading && 'primary'"
     :title="$t('repositoryAliases.newAlias')"
-    prepend-icon="mdi-database-plus"
+    prepend-icon="mdi-eye-plus"
   >
     <template #text>
       <v-row>
@@ -42,11 +42,9 @@
             </v-row>
           </v-form>
         </v-col>
-      </v-row>
 
-      <v-row v-if="institution">
-        <v-col>
-          <PermissionManager v-model="permissions" :institution="institution" />
+        <v-col v-if="institution" cols="12" lg="7">
+          <PermissionManager v-model="permissions" :institution="institution" :levels="['none', 'read']" />
         </v-col>
       </v-row>
     </template>
@@ -123,7 +121,7 @@ function create() {
 }
 
 async function link() {
-  const repo = await $fetch(`/api/institutions/${props.institution.id}/repository-aliases/${alias.value.pattern}`, {
+  const newAlias = await $fetch(`/api/institutions/${props.institution.id}/repository-aliases/${alias.value.pattern}`, {
     method: 'PUT',
     body: {
       target: repository.value.pattern,
@@ -133,14 +131,13 @@ async function link() {
 
   await $fetch(`/api/institutions/${props.institution.id}/repository-aliases/${alias.value.pattern}/permissions`, {
     method: 'PUT',
-    body: Array.from(permissions.value.entries()).map(([username, permission]) => ({
+    body: Array.from(permissions.value.keys()).map((username) => ({
       username,
-      readonly: permission === 'read',
       locked: false,
     })),
   });
 
-  return repo;
+  return newAlias;
 }
 
 async function save() {

@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="isOpen"
-    :width="institution ? 600 : 400"
+    :width="institution ? 1100 : 400"
     scrollable
     persistent
   >
