@@ -203,7 +203,7 @@ exports.addRepositoryAlias = async (ctx) => {
   const { body } = ctx.request;
 
   if (alias && alias.target !== body.target) {
-    ctx.throw(409, ctx.$t('repositoryAliases.targetMismatch', alias.pattern));
+    ctx.throw(409, ctx.$t('errors.repositoryAlias.targetMismatch', alias.pattern));
   }
 
   const repositoryAliasesService = new RepositoryAliasesService();

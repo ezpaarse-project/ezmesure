@@ -58,16 +58,16 @@ exports.getOne = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { pattern });
 
   const repositoryAliasesService = new RepositoryAliasesService();
-  const repository = await repositoryAliasesService.findUnique(prismaQuery);
+  const repositoryAlias = await repositoryAliasesService.findUnique(prismaQuery);
 
-  if (!repository) {
+  if (!repositoryAlias) {
     ctx.throw(404, ctx.$t('errors.repositoryAlias.notFound'));
     return;
   }
 
   ctx.type = 'json';
   ctx.status = 200;
-  ctx.body = repository;
+  ctx.body = repositoryAlias;
 };
 
 exports.createOne = async (ctx) => {
