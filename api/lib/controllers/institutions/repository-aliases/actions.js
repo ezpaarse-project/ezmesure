@@ -10,7 +10,7 @@ const {
 
 const {
   upsertSchema: permissionUpsertSchema,
-} = require('../../../entities/repository-permissions.dto');
+} = require('../../../entities/repository-alias-permissions.dto');
 
 /* eslint-disable max-len */
 /**
@@ -81,9 +81,8 @@ exports.upsertRepositoryAliasAllPermission = async (ctx) => {
               },
             },
             create: {
-              readonly: permission.readonly,
               locked: permission.locked,
-              repositoryAlias: {
+              alias: {
                 connect: {
                   pattern: alias.pattern,
                 },
@@ -98,7 +97,6 @@ exports.upsertRepositoryAliasAllPermission = async (ctx) => {
               },
             },
             update: {
-              readonly: permission.readonly,
               locked: permission.locked,
             },
           }),
@@ -126,14 +124,13 @@ exports.upsertRepositoryAliasPermission = async (ctx) => {
   const { value: body } = permissionUpsertSchema.validate({
     ...ctx.request.body,
     institutionId: institution.id,
-    pattern: alias.pattern,
     username,
   });
 
   /** @type {RepositoryPermissionCreateInput} */
   const permissionData = {
     ...body,
-    repositoryAlias: {
+    alias: {
       connect: {
         pattern: alias.pattern,
       },

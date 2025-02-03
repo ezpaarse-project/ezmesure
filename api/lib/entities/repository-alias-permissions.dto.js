@@ -19,7 +19,6 @@ const schema = {
   aliasPattern: Joi.string().trim(),
   alias: Joi.object(),
 
-  readonly: Joi.boolean(),
   locked: Joi.boolean(),
 };
 
@@ -53,7 +52,6 @@ const createSchema = withModifiers(
     username: () => schema.username,
   },
   withDefaults({
-    readonly: false,
     locked: false,
   }),
 );
@@ -66,7 +64,6 @@ const upsertSchema = withModifiers(
   requireFields(['username', 'aliasPattern', 'institutionId']),
   ignoreFields(immutableFields),
   withDefaults({
-    readonly: false,
     locked: false,
   }),
 );
