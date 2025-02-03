@@ -25,11 +25,16 @@
         <v-list-item
           v-for="alias in sortedAliases"
           :key="alias.pattern"
-          :title="alias.pattern"
           lines="two"
         >
-          <template #subtitle>
-            <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" />
+          <template #title>
+            <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
+
+            {{ alias.pattern }}
+          </template>
+
+          <template v-if="alias.repository" #subtitle>
+            {{ alias.repository.pattern }}
 
             <v-chip
               :text="$te(`spaces.types.${alias.repository.type}`) ? $t(`spaces.types.${alias.repository.type}`) : alias.repository.type"

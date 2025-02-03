@@ -773,6 +773,8 @@ repositoryAliases:
     |Manage {count} aliases
   target: Repository pattern
   filtered: Filtered ?
+  aliases: Repository aliases
+  noAliases: No repository alias has been assigned yet
   toolbarTitle: Repository aliases ({count})
   deleteNbAliases: You are about to delete {number} aliases
   newAlias: New alias

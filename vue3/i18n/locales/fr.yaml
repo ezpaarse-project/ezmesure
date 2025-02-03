@@ -790,6 +790,8 @@ repositoryAliases:
     |Gérer {count} alias
   target: Pattern de l'entrepôt
   filtered: Filtré ?
+  aliases: Alias d'entrepôts
+  noAliases: Aucun alias d'entrepôt n'est encore attribué
   toolbarTitle: Alias d'entrepôts ({count})
   deleteNbAliases: Vous allez supprimer {number} alias
   newAlias: Nouvel alias
