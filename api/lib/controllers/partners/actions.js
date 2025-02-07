@@ -1,14 +1,26 @@
 const { addDays, isAfter } = require('date-fns');
+const config = require('config');
 const InstitutionService = require('../../entities/institutions.service');
 
 const ezrAxios = require('../../services/ezreeport/axios');
 const { appLogger } = require('../../services/logger');
+
+const { username } = config.get('admin');
+let reportingAdminToken;
 
 /**
  * key is institution id, value is if a reporting was
  * @type {Map<string, { value: boolean, date: Date }>}
  */
 const reportingCache = new Map();
+
+const getTokenOfAdmin = async () => {
+  if (!reportingAdminToken) {
+    const { data: { content: adminUser } } = await ezrAxios.get(`/admin/users/${username}`);
+    reportingAdminToken = adminUser.token;
+  }
+  return reportingAdminToken;
+};
 
 /**
  * Checks if institution is using ezREEPORT
@@ -27,14 +39,11 @@ const institutionHasReport = async (institutionId) => {
   let found = false;
 
   try {
-    const { data } = await ezrAxios.get(`/admin/namespaces/${institutionId}`);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const task of (data.content?.tasks ?? [])) {
-      if (task.enabled) {
-        found = true;
-        break;
-      }
-    }
+    const { data: { content } } = await ezrAxios.get('/tasks', {
+      params: { namespaceId: institutionId, enabled: true },
+      headers: { Authorization: `Bearer ${await getTokenOfAdmin()}` },
+    });
+    found = content.length > 0;
   } catch (error) {
     appLogger.warn(`Couldn't get reports of [${institutionId}]: ${error}`);
   }

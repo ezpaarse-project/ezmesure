@@ -22,7 +22,7 @@ const { prepareStandardQueryParams } = require('../../services/std-query');
 const standardQueryParams = prepareStandardQueryParams({
   schema,
   includableFields,
-  queryFields: ['id'],
+  queryFields: ['id', 'name'],
 });
 exports.standardQueryParams = standardQueryParams;
 

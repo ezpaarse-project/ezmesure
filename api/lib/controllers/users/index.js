@@ -6,6 +6,9 @@ const {
   adminCreateSchema,
 } = require('../../entities/users.dto');
 
+const memberships = require('./memberships');
+
+const { stringOrArrayValidation } = require('../../services/std-query');
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const {
   standardQueryParams,
@@ -19,6 +22,8 @@ const {
   impersonateUser,
 } = require('./actions');
 
+router.use(memberships.prefix('/:username/memberships').middleware());
+
 router.use(requireJwt, requireUser);
 
 router.route({
@@ -28,6 +33,8 @@ router.route({
   validate: {
     query: standardQueryParams.manyValidation.append({
       source: Joi.string().trim(),
+      roles: stringOrArrayValidation,
+      permissions: stringOrArrayValidation,
     }),
   },
 });

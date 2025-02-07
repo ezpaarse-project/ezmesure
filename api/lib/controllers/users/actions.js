@@ -8,6 +8,7 @@ const { activateUserLink } = require('../auth/password');
 const { schema, adminImportSchema, includableFields } = require('../../entities/users.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
+const { arrayFilter } = require('../../services/std-query/filters');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -50,9 +51,20 @@ exports.getUser = async (ctx) => {
 exports.list = async (ctx) => {
   const {
     source = 'fullName,username',
+    roles,
+    permissions,
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+
+  if (roles != null || permissions != null) {
+    prismaQuery.where.memberships = {
+      some: {
+        roles: arrayFilter(roles),
+        permissions: arrayFilter(permissions),
+      },
+    };
+  }
 
   prismaQuery.select = Object.assign(
     {},

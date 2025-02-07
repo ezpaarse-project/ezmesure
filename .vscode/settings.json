@@ -1,12 +1,33 @@
 {
+  // ESLint settings
   "eslint.workingDirectories": [
     "api",
     "front",
-    "reporting"
+    "reporting",
+    "front"
   ],
   "eslint.validate": [
+    "typescript",
     "javascript",
     "javascriptreact",
     "vue"
-  ]
+  ],
+  // Conventional Commits settings
+  "conventionalCommits.scopes": [
+    "api",
+    "front",
+    "elasticsearch",
+    "kibana",
+    "reporting",
+    "rp",
+    "tools",
+    "front"
+  ],
+  // i18n-ally settings
+  "i18n-ally.localesPaths": "front/locales",
+  "i18n-ally.enabledFrameworks": [
+    "vue"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sourceLanguage": "fr"
 }

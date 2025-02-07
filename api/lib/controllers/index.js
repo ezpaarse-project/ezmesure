@@ -49,6 +49,7 @@ publicRouter.route({
     body: {
       username: Joi.string().required().trim().min(1),
       password: Joi.string().required().trim().min(1),
+      callbackUrl: Joi.string(),
     },
   },
 });

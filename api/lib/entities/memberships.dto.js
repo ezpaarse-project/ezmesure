@@ -50,6 +50,7 @@ const schema = {
   )),
 
   locked: Joi.boolean(),
+  comment: Joi.string().allow(''),
 
   spacePermissions: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),
@@ -74,7 +75,9 @@ const includableFields = [
   'user',
   'institution',
   'spacePermissions',
+  'spacePermissions.space',
   'repositoryPermissions',
+  'repositoryPermissions.repository',
 ];
 
 /**

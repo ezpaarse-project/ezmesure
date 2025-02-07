@@ -1,154 +1,190 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
-    <v-row
-      align="center"
-      justify="center"
-    >
-      <v-col style="max-width: 800px">
-        <v-card class="elevation-12">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title>
-              {{ $t('contact.contactUs') }}
-            </v-toolbar-title>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
+        <v-card elevation="10">
+          <v-card-title class="bg-primary d-flex">
+            {{ $t('contact.contactUs') }}
+
             <v-spacer />
-            <v-icon>mdi-email-edit</v-icon>
-          </v-toolbar>
 
-          <v-card-text>
-            <v-form
-              ref="form"
-              v-model="valid"
-            >
-              <v-text-field
-                v-model="email"
-                :rules="emailRules"
-                :label="$t('contact.email')"
-                name="email"
-                outlined
-                required
-              />
+            <v-icon icon="mdi-email-edit" />
+          </v-card-title>
 
-              <v-select
-                v-model="subject"
-                :items="subjects"
-                :rules="subjectRules"
-                :label="$t('contact.subject')"
-                name="subject"
-                outlined
-                required
-                return-object
-              />
-
-              <v-row v-if="endpointSubject" class="mt-2">
+          <v-card-text class="pt-4">
+            <v-form ref="formRef" v-model="valid">
+              <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="endpointVendor"
-                    :label="$t('contact.endpointVendor')"
-                    :hint="$t('contact.pleaseEnterFullVendorName')"
-                    :rules="[v => !!v || $t('fieldIsRequired')]"
+                    v-model="email"
+                    :label="$t('contact.email')"
+                    :rules="[
+                      v => !!v || $t('contact.emailIsRequired'),
+                      v => /.+@.+\..+/.test(v) || $t('contact.emailMustBeValid'),
+                    ]"
+                    prepend-icon="mdi-at"
+                    variant="underlined"
                     hide-details="auto"
-                    requried
-                    outlined
+                    required
                   />
                 </v-col>
 
                 <v-col cols="12">
-                  <v-text-field
-                    v-model="endpointUrl"
-                    :label="$t('contact.endpointUrl')"
-                    :rules="[v => !!v || $t('fieldIsRequired')]"
+                  <v-select
+                    v-model="subject"
+                    :label="$t('contact.subject')"
+                    :items="subjectsItems"
+                    :rules="[
+                      v => !!v || $t('contact.subjectIsRequired'),
+                    ]"
+                    prepend-icon="mdi-pencil"
+                    variant="underlined"
                     hide-details="auto"
-                    requried
-                    outlined
-                  />
-                </v-col>
-
-                <v-col cols="12">
-                  <p class="mb-0">
-                    {{ $t('contact.sushiDetails') }}
-                  </p>
-                </v-col>
-
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model="sushiRequestorId"
-                    :label="$t('institutions.sushi.requestorId')"
-                    :rules="[sushiRule]"
-                    hide-details="auto"
-                    outlined
-                  />
-                </v-col>
-
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model="sushiCustomerId"
-                    :label="$t('institutions.sushi.customerId')"
-                    :rules="[sushiRule]"
-                    hide-details="auto"
-                    outlined
-                  />
-                </v-col>
-
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model="sushiApiKey"
-                    :label="$t('institutions.sushi.apiKey')"
-                    :rules="[sushiRule]"
-                    hide-details="auto"
-                    outlined
-                  />
-                </v-col>
-
-                <v-col cols="12">
-                  <p>{{ $t('contact.endpointDetails') }}</p>
-
-                  <v-textarea
-                    v-model="message"
-                    :label="$t('contact.additionalInformation')"
-                    name="message"
-                    outlined
+                    required
+                    @update:model-value="onSubjectChange()"
                   />
                 </v-col>
               </v-row>
 
-              <v-textarea
-                v-else
-                v-model="message"
-                :rules="messageRules"
-                :label="$t('contact.content')"
-                name="message"
-                outlined
-                required
-              />
-              <v-checkbox
-                v-if="subject.value === 'bugs'"
-                v-model="sendBrowser"
-                :label="$t('contact.sendNavigatorVersion')"
-              />
+              <v-row v-if="subject === 'sushi-endpoint'" class="mt-2">
+                <v-col cols="12">
+                  <v-card
+                    :title="$t('endpoints.endpoint')"
+                    prepend-icon="mdi-api"
+                    variant="outlined"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="additionalData.endpointVendor"
+                            :label="$t('contact.endpointVendor')"
+                            :hint="$t('contact.pleaseEnterFullVendorName')"
+                            :rules="[
+                              v => !!v || $t('fieldIsRequired'),
+                            ]"
+                            prepend-icon="mdi-rename"
+                            variant="underlined"
+                            hide-details="auto"
+                            required
+                          />
+                        </v-col>
+
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="additionalData.endpointUrl"
+                            :label="$t('contact.endpointUrl')"
+                            :rules="[
+                              v => !!v || $t('fieldIsRequired'),
+                              v => isValidUrl(v) || $t('enterValidUrl'),
+                            ]"
+                            prepend-icon="mdi-link-variant"
+                            variant="underlined"
+                            hide-details="auto"
+                            required
+                          />
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-card>
+                </v-col>
+
+                <v-col cols="12">
+                  <v-card
+                    :title="$t('sushi.auth')"
+                    prepend-icon="mdi-lock"
+                    variant="outlined"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="12">
+                          <p class="mb-0">
+                            {{ $t('contact.sushiDetails') }}
+                          </p>
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                          <v-text-field
+                            v-model="additionalData.requestorId"
+                            :label="$t('institutions.sushi.requestorId')"
+                            :error-messages="sushiRule"
+                            prepend-icon="mdi-account-arrow-down"
+                            variant="underlined"
+                            hide-details="auto"
+                            required
+                          />
+                        </v-col>
+
+                        <v-col cols="12" sm="6">
+                          <v-text-field
+                            v-model="additionalData.customerId"
+                            :label="$t('institutions.sushi.customerId')"
+                            :error-messages="sushiRule"
+                            prepend-icon="mdi-account"
+                            variant="underlined"
+                            hide-details="auto"
+                            required
+                          />
+                        </v-col>
+
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="additionalData.apiKey"
+                            :label="$t('institutions.sushi.apiKey')"
+                            :error-messages="sushiRule"
+                            prepend-icon="mdi-key-variant"
+                            variant="underlined"
+                            hide-details="auto"
+                            required
+                          />
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-card>
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col cols="12">
+                  <v-textarea
+                    v-model="message"
+                    prepend-icon="mdi-image-text"
+                    variant="underlined"
+                    hide-details="auto"
+                    v-bind="messageArea"
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row v-if="subject === 'bugs'">
+                <v-col cols="12">
+                  <v-checkbox
+                    v-model="additionalData.sendBrowser"
+                    :label="$t('contact.sendNavigatorVersion')"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer />
-            <v-btn color="error" @click="$router.go(-1)">
-              {{ $t('cancel') }}
-            </v-btn>
+
             <v-btn
+              :text="$t('cancel')"
+              @click="back()"
+            />
+
+            <v-btn
+              :text="$t('send')"
               :disabled="!valid"
               :loading="loading"
               color="primary"
-              @click="validate"
-            >
-              {{ $t('send') }}
-            </v-btn>
+              @click="sendMail"
+            />
           </v-card-actions>
         </v-card>
       </v-col>
@@ -156,102 +192,116 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  asyncData({ $auth }) {
+<script setup>
+const { t } = useI18n();
+const { back } = useRouter();
+const { query } = useRoute();
+const { data: user } = useAuthState();
+const snacks = useSnacksStore();
+
+const loading = ref(false);
+const valid = ref(false);
+const email = ref('');
+const subject = ref('');
+const message = ref('');
+const additionalData = ref({});
+
+/** @type {Ref<Object | null>} */
+const formRef = useTemplateRef('formRef');
+
+const subjectsItems = computed(() => [
+  { title: t('contact.requestInformation'), value: 'informations' },
+  { title: t('contact.bugReport'), value: 'bugs' },
+  { title: t('contact.declareSushiEndpoint'), value: 'sushi-endpoint' },
+]);
+const messageArea = computed(() => {
+  if (subject.value === 'sushi-endpoint') {
     return {
-      email: $auth?.user?.email || '',
-      message: '',
-      endpointVendor: '',
-      endpointUrl: '',
-      sushiRequestorId: '',
-      sushiCustomerId: '',
-      sushiApiKey: '',
-      subject: {},
-      sendBrowser: true,
-      valid: true,
-      loading: false,
+      label: t('contact.additionalInformation'),
     };
-  },
-  computed: {
-    user() { return this.$auth.user; },
-    endpointSubject() { return this.subject?.value === 'sushi-endpoint'; },
-    subjects() {
-      return [
-        {
-          value: 'informations',
-          text: this.$t('contact.requestInformation'),
-        },
-        {
-          value: 'bugs',
-          text: this.$t('contact.bugReport'),
-        },
-        {
-          value: 'sushi-endpoint',
-          text: this.$t('contact.declareSushiEndpoint'),
-        },
-      ];
-    },
-    emailRules() {
-      return [
-        (v) => !!v || this.$t('contact.emailIsRequired'),
-        (v) => /.+@.+\..+/.test(v) || this.$t('contact.emailMustBeValid'),
-      ];
-    },
-    messageRules() { return [(v) => !!v || this.$t('contact.contentIsRequired')]; },
-    subjectRules() { return [(v) => !!v || this.$t('contact.subjectIsRequired')]; },
-    sushiRule() { return (!!this.sushiRequestorId || !!this.sushiCustomerId || !!this.sushiApiKey) || this.$t('contact.sushiIsRequired'); },
-  },
-  methods: {
-    async validate() {
-      this.$refs.form.validate();
+  }
+  return {
+    label: t('contact.content'),
+    rules: [
+      (v) => !!v || t('contact.contentIsRequired'),
+    ],
+    required: true,
+  };
+});
+const sushiRule = computed(() => ((!!additionalData.value.requestorId || !!additionalData.value.customerId || !!additionalData.value.apiKey) ? undefined : t('contact.sushiIsRequired')));
 
-      if (this.valid) {
-        this.loading = true;
+function isValidUrl(v) {
+  try {
+    const url = new URL(v);
+    return !!url;
+  } catch {
+    return false;
+  }
+}
+function onSubjectChange() {
+  // Send browser version by default for bug reports (if not set by user)
+  if (additionalData.value.sendBrowser == null && subject.value === 'bugs') {
+    additionalData.value.sendBrowser = true;
+  }
+  formRef.value?.validate();
+}
+function resetForm() {
+  email.value = user.value?.email || '';
+  subject.value = query.subject || '';
+  message.value = '';
+  additionalData.value = { sendBrowser: subject.value === 'bugs' ? true : undefined };
+  formRef.value?.validate();
+}
+async function sendMail() {
+  if (!valid.value) {
+    return;
+  }
 
-        let { message } = this;
+  const data = {
+    email: email.value,
+    subject: subject.value,
+    browser: null,
+  };
+  const meta = additionalData.value;
+  let parts = [message.value];
 
-        if (this.endpointSubject) {
-          message = [
-            `${this.$t('contact.endpointVendor')}:`,
-            this.endpointVendor,
-            `${this.$t('contact.endpointUrl')}:`,
-            this.endpointUrl,
-            '',
-            `${this.$t('institutions.sushi.requestorId')}:`,
-            this.sushiRequestorId,
-            `${this.$t('institutions.sushi.customerId')}:`,
-            this.sushiCustomerId,
-            `${this.$t('institutions.sushi.apiKey')}:`,
-            this.sushiApiKey,
-            '',
-            message,
-          ].join('\n');
-        }
+  if (subject.value === 'sushi-endpoint') {
+    parts = [
+      `${t('contact.endpointVendor')}:`, meta.endpointVendor,
+      `${t('contact.endpointUrl')}:`, meta.endpointUrl,
+      '',
+      `${t('institutions.sushi.requestorId')}:`, meta.requestorId,
+      `${t('institutions.sushi.customerId')}:`, meta.customerId,
+      `${t('institutions.sushi.apiKey')}:`, meta.apiKey,
+      '',
+      ...parts,
+    ];
+  }
 
-        try {
-          await this.$axios.post('/contact', {
-            email: this.user?.email || this.email,
-            subject: this.subject?.text,
-            message,
-            browser: this.sendBrowser || this.subject.value === 'bugs' ? navigator.userAgent : null,
-          });
-          this.$store.dispatch('snacks/success', this.$t('contact.emailSent'));
+  if (subject.value === 'bugs' && meta.sendBrowser) {
+    data.browser = navigator.userAgent;
+  }
 
-          this.email = '';
-          this.subject = {};
-          this.message = '';
-          this.endpointVendor = '';
-          this.endpointUrl = '';
-          this.sendBrowser = true;
-          this.$refs.form.resetValidation();
-          this.loading = false;
-        } catch (e) {
-          this.$store.dispatch('snacks/error', this.$t('contact.failed'));
-          this.loading = false;
-        }
-      }
-    },
-  },
-};
+  loading.value = true;
+  try {
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: {
+        ...data,
+        message: parts.join('\n'),
+      },
+    });
+
+    snacks.success(t('contact.emailSent'));
+
+    resetForm();
+  } catch {
+    snacks.error(t('contact.failed'));
+  }
+  loading.value = false;
+}
+
+onMounted(() => {
+  resetForm();
+});
 </script>

@@ -34,6 +34,7 @@ const propsToPrismaInclude = (props, includableFields) => {
     ...propsToMap.map((prop) => {
       const [parent, ...children] = prop.split('.');
 
+      /** @type {true | { include?: Record<string, any> }} */
       let value = true;
       if (children?.length > 0) {
         value = { include: propsToPrismaInclude([children.join('.')]) };
@@ -47,32 +48,41 @@ const propsToPrismaInclude = (props, includableFields) => {
 /**
  * Transform props to sort into a valid prisma `sort` field
  *
- * @param {string} prop
- * @param {'asc'|'desc'} order
+ * @param {string[]} props
+ * @param {('asc'|'desc')[]} orders
  * @param {(string[] | Set<string>)?} [sortableFields]
  *
  * @returns {Record<string, any> | undefined}
  */
-const propsToPrismaSort = (prop, order, sortableFields) => {
-  if (!prop) {
+const propsToPrismaSort = (props, orders, sortableFields) => {
+  if (!Array.isArray(props)) {
     return undefined;
   }
 
+  let propsToMap = props;
   if (sortableFields && (Array.isArray(sortableFields) || sortableFields instanceof Set)) {
     const sortable = new Set(sortableFields);
-    if (sortable.has(prop)) {
-      return undefined;
+    propsToMap = propsToMap.filter((p) => sortable.has(p));
+  }
+
+  if (propsToMap.length <= 0) {
+    return undefined;
+  }
+
+  // sorting props to avoid subfields begin overrode by parents
+  propsToMap.sort((a, b) => a.length - b.length);
+  return propsToMap.map((prop, i) => {
+    const order = orders[i] || 'asc';
+    const [parent, ...children] = prop.split('.');
+
+    /** @type {string | Record<string, any> | undefined }} */
+    let value = order;
+    if (children?.length > 0) {
+      value = propsToPrismaSort([children.join('.')], [order])?.[0];
     }
-  }
 
-  const [parent, ...children] = prop.split('.');
-
-  let value = order;
-  if (children?.length > 0) {
-    value = propsToPrismaSort(children.join('.'), order);
-  }
-
-  return { [parent]: value };
+    return { [parent]: value };
+  });
 };
 
 /**
