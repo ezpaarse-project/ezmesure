@@ -89,7 +89,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "./vue3:/usr/src/app"
+      - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
       - NUXT_PUBLIC_CURRENT_INSTANCE=${EZMESURE_INSTANCE}

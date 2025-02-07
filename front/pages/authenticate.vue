@@ -1,175 +1,190 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
-    <v-row
-      align="center"
-      justify="center"
-    >
-      <v-col style="max-width: 600px">
-        <v-card class="elevation-12">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title>
-              {{ $t('authenticate.restrictedAccess') }}
-            </v-toolbar-title>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
+        <v-card elevation="10">
+          <v-card-title class="bg-primary d-flex">
+            {{ $t('authenticate.restrictedAccess') }}
+
             <v-spacer />
-            <v-icon>mdi-lock</v-icon>
-          </v-toolbar>
 
-          <v-expansion-panels accordion :value="provider">
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <div>
-                  <img
-                    src="/images/kibana-logo-color-horizontal.svg"
-                    alt="Kibana"
-                    height="35"
-                  >
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p>
-                  {{ $t('authenticate.kibanaAuth') }}
-                </p>
+            <v-icon icon="mdi-lock" />
+          </v-card-title>
 
-                <v-alert
-                  v-model="showError"
-                  dismissible
-                  prominent
-                  dense
-                  type="error"
-                >
-                  {{ errorMessage }}
-                </v-alert>
+          <v-card-text class="pa-0">
+            <v-expansion-panels variant="accordion" :value="provider">
+              <v-expansion-panel>
+                <v-expansion-panel-title>
+                  <div>
+                    <img
+                      src="/images/kibana_logo.svg"
+                      alt="Kibana"
+                      height="35"
+                    >
+                  </div>
+                </v-expansion-panel-title>
 
-                <v-form v-model="loginFormValid" class="mb-4" @submit.prevent="signin">
-                  <v-text-field
-                    v-model="username"
-                    :label="$t('authenticate.user')"
-                    :rules="[() => !!username || ($t('authenticate.fieldIsRequired'))]"
-                    prepend-inner-icon="mdi-account"
-                    outlined
-                    required
-                  />
+                <v-expansion-panel-text>
+                  <v-row>
+                    <v-col>
+                      <p>
+                        {{ $t('authenticate.kibanaAuth') }}
+                      </p>
+                    </v-col>
+                  </v-row>
 
-                  <v-text-field
-                    v-model="password"
-                    :label="$t('authenticate.password')"
-                    :type="showPassword ? 'text' : 'password'"
-                    :rules="[() => !!password || ($t('authenticate.fieldIsRequired'))]"
-                    prepend-inner-icon="mdi-lock"
-                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    outlined
-                    required
-                    @click:append="showPassword = !showPassword"
-                  />
+                  <v-row v-if="errorMessage">
+                    <v-col>
+                      <v-alert
+                        :text="errorMessage"
+                        type="error"
+                        density="compact"
+                        closable
+                        @update:model-value="() => (errorMessage = '')"
+                      />
+                    </v-col>
+                  </v-row>
+
+                  <v-form v-model="valid" class="mt-4" @submit.prevent="login()">
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                          v-model="credentials.username"
+                          :label="$t('authenticate.user')"
+                          :rules="[() => !!credentials.username || ($t('authenticate.fieldIsRequired'))]"
+                          prepend-icon="mdi-account"
+                          variant="underlined"
+                          required
+                        />
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                          v-model="credentials.password"
+                          :label="$t('authenticate.password')"
+                          :type="showPassword ? 'text' : 'password'"
+                          :rules="[() => !!credentials.password || ($t('authenticate.fieldIsRequired'))]"
+                          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                          prepend-icon="mdi-lock"
+                          variant="underlined"
+                          required
+                          @click:append="showPassword = !showPassword"
+                        />
+                      </v-col>
+                    </v-row>
+
+                    <v-row class="align-center">
+                      <v-col>
+                        <nuxt-link to="/password/reset">
+                          {{ $t('password.forgot') }}
+                        </nuxt-link>
+                      </v-col>
+
+                      <v-col style="text-align: end;">
+                        <v-btn
+                          :text="$t('authenticate.logIn')"
+                          :loading="loading"
+                          :disabled="!valid"
+                          color="primary"
+                          type="submit"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-form>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+
+              <v-expansion-panel v-if="config.shibbolethDisabled">
+                <v-expansion-panel-title>
+                  <div>
+                    <img
+                      src="/images/shibboleth_logo.png"
+                      alt="Shibboleth"
+                      height="40"
+                    >
+                  </div>
+                </v-expansion-panel-title>
+
+                <v-expansion-panel-text>
+                  <v-row>
+                    <v-col>
+                      <p>
+                        {{ $t('authenticate.logInWithProvider') }}
+                      </p>
+                    </v-col>
+                  </v-row>
 
                   <v-row>
-                    <a href="/password/reset" class="text-left ml-5 mt-2">
-                      {{ $t('password.forgot') }}
-                    </a>
-
-                    <v-spacer />
-
-                    <v-btn
-                      class="mr-5"
-                      color="primary"
-                      type="submit"
-                      :loading="connecting"
-                      :disabled="!loginFormValid"
-                    >
-                      {{ $t('authenticate.logIn') }}
-                    </v-btn>
+                    <v-col>
+                      <p class="text-center">
+                        <v-btn
+                          :text="$t('authenticate.logIn')"
+                          :href="`/login?origin=/myspace`"
+                          color="primary"
+                        />
+                      </p>
+                    </v-col>
                   </v-row>
-                </v-form>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <v-expansion-panel v-if="$config.shibbolethEnabled">
-              <v-expansion-panel-header>
-                <div>
-                  <img
-                    src="/images/shibboleth_logowordmark_color.png"
-                    alt="Shibboleth"
-                    height="40"
-                  >
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p>
-                  {{ $t('authenticate.logInWithProvider') }}
-                </p>
-
-                <p class="text-center">
-                  <v-btn
-                    color="primary"
-                    :href="`/login?origin=${$auth.$state.redirect || '/myspace'}`"
-                  >
-                    {{ $t('authenticate.logIn') }}
-                  </v-btn>
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-<script>
-export default {
-  middleware: ['auth'],
-  asyncData({ query, $config }) {
-    let provider = $config.shibbolethEnabled ? 1 : 0;
-    if (query?.provider === 'kibana') {
-      provider = 0;
+<script setup>
+definePageMeta({
+  auth: {
+    unauthenticatedOnly: true,
+  },
+});
+
+const { public: config } = useRuntimeConfig();
+const { t } = useI18n();
+const { signIn, status } = useAuth();
+const { query } = useRoute();
+
+if (status.value === 'authenticated') {
+  await navigateTo('/myspace');
+}
+
+let provider = config.shibbolethDisabled ? 0 : 1;
+if (query?.provider === 'kibana') {
+  provider = 0;
+}
+
+const valid = ref(false);
+const loading = ref(false);
+const showPassword = ref(false);
+const errorMessage = ref('');
+const credentials = ref({
+  username: '',
+  password: '',
+});
+
+async function login() {
+  loading.value = true;
+
+  try {
+    await signIn(credentials.value, { callbackUrl: '/myspace' });
+  } catch (err) {
+    if (!(err instanceof Error)) {
+      errorMessage.value = t('authenticate.failed');
+      return;
     }
 
-    return {
-      username: '',
-      password: '',
-      showError: false,
-      errorMessage: '',
-      loginFormValid: true,
-      connecting: false,
-      showPassword: false,
-      provider,
-    };
-  },
-  methods: {
-    async signin() {
-      this.connecting = true;
-      this.showError = false;
-      this.errorMessage = '';
+    if (err.statusCode >= 400 && err.statusCode < 500) {
+      errorMessage.value = t('authenticate.loginFailed');
+    } else {
+      errorMessage.value = t('authenticate.failed');
+    }
+  }
 
-      try {
-        await this.$auth.loginWith('local', {
-          data: {
-            username: this.username,
-            password: this.password,
-          },
-        });
-      } catch (err) {
-        const statusCode = (err.response && err.response.status) || 500;
-
-        if (statusCode >= 400 && statusCode < 500) {
-          this.errorMessage = this.$t('authenticate.loginFailed');
-          this.showError = true;
-        } else {
-          this.errorMessage = this.$t('authenticate.failed');
-          this.showError = true;
-        }
-      }
-
-      this.connecting = false;
-    },
-  },
-};
+  loading.value = false;
+}
 </script>

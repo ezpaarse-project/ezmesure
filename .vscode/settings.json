@@ -4,7 +4,7 @@
     "api",
     "front",
     "reporting",
-    "vue3"
+    "front"
   ],
   "eslint.validate": [
     "typescript",
@@ -21,10 +21,10 @@
     "reporting",
     "rp",
     "tools",
-    "vue3"
+    "front"
   ],
   // i18n-ally settings
-  "i18n-ally.localesPaths": "vue3/locales",
+  "i18n-ally.localesPaths": "front/locales",
   "i18n-ally.enabledFrameworks": [
     "vue"
   ],

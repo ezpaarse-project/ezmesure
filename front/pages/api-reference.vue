@@ -1,31 +1,32 @@
 <template>
-  <v-container>
-    <div id="swagger" />
+  <v-container style="height: 100%;">
+    <iframe
+      ref="iframe"
+      title="Swagger UI"
+      width="100%"
+      height="100%"
+      frameborder="0"
+    />
   </v-container>
 </template>
 
-<script>
-import SwaggerUI from 'swagger-ui';
+<script setup>
+import setupSwaggerUI from '@/lib/swaggerUI';
 
-export default {
-  mounted() {
-    SwaggerUI({
-      url: '/api/openapi.json',
-      dom_id: '#swagger',
-      deepLinking: false,
-      docExpansion: 'none',
-    });
-  },
-};
+const iframe = ref(null);
+
+function setupIframe() {
+  if (!iframe.value) {
+    return;
+  }
+
+  const doc = iframe.value.contentWindow.document;
+  doc.open();
+  doc.write(setupSwaggerUI());
+  doc.close();
+}
+
+onMounted(() => {
+  setupIframe();
+});
 </script>
-
-<style>
-  #swagger .info {
-    background-color: transparent !important;
-    border-color: transparent !important;
-  }
-  #swagger .col {
-    width: auto;
-    max-width: 20%;
-  }
-</style>

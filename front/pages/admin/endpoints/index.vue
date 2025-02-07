@@ -1,785 +1,346 @@
 <template>
-  <section>
-    <ToolBar :title="toolbarTitle">
-      <v-spacer />
-
-      <v-btn
-        text
-        @click.stop="createEndpoint"
-      >
-        <v-icon left>
-          mdi-plus
-        </v-icon>
-        {{ $t('add') }}
-      </v-btn>
-
-      <v-btn
-        :loading="refreshing"
-        text
-        @click.stop="refreshSushiEndpoints"
-      >
-        <v-icon left>
-          mdi-refresh
-        </v-icon>
-        {{ $t('refresh') }}
-      </v-btn>
-
-      <v-btn
-        text
-        color="black"
-        @click="showEndpointFiltersDrawer = true"
-      >
-        <v-badge
-          :value="filtersCount > 0"
-          :content="filtersCount"
-          overlap
-          left
-        >
-          <v-icon>
-            mdi-filter
-          </v-icon>
-        </v-badge>
-        {{ $t('filter') }}
-      </v-btn>
-
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        :label="$t('search')"
-        solo
-        dense
-        hide-details
-        autocomplete="off"
-        style="max-width: 200px"
-      />
-    </ToolBar>
-
-    <v-container fluid>
-      <div>{{ $t('endpoints.pageDescription') }}</div>
-      <div><strong>{{ $t('endpoints.pageDescription2') }}</strong></div>
-    </v-container>
-
-    <EndpointForm
-      ref="endpointForm"
-      :available-tags="availableTags"
-      @update="refreshSushiEndpoints"
-    />
-
-    <v-menu nudge-width="100" style="z-index:100" top offset-y>
-      <template #activator="{ on, attrs }">
-        <v-slide-y-reverse-transition>
-          <v-btn
-            v-show="hasSelection"
-            fixed
-            bottom
-            right
-            large
-            color="primary"
-            style="z-index:50; transition: bottom .3s ease"
-            :style="hasSnackMessages && 'bottom:70px'"
-            v-bind="attrs"
-            v-on="on"
-          >
-            {{ $tc('endpoints.manageNendpoints', selected.length) }}
-            <v-icon right>
-              mdi-chevron-down
-            </v-icon>
-          </v-btn>
-        </v-slide-y-reverse-transition>
+  <div>
+    <SkeletonPageBar
+      v-model="query"
+      :title="toolbarTitle"
+      :refresh="refresh"
+      search
+      icons
+      @update:model-value="debouncedRefresh()"
+    >
+      <template #filters-panel="props">
+        <SushiEndpointFilters v-bind="props" />
       </template>
 
-      <v-list>
-        <v-list-item
-          v-if="hasNonValidatedInSelection"
-          :disabled="validating"
-          @click="setEndpointsValidation(true)"
-        >
-          <v-list-item-icon>
-            <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t('validate') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-btn
+        v-if="endpointFormDialogRef"
+        v-tooltip="$t('add')"
+        icon="mdi-plus"
+        variant="tonal"
+        density="comfortable"
+        color="green"
+        class="mr-2"
+        @click="endpointFormDialogRef.open()"
+      />
+    </SkeletonPageBar>
 
-        <v-list-item
-          v-if="hasValidatedInSelection"
-          :disabled="validating"
-          @click="setEndpointsValidation(false)"
-        >
-          <v-list-item-icon>
-            <v-icon>mdi-checkbox-marked-circle-outline</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t('invalidate') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item :disabled="deleting" @click="deleteEndpoints()">
-          <v-list-item-icon>
-            <v-icon>mdi-delete</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t('delete') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item @click="clearSelection">
-          <v-list-item-icon>
-            <v-icon>mdi-close</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t('deselect') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-menu>
-
-    <v-data-table
-      v-model="selected"
-      :headers="tableHeaders"
-      :items="endpoints"
-      :loading="refreshing"
-      :search="search"
-      :items-per-page="50"
-      :footer-props="{ itemsPerPageOptions: [10, 20, 50, -1] }"
-      :item-class="(item) => !item?.active && 'grey lighten-3 grey--text'"
+    <v-data-table-server
+      v-model="selectedEndpoints"
+      :headers="headers"
       show-select
       show-expand
-      single-expand
-      item-key="id"
-      sort-by="vendor"
-      @pagination="currentItemCount = $event.itemsLength"
+      return-object
+      v-bind="vDataTableOptions"
     >
-      <template #expanded-item="{ headers, item }">
-        <td />
-        <td :colspan="headers.length - 1" class="py-4">
-          <EndpointDetails :item="item" />
-        </td>
-      </template>
-
-      <template #[`item.disabledUntil`]="{ item }">
-        <EndpointDisabledIcon :endpoint="item" />
-      </template>
-
-      <template #[`item.active`]="{ item }">
-        <v-tooltip left open-on-hover>
-          <template #activator="{ on, attrs }">
-            <div
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-switch
-                :input-value="item.active"
-                :label="item.active
-                  ? $t('endpoints.active')
-                  : $t('endpoints.inactive')"
-                :loading="activeLoadingMap[item.id]"
-                hide-details
-                role="switch"
-                class="mt-0"
-                dense
-                style="transform: scale(0.8);"
-                @change="toggleEndpointActiveState(item)"
-              />
-            </div>
-          </template>
-
-          <i18n :path="`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`" tag="span">
-            <template #date>
-              <LocalDate :date="item.activeUpdatedAt" />
-            </template>
-          </i18n>
-        </v-tooltip>
-      </template>
-
-      <template #[`item.tags`]="{ item }">
+      <template #[`item.tags`]="{ value }">
         <v-chip
-          v-for="(tag, index) in item.tags"
+          v-for="(tag, index) in value"
           :key="index"
-          label
-          small
+          variant="outlined"
           color="primary"
-          outlined
+          size="small"
+          label
           class="ml-1"
         >
           {{ tag }}
         </v-chip>
       </template>
 
-      <template #[`item.credentials`]="{ item }">
-        <v-menu
-          :disabled="!Array.isArray(item.credentials) || item.credentials?.length <= 0"
-          transition="slide-y-transition"
-          nudge-bottom="2"
-          open-on-hover
-          left
-          offset-x
-        >
-          <template #activator="{ on, attrs }">
-            <v-chip
-              :outlined="item.credentials?.length <= 0"
-              :to="`/admin/endpoints/${item.id}/sushi`"
-              small
-              class="elevation-1"
-              v-bind="attrs"
-              v-on="on"
-            >
-              {{ $tc('sushi.credentialsCount', item.credentials?.length) }}
+      <template #[`item.disabledUntil`]="{ item }">
+        <SushiEndpointDisabledChip :model-value="item" />
+      </template>
 
-              <v-icon right small>
-                mdi-key
-              </v-icon>
-            </v-chip>
-          </template>
+      <template #[`item.credentials`]="{ value, item }">
+        <SushiCountChip
+          :model-value="value"
+          :to="`/admin/endpoints/${item.id}`"
+        />
+      </template>
 
-          <v-card height="150" width="150">
-            <v-card-text class="progress-menu">
-              <ProgressCircularStack
-                :value="credentialsStatuses.get(item.id) ?? []"
-                :labels="[
-                  `${item.id}-success`,
-                  `${item.id}-unauthorized`,
-                  `${item.id}-failed`,
-                ]"
-                size="100"
-              >
-                <template #[`default.${item.id}-success`]="{ value }">
-                  <v-chip color="success" small style="margin: 1px 0">
-                    {{ value }}
-
-                    <v-icon right small>
-                      mdi-check
-                    </v-icon>
-                  </v-chip>
-                </template>
-
-                <template #[`default.${item.id}-unauthorized`]="{ value }">
-                  <v-chip color="warning" small style="margin: 1px 0">
-                    {{ value }}
-
-                    <v-icon right small>
-                      mdi-key-alert-outline
-                    </v-icon>
-                  </v-chip>
-                </template>
-
-                <template #[`default.${item.id}-failed`]="{ value }">
-                  <v-chip color="error" small style="margin: 1px 0">
-                    {{ value }}
-
-                    <v-icon right small>
-                      mdi-alert-circle
-                    </v-icon>
-                  </v-chip>
-                </template>
-              </ProgressCircularStack>
-            </v-card-text>
-          </v-card>
-        </v-menu>
+      <template #[`item.active`]="{ item }">
+        <v-switch
+          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
+          :model-value="item.active"
+          :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
+          :loading="activeLoadingMap.get(item.id)"
+          density="compact"
+          color="primary"
+          hide-details
+          class="mt-0"
+          style="transform: scale(0.8);"
+          @update:model-value="toggleActiveStates([item])"
+        />
       </template>
 
       <template #[`item.actions`]="{ item }">
         <v-menu>
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props: menu }">
             <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>
-                mdi-cog
-              </v-icon>
-            </v-btn>
+              icon="mdi-cog"
+              variant="plain"
+              density="compact"
+              v-bind="menu"
+            />
           </template>
 
           <v-list>
             <v-list-item
-              v-for="action in itemActions"
-              :key="action.icon"
-              @click="action.callback(item)"
-            >
-              <v-list-item-icon>
-                <v-icon>{{ action.icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ action.label }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+              v-if="endpointFormDialogRef"
+              :title="$t('modify')"
+              prepend-icon="mdi-pencil"
+              @click="endpointFormDialogRef.open(item)"
+            />
+            <v-list-item
+              v-if="endpointFormDialogRef"
+              :title="$t('duplicate')"
+              prepend-icon="mdi-content-copy"
+              @click="endpointFormDialogRef.open({ ...item, id: null })"
+            />
+            <v-list-item
+              :title="$t('delete')"
+              prepend-icon="mdi-delete"
+              @click="deleteEndpoints([item])"
+            />
+
+            <v-divider />
+
+            <v-list-item
+              v-if="clipboard"
+              :title="$t('copyId')"
+              prepend-icon="mdi-identifier"
+              @click="copyEndpointId(item)"
+            />
           </v-list>
         </v-menu>
       </template>
-    </v-data-table>
 
-    <EndpointsFiltersDrawer
-      v-model="filters"
-      :show.sync="showEndpointFiltersDrawer"
-      :search="search"
-      :max-credentials-count="maxCounts.credentials"
-      :max-credentials-status-counts="maxCounts.credentialsStatuses"
+      <template #expanded-row="{ columns, item }">
+        <tr>
+          <td :colspan="columns.length">
+            <SushiEndpointDetails :model-value="item" />
+          </td>
+        </tr>
+      </template>
+    </v-data-table-server>
+
+    <SelectionMenu
+      v-model="selectedEndpoints"
+      :text="$t('endpoints.manageEndpoints', selectedEndpoints.length)"
+    >
+      <template #actions>
+        <v-list-item
+          :title="$t('delete')"
+          prepend-icon="mdi-delete"
+          @click="deleteEndpoints()"
+        />
+
+        <v-divider />
+
+        <v-list-item
+          :title="$t('institutions.sushi.activeSwitch')"
+          prepend-icon="mdi-toggle-switch"
+          @click="toggleActiveStates()"
+        />
+      </template>
+    </SelectionMenu>
+
+    <SushiEndpointFormDialog
+      ref="endpointFormDialogRef"
+      @submit="refresh()"
     />
-    <ConfirmDialog ref="confirmDialog" />
-  </section>
+  </div>
 </template>
 
-<script>
-import ToolBar from '~/components/space/ToolBar.vue';
-import EndpointForm from '~/components/EndpointForm.vue';
-import EndpointDetails from '~/components/EndpointDetails.vue';
-import EndpointsFiltersDrawer from '~/components/endpoints/EndpointsFiltersDrawer.vue';
-import EndpointDisabledIcon from '~/components/endpoints/EndpointDisabledIcon.vue';
-import ConfirmDialog from '~/components/ConfirmDialog.vue';
-import ProgressCircularStack from '~/components/ProgressCircularStack.vue';
-import LocalDate from '~/components/LocalDate.vue';
+<script setup>
+definePageMeta({
+  layout: 'admin',
+  middleware: ['sidebase-auth', 'terms', 'admin'],
+});
 
-export default {
-  layout: 'space',
-  middleware: ['auth', 'terms', 'isAdmin'],
-  components: {
-    ToolBar,
-    EndpointForm,
-    EndpointDetails,
-    ConfirmDialog,
-    ProgressCircularStack,
-    EndpointsFiltersDrawer,
-    EndpointDisabledIcon,
-    LocalDate,
+const { t, locale } = useI18n();
+const { isSupported: clipboard, copy } = useClipboard();
+const { openConfirm } = useDialogStore();
+const snacks = useSnacksStore();
+
+const selectedEndpoints = ref([]);
+const activeLoadingMap = ref(new Map());
+
+const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
+
+const {
+  refresh,
+  itemLength,
+  query,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/sushi-endpoints',
   },
-  data() {
-    return {
-      endpoints: [],
-      selected: [],
-      refreshing: false,
-      deleting: false,
-      validating: false,
-      search: '',
-      activeLoadingMap: {},
-      currentItemCount: 0,
-
-      filters: {},
-      showEndpointFiltersDrawer: false,
-    };
+  sortMapping: {
+    institutions: 'institutions._count',
+    credentials: 'credentials._count',
   },
-  computed: {
-    toolbarTitle() {
-      if (this.hasSelection) {
-        return this.$t('nSelected', { count: this.selected.length });
+  data: {
+    sortBy: [{ key: 'vendor', order: 'asc' }],
+    include: ['credentials'],
+  },
+});
+
+/**
+ * Table headers
+ */
+const headers = computed(() => [
+  {
+    title: t('endpoints.vendor'),
+    value: 'vendor',
+    sortable: true,
+  },
+  {
+    title: t('endpoints.tags'),
+    value: 'tags',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('endpoints.disabledUntil'),
+    value: 'disabledUntil',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('sushi.credentials'),
+    value: 'credentials',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('status'),
+    value: 'active',
+    align: 'center',
+    sortable: true,
+    minWidth: '175px',
+  },
+  {
+    title: t('actions'),
+    value: 'actions',
+    align: 'center',
+  },
+]);
+/**
+ * Toolbar title
+ */
+const toolbarTitle = computed(() => {
+  let count = `${itemLength.value.current}`;
+  if (itemLength.value.current !== itemLength.value.total) {
+    count = `${itemLength.value.current}/${itemLength.value.total}`;
+  }
+  return t('endpoints.toolbarTitle', { count: count ?? '?' });
+});
+
+/**
+ * Debounced refresh
+ */
+const debouncedRefresh = useDebounceFn(refresh, 250);
+
+/**
+ * Toggle active states for selected endpoints
+ *
+ * @param {any[]} items Endpoints to toggle, defaults to selected
+ */
+async function toggleActiveStates(items) {
+  const toToggle = items || selectedEndpoints.value;
+  if (toToggle.length <= 0) {
+    return;
+  }
+
+  await Promise.all(
+    toToggle.map(async (item) => {
+      activeLoadingMap.value.set(item.id, true);
+      try {
+        const active = !item.active;
+        // eslint-disable-next-line no-await-in-loop
+        await $fetch(`/api/sushi-endpoints/${item.id}`, {
+          method: 'PATCH',
+          body: { active },
+        });
+
+        // eslint-disable-next-line no-param-reassign
+        item.active = active;
+        activeLoadingMap.value.set(item.id, false);
+        return item;
+      } catch {
+        snacks.error(t('endpoints.unableToUpdate'));
+        activeLoadingMap.value.set(item.id, false);
+        return null;
       }
+    }),
+  );
 
-      let count = this.endpoints?.length;
-      if (count != null && this.currentItemCount !== count) {
-        count = `${this.currentItemCount}/${count}`;
-      }
+  if (!items) {
+    selectedEndpoints.value = [];
+  }
+}
 
-      return this.$t('endpoints.title', { count: count ?? '?' });
-    },
-    hasSnackMessages() {
-      const messages = this.$store?.state?.snacks?.messages;
-      return Array.isArray(messages) && messages.length >= 1;
-    },
-    availableTags() {
-      const tags = new Set(this.endpoints.flatMap((e) => (Array.isArray(e?.tags) ? e.tags : [])));
-      return Array.from(tags);
-    },
-    tableHeaders() {
-      return [
-        {
-          text: this.$t('endpoints.vendor'),
-          value: 'vendor',
-        },
-        {
-          text: this.$t('endpoints.tags'),
-          value: 'tags',
-          align: 'center',
-          width: '200px',
-        },
-        {
-          text: this.$t('endpoints.disabledUntil'),
-          value: 'disabledUntil',
-          align: 'center',
-          width: '200px',
-        },
-        {
-          text: this.$t('sushi.credentials'),
-          value: 'credentials',
-          align: 'center',
-          width: '200px',
-          filter: (_value, _search, item) => this.columnCredentialsFilter(item),
-        },
-        {
-          text: this.$t('endpoints.active'),
-          value: 'active',
-          align: 'center',
-          width: '130px',
-        },
-        {
-          text: this.$t('actions'),
-          value: 'actions',
-          sortable: false,
-          width: '85px',
-          align: 'center',
-        },
-      ];
-    },
-    hasSelection() {
-      return this.selected.length > 0;
-    },
-    hasValidatedInSelection() {
-      return this.selected.some((endpoint) => endpoint?.validated);
-    },
-    hasNonValidatedInSelection() {
-      return this.selected.some((endpoint) => !endpoint?.validated);
-    },
-    itemActions() {
-      return [
-        {
-          icon: 'mdi-pencil',
-          label: this.$t('modify'),
-          callback: this.editEndpoint,
-        },
-        {
-          icon: 'mdi-content-copy',
-          label: this.$t('duplicate'),
-          callback: this.duplicateItem,
-        },
-        {
-          icon: 'mdi-identifier',
-          label: this.$t('sushi.copyId'),
-          callback: this.copyId,
-        },
-      ];
-    },
-    credentialsStatuses() {
-      const entries = this.endpoints.map(
-        (e) => {
-          const credentials = e.credentials ?? [];
-          const total = credentials.length || 1;
+/**
+ * Delete multiple endpoints
+ *
+ * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
+ */
+function deleteEndpoints(items) {
+  const toDelete = items || selectedEndpoints.value;
+  if (toDelete.length <= 0) {
+    return;
+  }
 
-          const statuses = credentials.reduce(
-            (acc, { connection }) => {
-              const { status } = connection ?? {};
-              if (status) {
-                acc[status] += 1;
-              }
-              return acc;
-            },
-            {
-              success: 0,
-              unauthorized: 0,
-              failed: 0,
-            },
-          );
-
-          return [
-            e.id,
-            [
-              {
-                key: `${e.id}-success`,
-                label: statuses.success,
-                value: statuses.success / total,
-                color: 'success',
-              },
-              {
-                key: `${e.id}-unauthorized`,
-                label: statuses.unauthorized,
-                value: statuses.unauthorized / total,
-                color: 'warning',
-              },
-              {
-                key: `${e.id}-failed`,
-                label: statuses.failed,
-                value: statuses.failed / total,
-                color: 'error',
-              },
-            ],
-          ];
-        },
+  openConfirm({
+    title: t('areYouSure'),
+    text: t(
+      'endpoints.deleteNbEndpoints',
+      toDelete.length,
+    ),
+    agreeText: t('delete'),
+    agreeIcon: 'mdi-delete',
+    onAgree: async () => {
+      const results = await Promise.all(
+        toDelete.map((item) => {
+          try {
+            return $fetch(`/api/sushi-endpoints/${item.id}`, { method: 'DELETE' });
+          } catch {
+            snacks.error(t('cannotDeleteItem', { id: item.id }));
+            return Promise.resolve(null);
+          }
+        }),
       );
 
-      return new Map(entries);
-    },
-    /**
-     * Get the count of filters with value
-     *
-     * @returns {number} The count of active filters
-     */
-    filtersCount() {
-      return Object.values(this.filters)
-        .reduce(
-          (prev, filterDesc) => {
-            const filter = filterDesc?.value;
-            // skipping if undefined or empty
-            if (filter == null || filter === '') {
-              return prev;
-            }
-            // skipping if empty array
-            if (Array.isArray(filter) && filter.length <= 0) {
-              return prev;
-            }
-
-            return prev + 1;
-          },
-          0,
-        );
-    },
-    /**
-     * Compute maximum count of properties
-     *
-     * @returns {Record<string, number>}
-     */
-    maxCounts() {
-      const counters = {
-        credentials: 0,
-        credentialsStatuses: {
-          success: 0,
-          unauthorized: 0,
-          failed: 0,
-        },
-      };
-
-      const getCredentialsStatusesCount = (credentials) => {
-        const credentialsStatuses = {
-          success: 0,
-          unauthorized: 0,
-          failed: 0,
-        };
-        // eslint-disable-next-line no-restricted-syntax
-        for (const c of (credentials ?? [])) {
-          const { status } = c.connection ?? {};
-          if (status) {
-            credentialsStatuses[status] += 1;
-          }
-        }
-        return credentialsStatuses;
-      };
-
-      const setCounter = (property, endpoint) => {
-        counters[property] = Math.max(counters[property], endpoint[property]?.length);
-      };
-
-      const setCredentialsStatusCounter = (property, statuses) => {
-        counters.credentialsStatuses[property] = Math.max(
-          counters.credentialsStatuses[property],
-          statuses[property],
-        );
-      };
-
-      // eslint-disable-next-line no-restricted-syntax
-      for (const endpoint of this.endpoints) {
-        setCounter('credentials', endpoint);
-
-        const statuses = getCredentialsStatusesCount(endpoint.credentials);
-        setCredentialsStatusCounter('success', statuses);
-        setCredentialsStatusCounter('unauthorized', statuses);
-        setCredentialsStatusCounter('failed', statuses);
+      if (!results.some((r) => !r)) {
+        snacks.success(t('itemsDeleted', { count: toDelete.length }));
       }
 
-      return counters;
-    },
-  },
-  mounted() {
-    return this.refreshSushiEndpoints();
-  },
-  methods: {
-    /**
-     * Filter for credentials column using filters
-     *
-     * @param {*} item The item
-     *
-     * @return {boolean} If the item must be showed or not
-     */
-    columnCredentialsFilter(item) {
-      return this.columnArrayFilter('credentials', item) && this.columnSushiFilter(item);
-    },
-    /**
-     * Filter for array column using filters
-     *
-     * @param {string} field The filter's field
-     * @param {*} item The item
-     *
-     * @return {boolean} If the item must be showed or not
-     */
-    columnArrayFilter(field, item) {
-      const rangeField = `${field}Range`;
-      const range = this.filters?.[rangeField]?.value;
-      if (range == null || !Array.isArray(item[field])) {
-        return true;
+      if (!items) {
+        selectedEndpoints.value = [];
       }
 
-      const value = item[field].length;
-      return range[0] <= value && value <= range[1];
+      await refresh();
     },
-    /**
-     * Apply sushi filters to given item
-     *
-     * @param {*} item The item
-     *
-     * @return {boolean} Should item be shown
-     */
-    columnSushiFilter(item) {
-      const credentials = this.credentialsStatuses.get(item.id);
-      if (!credentials) {
-        return false;
-      }
-
-      const isInRange = (field, value) => {
-        const range = this.filters[field]?.value;
-        if (!range) {
-          return true;
-        }
-        return range[0] <= value && value <= range[1];
-      };
-
-      const [success, unauthorized, failed] = credentials;
-      const isSuccessInRange = isInRange('credsSuccessRange', success.label);
-      const isUnauthorizedInRange = isInRange('credsUnauthorizedRange', unauthorized.label);
-      const isFailedInRange = isInRange('credsFailedRange', failed.label);
-      return isUnauthorizedInRange && isSuccessInRange && isFailedInRange;
-    },
-    async copyId(item) {
-      if (!navigator.clipboard) {
-        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(item.id);
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('unableToCopyId'));
-        return;
-      }
-
-      this.$store.dispatch('snacks/info', this.$t('idCopied'));
-    },
-    showAvailableReports(item) {
-      this.$refs.reportsDialog.showReports(item);
-    },
-    createEndpoint() {
-      this.$refs.endpointForm.createEndpoint();
-    },
-    editEndpoint(item) {
-      this.$refs.endpointForm.editEndpoint(item);
-    },
-    duplicateItem(item) {
-      this.$refs.endpointForm.editEndpoint({ ...item, id: undefined });
-    },
-    async refreshSushiEndpoints() {
-      this.refreshing = true;
-
-      try {
-        this.endpoints = await this.$axios.$get('/sushi-endpoints', { params: { include: ['credentials'], size: 0 } });
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('endpoints.unableToRetriveEndpoints'));
-      }
-
-      this.refreshing = false;
-    },
-
-    clearSelection() {
-      this.selected = [];
-    },
-
-    async toggleEndpointActiveState(item) {
-      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: true };
-
-      const active = !item.active;
-
-      try {
-        await this.$axios.$patch(`/sushi-endpoints/${item.id}`, { active });
-
-        const index = this.endpoints.findIndex((i) => i.id === item.id);
-
-        if (index >= 0) {
-          this.endpoints.splice(index, 1, { ...item, active });
-        }
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('endpoints.unableToUpdate'));
-      }
-
-      this.activeLoadingMap = { ...this.activeLoadingMap, [item.id]: false };
-    },
-
-    async deleteEndpoints(items) {
-      const endpoints = items || this.selected;
-      if (endpoints.length === 0) {
-        return;
-      }
-
-      const confirmed = await this.$refs.confirmDialog?.open({
-        title: this.$t('areYouSure'),
-        message: this.$tc(
-          'endpoints.deleteNbEndpoints',
-          endpoints.length,
-        ),
-        agreeText: this.$t('delete'),
-        agreeIcon: 'mdi-delete',
-      });
-
-      if (!confirmed) {
-        return;
-      }
-      this.removing = true;
-
-      const requests = endpoints.map(async (item) => {
-        let deleted = false;
-        try {
-          await this.$axios.$delete(`/sushi-endpoints/${item.id}`);
-          deleted = true;
-        } catch (e) {
-          deleted = false;
-        }
-        return { item, deleted };
-      });
-
-      const results = await Promise.all(requests);
-
-      const { deleted, failed } = results.reduce((acc, result) => {
-        const { item } = result;
-
-        if (result.deleted) {
-          acc.deleted.push(item);
-        } else {
-          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.name || item.id }));
-          acc.failed.push(item);
-        }
-        return acc;
-      }, { deleted: [], failed: [] });
-
-      if (failed.length > 0) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
-      }
-      if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
-      }
-
-      this.removing = false;
-      this.show = false;
-      const removedIds = deleted.map((d) => d.id);
-
-      const removeDeleted = (endpoint) => !removedIds.some((id) => endpoint.id === id);
-      this.endpoints = this.endpoints.filter(removeDeleted);
-      this.selected = this.selected.filter(removeDeleted);
-    },
-  },
-};
-</script>
-
-<style scoped>
-.progress-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  });
 }
-</style>
+
+/**
+ * Put endpoint ID into clipboard
+ *
+ * @param {object} param0 Endpoint
+ */
+async function copyEndpointId({ id }) {
+  if (!id) {
+    return;
+  }
+
+  try {
+    await copy(id);
+  } catch {
+    snacks.error(t('clipboard.unableToCopy'));
+    return;
+  }
+  snacks.info(t('clipboard.textCopied'));
+}
+</script>

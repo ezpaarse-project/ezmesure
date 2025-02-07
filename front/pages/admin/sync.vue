@@ -1,78 +1,54 @@
 <template>
-  <section>
-    <ToolBar :title="$t('menu.sync')">
-      <v-chip v-if="syncState.startedAt" small outlined class="ml-2">
-        <v-icon left small>
-          mdi-calendar-blank
-        </v-icon>
+  <div>
+    <SkeletonPageBar
+      :refresh="refresh"
+      icons
+      @update:model-value="debouncedRefresh()"
+    >
+      <template #title>
+        {{ $t('menu.sync') }}
 
-        {{ startedAt }}
-      </v-chip>
+        <v-chip
+          v-if="syncState?.data?.startedAt"
+          :text="startedAt"
+          prepend-icon="mdi-calendar-blank"
+          size="small"
+          variant="outlined"
+          class="ml-2"
+        />
 
-      <v-chip v-if="syncState.runningTime" small outlined class="ml-2">
-        <v-icon left small>
-          mdi-timer-outline
-        </v-icon>
-
-        {{ runningTime }}
-      </v-chip>
-
-      <v-spacer />
-
-      <v-btn
-        color="primary"
-        text
-        :disabled="synchronizing"
-        @click.stop="startSync"
-      >
-        <v-icon left>
-          mdi-play
-        </v-icon>
-
-        {{ $t('sync.start') }}
-      </v-btn>
+        <v-chip
+          v-if="syncState?.data?.runningTime"
+          :text="runningTime"
+          prepend-icon="mdi-timer-outline"
+          size="small"
+          variant="outlined"
+          class="ml-2"
+        />
+      </template>
 
       <v-btn
+        v-tooltip="$t('sync.start')"
+        :disabled="isSynchronizing"
+        icon="mdi-play"
         color="primary"
-        text
-        :loading="refreshing"
-        @click.stop="refreshAll"
-      >
-        <v-icon left>
-          mdi-refresh
-        </v-icon>
-        {{ $t('refresh') }}
-      </v-btn>
-    </ToolBar>
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
+        @click="startSync()"
+      />
+    </SkeletonPageBar>
 
     <v-container>
       <v-row>
         <v-col>
-          <v-alert
-            :color="status.color || 'primary'"
-            prominent
-            style="color: white;"
-          >
-            <template v-if="synchronizing || status.icon" #prepend>
-              <div class="mr-4">
-                <v-progress-circular
-                  v-if="synchronizing"
-                  size="32"
-                  indeterminate
-                />
-                <v-icon v-else color="white" size="32">
-                  {{ status.icon }}
-                </v-icon>
-              </div>
+          <v-alert prominent v-bind="statusAlert">
+            <template v-if="isSynchronizing" #prepend>
+              <v-progress-circular
+                size="44"
+                indeterminate
+              />
             </template>
-
-            <h2>
-              {{ status.label || $t(`sync.status.${syncState.status}`) }}
-            </h2>
-
-            <div v-if="status.description">
-              {{ status.description }}
-            </div>
           </v-alert>
         </v-col>
       </v-row>
@@ -84,12 +60,12 @@
           </div>
 
           <v-row>
-            <v-col style="max-width: 300px;">
+            <v-col cols="6">
               <SyncCard
-                :label="$t('sync.spaces')"
-                :value="syncState.result?.spaces ?? {}"
-                :expected="expectedData.spaces ?? 0"
-                :synchronizing="synchronizing"
+                :title="$t('sync.spaces')"
+                :value="syncState?.data?.result?.spaces ?? {}"
+                :expected="syncState?.expected?.spaces ?? 0"
+                :loading="isSynchronizing"
               />
             </v-col>
           </v-row>
@@ -101,21 +77,21 @@
           </div>
 
           <v-row>
-            <v-col style="max-width: 300px;">
+            <v-col cols="6">
               <SyncCard
-                :label="$t('sync.repositories')"
-                :value="syncState.result?.repositories ?? {}"
-                :expected="expectedData.repositories ?? 0"
-                :synchronizing="synchronizing"
+                :title="$t('sync.repositories')"
+                :value="syncState?.data?.result?.repositories ?? {}"
+                :expected="syncState?.expected?.repositories ?? 0"
+                :loading="isSynchronizing"
               />
             </v-col>
 
-            <v-col style="max-width: 300px;">
+            <v-col cols="6">
               <SyncCard
-                :label="$t('sync.users')"
-                :value="syncState.result?.users ?? {}"
-                :expected="expectedData.users ?? 0"
-                :synchronizing="synchronizing"
+                :title="$t('sync.users')"
+                :value="syncState?.data?.result?.users ?? {}"
+                :expected="syncState?.expected?.users ?? 0"
+                :loading="isSynchronizing"
               />
             </v-col>
           </v-row>
@@ -124,165 +100,119 @@
 
       <v-spacer class="py-4" />
 
-      <div class="text-overline primary--text">
-        ezREEPORT
-      </div>
-
       <v-row>
-        <v-col style="max-width: 300px;">
-          <SyncCard
-            :label="$t('sync.ezreeportUsers')"
-            :value="syncState.result?.ezreeportUsers ?? {}"
-            :expected="expectedData.users ?? 0"
-            :synchronizing="synchronizing"
-          />
-        </v-col>
+        <v-col cols="6">
+          <div class="text-overline primary--text">
+            ezREEPORT
+          </div>
 
-        <v-col style="max-width: 300px;">
-          <SyncCard
-            :label="$t('sync.ezreeportNamespaces')"
-            :value="syncState.result?.ezreeportNamespaces ?? {}"
-            :expected="expectedData.institutions ?? 0"
-            :synchronizing="synchronizing"
-          />
+          <v-row>
+            <v-col cols="6">
+              <SyncCard
+                :title="$t('sync.ezreeportUsers')"
+                :value="syncState?.data?.result?.ezreeportUsers ?? {}"
+                :expected="syncState?.expected?.users ?? 0"
+                :loading="isSynchronizing"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <SyncCard
+                :title="$t('sync.ezreeportNamespaces')"
+                :value="syncState?.data?.result?.ezreeportNamespaces ?? {}"
+                :expected="syncState?.expected?.institutions ?? 0"
+                :loading="isSynchronizing"
+              />
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
-  </section>
+  </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import ToolBar from '~/components/space/ToolBar.vue';
-import SyncCard from '../../components/SyncCard.vue';
-
-export default defineComponent({
-  layout: 'space',
-  middleware: ['auth', 'terms', 'isAdmin'],
-  components: {
-    ToolBar,
-    SyncCard,
-  },
-  data: () => ({
-    refreshing: false,
-
-    syncState: {},
-    expectedData: {},
-  }),
-  computed: {
-    synchronizing() { return this.syncState.status === 'synchronizing'; },
-    startedAt() {
-      const date = new Date(this.syncState.startedAt);
-      return this.$t(
-        'sync.startedAt',
-        { date: this.$dateFunctions.format(date, 'PPPpp') },
-      );
-    },
-    runningTime() {
-      return this.$t(
-        'sync.running',
-        { time: this.$dateFunctions.msToLocalDistance(this.syncState.runningTime) },
-      );
-    },
-    states() {
-      return {
-        idle: {
-          color: 'orange',
-          icon: 'mdi-alert',
-          label: this.$t('sync.status.notSynced'),
-          description: this.$t('sync.description.notSynced'),
-        },
-        synchronizing: {
-          color: 'blue',
-        },
-        completed: {
-          color: 'green',
-          icon: 'mdi-check',
-          description: this.$t('sync.description.completed'),
-        },
-        error: {
-          color: 'red',
-          icon: 'mdi-alert-circle',
-          label: this.$t('sync.status.error'),
-          description: this.$t('sync.description.error'),
-        },
-      };
-    },
-    status() {
-      const status = this.syncState.hasErrors && !this.synchronizing
-        ? 'error'
-        : this.syncState.status;
-
-      return this.states[status] || this.states.idle;
-    },
-  },
-  mounted() {
-    this.refreshAll();
-  },
-  methods: {
-    async refreshAll() {
-      await Promise.all([
-        this.refreshState(),
-        this.refreshExpected(),
-      ]);
-    },
-    async refreshExpected() {
-      const getData = (url, params = {}) => this.$axios.$get(
-        url,
-        { params: { size: 0, ...params } },
-      );
-
-      try {
-        const [
-          repositories,
-          users,
-          institutions,
-        ] = await Promise.all([
-          getData('/repositories'),
-          getData('/users'),
-          getData('/institutions', { validated: true, include: ['spaces'] }),
-        ]);
-        const spaces = institutions.map((i) => i.spaces).flat();
-
-        this.expectedData = {
-          spaces: spaces.length,
-          repositories: repositories.length,
-          users: users.length,
-          institutions: institutions.length,
-        };
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('sync.unableToRetrieveInformations'));
-      }
-    },
-    async refreshState() {
-      this.refreshing = true;
-      try {
-        this.syncState = await this.$axios.$get('/sync');
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('sync.unableToRetrieveInformations'));
-      }
-      this.refreshing = false;
-    },
-    async startSync() {
-      this.refreshing = true;
-
-      try {
-        this.syncState = await this.$axios.$post('/sync/_start');
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('sync.unableToStart'));
-        return;
-      } finally {
-        this.refreshing = false;
-      }
-
-      while (this.synchronizing) {
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((resolve) => { setTimeout(resolve, 1000); });
-
-        // eslint-disable-next-line no-await-in-loop
-        await this.refreshState();
-      }
-    },
-  },
+<script setup>
+definePageMeta({
+  layout: 'admin',
+  middleware: ['sidebase-auth', 'terms', 'admin'],
 });
+
+const { t } = useI18n();
+const snacks = useSnacksStore();
+
+const {
+  data: syncState,
+  refresh,
+} = await useFetch('/api/sync');
+
+const startedAt = useDateFormat(() => syncState.value?.data?.startedAt ?? 0);
+const runningTime = useTimeAgo(() => syncState.value?.data?.runningTime ?? 0);
+const autoRefresh = useIntervalFn(refresh, 1000, { immediate: false });
+
+const isSynchronizing = computed(() => syncState.value?.data.status === 'synchronizing');
+
+const statusAlert = computed(() => {
+  let key = syncState.value?.data?.status;
+  if (syncState.value?.data?.hasErrors && !isSynchronizing.value) {
+    key = 'error';
+  }
+
+  switch (key) {
+    case 'synchronizing':
+      return {
+        color: 'info',
+        text: t('sync.status.synchronizing'),
+      };
+
+    case 'completed':
+      return {
+        color: 'success',
+        icon: 'mdi-check',
+        text: t('sync.description.completed'),
+      };
+
+    case 'error':
+      return {
+        color: 'error',
+        icon: 'mdi-alert-circle',
+        title: t('sync.status.error'),
+        text: t('sync.description.error'),
+      };
+
+    case 'idle':
+    default:
+      return {
+        color: 'warning',
+        icon: 'mdi-alert',
+        title: t('sync.status.notSynced'),
+        text: t('sync.description.notSynced'),
+      };
+  }
+});
+
+async function startSync() {
+  if (isSynchronizing.value) {
+    return;
+  }
+
+  try {
+    syncState.value.data = await $fetch('/api/sync/_start', { method: 'POST' });
+  } catch {
+    snacks.error('sync.unableToStart');
+  }
+}
+
+watch(
+  isSynchronizing,
+  (value) => {
+    if (value) {
+      // Auto refresh if synchronizing
+      autoRefresh.resume();
+    } else {
+      // Stop auto refresh if not synchronizing
+      autoRefresh.pause();
+    }
+  },
+  { immediate: true },
+);
 </script>

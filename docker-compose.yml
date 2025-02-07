@@ -137,7 +137,7 @@ services:
 
   front:
     build:
-      context: ./vue3
+      context: ./front
       args:
         - http_proxy
         - https_proxy
