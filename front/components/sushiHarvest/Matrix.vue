@@ -94,7 +94,7 @@
                 <template v-if="report.isSupported && !report.isIgnored">
                   <td v-for="month in periods" :key="`${reportId}-${month}`">
                     <SushiHarvestMatrixCell
-                      :model-value="report.harvestsOfReport.get(month)"
+                      :model-value="report.harvests.get(month)"
                     />
                   </td>
                 </template>
