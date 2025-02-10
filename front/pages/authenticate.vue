@@ -96,7 +96,7 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
 
-              <v-expansion-panel v-if="config.shibbolethDisabled">
+              <v-expansion-panel v-if="!config.shibbolethDisabled">
                 <v-expansion-panel-title>
                   <div>
                     <img
