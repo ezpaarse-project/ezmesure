@@ -12,6 +12,7 @@ const { syncIndexPatterns } = require('./kibana');
 
 const {
   generateRoleNameFromRepository,
+  generateRoleNameFromAlias,
   generateUserRoles,
 } = require('../../hooks/utils');
 const { execThrottledPromises } = require('../promises');
@@ -132,7 +133,7 @@ const syncAlias = async (alias) => {
     return;
   }
 
-  const readOnlyRole = generateRoleNameFromRepository({ ...repo, pattern: alias.pattern }, 'readonly');
+  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
 
   try {
     await upsertRole(readOnlyRole, [alias.pattern], ['read', 'view_index_metadata']);

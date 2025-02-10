@@ -1,3 +1,5 @@
+const { Prisma } = require('@prisma/client');
+
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
 
 const {
@@ -128,7 +130,10 @@ exports.updateOne = async (ctx) => {
       where: {
         pattern: params.pattern,
       },
-      data: body,
+      data: {
+        filters: Prisma.DbNull,
+        ...body,
+      },
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {

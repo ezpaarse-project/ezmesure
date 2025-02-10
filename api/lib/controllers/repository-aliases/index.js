@@ -74,7 +74,7 @@ router.route({
 });
 
 router.route({
-  method: 'PATCH',
+  method: 'PUT',
   path: '/:pattern',
   handler: [
     fetchRepositoryAlias(),

@@ -3,6 +3,7 @@ const { client: prisma } = require('../services/prisma');
 /**
  * @typedef {import('@prisma/client').Space} Space
  * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias
  */
 
 /**
@@ -16,6 +17,12 @@ const generateRoleNameFromSpace = (space, modifier) => `space.${space.id}.${spac
  * @param {string} modifier
  */
 const generateRoleNameFromRepository = (repository, modifier) => `repository.${repository.pattern}.${repository.type}.${modifier}`;
+
+/**
+ * @param {RepositoryAlias} alias
+ * @param {string} modifier
+ */
+const generateRoleNameFromAlias = (alias, repository) => `alias.${alias.pattern}.${repository.type}`;
 
 /**
  * Generate all Elasticsearch roles for a given username, based on the associated memberships
@@ -38,6 +45,15 @@ const generateUserRoles = async (username) => {
               repository: true,
             },
           },
+          repositoryAliasPermissions: {
+            include: {
+              alias: {
+                include: {
+                  repository: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -49,6 +65,9 @@ const generateUserRoles = async (username) => {
 
   const roles = new Set(user.memberships?.flatMap?.((membership) => {
     const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
+    const aliasRoles = membership?.repositoryAliasPermissions?.map(
+      (perm) => generateRoleNameFromAlias(perm.alias, perm.alias.repository),
+    ) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
 
     const permissions = new Set(membership.permissions);
@@ -62,6 +81,7 @@ const generateUserRoles = async (username) => {
 
     return [
       ...repoRoles,
+      ...aliasRoles,
       ...spaceRoles,
       ...otherRoles,
     ];
@@ -75,6 +95,7 @@ const generateUserRoles = async (username) => {
 };
 
 module.exports = {
+  generateRoleNameFromAlias,
   generateRoleNameFromSpace,
   generateRoleNameFromRepository,
   generateUserRoles,
