@@ -28,9 +28,9 @@
           lines="two"
         >
           <template #title>
-            <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
-
             {{ alias.pattern }}
+
+            <v-icon v-if="!!alias.filters" icon="mdi-filter" size="small" start />
           </template>
 
           <template v-if="alias.repository" #subtitle>
@@ -45,9 +45,23 @@
           </template>
 
           <template v-if="user.isAdmin" #append>
+            <v-btn
+              v-if="filterFormDialogRef"
+              v-tooltip="$t('repositoryAliases.filtersForm.editFilter')"
+              icon="mdi-filter"
+              variant="text"
+              size="small"
+              density="comfortable"
+              color="blue"
+              @click="filterFormDialogRef.open(
+                alias,
+                { institution, repository: alias.repository },
+              )"
+            />
+
             <ConfirmPopover
               :agree-text="$t('delete')"
-              :agree="() => removeRepository(alias)"
+              :agree="() => removeAlias(alias)"
               location="end"
             >
               <template #activator="{ props: confirm }">
@@ -77,7 +91,13 @@
       v-if="user.isAdmin"
       ref="aliasFormDialogRef"
       completion
-      @submit="onRepositoryAdded($event)"
+      @submit="onAliasAdded($event)"
+    />
+
+    <RepositoryAliasFilterFormDialog
+      v-if="user.isAdmin"
+      ref="filterFormDialogRef"
+      @submit="onAliasUpdate($event)"
     />
   </v-card>
 </template>
@@ -104,23 +124,45 @@ const { data: user } = useAuthState();
 const aliases = ref(props.institution.repositoryAliases || []);
 
 const aliasFormDialogRef = useTemplateRef('aliasFormDialogRef');
+const filterFormDialogRef = useTemplateRef('filterFormDialogRef');
 
 const sortedAliases = computed(
   () => aliases.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
 );
 
-function onRepositoryAdded(item) {
+function onAliasAdded(item) {
   aliases.value.push(item);
   emit('update:modelValue', aliases.value);
 }
 
-async function removeRepository(item) {
+async function removeAlias(item) {
   try {
     await $fetch(`/api/institutions/${props.institution.id}/repository-aliases/${item.pattern}`, {
       method: 'DELETE',
     });
 
     aliases.value = aliases.value.filter((i) => i.pattern !== item.pattern);
+
+    emit('update:modelValue', aliases.value);
+  } catch {
+    snacks.error(t('anErrorOccurred'));
+  }
+}
+
+async function onAliasUpdate(item) {
+  try {
+    await $fetch(`/api/repository-aliases/${item.pattern}`, {
+      method: 'PUT',
+      body: {
+        target: item.target,
+        filters: item.filters,
+      },
+    });
+
+    const index = aliases.value.findIndex((i) => i.pattern === item.pattern);
+    if (index >= 0) {
+      aliases.value[index] = item;
+    }
 
     emit('update:modelValue', aliases.value);
   } catch {

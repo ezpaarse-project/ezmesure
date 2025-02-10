@@ -798,6 +798,22 @@ repositoryAliases:
   noInstitutions: Aucun établissement n'utilise cet alias
   filters:
     title: Filtrer les alias
+  filtersForm:
+    title: Filtres de l'alias
+    newFilter: Nouveau filtre
+    editFilter: Mise à jour du filtre
+    empty: Aucun filtre n'est encore défini
+    advanced: Mode avancé
+    raw: Requête DSL
+    field: Champ
+    isNot: Inverser le filtre
+    value: Valeur(s)
+    nameTemplate:
+      exists: "{field} existe"
+      exists:not: "{field} n'existe pas"
+      values: "{0}|{0} {1}, etc."
+      is: "{field} est {valueText}"
+      is:not: "{field} n'est pas {valueText}"
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})

@@ -39,7 +39,7 @@
         />
       </template>
 
-      <template #[`item.filter`]="{ value }">
+      <template #[`item.filters`]="{ value }">
         <v-icon
           v-if="!!value"
           icon="mdi-filter"
@@ -69,6 +69,13 @@
           </template>
 
           <v-list>
+            <v-list-item
+              v-if="filterFormDialogRef"
+              :title="$t('repositoryAliases.filtersForm.editFilter')"
+              prepend-icon="mdi-filter"
+              @click="filterFormDialogRef.open(item, { repository: item.repository })"
+            />
+
             <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
@@ -110,6 +117,11 @@
       ref="aliasInstitutionsDialogRef"
       @update:model-value="refresh()"
     />
+
+    <RepositoryAliasFilterFormDialog
+      ref="filterFormDialogRef"
+      @submit="onAliasUpdate($event)"
+    />
   </div>
 </template>
 
@@ -128,6 +140,7 @@ const selectedAliases = ref([]);
 
 const aliasFormDialogRef = useTemplateRef('aliasFormDialogRef');
 const aliasInstitutionsDialogRef = useTemplateRef('aliasInstitutionsDialogRef');
+const filterFormDialogRef = useTemplateRef('filterFormDialogRef');
 
 const {
   refresh,
@@ -163,7 +176,7 @@ const headers = computed(() => [
   },
   {
     title: t('repositoryAliases.filtered'),
-    value: 'filter',
+    value: 'filters',
     align: 'center',
   },
   {
@@ -260,5 +273,21 @@ async function copyRepositoryPattern({ pattern }) {
     return;
   }
   snacks.info(t('clipboard.textCopied'));
+}
+
+async function onAliasUpdate(alias) {
+  try {
+    await $fetch(`/api/repository-aliases/${alias.pattern}`, {
+      method: 'PUT',
+      body: {
+        target: alias.target,
+        filters: alias.filters,
+      },
+    });
+
+    refresh();
+  } catch {
+    snacks.error(t('anErrorOccurred'));
+  }
 }
 </script>

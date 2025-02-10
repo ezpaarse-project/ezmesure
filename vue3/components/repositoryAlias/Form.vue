@@ -40,6 +40,17 @@
                 />
               </v-col>
             </v-row>
+
+            <v-row>
+              <v-col>
+                <RepositoryAliasFilterForm
+                  :alias="alias"
+                  :repository="repository"
+                  variant="outlined"
+                  @[`update:alias.filters`]="alias.filters = $event"
+                />
+              </v-col>
+            </v-row>
           </v-form>
         </v-col>
 
