@@ -1,25 +1,21 @@
 <template>
-  <span>{{ duration }}</span>
+  {{ timeAgo }}
 </template>
 
-<script>
-export default {
-  props: {
-    ms: {
-      type: Number,
-      default: () => 0,
-    },
-    includeSeconds: {
-      type: Boolean,
-      default: () => false,
-    },
+<script setup>
+const props = defineProps({
+  modelValue: {
+    type: [Date, String, Number],
+    required: true,
   },
-  computed: {
-    duration() {
-      return this.$dateFunctions.msToLocalDistance(this.ms, {
-        includeSeconds: this.includeSeconds,
-      });
-    },
+  includeSeconds: {
+    type: Boolean,
+    default: false,
   },
-};
+});
+
+const timeAgo = useTimeAgo(
+  () => props.modelValue,
+  { includeSeconds: props.includeSeconds },
+);
 </script>
