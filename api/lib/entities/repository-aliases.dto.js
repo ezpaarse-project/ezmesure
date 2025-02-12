@@ -54,7 +54,7 @@ const includableFields = [
 ];
 
 /**
- * Schema to be applied when an administrator creates a repository
+ * Schema to be applied when an administrator creates a repository alias
  */
 const adminCreateSchema = withModifiers(
   schema,
@@ -63,7 +63,7 @@ const adminCreateSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator connect a repository to an institution
+ * Schema to be applied when an administrator connect a repository alias to an institution
  */
 const adminCreateOrConnectSchema = withModifiers(
   schema,
@@ -72,7 +72,7 @@ const adminCreateOrConnectSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator updates a repository
+ * Schema to be applied when an administrator updates a repository alias
  */
 const adminUpdateSchema = withModifiers(
   schema,
@@ -80,7 +80,7 @@ const adminUpdateSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator imports multiple repositories
+ * Schema to be applied when an administrator imports multiple repository aliases
  */
 const adminImportSchema = withModifiers(
   adminCreateSchema,

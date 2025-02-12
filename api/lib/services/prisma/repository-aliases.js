@@ -15,9 +15,8 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.RepositoryAliasDeleteArgs} RepositoryAliasDeleteArgs
  *
  * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
- * @typedef {import('@prisma/client').Institution} Institution
  *
- * @typedef {RepositoryAlias & { permissions: RepositoryAliasPermission[], institutions: Institution[] }} OldRepositoryAlias
+ * @typedef {RepositoryAlias & { permissions: RepositoryAliasPermission[] }} OldRepositoryAlias
  * @typedef {{deleteResult: RepositoryAlias, deletedRepositoryAlias: OldRepositoryAlias }} RepositoryAliasRemoved
  * @typedef {{newRepositoryAlias: RepositoryAlias, oldRepositoryAlias: OldRepositoryAlias }} RepositoryAliasUpdated
  */
@@ -174,7 +173,6 @@ async function remove(params, tx = prisma) {
     where: params.where,
     include: {
       permissions: true,
-      institutions: true,
     },
   });
 
