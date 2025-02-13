@@ -86,6 +86,7 @@ const includableFields = [
   'childInstitutions',
   'repositories',
   'customProps',
+  'customProps.field',
 ];
 
 /**
