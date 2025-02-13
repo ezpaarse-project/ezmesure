@@ -20,6 +20,10 @@
       />
     </SkeletonPageBar>
 
+    <v-container>
+      <p>{{ $t('customFields.pageDesc') }}</p>
+    </v-container>
+
     <v-data-table-server
       v-model="selectedCustomField"
       :headers="headers"

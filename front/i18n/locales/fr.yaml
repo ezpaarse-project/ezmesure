@@ -893,6 +893,7 @@ social:
   facebook: Facebook
 customFields:
   toolbarTitle: Champs personnalisés ({count})
+  pageDesc: Entrez ici les champs personnalisés que vous souhaitez pouvoir associer aux établissements.
   newField: Nouveau champ personnalisé
   editField: Modifier le champ personnalisé
   deleteNbCustomField: Supprimer 1 champ personnalisé|Supprimer {count} champs personnalisés

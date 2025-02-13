@@ -874,6 +874,7 @@ social:
   facebook: Facebook
 customFields:
   toolbarTitle: Custom fields ({count})
+  pageDesc: Enter here the custom fields that you want to be able to associate with institutions.
   newField: New custom field
   editField: Edit custom field
   deleteNbCustomField: Delete 1 custom field|Delete {count} custom fields
