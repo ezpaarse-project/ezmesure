@@ -42,30 +42,22 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-menu>
-          <template #activator="{ props: menu }">
-            <v-btn
-              icon="mdi-cog"
-              variant="plain"
-              density="compact"
-              v-bind="menu"
-            />
-          </template>
-
-          <v-list>
-            <v-list-item
-              v-if="customFieldFormDialogRef"
-              :title="$t('modify')"
-              prepend-icon="mdi-pencil"
-              @click="customFieldFormDialogRef.open(item)"
-            />
-            <v-list-item
-              :title="$t('delete')"
-              prepend-icon="mdi-delete"
-              @click="deleteCustomField([item])"
-            />
-          </v-list>
-        </v-menu>
+        <v-btn
+          :disabled="!customFieldFormDialogRef"
+          :title="$t('modify')"
+          icon="mdi-pencil"
+          variant="text"
+          density="comfortable"
+          @click="customFieldFormDialogRef.open(item)"
+        />
+        <v-btn
+          :title="$t('delete')"
+          icon="mdi-delete"
+          variant="text"
+          density="comfortable"
+          color="error"
+          @click="deleteCustomField([item])"
+        />
       </template>
     </v-data-table-server>
 
