@@ -1,465 +1,418 @@
 <template>
-  <section>
-    <ToolBar
+  <div>
+    <SkeletonPageBar
       :title="$t('menu.activity')"
-    >
-      <v-spacer />
+      :refresh="refresh"
+      icons
+    />
 
-      <v-btn text :loading="loading" @click="loadActivity">
-        <v-icon left>
-          mdi-refresh
-        </v-icon>
-        {{ $t('refresh') }}
-      </v-btn>
-    </ToolBar>
-
-    <v-data-table
-      :headers="tableHeaders"
-      :items="activity"
-      :loading="loading"
-      :options.sync="tableOptions"
-      :server-items-length="totalItems"
-      :footer-props="{ itemsPerPageOptions: [20, 50, 100, 500] }"
-      :no-data-text="$t('activity.noActivity')"
-      dense
+    <v-data-table-server
+      :headers="headers"
+      density="compact"
       item-key="id"
-      sort-by="datetime"
-      :sort-desc="true"
-      @update:options="loadActivity"
+      v-bind="vDataTableOptions"
     >
       <template #top>
-        <v-container fluid>
-          <v-row>
-            <v-col cols="12" lg="4" class="d-flex justify-start align-center">
-              <v-btn
-                icon
-                color="primary"
-                :disabled="loading"
-                @click="previousDay"
-              >
-                <v-icon>mdi-arrow-left</v-icon>
-              </v-btn>
+        <v-toolbar color="transparent">
+          <div class="d-flex align-center text-h4 mx-4" style="gap: 1rem">
+            <v-btn
+              icon="mdi-arrow-left"
+              color="primary"
+              @click="addDayToCurrent(-1)"
+            />
 
-              <v-menu
-                v-model="showDatePicker"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-              >
-                <template #activator="{ on, attrs }">
-                  <span
-                    class="text-h4 mx-2"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    {{ $dateFunctions.format(new Date(date), 'PPP') }}
-                  </span>
-                </template>
+            <v-menu :close-on-content-click="false">
+              <template #activator="{ props }">
+                <div style="cursor: pointer;" v-bind="props">
+                  {{ dateLabel }}
+                </div>
+              </template>
 
-                <v-date-picker
-                  v-model="date"
-                  :locale="$i18n.locale"
-                  @input="showDatePicker = false"
-                />
-              </v-menu>
-
-              <v-btn
-                icon
-                color="primary"
-                :disabled="loading"
-                @click="nextDay"
-              >
-                <v-icon>mdi-arrow-right</v-icon>
-              </v-btn>
-            </v-col>
-
-            <v-col cols="12" md="6" lg="4">
-              <v-combobox
-                ref="actionCombo"
-                v-model="selectedActions"
-                :items="availableActions"
-                :label="$t('activity.action')"
-                item-text="label"
-                item-value="value"
-                hide-details
-                clearable
-                hide-no-data
-                multiple
-                outlined
-                dense
-                @change="loadActivity"
-              >
-                <template #selection="{ item, index }">
-                  <v-chip v-if="index === 0" small label>
-                    <span>{{ item.label }}</span>
-                  </v-chip>
-                  <span
-                    v-if="index === 1"
-                    class="grey--text text-caption"
-                  >
-                    (+{{ selectedActions.length - 1 }} others)
-                  </span>
-                </template>
-              </v-combobox>
-            </v-col>
-
-            <v-col cols="12" md="6" lg="4">
-              <v-combobox
-                ref="userCombo"
-                v-model="selectedUsers"
-                :label="$t('activity.user')"
-                hide-details
-                clearable
-                hide-no-data
-                multiple
-                outlined
-                dense
-                @change="loadActivity"
-              >
-                <template #selection="{ attrs, item, parent, selected }">
-                  <v-chip
-                    v-bind="attrs"
-                    :input-value="selected"
-                    label
-                    small
-                  >
-                    <span class="pr-2">
-                      {{ item }}
-                    </span>
-                    <v-icon small @click="parent.selectItem(item)">
-                      $delete
-                    </v-icon>
-                  </v-chip>
-                </template>
-              </v-combobox>
-            </v-col>
-          </v-row>
-        </v-container>
-      </template>
-
-      <template #[`item.action`]="{ item }">
-        <v-hover v-slot="{ hover }">
-          <span>
-            <span v-if="$te(`activity.actions.${item.action}`)">
-              {{ $t(`activity.actions.${item.action}`) }}
-            </span>
-            <span v-else>
-              {{ item.action }}
-            </span>
+              <v-date-picker
+                v-model="date"
+                :max="DATE_MAX"
+                multiple="range"
+                show-adjacent-months
+              />
+            </v-menu>
 
             <v-btn
-              v-if="hover"
-              x-small
-              icon
+              :disabled="isNextPeriodDisabled"
+              icon="mdi-arrow-right"
               color="primary"
-              @click="filterAction(item.action)"
-            >
-              <v-icon>
-                mdi-filter
-              </v-icon>
-            </v-btn>
-          </span>
-        </v-hover>
+              @click="addDayToCurrent(1)"
+            />
+          </div>
+
+          <v-spacer />
+
+          <v-combobox
+            v-model="query.action"
+            :label="$t('activity.action')"
+            :items="availableActions"
+            :return-object="false"
+            prepend-inner-icon="mdi-lightning-bolt"
+            variant="outlined"
+            density="comfortable"
+            item-value="value"
+            auto-select-first="exact"
+            hide-details
+            clearable
+            multiple
+            class="mr-4"
+            style="width: 15%"
+            @update:model-value="refresh()"
+          >
+            <template #chip="{ item, index, props }">
+              <v-chip
+                v-if="index === 0"
+                :text="item.title"
+                size="small"
+                label
+                v-bind="props"
+              />
+              <span v-if="index === 1" class="text-grey text-caption">
+                {{ $t('nbOthers', { count: query.action.length - 1 }) }}
+              </span>
+            </template>
+          </v-combobox>
+
+          <v-combobox
+            v-model="query.username"
+            :label="$t('activity.user')"
+            prepend-inner-icon="mdi-account"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            clearable
+            multiple
+            closable-chips
+            class="mr-4"
+            style="width: 15%"
+            @update:model-value="refresh()"
+          >
+            <template #chip="{ item, props }">
+              <v-chip
+                :text="item.title"
+                size="small"
+                label
+                v-bind="props"
+              />
+            </template>
+          </v-combobox>
+        </v-toolbar>
       </template>
 
       <template #[`item.datetime`]="{ item }">
-        <LocalDate
-          :date="item.datetime"
-          format="Pp"
-        />
+        <LocalDate :model-value="item.datetime" format="Pp" />
       </template>
 
-      <template #[`item.user.name`]="{ item }">
+      <template #[`item.user.name`]="{ value, item }">
         <v-menu
-          v-if="item.user"
+          v-if="value"
           :close-on-content-click="false"
-          :nudge-width="200"
+          location="end center"
+          open-delay="100"
+          max-width="800"
           open-on-hover
-          offset-x
         >
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props }">
             <v-chip
-              small
-              outlined
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon left>
-                mdi-account
-              </v-icon>
-              {{ item.user && item.user.name }}
-            </v-chip>
+              :text="value"
+              prepend-icon="mdi-account"
+              size="small"
+              variant="outlined"
+              v-bind="props"
+            />
           </template>
 
-          <v-card>
-            <v-list>
-              <v-list-item>
-                <v-list-item-action>
-                  <v-icon>mdi-account-circle</v-icon>
-                </v-list-item-action>
-
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ item.user.name }}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-divider />
-
-              <v-list-item>
-                <v-list-item-action>
-                  <v-icon>mdi-shield</v-icon>
-                </v-list-item-action>
-
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <v-chip
-                      v-for="role in item.user.roles"
-                      :key="role"
-                      class="mr-1"
-                      small
-                      label
-                    >
-                      {{ role }}
-                    </v-chip>
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-
-            <v-card-actions>
-              <v-spacer />
-              <v-btn small text color="primary" @click="filterUsername(item.user.name)">
-                <v-icon left>
-                  mdi-filter
-                </v-icon>
-                {{ $t('filter') }}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+          <ActivityUserCard :user="item.user">
+            <template #actions>
+              <v-btn
+                :text="$t('filter')"
+                prepend-icon="mdi-filter"
+                color="primary"
+                variant="text"
+                density="comfortable"
+                class="ml-2"
+                @click="filterUser(value)"
+              />
+            </template>
+          </ActivityUserCard>
         </v-menu>
       </template>
 
+      <template #[`item.action`]="{ value }">
+        <v-hover>
+          <template #default="{ props, isHovering }">
+            <div class="d-flex align-center" v-bind="props">
+              <template v-if="$te(`activity.actions.${value}`)">
+                {{ $t(`activity.actions.${value}`) }}
+              </template>
+              <template v-else>
+                {{ value }}
+              </template>
+
+              <v-btn
+                v-if="isHovering"
+                icon="mdi-filter"
+                color="primary"
+                variant="text"
+                size="x-small"
+                density="comfortable"
+                class="ml-2"
+                @click="filterAction(value)"
+              />
+            </div>
+          </template>
+        </v-hover>
+      </template>
+
       <template #[`item.details`]="{ item }">
-        <ActivityItemDetails :item="item" />
+        <ActivityItemDetails :model-value="item" />
       </template>
 
       <template #[`item.actions`]="{ item }">
         <v-btn
-          text
-          small
-          @click="showRawItem(item)"
-        >
-          <v-icon left>
-            mdi-file-code-outline
-          </v-icon>
-          JSON
-        </v-btn>
+          v-if="rawItemDialog"
+          text="JSON"
+          prepend-icon="mdi-code-json"
+          variant="text"
+          size="small"
+          @click="rawItemDialog.open(item)"
+        />
       </template>
-    </v-data-table>
+    </v-data-table-server>
 
-    <v-dialog
-      v-model="showRawItemDialog"
-      max-width="1000px"
-    >
-      <v-card>
-        <v-card-text class="pa-4" style="overflow: auto">
-          <pre>{{ rawItem }}</pre>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer />
-
-          <v-btn text @click="showRawItemDialog = false">
-            {{ $t('close') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </section>
+    <ActivityRawItemDialog ref="rawItemDialog" />
+  </div>
 </template>
 
-<script>
-import { addDays, subDays, format } from 'date-fns';
+<script setup>
+import {
+  parse,
+  format,
+  eachDayOfInterval,
+  differenceInDays,
+  addDays,
+} from 'date-fns';
 
-import ToolBar from '~/components/space/ToolBar.vue';
-import LocalDate from '~/components/LocalDate.vue';
-import ActivityItemDetails from '~/components/ActivityItemDetails.vue';
+definePageMeta({
+  layout: 'admin',
+  middleware: ['sidebase-auth', 'terms', 'admin'],
+});
 
-export default {
-  layout: 'space',
-  middleware: ['auth', 'terms', 'isAdmin'],
-  components: {
-    ToolBar,
-    LocalDate,
-    ActivityItemDetails,
-  },
-  data() {
-    return {
-      date: format(new Date(), 'yyyy-MM-dd'),
-      tableOptions: {},
-      metricTypes: [],
-      loading: false,
-      showDatePicker: false,
-      activity: [],
-      totalItems: 0,
-      selectedActions: [],
-      selectedUsers: [],
-      rawItem: '',
-      showRawItemDialog: false,
-    };
-  },
-  mounted() {
-    return this.loadActivity();
-  },
-  watch: {
-    date() {
-      this.tableOptions.page = 1;
-      this.loadActivity();
+const DATE_FORMAT = 'yyyy-MM-dd';
+const DATE_NOW = Date.now();
+const DATE_MAX = format(DATE_NOW, 'yyyy-MM-dd');
+
+const { t, locale } = useI18n();
+
+const rawItemDialog = useTemplateRef('rawItemDialog');
+
+const {
+  query,
+  refresh,
+  itemLength,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/activity',
+    transform: ({ items, total }) => {
+      itemLength.value.current = total.value;
+      if (!itemLength.value.total) {
+        itemLength.value.total = total.value;
+      }
+      return items;
     },
   },
-  computed: {
-    tableHeaders() {
-      return [
-        { text: this.$t('date'), value: 'datetime', width: '180px' },
-        { text: this.$t('activity.user'), value: 'user.name', width: '250px' },
-        { text: this.$t('activity.action'), value: 'action', width: '300px' },
-        { text: this.$t('activity.details'), value: 'details', sortable: false },
-        {
-          text: this.$t('actions'),
-          value: 'actions',
-          sortable: false,
-          width: '85px',
-          align: 'center',
+  data: {
+    'datetime:from': format(DATE_NOW, DATE_FORMAT),
+    'datetime:to': format(DATE_NOW, DATE_FORMAT),
+    sortBy: [{ key: 'datetime', order: 'desc' }],
+    search: undefined, // q parameter is not allowed
+  },
+});
+
+/**
+ * Query date as array of Date object
+ */
+const date = computed({
+  get: () => eachDayOfInterval({
+    start: parse(query.value['datetime:from'], DATE_FORMAT, DATE_NOW),
+    end: parse(query.value['datetime:to'], DATE_FORMAT, DATE_NOW),
+  }),
+  set: (value) => {
+    if (!Array.isArray(value)) {
+      return;
+    }
+
+    const from = Math.min(...value);
+    const to = Math.max(...value);
+    query.value['datetime:from'] = format(from, DATE_FORMAT);
+    query.value['datetime:to'] = format(to, DATE_FORMAT);
+    if (query.value['datetime:from'] && query.value['datetime:to']) {
+      query.value.page = 1;
+      refresh();
+    }
+  },
+});
+
+const daysCount = computed(() => differenceInDays(date.value.at(-1), date.value.at(0)));
+
+const dateLabel = computed(() => {
+  const from = dateFormat(date.value.at(0), locale.value, 'PPP');
+  if (query.value['datetime:from'] === query.value['datetime:to']) {
+    return from;
+  }
+
+  const to = dateFormat(date.value.at(-1), locale.value, 'PPP');
+  return `${from} ~ ${to}`;
+});
+
+const isNextPeriodDisabled = computed(
+  () => differenceInDays(DATE_NOW, date.value.at(-1) || DATE_NOW) <= 0,
+);
+
+const headers = computed(() => [
+  {
+    title: t('date'),
+    value: 'datetime',
+    width: '180px',
+    sortable: true,
+  },
+  {
+    title: t('activity.user'),
+    value: 'user.name',
+    align: 'center',
+    width: '250px',
+    sortable: true,
+  },
+  {
+    title: t('activity.action'),
+    value: 'action',
+    width: '300px',
+    sortable: true,
+  },
+  {
+    title: t('activity.details'),
+    value: 'details',
+    sortable: false,
+  },
+  {
+    title: t('actions'),
+    value: 'actions',
+    sortable: false,
+    width: '85px',
+    align: 'end',
+  },
+]);
+
+const availableActions = computed(() => {
+  const actions = [
+    { header: 'users' },
+    'user/register',
+    'user/refresh',
+    'user/connection',
+    { header: 'files' },
+    'file/upload',
+    'file/list',
+    'file/delete',
+    'file/delete-many',
+    { header: 'institutions' },
+    'institutions/create',
+    'institutions/update',
+    'institutions/delete',
+    'institutions/addMember',
+    'institutions/removeMember',
+    { header: 'exports' },
+    'export/aggregate',
+    'export/counter5',
+    'events/delete',
+    { header: 'indices' },
+    'indices/tops',
+    'indices/list',
+    'indices/delete',
+    'indices/search',
+    'indices/insert',
+    { header: 'sushi' },
+    'sushi/create',
+    'sushi/update',
+    'sushi/delete',
+    'sushi/delete-many',
+    'sushi/download-report',
+    'sushi/harvest',
+    'sushi/import',
+    'sushi/check-connection',
+    { header: 'endpoints' },
+    'endpoint/create',
+    'endpoint/update',
+    'endpoint/delete',
+    'endpoint/import',
+    { header: 'reporting' },
+    'reporting/index',
+    'reporting/getDashboards',
+    'reporting/list',
+    'reporting/store',
+    'reporting/update',
+    'reporting/delete',
+    'reporting/history',
+  ];
+
+  return actions.map((item) => {
+    if (item.header) {
+      // There's no way to add "headers", "groups" or "children" into a
+      // VSelect (and other derivate), so headers are items with custom style
+      return {
+        title: t(`activity.actionTypes.${item.header}`),
+        value: item,
+        props: {
+          disabled: true,
+          style: {
+            marginLeft: '-2.8rem',
+          },
         },
-      ];
-    },
-    availableActions() {
-      const availableActions = [
-        { header: 'users' },
-        'user/register',
-        'user/refresh',
-        'user/connection',
-        { header: 'files' },
-        'file/upload',
-        'file/list',
-        'file/delete',
-        'file/delete-many',
-        { header: 'institutions' },
-        'institutions/create',
-        'institutions/update',
-        'institutions/delete',
-        'institutions/addMember',
-        'institutions/removeMember',
-        { header: 'exports' },
-        'export/aggregate',
-        'export/counter5',
-        'events/delete',
-        { header: 'indices' },
-        'indices/tops',
-        'indices/list',
-        'indices/delete',
-        'indices/search',
-        'indices/insert',
-        { header: 'sushi' },
-        'sushi/create',
-        'sushi/update',
-        'sushi/delete',
-        'sushi/delete-many',
-        'sushi/download-report',
-        'sushi/harvest',
-        'sushi/import',
-        'sushi/check-connection',
-        { header: 'endpoints' },
-        'endpoint/create',
-        'endpoint/update',
-        'endpoint/delete',
-        'endpoint/import',
-        { header: 'reporting' },
-        'reporting/index',
-        'reporting/getDashboards',
-        'reporting/list',
-        'reporting/store',
-        'reporting/update',
-        'reporting/delete',
-        'reporting/history',
-      ];
-
-      return availableActions.map((item) => {
-        if (item.header) {
-          item.header = this.$t(`activity.actionTypes.${item.header}`);
-          return item;
-        }
-        return {
-          label: this.$t(`activity.actions.${item}`),
-          value: item,
-        };
-      });
-    },
-  },
-  methods: {
-    nextDay() {
-      this.date = format(addDays(new Date(this.date), 1), 'yyyy-MM-dd');
-    },
-    previousDay() {
-      this.date = format(subDays(new Date(this.date), 1), 'yyyy-MM-dd');
-    },
-    async loadActivity() {
-      if (this.loading) { return; }
-
-      this.loading = true;
-
-      const sortBy = this.tableOptions?.sortBy?.[0];
-      const sortDesc = this.tableOptions?.sortDesc?.[0];
-
-      const params = {
-        size: this.tableOptions?.itemsPerPage || 20,
-        page: this.tableOptions?.page || 1,
-        date: this.date,
-        sortBy,
       };
+    }
+    return {
+      title: t(`activity.actions.${item}`),
+      value: item,
+    };
+  });
+});
 
-      if (typeof sortBy === 'string' && typeof sortDesc === 'boolean') {
-        params.sortOrder = sortDesc ? 'desc' : 'asc';
-      }
+function addDayToCurrent(modifier) {
+  const offset = (daysCount.value * modifier) + modifier;
 
-      if (this.selectedActions.length > 0) {
-        params.type = this.selectedActions.map((item) => item.value).join(',');
-      }
-      if (this.selectedUsers.length > 0) {
-        params.username = this.selectedUsers.join(',');
-      }
+  date.value = [
+    addDays(date.value.at(0), offset),
+    addDays(date.value.at(-1), offset),
+  ];
+}
 
-      try {
-        const data = await this.$axios.$get('/activity', { params });
+async function filterAction(action) {
+  if (!query.value.action) {
+    query.value.action = [];
+  }
+  if (!Array.isArray(query.value.action)) {
+    query.value.action = [query.value.action];
+  }
+  const actions = new Set(query.value.action);
+  actions.add(action);
+  query.value.action = Array.from(actions);
+  await refresh();
+}
 
-        this.activity = Array.isArray(data?.items) ? data.items : [];
-        this.totalItems = data?.total?.value;
-        if (!Number.isInteger(this.totalItems)) {
-          this.totalItems = this.activity.length;
-        }
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('activity.failedToLoad'));
-      }
-
-      this.loading = false;
-    },
-    showRawItem(item) {
-      this.rawItem = JSON.stringify(item, null, 2);
-      this.showRawItemDialog = true;
-    },
-    filterAction(name) {
-      this.$refs.actionCombo.selectItem({
-        label: this.$t(`activity.actions.${name}`),
-        value: name,
-      });
-    },
-    filterUsername(name) {
-      this.$refs.userCombo.selectItem(name);
-    },
-  },
-};
+async function filterUser(username) {
+  if (!query.value.username) {
+    query.value.username = [];
+  }
+  if (!Array.isArray(query.value.username)) {
+    query.value.username = [query.value.username];
+  }
+  const usernames = new Set(query.value.username);
+  usernames.add(username);
+  query.value.username = Array.from(usernames);
+  await refresh();
+}
 </script>

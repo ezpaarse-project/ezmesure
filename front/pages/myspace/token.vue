@@ -1,80 +1,70 @@
 <template>
-  <section>
-    <ToolBar :title="$t('token.title')" />
-    <v-card-text class="w-800 mx-auto">
-      <i18n path="token.whatDoesToken.text" tag="p">
-        <template #header>
-          <code>{{ $t('token.whatDoesToken.header') }}</code>
-        </template>
-      </i18n>
+  <div>
+    <SkeletonPageBar :title="$t('token.title')" />
 
-      <v-container grid-list-md class="px-0">
-        <v-layout row align-center>
-          <v-flex grow>
-            <v-text-field
-              ref="token"
-              :label="$t('token.token')"
-              :value="token"
-              hide-details
-              readonly
-              outlined
-              :type="showToken ? 'text' : 'password'"
-              :append-icon="showToken ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="() => (showToken = !showToken)"
-            />
-          </v-flex>
+    <v-container>
+      <v-row>
+        <v-col>
+          <i18n-t keypath="token.whatDoesToken.text" tag="p">
+            <template #header>
+              <code class="v-code">{{ $t('token.whatDoesToken.header') }}</code>
+            </template>
+          </i18n-t>
+        </v-col>
+      </v-row>
 
-          <v-flex v-if="clipboardAvailable" shrink>
-            <v-btn text @click="copyTokenToClipboard">
-              <v-icon left>
-                mdi-clipboard-text
-              </v-icon>
-              {{ $t('copy') }}
-            </v-btn>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-card-text>
-  </section>
+      <v-row>
+        <v-col>
+          <v-text-field
+            :label="$t('token.token')"
+            :model-value="token"
+            :type="showToken ? 'text' : 'password'"
+            :append-inner-icon="showToken ? 'mdi-eye-off' : 'mdi-eye'"
+            variant="outlined"
+            hide-details
+            readonly
+            @click:append-inner="() => (showToken = !showToken)"
+          >
+            <template v-if="clipboard" #append>
+              <v-btn variant="text" @click="copyTokenToClipboard">
+                <v-icon left>
+                  mdi-clipboard-text
+                </v-icon>
+                {{ $t('copy') }}
+              </v-btn>
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
-<script>
-import ToolBar from '~/components/space/ToolBar.vue';
-
-export default {
+<script setup>
+definePageMeta({
   layout: 'space',
-  middleware: ['auth', 'terms'],
-  components: {
-    ToolBar,
-  },
-  data() {
-    return {
-      showToken: false,
-      token: '',
-    };
-  },
-  computed: {
-    clipboardAvailable() {
-      return navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
-    },
-  },
-  async mounted() {
-    try {
-      this.token = await this.$axios.$get('/profile/token');
-    } catch (e) {
-      this.$store.dispatch('snacks/error', this.$t('token.unableToRetriveToken'));
-    }
-  },
-  methods: {
-    async copyTokenToClipboard() {
-      try {
-        await navigator.clipboard.writeText(this.token);
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('token.copyFailed'));
-        return;
-      }
-      this.$store.dispatch('snacks/info', this.$t('token.clipped'));
-    },
-  },
-};
+  middleware: ['sidebase-auth', 'terms'],
+});
+
+const { t } = useI18n();
+const { isSupported: clipboard, copy } = useClipboard();
+const snacks = useSnacksStore();
+
+const { data: token } = await useFetch('/api/profile/token');
+
+const showToken = ref(false);
+
+async function copyTokenToClipboard() {
+  if (!token.value) {
+    return;
+  }
+
+  try {
+    await copy(token.value);
+  } catch {
+    snacks.error(t('clipboard.unableToCopy'));
+    return;
+  }
+  snacks.info(t('clipboard.textCopied'));
+}
 </script>

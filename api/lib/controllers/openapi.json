@@ -834,7 +834,7 @@
             "type": "object",
             "description": "Query used to get credentials to harvest",
             "properties": {
-              "ids": {
+              "sushiIds": {
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/ItemID"
@@ -7844,7 +7844,7 @@
                     "type": "object",
                     "description": "Query used to get credentials to harvest",
                     "properties": {
-                      "ids": {
+                      "sushiIds": {
                         "type": "array",
                         "items": {
                           "$ref": "#/components/schemas/ItemID"
@@ -8044,7 +8044,7 @@
                     "type": "object",
                     "description": "Query used to get credentials to harvest",
                     "properties": {
-                      "ids": {
+                      "sushiIds": {
                         "type": "array",
                         "items": {
                           "$ref": "#/components/schemas/ItemID"

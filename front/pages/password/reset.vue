@@ -1,87 +1,92 @@
 <template>
-  <v-container
-    fluid
-    fill-height
-  >
-    <v-row
-      align="center"
-      justify="center"
-    >
-      <v-col style="max-width: 600px">
-        <v-card class="elevation-12">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title>
-              {{ $t('password.forgot') }}
-            </v-toolbar-title>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
+        <v-card elevation="10">
+          <v-card-title class="bg-primary d-flex">
+            {{ $t('password.forgot') }}
 
             <v-spacer />
 
-            <v-icon>mdi-lock</v-icon>
-          </v-toolbar>
+            <v-icon icon="mdi-lock" />
+          </v-card-title>
 
-          <v-card-text>
-            <v-alert
-              class="mt-1"
-              :value="resetError"
-              dismissible
-              prominent
-              dense
-              type="error"
-            >
-              {{ resetErrorText }}
-            </v-alert>
+          <v-card-text class="pt-4">
+            <v-row v-if="errorMessage">
+              <v-col>
+                <v-alert
+                  :text="errorMessage"
+                  type="error"
+                  density="compact"
+                  closable
+                  @update:model-value="() => (errorMessage = '')"
+                />
+              </v-col>
+            </v-row>
 
-            <v-alert type="green" :value="reset">
-              <div>{{ $t('password.checkYourEmail') }}</div>
-              <div>{{ $t('password.waitFewMinutes') }}</div>
-            </v-alert>
+            <v-row v-if="success">
+              <v-col>
+                <v-alert
+                  :title="$t('password.checkYourEmail')"
+                  :text="$t('password.waitFewMinutes')"
+                  type="success"
+                  density="compact"
+                >
+                  <template #append>
+                    <v-btn
+                      :text="$t('password.backToLogin')"
+                      prepend-icon="mdi-arrow-left"
+                      to="/authenticate"
+                      variant="tonal"
+                    />
+                  </template>
+                </v-alert>
+              </v-col>
+            </v-row>
 
-            <v-btn
-              v-if="reset"
-              block
-              color="primary"
-              to="/authenticate"
-            >
-              {{ $t('password.backToLogin') }}
-            </v-btn>
+            <v-form v-model="valid" @submit.prevent="resetPassword()">
+              <v-row>
+                <v-col>
+                  <p>
+                    {{ $t('password.enterUser') }}
+                  </p>
+                </v-col>
+              </v-row>
 
-            <v-form
-              v-if="!reset"
-              v-model="resetFormValid"
-              @submit.prevent="resetPassword"
-            >
-              <p>
-                {{ $t('password.enterUser') }}
-              </p>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="username"
+                    :label="$t('password.user')"
+                    :rules="[
+                      (v) => !!v || $t('fieldIsRequired'),
+                    ]"
+                    prepend-icon="mdi-account"
+                    variant="underlined"
+                    required
+                    class="mb-2"
+                  />
+                </v-col>
+              </v-row>
 
-              <v-text-field
-                v-model="username"
-                :label="$t('password.user')"
-                :rules="fieldIsRequiredRules"
-                prepend-inner-icon="mdi-account"
-                outlined
-                required
-              />
+              <v-row class="align-center">
+                <v-col>
+                  <nuxt-link to="/authenticate">
+                    {{ $t('password.backToLogin') }}
+                  </nuxt-link>
+                </v-col>
 
-              <v-btn
-                block
-                color="primary"
-                type="submit"
-                class="mb-2"
-                :loading="resettingPassword"
-                :disabled="!resetFormValid"
-              >
-                {{ $t('password.reset') }}
-              </v-btn>
-
-              <a href="/authenticate" class="caption">
-                {{ $t('password.backToLogin') }}
-              </a>
+                <v-col>
+                  <v-btn
+                    :text="$t('password.reset')"
+                    :disabled="!valid"
+                    :loading="loading"
+                    type="submit"
+                    color="primary"
+                    block
+                  />
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
         </v-card>
@@ -90,46 +95,39 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      username: null,
-      resetFormValid: true,
-      resettingPassword: false,
-      resetError: null,
-      resetErrorText: '',
-      reset: false,
-    };
-  },
-  computed: {
-    fieldIsRequiredRules() {
-      return [!!this.username || this.$t('fieldIsRequired')];
-    },
-  },
-  methods: {
-    async resetPassword() {
-      this.connecting = true;
-      this.resettingPassword = true;
-      this.resetError = null;
+<script setup>
+const { t } = useI18n();
+const { data: user } = useAuthState();
 
-      try {
-        await this.$axios.$post('/profile/password/_get_token', { username: this.username });
-        this.reset = true;
-      } catch (e) {
-        this.resetError = true;
-        if (e.response.status >= 400 && e.response.status < 500) {
-          this.resetErrorText = e.response.data.error;
-        } else if (e.response.statusText) {
-          this.resetErrorText = e.response.statusText;
-        } else {
-          this.resetErrorText = e.message;
-        }
-      }
+const valid = ref(false);
+const loading = ref(false);
+const success = ref(false);
+const errorMessage = ref('');
+const username = ref(user.value?.username);
 
-      this.resettingPassword = false;
-      this.connecting = false;
-    },
-  },
-};
+async function resetPassword() {
+  loading.value = true;
+  try {
+    await $fetch('/api/profile/password/_get_token', {
+      method: 'POST',
+      body: {
+        username: username.value,
+      },
+    });
+
+    success.value = true;
+  } catch (err) {
+    if (!(err instanceof Error)) {
+      errorMessage.value = t('authenticate.failed');
+      return;
+    }
+
+    if (err.statusCode >= 400 && err.statusCode < 500) {
+      errorMessage.value = t('authenticate.loginFailed');
+    } else {
+      errorMessage.value = t('authenticate.failed');
+    }
+  }
+  loading.value = false;
+}
 </script>

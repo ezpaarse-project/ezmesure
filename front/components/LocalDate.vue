@@ -1,33 +1,18 @@
 <template>
-  <span>{{ localDate }}</span>
+  {{ localDate }}
 </template>
 
-<script>
-export default {
-  props: {
-    date: {
-      type: [String, Number, Date],
-      default: () => '',
-    },
-    format: {
-      type: String,
-      default: () => '',
-    },
+<script setup>
+const props = defineProps({
+  modelValue: {
+    type: [Date, String, Number],
+    required: true,
   },
-  computed: {
-    localDate() {
-      const localDate = new Date(this.date);
-
-      if (!this.$dateFunctions.isValid(localDate)) {
-        return this.$t('invalidDate');
-      }
-
-      try {
-        return this.$dateFunctions.format(localDate, this.format || 'PPPp');
-      } catch (e) {
-        return this.$t('invalidDate');
-      }
-    },
+  format: {
+    type: String,
+    default: undefined,
   },
-};
+});
+
+const localDate = useDateFormat(() => props.modelValue, () => props.format);
 </script>

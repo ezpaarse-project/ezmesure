@@ -10,13 +10,17 @@
     />
 
     <div class="label-container">
-      <slot name="default" v-bind="{ labels: labelsToShow }">
+      <slot
+        name="labels"
+        :labels="labelsToShow"
+      >
         <div v-for="label in labelsToShow" :key="`label-${label.key}`">
-          <slot :name="`default.__item`" v-bind="{ label }">
-            <div :class="[label.color && `${label.color}--text`]">
-              <slot :name="`default.${label.key}`" v-bind="{ value: label.value }">
-                {{ label.value }}
-              </slot>
+          <slot
+            name="label"
+            :label="label"
+          >
+            <div :class="label.color && `text-${label.color}`">
+              {{ label.value }}
             </div>
           </slot>
         </div>
@@ -25,105 +29,123 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  props: {
-    value: { type: Array, required: true },
-    labels: { type: Array, default: () => [] },
-    size: { type: [String, Number], default: undefined },
-    width: { type: [String, Number], default: undefined },
-    showEmpty: { type: Boolean, default: false },
-    loading: { type: Boolean, default: false },
-    loaderColor: { type: String, default: undefined },
+<script setup>
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-  computed: {
-    loaders() {
-      if (this.loading) {
-        return [
-          {
-            key: '__loading',
-            size: this.size,
-            width: this.width,
-            indeterminate: true,
-            color: this.loaderColor,
-          },
-        ];
-      }
-
-      const items = this.value.filter((loader) => loader.value >= 0.01 || loader.loading);
-
-      if (items.length <= 0) {
-        return [
-          {
-            key: '__placeholder',
-            size: this.size,
-            width: this.width,
-            value: 0,
-            color: this.loaderColor,
-          },
-        ];
-      }
-
-      let total = 0;
-      return items.map(
-        (loader) => {
-          const item = {
-            size: this.size,
-            width: this.width,
-            key: loader.key,
-            color: loader.color,
-            label: loader.label,
-            value: loader.value * 100,
-            rotate: -90 + (total * 360),
-          };
-
-          total += loader.value;
-          return item;
-        },
-      );
-    },
-    labelsToShow() {
-      const labels = new Set(this.labels);
-
-      let total = 0;
-      const items = this.loaders
-        .filter((loader) => labels.has(loader.key))
-        .map((loader) => {
-          const item = {
-            key: loader.key,
-            value: loader.label || loader.value,
-            color: loader.color,
-          };
-
-          total += loader.value;
-          return item;
-        });
-
-      if (this.showEmpty && !this.loading) {
-        items.push({
-          key: '__empty',
-          value: 100 - total,
-          color: 'grey',
-        });
-      }
-
-      return items;
-    },
+  labels: {
+    type: Array,
+    default: () => undefined,
   },
+  size: {
+    type: [String, Number],
+    default: undefined,
+  },
+  width: {
+    type: [String, Number],
+    default: undefined,
+  },
+  showEmpty: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  loaderColor: {
+    type: String,
+    default: 'primary',
+  },
+});
+
+const loaders = computed(() => {
+  if (props.loading) {
+    return [
+      {
+        key: '__loading',
+        size: props.size,
+        width: props.width,
+        indeterminate: true,
+        color: props.loaderColor,
+      },
+    ];
+  }
+
+  const items = props.modelValue.filter((loader) => loader.value >= 0.01 || loader.loading);
+  if (items.length <= 0) {
+    return [
+      {
+        key: '__placeholder',
+        size: props.size,
+        width: props.width,
+        modelValue: 0,
+        color: props.loaderColor,
+      },
+    ];
+  }
+
+  let total = 0;
+  return items.map(
+    (loader) => {
+      const item = {
+        size: props.size,
+        width: props.width,
+        key: loader.key,
+        color: loader.color,
+        label: loader.label,
+        modelValue: loader.value * 100,
+        rotate: -90 + (total * 360),
+
+        originalItem: loader,
+      };
+      total += loader.value;
+      return item;
+    },
+  );
+});
+
+const labelsToShow = computed(() => {
+  const labels = new Set(props.labels || loaders.value.map((loader) => loader.key));
+
+  let total = 0;
+  const items = loaders.value
+    .filter((loader) => labels.has(loader.key))
+    .map((loader) => {
+      const item = {
+        key: loader.key,
+        value: loader.label || loader.value,
+        color: loader.color,
+
+        originalItem: loader.originalItem,
+      };
+      total += loader.value;
+      return item;
+    });
+
+  if (props.showEmpty && !props.loading) {
+    items.push({
+      key: '__empty',
+      value: 100 - total,
+      color: 'grey',
+    });
+  }
+
+  return items;
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .progress-container {
   position: relative;
-}
 
-.progress-container > * {
-  position: absolute;
-  top: 0;
-  left: 0;
+  & > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 
 .label-container {

@@ -1,91 +1,96 @@
 <template>
-  <v-container fluid grid-list-lg>
-    <v-layout column>
-      <v-icon size="100" color="pink">
-        mdi-charity
-      </v-icon>
+  <v-container>
+    <v-row class="mb-4">
+      <v-col class="text-center">
+        <v-icon icon="mdi-charity" size="100" color="pink" />
 
-      <h1 class="display-1 text-center mb-2">
-        <span v-if="filteredPartners.length === partners.length">
-          {{ $t('partners.count', { count: partners.length }) }}
-        </span>
-        <span v-else>
-          {{
-            $t('partners.filteredCount', {
-              count: filteredPartners.length,
-              total: partners.length
-            })
-          }}
-        </span>
-      </h1>
-    </v-layout>
+        <h1>{{ title }}</h1>
 
-    <v-row align="center" justify="center">
-      <v-col cols="12" sm="6" md="5" lg="4">
         <v-text-field
           v-model="search"
           :label="$t('partners.search')"
-          solo
-          max-width="200"
-          append-icon="mdi-magnify"
+          variant="outlined"
+          append-inner-icon="mdi-magnify"
           hide-details
+          class="my-3"
         />
       </v-col>
+
+      <v-divider />
     </v-row>
 
-    <v-layout row wrap justify-center>
-      <v-flex v-for="(partner, index) in filteredPartners" :key="index" shrink>
+    <template v-if="status === 'pending' && !partners">
+      <v-row v-for="row in 3" :key="row">
+        <v-col v-for="col in 3" :key="col" cols="12" sm="6" lg="4">
+          <v-skeleton-loader type="card, paragraph" elevation="1" />
+        </v-col>
+      </v-row>
+    </template>
+    <v-row v-else>
+      <v-col
+        v-for="partner in filteredPartners"
+        :key="partner.id"
+        cols="12"
+        sm="6"
+        lg="4"
+      >
         <PartnerCard :partner="partner" />
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
-<script>
-import PartnerCard from '~/components/PartnerCard.vue';
+<script setup>
+const { t } = useI18n();
 
-export default {
-  components: {
-    PartnerCard,
-  },
-  async asyncData({ app }) {
-    return {
-      partners: await app.$axios.$get('/partners'),
-      search: '',
-    };
-  },
+const search = ref('');
 
-  computed: {
-    filteredPartners() {
-      const search = this.search.toLowerCase();
+const {
+  status,
+  data: partners,
+} = await useFetch('/api/partners', { lazy: true });
 
-      if (!search) {
-        return this.partners.slice().sort(this.sortByName);
-      }
+function sortByName(a, b) {
+  return a.name.localeCompare(b.name);
+}
 
-      const partners = this.partners.filter((partner) => {
-        const {
-          name: orgName,
-          acronym,
-          techContactName,
-          docContactName,
-        } = partner;
+const filteredPartners = computed(() => {
+  if (!partners.value) {
+    return [];
+  }
 
-        if (orgName?.toLowerCase?.()?.includes(search)) { return true; }
-        if (acronym?.toLowerCase?.()?.includes(search)) { return true; }
-        if (typeof techContactName === 'string' && techContactName.toLowerCase().includes(search)) { return true; }
-        if (typeof docContactName === 'string' && docContactName.toLowerCase().includes(search)) { return true; }
-        return false;
-      });
+  const query = search.value.toLowerCase();
+  if (!query) {
+    return partners.value.slice().sort(sortByName);
+  }
 
-      return partners.sort(this.sortByName);
-    },
-  },
+  const items = partners.value.filter((partner) => {
+    const {
+      name,
+      acronym,
+      techContactName,
+      docContactName,
+    } = partner;
 
-  methods: {
-    sortByName(a, b) {
-      return (a?.name?.toLowerCase?.() < b?.name?.toLowerCase?.() ? -1 : 1);
-    },
-  },
-};
+    if (name?.toLowerCase?.()?.includes(query)) { return true; }
+    if (acronym?.toLowerCase?.()?.includes(query)) { return true; }
+    if (techContactName?.toLowerCase?.()?.includes(query)) { return true; }
+    if (docContactName?.toLowerCase?.()?.includes(query)) { return true; }
+    return false;
+  });
+
+  return items.sort(sortByName);
+});
+
+const title = computed(() => {
+  if (!partners.value) {
+    return t('partners.count', { count: '???' });
+  }
+
+  if (filteredPartners.value.length === partners.value.length) {
+    return t('partners.count', { count: partners.value.length });
+  }
+  return t('partners.filteredCount', { count: filteredPartners.value.length, total: partners.value.length });
+});
+
 </script>

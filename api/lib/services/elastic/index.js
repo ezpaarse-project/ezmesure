@@ -7,10 +7,11 @@ const password = config.get('elasticsearch.password');
 const host = config.get('elasticsearch.host');
 const port = config.get('elasticsearch.port');
 const scheme = config.get('elasticsearch.scheme');
+const url = config.get('elasticsearch.url');
 
 const client = new Client({
   node: {
-    url: new URL(`${scheme}://${host}:${port}`),
+    url: url ? new URL(url) : new URL(`${scheme}://${host}:${port}`),
     auth: {
       username,
       password,

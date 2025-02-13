@@ -51,19 +51,9 @@ const generateUserRoles = async (username) => {
     const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
 
-    const permissions = new Set(membership.permissions);
-    const otherRoles = [];
-    // Compatibility with legacy reporting
-    if (permissions.has('reporting:write')) {
-      otherRoles.push('ezreporting');
-    } else if (permissions.has('reporting:read')) {
-      otherRoles.push('ezreporting_read_only');
-    }
-
     return [
       ...repoRoles,
       ...spaceRoles,
-      ...otherRoles,
     ];
   }));
 
