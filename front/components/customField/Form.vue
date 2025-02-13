@@ -163,13 +163,14 @@ const customField = ref({ ...(props.modelValue ?? {}) });
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
-const isEditing = computed(() => !!props.modelValue?.id);
+const originalId = computed(() => props.modelValue?.id);
+const isEditing = computed(() => !!originalId.value);
 
 async function save() {
   saving.value = true;
 
   try {
-    const newCustomField = await $fetch(`/api/custom-fields/${customField.value.id}`, {
+    const newCustomField = await $fetch(`/api/custom-fields/${originalId.value || customField.value.id}`, {
       method: 'PUT',
       body: { ...customField.value },
     });
