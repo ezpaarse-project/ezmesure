@@ -38,7 +38,6 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
-  'id',
   'institutionProperties',
   'createdAt',
   'updatedAt',
@@ -56,6 +55,7 @@ const includableFields = [
  */
 const adminUpsertSchema = withModifiers(
   schema,
+  requireFields(['id']),
   ignoreFields(immutableFields),
   withDefaults({
     multiple: false,

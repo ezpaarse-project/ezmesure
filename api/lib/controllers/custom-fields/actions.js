@@ -51,8 +51,8 @@ exports.upsertOne = async (ctx) => {
     }),
     upserted: await service.upsert({
       where: { id: fieldId },
-      create: { ...body, id: fieldId },
-      update: { ...body, id: fieldId },
+      create: body,
+      update: body,
     }),
   }));
 
