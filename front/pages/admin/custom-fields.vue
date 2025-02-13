@@ -32,15 +32,15 @@
       v-bind="vDataTableOptions"
     >
       <template #[`item.properties`]="{ item }">
-        <v-icon v-tooltip="$t('customFields.multivalued')" class="ml-1" :color="item.multiple ? 'primary' : 'grey-lighten-2'">
+        <v-icon v-tooltip:top="$t('customFields.multivalued')" class="ml-1" :color="item.multiple ? 'primary' : 'grey-lighten-2'">
           mdi-label-multiple
         </v-icon>
 
-        <v-icon v-tooltip="$t('customFields.editableByUsers')" class="ml-1" :color="item.editable ? 'primary' : 'grey-lighten-2'">
+        <v-icon v-tooltip:top="$t('customFields.editableByUsers')" class="ml-1" :color="item.editable ? 'primary' : 'grey-lighten-2'">
           mdi-pencil
         </v-icon>
 
-        <v-icon v-tooltip="$t('customFields.visibleToUsers')" class="ml-1" :color="item.visible ? 'primary' : 'grey-lighten-2'">
+        <v-icon v-tooltip:top="$t('customFields.visibleToUsers')" class="ml-1" :color="item.visible ? 'primary' : 'grey-lighten-2'">
           mdi-eye
         </v-icon>
       </template>
