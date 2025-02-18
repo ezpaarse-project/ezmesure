@@ -88,7 +88,7 @@
               v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
-              @click="copyRepositoryPattern(item)"
+              @click="copyAliasPattern(item)"
             />
           </v-list>
         </v-menu>
@@ -257,11 +257,11 @@ function deleteAliases(items) {
 }
 
 /**
- * Put repository ID into clipboard
+ * Put alias ID into clipboard
  *
  * @param {object} param0 Repository
  */
-async function copyRepositoryPattern({ pattern }) {
+async function copyAliasPattern({ pattern }) {
   if (!id) {
     return;
   }

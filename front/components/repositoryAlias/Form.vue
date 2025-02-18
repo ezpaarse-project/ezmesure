@@ -14,7 +14,6 @@
             @submit.prevent="save()"
           >
             <v-row>
-              <!-- TODO: completion -->
               <v-col cols="12">
                 <v-text-field
                   v-model="alias.pattern"
@@ -22,7 +21,7 @@
                   :label="`${$t('repositories.pattern')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
-                    v => /^[a-z0-9*_-]+$/i.test(v) || $t('invalidFormat'),
+                    v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
                   ]"
                   prepend-icon="mdi-form-textbox"
                   variant="underlined"
