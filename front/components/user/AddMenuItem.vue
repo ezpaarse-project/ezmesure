@@ -1,8 +1,7 @@
 <template>
   <v-list-item
-    :key="user.username"
-    :title="user.fullName"
-    :subtitle="user.email"
+    :title="modelValue.fullName"
+    :subtitle="modelValue.email"
     prepend-icon="mdi-account-circle"
     lines="two"
   >
@@ -10,8 +9,8 @@
       <v-menu open-on-hover>
         <template #activator="{ props: menu }">
           <v-chip
-            v-if="user.memberships.length > 0"
-            :text="`${user.memberships.length}`"
+            v-if="modelValue.memberships.length > 0"
+            :text="`${modelValue.memberships.length}`"
             append-icon="mdi-domain"
             class="mr-4"
             v-bind="menu"
@@ -20,26 +19,26 @@
 
         <v-list>
           <v-list-item
-            v-for="({ institution: i }) in user.memberships"
-            :key="`${user.username}:member:${i.id}`"
-            :title="i.name"
-            :to="currentUser?.isAdmin ? `/admin/institutions/${i.id}` : undefined"
+            v-for="({ institution }) in modelValue.memberships"
+            :key="`${modelValue.username}:member:${institution.id}`"
+            :title="institution.name"
+            :to="currentUser?.isAdmin ? `/admin/institutions/${institution.id}` : undefined"
           >
             <template #prepend>
-              <InstitutionAvatar :institution="i" />
+              <InstitutionAvatar :institution="institution" />
             </template>
           </v-list-item>
         </v-list>
       </v-menu>
 
       <v-btn
-        :disabled="isAlreadyMember"
+        :disabled="isAlreadyAssigned"
         :loading="loading"
         icon="mdi-account-plus"
         color="primary"
         variant="tonal"
         size="small"
-        @click="$emit('click', user)"
+        @click="$emit('click', $event)"
       />
     </template>
   </v-list-item>
@@ -47,13 +46,13 @@
 
 <script setup>
 const props = defineProps({
-  user: {
+  modelValue: {
     type: Object,
     required: true,
   },
-  institution: {
-    type: Object,
-    default: () => ({}),
+  list: {
+    type: Array,
+    default: () => [],
   },
   loading: {
     type: Boolean,
@@ -62,12 +61,12 @@ const props = defineProps({
 });
 
 defineEmits({
-  click: (user) => !!user,
+  click: () => true,
 });
 
 const { data: currentUser } = useAuthState();
 
-const isAlreadyMember = computed(
-  () => props.user.memberships.some(({ institution }) => institution.id === props.institution.id),
+const isAlreadyAssigned = computed(
+  () => props.list.some((user) => user.username === props.modelValue.username),
 );
 </script>

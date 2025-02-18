@@ -9,9 +9,10 @@
     </template>
 
     <v-card
-      :title="$t('institutions.members.addMember')"
-      :subtitle="institution.name"
+      :title="title"
+      :subtitle="subtitle"
       :loading="status === 'pending' && 'primary'"
+      prepend-icon="mdi-account-plus"
       min-height="250"
     >
       <template #append>
@@ -46,13 +47,13 @@
         <v-row v-else>
           <v-col>
             <v-list density="compact">
-              <MembershipAddMenuItem
+              <UserAddMenuItem
                 v-for="user in users"
                 :key="user.username"
-                :user="user"
-                :institution="institution"
+                :model-value="user"
+                :list="modelValue"
                 :loading="loadingMap.get(user.username)"
-                @click="addMember($event)"
+                @click="addUser(user)"
               />
             </v-list>
           </v-col>
@@ -64,18 +65,27 @@
 
 <script setup>
 const props = defineProps({
-  institution: {
-    type: Object,
-    required: true,
+  modelValue: {
+    type: Array,
+    default: () => ([]),
+  },
+  title: {
+    type: String,
+    default: undefined,
+  },
+  subtitle: {
+    type: String,
+    default: undefined,
+  },
+  onUserAdd: {
+    type: Function,
+    default: () => {},
   },
 });
 
 const emit = defineEmits({
   'update:model-value': (m) => !!m,
 });
-
-const snacks = useSnacksStore();
-const { t } = useI18n();
 
 const isOpen = ref(false);
 const search = ref('');
@@ -90,25 +100,19 @@ const {
   query: {
     q: debouncedSearch,
     source: '*',
-    include: 'memberships.institution',
+    include: ['memberships.institution'],
   },
 });
 
-async function addMember(user) {
+async function addUser(user) {
   if (!user?.username) {
     return;
   }
 
   loadingMap.value.set(user.username, true);
-  try {
-    const membership = await $fetch(`/api/institutions/${props.institution.id}/memberships/${user.username}`, {
-      method: 'PUT',
-      body: {},
-    });
-    emit('update:model-value', membership);
-    isOpen.value = false;
-  } catch {
-    snacks.error(t('institutions.members.cannotAddMember'));
-  }
+  await props.onUserAdd?.(user);
+  loadingMap.value.set(user.username, false);
+  emit('update:model-value', [...props.modelValue, user]);
+  isOpen.value = false;
 }
 </script>
