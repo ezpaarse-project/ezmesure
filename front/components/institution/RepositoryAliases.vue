@@ -41,17 +41,14 @@
 
           <template v-if="user.isAdmin" #append>
             <v-btn
-              v-if="filterFormDialogRef"
+              v-if="filtersFormDialogRef"
               v-tooltip="$t('repositoryAliases.filtersForm.editFilter')"
               icon="mdi-filter"
               variant="text"
               size="small"
               density="comfortable"
               color="blue"
-              @click="filterFormDialogRef.open(
-                alias,
-                { institution, repository: alias.repository },
-              )"
+              @click="openFiltersDialog(alias)"
             />
 
             <ConfirmPopover
@@ -89,11 +86,20 @@
       @submit="onAliasAdded($event)"
     />
 
-    <RepositoryAliasFilterFormDialog
+    <FiltersFormDialog
       v-if="user.isAdmin"
-      ref="filterFormDialogRef"
+      ref="filtersFormDialogRef"
+      :title="$t('repositoryAliases.filtersForm.title')"
       @submit="onAliasUpdate($event)"
-    />
+    >
+      <template v-if="updatedAlias" #subtitle>
+        <span class="mr-2">
+          {{ updatedAlias.pattern }}
+        </span>
+
+        <RepositoryTypeChip :model-value="updatedAlias.repository" />
+      </template>
+    </FiltersFormDialog>
   </v-card>
 </template>
 
@@ -114,16 +120,25 @@ const emit = defineEmits({
 });
 
 const { data: user } = useAuthState();
+const { t } = useI18n();
+const snacks = useSnacksStore();
 
 /** @type {Ref<object[]>} */
 const aliases = ref(props.institution.repositoryAliases || []);
+/** @type {Ref<object|undefined>} */
+const updatedAlias = ref();
 
 const aliasFormDialogRef = useTemplateRef('aliasFormDialogRef');
-const filterFormDialogRef = useTemplateRef('filterFormDialogRef');
+const filtersFormDialogRef = useTemplateRef('filtersFormDialogRef');
 
 const sortedAliases = computed(
   () => aliases.value.toSorted((a, b) => a.pattern.localeCompare(b.pattern)),
 );
+
+function openFiltersDialog(alias) {
+  updatedAlias.value = alias;
+  filtersFormDialogRef.value?.open(alias.filters);
+}
 
 function onAliasAdded(item) {
   aliases.value.push(item);
@@ -144,19 +159,19 @@ async function removeAlias(item) {
   }
 }
 
-async function onAliasUpdate(item) {
+async function onAliasUpdate(filters) {
   try {
-    await $fetch(`/api/repository-aliases/${item.pattern}`, {
+    await $fetch(`/api/repository-aliases/${updatedAlias.value.pattern}`, {
       method: 'PUT',
       body: {
-        target: item.target,
-        filters: item.filters,
+        target: updatedAlias.value.target,
+        filters,
       },
     });
 
-    const index = aliases.value.findIndex((i) => i.pattern === item.pattern);
+    const index = aliases.value.findIndex((i) => i.pattern === updatedAlias.value.pattern);
     if (index >= 0) {
-      aliases.value[index] = item;
+      aliases.value[index].filters = filters;
     }
 
     emit('update:modelValue', aliases.value);

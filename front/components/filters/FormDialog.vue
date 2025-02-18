@@ -5,12 +5,14 @@
     scrollable
     persistent
   >
-    <RepositoryAliasFilterForm
-      :alias="alias"
-      :repository="repository"
-      show-alias
-      @[`update:alias.filters`]="alias.filters = $event"
+    <FiltersForm
+      v-model="filters"
+      :title="title"
     >
+      <template v-if="$slots.subtitle" #subtitle>
+        <slot name="subtitle" />
+      </template>
+
       <template #actions>
         <v-btn
           :text="$t('cancel')"
@@ -26,32 +28,33 @@
           @click="onSave()"
         />
       </template>
-    </RepositoryAliasFilterForm>
+    </FiltersForm>
   </v-dialog>
 </template>
 
 <script setup>
+defineProps({
+  title: {
+    type: String,
+    default: undefined,
+  },
+});
+
 const emit = defineEmits({
-  submit: (item) => !!item,
+  submit: (values) => true,
 });
 
 const isOpen = ref(false);
-/** @type {Ref<object | undefined>} */
-const alias = ref(undefined);
-/** @type {Ref<object | undefined>} */
-const repository = ref(undefined);
-/** @type {Ref<object | undefined>} */
-const institution = ref(undefined);
+/** @type {Ref<object[] | undefined>} */
+const filters = ref(undefined);
 
-async function open(a, opts) {
-  alias.value = { ...a };
-  repository.value = opts?.repository;
-  institution.value = opts?.institution;
+async function open(values) {
+  filters.value = values;
   isOpen.value = true;
 }
 
 function onSave() {
-  emit('submit', alias.value);
+  emit('submit', filters.value);
   isOpen.value = false;
 }
 

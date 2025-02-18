@@ -1,20 +1,10 @@
 <template>
   <v-card
-    :title="$t('repositoryAliases.filtersForm.title')"
+    :title="title"
     prepend-icon="mdi-filter"
   >
-    <template #subtitle>
-      <span v-if="showAlias" class="mr-2">
-        {{ alias.pattern }}
-      </span>
-
-      <v-chip
-        v-if="repository"
-        :text="repository.type"
-        :color="repoColors.get(repository.type)"
-        size="x-small"
-        density="comfortable"
-      />
+    <template v-if="$slots.subtitle" #subtitle>
+      <slot name="subtitle" />
     </template>
 
     <template #append>
@@ -163,22 +153,22 @@
 
 <script setup>
 const props = defineProps({
-  alias: {
-    type: Object,
-    required: true,
-  },
-  repository: {
-    type: Object,
+  modelValue: {
+    type: Array,
     default: () => undefined,
   },
-  showAlias: {
-    type: Boolean,
-    default: false,
+  title: {
+    type: String,
+    default: undefined,
+  },
+  prependIcon: {
+    type: String,
+    default: undefined,
   },
 });
 
 const emit = defineEmits({
-  'update:alias.filters': (v) => v === undefined || Array.isArray(v),
+  'update:modelValue': (v) => v === undefined || Array.isArray(v),
 });
 
 const { t } = useI18n();
@@ -196,8 +186,8 @@ const isNot = ref(false);
 const rawFilterJSON = ref('');
 
 const filters = computed({
-  get: () => props.alias?.filters ?? [],
-  set: (v) => { emit('update:alias.filters', v.length > 0 ? v : undefined); },
+  get: () => props.modelValue ?? [],
+  set: (v) => { emit('update:modelValue', v.length > 0 ? v : undefined); },
 });
 
 function openForm(filter) {
