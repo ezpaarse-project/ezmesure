@@ -69,7 +69,7 @@ const upsertSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when updating a membership
+ * Schema to be applied when updating a new alias permission
  */
 const updateSchema = withModifiers(
   schema,

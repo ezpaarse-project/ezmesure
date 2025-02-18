@@ -17,7 +17,7 @@ const schema = {
   pattern: Joi.string().trim().min(1),
   target: Joi.string().trim().min(1),
 
-  filters: Joi.array().items(Joi.object({
+  filters: Joi.array().min(1).items(Joi.object({
     name: Joi.string().trim().min(1).required(),
     field: Joi.string().trim().min(1).required(),
     isNot: Joi.boolean().default(false),
