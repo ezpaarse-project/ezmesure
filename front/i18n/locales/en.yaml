@@ -865,6 +865,7 @@ harvest:
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
 elasticRoles:
+  toolbarTitle: Elastic Roles ({count})
   newRole: New role
   editRole: Edit role
   filtersForm.title: Filters of the role
@@ -875,6 +876,10 @@ elasticRoles:
   users: Users
   addUser: Add user
   noUsers: No users is using this role
+  manageElasticRoles: >
+    Manage roles
+    |Manage {count} roles
+  deleteNbRoles: You are about to delete {n} roles
 sync:
   status:
     notSynced: Not yet synchronized

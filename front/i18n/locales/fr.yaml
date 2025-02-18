@@ -885,6 +885,7 @@ harvest:
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
 elasticRoles:
+  toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle
   editRole: Modifier le rôle
   filtersForm.title: Filtres du rôle
@@ -895,6 +896,12 @@ elasticRoles:
   users: Utilisateurs
   addUser: Ajouter un utilisateur
   noUsers: Aucun utilisateur n'utilise ce rôle
+  manageElasticRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  deleteNbRoles: >
+    Vous êtes sur le point de supprimer {n} rôle
+    |Vous êtes sur le point de supprimer {n} rôles
 sync:
   status:
     notSynced: Pas encore synchronisé
