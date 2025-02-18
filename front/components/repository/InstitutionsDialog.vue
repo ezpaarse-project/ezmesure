@@ -8,13 +8,7 @@
       <template v-if="repository" #subtitle>
         {{ repository.pattern }}
 
-        <v-chip
-          :text="repository.type"
-          :color="repoColors.get(repository.type)"
-          size="x-small"
-          density="comfortable"
-          class="ml-2"
-        />
+        <RepositoryTypeChip :model-value="repository" class="ml-2" />
       </template>
 
       <template #append>

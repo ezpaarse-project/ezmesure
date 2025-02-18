@@ -27,13 +27,7 @@
         v-bind="listItem"
       >
         <template #subtitle>
-          <v-chip
-            :text="item.type"
-            :color="repoColors.get(item.type)"
-            size="x-small"
-            density="comfortable"
-            class="ml-2"
-          />
+          <RepositoryTypeChip :model-value="item" class="ml-1" />
         </template>
       </v-list-item>
     </template>

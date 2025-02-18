@@ -36,12 +36,7 @@
           <template v-if="alias.repository" #subtitle>
             {{ alias.repository.pattern }}
 
-            <v-chip
-              :text="$te(`spaces.types.${alias.repository.type}`) ? $t(`spaces.types.${alias.repository.type}`) : alias.repository.type"
-              :color="repoColors.get(alias.repository.type)"
-              size="x-small"
-              density="comfortable"
-            />
+            <RepositoryTypeChip :model-value="alias.repository" />
           </template>
 
           <template v-if="user.isAdmin" #append>
