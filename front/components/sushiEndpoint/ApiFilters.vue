@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.tags"
             :items="availableTags"
             :label="$t('endpoints.tags')"
@@ -39,7 +39,7 @@
         </v-col>
 
         <v-col cols="6">
-          <FiltersButtonsGroup
+          <ApiFiltersButtonsGroup
             v-model="isDisabled"
             :label="$t('endpoints.disabled')"
             prepend-icon="mdi-download-off"
@@ -47,7 +47,7 @@
         </v-col>
 
         <v-col cols="6">
-          <FiltersButtonsGroup
+          <ApiFiltersButtonsGroup
             v-model="filters.active"
             :label="$t('endpoints.active')"
             prepend-icon="mdi-toggle-switch"

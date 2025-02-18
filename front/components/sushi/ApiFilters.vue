@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col v-if="institution" cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.endpointId"
             :search="filters.search"
             :disabled="!!filters.search"
@@ -39,7 +39,7 @@
         </v-col>
 
         <v-col v-if="institution" cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.packages"
             :items="availablePackages"
             :label="$t('institutions.sushi.packages')"
@@ -53,7 +53,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersButtonsGroup
+          <ApiFiltersButtonsGroup
             v-model="filters.connection"
             :label="$t('status')"
             :items="statuses"
@@ -62,7 +62,7 @@
         </v-col>
 
         <v-col cols="6">
-          <FiltersButtonsGroup
+          <ApiFiltersButtonsGroup
             v-model="filters.active"
             :label="$t('endpoints.active')"
             prepend-icon="mdi-toggle-switch"

@@ -9,7 +9,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #filters-panel="props">
-        <RepositoryFilters v-bind="props" />
+        <RepositoryApiFilters v-bind="props" />
       </template>
 
       <v-btn

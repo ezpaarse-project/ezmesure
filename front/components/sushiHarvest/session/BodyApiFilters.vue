@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.endpointId"
             :items="endpointsOptions"
             :loading="credentialStatus === 'pending' && 'primary'"
@@ -38,7 +38,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.institutionId"
             :items="institutionsOptions"
             :loading="credentialStatus === 'pending' && 'primary'"
@@ -51,7 +51,7 @@
         </v-col>
 
         <v-col cols="6">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.reportType"
             :items="reportOptions"
             :label="$t('harvest.jobs.reportType')"
@@ -63,7 +63,7 @@
         </v-col>
 
         <v-col cols="6">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.status"
             :items="statusOptions"
             :label="$t('status')"
@@ -75,7 +75,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.errorCode"
             :empty-symbol="emptySymbol"
             :items="errorOptions"

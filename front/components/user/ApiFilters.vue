@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col cols="12" sm="6">
-          <FiltersButtonsGroup
+          <ApiFiltersButtonsGroup
             v-model="filters.isAdmin"
             :label="$t('users.user.isAdmin')"
             prepend-icon="mdi-security"
@@ -33,7 +33,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.permissions"
             :empty-symbol="emptySymbol"
             :items="permissionsItems"
@@ -46,7 +46,7 @@
         </v-col>
 
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.roles"
             :empty-symbol="emptySymbol"
             :items="rolesItems"

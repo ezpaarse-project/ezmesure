@@ -1,11 +1,11 @@
 <template>
   <div>
     <v-toolbar
-      :title="$t('spaces.filters.title')"
+      :title="$t('repositories.filters.title')"
       style="background-color: transparent;"
     >
       <template #prepend>
-        <v-icon icon="mdi-tab-search" end />
+        <v-icon icon="mdi-database-search" end />
       </template>
 
       <template #append>
@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.type"
             :items="typeItems"
             :label="$t('type')"
@@ -53,10 +53,7 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const {
-  filters,
-  resetFilters,
-} = useFilters(() => props.modelValue, emit);
+const { filters, resetFilters } = useFilters(() => props.modelValue, emit);
 
 const typeItems = computed(() => {
   const types = Array.from(repoColors.keys());

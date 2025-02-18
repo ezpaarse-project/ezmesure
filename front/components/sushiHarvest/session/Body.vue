@@ -23,7 +23,7 @@
               icon
             >
               <template #panel="panel">
-                <SushiHarvestSessionBodyFilters :session-id="modelValue.id" v-bind="panel" />
+                <SushiHarvestSessionBodyApiFilters :session-id="modelValue.id" v-bind="panel" />
               </template>
             </SkeletonFilterButton>
           </template>

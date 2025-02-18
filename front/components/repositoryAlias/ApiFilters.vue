@@ -25,7 +25,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <FiltersSelect
+          <ApiFiltersSelect
             v-model="filters.type"
             :items="typeItems"
             :label="$t('type')"
