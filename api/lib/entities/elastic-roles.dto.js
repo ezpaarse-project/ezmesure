@@ -6,6 +6,8 @@ const {
   requireFields,
 } = require('./schema.utils');
 
+const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
+
 /**
  * Base schema
  * @type {import('joi').SchemaLike}
@@ -14,8 +16,7 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  pattern: Joi.string().trim().min(1),
-  target: Joi.string().trim().min(1),
+  name: Joi.string().trim().min(1).regex(roleNamePattern),
 
   filters: Joi.array().min(1).items(Joi.object({
     name: Joi.string().trim().min(1).required(),
@@ -28,10 +29,11 @@ const schema = {
     ]).allow(null),
   })).allow(null),
 
+  users: Joi.array().items(Joi.object()),
   institutions: Joi.array().items(Joi.object()),
-  repository: Joi.object(),
-  permissions: Joi.array().items(Joi.object()),
-  elasticRolePermissions: Joi.array().items(Joi.object()),
+  repositoryPermissions: Joi.array().items(Joi.object()),
+  repositoryAliasPermissions: Joi.array().items(Joi.object()),
+  spacePermissions: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -40,42 +42,48 @@ const schema = {
 const immutableFields = [
   'updatedAt',
   'createdAt',
+  'users',
   'institutions',
-  'repository',
-  'permissions',
-  'elasticRolePermissions',
+  'repositoryPermissions',
+  'repositoryAliasPermissions',
+  'spacePermissions',
 ];
 
 /**
  * Fields that can be populated with related items
  */
 const includableFields = [
+  'users',
   'institutions',
-  'repository',
-  'permissions',
-  'elasticRolePermissions',
+  'repositoryPermissions',
+  'repositoryPermissions.repository',
+  'repositoryAliasPermissions',
+  'repositoryAliasPermissions.alias',
+  'repositoryAliasPermissions.alias.repository',
+  'spacePermissions',
+  'spacePermissions.space',
 ];
 
 /**
- * Schema to be applied when an administrator creates a repository alias
+ * Schema to be applied when an administrator creates a role
  */
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['pattern', 'target']),
+  requireFields(['name']),
 );
 
 /**
- * Schema to be applied when an administrator connect a repository alias to an institution
+ * Schema to be applied when an administrator connect a role
  */
 const adminCreateOrConnectSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['target']),
+  requireFields(['name']),
 );
 
 /**
- * Schema to be applied when an administrator updates a repository alias
+ * Schema to be applied when an administrator updates a role
  */
 const adminUpdateSchema = withModifiers(
   schema,
@@ -83,14 +91,16 @@ const adminUpdateSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator imports multiple repository aliases
+ * Schema to be applied when an administrator imports multiple roles
  */
 const adminImportSchema = withModifiers(
   adminCreateSchema,
   {
-    pattern: () => schema.pattern,
+    users: () => schema.users,
     institutions: () => schema.institutions,
-    permissions: () => schema.permissions,
+    repositoryPermissions: () => schema.repositoryPermissions,
+    repositoryAliasPermissions: () => schema.repositoryAliasPermissions,
+    spacePermissions: () => schema.spacePermissions,
   },
 );
 

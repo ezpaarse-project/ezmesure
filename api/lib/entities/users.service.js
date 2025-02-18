@@ -127,7 +127,6 @@ module.exports = class UsersService extends BasePrismaService {
    * @returns {Promise<User>}
    */
   async update(params) {
-    // TODO manage role
     const user = await usersPrisma.update(params, this.prisma);
     this.triggerHooks('user:update', user);
     return user;
