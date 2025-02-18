@@ -34,7 +34,7 @@
                     :hint="$t('password.pattern')"
                     :rules="[
                       (v) => !!v || $t('password.passwordIsRequired'),
-                      (v) => v >= 6 || $t('password.length'),
+                      (v) => v.length >= 6 || $t('password.length'),
                     ]"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     prepend-icon="mdi-lock"
@@ -56,8 +56,8 @@
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="[
                       (v) => !!v || $t('password.passwordIsRequired'),
+                      (v) => v.length >= 6 || $t('password.length'),
                       () => passwordRepeat === password || $t('password.notEqual'),
-                      (v) => v >= 6 || $t('password.length'),
                     ]"
                     prepend-icon="mdi-lock"
                     variant="underlined"
