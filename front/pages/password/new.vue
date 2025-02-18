@@ -58,7 +58,6 @@
                       (v) => !!v || $t('password.passwordIsRequired'),
                       (v) => v.length >= 6 || $t('password.length'),
                       () => passwordRepeat === password || $t('password.notEqual'),
-                      (v) => v >= 6 || $t('password.length'),
                     ]"
                     prepend-icon="mdi-lock"
                     variant="underlined"
