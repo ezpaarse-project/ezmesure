@@ -273,7 +273,7 @@ exports.resetPassword = async (ctx) => {
     const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
-      ctx.throw(404, ctx.$t('errors.password.expires'));
+      ctx.throw(400, ctx.$t('errors.password.expires'));
       return;
     }
   }
