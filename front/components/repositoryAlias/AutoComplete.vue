@@ -1,11 +1,12 @@
 <template>
-  <v-combobox
-    :model-value="modelValue?.pattern"
+  <v-autocomplete
+    v-model:search="pattern"
+    :model-value="modelValue"
     :label="`${$t('repositories.pattern')} *`"
-    :items="availableRepositories ?? []"
+    :items="availableAliases ?? []"
     :rules="[
-      () => !!modelValue?.pattern || $t('fieldIsRequired'),
-      () => /^[a-z0-9*_-]+$/i.test(modelValue?.pattern) || $t('invalidFormat'),
+      (v) => !!v?.pattern || $t('fieldIsRequired'),
+      (v) => /^[a-z0-9_-]+$/i.test(v?.pattern) || $t('invalidFormat'),
     ]"
     :loading="status === 'pending' && 'primary'"
     :error="!!error"
@@ -27,11 +28,11 @@
         v-bind="listItem"
       >
         <template #subtitle>
-          <RepositoryTypeChip :model-value="item" class="ml-1" />
+          <RepositoryTypeChip :model-value="item.repository" class="ml-1" />
         </template>
       </v-list-item>
     </template>
-  </v-combobox>
+  </v-autocomplete>
 </template>
 
 <script setup>
@@ -43,20 +44,21 @@ const props = defineProps({
 });
 
 defineEmits({
-  'update:modelValue': (repository) => !!repository,
+  'update:modelValue': (alias) => !!alias,
 });
 
-const pattern = computed(() => props.modelValue?.pattern);
+const pattern = ref(props.modelValue?.pattern);
 const debouncedPattern = useDebounce(pattern, 250);
 
 const {
   error,
   status,
-  data: availableRepositories,
-} = await useFetch('/api/repositories', {
+  data: availableAliases,
+} = await useFetch('/api/repository-aliases', {
   query: {
     q: debouncedPattern,
     sort: 'pattern',
+    include: ['repository'],
   },
 });
 </script>

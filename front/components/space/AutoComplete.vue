@@ -1,17 +1,17 @@
 <template>
-  <v-combobox
-    :model-value="modelValue?.pattern"
-    :label="`${$t('repositories.pattern')} *`"
-    :items="availableRepositories ?? []"
+  <v-autocomplete
+    v-model:search="name"
+    :model-value="modelValue"
+    :label="`${$t('name')} *`"
+    :items="availableSpaces ?? []"
     :rules="[
-      () => !!modelValue?.pattern || $t('fieldIsRequired'),
-      () => /^[a-z0-9*_-]+$/i.test(modelValue?.pattern) || $t('invalidFormat'),
+      (v) => !!v?.id || $t('fieldIsRequired'),
     ]"
     :loading="status === 'pending' && 'primary'"
     :error="!!error"
     :error-messages="error?.message"
-    item-title="pattern"
-    item-value="pattern"
+    item-title="name"
+    item-value="id"
     prepend-icon="mdi-form-textbox"
     variant="underlined"
     hide-details="auto"
@@ -22,7 +22,7 @@
   >
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
-        :title="item.pattern"
+        :title="item.name"
         lines="two"
         v-bind="listItem"
       >
@@ -31,7 +31,12 @@
         </template>
       </v-list-item>
     </template>
-  </v-combobox>
+
+    <template #message="{ message }">
+      <span v-if="message">{{ message }}</span>
+      <RepositoryTypeChip v-if="modelValue" :model-value="modelValue" class="ml-1" />
+    </template>
+  </v-autocomplete>
 </template>
 
 <script setup>
@@ -43,20 +48,20 @@ const props = defineProps({
 });
 
 defineEmits({
-  'update:modelValue': (repository) => !!repository,
+  'update:modelValue': (alias) => !!alias,
 });
 
-const pattern = computed(() => props.modelValue?.pattern);
-const debouncedPattern = useDebounce(pattern, 250);
+const name = ref(props.modelValue?.name);
+const debouncedName = useDebounce(name, 250);
 
 const {
   error,
   status,
-  data: availableRepositories,
-} = await useFetch('/api/repositories', {
+  data: availableSpaces,
+} = await useFetch('/api/kibana-spaces', {
   query: {
-    q: debouncedPattern,
-    sort: 'pattern',
+    q: debouncedName,
+    sort: 'name',
   },
 });
 </script>
