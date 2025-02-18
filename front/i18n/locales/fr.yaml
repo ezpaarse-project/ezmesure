@@ -884,6 +884,17 @@ harvest:
       de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+elasticRoles:
+  newRole: Nouveau rôle
+  editRole: Modifier le rôle
+  filtersForm.title: Filtres du rôle
+  institutions: Établissements
+  addInstitution: Ajouter un établissement
+  noInstitutions: Aucun établissement n'utilise ce rôle
+  readonly: Lecture seule
+  users: Utilisateurs
+  addUser: Ajouter un utilisateur
+  noUsers: Aucun utilisateur n'utilise ce rôle
 sync:
   status:
     notSynced: Pas encore synchronisé

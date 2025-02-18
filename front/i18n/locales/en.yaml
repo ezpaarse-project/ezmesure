@@ -864,6 +864,17 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+elasticRoles:
+  newRole: New role
+  editRole: Edit role
+  filtersForm.title: Filters of the role
+  institutions: Institutions
+  addInstitution: Add institution
+  noInstitutions: No institutions is using this role
+  readonly: Readonly
+  users: Users
+  addUser: Add user
+  noUsers: No users is using this role
 sync:
   status:
     notSynced: Not yet synchronized

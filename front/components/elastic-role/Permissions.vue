@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :title="$t('elasticRoles.access')"
+    :title="$t('institutions.members.accessRights')"
     :subtitle="showRole ? role.name : undefined"
     :loading="loading && 'primary'"
     prepend-icon="mdi-tag-arrow-right"

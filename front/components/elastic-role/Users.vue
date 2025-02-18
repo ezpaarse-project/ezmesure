@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :title="$t('elasticRoles.assignments')"
+    :title="$t('elasticRoles.users')"
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-account-multiple"
   >
