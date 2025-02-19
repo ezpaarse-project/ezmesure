@@ -171,7 +171,8 @@
           isGroupOpen,
         }"
       >
-        <tr>
+        <!-- eslint-disable-next-line vue/no-lone-template -->
+        <tr :ref="registerGroup(item, isGroupOpen, toggleGroup)">
           <td :colspan="columns.length" class="bg-grey-lighten-3">
             <div class="d-flex align-center">
               <v-checkbox
@@ -355,6 +356,7 @@ const { params } = useRoute();
 const { t, locale } = useI18n();
 const { addToCheck } = useSushiCheckQueueStore();
 const { isSupported: clipboard, copy } = useClipboard();
+const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
 const search = ref('');
@@ -638,8 +640,74 @@ async function resetConnectionsOfInstitutions() {
   await resetConnections(items);
 }
 
+// const groupsOpenedByDefault = new Map();
+// /**
+//  * Open group by default, Vuetify doesn't provide ways to toggle groups from outside
+//  *
+//  * @see https://github.com/vuetifyjs/vuetify/issues/17707
+//  *
+//  * @param {Object} item Vuetify group
+//  * @param {Function} isGroupOpen Function to check if group is open (provided by Vuetify)
+//  * @param {Function} toggleGroup Function to open group (provided by Vuetify)
+//  */
+// function openByDefault(item, isGroupOpen, toggleGroup) {
+//   if (status.value === 'success' && !isGroupOpen(item) && !groupsOpenedByDefault.has(item.id)) {
+//     toggleGroup(item);
+//     groupsOpenedByDefault.set(item.id, true);
+//   }
+// }
+
+// Map to keep track of groups in v-datatable
+const vDataTableGroups = new Map();
+/**
+ * Register group of v-datatable
+ *
+ * @see https://github.com/vuetifyjs/vuetify/issues/17707
+ *
+ * @param {Object} item Vuetify group
+ * @param {Function} isGroupOpen Function to check if group is open (provided by Vuetify)
+ * @param {Function} toggleGroup Function to open group (provided by Vuetify)
+ */
+function registerGroup(item, isGroupOpen, toggleGroup) {
+  if (vDataTableGroups.has(item.id)) {
+    return;
+  }
+
+  vDataTableGroups.set(item.id, {
+    item,
+    get isOpened() { return isGroupOpen(item); },
+    toggleGroup: () => toggleGroup(item),
+  });
+}
+
+/**
+ * Toggle all v-datatable group state
+ *
+ * @param state The state to set
+ */
+function toggleAllGroups(state) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const group of vDataTableGroups.values()) {
+    if (group.isOpened !== state) {
+      try {
+        group.toggleGroup();
+      } catch (e) {
+        console.error('Unable to open group', group.item, e);
+      }
+    }
+  }
+}
+
 watchOnce(
   sushis,
   () => calcSushiMetrics(),
+);
+
+watchOnce(
+  () => status.value === 'success',
+  async () => {
+    await nextTick();
+    toggleAllGroups(true);
+  },
 );
 </script>
