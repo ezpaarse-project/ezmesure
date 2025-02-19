@@ -20,11 +20,10 @@
     "kibana",
     "reporting",
     "rp",
-    "tools",
-    "front"
+    "tools"
   ],
   // i18n-ally settings
-  "i18n-ally.localesPaths": "front/locales",
+  "i18n-ally.localesPaths": "front/i18n/locales",
   "i18n-ally.enabledFrameworks": [
     "vue"
   ],
