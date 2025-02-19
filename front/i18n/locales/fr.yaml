@@ -223,7 +223,8 @@ endpoints:
   activeSince: Actif depuis le {date}
   inactiveSince: Inactif depuis le {date}
   technicalProvider: Prestataire technique
-  counterVersion: Version de COUNTER
+  counterVersion: Versions de COUNTER
+  counterVersionTooltip: Supporte COUNTER {version}
   testedReport: Rapport utilisé pour le test de connexion
   requireCustomerId: Un customer ID est nécessaire
   requireRequestorId: Un requestor ID est nécessaire
