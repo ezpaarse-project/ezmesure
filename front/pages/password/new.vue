@@ -140,15 +140,10 @@ async function replacePassword() {
 
     success.value = true;
   } catch (err) {
-    if (!(err instanceof Error)) {
-      errorMessage.value = t('authenticate.failed');
-      return;
-    }
-
-    if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = t('authenticate.loginFailed');
+    if (err?.data?.error) {
+      errorMessage.value = err?.data?.error;
     } else {
-      errorMessage.value = t('authenticate.failed');
+      errorMessage.value = t('anErrorOccurred');
     }
   }
   loading.value = false;
