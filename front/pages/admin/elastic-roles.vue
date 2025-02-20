@@ -27,14 +27,6 @@
       return-object
       v-bind="vDataTableOptions"
     >
-      <template #[`item.filters`]="{ value }">
-        <v-icon
-          v-if="!!value"
-          icon="mdi-filter"
-          size="small"
-        />
-      </template>
-
       <template #[`item.users`]="{ item, value }">
         <v-chip
           :text="`${value.length}`"
@@ -102,13 +94,6 @@
           </template>
 
           <v-list>
-            <v-list-item
-              v-if="roleFormDialogRef"
-              :title="$t('modify')"
-              prepend-icon="mdi-pencil"
-              @click="roleFormDialogRef.open(item)"
-            />
-
             <v-list-item
               :title="$t('delete')"
               prepend-icon="mdi-delete"
@@ -205,11 +190,6 @@ const headers = computed(() => [
   {
     title: t('name'),
     value: 'name',
-  },
-  {
-    title: t('repositoryAliases.filtered'),
-    value: 'filters',
-    align: 'center',
   },
   {
     title: t('menu.users'),
@@ -319,7 +299,7 @@ function deleteRoles(items) {
  * @param {object} param0 Repository
  */
 async function copyRoleName({ name }) {
-  if (!id) {
+  if (!name) {
     return;
   }
 

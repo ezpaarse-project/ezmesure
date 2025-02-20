@@ -1,7 +1,6 @@
 <template>
   <v-card
-    :title="isEditing ? $t('elasticRoles.editRole') : $t('elasticRoles.newRole')"
-    :subtitle="isEditing ? modelValue.name : undefined"
+    :title="$t('elasticRoles.newRole')"
     prepend-icon="mdi-account-tag"
   >
     <template #text>
@@ -28,16 +27,6 @@
                 />
               </v-col>
             </v-row>
-
-            <v-row>
-              <v-col>
-                <FiltersForm
-                  v-model="role.filters"
-                  :title="$t('elasticRoles.filtersForm.title')"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
           </v-form>
         </v-col>
       </v-row>
@@ -49,8 +38,8 @@
       <slot name="actions" />
 
       <v-btn
-        :text="!isEditing ? $t('add') : $t('save')"
-        :prepend-icon="!isEditing ? 'mdi-plus' : 'mdi-content-save'"
+        :text="$t('add')"
+        :prepend-icon="'mdi-plus'"
         :disabled="!valid"
         :loading="loading"
         type="submit"
@@ -63,17 +52,6 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => undefined,
-  },
-  showRole: {
-    type: Boolean,
-    default: false,
-  },
-});
-
 const emit = defineEmits({
   submit: (item) => !!item,
 });
@@ -83,9 +61,7 @@ const snacks = useSnacksStore();
 
 const loading = ref(false);
 const valid = ref(false);
-const role = ref({ ...(props.modelValue ?? {}) });
-
-const isEditing = computed(() => !!props.modelValue?.name);
+const role = ref({});
 
 async function save() {
   loading.value = true;
@@ -95,7 +71,6 @@ async function save() {
       method: 'PUT',
       body: {
         name: role.value.name,
-        filters: role.value.filters,
       },
     });
     emit('submit', newRole);

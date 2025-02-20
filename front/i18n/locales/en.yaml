@@ -867,7 +867,6 @@ harvest:
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role
-  editRole: Edit role
   filtersForm.title: Filters of the role
   institutions: Institutions
   addInstitution: Add institution

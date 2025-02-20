@@ -1,5 +1,3 @@
-const { Prisma } = require('@prisma/client');
-
 const ElasticRoleService = require('../../entities/elastic-roles.service');
 const ElasticRoleRepositoryPermissionService = require('../../entities/elastic-role-repository-permissions.service');
 const ElasticRoleRepositoryAliasPermissionService = require('../../entities/elastic-role-repository-alias-permissions.service');
@@ -66,7 +64,6 @@ exports.upsertRole = async (ctx) => {
   const elasticRoleService = new ElasticRoleService();
 
   const data = {
-    filters: Prisma.DbNull,
     name,
     ...body,
   };

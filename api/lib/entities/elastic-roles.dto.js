@@ -18,17 +18,6 @@ const schema = {
 
   name: Joi.string().trim().min(1).regex(roleNamePattern),
 
-  filters: Joi.array().min(1).items(Joi.object({
-    name: Joi.string().trim().min(1).required(),
-    field: Joi.string().trim().min(1).required(),
-    isNot: Joi.boolean().default(false),
-    value: Joi.alternatives([
-      // Null values are allowed to check if empty
-      Joi.string().trim().min(1), // Exact match
-      Joi.array().items(Joi.string().trim().min(1)), // One of
-    ]).allow(null),
-  })).allow(null),
-
   users: Joi.array().items(Joi.object()),
   institutions: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),
@@ -40,6 +29,7 @@ const schema = {
  * Fields that cannot be changed but could be found in request body
  */
 const immutableFields = [
+  'name',
   'updatedAt',
   'createdAt',
   'users',

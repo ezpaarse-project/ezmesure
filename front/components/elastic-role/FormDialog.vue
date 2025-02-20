@@ -4,10 +4,7 @@
     width="500"
     @update:model-value="isOpen = false"
   >
-    <ElasticRoleForm
-      :model-value="role"
-      @submit="onSave($event)"
-    >
+    <ElasticRoleForm @submit="onSave($event)">
       <template #actions>
         <v-btn
           :text="$t('close')"
@@ -26,11 +23,8 @@ const emit = defineEmits({
 
 const isOpen = ref(false);
 const hasChanged = ref(false);
-/** @type {Ref<object|null>} */
-const role = ref(null);
 
-function open(elasticRole) {
-  role.value = elasticRole;
+function open() {
   hasChanged.value = false;
   isOpen.value = true;
 }

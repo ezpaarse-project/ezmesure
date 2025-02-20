@@ -252,8 +252,6 @@ model RepositoryAliasPermission {
 model ElasticRole {
   /// Name of the role
   name                       String                                 @id
-  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
-  filters                    Json?
   /// Users using this roles
   users                      User[]
   /// Institutions using this roles
