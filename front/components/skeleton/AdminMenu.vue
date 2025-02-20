@@ -27,6 +27,11 @@
         prepend-icon="mdi-api"
       />
       <v-list-item
+        :title="$t('menu.customFields')"
+        to="/admin/custom-fields"
+        prepend-icon="mdi-tag-outline"
+      />
+      <v-list-item
         :title="$t('menu.harvest')"
         to="/admin/harvests"
         prepend-icon="mdi-tractor"

@@ -34,8 +34,7 @@ services:
     restart: unless-stopped
 
   kibana:
-    build:
-      context: ./kibana
+    image: docker.elastic.co/kibana/kibana:7.14.1
     ports:
       - 5601:5601
     environment:
@@ -176,41 +175,6 @@ services:
       - ./rp/apache2/ssl:/etc/ssl/certificates
       - ./rp/sp-log/:/var/log/shibboleth/
       - ./rp/sp-cache:/var/cache/shibboleth
-    restart: unless-stopped
-
-  legacy-reporting:
-    build:
-      context: ./reporting
-      args:
-        - http_proxy
-        - https_proxy
-    ports:
-      - 4000:3000
-    environment:
-      - http_proxy
-      - https_proxy
-      - no_proxy=localhost,rp
-      - REPORTING_PORT=3000
-      - REPORTING_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
-      - REPORTING_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
-      - REPORTING_ELASTIC_USER=${ELASTICSEARCH_USERNAME}
-      - REPORTING_ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - REPORTING_SMTP_HOST=${EZMESURE_SMTP_HOST}
-      - REPORTING_SMTP_PORT=${EZMESURE_SMTP_PORT}
-      - REPORTING_SMTP_SECURE=${EZMESURE_SMTP_SECURE}
-      - REPORTING_SMTP_IGNORE_TLS=${EZMESURE_SMTP_IGNORE_TLS}
-      - REPORTING_SMTP_REJECT_UNAUTHORIZED=${EZMESURE_SMTP_REJECT_UNAUTHORIZED}
-      - REPORTING_SENDER
-      - REPORTING_INDEX=.ezreporting
-      - REPORTING_FREQUENCIES
-      - KIBANA_INTERNAL_URL=${KIBANA_INTERNAL_URL:-https://rp/kibana}
-      - KIBANA_EXTERNAL_URL
-      - NODE_CONFIG
-      - REPORTING_NAME
-    volumes:
-      - "./api/templates:/usr/src/app/templates"
-      - "./reporting/logs:/usr/src/app/logs"
-      - "./reporting/tmp:/usr/src/app/tmp"
     restart: unless-stopped
 
   reporting:

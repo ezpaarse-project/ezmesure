@@ -1,9 +1,10 @@
 const { HarvestJobStatus } = require('@prisma/client');
-const { subDays, formatDistanceToNow } = require('date-fns');
+const { subDays, endOfDay, formatDistanceToNow } = require('date-fns');
 const { CronJob } = require('cron');
 const config = require('config');
 
 const HarvestsService = require('../entities/harvest.service');
+const HarvestJobsService = require('../entities/harvest-job.service');
 
 const { harvestQueue } = require('./jobs');
 const { appLogger } = require('./logger');
@@ -12,7 +13,8 @@ const harvestConfig = config.get('jobs.harvest');
 
 function cancelPendingHarvest() {
   return HarvestsService.$transaction(async (harvestsService) => {
-    // Get all pending/running harvests older than 1 day
+    const harvestJobService = new HarvestJobsService(harvestsService);
+    // Get all pending/running harvests older than 1 day (rounded)
     const harvests = await harvestsService.findMany({
       where: {
         status: {
@@ -23,29 +25,23 @@ function cancelPendingHarvest() {
           ],
         },
         harvestedAt: {
-          lte: subDays(new Date(), 1),
+          lte: endOfDay(subDays(new Date(), 1)),
         },
       },
     });
 
     await Promise.all(
       harvests.map(async (harvest) => {
-        // Check if the job is still in the queue
+        // If the job is still in the queue, it means it is still running so don't cancel it
         const job = await harvestQueue.getJob(harvest.harvestedById);
         if (job) {
           appLogger.warn(`[harvest-pending-cancel] ${harvest.status} job (${job.id}) still in queue while started ${formatDistanceToNow(harvest.harvestedAt, { addSuffix: true })}`);
           return;
         }
 
-        // Cancel the job otherwise
-        await harvestsService.update({
-          where: {
-            credentialsId_reportId_period: {
-              credentialsId: harvest.credentialsId,
-              reportId: harvest.reportId,
-              period: harvest.period,
-            },
-          },
+        // Mark the harvest job as interrupted, the hooks will update the harvest state
+        await harvestJobService.update({
+          where: { id: harvest.harvestedById },
           data: { status: HarvestJobStatus.interrupted },
         });
       }),

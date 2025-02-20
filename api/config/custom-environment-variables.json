@@ -4,6 +4,7 @@
     "scheme": "EZMESURE_ELASTIC_SCHEME",
     "port": "EZMESURE_ELASTIC_PORT",
     "host": "EZMESURE_ELASTIC_HOST",
+    "url": "EZMESURE_ELASTIC_URL",
     "user": "EZMESURE_ELASTIC_USER",
     "password": "ELASTICSEARCH_PASSWORD",
     "apiVersion": "EZMESURE_ELASTIC_VERSION",
@@ -14,6 +15,7 @@
     "password": "KIBANA_PASSWORD",
     "port": "EZMESURE_KIBANA_PORT",
     "host": "EZMESURE_KIBANA_HOST",
+    "url": "EZMESURE_KIBANA_URL",
     "dateFormat": "EZMESURE_KIBANA_DATE_FORMAT",
     "syncSchedule": "EZMESURE_KIBANA_SYNC_SCHEDULE"
   },

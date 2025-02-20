@@ -181,22 +181,22 @@
 
     <InstitutionFormDialog
       ref="institutionFormDialogRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
 
     <InstitutionComponentsDialog
       ref="institutionComponentsDialogRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
 
     <InstitutionRepositoriesDialog
       ref="institutionRepositoriesDialogRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
 
     <InstitutionSpacesDialog
       ref="institutionSpacesDialogRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
   </div>
 </template>
@@ -243,7 +243,14 @@ const {
   // reactivity please use `query.something = myReactiveThingy.value`
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-    include: ['repositories', 'spaces', 'memberships', 'childInstitutions', 'sushiCredentials'],
+    include: [
+      'repositories',
+      'spaces',
+      'memberships',
+      'childInstitutions',
+      'sushiCredentials',
+      'customProps.field',
+    ],
   },
 });
 

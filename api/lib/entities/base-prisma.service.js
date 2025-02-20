@@ -8,6 +8,12 @@ const { client } = require('../services/prisma');
 /* eslint-enable max-len */
 
 /**
+ * @typedef {Object} BasePrismaServiceOptions
+ * @property {boolean} [shouldTriggerHooks=true] Should trigger hooks when using methods of the
+ * service. (Default: `true`).
+ */
+
+/**
  * @template {BasePrismaService} S
  * @typedef {(service: S) => Promise<any>} Executor
  */
@@ -19,8 +25,17 @@ const { client } = require('../services/prisma');
 
 /** @abstract @class */
 class BasePrismaService {
-  /** @type {Promise<any> | undefined} */
+  /**
+   * @type {Promise<any> | undefined} The current transaction. If `undefined` no transaction is
+   * active
+   */
   currentTransaction = undefined;
+
+  /**
+   * @private
+   * @type {boolean} Should trigger hooks when using methods of the service. (Default: `true`).
+   */
+  shouldTriggerHooks = true;
 
   /**
    * Create a new service with a prisma client
@@ -28,8 +43,12 @@ class BasePrismaService {
    * @param {TransactionClient | BasePrismaService} prismaOrService Prisma instance or service.
    * Default to global prisma instance, if a service is provided it'll reuse the prisma instance
    * and transaction
+   * @param {BasePrismaServiceOptions} [opts] Options to configure the current instance of the
+   * service
    */
-  constructor(prismaOrService = client) {
+  constructor(prismaOrService = client, opts = {}) {
+    this.shouldTriggerHooks = opts?.shouldTriggerHooks ?? true;
+
     if (prismaOrService instanceof BasePrismaService) {
       this.prisma = prismaOrService.prisma;
       this.currentTransaction = prismaOrService.currentTransaction;
@@ -43,13 +62,15 @@ class BasePrismaService {
    * Start a new interactive transaction
    *
    * @param {Function} executor The executor of the transaction, take a service as parameter
+   * @param {BasePrismaServiceOptions} [opts] Options to configure the current instance of the
+   * service
    *
    * @returns {Promise<any>} The result of the transaction
    */
-  static $transaction(executor) {
+  static $transaction(executor, opts = {}) {
     const currentTransaction = client.$transaction(
       (tx) => {
-        const service = new this(tx);
+        const service = new this(tx, opts);
         service.currentTransaction = currentTransaction;
 
         return executor(service);
@@ -72,6 +93,10 @@ class BasePrismaService {
    * `false` otherwise. If in transaction returns a Promise resolved when the hook is triggered
    */
   triggerHooks(action, ...payload) {
+    if (!this.shouldTriggerHooks) {
+      return false;
+    }
+
     if (!this.currentTransaction) {
       return triggerHooks(action, ...payload);
     }

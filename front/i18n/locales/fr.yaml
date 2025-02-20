@@ -27,6 +27,7 @@ menu:
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
+  customFields: Champs personnalisés
 home:
   whatDoesEzMESURE: Qu'est-ce qu'ezMESURE ?
   supportedBy: Ce service est soutenu par
@@ -355,6 +356,8 @@ institutions:
     linkedinUrl: URL Linkedin
     youtubeUrl: URL Youtube
     facebookUrl: URL Facebook
+    customProperties: Propriétés personnalisées
+    propertyName: Nom de propriété
   members:
     noMembers: Aucun membre
     title: Membres ({count})
@@ -679,6 +682,7 @@ password:
   waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
   notEqual: Les mots de passes ne correspondent pas
   updated: Mot de passe mis à jour
+  youCanNowLogin: Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
   pattern: Minimum 6 caractères
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
@@ -888,6 +892,22 @@ social:
   linkedin: LinkedIn
   youtube: Youtube
   facebook: Facebook
+customFields:
+  toolbarTitle: Champs personnalisés ({count})
+  pageDesc: Entrez ici les champs personnalisés que vous souhaitez pouvoir associer aux établissements.
+  newField: Nouveau champ personnalisé
+  editField: Modifier le champ personnalisé
+  deleteNbCustomField: Supprimer 1 champ personnalisé|Supprimer {count} champs personnalisés
+  editableByUsers: Modifiable par les utilisateurs
+  visibleToUsers: Visible par les utilisateurs
+  multivalued: Multivalué
+  helpUrl: URL d'aide
+  itemUrl: URL de la page de l'établissement
+  labelFr: Label en français
+  labelEn: Label en anglais
+  descriptionFr: Description en français
+  descriptionEn: Description en anglais
+  manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -902,6 +922,8 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
+label: Label
+properties: Propriétés
 description: Description
 initials: Initiales
 language: Langue

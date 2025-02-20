@@ -143,7 +143,13 @@ const syncSpace = async (space) => {
       kibana: [
         {
           spaces: [space.id],
-          base: ['read'],
+          feature: {
+            discover: ['read'],
+            dashboard: ['read'],
+            canvas: ['read'],
+            maps: ['read'],
+            visualize: ['read'],
+          },
         },
       ],
     },
@@ -155,7 +161,15 @@ const syncSpace = async (space) => {
       kibana: [
         {
           spaces: [space.id],
-          base: ['all'],
+          feature: {
+            discover: ['all'],
+            dashboard: ['all'],
+            canvas: ['all'],
+            maps: ['all'],
+            visualize: ['all'],
+
+            indexPatterns: ['all'],
+          },
         },
       ],
     },
