@@ -668,6 +668,7 @@ password:
   waitFewMinutes: If it doesn’t appear within a few minutes, check your spam folder
   notEqual: Passwords don't match
   updated: Password updated
+  youCanNowLogin: You can now log in with your new credentials.
   pattern: Minimum 6 characters
   length: The password must be at least 6 characters long
   update: Update your password

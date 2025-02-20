@@ -682,6 +682,7 @@ password:
   waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
   notEqual: Les mots de passes ne correspondent pas
   updated: Mot de passe mis à jour
+  youCanNowLogin: Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
   pattern: Minimum 6 caractères
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
