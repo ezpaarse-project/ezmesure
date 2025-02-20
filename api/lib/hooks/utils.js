@@ -25,6 +25,48 @@ const generateRoleNameFromRepository = (repository, modifier) => `repository.${r
 const generateRoleNameFromAlias = (alias, repository) => `alias.${alias.pattern}.${repository.type}`;
 
 /**
+ *
+ * @param {{ readonly: boolean }} entity
+ * @returns
+ */
+const generateElasticPermissions = (entity) => {
+  if (entity.readonly) {
+    return { privileges: ['read', 'view_index_metadata'] };
+  }
+  return { privileges: ['all'] };
+};
+
+/**
+ *
+ * @param {{ readonly: boolean }} entity
+ * @returns
+ */
+const generateKibanaFeatures = (entity) => {
+  if (entity.readonly) {
+    return {
+      features: {
+        discover: ['read'],
+        dashboard: ['read'],
+        canvas: ['read'],
+        maps: ['read'],
+        visualize: ['read'],
+      },
+    };
+  }
+  return {
+    features: {
+      discover: ['all'],
+      dashboard: ['all'],
+      canvas: ['all'],
+      maps: ['all'],
+      visualize: ['all'],
+
+      indexPatterns: ['all'],
+    },
+  };
+};
+
+/**
  * Generate all Elasticsearch roles for a given username, based on the associated memberships
  * @param {string} username - The username of the user we want to generate roles for
  * @returns {Promise<string[]>} all roles for the user
@@ -33,8 +75,14 @@ const generateUserRoles = async (username) => {
   const user = await prisma.user.findUnique({
     where: { username },
     include: {
+      elasticRoles: true,
       memberships: {
         include: {
+          institution: {
+            include: {
+              elasticRoles: true,
+            },
+          },
           spacePermissions: {
             include: {
               space: true,
@@ -63,17 +111,22 @@ const generateUserRoles = async (username) => {
     return [];
   }
 
+  const additionalRoles = user.elasticRoles.map((role) => role.name);
+
   const roles = new Set(user.memberships?.flatMap?.((membership) => {
     const repoRoles = membership?.repositoryPermissions?.map((perm) => generateRoleNameFromRepository(perm.repository, perm.readonly ? 'readonly' : 'all')) || [];
     const aliasRoles = membership?.repositoryAliasPermissions?.map(
       (perm) => generateRoleNameFromAlias(perm.alias, perm.alias.repository),
     ) || [];
     const spaceRoles = membership?.spacePermissions?.map((perm) => generateRoleNameFromSpace(perm.space, perm.readonly ? 'readonly' : 'all')) || [];
+    const institutionRoles = membership?.institution?.elasticRoles.map((role) => role.name);
 
     return [
       ...repoRoles,
       ...aliasRoles,
       ...spaceRoles,
+      ...institutionRoles,
+      ...additionalRoles,
     ];
   }));
 
@@ -88,5 +141,7 @@ module.exports = {
   generateRoleNameFromAlias,
   generateRoleNameFromSpace,
   generateRoleNameFromRepository,
+  generateElasticPermissions,
+  generateKibanaFeatures,
   generateUserRoles,
 };

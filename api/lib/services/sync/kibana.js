@@ -1,14 +1,18 @@
 const config = require('config');
 const { CronJob } = require('cron');
+
+const prisma = require('../prisma');
 const { appLogger } = require('../logger');
 const kibana = require('../kibana');
 const assets = require('../assets');
 
 const RepositoriesService = require('../../entities/repositories.service');
 const SpacesService = require('../../entities/spaces.service');
+const ElasticRoleService = require('../../entities/elastic-roles.service');
 
 const {
   generateRoleNameFromSpace,
+  generateKibanaFeatures,
 } = require('../../hooks/utils');
 
 const { execThrottledPromises } = require('../promises');
@@ -137,43 +141,15 @@ const syncSpace = async (space) => {
     appLogger.verbose(`[kibana] Default settings failed to be applied in space [${space.id}]:\n${error}`);
   }
 
-  await kibana.putRole({
-    name: generateRoleNameFromSpace(space, 'readonly'),
-    body: {
-      kibana: [
-        {
-          spaces: [space.id],
-          feature: {
-            discover: ['read'],
-            dashboard: ['read'],
-            canvas: ['read'],
-            maps: ['read'],
-            visualize: ['read'],
-          },
-        },
-      ],
-    },
-  });
+  await kibana.putRole(
+    generateRoleNameFromSpace(space, 'readonly'),
+    new Map([[space.id, generateKibanaFeatures({ readonly: true })]]),
+  );
 
-  await kibana.putRole({
-    name: generateRoleNameFromSpace(space, 'all'),
-    body: {
-      kibana: [
-        {
-          spaces: [space.id],
-          feature: {
-            discover: ['all'],
-            dashboard: ['all'],
-            canvas: ['all'],
-            maps: ['all'],
-            visualize: ['all'],
-
-            indexPatterns: ['all'],
-          },
-        },
-      ],
-    },
-  });
+  await kibana.putRole(
+    generateRoleNameFromSpace(space, 'all'),
+    new Map([[space.id, generateKibanaFeatures({ readonly: false })]]),
+  );
 
   await syncIndexPatterns(space);
 };
@@ -233,8 +209,77 @@ const unmountSpace = async (space) => {
   }
 };
 
+/**
+ * Sync a custom role in kibana
+ *
+ * @param {string} roleName - The role to sync
+ * @returns {Promise<void>}
+ */
+async function syncCustomRole(roleName) {
+  const role = await prisma.client.elasticRole.findUnique({
+    where: { name: roleName },
+    include: {
+      spacePermissions: true,
+    },
+  });
+  if (!role) {
+    appLogger.error(`[kibana] Cannot create custom role [${roleName}], role not found`);
+    return;
+  }
+
+  try {
+    /** @type {[string, { privileges: string[] }][]} */
+    const spacePermissions = role.spacePermissions.map(
+      (p) => [p.spaceId, generateKibanaFeatures(p)],
+    );
+
+    await kibana.putRole(role.name, new Map(spacePermissions));
+    appLogger.verbose(`[kibana] Role [${role.name}] has been upserted`);
+  } catch (error) {
+    console.log(error.response.data);
+
+    appLogger.error(`[kibana] Role [${role.name}] cannot be upserted:\n${error}`);
+  }
+}
+
+/**
+ * Sync all custom roles in kibana
+ *
+ * @returns {Promise<ThrottledPromisesResult>}
+ */
+async function syncCustomRoles() {
+  const elasticRoleService = new ElasticRoleService();
+  const roles = await elasticRoleService.findMany({});
+
+  const executors = roles.map((role) => () => syncCustomRole(role.name));
+
+  const res = await execThrottledPromises(
+    executors,
+    (error) => appLogger.warn(`[kibana] Error on upserting custom roles: ${error.message}`),
+  );
+  appLogger.verbose(`[kibana] Upserted ${res.fulfilled} custom roles (${res.errors} errors)`);
+
+  return res;
+}
+
+/**
+ * Delete custom role in kibana
+ *
+ * @param {string} roleName - The role to sync
+ * @returns {Promise<void>}
+ */
+async function unmountCustomRole(roleName) {
+  try {
+    await kibana.deleteRole(roleName);
+    appLogger.verbose(`[kibana] Role [${roleName}] has been deleted`);
+  } catch (error) {
+    appLogger.error(`[kibana] Role [${roleName}] cannot be deleted:\n${error}`);
+  }
+}
+
 const sync = async () => {
   await syncSpaces();
+  await syncCustomRoles();
 };
 
 /**
@@ -267,4 +312,7 @@ module.exports = {
   syncSpace,
   syncSpaces,
   unmountSpace,
+  syncCustomRole,
+  syncCustomRoles,
+  unmountCustomRole,
 };

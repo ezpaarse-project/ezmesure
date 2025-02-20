@@ -51,12 +51,7 @@ exports.connectRole = async (ctx) => {
   const userService = new UserService();
 
   ctx.status = 200;
-  ctx.body = await userService.update({
-    where: { username },
-    data: {
-      elasticRoles: { connect: { name } },
-    },
-  });
+  ctx.body = await userService.connectRole(username, name);
 };
 
 exports.disconnectRole = async (ctx) => {
@@ -65,10 +60,5 @@ exports.disconnectRole = async (ctx) => {
   const userService = new UserService();
 
   ctx.status = 200;
-  ctx.body = await userService.update({
-    where: { username },
-    data: {
-      elasticRoles: { disconnect: { name } },
-    },
-  });
+  ctx.body = await userService.disconnectRole(username, name);
 };

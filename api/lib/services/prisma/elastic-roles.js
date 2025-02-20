@@ -14,11 +14,10 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.ElasticRoleCreateArgs} ElasticRoleCreateArgs
  * @typedef {import('@prisma/client').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs
  *
- * @typedef {import('@prisma/client').ElasticRoleRepositoryPermission} ElasticRoleRepositoryPermission
- * @typedef {import('@prisma/client').ElasticRoleRepositoryAliasPermission} ElasticRoleRepositoryAliasPermission
- * @typedef {import('@prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission
+ * @typedef {import('@prisma/client').User} User
+ * @typedef {import('@prisma/client').Institution} Institution
  *
- * @typedef {ElasticRole & { repositoryPermissions: ElasticRoleRepositoryPermission[], repositoryAliasPermissions: ElasticRoleRepositoryAliasPermission[], spacePermissions: ElasticRoleSpacePermission[] }} OldElasticRole
+ * @typedef {ElasticRole & { users: User[], institutions: Institution[] }} OldElasticRole
  * @typedef {{deleteResult: ElasticRole, deletedElasticRole: OldElasticRole }} ElasticRoleRemoved
  * @typedef {{newElasticRole: ElasticRole, oldElasticRole: OldElasticRole }} ElasticRoleUpdated
  */
@@ -96,9 +95,8 @@ async function remove(params, tx = prisma) {
   const elasticRole = await tx.elasticRole.findUnique({
     where: params.where,
     include: {
-      repositoryPermissions: true,
-      repositoryAliasPermissions: true,
-      spacePermissions: true,
+      users: true,
+      institutions: true,
     },
   });
 

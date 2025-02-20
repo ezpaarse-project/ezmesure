@@ -84,6 +84,9 @@ module.exports = class ElasticRoleService extends BasePrismaService {
 
     const { deletedElasticRole } = res;
     this.triggerHooks('elastic_role:delete', deletedElasticRole);
+    deletedElasticRole.users.forEach((user) => { this.triggerHooks('user:disconnect:elastic_role', { user, role: deletedElasticRole }); });
+    deletedElasticRole.institutions.forEach((institution) => { this.triggerHooks('institution:disconnect:elastic_role', { institution, role: deletedElasticRole }); });
+
     return deletedElasticRole;
   }
 };

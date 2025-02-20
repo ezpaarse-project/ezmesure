@@ -51,12 +51,7 @@ exports.connectRole = async (ctx) => {
   const institutionService = new InstitutionService();
 
   ctx.status = 200;
-  ctx.body = await institutionService.update({
-    where: { id: institutionId },
-    data: {
-      elasticRoles: { connect: { name } },
-    },
-  });
+  ctx.body = await institutionService.connectRole(institutionId, name);
 };
 
 exports.disconnectRole = async (ctx) => {
@@ -65,10 +60,5 @@ exports.disconnectRole = async (ctx) => {
   const institutionService = new InstitutionService();
 
   ctx.status = 200;
-  ctx.body = await institutionService.update({
-    where: { id: institutionId },
-    data: {
-      elasticRoles: { disconnect: { name } },
-    },
-  });
+  ctx.body = await institutionService.disconnectRole(institutionId, name);
 };
