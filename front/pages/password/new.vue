@@ -24,6 +24,28 @@
               </v-col>
             </v-row>
 
+            <v-expand-transition>
+              <v-row v-if="success">
+                <v-col>
+                  <v-alert
+                    :title="$t('password.updated')"
+                    :text="$t('password.youCanNowLogin')"
+                    type="success"
+                    density="compact"
+                  >
+                    <template #append>
+                      <v-btn
+                        :text="$t('authenticate.logIn')"
+                        prepend-icon="mdi-arrow-left"
+                        to="/authenticate"
+                        variant="tonal"
+                      />
+                    </template>
+                  </v-alert>
+                </v-col>
+              </v-row>
+            </v-expand-transition>
+
             <v-form v-model="valid" @submit.prevent="replacePassword()">
               <v-row>
                 <v-col>
@@ -97,6 +119,7 @@ if (!currentRoute.value.query?.token) {
 
 const valid = ref(false);
 const loading = ref(false);
+const success = ref(false);
 const password = ref('');
 const passwordRepeat = ref('');
 const showPassword = ref(false);
