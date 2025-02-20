@@ -132,9 +132,7 @@ async function replacePassword() {
       method: 'POST',
       body: {
         password: password.value,
-      },
-      headers: {
-        Authorization: `Bearer ${currentRoute.value.query?.token}`,
+        token: currentRoute.value.query?.token,
       },
     });
 
