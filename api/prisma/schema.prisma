@@ -477,6 +477,8 @@ model SushiEndpoint {
   harvestDateFormat         String?
   /// Report used when testing endpoint
   testedReport              String?
+  /// Id of platform in https://registry.countermetrics.org
+  registryId                String?
   /// SUSHI credentials associated with the endpoint
   credentials               SushiCredentials[]
   /// Additionnal default parameters. Each param has a name, a value, and a scope.
