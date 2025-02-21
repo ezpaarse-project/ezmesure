@@ -59,9 +59,14 @@ errors:
     cannotCancelJobWithoutPID: Impossible d'annuler la tâche, le processus n'est pas identifiable
 
   repository:
-    notFound: Dépôt introuvable
-    alreadyExists: Le dépôt [%s] est déjà associé à l'établissement
-    typeMismatch: Un dépôt [%s] de type différent existe déjà
+    notFound: Entrepôt introuvable
+    alreadyExists: Le entrepôt [%s] est déjà associé à l'établissement
+    typeMismatch: Un entrepôt [%s] de type différent existe déjà
+
+  repositoryAlias:
+    notFound: Alias introuvable
+    alreadyExists: L'alias [%s] est déjà associé à l'établissement
+    targetMismatch: Un alias [%s] représentant un entrepôt différent existe déjà
 
   institution:
     notFound: Établissement introuvable

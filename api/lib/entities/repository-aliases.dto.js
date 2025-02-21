@@ -14,13 +14,23 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
-  institutions: Joi.array().items(Joi.object()),
-
   pattern: Joi.string().trim().min(1),
-  type: Joi.string().trim().min(1),
+  target: Joi.string().trim().min(1),
 
+  filters: Joi.array().min(1).items(Joi.object({
+    name: Joi.string().trim().min(1).required(),
+    field: Joi.string().trim().min(1).required(),
+    isNot: Joi.boolean().default(false),
+    value: Joi.alternatives([
+      // Null values are allowed to check if empty
+      Joi.string().trim().min(1), // Exact match
+      Joi.array().items(Joi.string().trim().min(1)), // One of
+    ]).allow(null),
+  })).allow(null),
+
+  institutions: Joi.array().items(Joi.object()),
+  repository: Joi.object(),
   permissions: Joi.array().items(Joi.object()),
-  aliases: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -30,39 +40,39 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'institutions',
+  'repository',
   'permissions',
-  'aliases',
 ];
 
 /**
  * Fields that can be populated with related items
  */
 const includableFields = [
-  'permissions',
-  'aliases',
   'institutions',
+  'repository',
+  'permissions',
 ];
 
 /**
- * Schema to be applied when an administrator creates a repository
+ * Schema to be applied when an administrator creates a repository alias
  */
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['pattern', 'type']),
+  requireFields(['pattern', 'target']),
 );
 
 /**
- * Schema to be applied when an administrator connect a repository to an institution
+ * Schema to be applied when an administrator connect a repository alias to an institution
  */
 const adminCreateOrConnectSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['type']),
+  requireFields(['target']),
 );
 
 /**
- * Schema to be applied when an administrator updates a repository
+ * Schema to be applied when an administrator updates a repository alias
  */
 const adminUpdateSchema = withModifiers(
   schema,
@@ -70,7 +80,7 @@ const adminUpdateSchema = withModifiers(
 );
 
 /**
- * Schema to be applied when an administrator imports multiple repositories
+ * Schema to be applied when an administrator imports multiple repository aliases
  */
 const adminImportSchema = withModifiers(
   adminCreateSchema,

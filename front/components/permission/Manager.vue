@@ -24,6 +24,7 @@
               <PermissionSwitch
                 v-if="(memberships?.length ?? 0) > 0 && modelValue"
                 v-model="allValue"
+                :levels="levels"
                 icons
                 @update:model-value="updateAllPermission($event)"
               />
@@ -64,6 +65,7 @@
               <PermissionSwitch
                 v-if="modelValue"
                 :model-value="modelValue.get(member.username)"
+                :levels="levels"
                 mandatory
                 icons
                 @update:model-value="updatePermission(member.username, $event)"
@@ -85,6 +87,10 @@ const props = defineProps({
   institution: {
     type: Object,
     required: true,
+  },
+  levels: {
+    type: Array,
+    default: () => ['none', 'read', 'write'],
   },
 });
 

@@ -65,6 +65,17 @@
         />
       </template>
 
+      <template #[`item.repositoryAliases`]="{ value, item }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!institutionAliasesDialogRef"
+          prepend-icon="mdi-database-eye-outline"
+          size="small"
+          @click="institutionAliasesDialogRef?.open(item)"
+        />
+      </template>
+
       <template #[`item.spaces`]="{ value, item }">
         <v-chip
           :text="`${value.length}`"
@@ -194,6 +205,11 @@
       @update:model-value="refresh()"
     />
 
+    <InstitutionRepositoryAliasesDialog
+      ref="institutionAliasesDialogRef"
+      @update:model-value="refresh()"
+    />
+
     <InstitutionSpacesDialog
       ref="institutionSpacesDialogRef"
       @update:model-value="refresh()"
@@ -218,6 +234,7 @@ const selectedInstitutions = ref([]);
 const institutionFormDialogRef = useTemplateRef('institutionFormDialogRef');
 const institutionComponentsDialogRef = useTemplateRef('institutionComponentsDialogRef');
 const institutionRepositoriesDialogRef = useTemplateRef('institutionRepositoriesDialogRef');
+const institutionAliasesDialogRef = useTemplateRef('institutionAliasesDialogRef');
 const institutionSpacesDialogRef = useTemplateRef('institutionSpacesDialogRef');
 
 const {
@@ -236,6 +253,7 @@ const {
     memberships: 'memberships._count',
     childInstitutions: 'childInstitutions._count',
     repositories: 'repositories._count',
+    repositoryAliases: 'repositoryAliases._count',
     spaces: 'spaces._count',
     sushiCredentials: 'sushiCredentials._count',
   },
@@ -243,7 +261,14 @@ const {
   // reactivity please use `query.something = myReactiveThingy.value`
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
-    include: ['repositories', 'spaces', 'memberships', 'childInstitutions', 'sushiCredentials'],
+    include: [
+      'repositories',
+      'repositoryAliases.repository',
+      'spaces',
+      'memberships',
+      'childInstitutions',
+      'sushiCredentials',
+    ],
   },
 });
 
@@ -276,6 +301,12 @@ const headers = computed(() => [
   {
     title: t('repositories.repositories'),
     value: 'repositories',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('repositoryAliases.aliases'),
+    value: 'repositoryAliases',
     align: 'center',
     sortable: true,
   },

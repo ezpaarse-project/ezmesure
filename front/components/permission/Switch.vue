@@ -8,7 +8,7 @@
   >
     <template v-if="icons">
       <v-btn
-        v-for="level in levels"
+        v-for="level in levelOptions"
         :key="level.value"
         v-tooltip="level.text"
         :readonly="readonly"
@@ -21,7 +21,7 @@
 
     <template v-else>
       <v-btn
-        v-for="level in levels"
+        v-for="level in levelOptions"
         :key="level.value"
         :readonly="readonly"
         size="small"
@@ -36,6 +36,12 @@
 </template>
 
 <script setup>
+const LEVEL_ICONS = {
+  none: 'mdi-eye-off',
+  read: 'mdi-book',
+  write: 'mdi-book-edit',
+};
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -53,6 +59,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  levels: {
+    type: Array,
+    default: () => ['none', 'read', 'write'],
+  },
 });
 
 const emit = defineEmits({
@@ -61,14 +71,14 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 
-const levels = computed(() => [
-  { text: t('permissions.none'), icon: 'mdi-eye-off', value: 'none' },
-  { text: t('permissions.read'), icon: 'mdi-book', value: 'read' },
-  { text: t('permissions.write'), icon: 'mdi-book-edit', value: 'write' },
-]);
+const levelOptions = computed(() => props.levels.map((level) => ({
+  text: t(`permissions.${level}`),
+  icon: LEVEL_ICONS[level],
+  value: level,
+})));
 
 const currentLevel = computed({
-  get: () => levels.value.findIndex((level) => level.value === props.modelValue),
-  set: (index) => emit('update:modelValue', levels.value[index].value),
+  get: () => levelOptions.value.findIndex((level) => level.value === props.modelValue),
+  set: (index) => emit('update:modelValue', levelOptions.value[index].value),
 });
 </script>

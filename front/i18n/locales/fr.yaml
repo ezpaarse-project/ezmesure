@@ -24,6 +24,7 @@ menu:
   report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
+  repositoryAliases: Alias d'entrepôts
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
@@ -787,6 +788,36 @@ repositories:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
+repositoryAliases:
+  manageRepositoryAliases: >
+    Gérer les alias
+    |Gérer {count} alias
+  target: Pattern de l'entrepôt
+  filtered: Filtré ?
+  aliases: Alias d'entrepôts
+  noAliases: Aucun alias d'entrepôt n'est encore attribué
+  toolbarTitle: Alias d'entrepôts ({count})
+  deleteNbAliases: Vous allez supprimer {count} alias.
+  newAlias: Nouvel alias d'entrepôt
+  noInstitutions: Aucun établissement n'utilise cet alias
+  filters:
+    title: Filtrer les alias
+  filtersForm:
+    title: Filtres de l'alias
+    newFilter: Nouveau filtre
+    editFilter: Mise à jour du filtre
+    empty: Aucun filtre n'est encore défini
+    advanced: Mode avancé
+    raw: Requête DSL
+    field: Champ
+    isNot: Inverser le filtre
+    value: Valeur(s)
+    nameTemplate:
+      exists: "{field} existe"
+      exists:not: "{field} n'existe pas"
+      values: "{0}|{0} {1}, etc."
+      is: "{field} est {valueText}"
+      is:not: "{field} n'est pas {valueText}"
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})
@@ -874,6 +905,7 @@ sync:
   running: A duré {time}
   spaces: Espaces
   repositories: Entrepôts
+  repositoryAliases: Alias
   users: Utilisateurs
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements

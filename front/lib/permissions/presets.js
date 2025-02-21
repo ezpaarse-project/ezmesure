@@ -5,18 +5,21 @@ const guestPreset = {
     ['institution', 'read'],
   ]),
   repositories: 'read',
+  repositoryAliases: 'read',
   spaces: 'read',
 };
 
 const techContactPreset = {
   features: new Map(featureScopes.map((scope) => [scope, 'write'])),
   repositories: 'write',
+  repositoryAliases: 'read',
   spaces: 'write',
 };
 
 const docContactPreset = {
   features: new Map(featureScopes.map((scope) => [scope, 'write'])),
   repositories: 'read',
+  repositoryAliases: 'read',
   spaces: 'write',
 };
 
