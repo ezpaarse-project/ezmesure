@@ -24,6 +24,7 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
+  repositoryAliases: Repository aliases
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
