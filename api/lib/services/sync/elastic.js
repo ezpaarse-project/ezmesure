@@ -106,7 +106,7 @@ const unmountAlias = async (alias) => {
   const repositoryService = new RepositoriesService();
   const repo = await repositoryService.findUnique({ where: { pattern: alias.target } });
   if (!repo) {
-    appLogger.error(`[elastic] Cannot create alias [${alias.pattern}], repository [${alias.target}] not found`);
+    appLogger.error(`[elastic] Cannot unmount alias [${alias.pattern}], repository [${alias.target}] not found`);
     return;
   }
 
