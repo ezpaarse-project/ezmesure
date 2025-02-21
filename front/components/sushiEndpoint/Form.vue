@@ -5,6 +5,15 @@
     prepend-icon="mdi-server-plus"
   >
     <template #text>
+      <v-row v-if="!isEditing">
+        <v-col>
+          <SushiEndpointRegistrySearch
+            v-model="registryEndpoint"
+            @update:endpoint="applyRegistryEndpoint($event)"
+          />
+        </v-col>
+      </v-row>
+
       <v-row>
         <v-col>
           <v-form
@@ -128,6 +137,30 @@
                         />
                       </template>
                     </v-combobox>
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="endpoint.registryId"
+                      :label="$t('endpoints.registryId')"
+                      :hint="$t('endpoints.registryIdHint')"
+                      prepend-icon="mdi-identifier"
+                      variant="underlined"
+                      hide-details="auto"
+                      @update:model-value="extractIdFromUrl($event)"
+                    >
+                      <template v-if="endpoint.registryId" #append>
+                        <v-btn
+                          icon="mdi-open-in-new"
+                          :href="`https://registry.countermetrics.org/platform/${endpoint.registryId}`"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="text"
+                          density="comfortable"
+                          size="small"
+                        />
+                      </template>
+                    </v-text-field>
                   </v-col>
 
                   <v-col cols="12">
@@ -314,7 +347,7 @@
           <v-btn
             :disabled="!valid"
             :text="$t('endpoints.checkEndpoint')"
-            color="primary"
+            color="accent"
             variant="tonal"
             v-bind="menu"
           />
@@ -378,6 +411,7 @@ const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
 const loadingTags = ref(false);
+const registryEndpoint = ref();
 const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
 
 /** @type {Ref<Object | null>} */
@@ -470,6 +504,25 @@ async function save() {
   }
 
   saving.value = false;
+}
+
+function applyRegistryEndpoint(e) {
+  if (!e) {
+    endpoint.value.registryId = '';
+    return;
+  }
+  endpoint.value = e;
+}
+
+function extractIdFromUrl(url) {
+  if (!url.trim().startsWith('https://registry.countermetrics.org/')) {
+    return;
+  }
+
+  const id = /\/platform\/(.+)\/?$/.exec(url)?.[1];
+  if (id) {
+    endpoint.value.registryId = id;
+  }
 }
 
 onMounted(() => {
