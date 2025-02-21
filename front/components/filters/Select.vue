@@ -25,6 +25,10 @@
 
       <v-divider class="mb-2" />
     </template>
+
+    <template v-if="$slots.selection" #selection="selection">
+      <slot name="selection" v-bind="selection" />
+    </template>
   </v-autocomplete>
 </template>
 

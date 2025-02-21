@@ -31,3 +31,8 @@ export const harvestStatus = new Map([
   ['cancelled', { color: 'red', icon: 'mdi-cancel' }],
   ['waiting', { color: 'grey', icon: 'mdi-clock-outline' }],
 ]);
+
+export const counterVersionsColors = new Map([
+  ['5', 'rgb(205, 233, 250)'],
+  ['5.1', 'rgb(203, 252, 220)'],
+]);

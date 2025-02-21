@@ -220,7 +220,8 @@ endpoints:
   activeSince: Active since {date}
   inactiveSince: Inactive since {date}
   technicalProvider: Technical provider
-  counterVersion: COUNTER version
+  counterVersion: COUNTER versions
+  counterVersionTooltip: Supports COUNTER {version}
   testedReport: Report used to test connection
   requireCustomerId: Customer ID is required
   requireRequestorId: Requestor ID is required

@@ -58,8 +58,7 @@ const fields = computed(() => [
   { value: formatDate(props.modelValue.createdAt) || '-', label: t('endpoints.createdAt'), cols: 4 },
   { value: formatDate(props.modelValue.updatedAt) || '-', label: t('endpoints.updatedAt'), cols: 8 },
 
-  { value: props.modelValue.counterVersion || '5', label: t('endpoints.counterVersion'), cols: 4 },
-  { value: props.modelValue.sushiUrl || '5', label: t('endpoints.url'), cols: 4 },
+  { value: props.modelValue.sushiUrl || '', label: t('endpoints.url'), cols: 8 },
   { value: props.modelValue.technicalProvider || '-', label: t('endpoints.technicalProvider'), cols: 4 },
 
   { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('institutions.sushi.requestorId'), cols: 4 },
