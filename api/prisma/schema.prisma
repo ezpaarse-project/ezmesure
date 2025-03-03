@@ -515,8 +515,8 @@ model SushiEndpoint {
   tags                      String[]
   /// Description of the endpoint
   description               String?
-  /// Counter version of the SUSHI service
-  counterVersion            String?
+  /// Counter versions of the SUSHI service
+  counterVersions           String[]           @default(["5"])
   /// Technical provider of the endpoint (ex: Atypon)
   technicalProvider         String?
   /// Whether the endpoint is active and can be harvested
@@ -553,6 +553,8 @@ model SushiEndpoint {
   harvestDateFormat         String?
   /// Report used when testing endpoint
   testedReport              String?
+  /// Id of platform in https://registry.countermetrics.org
+  registryId                String?
   /// SUSHI credentials associated with the endpoint
   credentials               SushiCredentials[]
   /// Additionnal default parameters. Each param has a name, a value, and a scope.

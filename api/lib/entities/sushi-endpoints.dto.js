@@ -19,7 +19,8 @@ const schema = {
   sushiUrl: Joi.string().uri(),
   vendor: Joi.string().min(1),
   description: Joi.string().allow('').empty(null),
-  counterVersion: Joi.string().allow('').empty(null),
+  counterVersions: Joi.array().items(Joi.string().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/)).min(1),
+  registryId: Joi.string().min(1),
   technicalProvider: Joi.string().allow('').empty(null),
 
   active: Joi.boolean(),

@@ -1214,15 +1214,14 @@
               "null"
             ]
           },
-          "counterVersion": {
+          "counterVersions": {
             "description": "The COUNTER version supported by the endpoint",
-            "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ],
-            "example": "5.0.1",
-            "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?$"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5.1.0.1",
+              "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?)?$"
+            }
           },
           "technicalProvider": {
             "description": "The technical provider that operates the SUSHI endpoint",
@@ -9956,7 +9955,7 @@
             }
           },
           {
-            "name": "counterVersion",
+            "name": "counterVersions",
             "in": "query",
             "schema": {
               "type": "array",

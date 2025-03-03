@@ -115,7 +115,7 @@
     <v-data-table-server
       v-model="selectedSushi"
       :headers="headers"
-      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: !(item.active && item.endpoint.active) && 'bg-grey-lighten-4 text-grey' })"
       density="comfortable"
       show-select
       show-expand
@@ -164,21 +164,15 @@
       </template>
 
       <template #[`item.endpoint.vendor`]="{ item }">
-        <div>
-          <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
-            {{ item.endpoint.vendor }}
-          </nuxt-link>
-          <span v-else>{{ item.endpoint.vendor }}</span>
-        </div>
+        <div class="my-2">
+          <div>
+            <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
+              {{ item.endpoint.vendor }}
+            </nuxt-link>
+            <span v-else>{{ item.endpoint.vendor }}</span>
+          </div>
 
-        <div v-if="!item.endpoint.active" class="d-flex align-center text-caption warning--text">
-          <v-icon
-            icon="mdi-api-off"
-            color="warning"
-            class="mr-1"
-          />
-
-          {{ $t('endpoints.inactiveDescription') }}
+          <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
         </div>
       </template>
 
@@ -214,19 +208,30 @@
       </template>
 
       <template #[`item.active`]="{ item }">
-        <v-switch
-          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-          :model-value="item.active"
-          :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
-          :loading="activeLoadingMap.get(item.id)"
-          :readonly="!canEdit"
-          density="compact"
-          color="primary"
-          hide-details
-          class="mt-0"
-          style="transform: scale(0.8);"
-          @update:model-value="toggleActiveStates([item])"
-        />
+        <div class="d-flex align-center">
+          <v-switch
+            v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
+            :model-value="item.active"
+            :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
+            :loading="activeLoadingMap.get(item.id)"
+            :readonly="!canEdit"
+            density="compact"
+            color="primary"
+            hide-details
+            class="mt-0"
+            style="transform: scale(0.8);"
+            @update:model-value="toggleActiveStates([item])"
+          />
+
+          <v-spacer />
+
+          <v-icon
+            v-if="!item.endpoint.active"
+            v-tooltip="$t('endpoints.inactiveDescription')"
+            icon="mdi-api-off"
+            color="warning"
+          />
+        </div>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -452,6 +457,7 @@ const headers = computed(() => [
     title: t('institutions.sushi.endpoint'),
     value: 'endpoint.vendor',
     sortable: true,
+    minWidth: '300px',
   },
   {
     title: t('institutions.sushi.packages'),
@@ -482,7 +488,7 @@ const headers = computed(() => [
     title: t('endpoints.active'),
     value: 'active',
     align: 'center',
-    width: '130px',
+    width: '150px',
     sortable: true,
   },
   {

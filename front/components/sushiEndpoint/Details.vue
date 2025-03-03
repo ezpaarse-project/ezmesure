@@ -58,12 +58,18 @@ const fields = computed(() => [
   { value: formatDate(props.modelValue.createdAt) || '-', label: t('endpoints.createdAt'), cols: 4 },
   { value: formatDate(props.modelValue.updatedAt) || '-', label: t('endpoints.updatedAt'), cols: 8 },
 
-  { value: props.modelValue.counterVersion || '5', label: t('endpoints.counterVersion'), cols: 4 },
-  { value: props.modelValue.sushiUrl || '5', label: t('endpoints.url'), cols: 4 },
+  { value: props.modelValue.sushiUrl || '', label: t('endpoints.url'), cols: 8 },
   { value: props.modelValue.technicalProvider || '-', label: t('endpoints.technicalProvider'), cols: 4 },
 
-  { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('institutions.sushi.requestorId'), cols: 4 },
-  { value: props.modelValue.requireRequestorId ? t('yes') : t('no'), label: t('institutions.sushi.customerId'), cols: 4 },
-  { value: props.modelValue.requireApiKey ? t('yes') : t('no'), label: t('institutions.sushi.apiKey'), cols: 4 },
-]);
+  { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('endpoints.requireRequestorId'), cols: 4 },
+  { value: props.modelValue.requireRequestorId ? t('yes') : t('no'), label: t('endpoints.requireCustomerId'), cols: 4 },
+  { value: props.modelValue.requireApiKey ? t('yes') : t('no'), label: t('endpoints.requireApiKey'), cols: 4 },
+
+  {
+    value: `https://registry.countermetrics.org/platform/${props.modelValue.registryId}`,
+    label: t('endpoints.registryUrl'),
+    cols: 12,
+    hide: !props.modelValue.registryId,
+  },
+].filter((v) => v.hide !== true));
 </script>

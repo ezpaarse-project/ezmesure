@@ -24,6 +24,7 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
+  repositoryAliases: Repository aliases
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
@@ -52,7 +53,7 @@ myspace:
   infos: My informations
   repos: My repositories
   spaces: My spaces
-  roles: 'My roles:'
+  roles: "My roles:"
 files:
   title: My Deposits
   manageN: >
@@ -65,9 +66,9 @@ files:
   modified: Modified
   size: Size
   category:
-    pending: 'Pending'
-    loading: 'Loading'
-    finished: 'Finished'
+    pending: "Pending"
+    loading: "Loading"
+    finished: "Finished"
   letAdmin: Transfer to admin team
   letAdminDesc: Please note that the upload is not immediate, and will be done as soon as possible
   selectIndex: Select an index
@@ -83,7 +84,7 @@ files:
   validatingFile: Validation of the file...
   isWaiting: Waiting
   isNotCSV: This file is not a CSV
-  markFieldIncorrectlyFormatted: 'Row #${lineNumber}: A field in quotes is formatted incorrectly.'
+  markFieldIncorrectlyFormatted: "Row #${lineNumber}: A field in quotes is formatted incorrectly."
   missingField: '"{missingField}" is missing'
   fieldIsEmpty: 'Line #{lineNumber}: "{field}" is blank.'
   invalidField: 'Line #{lineNumber}: "{field}" is not valid, has the file been modified ?'
@@ -102,15 +103,17 @@ kibana:
     text: Don't remember your password? Click on {reset} to receive a reset email.
     reset: reset
   whatDoesUsername:
-    text: This username allows you to connect to the Kibana interface in order to
+    text:
+      This username allows you to connect to the Kibana interface in order to
       access your dashboards. To change your password, go to your {accountLink}.
     accountLink: Kibana account
 token:
   title: Authentication token
   whatDoesToken:
-    text: 'This token is required to use the ezMESURE API. To use it, add the following
-      header to your HTTP requests: {header}'
-    header: 'Authorization: Bearer [insert the token here]'
+    text:
+      "This token is required to use the ezMESURE API. To use it, add the following
+      header to your HTTP requests: {header}"
+    header: "Authorization: Bearer [insert the token here]"
   token: Token
   unableToRetrieveToken: Unable to retrieve authentication token
   copyFailed: The copy of the token failed
@@ -220,7 +223,8 @@ endpoints:
   activeSince: Active since {date}
   inactiveSince: Inactive since {date}
   technicalProvider: Technical provider
-  counterVersion: COUNTER version
+  counterVersion: COUNTER versions
+  counterVersionTooltip: Supports COUNTER {version}
   testedReport: Report used to test connection
   requireCustomerId: Customer ID is required
   requireRequestorId: Requestor ID is required
@@ -246,6 +250,11 @@ endpoints:
   checkEndpoint: Test endpoint
   filters:
     title: Filter endpoints
+  searchRegistryData: Search in the COUNTER registry
+  searchRegistryDataHint: Search for a platform by name
+  registryId: Platform ID in the COUNTER registry
+  registryIdHint: You can directly paste the URL of the COUNTER registry
+  registryUrl: Link to the COUNTER registry
 institutions:
   toolbarTitle: Institutions ({count})
   title: Institution
@@ -290,7 +299,8 @@ institutions:
     indexCount: Indexed consultation events
     indexPrefix: Allocated prefix for indices
     namespace: Institution namespace
-    namespaceHint: Prefix added to entities related to the institution (repositories,
+    namespaceHint:
+      Prefix added to entities related to the institution (repositories,
       Kibana spaces)
     role: Associated role
     uai: RAU
@@ -313,8 +323,8 @@ institutions:
     automations: Automations
     monitor: Monitoring
     dropImageHere: Drop your image here
-    invalidImageFile: 'Invalid image file. Accepted file types: JPEG, PNG, SVG'
-    imageTooLarge: 'Image is too large. Maximum allowed size: 2mb'
+    invalidImageFile: "Invalid image file. Accepted file types: JPEG, PNG, SVG"
+    imageTooLarge: "Image is too large. Maximum allowed size: 2mb"
     noDataFound: Your institution's information could not be retrieved.
     dataSent: Institution informations transmitted
     updated: Institution updated
@@ -339,7 +349,7 @@ institutions:
       ezmesure: Transfers into ezMESURE
       reporting: Periodic usage reports
       sushi: SUSHI harvesting
-    mustMatch: 'Must match: {pattern}'
+    mustMatch: "Must match: {pattern}"
     searchOpenData: Search among known institutions
     searchOpenDataHint: Search an institution by name, location, UAI code, siret number...
     searchEmpty: No institution matches the query.
@@ -372,7 +382,7 @@ institutions:
     updated: Member updated
     email: Email address *
     emailExample: e.g. john{'@'}doe.fr
-    thisMemberIs: 'This member is :'
+    thisMemberIs: "This member is :"
     enterValidEmail: Please enter a valid email.
     members: Members
     addMember: Add a member
@@ -401,7 +411,8 @@ institutions:
       sushi: SUSHI credentials
   sushi:
     title: SUSHI credentials ({count})
-    pageDescription: Here you can enter the SUSHI credentials that will be used to
+    pageDescription:
+      Here you can enter the SUSHI credentials that will be used to
       automatically harvest your COUNTER reports.
     pageDescription2: Only version 5 of the SUSHI protocol is supported.
     addCredentials: Add credentials
@@ -411,7 +422,8 @@ institutions:
     tags: Tags
     packages: Packages
     packagesHint: Profiles, accounts, funds, antennas, etc. that include the credentials.
-    packagesDescription: Profiles, accounts, funds, antennas, etc. that include the
+    packagesDescription:
+      Profiles, accounts, funds, antennas, etc. that include the
       credentials. The packages will be usable in your dashboards, using the X_Package
       field
     unableToRetriveSushiData: Unable to retrieve sushi information
@@ -450,7 +462,7 @@ institutions:
     invalidCredentialsShort: Invalid
     connectionSuccessful:
       title: Successful connection
-      desc: 'A test report has been successfuly downloaded, or generated errors that are not related to authentication (ex: unavailable period).'
+      desc: "A test report has been successfuly downloaded, or generated errors that are not related to authentication (ex: unavailable period)."
     connectionFailed:
       title: Connection failed
       desc: An error occurred when communicating with the endpoint. The team is in contact with the publisher to find out why.
@@ -555,17 +567,17 @@ tasks:
     terminatedIn: Terminated in {duration}
     deletedItems: "{n} deleted documents"
     processedItems: "{n} processed items"
-    progress: 'Progress: {progress}%'
+    progress: "Progress: {progress}%"
     labels:
       download: Report download
       validation: Report validation
       index: Index preparation
       insert: Insert in Elasticsearch
   params:
-    reportType: 'Report type:'
-    sessionId: 'Session identifier:'
-    period: 'Period:'
-    index: 'Indice:'
+    reportType: "Report type:"
+    sessionId: "Session identifier:"
+    period: "Period:"
+    index: "Indice:"
 sushi:
   filters:
     title: Filters credentials
@@ -608,7 +620,7 @@ sushi:
   insertedItems: "{count} report items have been inserted."
   updatedItems: "{count} report items have been updated."
   failedItems: "{count} report items could not be retrieved."
-  messagesFromEndpoint: 'Messages from the endpoint:'
+  messagesFromEndpoint: "Messages from the endpoint:"
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
@@ -633,7 +645,8 @@ reports:
   checkCredentials: Check credentials
   supportedReports: Supported reports
   supportedReportsOnPlatform: Reports supported by the publisher platform
-  supportedReportsUnavailable: The list of supported reports is not available for
+  supportedReportsUnavailable:
+    The list of supported reports is not available for
     this publisher platform.
   failedToFetchReports: Failed to fetch the list of available reports
   onlyShowMasterReports: Only show master reports
@@ -659,7 +672,8 @@ password:
   repeatPassword: Repeat password
   passwordIsRequired: Password required
   backToLogin: Back to login
-  enterUser: Please enter your username so we can send you an email to retrieve your
+  enterUser:
+    Please enter your username so we can send you an email to retrieve your
     password.
   checkYourEmail: Check your email for a link to reset your password.
   waitFewMinutes: If it doesn’t appear within a few minutes, check your spam folder
@@ -691,8 +705,8 @@ contact:
   endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.
   additionalInformation: Additional information
 errors:
-  '404': La page demandée n'a pas été trouvée
-  '500': An internal error occurred
+  "404": La page demandée n'a pas été trouvée
+  "500": An internal error occurred
   generic: An unexpected error has occurred
 account:
   title: Account activation
@@ -886,12 +900,15 @@ sync:
     completed: Synchronized
     error: Error occurred during synchronization
   description:
-    notSynced: The data of ezMESURE are not yet synchronized, you may encounter some
+    notSynced:
+      The data of ezMESURE are not yet synchronized, you may encounter some
       incoherences between ezMESURE's interface and the different services linked
       to ezMESURE. Just click on the button above to synchronize.
-    completed: The data of ezMESURE have been successfully synchronized with the different
+    completed:
+      The data of ezMESURE have been successfully synchronized with the different
       services linked to ezMESURE.
-    error: An error occurred during the synchronization of ezMESURE data with the
+    error:
+      An error occurred during the synchronization of ezMESURE data with the
       different services linked to ezMESURE. Please check your instance logs for more
       information.
   start: Launch synchronization
@@ -971,15 +988,15 @@ invalidDate: Invalid date
 invalidFormat: Invalid format
 areYouSure: Are you sure ?
 fieldIsRequired: This field is required
-fieldMustMatch: 'This field must match : {pattern}'
-maxLength: 'Maximum length: {n} characters'
+fieldMustMatch: "This field must match : {pattern}"
+maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
-'yes': 'Yes'
-'no': 'No'
+"yes": "Yes"
+"no": "No"
 validate: Validate
 invalidate: Invalidate
-reason: 'Reason: {reason}'
+reason: "Reason: {reason}"
 groupBy: Group by
 indeterminate: indeterminate
 noMatchFor: No results matching "{search}". Press {key} to add it.

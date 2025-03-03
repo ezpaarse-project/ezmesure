@@ -50,6 +50,10 @@
         <SushiEndpointDisabledChip :model-value="item" />
       </template>
 
+      <template #[`item.counterVersions`]="{ item }">
+        <SushiEndpointVersionsChip :model-value="item" />
+      </template>
+
       <template #[`item.credentials`]="{ value, item }">
         <SushiCountChip
           :model-value="value"
@@ -208,6 +212,12 @@ const headers = computed(() => [
     sortable: true,
   },
   {
+    title: t('endpoints.counterVersion'),
+    value: 'counterVersions',
+    align: 'center',
+    sortable: true,
+  },
+  {
     title: t('sushi.credentials'),
     value: 'credentials',
     align: 'center',
@@ -218,7 +228,6 @@ const headers = computed(() => [
     value: 'active',
     align: 'center',
     sortable: true,
-    minWidth: '175px',
   },
   {
     title: t('actions'),
