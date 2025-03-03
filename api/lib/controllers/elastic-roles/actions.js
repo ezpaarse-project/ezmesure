@@ -3,7 +3,7 @@ const ElasticRoleRepositoryPermissionService = require('../../entities/elastic-r
 const ElasticRoleRepositoryAliasPermissionService = require('../../entities/elastic-role-repository-alias-permissions.service');
 const ElasticRoleSpacePermissionService = require('../../entities/elastic-role-space-permissions.service');
 
-const { schema, includableFields } = require('../../entities/elastic-roles.dto');
+const { schema, includableFields, adminImportSchema } = require('../../entities/elastic-roles.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
@@ -13,6 +13,12 @@ const standardQueryParams = prepareStandardQueryParams({
   queryFields: ['name'],
 });
 exports.standardQueryParams = standardQueryParams;
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').Prisma.ElasticRoleCreateInput} ElasticRoleCreateInput
+*/
+/* eslint-enable max-len */
 
 exports.listRoles = async (ctx) => {
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
@@ -74,6 +80,149 @@ exports.upsertRole = async (ctx) => {
     create: data,
     update: data,
   });
+};
+
+exports.importRoles = async (ctx) => {
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {ElasticRoleService} elasticRoleService
+   * @param {*} repositoryData
+   */
+  const importItem = async (elasticRoleService, repositoryData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(repositoryData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.name) {
+      const role = await elasticRoleService.findUnique({ where: { name: item.name } });
+
+      if (role && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.repository.alreadyExists', role.pattern));
+        return;
+      }
+    }
+
+    /** @type {ElasticRoleCreateInput} */
+    const data = {
+      ...item,
+      repositoryPermissions: {
+        connectOrCreate: item.repositoryPermissions?.map(
+          (permission) => ({
+            where: {
+              elasticRoleName_repositoryPattern: {
+                elasticRoleName: item.name,
+                repositoryPattern: permission.repositoryPattern,
+              },
+            },
+            create: {
+              ...permission,
+              elasticRoleName: undefined,
+              repositoryPattern: undefined,
+              repository: {
+                connect: {
+                  pattern: permission.repositoryPattern,
+                },
+              },
+            },
+          }),
+        ),
+      },
+      repositoryAliasPermissions: {
+        connectOrCreate: item.repositoryAliasPermissions?.map(
+          (permission) => ({
+            where: {
+              elasticRoleName_aliasPattern: {
+                elasticRoleName: item.name,
+                aliasPattern: permission.aliasPattern,
+              },
+            },
+            create: {
+              ...permission,
+              elasticRoleName: undefined,
+              aliasPattern: undefined,
+              alias: {
+                connect: {
+                  pattern: permission.aliasPattern,
+                },
+              },
+            },
+          }),
+        ),
+      },
+      spacePermissions: {
+        connectOrCreate: item.spacePermissions?.map(
+          (permission) => ({
+            where: {
+              elasticRoleName_spaceId: {
+                elasticRoleName: item.name,
+                spaceId: permission.spaceId,
+              },
+            },
+            create: {
+              ...permission,
+              elasticRoleName: undefined,
+              spaceId: undefined,
+              space: {
+                connect: {
+                  id: permission.spaceId,
+                },
+              },
+            },
+          }),
+        ),
+      },
+      users: { connect: item.users?.map((user) => ({ username: user.username })) },
+      institutions: { connect: item.institutions?.map((institution) => ({ id: institution.id })) },
+    };
+
+    const role = await elasticRoleService.upsert({
+      where: { name: item.name },
+      create: data,
+      update: data,
+    });
+
+    addResponseItem(role, 'created');
+  };
+
+  await ElasticRoleService.$transaction(async (elasticRoleService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const roleData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(elasticRoleService, roleData);
+      } catch (e) {
+        addResponseItem(roleData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };
 
 exports.connectRepository = async (ctx) => {

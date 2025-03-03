@@ -15,6 +15,7 @@ const {
   getRole,
   upsertRole,
   deleteRole,
+  importRoles,
   connectRepository,
   disconnectRepository,
   connectRepositoryAlias,
@@ -155,7 +156,7 @@ router.route({
 router.route({
   method: 'POST',
   path: '/_import',
-  handler: [], // TODO
+  handler: importRoles,
   validate: {
     type: 'json',
     params: {

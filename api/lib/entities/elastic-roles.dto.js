@@ -3,7 +3,6 @@ const { Joi } = require('koa-joi-router');
 const {
   withModifiers,
   ignoreFields,
-  requireFields,
 } = require('./schema.utils');
 
 const roleNamePattern = /^[a-z0-9][a-z0-9_.-]*$/i;
@@ -60,7 +59,7 @@ const includableFields = [
 const adminCreateSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['name']),
+  { name: () => schema.name },
 );
 
 /**
@@ -69,7 +68,7 @@ const adminCreateSchema = withModifiers(
 const adminCreateOrConnectSchema = withModifiers(
   schema,
   ignoreFields(immutableFields),
-  requireFields(['name']),
+  { name: () => schema.name },
 );
 
 /**
