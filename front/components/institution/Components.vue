@@ -7,7 +7,7 @@
     <template #append>
       <InstitutionAddMenu
         :model-value="components"
-        :title="$t('institutions.addComponent')"
+        :title="$t('components.add')"
         @institution-add="linkComponent($event)"
       >
         <template #activator="{ props: menu }">

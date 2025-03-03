@@ -493,6 +493,7 @@ components:
   components: Components
   count: "{count} components"
   noComponent: No components
+  add: Add component
 group:
   group: Grouped in
   noGroup: No group
