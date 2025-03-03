@@ -15,7 +15,7 @@
       icons
     >
       <template #filters-panel="props">
-        <SushiFilters v-bind="props" />
+        <SushiApiFilters v-bind="props" />
       </template>
 
       <v-switch

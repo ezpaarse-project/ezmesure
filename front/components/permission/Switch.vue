@@ -10,7 +10,7 @@
       <v-btn
         v-for="level in levelOptions"
         :key="level.value"
-        v-tooltip="level.text"
+        v-tooltip:top="level.text"
         :readonly="readonly"
         size="small"
         variant="outlined"

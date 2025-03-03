@@ -4,22 +4,20 @@ const elastic = require('.');
 /**
  * Upsert role in elastic.
  *
- * @param {String} name - Name of Role.
- * @param {Array<string>} indices - Array of indices.
- * @param {Array<string>} privileges - Rights on indices.
+ * @param {string} name - Name of role.
+ * @param {Map<string, { privileges: string[] }>} indices - Map of rights,
+ * key is the index value and value are the rights.
  * @returns {Promise<Object>}
  */
-exports.upsertRole = async function upsertRole(name, indices, privileges) {
+exports.upsertRole = async function upsertRole(name, indices) {
   return elastic.security.putRole({
     name,
     body: {
       cluster: [],
-      indices: [
-        {
-          names: indices,
-          privileges,
-        },
-      ],
+      indices: [...indices].map(([index, { privileges }]) => ({
+        names: [index],
+        privileges,
+      })),
     },
   });
 };
@@ -27,7 +25,7 @@ exports.upsertRole = async function upsertRole(name, indices, privileges) {
 /**
  * Delete role in elastic.
  *
- * @param {String} name - Name of Role.
+ * @param {string} name - Name of Role.
  * @returns {Promise<Object>}
  */
 exports.deleteRole = async function deleteRole(name) {

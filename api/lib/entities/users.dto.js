@@ -23,6 +23,7 @@ const schema = {
   metadata: Joi.object(),
 
   memberships: Joi.array().items(Joi.object()),
+  elasticRoles: Joi.array().items(Joi.object()),
   historyEntries: Joi.array().items(Joi.object()),
 };
 
@@ -35,6 +36,7 @@ const immutableFields = [
   'createdAt',
   'memberships',
   'historyEntries',
+  'elasticRoles',
 ];
 
 /**
@@ -44,6 +46,7 @@ const includableFields = [
   'memberships',
   'memberships.institution',
   'historyEntries',
+  'elasticRoles',
 ];
 
 /**

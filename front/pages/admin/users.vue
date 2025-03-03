@@ -10,7 +10,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #filters-panel="props">
-        <UserFilters v-bind="props" />
+        <UserApiFilters v-bind="props" />
       </template>
 
       <v-btn

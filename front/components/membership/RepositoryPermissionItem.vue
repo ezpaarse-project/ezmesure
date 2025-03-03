@@ -13,12 +13,7 @@
     </template>
 
     <template #subtitle>
-      <v-chip
-        :text="$te(`spaces.types.${repository.type}`) ? $t(`spaces.types.${repository.type}`) : repository.type"
-        :color="repoColors.get(repository.type)"
-        size="x-small"
-        density="comfortable"
-      />
+      <RepositoryTypeChip :model-value="repository" />
     </template>
   </v-list-item>
 </template>

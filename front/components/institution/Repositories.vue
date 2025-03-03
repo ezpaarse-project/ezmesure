@@ -29,12 +29,7 @@
           lines="two"
         >
           <template #subtitle>
-            <v-chip
-              :text="$te(`spaces.types.${repository.type}`) ? $t(`spaces.types.${repository.type}`) : repository.type"
-              :color="repoColors.get(repository.type)"
-              size="x-small"
-              density="comfortable"
-            />
+            <RepositoryTypeChip :model-value="repository" />
           </template>
 
           <template v-if="user.isAdmin" #append>
