@@ -929,6 +929,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  elasticRoles: Roles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements
   unableToRetrieveInformation: Impossible de récupérer les informations de la synchronisation

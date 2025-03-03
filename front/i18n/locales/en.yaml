@@ -918,6 +918,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
+  elasticRoles: Elastic Roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
