@@ -91,7 +91,7 @@ async function moveToFinished(upload) {
 
 async function uploadNextFile() {
   const upload = filesLoading.value.at(0);
-  if (!upload) {
+  if (!upload || !upload.target.repository) {
     return;
   }
 
@@ -101,19 +101,11 @@ async function uploadNextFile() {
   };
 
   try {
-    if (upload.target.repository) {
-      await fetch(`/api/logs/${upload.target.index}`, {
-        method: 'POST',
-        body: upload.file,
-        signal: controller.signal,
-      });
-    } else {
-      await fetch(`/api/files/${upload.file.name}`, {
-        method: 'PUT',
-        body: upload.file,
-        signal: controller.signal,
-      });
-    }
+    await fetch(`/api/logs/${upload.target.index}`, {
+      method: 'POST',
+      body: upload.file,
+      signal: controller.signal,
+    });
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
       upload.status = 'cancelled';
