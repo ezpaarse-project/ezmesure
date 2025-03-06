@@ -77,6 +77,7 @@ A membership (a user belonging to an institution)
 | spacePermissions      | `SpacePermission[]`      | Permissions of the user for the institution spaces                                    |            |         |
 | repositoryPermissions | `RepositoryPermission[]` | Permissions of the user for the institution repositories                              |            |         |
 | locked                | `Boolean`                | Whether the membership can be modified or not by non-admins                           |            | `false` |
+| comment               | `String?`                | Abritrary comment about the membership                                                |            |         |
 
 ### Space
 
