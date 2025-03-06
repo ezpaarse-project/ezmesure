@@ -1,34 +1,33 @@
 <template>
   <v-sheet
-    v-bind="$attrs"
-    class="d-flex justify-start flex-column text-center"
+    class="d-flex flex-column justify-start align-center"
     style="gap: 10px"
   >
-    <v-icon large :color="color">
-      {{ icon }}
-    </v-icon>
+    <v-icon :icon="icon" :color="color" size="x-large" />
 
-    <div>{{ text }}</div>
+    <div class="text-center">
+      {{ text }}
+    </div>
 
-    <slot name="actions" />
+    <div>
+      <slot name="actions" />
+    </div>
   </v-sheet>
 </template>
 
-<script>
-export default {
-  props: {
-    text: {
-      type: String,
-      default: () => '',
-    },
-    icon: {
-      type: String,
-      default: () => '',
-    },
-    color: {
-      type: String,
-      default: () => '',
-    },
+<script setup>
+defineProps({
+  text: {
+    type: String,
+    default: '',
   },
-};
+  icon: {
+    type: String,
+    default: '',
+  },
+  color: {
+    type: String,
+    default: '',
+  },
+});
 </script>

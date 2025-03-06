@@ -34,6 +34,7 @@ const { prepareStandardQueryParams } = require('../../services/std-query');
 const standardQueryParams = prepareStandardQueryParams({
   schema: institutionSchema,
   includableFields,
+  queryFields: ['name', 'acronym'],
 });
 exports.standardQueryParams = standardQueryParams;
 

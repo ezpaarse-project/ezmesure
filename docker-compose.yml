@@ -178,7 +178,7 @@ services:
     restart: unless-stopped
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report:1.5.0
+    image: ghcr.io/ezpaarse-project/ezreeport-report:2.0.0
     environment:
       - http_proxy
       - https_proxy
@@ -220,7 +220,7 @@ services:
     restart: unless-stopped
 
   reporting-mail:
-    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.2.2
+    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.3.0
     environment:
       # node
       - NODE_ENV

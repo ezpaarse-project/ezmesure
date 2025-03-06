@@ -6,6 +6,7 @@ const { bodyParser } = require('@koa/bodyparser');
 const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
+  standardMembershipsQueryParams,
   getToken,
   getUser,
   getResetToken,
@@ -66,7 +67,14 @@ router.route({
 
 router.get('/', getUser);
 router.get('/reporting_token', getReportingToken);
-router.get('/memberships', getMemberships);
+router.route({
+  method: 'GET',
+  path: '/memberships',
+  handler: getMemberships,
+  validate: {
+    query: standardMembershipsQueryParams.manyValidation,
+  },
+});
 router.get('/token', getToken);
 router.route({
   method: 'PUT',

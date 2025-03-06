@@ -1,129 +1,169 @@
 <template>
-  <v-container fluid fill-height>
-    <v-layout align-center justify-center>
-      <v-flex xs12 sm8 md4>
-        <v-card class="elevation-12">
-          <v-toolbar color="primary" dark flat dense>
-            <v-toolbar-title>{{ $t("account.title") }}</v-toolbar-title>
+  <v-container class="fill-height">
+    <v-row class="justify-center">
+      <v-col cols="12" md="8" lg="6">
+        <v-card elevation="10">
+          <v-card-title class="bg-primary d-flex">
+            {{ $t('account.title') }}
+
             <v-spacer />
-            <v-icon>mdi-text</v-icon>
-          </v-toolbar>
 
-          <v-card-text>
-            <v-alert
-              class="mt-1"
-              :value="error"
-              dismissible
-              prominent
-              dense
-              type="error"
-            >
-              {{ sendErrorText }}
-            </v-alert>
-            <v-form v-model="validForm" @submit.prevent="submit">
-              <PasswordForm @input="setPassword" />
-              <i18n path="account.description.text" tag="p">
-                <template #regulationLink>
-                  <a href="https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2" target="_blank">{{ $t('account.description.regulationLink') }}</a>
-                </template>
-              </i18n>
+            <v-icon icon="mdi-text" />
+          </v-card-title>
 
-              <v-checkbox
-                v-model="accepted"
-                :rules="[() => !!accepted || $t('account.acceptTerms')]"
-                :label="$t('account.readAndAccept')"
-              />
+          <v-card-text class="pt-4">
+            <v-row v-if="errorMessage">
+              <v-col>
+                <v-alert
+                  :text="errorMessage"
+                  type="error"
+                  density="compact"
+                  closable
+                  @update:model-value="() => (errorMessage = '')"
+                />
+              </v-col>
+            </v-row>
 
-              <v-btn
-                block
-                color="primary"
-                type="submit"
-                class="my-2"
-                :disabled="!validForm"
-                :loading="loading"
-              >
-                {{ $t("account.activate") }}
-              </v-btn>
+            <v-form v-model="valid" @submit.prevent="activateProfile()">
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="password"
+                    :label="$t('password.password')"
+                    :type="showPassword ? 'text' : 'password'"
+                    :hint="$t('password.pattern')"
+                    :rules="[
+                      (v) => !!v || $t('password.passwordIsRequired'),
+                      (v) => v >= 6 || $t('password.length'),
+                    ]"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    prepend-icon="mdi-lock"
+                    variant="underlined"
+                    persistent-hint
+                    required
+                    class="mb-2"
+                    @click:append="showPassword = !showPassword"
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="passwordRepeat"
+                    :label="$t('password.repeatPassword')"
+                    :type="showPassword ? 'text' : 'password'"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    :rules="[
+                      (v) => !!v || $t('password.passwordIsRequired'),
+                      () => passwordRepeat === password || $t('password.notEqual'),
+                      (v) => v >= 6 || $t('password.length'),
+                    ]"
+                    prepend-icon="mdi-lock"
+                    variant="underlined"
+                    required
+                    @click:append="showPassword = !showPassword"
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col>
+                  <i18n-t keypath="account.description.text" tag="p">
+                    <template #regulationLink>
+                      <a href="https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32016R0679#PP2" target="_blank" rel="noopener noreferrer">
+                        {{ $t('account.description.regulationLink') }}
+                      </a>
+                    </template>
+                  </i18n-t>
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col>
+                  <v-checkbox
+                    v-model="accepted"
+                    :label="$t('account.readAndAccept')"
+                    density="compact"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col>
+                  <v-btn
+                    :text="$t('account.activate')"
+                    :disabled="!valid"
+                    :loading="loading"
+                    type="submit"
+                    color="primary"
+                    block
+                  />
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
         </v-card>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
-<script>
-import PasswordForm from '~/components/PasswordForm.vue';
+<script setup>
+const { currentRoute, push: goTo } = useRouter();
+const { t } = useI18n();
+const { status: authStatus, refresh: authRefresh } = useAuth();
 
-export default {
-  middleware({ $auth, route, error }) {
-    if (!$auth?.loggedIn && !route?.query?.token) {
-      return error({ statusCode: 404 });
+if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
+  goTo('/');
+}
+
+const valid = ref(false);
+const loading = ref(false);
+const password = ref('');
+const passwordRepeat = ref('');
+const accepted = ref(false);
+const showPassword = ref(false);
+const errorMessage = ref('');
+
+async function activateProfile() {
+  errorMessage.value = '';
+  if (!accepted.value) {
+    errorMessage.value = t('account.acceptTerms');
+    return;
+  }
+
+  const { token, username } = currentRoute.value.query ?? {};
+
+  loading.value = true;
+  try {
+    await $fetch('/api/profile/_activate', {
+      method: 'POST',
+      body: {
+        password: password.value,
+        acceptTerms: accepted.value,
+        username,
+      },
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined,
+      },
+    });
+
+    await authRefresh();
+    goTo('/myspace');
+  } catch (err) {
+    if (!(err instanceof Error)) {
+      errorMessage.value = t('authenticate.failed');
+      return;
     }
-    return true;
-  },
-  components: {
-    PasswordForm,
-  },
-  data() {
-    return {
-      pleaseAccept: false,
-      accepted: false,
-      error: false,
-      sendErrorText: '',
-      loading: false,
-      activated: false,
-      password: false,
-      validForm: false,
-    };
-  },
-  methods: {
-    setPassword(value) {
-      this.password = value;
-    },
-    async submit() {
-      this.error = false;
-      this.pleaseAccept = false;
 
-      if (!this.accepted) {
-        this.pleaseAccept = true;
-        this.sendErrorText = this.$t('account.acceptTerms');
-        return;
-      }
-
-      this.loading = true;
-
-      try {
-        let headers;
-        if (this.$route.query.token) {
-          headers = { Authorization: `Bearer ${this.$route.query.token}` };
-        }
-        await this.$axios.$post(
-          '/profile/_activate',
-          {
-            password: this.password,
-            acceptTerms: this.accepted,
-            username: this.$route.query.username,
-          },
-          { headers },
-        );
-
-        await this.$auth.fetchUser();
-
-        this.$router.replace({ path: '/myspace' });
-      } catch (e) {
-        this.error = true;
-        if (e.response.status >= 400 && e.response.status < 500) {
-          this.sendErrorText = e.response.data.error;
-        } else if (e.response.statusText) {
-          this.sendErrorText = e.response.statusText;
-        } else {
-          this.sendErrorText = e.message;
-        }
-      }
-
-      this.loading = false;
-    },
-  },
-};
+    if (err.statusCode >= 400 && err.statusCode < 500) {
+      errorMessage.value = t('authenticate.loginFailed');
+    } else {
+      errorMessage.value = t('authenticate.failed');
+    }
+  }
+  loading.value = false;
+}
 </script>

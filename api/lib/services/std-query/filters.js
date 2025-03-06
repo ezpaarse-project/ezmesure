@@ -45,6 +45,22 @@ const stringJoiAndFilter = (key, regex = undefined) => {
 };
 
 /**
+ * Prepare Prisma filter for a boolean
+ *
+ * @param {string | undefined} value Value of the query parameter
+ * @param {boolean} [isNullable] Is field nullable
+ */
+const booleanFilter = (value, isNullable) => {
+  if (value == null) {
+    return undefined;
+  }
+  if (isNullable && typeof value !== 'boolean') {
+    return null;
+  }
+  return value;
+};
+
+/**
  * Prepare Joi validation and filter for a boolean
  *
  * @param {string} key The name of the field
@@ -60,13 +76,25 @@ const booleanJoiAndFilter = (key, isNullable) => {
 
   return {
     validation,
-    filter: (value) => {
-      if (isNullable && typeof value !== 'boolean') {
-        return { [key]: null };
-      }
-      return { [key]: value };
-    },
+    filter: (value) => ({ [key]: booleanFilter(value, isNullable) }),
   };
+};
+
+/**
+ * Prepare Prisma filter for a array
+ *
+ * @param {string | string[] | undefined} value Value of the query parameter
+ */
+const arrayFilter = (value) => {
+  if (value == null) {
+    return undefined;
+  }
+
+  const values = stringToArray(value ?? '');
+  if (values.length <= 0) {
+    return { isEmpty: true };
+  }
+  return { hasEvery: values };
 };
 
 /**
@@ -89,14 +117,25 @@ const arrayJoiAndFilter = (key, subtypes) => {
 
   return {
     validation: stringOrArrayValidation,
-    filter: (value) => {
-      const values = stringToArray(value ?? '');
-      if (values.length <= 0) {
-        return { [key]: { isEmpty: true } };
-      }
-      return { [key]: { hasEvery: values } };
-    },
+    filter: (value) => ({ [key]: arrayFilter(value) }),
   };
+};
+
+/**
+ * Prepare Prisma filter for a date
+ *
+ * @param {string | undefined} value Value of the query parameter
+ * @param {'gte' | 'gt' | 'eq' | 'lte' | 'lt'} operator The operator
+ * @param {boolean} [isNullable] Is field nullable
+ */
+const dateFilter = (value, operator, isNullable) => {
+  if (value == null) {
+    return undefined;
+  }
+  if (isNullable && !value) {
+    return null;
+  }
+  return { [operator]: value };
 };
 
 /**
@@ -116,13 +155,25 @@ const dateJoiAndFilter = (key, operator, isNullable) => {
 
   return {
     validation,
-    filter: (value) => {
-      if (isNullable && value === '') {
-        return { [key]: null };
-      }
-      return { [key]: { [operator]: value } };
-    },
+    filter: (value) => ({ [key]: dateFilter(value, operator, isNullable) }),
   };
+};
+
+/**
+ * Prepare Prisma filter for a number
+ *
+ * @param {number | undefined} value Value of the query parameter
+ * @param {'gte' | 'gt' | 'eq' | 'lte' | 'lt'} operator The operator
+ * @param {boolean} [isNullable] Is field nullable
+ */
+const numberFilter = (value, operator, isNullable) => {
+  if (value == null) {
+    return undefined;
+  }
+  if (isNullable && typeof value !== 'number') {
+    return null;
+  }
+  return { [operator]: value };
 };
 
 /**
@@ -142,12 +193,7 @@ const numberJoiAndFilter = (key, operator, isNullable) => {
 
   return {
     validation,
-    filter: (value) => {
-      if (isNullable && typeof value !== 'number') {
-        return { [key]: null };
-      }
-      return { [key]: { [operator]: value } };
-    },
+    filter: (value) => ({ [key]: numberFilter(value, operator, isNullable) }),
   };
 };
 
@@ -155,8 +201,12 @@ module.exports = {
   stringOrArrayValidation,
 
   stringJoiAndFilter,
+  booleanFilter,
   booleanJoiAndFilter,
+  arrayFilter,
   arrayJoiAndFilter,
+  dateFilter,
   dateJoiAndFilter,
+  numberFilter,
   numberJoiAndFilter,
 };

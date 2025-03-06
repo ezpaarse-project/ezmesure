@@ -1,66 +1,109 @@
 <template>
   <v-menu
+    v-model="show"
+    :close-on-content-click="false"
+    :persistent="loading"
     v-bind="$attrs"
+    @update:model-value="$event || cancel()"
   >
-    <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-      <slot :name="slot" v-bind="scope" />
+    <template #activator="scope">
+      <slot name="activator" v-bind="scope" />
     </template>
 
-    <v-card>
-      <v-card-title v-if="title" class="text-h5">
-        {{ title }}
-      </v-card-title>
-      <v-card-text v-if="message">
-        {{ message }}
-      </v-card-text>
-      <v-card-actions>
+    <v-card
+      :title="title || $t('areYouSure')"
+      :text="text"
+    >
+      <template #actions>
         <v-spacer />
+
         <v-btn
-          small
-          text
-          @click="disagree"
-        >
-          {{ disagreeText || $t('cancel') }}
-        </v-btn>
+          :text="disagreeText || $t('cancel')"
+          :prepend-icon="disagreeIcon"
+          :disabled="confirmLoading"
+          :loading="cancelLoading"
+          size="small"
+          variant="text"
+          @click="cancel()"
+        />
         <v-btn
-          small
+          :text="agreeText || $t('confirm')"
+          :prepend-icon="agreeIcon"
+          :disabled="cancelLoading"
+          :loading="confirmLoading"
+          size="small"
           color="primary"
-          @click="agree"
-        >
-          {{ agreeText || $t('confirm') }}
-        </v-btn>
-      </v-card-actions>
+          @click="confirm()"
+        />
+      </template>
     </v-card>
   </v-menu>
 </template>
 
-<script>
-export default {
-  props: {
-    title: {
-      type: String,
-      default: () => '',
-    },
-    message: {
-      type: String,
-      default: () => '',
-    },
-    agreeText: {
-      type: String,
-      default: () => '',
-    },
-    disagreeText: {
-      type: String,
-      default: () => '',
-    },
+<script setup>
+const props = defineProps({
+  title: {
+    type: String,
+    default: undefined,
   },
-  methods: {
-    agree() {
-      this.$emit('agree');
-    },
-    disagree() {
-      this.$emit('disagree');
-    },
+  text: {
+    type: String,
+    default: undefined,
   },
-};
+  agreeText: {
+    type: String,
+    default: '',
+  },
+  agreeIcon: {
+    type: String,
+    default: '',
+  },
+  agree: {
+    type: Function,
+    default: () => {},
+  },
+  disagreeText: {
+    type: String,
+    default: '',
+  },
+  disagreeIcon: {
+    type: String,
+    default: '',
+  },
+  disagree: {
+    type: Function,
+    default: () => {},
+  },
+});
+
+const show = ref(false);
+const confirmLoading = ref(false);
+const cancelLoading = ref(false);
+
+const loading = computed(() => confirmLoading.value || cancelLoading.value);
+
+async function confirm() {
+  confirmLoading.value = true;
+  try {
+    await props.agree();
+  } finally {
+    confirmLoading.value = false;
+    show.value = false;
+  }
+}
+
+async function cancel() {
+  cancelLoading.value = true;
+  try {
+    await props.disagree();
+  } finally {
+    cancelLoading.value = false;
+    show.value = false;
+  }
+}
+
+defineExpose({
+  confirm,
+  cancel,
+});
 </script>

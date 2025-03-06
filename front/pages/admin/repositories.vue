@@ -1,446 +1,246 @@
 <template>
-  <section>
-    <ToolBar
+  <div>
+    <SkeletonPageBar
+      v-model="query"
       :title="toolbarTitle"
-      :dark="hasSelection"
+      :refresh="refresh"
+      search
+      icons
+      @update:model-value="debouncedRefresh()"
     >
-      <template v-if="hasSelection" #nav-icon>
-        <v-btn icon @click="clearSelection">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
+      <template #filters-panel="props">
+        <RepositoryFilters v-bind="props" />
       </template>
 
-      <template v-if="hasSelection" #default>
-        <v-spacer />
+      <v-btn
+        v-if="repositoryFormDialogRef"
+        v-tooltip="$t('add')"
+        icon="mdi-plus"
+        variant="tonal"
+        density="comfortable"
+        color="green"
+        class="mr-2"
+        @click="repositoryFormDialogRef.open()"
+      />
+    </SkeletonPageBar>
 
-        <v-btn text @click="deleteRepositories()">
-          <v-icon left>
-            mdi-delete
-          </v-icon>
-          {{ $t('delete') }}
-        </v-btn>
-      </template>
-
-      <template v-else #default>
-        <v-spacer />
-
-        <v-menu
-          v-model="showCreationForm"
-          :close-on-content-click="false"
-          :nudge-width="200"
-          offset-y
-          bottom
-          left
-          @input="$refs.repoCreateForm?.resetForm?.()"
-        >
-          <template #activator="{ on, attrs }">
-            <v-btn
-              text
-              :loading="creating"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon left>
-                mdi-plus
-              </v-icon>
-              {{ $t('add') }}
-            </v-btn>
-          </template>
-
-          <RepositoriesCreateForm
-            ref="repoCreateForm"
-            @submit="onRepositoryCreate"
-            @cancel="showCreationForm = false"
-            @loading="creating = $event"
-          />
-        </v-menu>
-
-        <v-btn text :loading="refreshing" @click="refreshRepos">
-          <v-icon left>
-            mdi-refresh
-          </v-icon>
-          {{ $t('refresh') }}
-        </v-btn>
-
-        <v-btn
-          text
-          color="black"
-          @click="showReposFiltersDrawer = true"
-        >
-          <v-badge
-            :value="filtersCount > 0"
-            :content="filtersCount"
-            overlap
-            left
-          >
-            <v-icon>
-              mdi-filter
-            </v-icon>
-          </v-badge>
-          {{ $t('filter') }}
-        </v-btn>
-
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          :label="$t('search')"
-          solo
-          dense
-          hide-details
-          style="max-width: 200px"
+    <v-data-table-server
+      v-model="selectedRepositories"
+      :headers="headers"
+      show-select
+      return-object
+      v-bind="vDataTableOptions"
+    >
+      <template #[`item.type`]="{ value }">
+        <v-chip
+          :text="$te(`spaces.types.${value}`) ? $t(`spaces.types.${value}`) : value"
+          :color="repoColors.get(value)"
+          size="small"
         />
       </template>
-    </ToolBar>
 
-    <v-data-table
-      v-model="selected"
-      :headers="tableHeaders"
-      :items="repos"
-      :loading="refreshing"
-      sort-by="pattern"
-      item-key="pattern"
-      show-select
-      @pagination="currentItemCount = $event.itemsLength"
-    >
-      <template #[`item.institutions`]="{ item }">
+      <template #[`item.institutions`]="{ value, item }">
         <v-chip
-          v-if="Array.isArray(item.institutions)"
-          :outlined="item.institutions?.length <= 0"
-          small
-          class="elevation-1"
-          @click="$refs.institutionsDialog?.display?.(item)"
-        >
-          {{ $tc('repositories.institutionsCount', item.institutions.length) }}
-
-          <v-icon right small>
-            mdi-domain
-          </v-icon>
-        </v-chip>
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          prepend-icon="mdi-domain"
+          size="small"
+          @click="repoInstitutionsDialogRef?.open(item)"
+        />
       </template>
 
       <template #[`item.actions`]="{ item }">
         <v-menu>
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props: menu }">
             <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>
-                mdi-cog
-              </v-icon>
-            </v-btn>
+              icon="mdi-cog"
+              variant="plain"
+              density="compact"
+              v-bind="menu"
+            />
           </template>
 
           <v-list>
-            <v-list-item @click="deleteRepositories([item])">
-              <v-list-item-icon>
-                <v-icon>mdi-delete</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ $t('delete') }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+            <v-list-item
+              :title="$t('delete')"
+              prepend-icon="mdi-delete"
+              @click="deleteRepositories([item])"
+            />
+
+            <v-divider />
+
+            <v-list-item
+              v-if="clipboard"
+              :title="$t('copyId')"
+              prepend-icon="mdi-identifier"
+              @click="copyRepositoryPattern(item)"
+            />
           </v-list>
         </v-menu>
       </template>
-    </v-data-table>
+    </v-data-table-server>
 
-    <ConfirmDialog ref="confirmDialog" />
-    <RepositoriesInstitutionsDialog ref="institutionsDialog" @updated="refreshRepos" />
-    <ReposFiltersDrawer
-      v-model="filters"
-      :show.sync="showReposFiltersDrawer"
-      :search="search"
-      :max-institutions-count="maxCounts.institutions"
+    <SelectionMenu
+      v-model="selectedRepositories"
+      :text="$t('repositories.manageRepositories', selectedRepositories.length)"
+    >
+      <template #actions>
+        <v-list-item
+          :title="$t('delete')"
+          prepend-icon="mdi-delete"
+          @click="deleteRepositories()"
+        />
+      </template>
+    </SelectionMenu>
+
+    <RepositoryFormDialog
+      ref="repositoryFormDialogRef"
+      @submit="refresh()"
     />
-  </section>
+
+    <RepositoryInstitutionsDialog
+      ref="repoInstitutionsDialogRef"
+      @update:model-value="refresh()"
+    />
+  </div>
 </template>
 
-<script>
-import ToolBar from '~/components/space/ToolBar.vue';
-import RepositoriesInstitutionsDialog from '~/components/repositories/RepositoriesInstitutionsDialog.vue';
-import RepositoriesCreateForm from '~/components/repositories/RepositoriesCreateForm.vue';
-import ConfirmDialog from '~/components/ConfirmDialog.vue';
-import ReposFiltersDrawer from '~/components/repositories/ReposFiltersDrawer.vue';
+<script setup>
+definePageMeta({
+  layout: 'admin',
+  middleware: ['sidebase-auth', 'terms', 'admin'],
+});
 
-export default {
-  layout: 'space',
-  middleware: ['auth', 'terms', 'isAdmin'],
-  components: {
-    ToolBar,
-    RepositoriesInstitutionsDialog,
-    RepositoriesCreateForm,
-    ReposFiltersDrawer,
-    ConfirmDialog,
+const { t } = useI18n();
+const { isSupported: clipboard, copy } = useClipboard();
+const { openConfirm } = useDialogStore();
+const snacks = useSnacksStore();
+
+const selectedRepositories = ref([]);
+
+const repositoryFormDialogRef = useTemplateRef('repositoryFormDialogRef');
+const repoInstitutionsDialogRef = useTemplateRef('repoInstitutionsDialogRef');
+
+const {
+  refresh,
+  itemLength,
+  query,
+  vDataTableOptions,
+} = await useServerSidePagination({
+  fetch: {
+    url: '/api/repositories',
   },
-  data() {
-    return {
-      showReposFiltersDrawer: false,
-
-      showCreationForm: false,
-      creating: false,
-      selected: [],
-      search: '',
-      refreshing: false,
-      repos: [],
-      filters: {},
-      currentItemCount: 0,
-    };
+  sortMapping: {
+    institutions: 'institutions._count',
   },
-  mounted() {
-    return this.refreshRepos();
+  data: {
+    sortBy: [{ key: 'pattern', order: 'asc' }],
+    include: ['institutions'],
   },
-  computed: {
-    hasSelection() {
-      return this.selected.length > 0;
-    },
-    toolbarTitle() {
-      if (this.hasSelection) {
-        return this.$t('nSelected', { count: this.selected.length });
-      }
+});
 
-      let count = this.repos?.length;
-      if (count != null && this.currentItemCount !== count) {
-        count = `${this.currentItemCount}/${count}`;
-      }
+/**
+ * Table headers
+ */
+const headers = computed(() => [
+  {
+    title: t('repositories.pattern'),
+    value: 'pattern',
+    sortable: true,
+  },
+  {
+    title: t('repositories.type'),
+    value: 'type',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('repositories.institutions'),
+    value: 'institutions',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    title: t('actions'),
+    value: 'actions',
+    align: 'center',
+  },
+]);
+/**
+ * Toolbar title
+ */
+const toolbarTitle = computed(() => {
+  let count = `${itemLength.value.current}`;
+  if (itemLength.value.current !== itemLength.value.total) {
+    count = `${itemLength.value.current}/${itemLength.value.total}`;
+  }
+  return t('repositories.toolbarTitle', { count: count ?? '?' });
+});
 
-      return this.$t('repositories.toolbarTitle', { count: count ?? '?' });
-    },
-    tableHeaders() {
-      return [
-        {
-          text: this.$t('repositories.pattern'),
-          value: 'pattern',
-          filter: (_value, _search, item) => this.columnStringFilter('pattern', item),
-        },
-        {
-          text: this.$t('repositories.type'),
-          value: 'type',
-          filter: (_value, _search, item) => this.columnTypeFilter('type', item),
-          width: '200px',
-        },
-        {
-          text: this.$t('repositories.institutions'),
-          value: 'institutions',
-          filter: (_value, _search, item) => this.columnArrayFilter('institutions', item),
-          align: 'center',
-          width: '200px',
-        },
-        {
-          text: this.$t('actions'),
-          value: 'actions',
-          filterable: false,
-          sortable: false,
-          width: '85px',
-          align: 'center',
-        },
-      ];
-    },
-    filtersCount() {
-      return Object.values(this.filters)
-        .reduce(
-          (prev, filter) => {
-            // skipping if undefined or empty
-            if (filter == null || filter === '') {
-              return prev;
-            }
-            // skipping if empty array
-            if (Array.isArray(filter) && filter.length <= 0) {
-              return prev;
-            }
+/**
+ * Debounced refresh
+ */
+const debouncedRefresh = useDebounceFn(refresh, 250);
 
-            return prev + 1;
-          },
-          0,
-        );
-    },
-    /**
-     * Compute maximum count of properties
-     *
-     * @returns {Record<string, number>}
-     */
-    maxCounts() {
-      const counters = {
-        institutions: 0,
-      };
+/**
+ * Delete multiple repositories
+ *
+ * @param {Object[]} [items] List of items to delete, if none it'll fall back to selected
+ */
+function deleteRepositories(items) {
+  const toDelete = items || selectedRepositories.value;
+  if (toDelete.length <= 0) {
+    return;
+  }
 
-      // eslint-disable-next-line no-restricted-syntax
-      for (const institution of this.repos) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const property of Object.keys(counters)) {
-          if (Array.isArray(institution[property])) {
-            counters[property] = Math.max(counters[property], institution[property].length);
+  openConfirm({
+    text: t(
+      'repositories.deleteNbRepositories',
+      toDelete.length,
+    ),
+    agreeText: t('delete'),
+    agreeIcon: 'mdi-delete',
+    onAgree: async () => {
+      const results = await Promise.all(
+        toDelete.map((item) => {
+          try {
+            return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
+          } catch {
+            snacks.error(t('cannotDeleteItem', { id: item.pattern }));
+            return Promise.resolve(null);
           }
-        }
+        }),
+      );
+
+      if (!results.some((r) => !r)) {
+        snacks.success(t('itemsDeleted', { count: toDelete.length }));
       }
 
-      return counters;
+      if (!items) {
+        selectedRepositories.value = [];
+      }
+
+      await refresh();
     },
-  },
-  methods: {
-    /**
-     * Basic filter applied by default to v-data-table
-     *
-     * @param {string | undefined} value The item's value
-     * @param {string | undefined} search The value searched
-     */
-    basicFilter(value, search) {
-      return value?.toLowerCase()?.includes(search?.toLowerCase() ?? '');
-    },
-    /**
-     * Basic filter applied to string fields using filter popups
-     *
-     * @param {string} field The filter's field
-     * @param {string} value The item's value
-     *
-     * @return {boolean} If the item must be showed or not
-     */
-    basicStringFilter(field, value) {
-      const filter = this.filters[field]?.value;
-      if (!filter) {
-        return true;
-      }
-      return this.basicFilter(value, filter);
-    },
-    /**
-     * Filter for array column using filters
-     *
-     * @param {string} field The filter's field
-     * @param {*} item The item
-     *
-     * @return {boolean} If the item must be showed or not
-     */
-    columnArrayFilter(field, item) {
-      const rangeField = `${field}Range`;
-      const range = this.filters?.[rangeField]?.value;
-      if (range == null || !Array.isArray(item[field])) {
-        return true;
-      }
+  });
+}
 
-      const value = item[field].length;
-      return range[0] <= value && value <= range[1];
-    },
-    /**
-     * Filter for string column using search, fallbacks to filters
-     *
-     * @param {string} field The item's field
-     * @param {*} item The item
-     *
-     * @return {boolean} If the item must be showed or not
-     */
-    columnStringFilter(field, item) {
-      if (this.search) {
-        const isPattern = this.basicFilter(item.pattern, this.search);
-        return isPattern;
-      }
-      return this.basicStringFilter(field, item[field]);
-    },
-    columnTypeFilter(field, item) {
-      const filter = this.filters[field]?.value;
-      if (!filter) {
-        return true;
-      }
+/**
+ * Put repository ID into clipboard
+ *
+ * @param {object} param0 Repository
+ */
+async function copyRepositoryPattern({ pattern }) {
+  if (!id) {
+    return;
+  }
 
-      return item[field] === filter;
-    },
-
-    async refreshRepos() {
-      this.refreshing = true;
-
-      try {
-        this.repos = await this.$axios.$get('/repositories', {
-          params: {
-            include: ['institutions'],
-            size: 0,
-          },
-        });
-      } catch (e) {
-        this.$store.dispatch('snacks/error', this.$t('repositories.repository'));
-      }
-
-      if (!Array.isArray(this.repos)) {
-        this.repos = [];
-      }
-
-      this.refreshing = false;
-    },
-
-    async deleteRepositories(items) {
-      const repositories = items || this.selected;
-      if (repositories.length === 0) {
-        return;
-      }
-      const confirmed = await this.$refs.confirmDialog?.open({
-        title: this.$t('areYouSure'),
-        message: this.$tc(
-          'repositories.deleteNbRepositories',
-          repositories.length,
-        ),
-        agreeText: this.$t('delete'),
-        agreeIcon: 'mdi-delete',
-      });
-
-      if (!confirmed) {
-        return;
-      }
-
-      this.removing = true;
-
-      const requests = repositories.map(async (item) => {
-        let deleted = false;
-        try {
-          await this.$axios.$delete(`/repositories/${item.pattern}`);
-          deleted = true;
-        } catch (e) {
-          deleted = false;
-        }
-        return { item, deleted };
-      });
-
-      const results = await Promise.all(requests);
-
-      const { deleted, failed } = results.reduce((acc, result) => {
-        const { item } = result;
-
-        if (result.deleted) {
-          acc.deleted.push(item);
-        } else {
-          this.$store.dispatch('snacks/error', this.$t('cannotDeleteItem', { id: item.pattern }));
-          acc.failed.push(item);
-        }
-        return acc;
-      }, { deleted: [], failed: [] });
-
-      if (failed.length > 0) {
-        this.$store.dispatch('snacks/error', this.$t('cannotDeleteItems', { count: failed.length }));
-      }
-      if (deleted.length > 0) {
-        this.$store.dispatch('snacks/success', this.$t('itemsDeleted', { count: deleted.length }));
-      }
-
-      this.removing = false;
-      this.show = false;
-      const removedIds = deleted.map((d) => d.pattern);
-
-      const removeDeleted = (repo) => !removedIds.some((pattern) => repo.pattern === pattern);
-      this.repos = this.repos.filter(removeDeleted);
-      this.selected = this.selected.filter(removeDeleted);
-    },
-    async onRepositoryCreate() {
-      this.showCreationForm = false;
-      await this.refreshRepos();
-    },
-
-    clearSelection() {
-      this.selected = [];
-    },
-  },
-};
+  try {
+    await copy(pattern);
+  } catch {
+    snacks.error(t('clipboard.unableToCopy'));
+    return;
+  }
+  snacks.info(t('clipboard.textCopied'));
+}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

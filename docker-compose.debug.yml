@@ -85,18 +85,16 @@ services:
     command: npm run dev
 
   front:
-    image: node:18.18.2-alpine3.18
+    image: node:22.8.0-alpine3.20
     ports:
       - 8080:8080
     volumes:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}/api
-      - EZMESURE_INSTANCE="local"
-      - EZMESURE_DISABLE_SHIBBOLETH
-      - HOST=0.0.0.0
-      - PORT=8080
+      - NUXT_PUBLIC_CURRENT_INSTANCE=${EZMESURE_INSTANCE}
+      - NUXT_PUBLIC_SHIBBOLETH_DISABLED=${EZMESURE_DISABLE_SHIBBOLETH}
+    tmpfs: /tmp
     command: npm run dev
     restart: "no"
 

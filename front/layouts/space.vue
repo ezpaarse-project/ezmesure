@@ -1,35 +1,16 @@
 <template>
-  <v-app>
-    <SpaceMenu />
-
-    <AppBar />
-
-    <v-main>
-      <v-card flat tile color="transparent" style="height: 100%;">
-        <nuxt />
-      </v-card>
-    </v-main>
-
-    <AppSnackbar />
-  </v-app>
+  <v-main>
+    <SkeletonSpaceMenu />
+    <slot />
+  </v-main>
 </template>
 
-<script>
-import AppBar from '~/components/AppBar.vue';
-import AppSnackbar from '~/components/AppSnackbar.vue';
-import SpaceMenu from '~/components/space/SpaceMenu.vue';
+<script setup>
+const snackbarStore = useSnacksStore();
+const currentUserStore = useCurrentUserStore();
 
-export default {
-  components: {
-    AppBar,
-    AppSnackbar,
-    SpaceMenu,
-  },
-  head() {
-    return this.$nuxtI18nHead({
-      addDirAttribute: true,
-      addSeoAttributes: true,
-    });
-  },
-};
+const { error } = await useAsyncData('currentMemberships', () => currentUserStore.fetchMemberships());
+if (error.value) {
+  snackbarStore.error(error.value.message);
+}
 </script>

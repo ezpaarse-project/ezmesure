@@ -1,200 +1,160 @@
 <template>
-  <v-card width="350" height="100%" class="flexCard">
-    <v-card-text class="text-center grow">
-      <v-img
-        v-if="partner.logoId"
-        :src="`/api/assets/logos/${partner.logoId}`"
-        contain
-        height="100"
-        class="mb-3"
-      />
+  <v-card style="height: 100%;">
+    <v-img
+      :src="partner.logoId ? `/api/assets/logos/${partner.logoId}` : undefined"
+      height="100"
+      class="mb-3"
+    />
 
-      <v-img
-        v-else
-        contain
-        height="100"
-        class="mb-3"
-      />
+    <v-card-title class="text-wrap text-center">
+      {{ partner.name }}
+    </v-card-title>
+    <v-card-subtitle class="text-center">
+      {{ partner.acronym }}
+    </v-card-subtitle>
 
-      <div class="title">
-        {{ partnerName }}
-      </div>
-    </v-card-text>
+    <v-card-text class="text-center">
+      <template v-if="contacts.length > 0">
+        <v-divider class="mb-3" />
 
-    <template v-if="hasContacts">
-      <v-divider />
-
-      <v-card-text class="text-center">
-        <div class="subtitle-1">
+        <div class="text-subtitle-1">
           {{ $t('partners.correspondents') }}
         </div>
 
-        <div v-for="contact in contacts" :key="contact.name">
-          <v-tooltip right>
-            <template #activator="{ on }">
-              <v-chip class="mb-1" :color="contact.color" outlined v-on="on">
-                <v-icon small left>
-                  {{ contact.icon }}
-                </v-icon>
-                {{ contact.name }}
-              </v-chip>
-            </template>
-
-            <span>{{ contact.label }}</span>
-          </v-tooltip>
+        <div v-for="contact in contacts" :key="contact.name" class="mb-1">
+          <v-chip
+            v-tooltip="contact.label"
+            :prepend-icon="contact.icon"
+            :text="contact.name"
+            :color="contact.color"
+            variant="outlined"
+          />
         </div>
-      </v-card-text>
-    </template>
+      </template>
 
-    <template v-if="hasServices">
-      <v-divider />
+      <div v-if="services.length > 0">
+        <v-divider class="my-4" />
 
-      <v-card-text class="text-center">
         <v-chip
-          v-for="auto in servicesEnabled"
-          :key="auto.label"
-          :color="auto.color"
-          small
+          v-for="service in services"
+          :key="service.service"
+          :text="service.label"
+          :color="service.color"
+          size="small"
+          variant="flat"
           label
-          dark
           class="mr-1 mb-1"
-        >
-          {{ $t(`partners.auto.${auto.label}`) }}
-        </v-chip>
-      </v-card-text>
-    </template>
+        />
+      </div>
 
-    <template v-if="hasLinks">
-      <v-divider />
+      <div v-if="socials.length > 0">
+        <v-divider class="my-4" />
 
-      <v-card-text class="text-center">
         <v-btn
-          v-for="link in links"
-          :key="link.icon"
-          :href="link.url"
-          :color="link.color"
-          icon
-        >
-          <v-icon>{{ link.icon }}</v-icon>
-        </v-btn>
-      </v-card-text>
-    </template>
+          v-for="social in socials"
+          :key="social.property"
+          :color="social.color"
+          :icon="social.icon"
+          density="comfortable"
+          variant="text"
+          class="mr-1 mb-1"
+        />
+      </div>
+    </v-card-text>
   </v-card>
 </template>
 
-<script>
-export default {
-  props: {
-    partner: {
-      type: Object,
-      default: () => ({}),
-    },
+<script setup>
+const props = defineProps({
+  partner: {
+    type: Object,
+    required: true,
   },
-  computed: {
-    partnerName() {
-      if (this.partner?.acronym) {
-        return `${this.partner.name} (${this.partner.acronym})`;
-      }
-      return this.partner.name;
-    },
-    hasContacts() {
-      return this.contacts.length > 0;
-    },
-    contacts() {
-      if (!this.partnerName) {
-        return [];
-      }
+});
 
-      return this.partner.contacts
-        .filter((user) => user.fullName)
-        .map(
-          (user) => {
-            const roles = new Set(user.roles);
+const socialChips = new Map([
+  ['website', { icon: 'mdi-web', color: '#616161' }],
+  ['twitterUrl', { icon: 'mdi-twitter', color: '#1da1f2' }],
+  ['linkedinUrl', { icon: 'mdi-linkedin', color: '#0077b5' }],
+  ['youtubeUrl', { icon: 'mdi-youtube', color: '#ff0000' }],
+  ['facebookUrl', { icon: 'mdi-facebook', color: '#1877f2' }],
+]);
 
-            if (roles.has('contact:doc')) {
-              return {
-                name: user.fullName,
-                type: 'doc',
-                icon: 'mdi-book',
-                color: 'green',
-                label: this.$t('partners.documentary'),
-              };
-            }
+const { t } = useI18n();
 
-            if (roles.has('contact:tech')) {
-              return {
-                name: user.fullName,
-                type: 'tech',
-                icon: 'mdi-wrench',
-                color: 'blue',
-                label: this.$t('partners.technical'),
-              };
-            }
+const contacts = computed(
+  () => props.partner.contacts
+    .filter((user) => user.fullName)
+    .map(
+      (user) => {
+        const roles = new Set(user.roles);
 
-            return {
-              name: user.fullName,
-              type: 'unknown',
-              icon: 'mdi-mdi',
-              color: 'grey',
-              label: '????',
-            };
-          },
-        )
-        .sort(
-          ({ type }) => (type === 'doc' ? -1 : 1),
-        );
-    },
-    servicesEnabled() {
-      const servicesEnabled = this.partner?.servicesEnabled;
-      if (!servicesEnabled) {
-        return [];
-      }
+        if (roles.has('contact:doc')) {
+          return {
+            ...roleColors.get('contact:doc'),
+            name: user.fullName,
+            type: 'doc',
+            label: t('partners.documentary'),
+          };
+        }
 
-      return [
-        { label: 'ezpaarse', color: 'teal', automated: servicesEnabled.ezpaarse },
-        { label: 'ezreeport', color: 'blue', automated: servicesEnabled.ezreeport },
-        { label: 'ezcounter', color: 'red', automated: servicesEnabled.ezcounter },
-      ].filter((auto) => auto.automated);
-    },
-    hasServices() {
-      return this.servicesEnabled.length > 0;
-    },
-    hasLinks() {
-      return this.links.length > 0;
-    },
-    links() {
-      const social = this.partner?.social;
-      if (!social) {
-        return [];
-      }
+        if (roles.has('contact:tech')) {
+          return {
+            ...roleColors.get('contact:tech'),
+            name: user.fullName,
+            type: 'tech',
+            label: t('partners.technical'),
+          };
+        }
 
-      const links = [];
+        return {
+          name: user.fullName,
+          type: 'unknown',
+          icon: 'mdi-mdi',
+          color: 'grey',
+          label: '????',
+        };
+      },
+    )
+    .sort(({ type }) => (type === 'doc' ? -1 : 1)),
+);
 
-      if (social.website) {
-        links.push({ icon: 'mdi-web', color: '#616161', url: social.website });
-      }
-      if (social.twitterUrl) {
-        links.push({ icon: 'mdi-twitter', color: '#1da1f2', url: social.twitterUrl });
-      }
-      if (social.linkedinUrl) {
-        links.push({ icon: 'mdi-linkedin', color: '#0077b5', url: social.linkedinUrl });
-      }
-      if (social.youtubeUrl) {
-        links.push({ icon: 'mdi-youtube', color: '#ff0000', url: social.youtubeUrl });
-      }
-      if (social.facebookUrl) {
-        links.push({ icon: 'mdi-facebook', color: '#1877f2', url: social.facebookUrl });
-      }
+const services = computed(() => {
+  const { servicesEnabled } = props.partner;
 
-      return links;
-    },
-  },
-};
+  const items = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [service, color] of serviceColors) {
+    const automated = servicesEnabled[service];
+    if (automated) {
+      items.push({
+        service,
+        label: t(`partners.auto.${service}`),
+        color,
+        automated,
+      });
+    }
+  }
+
+  return items;
+});
+
+const socials = computed(() => {
+  const { social } = props.partner;
+
+  const items = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [property, chip] of socialChips) {
+    const url = social[property];
+    if (url) {
+      items.push({
+        ...chip,
+        property,
+        url,
+      });
+    }
+  }
+
+  return items;
+});
 </script>
-
-<style>
-.flexCard {
-  display: flex;
-  flex-direction: column;
-}
-</style>
