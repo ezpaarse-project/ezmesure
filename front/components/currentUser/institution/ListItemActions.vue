@@ -49,6 +49,7 @@
             :title="space.name"
             :href="`/kibana/s/${space.id}`"
             append-icon="mdi-open-in-app"
+            @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
           >
             <template #subtitle>
               <v-chip
@@ -82,6 +83,7 @@ const props = defineProps({
 });
 
 const { data: user } = useAuthState();
+const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
 const spaces = computed(() => props.spacePermissions?.map(({ space }) => space));
 
