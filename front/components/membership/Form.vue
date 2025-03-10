@@ -290,7 +290,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return !isLocked.value && hasPermission('memberships:write', { throwOnNoMembership: true });
+  return !isLocked.value && hasPermission(props.institution.id, 'memberships:write', { throwOnNoMembership: true });
 });
 
 /**
