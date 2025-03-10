@@ -442,7 +442,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return !isLocked.value && hasPermission(item.id, 'sushi:write', { throwOnNoMembership: true });
+  return !isLocked.value && hasPermission(params.id, 'sushi:write', { throwOnNoMembership: true });
 });
 /**
  * Table headers
