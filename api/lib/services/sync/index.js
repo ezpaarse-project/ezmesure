@@ -5,6 +5,7 @@ const {
   syncRepositories,
   syncRepositoryAliases,
   syncUsers,
+  syncCustomRoles,
 } = require('./elastic');
 
 const {
@@ -26,6 +27,7 @@ const ezr = require('./ezreeport');
  * @property {EntitySyncResult} repositories - Result of repositories synchronization
  * @property {EntitySyncResult} repositoryAliases - Result of repository aliases synchronization
  * @property {EntitySyncResult} users - Result of users synchronization
+ * @property {EntitySyncResult} elasticRoles - Result of elastic roles synchronization
  * @property {EntitySyncResult} ezreeportUsers - Result of ezreeport's users synchronization
  * @property {EntitySyncResult} ezreeportNamespaces - Result of ezreeport's namespaces sync
  */
@@ -50,6 +52,7 @@ const syncStatus = {
     repositories: { errors: 0, synchronized: 0 },
     repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
+    elasticRoles: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
   },
@@ -80,6 +83,7 @@ async function startSync() {
     repositories: { errors: 0, synchronized: 0 },
     repositoryAliases: { errors: 0, synchronized: 0 },
     users: { errors: 0, synchronized: 0 },
+    elasticRoles: { errors: 0, synchronized: 0 },
     ezreeportUsers: { errors: 0, synchronized: 0 },
     ezreeportNamespaces: { errors: 0, synchronized: 0 },
   };
@@ -136,6 +140,15 @@ async function startSync() {
   } catch (e) {
     setSyncResult('users', { fulfilled: 0, errors: 1 });
     appLogger.error(`[sync] An error occurred during users synchronization: ${e}`);
+  }
+
+  // Sync elastic roles in Elastic
+  try {
+    appLogger.info('[sync] Synchronizing elastic roles...');
+    setSyncResult('elasticRoles', await syncCustomRoles());
+  } catch (e) {
+    setSyncResult('elasticRoles', { fulfilled: 0, errors: 1 });
+    appLogger.error(`[sync] An error occurred during elastic roles synchronization: ${e}`);
   }
 
   // Sync users in ezREEPORT

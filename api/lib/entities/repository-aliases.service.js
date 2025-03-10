@@ -115,6 +115,7 @@ module.exports = class RepositoriesService extends BasePrismaService {
 
     this.triggerHooks('repository_alias:delete', deletedRepositoryAlias);
     deletedRepositoryAlias.permissions.forEach((repoPerm) => { this.triggerHooks('repository_alias_permission:delete', repoPerm); });
+    deletedRepositoryAlias.elasticRolePermissions.forEach((rolePerm) => { this.triggerHooks('elastic_role_repository_alias_permission:delete', rolePerm); });
 
     return deleteResult;
   }

@@ -18,7 +18,12 @@
     autofocus
     return-object
     @update:model-value="$emit('update:modelValue', $event)"
+    @click:clear="$emit('update:modelValue', undefined)"
   >
+    <template #prepend>
+      <InstitutionAvatar :institution="modelValue" />
+    </template>
+
     <template #item="{ item: { raw: item }, props: listItem }">
       <v-list-item
         :title="item.name"

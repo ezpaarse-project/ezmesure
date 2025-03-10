@@ -15,8 +15,9 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.SpacePermissionDeleteManyArgs} SpacePermissionDeleteManyArgs
  *
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
+ * @typedef {import('@prisma/client').ElasticRoleSpacePermission} ElasticRoleSpacePermission
  *
- * @typedef {import('@prisma/client').Space & { permissions: SpacePermission[] }} OldSpace
+ * @typedef {import('@prisma/client').Space & { permissions: SpacePermission[], elasticRolePermissions: ElasticRoleSpacePermission[] }} OldSpace
  * @typedef {{deleteResult: Space, deletedSpace: OldSpace }} SpaceRemoved
  */
 /* eslint-enable max-len */
@@ -94,6 +95,7 @@ async function remove(params, tx = prisma) {
     where: params.where,
     include: {
       permissions: true,
+      elasticRolePermissions: true,
     },
   });
 

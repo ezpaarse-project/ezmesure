@@ -19,6 +19,7 @@ menu:
   members: Members
   sushi: Sushi
   users: Users
+  elasticRoles: Elastic Roles
   logout: Logout
   contact: Contact
   report: Reports
@@ -492,6 +493,7 @@ components:
   components: Components
   count: "{count} components"
   noComponent: No components
+  add: Add component
 group:
   group: Grouped in
   noGroup: No group
@@ -878,6 +880,21 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+elasticRoles:
+  toolbarTitle: Elastic Roles ({count})
+  newRole: New role
+  filtersForm.title: Filters of the role
+  institutions: Institutions
+  addInstitution: Add institution
+  noInstitutions: No institutions is using this role
+  readonly: Readonly
+  users: Users
+  addUser: Add user
+  noUsers: No users is using this role
+  manageElasticRoles: >
+    Manage roles
+    |Manage {count} roles
+  deleteNbRoles: You are about to delete {n} roles
 sync:
   status:
     notSynced: Not yet synchronized
@@ -903,6 +920,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
+  elasticRoles: Elastic Roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization

@@ -31,6 +31,7 @@ const schema = {
   institutions: Joi.array().items(Joi.object()),
   repository: Joi.object(),
   permissions: Joi.array().items(Joi.object()),
+  elasticRolePermissions: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -42,6 +43,7 @@ const immutableFields = [
   'institutions',
   'repository',
   'permissions',
+  'elasticRolePermissions',
 ];
 
 /**
@@ -51,6 +53,7 @@ const includableFields = [
   'institutions',
   'repository',
   'permissions',
+  'elasticRolePermissions',
 ];
 
 /**
