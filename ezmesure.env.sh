@@ -1,10 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 LOCAL_ENV_FILE="$SCRIPT_DIR/ezmesure.local.env.sh"
 
 EZMESURE_NODE_NAME=`hostname`
-THIS_HOST=`hostname -I | cut -d ' ' -f1`
+
+hostname -I > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+  THIS_HOST=`hostname -I | cut -d ' ' -f1`
+else
+  THIS_HOST=`ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -n1`
+fi
 
 export EZMESURE_DOMAIN="ezmesure-preprod.couperin.org"
 export EZMESURE_APPLICATION_NAME="ezMESURE"
