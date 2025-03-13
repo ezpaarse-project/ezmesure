@@ -509,6 +509,7 @@ tasks:
     interrupted: The harvest has been interrupted.
     cancelled: The harvest has been cancelled.
     delayed: The harvest has been initiated, but the report was not ready yet. A new attempt will be made soon.
+    missing: The harvest is terminated, but the requested period is missing.
   status:
     notLaunchedYet: Not launched yet
     waiting: Waiting
@@ -519,6 +520,7 @@ tasks:
     error: Error
     cancelled: Cancelled
     delayed: Delayed
+    missing: Missing
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report

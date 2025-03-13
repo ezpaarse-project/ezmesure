@@ -511,6 +511,7 @@ tasks:
     interrupted: Le moissonnage a été interrompu.
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
+    missing: Le moissonnage est terminé, mais la période demandée est manquante.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -521,6 +522,7 @@ tasks:
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
+    missing: Manquant
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible

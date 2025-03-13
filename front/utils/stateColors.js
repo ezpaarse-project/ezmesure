@@ -23,6 +23,7 @@ export const sushiStatus = new Map([
 ]);
 
 export const harvestStatus = new Map([
+  ['missing', { color: 'orange', icon: 'mdi-file-hidden' }],
   ['finished', { color: 'green', icon: 'mdi-check' }],
   ['running', { color: 'blue', icon: 'mdi-play' }],
   ['delayed', { color: 'blue', icon: 'mdi-update' }],
