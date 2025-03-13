@@ -92,7 +92,7 @@
         :disabled="!valid"
         :loading="saving"
         type="submit"
-        form="endpointForm"
+        form="userForm"
         variant="elevated"
         color="primary"
       />
