@@ -15,6 +15,8 @@ const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 
+const resetPasswordSecret = `${secret}_password_reset`;
+
 const standardMembershipsQueryParams = prepareStandardQueryParams({
   schema: membershipSchema,
   includableFields: includableMembershipFields,
@@ -247,7 +249,7 @@ exports.getResetToken = async (ctx) => {
     username: user.username,
     createdAt: currentDate,
     expiresAt,
-  }, secret);
+  }, resetPasswordSecret);
 
   const diffInHours = config.get('passwordResetValidity');
   await sendPasswordRecovery(user, {
@@ -260,9 +262,20 @@ exports.getResetToken = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const { password } = ctx.request.body;
-  const { username } = ctx.state.user;
-  const { createdAt } = ctx.state.jwtdata;
+  const { password, token } = ctx.request.body;
+
+  const { valid, data } = await new Promise((resolve) => {
+    jwt.verify(token, resetPasswordSecret, (err, decoded) => {
+      resolve({ valid: !err, data: decoded });
+    });
+  });
+
+  if (!valid || !data?.username || !data?.createdAt) {
+    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
+    return;
+  }
+
+  const { username, createdAt } = data;
 
   const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
@@ -273,7 +286,7 @@ exports.resetPassword = async (ctx) => {
     const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
-      ctx.throw(404, ctx.$t('errors.password.expires'));
+      ctx.throw(400, ctx.$t('errors.password.expires'));
       return;
     }
   }
