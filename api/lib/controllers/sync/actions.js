@@ -1,4 +1,5 @@
 const UsersService = require('../../entities/users.service');
+const ElasticRoleService = require('../../entities/elastic-roles.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const SpacesService = require('../../entities/spaces.service');
 const RepositoriesService = require('../../entities/repositories.service');
@@ -30,6 +31,7 @@ exports.getSyncStatus = async (ctx) => {
 
   const expectedPromises = {
     users: new UsersService().count(),
+    elasticRoles: new ElasticRoleService().count(),
     institutions: new InstitutionsService().count({ where: { validated: true } }),
     spaces: new SpacesService().count(),
     repositories: new RepositoriesService().count(),

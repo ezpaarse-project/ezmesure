@@ -185,4 +185,30 @@ module.exports = class InstitutionsService extends BasePrismaService {
   getContacts(institutionId) {
     return institutionsPrisma.getContacts(institutionId, this.prisma);
   }
+
+  async connectRole(id, roleName) {
+    const { elasticRoles, ...institution } = await institutionsPrisma.update({
+      where: { id },
+      data: {
+        elasticRoles: { connect: { name: roleName } },
+      },
+      include: { elasticRoles: true },
+    }, this.prisma);
+    this.triggerHooks('institution:connect:elastic_role', { institution, role: elasticRoles.find((r) => r.name === roleName) });
+
+    return institution;
+  }
+
+  async disconnectRole(id, roleName) {
+    const { elasticRoles, ...institution } = await institutionsPrisma.update({
+      where: { id },
+      data: {
+        elasticRoles: { disconnect: { name: roleName } },
+      },
+      include: { elasticRoles: true },
+    }, this.prisma);
+    this.triggerHooks('institution:disconnect:elastic_role', { institution, role: elasticRoles.find((r) => r.name === roleName) });
+
+    return institution;
+  }
 };

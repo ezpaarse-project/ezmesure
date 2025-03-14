@@ -28,6 +28,7 @@ const sushi = require('./sushi');
 const repositories = require('./repositories');
 const repositoryAliases = require('./repository-aliases');
 const spaces = require('./spaces');
+const elasticRoles = require('./elastic-roles');
 
 const {
   getSubInstitutions,
@@ -41,6 +42,7 @@ router.use(sushi.prefix('/:institutionId/sushi').middleware());
 router.use(repositories.prefix('/:institutionId/repositories').middleware());
 router.use(repositoryAliases.prefix('/:institutionId/repository-aliases').middleware());
 router.use(spaces.prefix('/:institutionId/spaces').middleware());
+router.use(elasticRoles.prefix('/:institutionId/elastic-roles').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
 
 router.use(requireJwt, requireUser);

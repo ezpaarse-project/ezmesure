@@ -5,11 +5,10 @@
     prepend-icon="mdi-home-group"
   >
     <template #append>
-      <v-menu
-        v-model="isSearchOpen"
-        :persistent="isLinkLoading"
-        :close-on-content-click="false"
-        width="300"
+      <InstitutionAddMenu
+        :model-value="components"
+        :title="$t('components.add')"
+        @institution-add="linkComponent($event)"
       >
         <template #activator="{ props: menu }">
           <v-btn
@@ -21,30 +20,7 @@
             v-bind="menu"
           />
         </template>
-
-        <v-card>
-          <template #text>
-            <InstitutionAutoComplete v-model="componentToLink" />
-          </template>
-
-          <template #actions>
-            <v-spacer />
-
-            <v-btn variant="text" @click="isSearchOpen = false">
-              {{ $t('cancel') }}
-            </v-btn>
-
-            <v-btn
-              color="primary"
-              :loading="isLinkLoading"
-              :disabled="!componentToLink || componentToLink.id === props.institution.id"
-              @click="linkComponent()"
-            >
-              {{ $t('add') }}
-            </v-btn>
-          </template>
-        </v-card>
-      </v-menu>
+      </InstitutionAddMenu>
     </template>
 
     <template #text>
@@ -116,12 +92,9 @@ const emit = defineEmits({
 const { t } = useI18n();
 const snacks = useSnacksStore();
 
-const isSearchOpen = ref(false);
 const isLinkLoading = ref(false);
 /** @type {Ref<object[]>} */
 const components = ref(props.institution.childInstitutions || []);
-/** @type {Ref<object|null>} */
-const componentToLink = ref(null);
 
 const sortedComponents = computed(
   () => components.value.toSorted((a, b) => a.name.localeCompare(b.name)),
@@ -141,27 +114,20 @@ async function unlinkComponent(item) {
   }
 }
 
-async function linkComponent() {
-  if (
-    !componentToLink.value
-    || !props.institution
-    || componentToLink.value.id === props.institution.id
-  ) {
+async function linkComponent(item) {
+  if (!item) {
     return;
   }
 
   isLinkLoading.value = true;
   try {
-    await $fetch(`/api/institutions/${props.institution.id}/subinstitutions/${componentToLink.value.id}/`, {
+    await $fetch(`/api/institutions/${props.institution.id}/subinstitutions/${item.id}/`, {
       method: 'PUT',
-      body: { type: props.institution.type },
     });
 
-    components.value.push(componentToLink.value);
-    componentToLink.value = null;
+    components.value.push(item);
 
     emit('update:modelValue', components.value);
-    isSearchOpen.value = false;
   } catch {
     snacks.error(t('anErrorOccurred'));
   }
