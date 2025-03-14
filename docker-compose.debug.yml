@@ -99,7 +99,7 @@ services:
     restart: "no"
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report
+    image: ghcr.io/ezpaarse-project/ezreeport-api
     ports:
       - 8888:8080
     environment:
