@@ -279,11 +279,15 @@ exports.resetPassword = async (ctx) => {
 
   const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
 
   user.metadata = user.metadata || {};
 
-  if (user?.metadata?.passwordDate) {
-    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
+  if (user.metadata.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(400, ctx.$t('errors.password.expires'));
