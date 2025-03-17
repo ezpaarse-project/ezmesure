@@ -42,9 +42,8 @@
                 class="mr-2"
               />
 
-              <v-chip
-                :text="$te(`spaces.types.${space.type}`) ? $t(`spaces.types.${space.type}`) : space.type"
-                :color="repoColors.get(space.type)"
+              <RepositoryTypeChip
+                :model-value="space"
                 size="small"
                 density="comfortable"
               />

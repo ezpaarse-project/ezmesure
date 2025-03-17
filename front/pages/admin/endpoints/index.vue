@@ -9,7 +9,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #filters-panel="props">
-        <SushiEndpointFilters v-bind="props" />
+        <SushiEndpointApiFilters v-bind="props" />
       </template>
 
       <v-btn

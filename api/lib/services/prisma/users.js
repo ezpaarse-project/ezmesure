@@ -106,7 +106,6 @@ function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
  * @returns {Promise<User>}
  */
 function update(params, tx = prisma) {
-  // TODO manage role
   return tx.user.update(params);
 }
 
