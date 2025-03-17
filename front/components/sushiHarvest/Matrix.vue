@@ -100,7 +100,7 @@
                 </template>
 
                 <template v-else>
-                  <td :colspan="periods.length - 1" class="text-center">
+                  <td :colspan="periods.length" class="text-center">
                     {{ report.isIgnored ? $t('sushi.matrix.ignored') : $t('sushi.matrix.unsupported') }}
                   </td>
                 </template>
