@@ -68,6 +68,8 @@ defineEmits({
 const { data: currentUser } = useAuthState();
 
 const isAlreadyMember = computed(
-  () => props.user.memberships.some(({ institution }) => institution.id === props.institution.id),
+  () => props.user.memberships?.some(
+    ({ institution }) => institution.id === props.institution.id,
+  ) ?? false,
 );
 </script>
