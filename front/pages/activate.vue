@@ -113,7 +113,7 @@
 <script setup>
 const { currentRoute } = useRouter();
 const { t } = useI18n();
-const { status: authStatus, refresh: authRefresh } = useAuth();
+const { status: authStatus, getSession } = useAuth();
 
 if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
   await navigateTo('/');
@@ -150,7 +150,7 @@ async function activateProfile() {
       },
     });
 
-    await authRefresh();
+    await getSession({ force: true });
     await navigateTo('/myspace');
   } catch (err) {
     if (!(err instanceof Error)) {
