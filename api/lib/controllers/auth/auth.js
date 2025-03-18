@@ -181,7 +181,8 @@ exports.activate = async (ctx) => {
   const usersService = new UsersService();
 
   try {
-    await usersService.acceptTerms(user.username);
+    const res = await usersService.acceptTerms(user.username);
+    user.metadata = res.metadata;
   } catch (err) {
     ctx.status = 500;
     appLogger.error(`Failed to update user: ${err}`);
@@ -223,8 +224,11 @@ exports.activate = async (ctx) => {
     }
   }
 
-  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
-  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
+  const token = generateToken(user);
+  ctx.metadata = { username: user.username };
+  ctx.cookies.set(cookie, token, { httpOnly: true });
+  ctx.body = { ...user, token };
+  ctx.status = 200;
 };
 
 exports.getResetToken = async (ctx) => {

@@ -33,8 +33,8 @@
                     :type="showPassword ? 'text' : 'password'"
                     :hint="$t('password.pattern')"
                     :rules="[
-                      (v) => !!v || $t('password.passwordIsRequired'),
-                      (v) => v >= 6 || $t('password.length'),
+                      (v) => !!v.length || $t('password.passwordIsRequired'),
+                      (v) => v.length >= 6 || $t('password.length'),
                     ]"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     prepend-icon="mdi-lock"
@@ -55,9 +55,9 @@
                     :type="showPassword ? 'text' : 'password'"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="[
-                      (v) => !!v || $t('password.passwordIsRequired'),
+                      (v) => !!v.length || $t('password.passwordIsRequired'),
                       () => passwordRepeat === password || $t('password.notEqual'),
-                      (v) => v >= 6 || $t('password.length'),
+                      (v) => v.length >= 6 || $t('password.length'),
                     ]"
                     prepend-icon="mdi-lock"
                     variant="underlined"
@@ -111,12 +111,12 @@
 </template>
 
 <script setup>
-const { currentRoute, push: goTo } = useRouter();
+const { currentRoute } = useRouter();
 const { t } = useI18n();
-const { status: authStatus, refresh: authRefresh } = useAuth();
+const { status: authStatus, getSession } = useAuth();
 
 if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
-  goTo('/');
+  await navigateTo('/');
 }
 
 const valid = ref(false);
@@ -150,8 +150,8 @@ async function activateProfile() {
       },
     });
 
-    await authRefresh();
-    goTo('/myspace');
+    await getSession({ force: true });
+    await navigateTo('/myspace');
   } catch (err) {
     if (!(err instanceof Error)) {
       errorMessage.value = t('authenticate.failed');

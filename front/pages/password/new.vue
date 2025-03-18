@@ -88,11 +88,11 @@
 </template>
 
 <script setup>
-const { currentRoute, push: goTo } = useRouter();
+const { currentRoute } = useRouter();
 const { t } = useI18n();
 
 if (!currentRoute.value.query?.token) {
-  goTo('/');
+  await navigateTo('/');
 }
 
 const valid = ref(false);

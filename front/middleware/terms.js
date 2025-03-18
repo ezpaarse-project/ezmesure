@@ -8,5 +8,5 @@ export default defineNuxtRouteMiddleware(() => {
   if (user.value?.metadata?.acceptedTerms) {
     return true;
   }
-  return navigateTo('/myspace');
+  return navigateTo('/activate');
 });
