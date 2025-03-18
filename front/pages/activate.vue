@@ -111,12 +111,12 @@
 </template>
 
 <script setup>
-const { currentRoute, push: goTo } = useRouter();
+const { currentRoute } = useRouter();
 const { t } = useI18n();
 const { status: authStatus, refresh: authRefresh } = useAuth();
 
 if (authStatus.value === 'unauthenticated' && !currentRoute.value.query?.token) {
-  goTo('/');
+  await navigateTo('/');
 }
 
 const valid = ref(false);
@@ -151,7 +151,7 @@ async function activateProfile() {
     });
 
     await authRefresh();
-    goTo('/myspace');
+    await navigateTo('/myspace');
   } catch (err) {
     if (!(err instanceof Error)) {
       errorMessage.value = t('authenticate.failed');
