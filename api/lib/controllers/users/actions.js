@@ -52,7 +52,9 @@ exports.list = async (ctx) => {
   const {
     source = 'fullName,username',
     roles,
+    'roles:loose': hasSomeRoles,
     permissions,
+    'permissions:loose': hasSomePermissions,
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
@@ -60,8 +62,8 @@ exports.list = async (ctx) => {
   if (roles != null || permissions != null) {
     prismaQuery.where.memberships = {
       some: {
-        roles: arrayFilter(roles),
-        permissions: arrayFilter(permissions),
+        roles: arrayFilter(roles, hasSomeRoles),
+        permissions: arrayFilter(permissions, hasSomePermissions),
       },
     };
   }
