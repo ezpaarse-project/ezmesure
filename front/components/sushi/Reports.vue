@@ -80,10 +80,12 @@
               >
                 <td>{{ report.Report_Name }}</td>
                 <td>{{ report.Report_ID }}</td>
-                <td v-if="report.First_Month_Available || report.Last_Month_Available">
-                  {{ report.First_Month_Available ?? $t('unknown') }}
-                  ~
-                  {{ report.Last_Month_Available ?? $t('unknown') }}
+                <td>
+                  <span v-if="report.First_Month_Available || report.Last_Month_Available">
+                    {{ report.First_Month_Available ?? $t('unknown') }}
+                    ~
+                    {{ report.Last_Month_Available ?? $t('unknown') }}
+                  </span>
                 </td>
               </tr>
             </tbody>
