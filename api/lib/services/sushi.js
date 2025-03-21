@@ -165,7 +165,7 @@ const DEFAULT_REPORT_TYPE = 'tr';
  * It also remove the trailing `/`
  *
  * @param {import('@prisma/client').SushiEndpoint} endpoint - The endpoint
- * @param {string} version - The COUNTER version
+ * @param {string} [version=5] - The COUNTER version
  * @returns
  */
 function getSushiURL({ sushiUrl }, version = '5') {
@@ -216,7 +216,7 @@ function getSushiParams(sushiItem, scopes = []) {
 /**
  * Get the list of available reports for a given SUSHI item
  * @param {SushiCredentials} sushi - The SUSHI item
- * @param {string} [version] - The COUNTER version
+ * @param {string} [version=5] - The COUNTER version
  * @returns {Promise<any>} The endpoint response
  */
 async function getAvailableReports(sushi, version = '5') {
