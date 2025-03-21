@@ -5,7 +5,8 @@ const { Joi } = require('koa-joi-router');
 const { stringToArray } = require('../utils');
 
 /**
- * @typedef {((value: any) => object) | undefined} PreparePrismaFilter
+ * @typedef {import('koa').Context['query']} KoaQuery
+ * @typedef {((value: any, query: KoaQuery) => object) | undefined} PreparePrismaFilter
  * @typedef {{ validation: any | undefined, filter: PreparePrismaFilter }} ValidationAndFilter
  */
 
@@ -84,8 +85,9 @@ const booleanJoiAndFilter = (key, isNullable) => {
  * Prepare Prisma filter for a array
  *
  * @param {string | string[] | undefined} value Value of the query parameter
+ * @param {boolean} [hasSome] uses hasSome instead of hasEvery
  */
-const arrayFilter = (value) => {
+const arrayFilter = (value, hasSome) => {
   if (value == null) {
     return undefined;
   }
@@ -93,6 +95,9 @@ const arrayFilter = (value) => {
   const values = stringToArray(value ?? '');
   if (values.length <= 0) {
     return { isEmpty: true };
+  }
+  if (hasSome) {
+    return { hasSome: values };
   }
   return { hasEvery: values };
 };
@@ -117,7 +122,7 @@ const arrayJoiAndFilter = (key, subtypes) => {
 
   return {
     validation: stringOrArrayValidation,
-    filter: (value) => ({ [key]: arrayFilter(value) }),
+    filter: (value, query) => ({ [key]: arrayFilter(value, !!query[`${key}:loose`]) }),
   };
 };
 
