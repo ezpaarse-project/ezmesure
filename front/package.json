@@ -11,6 +11,7 @@
     "lintfix": "npm run lint --fix"
   },
   "devDependencies": {
+    "@date-io/date-fns": "^3.2.1",
     "@ezpaarse-project/ezreeport-vue": "2.1.0-beta.1",
     "@mdi/font": "^7.4.47",
     "@nuxt/devtools": "^1.7.0",
