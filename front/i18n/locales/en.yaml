@@ -640,11 +640,10 @@ reports:
   checkCredentials: Check credentials
   supportedReports: Supported reports
   supportedReportsOnPlatform: Reports supported by the publisher platform
-  supportedReportsUnavailable:
-    The list of supported reports is not available for
-    this publisher platform.
+  supportedReportsUnavailable: The list of supported reports is not available for this publisher platform.
   failedToFetchReports: Failed to fetch the list of available reports
   onlyShowMasterReports: Only show master reports
+  availablePeriod: Available period
 identifier: Identifier
 authenticate:
   restrictedAccess: Restricted Access
@@ -986,3 +985,4 @@ enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL
 nbOthers: (+{count} others)
+unknown: Unknown
