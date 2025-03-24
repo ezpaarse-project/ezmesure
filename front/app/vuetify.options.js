@@ -11,10 +11,6 @@ export default {
     labComponents: ['VTreeview'],
     directives: true,
 
-    date: {
-      adapter: 'date-fns',
-    },
-
     theme: {
       themes: {
         light: {
