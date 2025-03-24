@@ -1,3 +1,5 @@
+const { setTimeout } = require('node:timers/promises');
+
 const fs = require('fs-extra');
 const path = require('path');
 const send = require('koa-send');
@@ -223,45 +225,58 @@ exports.getHarvests = async (ctx) => {
 
 exports.getAvailableReports = async (ctx) => {
   const { sushi } = ctx.state;
+  const { endpoint } = sushi;
 
-  let data;
-  let headers;
-  let exceptions;
+  const reportsPerVersion = new Map();
 
-  try {
-    ({ data, headers } = await sushiService.getAvailableReports(sushi));
-  } catch (e) {
-    exceptions = sushiService.getExceptions(e?.response?.data);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const version of endpoint.counterVersions) {
+    let data;
+    let headers;
+    let exceptions;
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      ({ data, headers } = await sushiService.getAvailableReports(sushi, version));
+    } catch (e) {
+      exceptions = sushiService.getExceptions(e?.response?.data);
+
+      if (!Array.isArray(exceptions) || exceptions.length === 0) {
+        reportsPerVersion.set(version, { error: e.message });
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+    }
 
     if (!Array.isArray(exceptions) || exceptions.length === 0) {
-      ctx.throw(502, e);
+      exceptions = sushiService.getExceptions(data);
     }
-  }
 
-  if (!Array.isArray(exceptions) || exceptions.length === 0) {
-    exceptions = sushiService.getExceptions(data);
-  }
-
-  if (exceptions.length > 0) {
-    ctx.status = 502;
-    ctx.body = { exceptions };
-    return;
-  }
-
-  const isValidReport = (report) => (report.Report_ID && report.Report_Name);
-
-  if (!Array.isArray(data) || !data.every(isValidReport)) {
-    const contentType = /^\s*([^;\s]*)/.exec(headers['content-type'])?.[1];
-
-    if (contentType === 'application/json') {
-      ctx.throw(502, ctx.$t('errors.sushi.invalidResponse'), { expose: true });
-    } else {
-      ctx.throw(502, ctx.$t('errors.sushi.notJsonResponse', contentType), { expose: true });
+    if (exceptions.length > 0) {
+      reportsPerVersion.set(version, { exceptions });
+      // eslint-disable-next-line no-continue
+      continue;
     }
+
+    const isValidReport = (report) => (report.Report_ID && report.Report_Name);
+
+    if (!Array.isArray(data) || !data.every(isValidReport)) {
+      const contentType = /^\s*([^;\s]*)/.exec(headers['content-type'])?.[1];
+
+      if (contentType === 'application/json') {
+        reportsPerVersion.set(version, { error: ctx.$t('errors.sushi.invalidResponse') });
+      } else {
+        reportsPerVersion.set(version, { error: ctx.$t('errors.sushi.notJsonResponse', contentType) });
+      }
+    }
+
+    reportsPerVersion.set(version, { data });
+    // eslint-disable-next-line no-await-in-loop
+    await setTimeout(1000);
   }
 
   ctx.status = 200;
-  ctx.body = data;
+  ctx.body = Object.fromEntries(reportsPerVersion);
 };
 
 exports.downloadReport = async (ctx) => {

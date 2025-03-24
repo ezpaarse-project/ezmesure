@@ -654,6 +654,7 @@ reports:
   supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.
   failedToFetchReports: Impossible de récupérer la liste des rapports disponibles
   onlyShowMasterReports: Afficher uniquement les rapports maîtres
+  availablePeriod: Période disponible
 identifier: Identifiant
 authenticate:
   restrictedAccess: Accès restreint
@@ -994,5 +995,6 @@ enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
 nbOthers: (+{count} autres)
+unknown: Inconnu
 looseFilter: Les résultats correspondront à l'une des valeurs
 strictFilter: Les résultats correspondront à toutes les valeurs
