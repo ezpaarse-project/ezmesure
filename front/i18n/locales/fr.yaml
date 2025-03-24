@@ -98,22 +98,14 @@ kibana:
   title: Identifiants kibana
   passwordLost: Mot de passe oublié
   username: Nom d'utilisateur
-  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot
-    de passe.
-  resetPassword:
-    text: Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur {reset} pour
-      recevoir un courriel de réinitialisation.
-    reset: réinitialiser
+  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot de passe.
   whatDoesUsername:
-    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana
-      afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez
-      à votre {accountLink}.
+    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, remplissez le formulaire ci-dessous ou accédez à votre {accountLink}.
     accountLink: compte Kibana
 token:
   title: Token d'autentification
   whatDoesToken:
-    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser,
-      ajoutez le header suivant à vos requêtes HTTP : {header}'
+    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
   token: Token
   unableToRetrieveToken: Impossible de récupérer le token d'authentification
@@ -662,6 +654,7 @@ reports:
   supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.
   failedToFetchReports: Impossible de récupérer la liste des rapports disponibles
   onlyShowMasterReports: Afficher uniquement les rapports maîtres
+  availablePeriod: Période disponible
 identifier: Identifiant
 authenticate:
   restrictedAccess: Accès restreint
@@ -947,6 +940,7 @@ description: Description
 initials: Initiales
 language: Langue
 refresh: Actualiser
+refreshShib: Actualiser les informations
 delete: Supprimer
 revoke: Révoquer
 close: Fermer
@@ -1001,3 +995,4 @@ enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
 nbOthers: (+{count} autres)
+unknown: Inconnu

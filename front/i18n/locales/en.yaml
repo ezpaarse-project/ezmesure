@@ -99,20 +99,13 @@ kibana:
   passwordLost: Password forgotten
   username: Username
   newPasswordSentByEmail: An email has been sent to you to reset your password.
-  resetPassword:
-    text: Don't remember your password? Click on {reset} to receive a reset email.
-    reset: reset
   whatDoesUsername:
-    text:
-      This username allows you to connect to the Kibana interface in order to
-      access your dashboards. To change your password, go to your {accountLink}.
+    text: This username allows you to connect to the Kibana interface in order to access your dashboards. To change your password, fille the form below or go to your {accountLink}.
     accountLink: Kibana account
 token:
   title: Authentication token
   whatDoesToken:
-    text:
-      "This token is required to use the ezMESURE API. To use it, add the following
-      header to your HTTP requests: {header}"
+    text: "This token is required to use the ezMESURE API. To use it, add the following header to your HTTP requests: {header}"
     header: "Authorization: Bearer [insert the token here]"
   token: Token
   unableToRetrieveToken: Unable to retrieve authentication token
@@ -647,11 +640,10 @@ reports:
   checkCredentials: Check credentials
   supportedReports: Supported reports
   supportedReportsOnPlatform: Reports supported by the publisher platform
-  supportedReportsUnavailable:
-    The list of supported reports is not available for
-    this publisher platform.
+  supportedReportsUnavailable: The list of supported reports is not available for this publisher platform.
   failedToFetchReports: Failed to fetch the list of available reports
   onlyShowMasterReports: Only show master reports
+  availablePeriod: Available period
 identifier: Identifier
 authenticate:
   restrictedAccess: Restricted Access
@@ -938,6 +930,7 @@ description: Description
 initials: Initials
 language: Language
 refresh: Refresh
+refreshShib: Refresh informations
 delete: Remove
 revoke: Revoke
 close: Close
@@ -992,3 +985,4 @@ enterKey: enter
 general: General
 enterValidUrl: Please enter a valid URL
 nbOthers: (+{count} others)
+unknown: Unknown

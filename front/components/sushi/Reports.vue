@@ -5,7 +5,7 @@
     prepend-icon="mdi-file-search"
   >
     <template v-if="showSushi" #subtitle>
-      <SushiSubtitle :model-value="modelValue" />
+      <SushiSubtitle :model-value="sushi" />
     </template>
 
     <template #append>
@@ -20,7 +20,27 @@
       />
     </template>
 
-    <template #text>
+    <v-tabs
+      v-if="versions.length > 0"
+      v-model="currentVersion"
+      bg-color="primary"
+      class="px-2"
+    >
+      <v-tab
+        v-for="version in versions"
+        :key="version"
+        :value="version"
+      >
+        COUNTER
+        <v-badge
+          :content="version"
+          :color="counterVersionsColors.get(version) || 'secondary'"
+          inline
+        />
+      </v-tab>
+    </v-tabs>
+
+    <v-card-text>
       <v-row v-if="exceptions.length > 0">
         <v-col>
           <v-alert
@@ -41,13 +61,16 @@
         </v-col>
       </v-row>
 
-      <v-row>
+      <v-row v-if="filteredReports.length > 0">
         <v-col>
           <v-table>
             <thead>
               <tr>
                 <th>{{ $t('name') }}</th>
                 <th>{{ $t('identifier') }}</th>
+                <th v-if="currentVersion !== '5'">
+                  {{ $t('reports.availablePeriod') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -57,12 +80,29 @@
               >
                 <td>{{ report.Report_Name }}</td>
                 <td>{{ report.Report_ID }}</td>
+                <td>
+                  <span v-if="report.First_Month_Available || report.Last_Month_Available">
+                    {{ report.First_Month_Available ?? $t('unknown') }}
+                    ~
+                    {{ report.Last_Month_Available ?? $t('unknown') }}
+                  </span>
+                </td>
               </tr>
             </tbody>
           </v-table>
         </v-col>
       </v-row>
-    </template>
+
+      <v-row v-else-if="status !== 'pending'">
+        <v-col>
+          <v-empty-state
+            icon="mdi-file-hidden"
+            :title="$t('reports.failedToFetchReports')"
+            :text="$t('reports.supportedReportsUnavailable')"
+          />
+        </v-col>
+      </v-row>
+    </v-card-text>
 
     <template #actions>
       <v-switch
@@ -93,9 +133,12 @@ const props = defineProps({
 });
 
 const showOnlyMaster = ref(true);
+const currentVersion = ref('5');
+
+const { t } = useI18n();
 
 const {
-  data: reports,
+  data: reportsPerVersion,
   error,
   refresh,
   status,
@@ -103,32 +146,36 @@ const {
   lazy: true,
 });
 
+const versions = computed(() => Object.keys(reportsPerVersion.value ?? {}));
+const reports = computed(() => reportsPerVersion.value?.[currentVersion.value]?.data ?? []);
+
 const exceptions = computed(() => {
-  if (!error.value) {
+  if (status.value === 'pending') {
     return [];
   }
 
-  let rawExceptions = error.value?.data?.exceptions;
-  if (!Array.isArray(rawExceptions)) {
-    rawExceptions = [{ Message: data?.error }];
+  const rawExceptions = reportsPerVersion.value?.[currentVersion.value]?.exceptions ?? [];
+  if (reportsPerVersion.value?.[currentVersion.value]?.error) {
+    rawExceptions.push({ Message: reportsPerVersion.value[currentVersion.value].error });
+  }
+  if (error.value) {
+    rawExceptions.push({ Message: error.value?.data?.error || t('errors.generic') });
   }
 
-  return rawExceptions.map(
-    (exception) => {
-      if (!exception) {
-        return undefined;
-      }
+  return rawExceptions.map((exception) => {
+    if (!exception) {
+      return undefined;
+    }
 
-      let message = exception.Message;
-      if (exception.Code) {
-        message = `[#${exception.Code}] ${message}`;
-      }
-      if (exception.Severity) {
-        message = `[${exception.Severity}] ${message}`;
-      }
-      return message;
-    },
-  ).filter((message) => !!message);
+    let message = exception.Message;
+    if (exception.Code) {
+      message = `[#${exception.Code}] ${message}`;
+    }
+    if (exception.Severity) {
+      message = `[${exception.Severity}] ${message}`;
+    }
+    return message;
+  }).filter((message) => !!message);
 });
 
 const filteredReports = computed(() => {
