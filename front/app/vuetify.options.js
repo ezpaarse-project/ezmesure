@@ -1,7 +1,5 @@
 /* eslint-disable import/no-unresolved */
 import colors from 'vuetify/util/colors';
-/* eslint-enable import/no-unresolved */
-import DateFnsAdapter from '@date-io/date-fns';
 
 /**
  * @type {import('vuetify-nuxt-module').ModuleOptions}
@@ -14,7 +12,7 @@ export default {
     directives: true,
 
     date: {
-      adapter: DateFnsAdapter,
+      adapter: 'date-fns',
     },
 
     theme: {
