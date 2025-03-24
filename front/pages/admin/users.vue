@@ -128,7 +128,6 @@ definePageMeta({
 
 const { t } = useI18n();
 const { getSession } = useAuth();
-const { push: goTo } = useRouter();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -304,6 +303,6 @@ async function impersonateUser(item) {
     snacks.error(t('anErrorOccurred'));
     return;
   }
-  await goTo('/myspace');
+  await navigateTo('/myspace');
 }
 </script>
