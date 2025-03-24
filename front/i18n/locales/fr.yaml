@@ -996,3 +996,5 @@ general: General
 enterValidUrl: Veuillez saisir une URL valide
 nbOthers: (+{count} autres)
 unknown: Inconnu
+looseFilter: Les résultats correspondront à l'une des valeurs
+strictFilter: Les résultats correspondront à toutes les valeurs

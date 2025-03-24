@@ -29,6 +29,15 @@
     <template v-if="$slots.selection" #selection="selection">
       <slot name="selection" v-bind="selection" />
     </template>
+
+    <template v-if="looseEnabled" #append>
+      <v-btn
+        v-tooltip="loose ? $t('looseFilter') : $t('strictFilter')"
+        :icon="loose ? 'mdi-approximately-equal' : 'mdi-equal'"
+        density="comfortable"
+        @click="emit('update:loose', !loose)"
+      />
+    </template>
   </v-autocomplete>
 </template>
 
@@ -46,15 +55,25 @@ const props = defineProps({
     type: Symbol,
     default: undefined,
   },
+  loose: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const emit = defineEmits({
   'update:modelValue': (v) => Array.isArray(v) || typeof v === 'string' || v === undefined,
+  'update:loose': (v) => v === true || v === false,
 });
 
 const { t } = useI18n();
 
 const search = ref('');
+
+const looseEnabled = computed(() => {
+  const { 'onUpdate:loose': looseListener } = getCurrentInstance()?.vnode.props ?? {};
+  return !!looseListener;
+});
 
 const value = computed({
   get: () => {
