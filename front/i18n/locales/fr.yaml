@@ -675,6 +675,9 @@ password:
   user: Utilisateur
   password: Mot de passe
   repeatPassword: Répéter le mot de passe
+  actualPassword: Mot de passe Kibana actuel
+  newPassword: Nouveau mot de passe Kibana
+  repeatNewPassword: Répéter le nouveau mot de passe Kibana
   passwordIsRequired: Mot de passe requis
   enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.
   checkYourEmail: Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.

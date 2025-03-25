@@ -95,6 +95,7 @@
                     :text="$t('password.update')"
                     :disabled="!valid"
                     :loading="loading"
+                    prepend-icon="mdi-pencil"
                     type="submit"
                     color="primary"
                     block
@@ -127,6 +128,8 @@ const errorMessage = ref('');
 
 async function replacePassword() {
   loading.value = true;
+  errorMessage.value = '';
+  success.value = false;
   try {
     await $fetch('/api/profile/password/_reset', {
       method: 'POST',
