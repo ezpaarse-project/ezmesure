@@ -318,16 +318,38 @@ exports.resetPassword = async (ctx) => {
 
 exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
-  const { password } = body;
+  const { actualPassword, password } = body;
 
   const { username } = ctx.state.user;
 
-  const user = await usersElastic.getUserByUsername(username);
+  // Check if actualPassword is correct
+  const basicString = Buffer.from(`${username}:${actualPassword}`).toString('base64');
+  let esUser;
 
-  if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+  try {
+    const response = await elastic.security.authenticate({}, {
+      headers: {
+        authorization: `Basic ${basicString}`,
+      },
+    });
+    esUser = response && response.body;
+  } catch (e) {
+    ctx.throw(e.statusCode || 500, e.message);
     return;
   }
+
+  if (!esUser) {
+    ctx.throw(401);
+    return;
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  if (esUser.metadata && esUser.metadata._reserved) {
+    ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
+    return;
+  }
+
+  // Update password
 
   await usersElastic.updatePassword(username, password);
 

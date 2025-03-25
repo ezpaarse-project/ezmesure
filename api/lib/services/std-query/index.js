@@ -20,15 +20,18 @@ const { propsToPrismaInclude, propsToPrismaSort } = require('./prisma-query');
  * @typedef {import('joi').AnySchema} JoiAnySchema
  * @typedef {import('joi').ObjectSchema} JoiObjectSchema
  *
+ * @typedef {import('koa').Context} KoaContext
+ * @typedef {import('koa').Context['query']} KoaQuery
+ *
  * @typedef {object} JoiAndFilters
  * @prop {JoiObjectSchema} validations
  * @prop {Record<string, (value: any) => any>} filters
  *
  * @typedef {object} StandardQueryParams
  * @prop {JoiObjectSchema} manyValidation
- * @prop {(ctx: import('koa').Context) => object} getPrismaManyQuery
+ * @prop {(ctx: KoaContext) => object} getPrismaManyQuery
  * @prop {JoiObjectSchema} oneValidation
- * @prop {(ctx: import('koa').Context, where: object) => object} getPrismaOneQuery
+ * @prop {(ctx: KoaContext, where: object) => object} getPrismaOneQuery
  */
 
 /**
@@ -67,7 +70,12 @@ const prepareJoiAndFilters = (schema) => {
         break;
       case 'array': {
         const subtypes = def.$_terms.items?.map((i) => i.type) ?? [];
+
         ({ validation, filter } = arrayJoiAndFilter(key, subtypes));
+
+        validations[`${key}:loose`] = Joi.boolean().default(false);
+        // filter for ${key}:loose will be handled in arrayJoiAndFilter
+
         arrayFields.push(key);
         break;
       }
@@ -123,8 +131,8 @@ const prepareJoiAndFilters = (schema) => {
 /**
  * Apply prisma filters from a query
  *
- * @param {import('koa').Context['query']} query Koa's query
- * @param {Record<string, (value: any) => any>} fieldsFilters Fields filters
+ * @param {KoaQuery} query Koa's query
+ * @param {Record<string, (value: any, query: KoaQuery) => any>} fieldsFilters Fields filters
  *
  * @returns {Record<string, any>} Prisma filter
  */
@@ -132,7 +140,7 @@ const applyPrismaFilters = (query, fieldsFilters) => {
   const filters = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of Object.entries(query)) {
-    const filter = fieldsFilters[key]?.(value);
+    const filter = fieldsFilters[key]?.(value, query);
     if (filter) {
       filters.push(filter);
     }

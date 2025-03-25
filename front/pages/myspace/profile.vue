@@ -61,33 +61,54 @@
                 <v-row>
                   <v-col>
                     <v-text-field
-                      v-model="password"
-                      :label="$t('password.password')"
+                      v-model="actualPassword"
+                      :label="$t('password.actualPassword')"
                       :type="showPassword ? 'text' : 'password'"
-                      :hint="$t('password.pattern')"
-                      :rules="[
-                        (v) => v.length === 0 || v.length >= 6 || $t('password.length'),
-                      ]"
                       :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      prepend-icon="mdi-lock"
+                      :messages="[$t('password.forgot')]"
+                      prepend-icon="mdi-form-textbox-password"
                       variant="underlined"
-                      persistent-hint
                       @click:append="showPassword = !showPassword"
-                    />
+                    >
+                      <template #message="{ message }">
+                        <nuxt-link to="/password/reset">
+                          {{ message }}
+                        </nuxt-link>
+                      </template>
+                    </v-text-field>
                   </v-col>
                 </v-row>
 
                 <v-row>
                   <v-col>
                     <v-text-field
+                      v-model="password"
+                      :label="$t('password.newPassword')"
+                      :type="showPassword ? 'text' : 'password'"
+                      :hint="$t('password.pattern')"
+                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                      :disabled="actualPassword.length === 0"
+                      :rules="[
+                        (v) => v.length >= 6 || $t('password.length'),
+                      ]"
+                      prepend-icon="mdi-lock"
+                      variant="underlined"
+                      persistent-hint
+                      @click:append="showPassword = !showPassword"
+                    />
+                  </v-col>
+
+                  <v-col>
+                    <v-text-field
                       v-model="passwordRepeat"
-                      :label="$t('password.repeatPassword')"
+                      :label="$t('password.repeatNewPassword')"
                       :type="showPassword ? 'text' : 'password'"
                       :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                      :disabled="actualPassword.length === 0"
                       :rules="[
-                        (v) => password.length === 0 || !!v || $t('password.passwordIsRequired'),
-                        (v) => password.length === 0 || v.length >= 6 || $t('password.length'),
-                        () => password.length === 0 || passwordRepeat === password || $t('password.notEqual'),
+                        (v) => !!v || $t('password.passwordIsRequired'),
+                        (v) => v.length >= 6 || $t('password.length'),
+                        () => passwordRepeat === password || $t('password.notEqual'),
                       ]"
                       prepend-icon="mdi-lock"
                       variant="underlined"
@@ -106,6 +127,7 @@
                 :text="$t('password.update')"
                 :disabled="!valid"
                 :loading="loading"
+                prepend-icon="mdi-pencil"
                 type="submit"
                 form="passwordForm"
                 color="primary"
@@ -155,12 +177,14 @@ definePageMeta({
 const { public: config } = useRuntimeConfig();
 const { data: user } = useAuthState();
 const { openInTab } = useSingleTabLinks('profile');
+const { t } = useI18n();
 
 const { spacesPermissions } = storeToRefs(useCurrentUserStore());
 
 const valid = ref(false);
 const loading = ref(false);
 const success = ref(false);
+const actualPassword = ref('');
 const password = ref('');
 const passwordRepeat = ref('');
 const showPassword = ref(false);
@@ -195,17 +219,22 @@ const fields = computed(
 
 async function replacePassword() {
   loading.value = true;
+  errorMessage.value = '';
+  success.value = false;
   try {
     await $fetch('/api/profile/password', {
       method: 'PUT',
       body: {
+        actualPassword: actualPassword.value,
         password: password.value,
       },
     });
 
     success.value = true;
   } catch (err) {
-    if (err?.data?.error) {
+    if (err?.statusCode === 401) {
+      errorMessage.value = t('authenticate.loginFailed');
+    } else if (err?.data?.error) {
       errorMessage.value = err?.data?.error;
     } else {
       errorMessage.value = t('anErrorOccurred');

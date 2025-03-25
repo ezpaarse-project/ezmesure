@@ -150,7 +150,7 @@ const { signIn, status } = useAuth();
 const { query } = useRoute();
 
 if (status.value === 'authenticated') {
-  await navigateTo('/myspace');
+  await navigateTo(query?.redirect || '/myspace');
 }
 
 let provider = config.shibbolethDisabled ? 0 : 1;
@@ -171,7 +171,7 @@ async function login() {
   loading.value = true;
 
   try {
-    await signIn(credentials.value, { callbackUrl: '/myspace' });
+    await signIn(credentials.value, { callbackUrl: query?.redirect || '/myspace' });
   } catch (err) {
     if (!(err instanceof Error)) {
       errorMessage.value = t('authenticate.failed');

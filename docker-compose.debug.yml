@@ -92,8 +92,9 @@ services:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
-      - NUXT_PUBLIC_CURRENT_INSTANCE=${EZMESURE_INSTANCE}
-      - NUXT_PUBLIC_SHIBBOLETH_DISABLED=${EZMESURE_DISABLE_SHIBBOLETH}
+      - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_SUPPORT_MAIL
+      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     tmpfs: /tmp
     command: npm run dev
     restart: "no"
