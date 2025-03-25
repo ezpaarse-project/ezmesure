@@ -13,7 +13,7 @@ menu:
   myInstitution: My institution
   myInstitutions: My institutions
   institutions: Institutions
-  sushiEndpoints: COUNTER API
+  sushiEndpoints: COUNTER endpoints
   activity: Activity
   profile: Profile
   members: Members
@@ -151,7 +151,7 @@ activity:
     exports: Exports
     indices: Indices
     sushi: COUNTER credentials
-    endpoints: COUNTER API
+    endpoints: COUNTER endpoints
     reporting: Reporting
   actions:
     user/register: Registering
@@ -195,14 +195,14 @@ activity:
     reporting/history: Reporting task history consultation
 endpoints:
   endpoint: Endpoint
-  toolbarTitle: COUNTER API ({count})
-  pageDescription: Here you can manage the list of the available COUNTER API.
+  toolbarTitle: COUNTER endpoints ({count})
+  pageDescription: Here you can manage the list of the available COUNTER endpoints.
   pageDescription2: Only version 5 of the COUNTER protocol is supported.
   manageEndpoints: >
     Manage endpoint
     |Manage {count} endpoints
   unableToRetriveEndpoints: Unable to retrieve COUNTER APIS
-  soapWarning: The URL seems to point to an unsupported COUNTER API (version 4 or below)
+  soapWarning: The URL seems to point to an unsupported COUNTER endpoint (version 4 or below)
   sushiNotRootDetected: It seems that the COUNTER URL does not point to the root of the service. It should not contain /reports, /status ou /member.
   validated: Validated
   addEndpoint: Add an endpoint
@@ -637,7 +637,7 @@ sushi:
     noFilesAvailable: No files available
     nbFiles: 1 file|{count} files
 reports:
-  sushiReturnedErrors: The COUNTER API responded with errors.
+  sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
   supportedReports: Supported reports
   supportedReportsOnPlatform: Reports supported by the publisher platform
@@ -688,14 +688,14 @@ contact:
   failed: Sending the contact form failed.
   requestInformation: Information request
   bugReport: Bug report
-  declareSushiEndpoint: Declare a COUNTER API
+  declareSushiEndpoint: Declare a COUNTER endpoint
   emailIsRequired: The email address is required
   emailMustBeValid: The email address must be valid
   contentIsRequired: A message is required
   subjectIsRequired: Subject is required
   sushiIsRequired: COUNTER credentials are required
   endpointVendor: Vendor name
-  endpointUrl: URL of the COUNTER API
+  endpointUrl: URL of the COUNTER endpoint
   pleaseEnterFullVendorName: Please enter the full name (possibly with its acronym)
   sushiDetails: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
   endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.

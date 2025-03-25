@@ -13,7 +13,7 @@ menu:
   myInstitution: Mon établissement
   myInstitutions: Mes établissements
   institutions: Établissements
-  sushiEndpoints: API COUNTER
+  sushiEndpoints: Points d'accès COUNTER
   activity: Activité
   profile: Profil
   members: Membres
@@ -152,7 +152,7 @@ activity:
     exports: Exports
     indices: Index
     sushi: Identifiants COUNTER
-    endpoints: API COUNTER
+    endpoints: Points d'accès COUNTER
     reporting: Reporting
   actions:
     user/register: Enregistrement
@@ -196,14 +196,14 @@ activity:
     reporting/history: Consultation de l'historique d'une tâche de reporting
 endpoints:
   endpoint: Point d'accès
-  toolbarTitle: API COUNTER ({count})
-  pageDescription: Gérez ici la liste des API COUNTER disponibles.
+  toolbarTitle: Point d'accès COUNTER ({count})
+  pageDescription: Gérez ici la liste des points d'accès COUNTER disponibles.
   pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
   manageEndpoints: >
     Gérer le point d'accès
     |Gérer {count} points d'accès
-  unableToRetriveEndpoints: Impossible de récupérer les aAPI
-  soapWarning: L'URL semble pointer vers une API COUNTER non supporté (version 4 ou inférieure)
+  unableToRetriveEndpoints: Impossible de récupérer les point's d'accès
+  soapWarning: L'URL semble pointer vers un point d'accès COUNTER non supporté (version 4 ou inférieure)
   sushiNotRootDetected: L'URL COUNTER ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.
   validated: Validé
   addEndpoint: Ajouter un point d'accès
@@ -651,7 +651,7 @@ sushi:
     noFilesAvailable: Aucun fichier disponible
     nbFiles: 1 fichier|{count} fichiers
 reports:
-  sushiReturnedErrors: L'API COUNTER a retourné des erreurs.
+  sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
   supportedReports: Rapports supportés
   supportedReportsOnPlatform: Rapports supportés par la plateforme éditeur
@@ -697,14 +697,14 @@ contact:
   failed: L'envoi du formulaire de contact a échoué.
   requestInformation: Demande d'information
   bugReport: Rapporter un bug
-  declareSushiEndpoint: Déclarer une API COUNTER
+  declareSushiEndpoint: Déclarer un point d'accès COUNTER
   emailIsRequired: L'adresse électronique est requise
   emailMustBeValid: L'adresse électronique doit être valide
   sushiIsRequired: Des identifiants COUNTER sont requis
   contentIsRequired: Un message est requis
   subjectIsRequired: L'objet est requis
   endpointVendor: Nom du fournisseur
-  endpointUrl: URL de l'API COUNTER
+  endpointUrl: URL du point d'accès COUNTER
   pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
   sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.
   endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
