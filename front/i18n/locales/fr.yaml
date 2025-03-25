@@ -284,6 +284,7 @@ institutions:
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
   createMailContactList: Copier les adresses mails des correspondants
+  modify: Modifier mon établissement
   reports:
     reports: Rapports
   filters:
@@ -441,7 +442,7 @@ institutions:
     enterCustomerId: Veuillez saisir un Customer Id.
     enterAPIKey: Veuillez saisir une Clé API.
     comment: Commentaire
-    credentials: ezCOUNTER
+    credentials: COUNTER
     manageN: >
       Gérer les identifiants
       |Gérer {count} identifiants

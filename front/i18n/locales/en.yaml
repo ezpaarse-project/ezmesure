@@ -279,6 +279,7 @@ institutions:
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
   createMailContactList: Copy the emails of the correspondents
+  modify: Modify my institution
   reports:
     reports: Reports
   filters:
@@ -440,7 +441,7 @@ institutions:
     enterCustomerId: Please enter a Customer Id.
     enterAPIKey: Please enter an API Key.
     comment: Comment
-    credentials: Sushi credentials
+    credentials: COUNTER
     manageN: >
       Manage credentials
       |Manage {count} credentials
