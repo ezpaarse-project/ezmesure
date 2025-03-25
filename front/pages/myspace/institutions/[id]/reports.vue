@@ -1,7 +1,7 @@
 <template>
   <div>
     <SkeletonPageLoader
-      v-if="error"
+      v-if="ezrError || error"
       :error="ezrError || error"
       show
       show-refresh
