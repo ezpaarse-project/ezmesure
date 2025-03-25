@@ -87,6 +87,7 @@ router.route({
   validate: {
     type: 'json',
     body: Joi.object({
+      actualPassword: Joi.string().required().trim().min(1),
       password: Joi.string().trim().min(6).required(),
     }),
   },
