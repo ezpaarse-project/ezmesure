@@ -143,10 +143,9 @@ services:
     ports:
       - 8080:8080
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}/api
-      - EZMESURE_DISABLE_SHIBBOLETH
-      - PORT=8080
-      - HOST=0.0.0.0
+      - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_SUPPORT_MAIL
+      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
     restart: unless-stopped
 
   rp:
