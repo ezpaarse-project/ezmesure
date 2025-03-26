@@ -24,6 +24,7 @@
           :model-value="bars"
           height="8"
           v-bind="menu"
+          class="mx-4"
         />
       </template>
 
@@ -103,29 +104,29 @@ const bars = computed(() => {
   return [
     {
       key: 'success',
-      color: 'green',
+      color: harvestStatus.get('finished')?.color,
       value: getValue(metrics.value.finished),
     },
     {
       key: 'failed',
-      color: 'red',
+      color: harvestStatus.get('failed')?.color,
       value: getValue(metrics.value.failed),
     },
     {
       key: 'active',
-      color: 'info',
+      color: harvestStatus.get('running')?.color,
       value: getValue(metrics.value.running),
     },
     {
       key: 'delayed',
       type: 'buffer',
-      color: 'info',
+      color: harvestStatus.get('delayed')?.color,
       value: getValue(metrics.value.delayed),
     },
     {
       key: 'pending',
       type: 'stream',
-      color: 'grey',
+      color: harvestStatus.get('waiting')?.color,
       value: getValue(metrics.value.waiting),
     },
   ];
