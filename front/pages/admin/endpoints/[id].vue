@@ -203,6 +203,34 @@
         </tr>
       </template>
 
+      <template #[`header.harvests`]="{ column: { title } }">
+        <div>{{ title }}</div>
+
+        <div class="d-flex justify-center align-center">
+          <v-btn
+            :disabled="status === 'pending'"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-left"
+            @click="currentHarvestYear -= 1"
+          />
+
+          <span class="mx-3">
+            {{ currentHarvestYear }}
+          </span>
+
+          <v-btn
+            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-right"
+            @click="currentHarvestYear += 1"
+          />
+        </div>
+      </template>
+
       <template #[`item.packages`]="{ value }">
         <v-chip
           v-for="(pkg, index) in value"
@@ -225,6 +253,8 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
+          :endpoint="endpoint"
+          :current-year="currentHarvestYear"
           @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
       </template>
@@ -352,6 +382,8 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
+const maxHarvestYear = new Date().getFullYear();
+
 const { params } = useRoute();
 const { t, locale } = useI18n();
 const { addToCheck } = useSushiCheckQueueStore();
@@ -364,6 +396,7 @@ const filters = ref({});
 const sushiMetrics = ref(undefined);
 const loading = ref(false);
 const selectedInstitutions = ref([]);
+const currentHarvestYear = ref(maxHarvestYear);
 
 const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
@@ -410,7 +443,7 @@ const headers = computed(() => [
     align: 'center',
   },
   {
-    title: t('institutions.sushi.lastHarvest'),
+    title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
     width: '230px',
@@ -525,7 +558,6 @@ async function toggleActiveStates() {
   loading.value = true;
   try {
     const active = !endpoint.value.active;
-    // eslint-disable-next-line no-await-in-loop
     await $fetch(`/api/sushi-endpoints/${endpoint.value.id}`, {
       method: 'PATCH',
       body: { active },
@@ -639,23 +671,6 @@ async function resetConnectionsOfInstitutions() {
   const items = sushis.value.filter((s) => ids.has(s.institution.id));
   await resetConnections(items);
 }
-
-// const groupsOpenedByDefault = new Map();
-// /**
-//  * Open group by default, Vuetify doesn't provide ways to toggle groups from outside
-//  *
-//  * @see https://github.com/vuetifyjs/vuetify/issues/17707
-//  *
-//  * @param {Object} item Vuetify group
-//  * @param {Function} isGroupOpen Function to check if group is open (provided by Vuetify)
-//  * @param {Function} toggleGroup Function to open group (provided by Vuetify)
-//  */
-// function openByDefault(item, isGroupOpen, toggleGroup) {
-//   if (status.value === 'success' && !isGroupOpen(item) && !groupsOpenedByDefault.has(item.id)) {
-//     toggleGroup(item);
-//     groupsOpenedByDefault.set(item.id, true);
-//   }
-// }
 
 // Map to keep track of groups in v-datatable
 const vDataTableGroups = new Map();
