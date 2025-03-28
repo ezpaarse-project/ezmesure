@@ -201,7 +201,7 @@ endpoints:
   manageEndpoints: >
     Manage endpoint
     |Manage {count} endpoints
-  unableToRetriveEndpoints: Unable to retrieve COUNTER APIS
+  unableToRetriveEndpoints: Unable to retrieve COUNTER endpoints
   soapWarning: The URL seems to point to an unsupported COUNTER endpoint (version 4 or below)
   sushiNotRootDetected: It seems that the COUNTER URL does not point to the root of the service. It should not contain /reports, /status ou /member.
   validated: Validated
