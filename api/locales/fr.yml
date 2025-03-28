@@ -48,7 +48,7 @@ errors:
     managementLocked: La gestion des identifiants COUNTER est actuellement verrouillée
 
     import:
-      belongsToAnother: Les identifiants COUNTER [%s] appartient à un autre établissement
+      belongsToAnother: Les identifiants COUNTER [%s] appartiennent à un autre établissement
       alreadyExists: Les identifiants COUNTER [%s] existent déjà
 
   task:
