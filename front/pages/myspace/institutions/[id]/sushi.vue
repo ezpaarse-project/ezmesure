@@ -163,6 +163,34 @@
         </div>
       </template>
 
+      <template #[`header.harvests`]="{ column: { title } }">
+        <div>{{ title }}</div>
+
+        <div class="d-flex justify-center align-center">
+          <v-btn
+            :disabled="status === 'pending'"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-left"
+            @click="currentHarvestYear -= 1"
+          />
+
+          <span class="mx-3">
+            {{ currentHarvestYear }}
+          </span>
+
+          <v-btn
+            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-right"
+            @click="currentHarvestYear += 1"
+          />
+        </div>
+      </template>
+
       <template #[`item.endpoint.vendor`]="{ item }">
         <div class="my-2">
           <div>
@@ -199,6 +227,8 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
+          :endpoint="item.endpoint"
+          :current-year="currentHarvestYear"
           @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
       </template>
@@ -380,6 +410,8 @@ definePageMeta({
   alias: ['/admin/institutions/:id/sushi'],
 });
 
+const maxHarvestYear = new Date().getFullYear();
+
 const { params } = useRoute();
 const { data: user } = useAuthState();
 const { t, locale } = useI18n();
@@ -391,6 +423,7 @@ const snacks = useSnacksStore();
 
 const selectedSushi = ref([]);
 const activeLoadingMap = ref(new Map());
+const currentHarvestYear = ref(maxHarvestYear);
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
@@ -420,6 +453,7 @@ const {
   itemLength,
   query,
   data: sushis,
+  status,
   vDataTableOptions,
 } = await useServerSidePagination({
   fetch: {
@@ -457,7 +491,7 @@ const headers = computed(() => [
     title: t('institutions.sushi.endpoint'),
     value: 'endpoint.vendor',
     sortable: true,
-    minWidth: '300px',
+    maxWidth: '350px',
   },
   {
     title: t('institutions.sushi.packages'),
@@ -468,27 +502,26 @@ const headers = computed(() => [
   {
     title: t('status'),
     value: 'connection',
-    width: '160px',
+    minWidth: '200px',
+    maxWidth: '200px',
     sortable: true,
     align: 'center',
   },
   {
-    title: t('institutions.sushi.lastHarvest'),
+    title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
-    width: '230px',
   },
   {
     title: t('institutions.sushi.updatedAt'),
     value: 'updatedAt',
-    width: '230px',
     sortable: true,
   },
   {
     title: t('endpoints.active'),
     value: 'active',
     align: 'center',
-    width: '150px',
+    minWidth: '130px',
     sortable: true,
   },
   {
@@ -770,4 +803,18 @@ async function deleteSushis(items) {
     },
   });
 }
+
+watchOnce(
+  sushis,
+  (v) => {
+    const harvests = v
+      .flatMap((s) => s.harvests || [])
+      .sort((a, b) => a.period.localeCompare(b.period));
+
+    const lastYear = harvests.at(-1)?.period?.replace(/(-[0-9]{2})*$/, '');
+    if (lastYear) {
+      currentHarvestYear.value = Number.parseInt(lastYear, 10);
+    }
+  },
+);
 </script>
