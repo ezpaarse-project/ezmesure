@@ -69,26 +69,8 @@ async function getDataHost(id) {
   return dataHost;
 }
 
-/**
- * Strip known counter version from url
- *
- * @param {string} url The url of the endpoint
- * @param {string} version The version of the endpoint
- *
- * @returns {string} URL without known counter version
- */
-function stripCounterVersionFromUrl(url, version) {
-  let result = url;
-  if (version.startsWith('5.1')) {
-    result = url.replace(/\/r51\/?$/, '/');
-  }
-
-  return result.replace(/\/$/, '');
-}
-
 module.exports = {
   getAllPlatforms,
   getPlatform,
   getDataHost,
-  stripCounterVersionFromUrl,
 };
