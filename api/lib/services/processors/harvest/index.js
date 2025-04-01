@@ -15,6 +15,7 @@ const {
 
 const HarvestJobService = require('../../../entities/harvest-job.service');
 const LogService = require('../../../entities/log.service');
+const SushiCredentialsService = require('../../../entities/sushi-credentials.service');
 const SushiEndpointService = require('../../../entities/sushi-endpoints.service');
 
 const { appLogger } = require('../../logger');
@@ -153,6 +154,41 @@ async function handleErrorTypes(job, task, err, lockToken) {
 
     await deferJob(job, task, disabledUntil.getTime(), lockToken);
     // Job was deferred and an error was thrown
+    return;
+  }
+
+  if (err.type === 'auth') {
+    appLogger.verbose(`[Harvest Job #${job?.id}] Updating sushi [${task.credentialsId}] connection status`);
+
+    const errExceptions = Array.isArray(err.cause?.exceptions) ? err.cause.exceptions : [];
+
+    await SushiCredentialsService.$transaction(async (service) => {
+      const credentials = await service.findUnique({ where: { id: task.credentialsId } });
+      if (!credentials) {
+        return;
+      }
+
+      // Merge exceptions
+      const credExceptions = Array.isArray(credentials.connection?.exceptions)
+        ? credentials.connection?.exceptions
+        : [];
+
+      const exceptions = new Map(
+        [...credExceptions, ...errExceptions].map((ex) => [ex.Code, ex]),
+      );
+
+      return service.update({
+        where: { id: task.credentialsId },
+        data: {
+          connection: {
+            date: Date.now(),
+            status: 'unauthorized',
+            exceptions: exceptions.size > 0 ? Array.from(exceptions.values()) : null,
+            errorCode: err.cause?.code || null,
+          },
+        },
+      });
+    });
   }
 }
 
