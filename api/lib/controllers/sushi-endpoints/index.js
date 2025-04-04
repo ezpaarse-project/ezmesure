@@ -24,6 +24,10 @@ const {
   importEndpoints,
 } = require('./actions');
 
+const registry = require('./_registry');
+
+router.use(registry.prefix('/_registry').middleware());
+
 router.use(
   requireJwt,
   requireUser,

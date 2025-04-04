@@ -2,6 +2,7 @@ const UsersService = require('../../entities/users.service');
 const InstitutionsService = require('../../entities/institutions.service');
 const SpacesService = require('../../entities/spaces.service');
 const RepositoriesService = require('../../entities/repositories.service');
+const RepositoryAliasesService = require('../../entities/repository-aliases.service');
 
 const {
   startSync,
@@ -32,6 +33,7 @@ exports.getSyncStatus = async (ctx) => {
     institutions: new InstitutionsService().count({ where: { validated: true } }),
     spaces: new SpacesService().count(),
     repositories: new RepositoriesService().count(),
+    repositoryAliases: new RepositoryAliasesService().count(),
   };
 
   const expectedEntries = await Promise.all(

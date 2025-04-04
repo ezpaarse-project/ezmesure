@@ -15,6 +15,8 @@ const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
 
+const resetPasswordSecret = `${secret}_password_reset`;
+
 const standardMembershipsQueryParams = prepareStandardQueryParams({
   schema: membershipSchema,
   includableFields: includableMembershipFields,
@@ -251,7 +253,7 @@ exports.getResetToken = async (ctx) => {
     username: user.username,
     createdAt: currentDate,
     expiresAt,
-  }, secret);
+  }, resetPasswordSecret);
 
   const diffInHours = config.get('passwordResetValidity');
   await sendPasswordRecovery(user, {
@@ -264,20 +266,35 @@ exports.getResetToken = async (ctx) => {
 };
 
 exports.resetPassword = async (ctx) => {
-  const { password } = ctx.request.body;
-  const { username } = ctx.state.user;
-  const { createdAt } = ctx.state.jwtdata;
+  const { password, token } = ctx.request.body;
+
+  const { valid, data } = await new Promise((resolve) => {
+    jwt.verify(token, resetPasswordSecret, (err, decoded) => {
+      resolve({ valid: !err, data: decoded });
+    });
+  });
+
+  if (!valid || !data?.username || !data?.createdAt) {
+    ctx.throw(400, ctx.$t('errors.password.invalidToken'));
+    return;
+  }
+
+  const { username, createdAt } = data;
 
   const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
 
   user.metadata = user.metadata || {};
 
-  if (user?.metadata?.passwordDate) {
-    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
+  if (user.metadata.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
-      ctx.throw(404, ctx.$t('errors.password.expires'));
+      ctx.throw(400, ctx.$t('errors.password.expires'));
       return;
     }
   }
@@ -301,16 +318,38 @@ exports.resetPassword = async (ctx) => {
 
 exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
-  const { password } = body;
+  const { actualPassword, password } = body;
 
   const { username } = ctx.state.user;
 
-  const user = await usersElastic.getUserByUsername(username);
+  // Check if actualPassword is correct
+  const basicString = Buffer.from(`${username}:${actualPassword}`).toString('base64');
+  let esUser;
 
-  if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+  try {
+    const response = await elastic.security.authenticate({}, {
+      headers: {
+        authorization: `Basic ${basicString}`,
+      },
+    });
+    esUser = response && response.body;
+  } catch (e) {
+    ctx.throw(e.statusCode || 500, e.message);
     return;
   }
+
+  if (!esUser) {
+    ctx.throw(401);
+    return;
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  if (esUser.metadata && esUser.metadata._reserved) {
+    ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
+    return;
+  }
+
+  // Update password
 
   await usersElastic.updatePassword(username, password);
 

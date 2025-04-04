@@ -32,8 +32,6 @@ router.route({
   },
 });
 
-router.use(requireJwt, requireUser);
-
 router.route({
   method: 'POST',
   path: '/password/_reset',
@@ -45,9 +43,12 @@ router.route({
     type: 'json',
     body: Joi.object({
       password: Joi.string().trim().min(6).required(),
+      token: Joi.string().trim().required(),
     }),
   },
 });
+
+router.use(requireJwt, requireUser);
 
 router.route({
   method: 'POST',
@@ -86,6 +87,7 @@ router.route({
   validate: {
     type: 'json',
     body: Joi.object({
+      actualPassword: Joi.string().required().trim().min(1),
       password: Joi.string().trim().min(6).required(),
     }),
   },

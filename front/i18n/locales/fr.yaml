@@ -24,6 +24,7 @@ menu:
   report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
+  repositoryAliases: Alias d'entrepôts
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
@@ -97,22 +98,14 @@ kibana:
   title: Identifiants kibana
   passwordLost: Mot de passe oublié
   username: Nom d'utilisateur
-  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot
-    de passe.
-  resetPassword:
-    text: Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur {reset} pour
-      recevoir un courriel de réinitialisation.
-    reset: réinitialiser
+  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot de passe.
   whatDoesUsername:
-    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana
-      afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez
-      à votre {accountLink}.
+    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, remplissez le formulaire ci-dessous ou accédez à votre {accountLink}.
     accountLink: compte Kibana
 token:
   title: Token d'autentification
   whatDoesToken:
-    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser,
-      ajoutez le header suivant à vos requêtes HTTP : {header}'
+    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
   token: Token
   unableToRetrieveToken: Impossible de récupérer le token d'authentification
@@ -223,7 +216,8 @@ endpoints:
   activeSince: Actif depuis le {date}
   inactiveSince: Inactif depuis le {date}
   technicalProvider: Prestataire technique
-  counterVersion: Version de COUNTER
+  counterVersion: Versions de COUNTER
+  counterVersionTooltip: Supporte COUNTER {version}
   testedReport: Rapport utilisé pour le test de connexion
   requireCustomerId: Un customer ID est nécessaire
   requireRequestorId: Un requestor ID est nécessaire
@@ -249,6 +243,11 @@ endpoints:
   disabledUntil: Désactivé jusqu'au
   disabledUntilDesc: Ce point d'accès est désactivé, ce qui signifie que toutes les tâches de moissonnage de ce point d'accès seront suspendues jusqu'a cette date.
   checkEndpoint: Tester le point d'accès
+  searchRegistryData: Rechercher dans le registre COUNTER
+  searchRegistryDataHint: Chercher une plateforme par nom
+  registryId: ID de la plateforme dans le registre COUNTER
+  registryIdHint: Vous pouvez directement coller l'URL du registre COUNTER
+  registryUrl: Lien vers le registre COUNTER
   filters:
     title: Filtrer les points d'accès
 institutions:
@@ -504,6 +503,7 @@ tasks:
     interrupted: Le moissonnage a été interrompu.
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
+    missing: Le moissonnage est terminé, mais la période demandée est manquante.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -514,6 +514,7 @@ tasks:
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
+    missing: Manquant
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -653,6 +654,7 @@ reports:
   supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.
   failedToFetchReports: Impossible de récupérer la liste des rapports disponibles
   onlyShowMasterReports: Afficher uniquement les rapports maîtres
+  availablePeriod: Période disponible
 identifier: Identifiant
 authenticate:
   restrictedAccess: Accès restreint
@@ -673,12 +675,16 @@ password:
   user: Utilisateur
   password: Mot de passe
   repeatPassword: Répéter le mot de passe
+  actualPassword: Mot de passe Kibana actuel
+  newPassword: Nouveau mot de passe Kibana
+  repeatNewPassword: Répéter le nouveau mot de passe Kibana
   passwordIsRequired: Mot de passe requis
   enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.
   checkYourEmail: Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.
   waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
   notEqual: Les mots de passes ne correspondent pas
   updated: Mot de passe mis à jour
+  youCanNowLogin: Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
   pattern: Minimum 6 caractères
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
@@ -786,6 +792,36 @@ repositories:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
+repositoryAliases:
+  manageRepositoryAliases: >
+    Gérer les alias
+    |Gérer {count} alias
+  target: Pattern de l'entrepôt
+  filtered: Filtré ?
+  aliases: Alias d'entrepôts
+  noAliases: Aucun alias d'entrepôt n'est encore attribué
+  toolbarTitle: Alias d'entrepôts ({count})
+  deleteNbAliases: Vous allez supprimer {count} alias.
+  newAlias: Nouvel alias d'entrepôt
+  noInstitutions: Aucun établissement n'utilise cet alias
+  filters:
+    title: Filtrer les alias
+  filtersForm:
+    title: Filtres de l'alias
+    newFilter: Nouveau filtre
+    editFilter: Mise à jour du filtre
+    empty: Aucun filtre n'est encore défini
+    advanced: Mode avancé
+    raw: Requête DSL
+    field: Champ
+    isNot: Inverser le filtre
+    value: Valeur(s)
+    nameTemplate:
+      exists: "{field} existe"
+      exists:not: "{field} n'existe pas"
+      values: "{0}|{0} {1}, etc."
+      is: "{field} est {valueText}"
+      is:not: "{field} n'est pas {valueText}"
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})
@@ -873,6 +909,7 @@ sync:
   running: A duré {time}
   spaces: Espaces
   repositories: Entrepôts
+  repositoryAliases: Alias
   users: Utilisateurs
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements
@@ -906,6 +943,7 @@ description: Description
 initials: Initiales
 language: Langue
 refresh: Actualiser
+refreshShib: Actualiser les informations
 delete: Supprimer
 revoke: Révoquer
 close: Fermer
@@ -960,3 +998,6 @@ enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
 nbOthers: (+{count} autres)
+unknown: Inconnu
+looseFilter: Les résultats correspondront à l'une des valeurs
+strictFilter: Les résultats correspondront à toutes les valeurs

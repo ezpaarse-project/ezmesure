@@ -27,6 +27,7 @@
         <v-col cols="12">
           <FiltersSelect
             v-model="filters.tags"
+            v-model:loose="filters['tags:loose']"
             :items="availableTags"
             :label="$t('endpoints.tags')"
             :loading="loadingTags && 'primary'"
@@ -53,12 +54,36 @@
             prepend-icon="mdi-toggle-switch"
           />
         </v-col>
+
+        <v-col cols="12">
+          <FiltersSelect
+            v-model="filters.counterVersions"
+            v-model:loose="filters['counterVersions:loose']"
+            :items="SUPPORTED_COUNTER_VERSIONS"
+            :label="$t('endpoints.counterVersion')"
+            :return-object="false"
+            multiple
+            prepend-icon="mdi-numeric"
+          >
+            <template #selection="{ item: { value: version } }">
+              <v-chip
+                :text="version"
+                :color="counterVersionsColors.get(version) || 'secondary'"
+                density="comfortable"
+                variant="flat"
+                label
+              />
+            </template>
+          </FiltersSelect>
+        </v-col>
       </v-row>
     </v-container>
   </div>
 </template>
 
 <script setup>
+const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
+
 const props = defineProps({
   modelValue: {
     type: Object,

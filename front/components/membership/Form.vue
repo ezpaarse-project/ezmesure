@@ -99,7 +99,7 @@
                 prepend-icon="mdi-database"
                 variant="outlined"
               >
-                <template #text>
+                <template v-if="(repositories?.length ?? 0) > 0" #text>
                   <v-list density="compact">
                     <MembershipRepositoryPermissionItem
                       v-for="repo in repositories"
@@ -110,6 +110,46 @@
                       @update:model-value="save([saveRepoPermissions])"
                     />
                   </v-list>
+                </template>
+
+                <template v-else-if="repoError" #text>
+                  <v-alert :text="repoError.message" type="error" />
+                </template>
+
+                <template v-else #text>
+                  {{ $t('repositories.noRepository') }}
+                </template>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row v-if="repositoryAliasPermissions">
+            <v-col cols="12">
+              <v-card
+                :title="$t('repositoryAliases.aliases')"
+                :loading="aliasesStatus === 'pending' && 'primary'"
+                prepend-icon="mdi-database-eye"
+                variant="outlined"
+              >
+                <template v-if="(repositoryAliases?.length ?? 0) > 0" #text>
+                  <v-list density="compact">
+                    <MembershipRepositoryAliasPermissionItem
+                      v-for="alias in repositoryAliases"
+                      :key="alias.pattern"
+                      v-model="repositoryAliasPermissions"
+                      :alias="alias"
+                      :readonly="!canEdit"
+                      @update:model-value="save([saveAliasPermissions])"
+                    />
+                  </v-list>
+                </template>
+
+                <template v-else-if="aliasesError" #text>
+                  <v-alert :text="aliasesError.message" type="error" />
+                </template>
+
+                <template v-else #text>
+                  {{ $t('repositoryAliases.noAliases') }}
                 </template>
               </v-card>
             </v-col>
@@ -123,7 +163,7 @@
                 prepend-icon="mdi-tab"
                 variant="outlined"
               >
-                <template #text>
+                <template v-if="(spaces?.length ?? 0) > 0" #text>
                   <v-list density="compact">
                     <MembershipSpacePermissionItem
                       v-for="space in spaces"
@@ -134,6 +174,14 @@
                       @update:model-value="save([saveSpacePermissions])"
                     />
                   </v-list>
+                </template>
+
+                <template v-else-if="spaceError" #text>
+                  <v-alert :text="spaceError.message" type="error" />
+                </template>
+
+                <template v-else #text>
+                  {{ $t('spaces.noSpace') }}
                 </template>
               </v-card>
             </v-col>
@@ -219,6 +267,8 @@ const permissions = ref(new Map());
 /** @type {Ref<Map<string, string>>} */
 const repositoryPermissions = ref(new Map());
 /** @type {Ref<Map<string, string>>} */
+const repositoryAliasPermissions = ref(new Map());
+/** @type {Ref<Map<string, string>>} */
 const spacePermissions = ref(new Map());
 
 const formRef = useTemplateRef('formRef');
@@ -249,6 +299,7 @@ const canEdit = computed(() => {
 const {
   data: spaces,
   status: spaceStatus,
+  error: spaceError,
 } = await useFetch(`/api/institutions/${props.institution.id}/spaces`, {
   lazy: true,
   query: {
@@ -262,10 +313,26 @@ const {
 const {
   data: repositories,
   status: repoStatus,
+  error: repoError,
 } = await useFetch(`/api/institutions/${props.institution.id}/repositories`, {
   lazy: true,
   query: {
     size: 0,
+  },
+});
+
+/**
+ * Get repository aliases
+ */
+const {
+  data: repositoryAliases,
+  status: aliasesStatus,
+  error: aliasesError,
+} = await useFetch(`/api/institutions/${props.institution.id}/repository-aliases`, {
+  lazy: true,
+  query: {
+    size: 0,
+    include: ['repository'],
   },
 });
 
@@ -312,7 +379,17 @@ function mapRepoPermissions(perms, map) {
   }
 }
 /**
- * Map permissions from API
+ * Map alias permissions from API
+ */
+function mapAliasPermissions(perms, map) {
+  map.clear();
+  // eslint-disable-next-line no-restricted-syntax
+  for (const perm of perms) {
+    map.set(perm.aliasPattern, 'read');
+  }
+}
+/**
+ * Map space permissions from API
  */
 function mapSpacePermissions(perms, map) {
   map.clear();
@@ -349,7 +426,7 @@ function saveMembership() {
 function saveRepoPermissions() {
   /** @type {Map<string, string>} */
   const oldRepoPerms = new Map();
-  mapRepoPermissions(props.modelValue?.repoPermissions ?? [], oldRepoPerms);
+  mapRepoPermissions(props.modelValue?.repositoryPermissions ?? [], oldRepoPerms);
 
   const promises = [...repositoryPermissions.value, ...oldRepoPerms]
     .map(([pattern, level]) => {
@@ -362,6 +439,34 @@ function saveRepoPermissions() {
 
       // If deleted
       if (!repositoryPermissions.value.has(pattern)) {
+        return $fetch(url, { method: 'DELETE' });
+      }
+
+      return null;
+    })
+    .filter((p) => p !== null);
+
+  return Promise.all(promises);
+}
+/**
+ * Save repository alias permissions
+ */
+function saveAliasPermissions() {
+  /** @type {Map<string, boolean>} */
+  const oldAliasPerms = new Map();
+  mapAliasPermissions(props.modelValue?.repositoryAliasPermissions ?? [], oldAliasPerms);
+
+  const promises = [...repositoryAliasPermissions.value, ...oldAliasPerms]
+    .map(([pattern, access]) => {
+      const url = `/api/institutions/${props.institution.id}/repository-aliases/${pattern}/permissions/${props.modelValue.username}`;
+
+      // If new or modified
+      if (oldAliasPerms.get(pattern) !== access) {
+        return $fetch(url, { method: 'PUT', body: {} });
+      }
+
+      // If deleted
+      if (!repositoryAliasPermissions.value.has(pattern)) {
         return $fetch(url, { method: 'DELETE' });
       }
 
@@ -409,7 +514,7 @@ async function save(actions) {
 
   const toDo = actions;
   if (!actions) {
-    toDo = [saveMembership, saveRepoPermissions, saveSpacePermissions];
+    toDo = [saveMembership, saveRepoPermissions, saveAliasPermissions, saveSpacePermissions];
   }
 
   try {
@@ -437,14 +542,9 @@ function toggleRole(role) {
   }
   actions.push(saveMembership);
 
-  // If it's the first role added, apply preset
-  if (roles.value.size !== 1 || oldSize !== 0) {
-    save(actions);
-    return;
-  }
-
   const preset = presets.get(role);
-  if (!preset) {
+  // If it's the first role added, apply preset
+  if (roles.value.size !== 1 || oldSize !== 0 || !preset) {
     save(actions);
     return;
   }
@@ -460,6 +560,12 @@ function toggleRole(role) {
     );
     actions.push(saveRepoPermissions);
   }
+  if (preset.repositoryAliases) {
+    repositoryAliasPermissions.value = new Map(
+      (repositoryAliases.value ?? []).map((a) => [a.pattern, preset.repositoryAliases]),
+    );
+    actions.push(saveAliasPermissions);
+  }
   if (preset.spaces) {
     spacePermissions.value = new Map((spaces.value ?? []).map((s) => [s.id, preset.spaces]));
     actions.push(saveSpacePermissions);
@@ -467,9 +573,12 @@ function toggleRole(role) {
   save(actions);
 }
 
+/* eslint-disable vue/max-len */
 mapPermissions(props.modelValue?.permissions ?? [], permissions.value);
 mapRepoPermissions(props.modelValue?.repositoryPermissions ?? [], repositoryPermissions.value);
+mapAliasPermissions(props.modelValue?.repositoryAliasPermissions ?? [], repositoryAliasPermissions.value);
 mapSpacePermissions(props.modelValue?.spacePermissions ?? [], spacePermissions.value);
+/* eslint-enable vue/max-len */
 
 watchDebounced(
   comment,

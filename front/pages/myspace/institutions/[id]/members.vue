@@ -77,7 +77,18 @@
           :disabled="!canEdit || !membershipFormDialogRef"
           prepend-icon="mdi-database-outline"
           size="small"
-          @click="membershipFormDialogRef?.open(item, { institution })"
+          @click="openMembershipFormDialog(item)"
+        />
+      </template>
+
+      <template #[`item.repositoryAliasPermissions`]="{ value, item }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!canEdit || !membershipFormDialogRef"
+          prepend-icon="mdi-database-eye-outline"
+          size="small"
+          @click="openMembershipFormDialog(item)"
         />
       </template>
 
@@ -88,7 +99,7 @@
           :disabled="!canEdit || !membershipFormDialogRef"
           prepend-icon="mdi-tab"
           size="small"
-          @click="membershipFormDialogRef?.open(item, { institution })"
+          @click="openMembershipFormDialog(item)"
         />
       </template>
 
@@ -191,7 +202,12 @@ const {
   },
   data: {
     sortBy: [{ key: 'user.fullName', order: 'asc' }],
-    include: ['user', 'repositoryPermissions', 'spacePermissions'],
+    include: [
+      'user',
+      'repositoryPermissions',
+      'repositoryAliasPermissions',
+      'spacePermissions',
+    ],
   },
 });
 
@@ -239,6 +255,12 @@ const headers = computed(() => [
         align: 'center',
       },
       {
+        title: t('repositoryAliases.aliases'),
+        value: 'repositoryAliasPermissions',
+        sortable: true,
+        align: 'center',
+      },
+      {
         title: t('spaces.spaces'),
         value: 'spacePermissions',
         sortable: true,
@@ -267,6 +289,13 @@ const toolbarTitle = computed(() => {
  * Debounced refresh
  */
 const debouncedRefresh = useDebounceFn(refresh, 250);
+
+/**
+ * Open
+ */
+function openMembershipFormDialog(item) {
+  membershipFormDialogRef.value?.open(item, { institution: institution.value });
+}
 
 /**
  * Delete multiple members

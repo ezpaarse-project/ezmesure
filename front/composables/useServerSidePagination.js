@@ -36,6 +36,7 @@ export default async function useServerSidePagination(params = {}) {
 
   const sortMapping = new Map(Object.entries(params.sortMapping ?? {}));
 
+  const itemsPerPageOptions = [10, 25, 50, 100];
   const itemsPerPage = useLocalStorage('ezm.itemsPerPage', params.data?.itemsPerPage ?? 10);
 
   /**
@@ -144,6 +145,7 @@ export default async function useServerSidePagination(params = {}) {
     page: query.value.page,
     itemsLength: itemLength.value.current,
     itemsPerPage: itemsPerPage.value,
+    itemsPerPageOptions,
     sortBy: query.value.sortBy,
 
     'onUpdate:page': (page) => onDataTableOptionsUpdate({ page }),
@@ -155,6 +157,8 @@ export default async function useServerSidePagination(params = {}) {
   return {
     ...asyncData,
     itemLength,
+    itemsPerPage,
+    itemsPerPageOptions,
     query,
     vPaginationOptions,
     vDataTableOptions,

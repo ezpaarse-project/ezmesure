@@ -78,6 +78,9 @@ const includableFields = [
   'spacePermissions.space',
   'repositoryPermissions',
   'repositoryPermissions.repository',
+  'repositoryAliasPermissions',
+  'repositoryAliasPermissions.alias',
+  'repositoryAliasPermissions.alias.repository',
 ];
 
 /**

@@ -40,6 +40,8 @@
             label
             class="ml-2"
           />
+
+          <SushiEndpointVersionsChip :model-value="item" end />
         </template>
       </v-list-item>
     </template>

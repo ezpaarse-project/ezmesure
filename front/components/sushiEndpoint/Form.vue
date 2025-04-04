@@ -5,6 +5,15 @@
     prepend-icon="mdi-server-plus"
   >
     <template #text>
+      <v-row v-if="!isEditing">
+        <v-col>
+          <SushiEndpointRegistrySearch
+            v-model="registryEndpoint"
+            @update:endpoint="applyRegistryEndpoint($event)"
+          />
+        </v-col>
+      </v-row>
+
       <v-row>
         <v-col>
           <v-form
@@ -106,15 +115,52 @@
                   </v-col>
 
                   <v-col cols="12" sm="4">
-                    <v-text-field
-                      v-model="endpoint.counterVersion"
+                    <v-combobox
+                      v-model="endpoint.counterVersions"
                       :label="$t('endpoints.counterVersion')"
+                      :items="SUPPORTED_COUNTER_VERSIONS"
                       :rules="versionRules"
-                      placeholder="5"
+                      :return-object="false"
                       prepend-icon="mdi-numeric"
                       variant="underlined"
                       hide-details="auto"
-                    />
+                      multiple
+                      required
+                    >
+                      <template #selection="{ item: { raw: version } }">
+                        <v-chip
+                          :text="version"
+                          :color="counterVersionsColors.get(version) || 'secondary'"
+                          density="comfortable"
+                          variant="flat"
+                          label
+                        />
+                      </template>
+                    </v-combobox>
+                  </v-col>
+
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="endpoint.registryId"
+                      :label="$t('endpoints.registryId')"
+                      :hint="$t('endpoints.registryIdHint')"
+                      prepend-icon="mdi-identifier"
+                      variant="underlined"
+                      hide-details="auto"
+                      @update:model-value="extractIdFromUrl($event)"
+                    >
+                      <template v-if="endpoint.registryId" #append>
+                        <v-btn
+                          icon="mdi-open-in-new"
+                          :href="`https://registry.countermetrics.org/platform/${endpoint.registryId}`"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="text"
+                          density="comfortable"
+                          size="small"
+                        />
+                      </template>
+                    </v-text-field>
                   </v-col>
 
                   <v-col cols="12">
@@ -301,7 +347,7 @@
           <v-btn
             :disabled="!valid"
             :text="$t('endpoints.checkEndpoint')"
-            color="primary"
+            color="accent"
             variant="tonal"
             v-bind="menu"
           />
@@ -339,6 +385,8 @@
 </template>
 
 <script setup>
+const SUPPORTED_COUNTER_VERSIONS = ['5', '5.1'];
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -363,7 +411,8 @@ const saving = ref(false);
 const valid = ref(false);
 const isConnectionMenuOpen = ref(false);
 const loadingTags = ref(false);
-const endpoint = ref({ ...(props.modelValue ?? {}) });
+const registryEndpoint = ref();
+const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -403,14 +452,15 @@ const sushiUrlRules = computed(() => [
   },
 ]);
 const versionRules = computed(() => [
-  (value) => {
-    const pattern = /^[0-9]+(\.[0-9]+(\.[0-9]+)?)?$/;
+  (values) => values.length > 0 || t('fieldIsRequired'),
+  (values) => values.every((v) => {
+    const pattern = /^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/;
 
-    if (!value || pattern.test(value)) {
+    if (!v || pattern.test(v)) {
       return true;
     }
     return t('fieldMustMatch', { pattern: pattern.toString() });
-  },
+  }),
 ]);
 
 async function changeSushiUrl(sushiUrl) {
@@ -454,6 +504,25 @@ async function save() {
   }
 
   saving.value = false;
+}
+
+function applyRegistryEndpoint(e) {
+  if (!e) {
+    endpoint.value.registryId = '';
+    return;
+  }
+  endpoint.value = e;
+}
+
+function extractIdFromUrl(url) {
+  if (!url.trim().startsWith('https://registry.countermetrics.org/')) {
+    return;
+  }
+
+  const id = /\/platform\/(.+)\/?$/.exec(url)?.[1];
+  if (id) {
+    endpoint.value.registryId = id;
+  }
 }
 
 onMounted(() => {

@@ -16,8 +16,11 @@ const { client: prisma } = require('./index');
  *
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias
+ * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
  *
- * @typedef {Repository & { permissions: RepositoryPermission[], institutions: Institution[] }} OldRepository
+ * @typedef {RepositoryAlias & { permissions: RepositoryAliasPermission[] }} OldRepositoryAlias
+ * @typedef {Repository & { permissions: RepositoryPermission[], institutions: Institution[], aliases: OldRepositoryAlias[] }} OldRepository
  * @typedef {{deleteResult: Repository, deletedRepository: OldRepository }} RepositoryRemoved
  * @typedef {{newRepository: Repository, oldRepository: OldRepository }} RepositoryUpdated
  */
@@ -123,6 +126,11 @@ async function disconnectInstitution(pattern, institutionId, tx) {
       include: {
         permissions: { where: { institutionId } },
         institutions: { where: { id: institutionId } },
+        aliases: {
+          include: {
+            permissions: { where: { institutionId } },
+          },
+        },
       },
     });
 
@@ -175,6 +183,11 @@ async function remove(params, tx = prisma) {
     include: {
       permissions: true,
       institutions: true,
+      aliases: {
+        include: {
+          permissions: true,
+        },
+      },
     },
   });
 

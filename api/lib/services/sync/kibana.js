@@ -169,6 +169,7 @@ const syncSpace = async (space) => {
             visualize: ['all'],
 
             indexPatterns: ['all'],
+            savedObjectsTagging: ['all'],
           },
         },
       ],

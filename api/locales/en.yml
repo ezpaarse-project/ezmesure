@@ -63,6 +63,11 @@ errors:
     alreadyExists: The repository [%s] is already associated to the institution
     typeMismatch: A repository [%s] with a different type already exists
 
+  repositoryAlias:
+    notFound: Repository alias not found
+    alreadyExists: The repository alias [%s] is already associated to the institution
+    targetMismatch: A repository alias [%s] with a different target already exists
+
   institution:
     notFound: Institution not found
     unauthorized: You are not allowed to access this institution
