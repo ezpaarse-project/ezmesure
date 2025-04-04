@@ -47,6 +47,7 @@ An institution
 | sushiCredentials  | `SushiCredentials[]` | Institution SUSHI credentials                                     |            |          |
 | childInstitutions | `Institution[]`      | Child institutions                                                |            |          |
 | repositories      | `Repository[]`       | Institution repositories                                          |            |          |
+| repositoryAliases | `RepositoryAlias[]`  | Institution aliases                                               |            |          |
 
 ### User
 
@@ -68,16 +69,17 @@ A user
 
 A membership (a user belonging to an institution)
 
-| Property              | Type                     | Description                                                                           | Attributes | Default |
-|-----------------------|--------------------------|---------------------------------------------------------------------------------------|------------|---------|
-| user                  | `User`                   | The member                                                                            |            |         |
-| institution           | `Institution`            | The institution                                                                       |            |         |
-| roles                 | `String[]`               | Roles of the member inside the institution                                            |            |         |
-| permissions           | `String[]`               | Permissions of the user for the institution (members management, SUSHI, ezREEPORT...) |            |         |
-| spacePermissions      | `SpacePermission[]`      | Permissions of the user for the institution spaces                                    |            |         |
-| repositoryPermissions | `RepositoryPermission[]` | Permissions of the user for the institution repositories                              |            |         |
-| locked                | `Boolean`                | Whether the membership can be modified or not by non-admins                           |            | `false` |
-| comment               | `String?`                | Abritrary comment about the membership                                                |            |         |
+| Property                   | Type                          | Description                                                                           | Attributes | Default |
+|----------------------------|-------------------------------|---------------------------------------------------------------------------------------|------------|---------|
+| user                       | `User`                        | The member                                                                            |            |         |
+| institution                | `Institution`                 | The institution                                                                       |            |         |
+| roles                      | `String[]`                    | Roles of the member inside the institution                                            |            |         |
+| permissions                | `String[]`                    | Permissions of the user for the institution (members management, SUSHI, ezREEPORT...) |            |         |
+| spacePermissions           | `SpacePermission[]`           | Permissions of the user for the institution spaces                                    |            |         |
+| repositoryPermissions      | `RepositoryPermission[]`      | Permissions of the user for the institution repositories                              |            |         |
+| repositoryAliasPermissions | `RepositoryAliasPermission[]` | Permissions of the user for the institution aliases                                   |            |         |
+| locked                     | `Boolean`                     | Whether the membership can be modified or not by non-admins                           |            | `false` |
+| comment                    | `String?`                     | Abritrary comment about the membership                                                |            |         |
 
 ### Space
 
@@ -120,6 +122,7 @@ A repository (a section of elasticsearch allocated to an institution)
 | pattern      | `String`                 | The index pattern (ex: b-bibcnrs*)               | Id         |         |
 | type         | `String`                 | The repository type (ezpaarse, counter5)         |            |         |
 | permissions  | `RepositoryPermission[]` | Member permissions associated to this repository |            |         |
+| aliases      | `RepositoryAlias[]`      | Aliases associated to this repository            |            |         |
 
 ### RepositoryPermission
 
@@ -131,6 +134,30 @@ A repository permission (access rights of a member for a specific repository)
 | repository | `Repository` | The repository                                             |            |         |
 | readonly   | `Boolean`    | Whether the member has a readonly access to the repository |            | `false` |
 | locked     | `Boolean`    | Whether the permission can be modified or not              |            | `false` |
+
+### RepositoryAlias
+
+A repository alias (alias for a section of elasticsearch)
+
+| Property     | Type                          | Description                                                                 | Attributes | Default |
+|--------------|-------------------------------|-----------------------------------------------------------------------------|------------|---------|
+| institutions | `Institution[]`               | The institution this repository is associated to                            |            |         |
+| createdAt    | `DateTime`                    | Creation date                                                               |            | `now()` |
+| updatedAt    | `DateTime`                    | Latest update date                                                          |            |         |
+| pattern      | `String`                      | The alias pattern (ex: b-bibcnrs*)                                          | Id         |         |
+| repository   | `Repository`                  | The repository                                                              |            |         |
+| filters      | `Json?`                       | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }]) |            |         |
+| permissions  | `RepositoryAliasPermission[]` | Member permissions associated to this alias                                 |            |         |
+
+### RepositoryAliasPermission
+
+A alias permission (access rights of a member for a specific alias)
+
+| Property   | Type              | Description                                   | Attributes | Default |
+|------------|-------------------|-----------------------------------------------|------------|---------|
+| membership | `Membership`      | The member                                    |            |         |
+| alias      | `RepositoryAlias` | The alias                                     |            |         |
+| locked     | `Boolean`         | Whether the permission can be modified or not |            | `false` |
 
 ### Action
 
@@ -249,7 +276,7 @@ A SUSHI endpoint
 | vendor                    | `String`             | Vendor name of the endpoint                                                                       |            |          |
 | tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                                     |            |          |
 | description               | `String?`            | Description of the endpoint                                                                       |            |          |
-| counterVersion            | `String?`            | Counter version of the SUSHI service                                                              |            |          |
+| counterVersions           | `String[]`           | Counter versions of the SUSHI service                                                             |            |          |
 | technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                   |            |          |
 | active                    | `Boolean`            | Whether the endpoint is active and can be harvested                                               |            | `true`   |
 | activeUpdatedAt           | `DateTime`           | Date on which the active status was last modified                                                 |            | `now()`  |
@@ -268,6 +295,7 @@ A SUSHI endpoint
 | supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                                      |            |          |
 | harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")             |            |          |
 | testedReport              | `String?`            | Report used when testing endpoint                                                                 |            |          |
+| registryId                | `String?`            | Id of platform in https://registry.countermetrics.org                                             |            |          |
 | credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                    |            |          |
 | params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                      |            |          |
 
