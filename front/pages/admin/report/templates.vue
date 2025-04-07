@@ -9,7 +9,12 @@
     />
 
     <div v-else>
-      <ezr-template-table :title-prefix="`${$t('menu.adminReport')} / `">
+      {{ itemsPerPage }}
+      <ezr-template-table
+        v-model:items-per-page="itemsPerPage"
+        :title-prefix="`${$t('menu.adminReport')} / `"
+        :items-per-page-options="itemsPerPageOptions"
+      >
         <template #prepend>
           <v-btn
             icon="mdi-menu"
@@ -29,5 +34,5 @@ definePageMeta({
 
 const { toggle } = useDrawerStore();
 
-const { error } = await useEzr();
+const { error, itemsPerPage, itemsPerPageOptions } = await useEzr();
 </script>
