@@ -173,6 +173,18 @@
           </div>
 
           <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
+
+          <v-chip
+            v-for="tag in item.endpoint.tags ?? []"
+            :key="tag"
+            :text="tag"
+            color="accent"
+            density="comfortable"
+            variant="outlined"
+            size="small"
+            label
+            class="mr-2"
+          />
         </div>
       </template>
 
