@@ -47,6 +47,27 @@ const schema = {
   disabledUntil: Joi.date().allow(null),
   supportedReports: Joi.array().items(Joi.string().trim()),
   supportedReportsUpdatedAt: Joi.date().allow(null),
+  supportedData: Joi.object().pattern(
+    Joi.string(), // reportId
+    Joi.object({
+      supported: Joi.object({
+        value: Joi.boolean(),
+        raw: Joi.boolean().optional(),
+        manual: Joi.boolean().optional(),
+      }),
+      firstMonthAvailable: Joi.object({
+        value: Joi.string().regex(/^\d{4}-\d{2}$/),
+        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+        manual: Joi.boolean().optional(),
+      }).optional(),
+      lastMonthAvailable: Joi.object({
+        value: Joi.string().regex(/^\d{4}-\d{2}$/),
+        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+        manual: Joi.boolean().optional(),
+      }).optional(),
+    }),
+  ),
+  supportedDataUpdatedAt: Joi.date().allow(null),
 
   params: Joi.array().items(Joi.object({
     name: Joi.string().trim(),

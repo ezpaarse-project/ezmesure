@@ -332,6 +332,10 @@ model HarvestJob {
   sessionId       String
   /// Session that created the job
   session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// Beginning of the requested period, may differ from session's cause of supported periods
+  beginDate       String
+  /// End of the requested period, may differ from session's cause of supported periods
+  endDate         String
   /// Index where the harvested data should be inserted
   index           String
   /// Job running time
@@ -465,14 +469,18 @@ model SushiEndpoint {
   defaultApiKey             String?
   /// Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")
   paramSeparator            String?
-  /// List report IDs that are supported by the endpoint
+  /// [Deprecated] List report IDs that are supported by the endpoint
   supportedReports          String[]
-  /// List of report IDs that should be ignored, even if the endpoint indicates that they are supported
+  /// [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported
   ignoredReports            String[]
-  /// Additional report IDs to be added to the list of supported reports provided by the endpoint
+  /// [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint
   additionalReports         String[]
-  /// Date on which the list of supported reports was last updated
+  /// [Deprecated] Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
+  /// List of reports that are supported (or unsupported) by the endpoint, with periods available
+  supportedData             Json               @default("{}")
+  /// Date on which the list of supported data was last updated
+  supportedDataUpdatedAt    DateTime?
   /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
   harvestDateFormat         String?
   /// Report used when testing endpoint
