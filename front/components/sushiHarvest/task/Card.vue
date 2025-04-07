@@ -22,24 +22,31 @@
         </DetailsField>
       </v-row>
 
-      <template v-if="modelValue.result">
-        <v-row>
-          <DetailsField
-            :label="$t('harvest.jobs.coveredPeriods')"
-            prepend-icon="mdi-calendar-blank"
-          >
-            <v-chip
-              v-for="month in modelValue.result.coveredPeriods"
-              :key="month"
-              :text="month"
-              density="comfortable"
-              variant="outlined"
-              size="small"
-              class="mr-2"
-            />
-          </DetailsField>
-        </v-row>
+      <v-row>
+        <DetailsField
+          :label="$t('harvest.jobs.period')"
+          :value="`${modelValue.beginDate} ~ ${modelValue.endDate}`"
+          prepend-icon="mdi-calendar-range"
+        />
 
+        <DetailsField
+          v-if="modelValue.result"
+          :label="$t('harvest.jobs.coveredPeriods')"
+          prepend-icon="mdi-calendar-blank"
+        >
+          <v-chip
+            v-for="month in modelValue.result.coveredPeriods"
+            :key="month"
+            :text="month"
+            density="comfortable"
+            variant="outlined"
+            size="small"
+            class="mr-2"
+          />
+        </DetailsField>
+      </v-row>
+
+      <template v-if="modelValue.result">
         <v-divider class="my-4" />
 
         <v-row>

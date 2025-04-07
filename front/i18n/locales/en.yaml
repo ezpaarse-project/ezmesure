@@ -222,10 +222,14 @@ endpoints:
   requireApiKey: An API key is required
   isSushiCompliant: The endpoint is COUNTER compliant
   harvestedReports: Harvested reports
-  ignoredReportsDesc: The reports listed below will be considered as unsupported, even if they are present in the list provided by the endpoint.
-  ignoredReports: Ignored reports
-  additionalReportsDesc: The reports listed below will be considered as supported, even if they are not present in the list provided by the endpoint.
-  additionalReports: Additional reports
+  supportedDataDesc: The table below represents the list of supported (or unsupported) reports by the endpoint. The checked reports will be harvested, even if they are not in the list provided by the endpoint. The unchecked reports will not be harvested, even if they are in the list provided by the endpoint. You can modify this list at any time.
+  noSupportedData: No supported report
+  noSupportedDataDesc: The list of supported reports is updated every month before a harvest. To fill this list, you must first harvest the endpoint. You can also add additional reports with the button below.
+  firstMonthAvailable: First available month
+  lastMonthAvailable: Last available month
+  addAdditionalReport: Add an additional report
+  undoReport: Undo changes
+  manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
   description: Description
   paramSeparatorDesc: ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.

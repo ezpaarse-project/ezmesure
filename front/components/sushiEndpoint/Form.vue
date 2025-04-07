@@ -198,44 +198,14 @@
             >
               <template #text>
                 <v-row>
-                  <v-col cols="12">
-                    <p>
-                      {{ $t('endpoints.ignoredReportsDesc') }}
-                    </p>
-
-                    <SushiEndpointReportCombobox
-                      v-model="endpoint.ignoredReports"
-                      :label="$t('endpoints.ignoredReports')"
-                      :endpoint="modelValue"
-                      prepend-icon="mdi-file-document-minus"
-                      variant="underlined"
-                      hide-details="auto"
-                      clearable
-                      multiple
-                      chips
-                      closable-chips
-                    />
+                  <v-col>
+                    <SushiEndpointSupportedData v-model="endpoint.supportedData" />
                   </v-col>
+                </v-row>
 
-                  <v-col cols="12">
-                    <p>
-                      {{ $t('endpoints.additionalReportsDesc') }}
-                    </p>
+                <v-divider class="mt-4 mb-2" />
 
-                    <v-combobox
-                      v-model="endpoint.additionalReports"
-                      :label="$t('endpoints.additionalReports')"
-                      prepend-icon="mdi-file-document-plus"
-                      variant="underlined"
-                      hide-details="auto"
-                      menu-icon=""
-                      clearable
-                      multiple
-                      chips
-                      closable-chips
-                    />
-                  </v-col>
-
+                <v-row>
                   <v-col cols="12">
                     <SushiEndpointReportCombobox
                       v-model="endpoint.testedReport"
