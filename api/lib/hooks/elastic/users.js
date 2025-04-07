@@ -4,6 +4,7 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
+const { syncUser } = require('../../services/sync/elastic');
 
 /**
  * @typedef {import('@prisma/client').User} User
@@ -54,12 +55,7 @@ const onUserUpdate = async (user) => {
   }
 
   try {
-    await elasticUsers.updateUser({
-      username: user.username,
-      email: user.email,
-      fullName: user.fullName,
-      roles: elasticUser.roles,
-    });
+    await syncUser(user);
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
   } catch (error) {
     appLogger.error(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
