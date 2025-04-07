@@ -94,6 +94,7 @@
                       :hint="$t('institutions.sushi.packagesDescription')"
                       :items="availablePackages"
                       :loading="loadingPackages && 'primary'"
+                      :rules="[(v) => v.length <= 1 || $t('institutions.sushi.onlyOnePackage')]"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       multiple

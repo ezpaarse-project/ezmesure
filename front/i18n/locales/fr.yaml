@@ -413,10 +413,11 @@ institutions:
     unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi
     label: Libellé
     tags: Étiquettes
-    packages: Packages
-    packagesHint: Profils, comptes, fonds, antennes, etc. dont font partie les identifiants.
-    packagesDescription: Profils, comptes, fonds, antennes, etc. dont font partie les identifiants. Les packages peuvent être utilisés dans vos tableaux de bord, à travers le champ X_Package.
+    packages: Package
+    packagesHint: Profil, compte, fond, antenne, etc. dont font partie les identifiants.
+    packagesDescription: Profil, compte, fond, antenne, etc. dont font partie les identifiants. Le package peut être utilisés dans vos tableaux de bord, à travers le champ X_Package.
     unableToRetriveSushiData: Impossible de récupérer les informations sushi
+    onlyOnePackage: Vous devez choisir un seul package.
     endpoint: Point d'accès
     requestorId: Requestor ID
     customerId: Customer ID

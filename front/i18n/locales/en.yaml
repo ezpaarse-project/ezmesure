@@ -410,13 +410,11 @@ institutions:
     unabletToRetriveSushiInformations: Unable to retrieve information from sushi platforms
     label: Label
     tags: Tags
-    packages: Packages
-    packagesHint: Profiles, accounts, funds, antennas, etc. that include the credentials.
-    packagesDescription:
-      Profiles, accounts, funds, antennas, etc. that include the
-      credentials. The packages will be usable in your dashboards, using the X_Package
-      field
+    packages: Package
+    packagesHint: Profile, account, fund, antenna, etc. that include the credentials.
+    packagesDescription: Profile, account, fund, antenna, etc. that include the credentials. The package will be usable in your dashboards, using the X_Package field
     unableToRetriveSushiData: Unable to retrieve sushi information
+    onlyOnePackage: You must choose one package.
     endpoint: Endpoint
     requestorId: Requestor ID
     customerId: Customer ID
