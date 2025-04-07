@@ -62,6 +62,7 @@ const generateKibanaFeatures = (entity) => {
       visualize: ['all'],
 
       indexPatterns: ['all'],
+      savedObjectsTagging: ['all'],
     },
   };
 };

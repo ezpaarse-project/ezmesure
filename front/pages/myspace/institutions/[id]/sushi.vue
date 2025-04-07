@@ -173,6 +173,18 @@
           </div>
 
           <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
+
+          <v-chip
+            v-for="tag in item.endpoint.tags ?? []"
+            :key="tag"
+            :text="tag"
+            color="accent"
+            density="comfortable"
+            variant="outlined"
+            size="small"
+            label
+            class="mr-2"
+          />
         </div>
       </template>
 
@@ -447,7 +459,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return !isLocked.value && hasPermission('sushi:write', { throwOnNoMembership: true });
+  return !isLocked.value && hasPermission(params.id, 'sushi:write', { throwOnNoMembership: true });
 });
 /**
  * Table headers

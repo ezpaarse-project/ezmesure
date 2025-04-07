@@ -1,4 +1,5 @@
 const counterRegistry = require('../../../services/counter-registry');
+const sushi = require('../../../services/sushi');
 
 exports.getAll = async (ctx) => {
   const platforms = await counterRegistry.getAllPlatforms();
@@ -21,6 +22,9 @@ exports.getOne = async (ctx) => {
     ctx.throw(404, ctx.$t('errors.sushi-endpoint.notFound'));
   }
 
+  let domainFound = '';
+  const urlPerVersion = new Map();
+
   const endpoint = {
     vendor: platform.name,
     registryId: platform.id,
@@ -37,14 +41,19 @@ exports.getOne = async (ctx) => {
 
   // eslint-disable-next-line no-restricted-syntax
   for (const service of platform.sushi_services) {
-    const url = counterRegistry.stripCounterVersionFromUrl(service.url, service.counter_release);
+    const { domain, baseUrl: url } = sushi.getSushiURL(
+      { sushiUrl: service.url },
+      service.counter_release,
+    );
 
-    if (endpoint.sushiUrl && url !== endpoint.sushiUrl) {
+    if (domainFound && domainFound !== domain) {
       // eslint-disable-next-line no-continue
       continue;
     }
 
-    endpoint.sushiUrl = url;
+    domainFound = domain;
+    urlPerVersion.set(service.counter_release, url);
+
     endpoint.counterVersions.add(service.counter_release);
     dataHosts.add(service.data_host);
     const description = [];
@@ -82,9 +91,16 @@ exports.getOne = async (ctx) => {
   ctx.status = 200;
   ctx.body = {
     ...endpoint,
+    // Using COUNTER5 by default, cause of Scholarly iQ (and others) putting a /r5 in the URL
+    // if COUNTER5 is not available, take the first one
+    sushiUrl: urlPerVersion.get('5') || Array.from(urlPerVersion.values())[0],
+    // Format description
     description: endpoint.description.join('\n'),
+    // Transform sets to arrays
     counterVersions: Array.from(endpoint.counterVersions),
+    // Format technicalProvider
     technicalProvider: Array.from(endpoint.technicalProvider).join(', '),
+    // Transform sets to arrays
     tags: Array.from(endpoint.tags),
   };
 };

@@ -49,23 +49,7 @@
               density="comfortable"
               hide-details
               @update:model-value="updateRepository($event)"
-            >
-              <template #prepend-item>
-                <ConfirmPopover
-                  :text="$t('files.letAdminDesc')"
-                  :agree="() => updateRepository('')"
-                  location="end"
-                >
-                  <template #activator="{ props: confirm }">
-                    <v-list-item
-                      :title="$t('files.letAdmin')"
-                      append-icon="mdi-folder-arrow-up-outline"
-                      v-bind="confirm"
-                    />
-                  </template>
-                </ConfirmPopover>
-              </template>
-            </v-select>
+            />
           </v-col>
 
           <v-col v-if="modelValue.target?.repository" cols="6">

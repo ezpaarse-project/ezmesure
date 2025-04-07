@@ -35,6 +35,7 @@
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.permissions"
+            v-model:loose="filters['permissions:loose']"
             :empty-symbol="emptySymbol"
             :items="permissionsItems"
             :label="$t('users.user.permissions')"
@@ -48,6 +49,7 @@
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.roles"
+            v-model:loose="filters['roles:loose']"
             :empty-symbol="emptySymbol"
             :items="rolesItems"
             :label="$t('users.user.roles')"

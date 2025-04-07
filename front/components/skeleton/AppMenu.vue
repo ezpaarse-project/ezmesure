@@ -12,6 +12,7 @@
           :href="item.href"
           :text="item.text"
           :exact="item.exact"
+          :target="item.target"
           variant="text"
         />
       </template>
@@ -61,6 +62,7 @@
               :href="item.href"
               :text="item.text"
               :exact="item.exact"
+              :target="item.target"
             />
           </template>
         </v-list>
@@ -80,7 +82,12 @@ const items = computed(() => [
 
   { separator: true, key: 'menu-separator' },
 
-  { text: t('menu.dashboard'), href: '/kibana/', exact: true },
+  {
+    text: t('menu.dashboard'),
+    href: '/kibana/',
+    exact: true,
+    target: '_blank',
+  },
   { text: t('menu.myspace'), to: '/myspace/' },
   { text: t('administration'), to: '/admin/', hide: !user.value?.isAdmin },
 ].filter((item) => !item.hide));

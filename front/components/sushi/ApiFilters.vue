@@ -41,6 +41,7 @@
         <v-col v-if="institution" cols="12">
           <ApiFiltersSelect
             v-model="filters.packages"
+            v-model:loose="filters['packages:loose']"
             :items="availablePackages"
             :label="$t('institutions.sushi.packages')"
             :loading="loadingPackages && 'primary'"

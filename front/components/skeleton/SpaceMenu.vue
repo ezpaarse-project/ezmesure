@@ -22,7 +22,7 @@
 
       <v-list-item
         :title="$t('menu.credentials')"
-        :href="kibanaProfileUrl"
+        to="/myspace/profile"
         prepend-icon="mdi-account-key"
         class="text-grey-darken-3"
       />
@@ -37,7 +37,6 @@
         :title="user.fullName"
         :subtitle="user.username"
         lines="two"
-        to="/myspace/profile"
         prepend-icon="mdi-account"
       >
         <template #append>
@@ -47,7 +46,7 @@
             size="small"
             color="red"
             variant="tonal"
-            @click.prevent="logout()"
+            @click="logout()"
           />
         </template>
       </v-list-item>
@@ -56,21 +55,9 @@
 </template>
 
 <script setup>
-import { useDrawerStore } from '@/store/drawer';
-import { useCurrentUserStore } from '@/store/currentUser';
-
 const { public: config } = useRuntimeConfig();
 const { data: user, signOut } = useAuth();
 const { isOpen } = storeToRefs(useDrawerStore());
-const { spacesPermissions } = storeToRefs(useCurrentUserStore());
-
-const kibanaProfileUrl = computed(() => {
-  const firstSpace = spacesPermissions.value.at(0);
-  if (firstSpace) {
-    return `/kibana/s/${firstSpace.spaceId}/security/account`;
-  }
-  return '/kibana/';
-});
 
 async function logout() {
   if (!config.shibbolethDisabled) {

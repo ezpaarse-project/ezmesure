@@ -13,11 +13,10 @@ menu:
   myInstitution: Mon établissement
   myInstitutions: Mes établissements
   institutions: Établissements
-  sushiEndpoints: Points d'accès SUSHI
+  sushiEndpoints: Points d'accès COUNTER
   activity: Activité
   profile: Profil
   members: Membres
-  sushi: Sushi
   users: Utilisateurs
   elasticRoles: Rôles Elastic
   logout: Déconnexion
@@ -99,22 +98,14 @@ kibana:
   title: Identifiants kibana
   passwordLost: Mot de passe oublié
   username: Nom d'utilisateur
-  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot
-    de passe.
-  resetPassword:
-    text: Vous ne vous souvenez plus de votre mot de passe ? Cliquez sur {reset} pour
-      recevoir un courriel de réinitialisation.
-    reset: réinitialiser
+  newPasswordSentByEmail: Un courriel vous a été envoyé pour réinitialiser votre mot de passe.
   whatDoesUsername:
-    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana
-      afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, accédez
-      à votre {accountLink}.
+    text: Ce nom d'utilisateur vous permet de vous connecter à l'interface Kibana afin d'accéder à vos tableaux de bord. Pour changer votre mot de passe, remplissez le formulaire ci-dessous ou accédez à votre {accountLink}.
     accountLink: compte Kibana
 token:
   title: Token d'autentification
   whatDoesToken:
-    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser,
-      ajoutez le header suivant à vos requêtes HTTP : {header}'
+    text: 'Ce token est nécessaire pour utiliser l''API d''ezMESURE. Pour l''utiliser, ajoutez le header suivant à vos requêtes HTTP : {header}'
     header: 'Authorization: Bearer [insérez le token ici]'
   token: Token
   unableToRetrieveToken: Impossible de récupérer le token d'authentification
@@ -140,7 +131,6 @@ partners:
     ezcounter: ezCOUNTER
     ezreeport: ezREEPORT
     report: Reporting
-    sushi: SUSHI
 activity:
   action: Action
   user: Utilisateur
@@ -154,8 +144,8 @@ activity:
     institutions: Établissements
     exports: Exports
     indices: Index
-    sushi: Identifiants SUSHI
-    endpoints: Points d'accès SUSHI
+    sushi: Identifiants COUNTER
+    endpoints: Points d'accès COUNTER
     reporting: Reporting
   actions:
     user/register: Enregistrement
@@ -178,14 +168,14 @@ activity:
     indices/delete: Suppression d'index
     indices/search: Recherche
     indices/insert: Chargement de données
-    sushi/create: Création d'identifiant SUSHI
-    sushi/update: Mise à jour d'identifiant SUSHI
-    sushi/delete: Suppression d'identifiant SUSHI
-    sushi/delete-many: Suppression par lot d'identifiants SUSHI
-    sushi/download-report: Téléchargement de rapport SUSHI
-    sushi/harvest: Moissonnage SUSHI
-    sushi/import: Import d'identifiants SUSHI
-    sushi/check-connection: Test de connexion SUSHI
+    sushi/create: Création d'identifiant COUNTER
+    sushi/update: Mise à jour d'identifiant COUNTER
+    sushi/delete: Suppression d'identifiant COUNTER
+    sushi/delete-many: Suppression par lot d'identifiants COUNTER
+    sushi/download-report: Téléchargement de rapport COUNTER
+    sushi/harvest: Moissonnage COUNTER
+    sushi/import: Import d'identifiants COUNTER
+    sushi/check-connection: Test de connexion COUNTER
     endpoint/create: Création de point d'accès
     endpoint/update: Mise à jour de point d'accès
     endpoint/delete: Suppression de point d'accès
@@ -199,15 +189,15 @@ activity:
     reporting/history: Consultation de l'historique d'une tâche de reporting
 endpoints:
   endpoint: Point d'accès
-  toolbarTitle: Points d'accès SUSHI ({count})
-  pageDescription: Gérez ici la liste des points d'accès SUSHI disponibles.
-  pageDescription2: Seule la version 5 du protocole SUSHI est supportée.
+  toolbarTitle: Point d'accès COUNTER ({count})
+  pageDescription: Gérez ici la liste des points d'accès COUNTER disponibles.
+  pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
   manageEndpoints: >
     Gérer le point d'accès
     |Gérer {count} points d'accès
-  unableToRetriveEndpoints: Impossible de récupérer les points d'accès
-  soapWarning: L'URL semble pointer vers un service SUSHI non supporté (version 4 ou inférieure)
-  sushiNotRootDetected: L'URL SUSHI ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.
+  unableToRetriveEndpoints: Impossible de récupérer les point's d'accès
+  soapWarning: L'URL semble pointer vers un point d'accès COUNTER non supporté (version 4 ou inférieure)
+  sushiNotRootDetected: L'URL COUNTER ne semble pas pointer vers la racine du service. Celle-ci ne devrait pas contenir /reports, /status ou /member.
   validated: Validé
   addEndpoint: Ajouter un point d'accès
   updateEndpoint: Mettre à jour le point d'accès
@@ -231,7 +221,7 @@ endpoints:
   requireCustomerId: Un customer ID est nécessaire
   requireRequestorId: Un requestor ID est nécessaire
   requireApiKey: Une clé d'API est nécessaire
-  isSushiCompliant: Le point d'accès est conforme SUSHI
+  isSushiCompliant: Le point d'accès est conforme COUNTER
   harvestedReports: Rapports moissonnés
   ignoredReportsDesc: Les rapports saisis ci-dessous seront considérés comme non-supportés, même s'ils sont présents dans la liste fournie par le point d'accès.
   ignoredReports: Rapports ignorés
@@ -287,6 +277,7 @@ institutions:
   joinInstitution: Vous souhaitez rejoindre {institution} ?
   joinInstitutionEmail: Un email sera envoyé aux correspondants de cet établissement afin qu'ils puissent vous ajouter.
   createMailContactList: Copier les adresses mails des correspondants
+  modify: Modifier mon établissement
   reports:
     reports: Rapports
   filters:
@@ -352,7 +343,7 @@ institutions:
       ezpaarse: Traitements des logs avec ezPAARSE
       ezmesure: Reversements dans ezMESURE
       reporting: Rapports d'usage périodiques
-      sushi: Moissonnage SUSHI
+      sushi: Moissonnage COUNTER
     mustMatch: 'Doit correspondre à : {pattern}'
     searchOpenData: Chercher parmi les établissements connus
     searchOpenDataHint: Chercher un établissement par nom, localité, code UAI, numéro de siret...
@@ -412,12 +403,12 @@ institutions:
     featureLabels:
       institution: Fiche établissement
       memberships: Membres
-      sushi: Identifiants SUSHI
-      reporting: Reporting
+      sushi: ezCOUNTER
+      reporting: ezREEPORT
   sushi:
-    title: Identifiants SUSHI ({count})
-    pageDescription: Entrez ici les identifiants SUSHI qui serviront à moissonner automatiquement vos rapports COUNTER.
-    pageDescription2: Seule la version 5 du protocole SUSHI est supportée.
+    title: Identifiants COUNTER ({count})
+    pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
+    pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
     addCredentials: Ajouter des identifiants
     updateCredentials: Mettre à jour des identifiants
     unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi
@@ -444,7 +435,7 @@ institutions:
     enterCustomerId: Veuillez saisir un Customer Id.
     enterAPIKey: Veuillez saisir une Clé API.
     comment: Commentaire
-    credentials: ezCOUNTER
+    credentials: COUNTER
     manageN: >
       Gérer les identifiants
       |Gérer {count} identifiants
@@ -513,6 +504,7 @@ tasks:
     interrupted: Le moissonnage a été interrompu.
     cancelled: Le moissonnage a été annulé.
     delayed: Le moissonnage a été lancé, mais le rapport n'était pas encore prêt. Une nouvelle tentative aura bientôt lieu.
+    missing: Le moissonnage est terminé, mais la période demandée est manquante.
   status:
     notLaunchedYet: Pas encore lancé
     waiting: En attente
@@ -523,6 +515,7 @@ tasks:
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
+    missing: Manquant
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
@@ -548,7 +541,7 @@ tasks:
       invalid_json: Le rapport téléchargé n'est pas au bon format (JSON), ou présente des problèmes de syntaxe.
       max_defferals_exceeded: Après plusieurs tentatives, le rapport n'était toujours pas prêt.
       unauthorized: L'identification auprès du point d'accès a échoué. Vérifiez que vos identifiants sont correctement saisis.
-      invalid_report: Le rapport téléchargé n'est pas valide, ou contient des modifications qui ne font pas partie du standard SUSHI.
+      invalid_report: Le rapport téléchargé n'est pas valide, ou contient des modifications qui ne font pas partie du standard COUNTER.
       sushi:1000: La rapport n'a pas pu être moissonné car le point d'accès n'est pas accessible.
       sushi:1010: Le point d'accès est dans l'incapacité de fournir le rapport en raison d'une forte charge.
       sushi:1020: Le point d'accès refuse de fournir le rapport en raison d'un nombre de requêtes trop élevé.
@@ -598,7 +591,7 @@ sushi:
   latestImport: Dernier import
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
-  managementIsLocked: La gestion des identifiants SUSHI est actuellement verrouillée.
+  managementIsLocked: La gestion des identifiants COUNTER est actuellement verrouillée.
   nInstitutions: >
     1 établissement utilise cet endpoint
     |{count} établissements utilisent cet endpoint
@@ -618,8 +611,8 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant SUSHI.
-    |Vous allez supprimer {count} identifiants SUSHI.
+    Vous allez supprimer {count} identifiant COUNTER.
+    |Vous allez supprimer {count} identifiants COUNTER.
   problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
@@ -641,7 +634,7 @@ sushi:
     ignored: Rapport non supporté (constat ezMESURE)
   noMatrix:
     title: Aucun rapport moissonné pour ces identifiants sur cette période
-    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants SUSHI pour être moissonné prochainement par l'équipe d'administration.
+    description: Ces identifiants n'ont pas encore été moissonnés pour cette période. Veuillez validez vos identifiants COUNTER pour être moissonné prochainement par l'équipe d'administration.
   paramScopes:
     all: Toutes les requêtes au point d'accès
     report_list: Listing des rapports
@@ -655,13 +648,14 @@ sushi:
     noFilesAvailable: Aucun fichier disponible
     nbFiles: 1 fichier|{count} fichiers
 reports:
-  sushiReturnedErrors: Le point d'accès SUSHI a retourné des erreurs.
+  sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
   supportedReports: Rapports supportés
   supportedReportsOnPlatform: Rapports supportés par la plateforme éditeur
   supportedReportsUnavailable: La liste des rapports supportés n'est pas disponible pour cette plateforme éditeur.
   failedToFetchReports: Impossible de récupérer la liste des rapports disponibles
   onlyShowMasterReports: Afficher uniquement les rapports maîtres
+  availablePeriod: Période disponible
 identifier: Identifiant
 authenticate:
   restrictedAccess: Accès restreint
@@ -682,12 +676,16 @@ password:
   user: Utilisateur
   password: Mot de passe
   repeatPassword: Répéter le mot de passe
+  actualPassword: Mot de passe Kibana actuel
+  newPassword: Nouveau mot de passe Kibana
+  repeatNewPassword: Répéter le nouveau mot de passe Kibana
   passwordIsRequired: Mot de passe requis
   enterUser: Veuillez saisir votre identifiant pour que nous vous envoyions un e-mail afin de récupérer votre mot de passe.
   checkYourEmail: Vérifiez votre e-mail pour un lien permettant de réinitialiser votre mot de passe.
   waitFewMinutes: S'il n'apparaît pas dans les minutes qui suivent, vérifiez votre dossier spam.
   notEqual: Les mots de passes ne correspondent pas
   updated: Mot de passe mis à jour
+  youCanNowLogin: Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.
   pattern: Minimum 6 caractères
   length: Le mot de passe doit contenir au moins 6 caractères
   update: Mettre à jour votre mot de passe
@@ -701,14 +699,14 @@ contact:
   failed: L'envoi du formulaire de contact a échoué.
   requestInformation: Demande d'information
   bugReport: Rapporter un bug
-  declareSushiEndpoint: Déclarer un point d'accès SUSHI
+  declareSushiEndpoint: Déclarer un point d'accès COUNTER
   emailIsRequired: L'adresse électronique est requise
   emailMustBeValid: L'adresse électronique doit être valide
-  sushiIsRequired: Des identifiants SUSHI sont requis
+  sushiIsRequired: Des identifiants COUNTER sont requis
   contentIsRequired: Un message est requis
   subjectIsRequired: L'objet est requis
   endpointVendor: Nom du fournisseur
-  endpointUrl: URL du point d'accès SUSHI
+  endpointUrl: URL du point d'accès COUNTER
   pleaseEnterFullVendorName: Veuillez rentrer le nom complet (accompagné éventuellement de son acronyme)
   sushiDetails: Merci de préciser des identifiants à utiliser pour tester ce point d'accès, l'équipe d'administration les utilisera pour confirmer que ce dernier est fonctionnel et compatible COUNTER5.
   endpointDetails: Si vous avez connaissance d'autres éléments (clés d'authentification requises, prestataire technique, etc.), veuillez les indiquer ci-dessous.
@@ -964,6 +962,7 @@ description: Description
 initials: Initiales
 language: Langue
 refresh: Actualiser
+refreshShib: Actualiser les informations
 delete: Supprimer
 revoke: Révoquer
 close: Fermer
@@ -1018,3 +1017,6 @@ enterKey: entrée
 general: General
 enterValidUrl: Veuillez saisir une URL valide
 nbOthers: (+{count} autres)
+unknown: Inconnu
+looseFilter: Les résultats correspondront à l'une des valeurs
+strictFilter: Les résultats correspondront à toutes les valeurs

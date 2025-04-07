@@ -36,7 +36,9 @@ export default async function useServerSidePagination(params = {}) {
 
   const sortMapping = new Map(Object.entries(params.sortMapping ?? {}));
 
-  const itemsPerPage = useLocalStorage('ezm.itemsPerPage', params.data?.itemsPerPage ?? 10);
+  const itemsPerPageOptions = [10, 25, 50, 100, -1];
+  const itemsPerPageStored = useLocalStorage('ezm.itemsPerPage', params.data?.itemsPerPage ?? 10);
+  const itemsPerPage = ref(itemsPerPageStored.value);
 
   /**
    * Unpaginated item counts in API
@@ -117,6 +119,10 @@ export default async function useServerSidePagination(params = {}) {
   const onDataTableOptionsUpdate = ({ size, ...data }) => {
     if (Number.isInteger(size)) {
       itemsPerPage.value = size;
+      // Prevent "all" from begin saved, allowing to select it for 1 page
+      if (size !== -1) {
+        itemsPerPageStored.value = size;
+      }
     }
     query.value = {
       ...query.value,
@@ -144,6 +150,7 @@ export default async function useServerSidePagination(params = {}) {
     page: query.value.page,
     itemsLength: itemLength.value.current,
     itemsPerPage: itemsPerPage.value,
+    itemsPerPageOptions,
     sortBy: query.value.sortBy,
 
     'onUpdate:page': (page) => onDataTableOptionsUpdate({ page }),
@@ -155,6 +162,8 @@ export default async function useServerSidePagination(params = {}) {
   return {
     ...asyncData,
     itemLength,
+    itemsPerPage,
+    itemsPerPageOptions,
     query,
     vPaginationOptions,
     vDataTableOptions,

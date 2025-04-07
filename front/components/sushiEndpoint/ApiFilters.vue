@@ -27,6 +27,7 @@
         <v-col cols="12">
           <ApiFiltersSelect
             v-model="filters.tags"
+            v-model:loose="filters['tags:loose']"
             :items="availableTags"
             :label="$t('endpoints.tags')"
             :loading="loadingTags && 'primary'"
@@ -57,6 +58,7 @@
         <v-col cols="12">
           <FiltersSelect
             v-model="filters.counterVersions"
+            v-model:loose="filters['counterVersions:loose']"
             :items="SUPPORTED_COUNTER_VERSIONS"
             :label="$t('endpoints.counterVersion')"
             :return-object="false"

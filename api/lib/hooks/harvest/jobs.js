@@ -19,6 +19,12 @@ const HarvestSessionService = require('../../entities/harvest-session.service');
 
 const HARVEST_FORMAT = 'yyyy-MM';
 
+const SUSHI_CODES_UNAVAILABLE_PERIODS = new Set([
+  SUSHI_CODES.unavailablePeriod,
+  SUSHI_CODES.usageNotReadyForRequestedDates,
+  SUSHI_CODES.usageNotAvailable,
+].map((c) => `sushi:${c}`));
+
 const onHarvestJobUpdate = async (harvestJob) => {
   const now = new Date();
 
@@ -59,8 +65,10 @@ const onHarvestJobUpdate = async (harvestJob) => {
 
         try {
           const data = { ...harvestData, period: periodStr };
-          if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
-            data.status = 'failed';
+          if (data.status === 'failed' && SUSHI_CODES_UNAVAILABLE_PERIODS.has(data.errorCode || '')) {
+            data.status = 'missing';
+          } else if (data.status === 'finished' && !coveredPeriods?.has(periodStr)) {
+            data.status = 'missing';
             data.errorCode = `sushi:${SUSHI_CODES.unavailablePeriod}`;
           }
 

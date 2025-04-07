@@ -92,7 +92,7 @@
                 variant="text"
                 size="small"
                 class="mr-2"
-                @click.prevent=""
+                @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
               />
             </template>
           </v-card>
@@ -132,6 +132,7 @@ const emit = defineEmits({
 
 const { t } = useI18n();
 const { data: user } = useAuthState();
+const { openInTab } = useSingleTabLinks('kibanaSpaces');
 const snacks = useSnacksStore();
 
 /** @type {Ref<object[]>} */

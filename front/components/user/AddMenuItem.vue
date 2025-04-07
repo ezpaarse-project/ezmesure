@@ -67,6 +67,6 @@ defineEmits({
 const { data: currentUser } = useAuthState();
 
 const isAlreadyAssigned = computed(
-  () => props.list.some((user) => user.username === props.modelValue.username),
+  () => props.list.some((user) => user.username === props.modelValue.username) ?? false,
 );
 </script>

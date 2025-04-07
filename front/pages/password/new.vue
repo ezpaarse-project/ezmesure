@@ -24,6 +24,28 @@
               </v-col>
             </v-row>
 
+            <v-expand-transition>
+              <v-row v-if="success">
+                <v-col>
+                  <v-alert
+                    :title="$t('password.updated')"
+                    :text="$t('password.youCanNowLogin')"
+                    type="success"
+                    density="compact"
+                  >
+                    <template #append>
+                      <v-btn
+                        :text="$t('authenticate.logIn')"
+                        prepend-icon="mdi-arrow-left"
+                        to="/authenticate"
+                        variant="tonal"
+                      />
+                    </template>
+                  </v-alert>
+                </v-col>
+              </v-row>
+            </v-expand-transition>
+
             <v-form v-model="valid" @submit.prevent="replacePassword()">
               <v-row>
                 <v-col>
@@ -34,7 +56,7 @@
                     :hint="$t('password.pattern')"
                     :rules="[
                       (v) => !!v || $t('password.passwordIsRequired'),
-                      (v) => v >= 6 || $t('password.length'),
+                      (v) => v.length >= 6 || $t('password.length'),
                     ]"
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     prepend-icon="mdi-lock"
@@ -56,8 +78,8 @@
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="[
                       (v) => !!v || $t('password.passwordIsRequired'),
+                      (v) => v.length >= 6 || $t('password.length'),
                       () => passwordRepeat === password || $t('password.notEqual'),
-                      (v) => v >= 6 || $t('password.length'),
                     ]"
                     prepend-icon="mdi-lock"
                     variant="underlined"
@@ -73,6 +95,7 @@
                     :text="$t('password.update')"
                     :disabled="!valid"
                     :loading="loading"
+                    prepend-icon="mdi-pencil"
                     type="submit"
                     color="primary"
                     block
@@ -88,15 +111,16 @@
 </template>
 
 <script setup>
-const { currentRoute, push: goTo } = useRouter();
+const { currentRoute } = useRouter();
 const { t } = useI18n();
 
 if (!currentRoute.value.query?.token) {
-  goTo('/');
+  await navigateTo('/');
 }
 
 const valid = ref(false);
 const loading = ref(false);
+const success = ref(false);
 const password = ref('');
 const passwordRepeat = ref('');
 const showPassword = ref(false);
@@ -104,28 +128,23 @@ const errorMessage = ref('');
 
 async function replacePassword() {
   loading.value = true;
+  errorMessage.value = '';
+  success.value = false;
   try {
     await $fetch('/api/profile/password/_reset', {
       method: 'POST',
       body: {
         password: password.value,
-      },
-      headers: {
-        Authorization: `Bearer ${currentRoute.value.query?.token}`,
+        token: currentRoute.value.query?.token,
       },
     });
 
     success.value = true;
   } catch (err) {
-    if (!(err instanceof Error)) {
-      errorMessage.value = t('authenticate.failed');
-      return;
-    }
-
-    if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = t('authenticate.loginFailed');
+    if (err?.data?.error) {
+      errorMessage.value = err?.data?.error;
     } else {
-      errorMessage.value = t('authenticate.failed');
+      errorMessage.value = t('anErrorOccurred');
     }
   }
   loading.value = false;

@@ -219,7 +219,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return hasPermission('memberships:write', { throwOnNoMembership: true });
+  return hasPermission(params.id, 'memberships:write', { throwOnNoMembership: true });
 });
 /**
  * Table headers

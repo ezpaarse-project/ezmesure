@@ -74,7 +74,10 @@
           <v-col>
             <v-card>
               <template #text>
-                <ezr-queue-list />
+                <ezr-queue-list
+                  v-model:items-per-page="itemsPerPage"
+                  :items-per-page-options="itemsPerPageOptions"
+                />
               </template>
             </v-card>
           </v-col>
@@ -102,5 +105,5 @@ definePageMeta({
 
 const { toggle } = useDrawerStore();
 
-const { error } = await useEzr();
+const { error, itemsPerPage, itemsPerPageOptions } = await useEzr();
 </script>

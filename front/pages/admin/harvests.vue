@@ -30,7 +30,23 @@
       </template>
 
       <template #footer>
-        <v-pagination rounded v-bind="vPaginationOptions" />
+        <div class="d-flex align-center mt-2 mx-4">
+          <v-pagination rounded v-bind="vPaginationOptions" :total-visible="10" />
+
+          <v-spacer />
+
+          {{ $t('$vuetify.dataFooter.itemsPerPageText') }}
+          <div class="ml-2" style="width: 90px;">
+            <v-select
+              v-model="itemsPerPage"
+              :items="itemsPerPageOptions"
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              @update:model-value="refresh()"
+            />
+          </div>
+        </div>
       </template>
     </v-data-iterator>
   </div>
@@ -49,6 +65,8 @@ const {
   refresh: refreshSessions,
   itemLength,
   query,
+  itemsPerPage,
+  itemsPerPageOptions,
   vPaginationOptions,
 } = await useServerSidePagination({
   fetch: {
