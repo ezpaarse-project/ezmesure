@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex mx-4 rounded-bars">
+  <div class="d-flex rounded-bars">
     <div
       v-for="{ key, width, ...bar } in bars"
       :key="key"
