@@ -1,0 +1,65 @@
+{% extends "layout.mjml" %}
+
+{% block title %}
+<mj-title>
+  Des nouvelles données COUNTER pour "<strong>{{ institution }}</strong>"
+  ont été moissonnées !
+</mj-title>
+{% endblock %}
+
+{% block content %}
+
+<mj-section>
+  <mj-column>
+    <mj-text mj-class="headline">Chers utilisateurs-ices ezCOUNTER,</mj-text>
+  </mj-column>
+</mj-section>
+
+<mj-section>
+  <mj-column>
+    <mj-text>
+      Nous vous informons que nous avons procédé au moissonnage des données COUNTER 5 concernant
+      la période <strong>{{ periodStart }}</strong> ~ <strong>{{ periodEnd }}</strong>
+      pour "<strong>{{ institution }}</strong>".
+    </mj-text>
+
+    <mj-text>
+      Les données sont accessibles via vos tableaux de bords habituels, à condition d'en régler
+      la temporalité à la période voulue.
+    </mj-text>
+
+    {% if space %}
+    <mj-button 
+      href="https://ezmesure.couperin.org/kibana/s/{{ space }}"
+      font-family="Helvetica"
+      background-color="#9c27b0"
+      color="white"
+    >
+      Accéder à votre espace
+    </mj-button>
+    {% endif %}
+
+    <mj-text>
+      Si vous remarquez des données qui vous paraissent manquantes ou non valides,
+      merci de nous contacter
+      {% if recipients %}
+      à <a href="mailto:{{ recipients }}">{{ recipients }}</a>
+      {% endif %}
+      rapidement pour nous permettre de le signaler aux éditeurs.
+    </mj-text>
+
+    <mj-text>
+      Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER.
+      A l’issue de cette saisie, merci de cliquer à nouveau sur le bouton
+      “VALIDER DES IDENTIFIANTS” si vous souhaitez être moissonné pour ces nouvelles données.
+      Nous procéderons à des moissonnages réguliers (au moins une fois par mois).
+    </mj-text>
+
+    <mj-text>
+      <p>Cordialement,</p>
+      <p>L'équipe ezMESURE.</p>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+{% endblock %}

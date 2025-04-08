@@ -1,7 +1,7 @@
 // @ts-check
 const { eachMonthOfInterval, parse, format } = require('date-fns');
 
-const { registerHook } = require('../hookEmitter');
+const { registerHook, triggerHooks } = require('../hookEmitter');
 
 const { appLogger } = require('../../services/logger');
 const { SUSHI_CODES } = require('../../services/sushi');
@@ -58,6 +58,7 @@ const onHarvestJobUpdate = async (harvestJob) => {
       coveredPeriods = new Set(harvestJob.result.coveredPeriods);
     }
 
+    // Update harvest states
     await Promise.all(
       periods.map(async (period) => {
         const periodStr = format(period, HARVEST_FORMAT);
@@ -89,6 +90,11 @@ const onHarvestJobUpdate = async (harvestJob) => {
         }
       }),
     );
+
+    // Check if session is still active, if not: trigger hook as session ended
+    if (!(await harvestSessionService.isActive(session))) {
+      triggerHooks('harvest-session:end', session);
+    }
   });
 };
 
