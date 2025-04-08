@@ -116,8 +116,8 @@ const period = computed(() => {
 
 const bars = computed(() => {
   const getValue = (states) => {
-    const set = new Set(states);
-    const stateCount = harvests.value.filter((h) => set.has(h.status)).length;
+    const statesSet = new Set(states);
+    const stateCount = harvests.value.filter((h) => statesSet.has(h.status)).length;
     const value = stateCount / harvests.value.length;
     return {
       value,
