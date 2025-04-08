@@ -415,7 +415,7 @@ institutions:
     tags: Étiquettes
     packages: Package
     packagesHint: Profil, compte, fond, antenne, etc. dont font partie les identifiants.
-    packagesDescription: Profil, compte, fond, antenne, etc. dont font partie les identifiants. Le package peut être utilisés dans vos tableaux de bord, à travers le champ X_Package.
+    packagesDescription: Profil, compte, fond, antenne, etc. dont font partie les identifiants. Le package peut être utilisé dans vos tableaux de bord, à travers le champ X_Package.
     unableToRetriveSushiData: Impossible de récupérer les informations sushi
     onlyOnePackage: Vous devez choisir un seul package.
     endpoint: Point d'accès
