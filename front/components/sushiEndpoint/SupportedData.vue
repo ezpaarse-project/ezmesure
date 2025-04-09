@@ -56,7 +56,7 @@
                   density="comfortable"
                   size="small"
                   variant="plain"
-                  @click="undoSupportedData(reportId, 'firstMonthAvailable')"
+                  @click.stop="undoSupportedData(reportId, 'firstMonthAvailable')"
                 />
               </template>
             </MonthPickerField>
@@ -83,7 +83,7 @@
                   density="comfortable"
                   size="small"
                   variant="plain"
-                  @click="undoSupportedData(reportId, 'lastMonthAvailable')"
+                  @click.stop="undoSupportedData(reportId, 'lastMonthAvailable')"
                 />
               </template>
             </MonthPickerField>
