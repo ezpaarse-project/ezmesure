@@ -199,7 +199,7 @@ function undoSupportedData(reportId, field) {
     return;
   }
 
-  const value = original[field]?.raw;
+  const value = original?.[field]?.raw;
   data[field] = value != null ? { raw: value, value, manual: false } : undefined;
   innerSupportedData.value[reportId] = data;
 
