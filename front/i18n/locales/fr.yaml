@@ -224,7 +224,7 @@ endpoints:
   harvestedReports: Rapports moissonnés
   supportedDataDesc: Le tableau ci-dessous représente la liste des rapports supportés (ou non) par le point d'accès. Les rapports cochés sont ceux qui seront moissonnées, même s'ils ne se trouvent pas dans la liste fournie par le point d'accès. Les rapports non-cochés ne seront pas moissonnées, meme s'ils se trouvent dans la liste fournie par le point d'accès. Vous pouvez modifier cette liste à tout moment.
   noSupportedData: Aucun rapport supporté
-  noSupportedDataDesc: La liste des rapports supportés est mise à jour tout les mois avant un moissonnage. Pour remplir cette liste, vous devez d'abord moissonner le point d'accès. Vous pouvez aussi ajouter des rapports additionnels avec le bouton ci-dessous.
+  noSupportedDataDesc: La liste des rapports supportés est mise à jour tous les mois avant un moissonnage. Pour remplir cette liste, vous devez d'abord moissonner le point d'accès. Vous pouvez aussi ajouter des rapports additionnels avec le bouton ci-dessous.
   firstMonthAvailable: Premier mois disponible
   lastMonthAvailable: Dernier mois disponible
   addAdditionalReport: Ajouter un rapport additionnel
