@@ -98,6 +98,7 @@
         :close-on-content-click="false"
         min-width="200px"
         width="500px"
+        @update:model-value="resetForm"
       >
         <template #activator="{ props: menu }">
           <v-btn
@@ -114,7 +115,11 @@
           <template #text>
             <v-row>
               <v-col>
-                <v-form id="additionalReportForm" @submit.prevent="addSupportedData">
+                <v-form
+                  id="additionalReportForm"
+                  ref="additionalReportForm"
+                  @submit.prevent="addSupportedData"
+                >
                   <v-text-field
                     v-model="additionalReport"
                     :label="$t('harvest.jobs.reportType')"
@@ -158,6 +163,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const isAdditionalReportOpen = ref(false);
 const additionalReport = ref('');
+const additionalReportForm = useTemplateRef('additionalReportForm');
 
 const { cloned: innerSupportedData } = useCloned(props.modelValue);
 const { cloned: originalSupportedData } = useCloned(props.modelValue, { manual: true });
@@ -192,6 +198,10 @@ function addSupportedData() {
   isAdditionalReportOpen.value = false;
 
   emit('update:modelValue', innerSupportedData.value);
+}
+
+function resetForm() {
+  additionalReportForm.value?.reset();
 }
 
 function undoSupportedData(reportId, field) {
