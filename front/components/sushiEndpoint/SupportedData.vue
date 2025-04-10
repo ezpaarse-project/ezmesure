@@ -98,7 +98,7 @@
         :close-on-content-click="false"
         min-width="200px"
         width="500px"
-        @update:model-value="resetForm"
+        @update:model-value="resetForm()"
       >
         <template #activator="{ props: menu }">
           <v-btn
@@ -118,7 +118,7 @@
                 <v-form
                   id="additionalReportForm"
                   ref="additionalReportForm"
-                  @submit.prevent="addSupportedData"
+                  @submit.prevent="addSupportedData()"
                 >
                   <v-text-field
                     v-model="additionalReport"
