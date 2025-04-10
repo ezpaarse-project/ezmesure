@@ -111,28 +111,28 @@
         <v-card width="50%">
           <template #text>
             <v-row>
-              <v-col cols="8">
-                <SushiEndpointReportCombobox
+              <v-col>
+                <v-text-field
                   v-model="additionalReport"
                   :label="$t('harvest.jobs.reportType')"
-                  :endpoint="modelValue"
                   variant="underlined"
                   hide-details="auto"
                 />
               </v-col>
-
-              <v-col class="d-flex align-center">
-                <v-btn
-                  :text="$t('add')"
-                  :disabled="!additionalReport"
-                  color="success"
-                  prepend-icon="mdi-plus"
-                  variant="text"
-                  block
-                  @click="addSupportedData()"
-                />
-              </v-col>
             </v-row>
+          </template>
+
+          <template #actions>
+            <v-spacer />
+
+            <v-btn
+              :text="$t('add')"
+              :disabled="!additionalReport"
+              color="success"
+              prepend-icon="mdi-plus"
+              variant="text"
+              @click="addSupportedData()"
+            />
           </template>
         </v-card>
       </v-menu>
