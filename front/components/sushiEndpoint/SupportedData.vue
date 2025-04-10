@@ -114,12 +114,14 @@
           <template #text>
             <v-row>
               <v-col>
-                <v-text-field
-                  v-model="additionalReport"
-                  :label="$t('harvest.jobs.reportType')"
-                  variant="underlined"
-                  hide-details="auto"
-                />
+                <v-form id="additionalReportForm" @submit.prevent="addSupportedData">
+                  <v-text-field
+                    v-model="additionalReport"
+                    :label="$t('harvest.jobs.reportType')"
+                    variant="underlined"
+                    hide-details="auto"
+                  />
+                </v-form>
               </v-col>
             </v-row>
           </template>
@@ -133,7 +135,8 @@
               color="success"
               prepend-icon="mdi-plus"
               variant="text"
-              @click="addSupportedData()"
+              type="submit"
+              form="additionalReportForm"
             />
           </template>
         </v-card>
