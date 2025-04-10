@@ -263,6 +263,7 @@ const {
     sortBy: [{ key: 'name', order: 'asc' }],
     include: [
       'repositories',
+      'repositoryAliases',
       'spaces',
       'memberships',
       'childInstitutions',
