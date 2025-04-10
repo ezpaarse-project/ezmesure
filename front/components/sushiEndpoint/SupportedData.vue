@@ -96,6 +96,8 @@
       <v-menu
         v-model="isAdditionalReportOpen"
         :close-on-content-click="false"
+        min-width="200px"
+        width="500px"
       >
         <template #activator="{ props: menu }">
           <v-btn
@@ -108,7 +110,7 @@
           />
         </template>
 
-        <v-card width="50%">
+        <v-card>
           <template #text>
             <v-row>
               <v-col>
