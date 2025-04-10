@@ -58,5 +58,7 @@ export default defineNuxtConfig({
         clientPort: 8080,
       },
     },
+    // Prevent Vite from optimizing ezreeport in dev, allowing to replace it with a local version
+    optimizeDeps: process.env.NODE_ENV !== 'production' ? { exclude: ['@ezpaarse-project/ezreeport-vue'] } : undefined,
   },
 });

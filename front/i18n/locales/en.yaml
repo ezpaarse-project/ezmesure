@@ -414,13 +414,11 @@ institutions:
     unabletToRetriveSushiInformations: Unable to retrieve information from sushi platforms
     label: Label
     tags: Tags
-    packages: Packages
-    packagesHint: Profiles, accounts, funds, antennas, etc. that include the credentials.
-    packagesDescription:
-      Profiles, accounts, funds, antennas, etc. that include the
-      credentials. The packages will be usable in your dashboards, using the X_Package
-      field
+    packages: Package
+    packagesHint: Profile, account, fund, antenna, etc. that include the credentials.
+    packagesDescription: Profile, account, fund, antenna, etc. that include the credentials. The package will be usable in your dashboards, using the X_Package field
     unableToRetriveSushiData: Unable to retrieve sushi information
+    onlyOnePackage: You must choose one package.
     endpoint: Endpoint
     requestorId: Requestor ID
     customerId: Customer ID
@@ -451,7 +449,7 @@ institutions:
     cannotResetCheck: Failed to reset connection status for {name}
     connection: Connection
     untested: Untested
-    operational: Operational
+    operational: Valid credentials
     invalidCredentials: Invalid credentials
     invalidCredentialsShort: Invalid
     connectionSuccessful:
@@ -474,7 +472,7 @@ institutions:
     validateMyCredentials: Validate my credentials
     resumeEntryQuestion: Resume your entry ?
     resumeEntryDesc: You have declared the completion of your credentials on {date}. Do you want to resume your entry ?
-    lastHarvest: Last harvest
+    harvest: Harvest
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
@@ -594,7 +592,7 @@ sushi:
     |{count} institutions use this endpoint
   nUntestedCredentials: "{count} untested credentials"
   nInvalidCredentials: "{count} invalid credentials"
-  nOperationalCredentials: "{count} operational credentials"
+  nOperationalCredentials: "{count} valid credentials"
   nProblematicEndpoints: >
     1 problematic endpoint
     |{count} problematic endpoints

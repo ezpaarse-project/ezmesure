@@ -92,6 +92,7 @@ services:
       - "./front:/usr/src/app"
     working_dir: /usr/src/app
     environment:
+      - NODE_ENV
       - NUXT_PUBLIC_CURRENT_INSTANCE
       - NUXT_PUBLIC_SUPPORT_MAIL
       - NUXT_PUBLIC_SHIBBOLETH_DISABLED

@@ -7,7 +7,7 @@
       <v-menu
         v-model="isCredentialsMenuOpen"
         :close-on-content-click="false"
-        max-width="800"
+        width="75vw"
       >
         <template #activator="{ props: menu }">
           <v-chip

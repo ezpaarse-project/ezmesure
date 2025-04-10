@@ -682,6 +682,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       const createdJobs = await createJobs(buffer);
       yield* createdJobs;
     }
+
+    this.triggerHooks('harvest-session:start', session);
   }
 
   /**
@@ -739,5 +741,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       const canceledJob = await cancelJobs(buffer);
       yield* canceledJob;
     }
+
+    this.triggerHooks('harvest-session:stop', session);
   }
 };
