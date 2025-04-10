@@ -120,6 +120,7 @@
                     :label="$t('harvest.jobs.reportType')"
                     variant="underlined"
                     hide-details="auto"
+                    autofocus
                   />
                 </v-form>
               </v-col>
