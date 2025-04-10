@@ -217,7 +217,7 @@ const supportedReports = computed(() => {
     ];
   });
 
-  return new Map([...legacySupported, legacyAdditional, ...supported]);
+  return new Map([...legacySupported, ...legacyAdditional, ...supported]);
 });
 
 const unsupportedReports = computed(() => {
