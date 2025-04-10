@@ -123,6 +123,8 @@ router.route({
     },
     body: Joi.object({
       restartAll: Joi.boolean().default(false),
+      forceRefreshSupported: Joi.boolean().default(false),
+      dryRun: Joi.boolean().default(false),
     }),
   },
 });
