@@ -92,7 +92,7 @@
         :disabled="!valid"
         :loading="saving"
         type="submit"
-        form="endpointForm"
+        form="userForm"
         variant="elevated"
         color="primary"
       />
@@ -127,7 +127,7 @@ const user = ref({ ...(props.modelValue ?? {}) });
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
-const isEditing = computed(() => !!props.modelValue?.id);
+const isEditing = computed(() => !!props.modelValue?.username);
 
 async function save() {
   saving.value = true;

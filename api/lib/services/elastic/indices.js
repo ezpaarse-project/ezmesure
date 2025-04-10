@@ -5,7 +5,7 @@ const elastic = require('.');
  *
  * @param {string} indexName - index name.
  * @param {Object} opts - options.
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index.
  */
@@ -21,7 +21,7 @@ exports.get = async function getIndex(indexName, opts, requestConfig) {
  *
  * @param {string} indexName - index name.
  * @param {string} mapping - mapping of index.
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index created.
  */
@@ -33,10 +33,27 @@ exports.create = async function createIndex(indexName, mapping, requestConfig) {
 };
 
 /**
+ * Create an alias in elastic.
+ *
+ * @param {string} aliasName The name of the alias
+ * @param {string} indexName The name of the index targeted by the alias
+ * @param {object} [filter] The filter for the alias
+ * @param {object} [requestConfig] config of request (timeouts, headers, ignore, and so on).
+ *
+ * @returns {Promise<>} alias created
+ */
+exports.upsertAlias = async function upsertAlias(aliasName, indexName, filter, requestConfig) {
+  return elastic.indices.putAlias({
+    name: aliasName,
+    index: indexName,
+    body: filter ? { filter } : undefined,
+  }, requestConfig);
+};
+/**
  * delete index in elastic.
  *
  * @param {string} indexName - index name.
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index.
  */
@@ -47,9 +64,21 @@ exports.delete = async function deleteIndex(indexName, requestConfig) {
 };
 
 /**
+ * Delete an alias in elastic.
+ *
+ * @param {string} aliasName The name of the alias
+ * @param {object} [requestConfig] config of request (timeouts, headers, ignore, and so on).
+ *
+ * @returns {Promise<>} alias deleted
+ */
+exports.deleteAlias = async function deleteAlias(aliasName, requestConfig) {
+  return elastic.indices.deleteAlias({ name: aliasName }, requestConfig);
+};
+
+/**
  * delete all indices in elastic.
  *
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index.
  */
@@ -72,7 +101,7 @@ exports.removeAll = async function removeAllIndices(requestConfig) {
  * get stats of indices in elastic.
  *
  * @param {Object} body - body of search.
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index.
  */
@@ -84,7 +113,7 @@ exports.stats = async function statsIndices(body, requestConfig) {
  * check if index exist in elastic.
  *
  * @param {string} indexName - index name.
- * @param {Object} requestConfig - config of request (timeouts, headers, ignore, and so on).
+ * @param {Object} [requestConfig] - config of request (timeouts, headers, ignore, and so on).
  *
  * @return {Promise<>} index.
  */

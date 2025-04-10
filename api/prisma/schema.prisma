@@ -60,6 +60,8 @@ model Institution {
   childInstitutions   Institution[]         @relation("ParentInstitution")
   /// Institution repositories
   repositories        Repository[]
+  /// Institution aliases
+  repositoryAliases        RepositoryAlias[]
   /// Custom properties
   customProps         InstitutionProperty[]
 }
@@ -154,6 +156,8 @@ model Membership {
   spacePermissions      SpacePermission[]
   /// Permissions of the user for the institution repositories
   repositoryPermissions RepositoryPermission[]
+  /// Permissions of the user for the institution aliases
+  repositoryAliasPermissions RepositoryAliasPermission[]
   /// Whether the membership can be modified or not by non-admins
   locked                Boolean                @default(false)
   /// Abritrary comment about the membership
@@ -224,6 +228,8 @@ model Repository {
   type         String                 @db.VarChar(50)
   /// Member permissions associated to this repository
   permissions  RepositoryPermission[]
+  /// Aliases associated to this repository
+  aliases RepositoryAlias[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -244,6 +250,44 @@ model RepositoryPermission {
   locked            Boolean    @default(false)
 
   @@id([username, institutionId, repositoryPattern])
+}
+
+/// A repository alias (alias for a section of elasticsearch)
+model RepositoryAlias {
+  /// The institution this repository is associated to
+  institutions Institution[]
+  /// Creation date
+  createdAt    DateTime               @default(now())
+  /// Latest update date
+  updatedAt    DateTime               @updatedAt
+  /// The alias pattern (ex: b-bibcnrs*)
+  pattern      String                 @id
+  /// The repository's pattern targeted by alias
+  target       String
+  /// The repository
+  repository        Repository @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters      Json?
+  /// Member permissions associated to this alias
+  permissions  RepositoryAliasPermission[]
+}
+
+/// A alias permission (access rights of a member for a specific alias)
+model RepositoryAliasPermission {
+  /// Username of the member
+  username          String
+  /// Institution of the member
+  institutionId     String
+  /// The member
+  membership        Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  /// Pattern of the alias
+  aliasPattern String
+  /// The alias
+  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the permission can be modified or not
+  locked            Boolean    @default(false)
+
+  @@id([username, institutionId, aliasPattern])
 }
 
 /// Represent the actions that are triggered
@@ -340,6 +384,10 @@ model HarvestJob {
   sessionId       String
   /// Session that created the job
   session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// Beginning of the requested period, may differ from session's cause of supported periods
+  beginDate       String
+  /// End of the requested period, may differ from session's cause of supported periods
+  endDate         String
   /// Index where the harvested data should be inserted
   index           String
   /// Job running time
@@ -447,8 +495,8 @@ model SushiEndpoint {
   tags                      String[]
   /// Description of the endpoint
   description               String?
-  /// Counter version of the SUSHI service
-  counterVersion            String?
+  /// Counter versions of the SUSHI service
+  counterVersions           String[]           @default(["5"])
   /// Technical provider of the endpoint (ex: Atypon)
   technicalProvider         String?
   /// Whether the endpoint is active and can be harvested
@@ -473,18 +521,24 @@ model SushiEndpoint {
   defaultApiKey             String?
   /// Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")
   paramSeparator            String?
-  /// List report IDs that are supported by the endpoint
+  /// [Deprecated] List report IDs that are supported by the endpoint
   supportedReports          String[]
-  /// List of report IDs that should be ignored, even if the endpoint indicates that they are supported
+  /// [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported
   ignoredReports            String[]
-  /// Additional report IDs to be added to the list of supported reports provided by the endpoint
+  /// [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint
   additionalReports         String[]
-  /// Date on which the list of supported reports was last updated
+  /// [Deprecated] Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
+  /// List of reports that are supported (or unsupported) by the endpoint, with periods available
+  supportedData             Json               @default("{}")
+  /// Date on which the list of supported data was last updated
+  supportedDataUpdatedAt    DateTime?
   /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
   harvestDateFormat         String?
   /// Report used when testing endpoint
   testedReport              String?
+  /// Id of platform in https://registry.countermetrics.org
+  registryId                String?
   /// SUSHI credentials associated with the endpoint
   credentials               SushiCredentials[]
   /// Additionnal default parameters. Each param has a name, a value, and a scope.

@@ -171,7 +171,8 @@
           isGroupOpen,
         }"
       >
-        <tr>
+        <!-- eslint-disable-next-line vue/no-lone-template -->
+        <tr :ref="registerGroup(item, isGroupOpen, toggleGroup)">
           <td :colspan="columns.length" class="bg-grey-lighten-3">
             <div class="d-flex align-center">
               <v-checkbox
@@ -202,6 +203,34 @@
         </tr>
       </template>
 
+      <template #[`header.harvests`]="{ column: { title } }">
+        <div>{{ title }}</div>
+
+        <div class="d-flex justify-center align-center">
+          <v-btn
+            :disabled="status === 'pending'"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-left"
+            @click="currentHarvestYear -= 1"
+          />
+
+          <span class="mx-3">
+            {{ currentHarvestYear }}
+          </span>
+
+          <v-btn
+            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-right"
+            @click="currentHarvestYear += 1"
+          />
+        </div>
+      </template>
+
       <template #[`item.packages`]="{ value }">
         <v-chip
           v-for="(pkg, index) in value"
@@ -224,6 +253,8 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
+          :endpoint="endpoint"
+          :current-year="currentHarvestYear"
           @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
       </template>
@@ -351,10 +382,13 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
+const maxHarvestYear = new Date().getFullYear();
+
 const { params } = useRoute();
 const { t, locale } = useI18n();
 const { addToCheck } = useSushiCheckQueueStore();
 const { isSupported: clipboard, copy } = useClipboard();
+const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
 const search = ref('');
@@ -362,6 +396,7 @@ const filters = ref({});
 const sushiMetrics = ref(undefined);
 const loading = ref(false);
 const selectedInstitutions = ref([]);
+const currentHarvestYear = ref(maxHarvestYear);
 
 const endpointFormDialogRef = useTemplateRef('endpointFormDialogRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
@@ -408,7 +443,7 @@ const headers = computed(() => [
     align: 'center',
   },
   {
-    title: t('institutions.sushi.lastHarvest'),
+    title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
     width: '230px',
@@ -523,7 +558,6 @@ async function toggleActiveStates() {
   loading.value = true;
   try {
     const active = !endpoint.value.active;
-    // eslint-disable-next-line no-await-in-loop
     await $fetch(`/api/sushi-endpoints/${endpoint.value.id}`, {
       method: 'PATCH',
       body: { active },
@@ -638,8 +672,57 @@ async function resetConnectionsOfInstitutions() {
   await resetConnections(items);
 }
 
+// Map to keep track of groups in v-datatable
+const vDataTableGroups = new Map();
+/**
+ * Register group of v-datatable
+ *
+ * @see https://github.com/vuetifyjs/vuetify/issues/17707
+ *
+ * @param {Object} item Vuetify group
+ * @param {Function} isGroupOpen Function to check if group is open (provided by Vuetify)
+ * @param {Function} toggleGroup Function to open group (provided by Vuetify)
+ */
+function registerGroup(item, isGroupOpen, toggleGroup) {
+  if (vDataTableGroups.has(item.id)) {
+    return;
+  }
+
+  vDataTableGroups.set(item.id, {
+    item,
+    get isOpened() { return isGroupOpen(item); },
+    toggleGroup: () => toggleGroup(item),
+  });
+}
+
+/**
+ * Toggle all v-datatable group state
+ *
+ * @param state The state to set
+ */
+function toggleAllGroups(state) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const group of vDataTableGroups.values()) {
+    if (group.isOpened !== state) {
+      try {
+        group.toggleGroup();
+      } catch (e) {
+        console.error('Unable to open group', group.item, e);
+      }
+    }
+  }
+}
+
 watchOnce(
   sushis,
   () => calcSushiMetrics(),
+);
+
+watchOnce(
+  () => status.value === 'success',
+  async () => {
+    await nextTick();
+    toggleAllGroups(true);
+  },
 );
 </script>

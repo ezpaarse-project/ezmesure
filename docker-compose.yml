@@ -143,10 +143,11 @@ services:
     ports:
       - 8080:8080
     environment:
-      - API_URL=https://${EZMESURE_DOMAIN}/api
-      - EZMESURE_DISABLE_SHIBBOLETH
-      - PORT=8080
+      - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_SUPPORT_MAIL
+      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
       - HOST=0.0.0.0
+      - PORT=8080
     restart: unless-stopped
 
   rp:
@@ -178,7 +179,7 @@ services:
     restart: unless-stopped
 
   reporting:
-    image: ghcr.io/ezpaarse-project/ezreeport-report:1.3.1
+    image: ghcr.io/ezpaarse-project/ezreeport-api:2.0.0
     environment:
       - http_proxy
       - https_proxy
@@ -220,7 +221,7 @@ services:
     restart: unless-stopped
 
   reporting-mail:
-    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.2.2
+    image: ghcr.io/ezpaarse-project/ezreeport-mail:1.3.0
     environment:
       # node
       - NODE_ENV

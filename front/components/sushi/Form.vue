@@ -94,6 +94,7 @@
                       :hint="$t('institutions.sushi.packagesDescription')"
                       :items="availablePackages"
                       :loading="loadingPackages && 'primary'"
+                      :rules="[(v) => v.length <= 1 || $t('institutions.sushi.onlyOnePackage')]"
                       prepend-icon="mdi-tag"
                       variant="underlined"
                       multiple
@@ -155,7 +156,7 @@
             :disabled="!valid"
             :loading="loading"
             :text="connectionStatus.text"
-            :color="connectionStatus.color || 'primary'"
+            :color="connectionStatus.color || 'accent'"
             :append-icon="connectionStatus.icon"
             :variant="!sushi.connection ? 'elevated' : 'tonal'"
             v-bind="menu"
@@ -245,7 +246,7 @@ const connectionStatus = computed(() => {
   if (!sushi.value.connection) {
     return {
       text,
-      color: 'primary',
+      color: 'accent',
     };
   }
 

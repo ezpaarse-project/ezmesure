@@ -178,6 +178,11 @@ exports.startOne = async (ctx) => {
   ctx.action = 'harvest-sessions/start';
   ctx.type = 'json';
   const { harvestId } = ctx.params;
+  const {
+    restartAll = false,
+    forceRefreshSupported = false,
+    dryRun = false,
+  } = ctx.request.body;
 
   const harvestSessionService = new HarvestSessionService();
 
@@ -195,10 +200,11 @@ exports.startOne = async (ctx) => {
     return;
   }
 
-  const harvestJobs = harvestSessionService.start(
-    session,
-    { restartAll: ctx.request.body?.restartAll ?? false },
-  );
+  const harvestJobs = harvestSessionService.start(session, {
+    restartAll,
+    forceRefreshSupported,
+    dryRun,
+  });
 
   const now = new Date();
   const jobs = [];
@@ -206,18 +212,21 @@ exports.startOne = async (ctx) => {
   // eslint-disable-next-line no-restricted-syntax
   for await (const harvestJob of harvestJobs) {
     jobs.push(harvestJob);
-    const job = await harvestQueue.getJob(harvestJob.id);
-    if (job) {
-      await job.moveToDelayed(now + 100);
-      // eslint-disable-next-line no-continue
-      continue;
-    }
 
-    await harvestQueue.add(
-      'harvest',
-      { taskId: harvestJob.id, timeout: session.timeout },
-      { jobId: harvestJob.id },
-    );
+    if (!dryRun) {
+      const job = await harvestQueue.getJob(harvestJob.id);
+      if (job) {
+        await job.moveToDelayed(now + 100);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      await harvestQueue.add(
+        'harvest',
+        { taskId: harvestJob.id, timeout: session.timeout },
+        { jobId: harvestJob.id },
+      );
+    }
   }
 
   ctx.status = 201;

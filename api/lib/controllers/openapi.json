@@ -63,6 +63,9 @@
       "name": "Repositories"
     },
     {
+      "name": "Repository Aliases"
+    },
+    {
       "name": "Sushi"
     },
     {
@@ -693,6 +696,105 @@
           }
         }
       },
+      "RepositoryAlias": {
+        "description": "Represent a ElasticSearch alias",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "institution": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Institution",
+                "nullable": true
+              }
+            ]
+          },
+          "repository": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Repository",
+                "nullable": true
+              }
+            ]
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "institutionId": {
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "type": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "field", "isNot"],
+              "properties": {
+                "name": { "type": "string" },
+                "field": { "type": "string" },
+                "isNot": { "type": "boolean" },
+                "value": {
+                  "nullable": true,
+                  "allOf": [
+                    { "type": "string" },
+                    { "type": "array", "items": { "type": "string" } }
+                  ]
+                }
+              }
+            },
+            "nullable": true
+          },
+          "permissions": {
+            "readOnly": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RepositoryAliasPermission"
+            }
+          }
+        }
+      },
+      "RepositoryAliasPermission": {
+        "description": "Represent permissions of a user for an alias",
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User",
+            "readOnly": true
+          },
+          "alias": {
+            "$ref": "#/components/schemas/RepositoryAlias",
+            "readOnly": true
+          },
+          "permissions": {
+            "description": "User permissions for the repository",
+            "type": "string",
+            "enum": [
+              "read",
+              "read_write"
+            ]
+          },
+          "locked": {
+            "description": "Whether the permission can be modified by admins only",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "Action": {
         "description": "Represent an activity associated to an institution",
         "type": "object",
@@ -1186,15 +1288,14 @@
               "null"
             ]
           },
-          "counterVersion": {
+          "counterVersions": {
             "description": "The COUNTER version supported by the endpoint",
-            "type": "string",
-            "enum": [
-              "string",
-              "null"
-            ],
-            "example": "5.0.1",
-            "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?$"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "5.1.0.1",
+              "pattern": "^[0-9]+(\\.[0-9]+(\\.[0-9]+(\\.[0-9]+)?)?)?$"
+            }
           },
           "technicalProvider": {
             "description": "The technical provider that operates the SUSHI endpoint",
@@ -4550,6 +4651,222 @@
         }
       }
     },
+    "/institutions/{id}/repository-aliases": {
+      "get": {
+        "summary": "Get institution repository aliases",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RepositoryAlias"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-institutions-:id-repository-aliases",
+        "description": "Get the repository aliases of an institution. Must be either admin or have read access to members."
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the institution"
+        }
+      ]
+    },
+    "/institutions/{id}/repository-aliases/{pattern}": {
+      "delete": {
+        "summary": "Unlink a repository from an institution",
+        "operationId": "delete-institutions-id-repository-aliases-pattern",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Link a repository to an institution",
+        "operationId": "put-institutions-id-repository-aliases-pattern",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repository-aliases/{pattern}/permissions": {
+      "put": {
+        "summary": "Set repository permissions",
+        "operationId": "put-institutions-id-repository-aliases-pattern-permissions",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "readonly": {
+                      "description": "Whether the user has read of read/write access to the space",
+                      "type": "boolean"
+                    },
+                    "locked": {
+                      "description": "Whether the permission can be modified by admins only",
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/institutions/{id}/repository-aliases/{pattern}/permissions/{username}": {
+      "delete": {
+        "summary": "Remove repository alias permission",
+        "operationId": "delete-institutions-id-repository-aliases-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update repository alias permission",
+        "operationId": "put-institutions-id-repository-aliases-pattern-permissions-username",
+        "tags": [
+          "Institutions",
+          "Repository Aliases"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAliasPermission"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/logs": {
       "get": {
         "tags": [
@@ -6162,6 +6479,442 @@
             "description": "Forbidden"
           }
         }
+      }
+    },
+    "/repository-aliases": {
+      "get": {
+        "operationId": "get-repository-aliases",
+        "summary": "Get all repository aliases",
+        "description": "Get all data repository aliases",
+        "tags": [
+          "Repository Aliases"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RepositoryAliases"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "permissions",
+                  "repository",
+                  "institutions"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "repository",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a repository alias",
+        "description": "Create a new data alias",
+        "operationId": "post-repository-aliases",
+        "tags": [
+          "Repository Aliases"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RepositoryAlias"
+                  },
+                  {
+                    "properties": {
+                      "institutionId": {
+                        "readOnly": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repository-aliases/_import": {
+      "post": {
+        "summary": "Import repository alias items",
+        "operationId": "post-repository-aliases-_import",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "integer",
+                      "description": "number of items that failed to be imported"
+                    },
+                    "conflicts": {
+                      "type": "integer",
+                      "description": "number of items that already exists"
+                    },
+                    "created": {
+                      "type": "number",
+                      "description": "number if items that were successfuly imported"
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "operation details for each item",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "import status of the item",
+                            "enum": [
+                              "error",
+                              "conflict",
+                              "created"
+                            ]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "error or conflict message"
+                          },
+                          "data": {
+                            "$ref": "#/components/schemas/RepositoryAlias"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "data"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors",
+                    "conflicts",
+                    "created",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Repository Aliases"
+        ],
+        "description": "Import a list of alias items",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "overwrite",
+            "description": "overwrite item if one with the same ID already exists"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      }
+    },
+    "/repository-aliases/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the repository"
+        },
+        {
+          "name": "include",
+          "description": "",
+          "in": "query",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "permissions",
+                "institutions"
+              ]
+            }
+          }
+        }
+      ],
+      "patch": {
+        "summary": "Update a data alias",
+        "description": "Update a data alias",
+        "operationId": "patch-repository-aliases-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "tags": [
+          "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RepositoryAlias"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a repository alias",
+        "description": "Get a data repository alias",
+        "operationId": "get-repository-alias-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepositoryAlias"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Repository Aliases"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a repository alias",
+        "description": "Delete a data repository alias",
+        "operationId": "delete-repository-alias-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Repository Aliases"
+        ]
       }
     },
     "/roles": {
@@ -9572,7 +10325,7 @@
             }
           },
           {
-            "name": "counterVersion",
+            "name": "counterVersions",
             "in": "query",
             "schema": {
               "type": "array",

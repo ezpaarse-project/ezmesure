@@ -10,7 +10,7 @@
 
     <template #text>
       <v-row>
-        <v-col cols="12" lg="5">
+        <v-col>
           <v-form
             id="spaceForm"
             ref="formRef"

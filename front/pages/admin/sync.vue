@@ -56,28 +56,11 @@
       <v-row>
         <v-col>
           <div class="text-overline primary--text">
-            Kibana
-          </div>
-
-          <v-row>
-            <v-col cols="6">
-              <SyncCard
-                :title="$t('sync.spaces')"
-                :value="syncState?.data?.result?.spaces ?? {}"
-                :expected="syncState?.expected?.spaces ?? 0"
-                :loading="isSynchronizing"
-              />
-            </v-col>
-          </v-row>
-        </v-col>
-
-        <v-col>
-          <div class="text-overline primary--text">
             Elastic
           </div>
 
           <v-row>
-            <v-col cols="6">
+            <v-col>
               <SyncCard
                 :title="$t('sync.repositories')"
                 :value="syncState?.data?.result?.repositories ?? {}"
@@ -86,11 +69,37 @@
               />
             </v-col>
 
-            <v-col cols="6">
+            <v-col>
+              <SyncCard
+                :title="$t('sync.repositoryAliases')"
+                :value="syncState?.data?.result?.repositoryAliases ?? {}"
+                :expected="syncState?.expected?.repositoryAliases ?? 0"
+                :loading="isSynchronizing"
+              />
+            </v-col>
+
+            <v-col>
               <SyncCard
                 :title="$t('sync.users')"
                 :value="syncState?.data?.result?.users ?? {}"
                 :expected="syncState?.expected?.users ?? 0"
+                :loading="isSynchronizing"
+              />
+            </v-col>
+          </v-row>
+        </v-col>
+
+        <v-col cols="3">
+          <div class="text-overline primary--text">
+            Kibana
+          </div>
+
+          <v-row>
+            <v-col>
+              <SyncCard
+                :title="$t('sync.spaces')"
+                :value="syncState?.data?.result?.spaces ?? {}"
+                :expected="syncState?.expected?.spaces ?? 0"
                 :loading="isSynchronizing"
               />
             </v-col>

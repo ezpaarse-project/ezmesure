@@ -183,7 +183,8 @@ exports.activate = async (ctx) => {
   const usersService = new UsersService();
 
   try {
-    await usersService.acceptTerms(user.username);
+    const res = await usersService.acceptTerms(user.username);
+    user.metadata = res.metadata;
   } catch (err) {
     ctx.status = 500;
     appLogger.error(`Failed to update user: ${err}`);
@@ -225,8 +226,11 @@ exports.activate = async (ctx) => {
     }
   }
 
-  ctx.cookies.set(cookie, generateToken(user), { httpOnly: true });
-  ctx.redirect(decodeURIComponent(ctx.query.origin || '/'));
+  const token = generateToken(user);
+  ctx.metadata = { username: user.username };
+  ctx.cookies.set(cookie, token, { httpOnly: true });
+  ctx.body = { ...user, token };
+  ctx.status = 200;
 };
 
 exports.getResetToken = async (ctx) => {
@@ -279,11 +283,15 @@ exports.resetPassword = async (ctx) => {
 
   const usersService = new UsersService();
   const user = await usersService.findUnique({ where: { username } });
+  if (!user) {
+    ctx.throw(404, ctx.$t('errors.auth.noUserFound'));
+    return;
+  }
 
   user.metadata = user.metadata || {};
 
-  if (user?.metadata?.passwordDate) {
-    const tokenIsValid = isBefore(parseISO(user?.metadata?.passwordDate), parseISO(createdAt));
+  if (user.metadata.passwordDate) {
+    const tokenIsValid = isBefore(parseISO(user.metadata.passwordDate), parseISO(createdAt));
 
     if (!tokenIsValid) {
       ctx.throw(400, ctx.$t('errors.password.expires'));
@@ -310,16 +318,38 @@ exports.resetPassword = async (ctx) => {
 
 exports.changePassword = async (ctx) => {
   const { body } = ctx.request;
-  const { password } = body;
+  const { actualPassword, password } = body;
 
   const { username } = ctx.state.user;
 
-  const user = await usersElastic.getUserByUsername(username);
+  // Check if actualPassword is correct
+  const basicString = Buffer.from(`${username}:${actualPassword}`).toString('base64');
+  let esUser;
 
-  if (!user) {
-    ctx.throw(401, ctx.$t('errors.auth.unableToFetchUser'));
+  try {
+    const response = await elastic.security.authenticate({}, {
+      headers: {
+        authorization: `Basic ${basicString}`,
+      },
+    });
+    esUser = response && response.body;
+  } catch (e) {
+    ctx.throw(e.statusCode || 500, e.message);
     return;
   }
+
+  if (!esUser) {
+    ctx.throw(401);
+    return;
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  if (esUser.metadata && esUser.metadata._reserved) {
+    ctx.throw(403, ctx.$t('errors.auth.reservedUser'));
+    return;
+  }
+
+  // Update password
 
   await usersElastic.updatePassword(username, password);
 

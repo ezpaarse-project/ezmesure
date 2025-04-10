@@ -46,6 +46,17 @@
       </template>
     </v-card-subtitle>
 
+    <div v-if="allowedActions.institution" class="px-4 mt-2">
+      <v-btn
+        :text="$t('institutions.modify')"
+        prepend-icon="mdi-pencil"
+        color="blue"
+        variant="flat"
+        block
+        @click="$emit('click:update', institution)"
+      />
+    </div>
+
     <div class="bg-primary">
       <div class="d-flex justify-space-evenly mt-2 py-2">
         <v-btn
@@ -65,7 +76,7 @@
         />
 
         <v-btn
-          :text="$t('menu.report')"
+          :text="$t('institutions.reports.reports')"
           :to="`/myspace/institutions/${institution.id}/reports`"
           :disabled="!allowedActions.reports"
           prepend-icon="mdi-file-chart-outline"
@@ -140,16 +151,6 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </v-card-text>
-
-    <v-card-actions v-if="allowedActions.institution">
-      <v-btn
-        :text="$t('modify')"
-        prepend-icon="mdi-pencil"
-        color="blue"
-        block
-        @click="$emit('click:update', institution)"
-      />
-    </v-card-actions>
   </v-card>
 </template>
 

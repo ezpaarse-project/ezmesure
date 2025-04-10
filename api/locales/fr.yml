@@ -11,7 +11,7 @@ errors:
 
   harvest:
     noTarget: Veuillez spécifier un index cible, ou associer un préfixe à l'établissement [%s]
-    taskExists: "L'item SUSHI [%s] a déjà une tâche associée (statut: [%s])"
+    taskExists: "Les identifiants COUNTER [%s] ont déjà une tâche associée (statut: [%s])"
     invalidDate: La date [%s] est invalide
     invalidPeriod: La période [de %s à %s] est invalide
     failedToUpdateSupportedReports: La mise à jour de la liste des rapports disponibles a échoué
@@ -31,25 +31,25 @@ errors:
     noUserFound: Utilisateur introuvable
 
   sushi-endpoint:
-    notFound: Point d'accès introuvable
+    notFound: Point d'accès COUNTER introuvable
 
     import:
-      alreadyExists: Le point d'accès [%s] existe déjà
+      alreadyExists: Le point d'accès COUNTER [%s] existe déjà
 
   sushi:
-    unauthorized: Vous n'êtes pas autorisé à gérer les identifiants SUSHI
-    institutionNotValidated: "Impossible de gérer les identifiants SUSHI : l'établissement n'est pas validé"
-    notFound: Item SUSHI introuvable
-    emptyEndpointResponse: Le point d'accès SUSHI a retourné une réponse vide
-    invalidResponse: Le point d'accès SUSHI a retourné des données invalides
+    unauthorized: Vous n'êtes pas autorisé à gérer les identifiants COUNTER
+    institutionNotValidated: "Impossible de gérer les identifiants COUNTER : l'établissement n'est pas validé"
+    notFound: Item COUNTER introuvable
+    emptyEndpointResponse: Le point d'accès COUNTER a retourné une réponse vide
+    invalidResponse: Le point d'accès COUNTER a retourné des données invalides
     notJsonResponse: "La réponse du point d'accès n'est pas au format JSON (type: %s)"
     badStatus: Le point d'accès a répondu avec un code %s %s
     requestFailed: La requête a échoué pour une raison indéterminée
-    managementLocked: La gestion des identifiants SUSHI est actuellement verrouillée
+    managementLocked: La gestion des identifiants COUNTER est actuellement verrouillée
 
     import:
-      belongsToAnother: L'item SUSHI [%s] appartient à un autre établissement
-      alreadyExists: L'item SUSHI [%s] existe déjà
+      belongsToAnother: Les identifiants COUNTER [%s] appartiennent à un autre établissement
+      alreadyExists: Les identifiants COUNTER [%s] existent déjà
 
   task:
     notFound: Tâche introuvable
@@ -59,9 +59,14 @@ errors:
     cannotCancelJobWithoutPID: Impossible d'annuler la tâche, le processus n'est pas identifiable
 
   repository:
-    notFound: Dépôt introuvable
-    alreadyExists: Le dépôt [%s] est déjà associé à l'établissement
-    typeMismatch: Un dépôt [%s] de type différent existe déjà
+    notFound: Entrepôt introuvable
+    alreadyExists: Le entrepôt [%s] est déjà associé à l'établissement
+    typeMismatch: Un entrepôt [%s] de type différent existe déjà
+
+  repositoryAlias:
+    notFound: Alias introuvable
+    alreadyExists: L'alias [%s] est déjà associé à l'établissement
+    targetMismatch: Un alias [%s] représentant un entrepôt différent existe déjà
 
   institution:
     notFound: Établissement introuvable

@@ -12,6 +12,11 @@
         prepend-icon="mdi-database"
       />
       <v-list-item
+        :title="$t('menu.repositoryAliases')"
+        to="/admin/repository-aliases"
+        prepend-icon="mdi-database-eye"
+      />
+      <v-list-item
         :title="$t('menu.spaces')"
         to="/admin/spaces"
         prepend-icon="mdi-tab"

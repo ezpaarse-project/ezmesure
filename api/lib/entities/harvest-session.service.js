@@ -414,7 +414,13 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const jobsPerCredential = await Promise.all(
       credentialsToHarvest.map(async (credentials) => {
         const { endpoint, institution } = credentials;
-        let harvestedReportTypes = [...reportTypes];
+        /** @type {Record<string, { beginDate: string, endDate: string } | undefined>} */
+        let harvestedReportTypes = Object.fromEntries(
+          reportTypes.map((reportType) => [reportType, {
+            beginDate: session.beginDate,
+            endDate: session.endDate,
+          }]),
+        );
 
         // Get index for institution
         let index = institutionIndices.get(institution.id) || '';
@@ -436,25 +442,44 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           institutionIndices.set(institution.id, index);
         }
 
-        // Get supported reports
-        const {
-          supportedReportsUpdatedAt,
-          ignoredReports,
-          additionalReports,
-        } = endpoint;
+        // [DEPRECATED] Use old way to get supported data
+        const oldSupportedData = {};
+        const { supportedReports, ignoredReports, additionalReports } = endpoint;
+        supportedReports.forEach((rId) => {
+          const current = oldSupportedData[rId] ?? {};
+          oldSupportedData[rId] = { ...current, supported: { value: true, raw: true } };
+        });
+        additionalReports.forEach((rId) => {
+          const current = oldSupportedData[rId] ?? {};
+          oldSupportedData[rId] = { ...current, supported: { value: true, manual: true } };
+        });
+        ignoredReports.forEach((rId) => {
+          const current = oldSupportedData[rId] ?? {};
+          oldSupportedData[rId] = { ...current, supported: { value: false, manual: true } };
+        });
 
-        const oneMonthAgo = subMonths(new Date(), 1);
-
-        let supportedReports = [];
-        if (Array.isArray(endpoint.supportedReports)) {
-          supportedReports = endpoint.supportedReports;
+        // Get supported data
+        const { supportedDataUpdatedAt } = endpoint;
+        let supportedData = oldSupportedData;
+        if (
+          endpoint.supportedData
+          && typeof endpoint.supportedData === 'object'
+          && !Array.isArray(endpoint.supportedData)
+        ) {
+          const manualOldData = Object.fromEntries(
+            Object.entries(oldSupportedData).filter(([, params]) => params?.supported?.manual),
+          );
+          supportedData = { ...oldSupportedData, ...endpoint.supportedData, ...manualOldData };
         }
 
-        if (
-          !supportedReportsUpdatedAt
-            || !isValidDate(supportedReportsUpdatedAt)
-            || isBefore(supportedReportsUpdatedAt, oneMonthAgo)
-        ) {
+        const oneMonthAgo = subMonths(new Date(), 1);
+        const hasSupportedDataExpired = options.forceRefreshSupported
+          || !supportedDataUpdatedAt
+          || !isValidDate(supportedDataUpdatedAt)
+          || isBefore(supportedDataUpdatedAt, oneMonthAgo);
+
+        // Get supported reports
+        if (hasSupportedDataExpired) {
           appLogger.verbose(`Updating supported SUSHI reports of [${credentials.endpoint.vendor}]`);
 
           const isValidReport = (report) => (report.Report_ID && report.Report_Name);
@@ -466,7 +491,56 @@ module.exports = class HarvestSessionService extends BasePrismaService {
               throw new Error('invalid response body');
             }
 
-            supportedReports = data.map((report) => report.Report_ID.toLowerCase());
+            const list = new Map(data.map((report) => [report.Report_ID.toLowerCase(), report]));
+
+            // Remove unsupported reports
+            Object.entries(supportedData).forEach(([reportId, params]) => {
+              const { supported = {} } = params ?? {};
+
+              supported.raw = false;
+              if (!list.has(reportId) && !supported.manual) {
+                supported.value = false;
+              }
+
+              supportedData[reportId] = {
+                ...params,
+                supported,
+              };
+            });
+
+            // Update supported data
+            data.forEach((report) => {
+              const reportId = report.Report_ID.toLowerCase();
+
+              const {
+                supported = {},
+                firstMonthAvailable = {},
+                lastMonthAvailable = {},
+                ...otherParams
+              } = supportedData[reportId] ?? {};
+
+              supported.raw = true;
+              if (supported.manual !== true) {
+                supported.value = true;
+              }
+
+              firstMonthAvailable.raw = report.First_Month_Available;
+              if (firstMonthAvailable.manual !== true) {
+                firstMonthAvailable.value = report.First_Month_Available;
+              }
+
+              lastMonthAvailable.raw = report.Last_Month_Available;
+              if (lastMonthAvailable.manual !== true) {
+                lastMonthAvailable.value = report.Last_Month_Available;
+              }
+
+              supportedData[reportId] = {
+                supported,
+                firstMonthAvailable,
+                lastMonthAvailable,
+                ...otherParams,
+              };
+            });
           } catch (e) {
             appLogger.warn(`Failed to update supported reports of [${endpoint.vendor}] (Reason: ${e.message})`);
           }
@@ -474,43 +548,57 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           await endpointsService.update({
             where: { id: credentials.endpoint.id },
             data: {
-              supportedReports,
-              supportedReportsUpdatedAt: new Date(),
+              supportedData,
+              supportedDataUpdatedAt: new Date(),
+              // Remove deprecated fields to ease migration
+              supportedReports: [],
+              ignoredReports: [],
+              additionalReports: [],
             },
           });
         }
 
-        const supportedReportsSet = new Set([
-          // If there's no support list available, assume the default list is supported
-          ...(supportedReports.length > 0 ? supportedReports : defaultHarvestedReports),
-          ...additionalReports,
-        ]);
-        const ignoredReportsSet = new Set(ignoredReports);
-
         if (!session.downloadUnsupported) {
-          // Filter supported reports based on session params
-          if (supportedReportsSet.size > 0) {
-            harvestedReportTypes = harvestedReportTypes.filter(
-              (reportId) => supportedReportsSet.has(reportId),
-            );
-          }
+          const isSessionBeforeAvailable = (limit) => limit && isBefore(session.beginDate, limit);
+          const isSessionAfterAvailable = (limit) => limit && isBefore(limit, session.endDate);
 
-          // Remove reports that should be ignored
-          if (ignoredReportsSet.size > 0) {
-            harvestedReportTypes = harvestedReportTypes.filter(
-              (reportId) => !ignoredReportsSet.has(reportId),
-            );
-          }
+          // Filter supported reports based on session params
+          harvestedReportTypes = Object.fromEntries(
+            Object.entries(harvestedReportTypes).map(([reportId, params]) => {
+              const {
+                supported = {},
+                firstMonthAvailable = {},
+                lastMonthAvailable = {},
+              } = supportedData[reportId] ?? {};
+              if (!params || !supported.value) {
+                return [reportId, undefined];
+              }
+
+              let { beginDate, endDate } = params;
+              if (isSessionBeforeAvailable(firstMonthAvailable.value)) {
+                beginDate = firstMonthAvailable.value;
+              }
+
+              if (isSessionAfterAvailable(lastMonthAvailable.value)) {
+                endDate = lastMonthAvailable.value;
+              }
+
+              return [reportId, { ...params, beginDate, endDate }];
+            }),
+          );
         }
 
-        return harvestedReportTypes.map((reportType) => ({
-          /** @type {HarvestJobStatus} */
-          status: 'waiting',
-          credentials: { id: credentials.id },
-          session: { id: session.id },
-          reportType,
-          index,
-        }));
+        return Object.entries(harvestedReportTypes)
+          .filter(([, params]) => !!params)
+          .map(([reportType, params]) => ({
+            ...params,
+            /** @type {HarvestJobStatus} */
+            status: 'waiting',
+            credentials: { id: credentials.id },
+            session: { id: session.id },
+            reportType,
+            index,
+          }));
       }),
     );
 
@@ -524,6 +612,14 @@ module.exports = class HarvestSessionService extends BasePrismaService {
     const createJobs = async (jobs) => HarvestJobsService.$transaction(
       async (service) => Promise.all(
         jobs.map(async (data) => {
+          if (options.dryRun) {
+            return {
+              ...data,
+              credentialsId: data.credentials.id,
+              sessionId: data.session.id,
+            };
+          }
+
           const job = await service.findFirst({
             where: {
               ...data,
@@ -534,7 +630,11 @@ module.exports = class HarvestSessionService extends BasePrismaService {
           if (job) {
             return service.update({
               where: { id: job.id },
-              data: { status: 'waiting' },
+              data: {
+                status: 'waiting',
+                beginDate: data.beginDate,
+                endDate: data.endDate,
+              },
             });
           }
           // if not, create new job
@@ -553,10 +653,12 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       ),
     );
 
-    await this.update({
-      where: { id: session.id },
-      data: { startedAt: new Date() },
-    });
+    if (!options.dryRun) {
+      await this.update({
+        where: { id: session.id },
+        data: { startedAt: new Date() },
+      });
+    }
 
     let buffer = [];
     // eslint-disable-next-line no-restricted-syntax
@@ -580,6 +682,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       const createdJobs = await createJobs(buffer);
       yield* createdJobs;
     }
+
+    this.triggerHooks('harvest-session:start', session);
   }
 
   /**
@@ -637,5 +741,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       const canceledJob = await cancelJobs(buffer);
       yield* canceledJob;
     }
+
+    this.triggerHooks('harvest-session:stop', session);
   }
 };

@@ -157,6 +157,34 @@ const DEFAULT_REPORT_TYPE = 'tr';
 // https://app.swaggerhub.com/apis/COUNTER/counter-sushi_5_0_api/
 
 /**
+ * Get SUSHI URL for a given COUNTER version
+ *
+ * Some endpoints uses the (non standard) prefix `/r5` for COUNTER 5 while also using `/r51`
+ * for COUNTER 5.1. This methods removes the suffix `/r5` before adding the standard if
+ * using COUNTER 5.1
+ * It also remove the trailing `/`
+ *
+ * @param {import('@prisma/client').SushiEndpoint} endpoint - The endpoint
+ * @param {string} [version=5] - The COUNTER version
+ * @returns
+ */
+function getSushiURL({ sushiUrl }, version = '5') {
+  const versionPrefixRegex = /(\/?r51?)?\/*$/;
+  const domain = sushiUrl.trim().replace(versionPrefixRegex, '');
+  const versionPrefix = versionPrefixRegex.exec(sushiUrl)?.[1];
+
+  switch (version) {
+    case '5':
+      return { domain, baseUrl: `${domain}${versionPrefix || ''}` };
+    case '5.1':
+      return { domain, baseUrl: `${domain}/r51` };
+
+    default:
+      throw new Error(`Unsupported COUNTER version: ${version}`);
+  }
+}
+
+/**
  * Get query parameters of a given SUSHI item
  * @param {SushiCredentials} sushiItem - The SUSHI item
  * @param {Array<string>} scopes - The scopes of the request
@@ -188,14 +216,12 @@ function getSushiParams(sushiItem, scopes = []) {
 /**
  * Get the list of available reports for a given SUSHI item
  * @param {SushiCredentials} sushi - The SUSHI item
+ * @param {string} [version=5] - The COUNTER version
  * @returns {Promise<any>} The endpoint response
  */
-async function getAvailableReports(sushi) {
-  const {
-    sushiUrl,
-  } = sushi?.endpoint || {};
+async function getAvailableReports(sushi, version = '5') {
+  const { baseUrl } = getSushiURL(sushi?.endpoint || {}, version);
 
-  const baseUrl = sushiUrl.trim().replace(/\/+$/, '');
   const allowedScopes = [undefined, 'all', 'report_list'];
   const params = getSushiParams(sushi, allowedScopes);
 
@@ -608,6 +634,7 @@ async function startCleanCron() {
 }
 
 module.exports = {
+  getSushiURL,
   getReportDownloadConfig,
   validateReport,
   getReportFilename,

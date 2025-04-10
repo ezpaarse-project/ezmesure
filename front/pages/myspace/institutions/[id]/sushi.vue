@@ -115,7 +115,7 @@
     <v-data-table-server
       v-model="selectedSushi"
       :headers="headers"
-      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: !(item.active && item.endpoint.active) && 'bg-grey-lighten-4 text-grey' })"
       density="comfortable"
       show-select
       show-expand
@@ -163,22 +163,56 @@
         </div>
       </template>
 
-      <template #[`item.endpoint.vendor`]="{ item }">
-        <div>
-          <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
-            {{ item.endpoint.vendor }}
-          </nuxt-link>
-          <span v-else>{{ item.endpoint.vendor }}</span>
-        </div>
+      <template #[`header.harvests`]="{ column: { title } }">
+        <div>{{ title }}</div>
 
-        <div v-if="!item.endpoint.active" class="d-flex align-center text-caption warning--text">
-          <v-icon
-            icon="mdi-api-off"
-            color="warning"
-            class="mr-1"
+        <div class="d-flex justify-center align-center">
+          <v-btn
+            :disabled="status === 'pending'"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-left"
+            @click="currentHarvestYear -= 1"
           />
 
-          {{ $t('endpoints.inactiveDescription') }}
+          <span class="mx-3">
+            {{ currentHarvestYear }}
+          </span>
+
+          <v-btn
+            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
+            color="primary"
+            variant="text"
+            density="comfortable"
+            icon="mdi-arrow-right"
+            @click="currentHarvestYear += 1"
+          />
+        </div>
+      </template>
+
+      <template #[`item.endpoint.vendor`]="{ item }">
+        <div class="my-2">
+          <div>
+            <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
+              {{ item.endpoint.vendor }}
+            </nuxt-link>
+            <span v-else>{{ item.endpoint.vendor }}</span>
+          </div>
+
+          <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
+
+          <v-chip
+            v-for="tag in item.endpoint.tags ?? []"
+            :key="tag"
+            :text="tag"
+            color="accent"
+            density="comfortable"
+            variant="outlined"
+            size="small"
+            label
+            class="mr-2"
+          />
         </div>
       </template>
 
@@ -205,6 +239,8 @@
         <SushiHarvestStateChip
           v-if="item.harvests?.length > 0"
           :model-value="item.harvests"
+          :endpoint="item.endpoint"
+          :current-year="currentHarvestYear"
           @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
       </template>
@@ -214,19 +250,30 @@
       </template>
 
       <template #[`item.active`]="{ item }">
-        <v-switch
-          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-          :model-value="item.active"
-          :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
-          :loading="activeLoadingMap.get(item.id)"
-          :readonly="!canEdit"
-          density="compact"
-          color="primary"
-          hide-details
-          class="mt-0"
-          style="transform: scale(0.8);"
-          @update:model-value="toggleActiveStates([item])"
-        />
+        <div class="d-flex align-center">
+          <v-switch
+            v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
+            :model-value="item.active"
+            :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
+            :loading="activeLoadingMap.get(item.id)"
+            :readonly="!canEdit"
+            density="compact"
+            color="primary"
+            hide-details
+            class="mt-0"
+            style="transform: scale(0.8);"
+            @update:model-value="toggleActiveStates([item])"
+          />
+
+          <v-spacer />
+
+          <v-icon
+            v-if="!item.endpoint.active"
+            v-tooltip="$t('endpoints.inactiveDescription')"
+            icon="mdi-api-off"
+            color="warning"
+          />
+        </div>
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -375,6 +422,8 @@ definePageMeta({
   alias: ['/admin/institutions/:id/sushi'],
 });
 
+const maxHarvestYear = new Date().getFullYear();
+
 const { params } = useRoute();
 const { data: user } = useAuthState();
 const { t, locale } = useI18n();
@@ -386,6 +435,7 @@ const snacks = useSnacksStore();
 
 const selectedSushi = ref([]);
 const activeLoadingMap = ref(new Map());
+const currentHarvestYear = ref(maxHarvestYear);
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
 const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
@@ -415,6 +465,7 @@ const {
   itemLength,
   query,
   data: sushis,
+  status,
   vDataTableOptions,
 } = await useServerSidePagination({
   fetch: {
@@ -442,7 +493,7 @@ const canEdit = computed(() => {
   if (user.value?.isAdmin) {
     return true;
   }
-  return !isLocked.value && hasPermission('sushi:write', { throwOnNoMembership: true });
+  return !isLocked.value && hasPermission(params.id, 'sushi:write', { throwOnNoMembership: true });
 });
 /**
  * Table headers
@@ -452,6 +503,7 @@ const headers = computed(() => [
     title: t('institutions.sushi.endpoint'),
     value: 'endpoint.vendor',
     sortable: true,
+    maxWidth: '350px',
   },
   {
     title: t('institutions.sushi.packages'),
@@ -462,27 +514,26 @@ const headers = computed(() => [
   {
     title: t('status'),
     value: 'connection',
-    width: '160px',
+    minWidth: '200px',
+    maxWidth: '200px',
     sortable: true,
     align: 'center',
   },
   {
-    title: t('institutions.sushi.lastHarvest'),
+    title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
-    width: '230px',
   },
   {
     title: t('institutions.sushi.updatedAt'),
     value: 'updatedAt',
-    width: '230px',
     sortable: true,
   },
   {
     title: t('endpoints.active'),
     value: 'active',
     align: 'center',
-    width: '130px',
+    minWidth: '130px',
     sortable: true,
   },
   {
@@ -764,4 +815,18 @@ async function deleteSushis(items) {
     },
   });
 }
+
+watchOnce(
+  sushis,
+  (v) => {
+    const harvests = v
+      .flatMap((s) => s.harvests || [])
+      .sort((a, b) => a.period.localeCompare(b.period));
+
+    const lastYear = harvests.at(-1)?.period?.replace(/(-[0-9]{2})*$/, '');
+    if (lastYear) {
+      currentHarvestYear.value = Number.parseInt(lastYear, 10);
+    }
+  },
+);
 </script>

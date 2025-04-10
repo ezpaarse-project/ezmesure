@@ -122,6 +122,8 @@ module.exports = async function process(params) {
     }
   }
 
+  let unauthorizedErrorCode;
+
   if (!report || forceDownload) {
     try {
       await fs.remove(reportPath);
@@ -173,6 +175,10 @@ module.exports = async function process(params) {
 
             if (response?.status !== 200) {
               logs.add('error', `Endpoint responded with status [${response?.status}]`);
+            }
+
+            if (response?.status === 401 || response?.status === 403) {
+              unauthorizedErrorCode = ERROR_CODES.unauthorized;
             }
 
             if (contentType !== 'application/json') {
@@ -228,6 +234,14 @@ module.exports = async function process(params) {
       task.sushiExceptions.push({ code, severity, message: e?.Message });
 
       switch (code) {
+        case SUSHI_CODES.insufficientInformation:
+        case SUSHI_CODES.unauthorizedRequestor:
+        case SUSHI_CODES.unauthorizedRequestorAlt:
+        case SUSHI_CODES.invalidAPIKey:
+        case SUSHI_CODES.unauthorizedIPAddress:
+          logs.add('error', 'Credentials are invalid or missing');
+          unauthorizedErrorCode = `sushi:${code}`;
+          break;
         case SUSHI_CODES.serviceBusy:
           logs.add('warning', 'Endpoint is too busy to respond');
           endpointIsBusy = true;
@@ -275,6 +289,12 @@ module.exports = async function process(params) {
     await steps.update(downloadStep);
     await saveTask();
 
+    if (unauthorizedErrorCode) {
+      throw new HarvestError(
+        'Credentials are invalid or missing',
+        { type: 'auth', cause: { code: unauthorizedErrorCode, exceptions } },
+      );
+    }
     if (endpointIsBusy) {
       throw new HarvestError('Endpoint is busy', { type: 'busy' });
     }

@@ -13,7 +13,7 @@ async function upsertMembershipFromMembership(membership) {
   const body = {
     access: membership.permissions.some((p) => p === 'reporting:write') ? 'READ_WRITE' : 'READ',
   };
-  const { data } = await ezrAxios.put(`/admin/namespaces/${membership.institutionId}/members/${membership.username}`, body);
+  const { data } = await ezrAxios.put(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`, body);
 
   return data?.content;
 }
@@ -24,7 +24,7 @@ async function upsertMembershipFromMembership(membership) {
  * @param {Membership} membership
  */
 async function deleteMembershipFromMembership(membership) {
-  await ezrAxios.delete(`/admin/namespaces/${membership.institutionId}/members/${membership.username}`);
+  await ezrAxios.delete(`/admin/namespaces/${membership.institutionId}/memberships/${membership.username}`);
 }
 
 module.exports = {

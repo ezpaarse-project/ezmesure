@@ -26,6 +26,7 @@ const {
 const memberships = require('./memberships');
 const sushi = require('./sushi');
 const repositories = require('./repositories');
+const repositoryAliases = require('./repository-aliases');
 const spaces = require('./spaces');
 
 const {
@@ -38,6 +39,7 @@ const { validateInstitution } = require('./admin');
 
 router.use(sushi.prefix('/:institutionId/sushi').middleware());
 router.use(repositories.prefix('/:institutionId/repositories').middleware());
+router.use(repositoryAliases.prefix('/:institutionId/repository-aliases').middleware());
 router.use(spaces.prefix('/:institutionId/spaces').middleware());
 router.use(memberships.prefix('/:institutionId/').middleware()); // Weird prefix cause of contact route
 

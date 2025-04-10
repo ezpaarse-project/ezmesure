@@ -20,6 +20,7 @@ const schema = {
   type: Joi.string().trim().min(1),
 
   permissions: Joi.array().items(Joi.object()),
+  aliases: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -30,6 +31,7 @@ const immutableFields = [
   'createdAt',
   'institutions',
   'permissions',
+  'aliases',
 ];
 
 /**
@@ -37,6 +39,7 @@ const immutableFields = [
  */
 const includableFields = [
   'permissions',
+  'aliases',
   'institutions',
 ];
 

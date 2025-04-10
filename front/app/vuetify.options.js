@@ -1,6 +1,5 @@
 /* eslint-disable import/no-unresolved */
 import colors from 'vuetify/util/colors';
-/* eslint-enable import/no-unresolved */
 
 /**
  * @type {import('vuetify-nuxt-module').ModuleOptions}

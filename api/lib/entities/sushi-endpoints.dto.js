@@ -19,7 +19,8 @@ const schema = {
   sushiUrl: Joi.string().uri(),
   vendor: Joi.string().min(1),
   description: Joi.string().allow('').empty(null),
-  counterVersion: Joi.string().allow('').empty(null),
+  counterVersions: Joi.array().items(Joi.string().regex(/^[0-9]+(\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?)?$/)).min(1),
+  registryId: Joi.string().allow('').empty(null),
   technicalProvider: Joi.string().allow('').empty(null),
 
   active: Joi.boolean(),
@@ -46,6 +47,27 @@ const schema = {
   disabledUntil: Joi.date().allow(null),
   supportedReports: Joi.array().items(Joi.string().trim()),
   supportedReportsUpdatedAt: Joi.date().allow(null),
+  supportedData: Joi.object().pattern(
+    Joi.string(), // reportId
+    Joi.object({
+      supported: Joi.object({
+        value: Joi.boolean(),
+        raw: Joi.boolean().optional(),
+        manual: Joi.boolean().optional(),
+      }),
+      firstMonthAvailable: Joi.object({
+        value: Joi.string().regex(/^\d{4}-\d{2}$/),
+        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+        manual: Joi.boolean().optional(),
+      }).optional(),
+      lastMonthAvailable: Joi.object({
+        value: Joi.string().regex(/^\d{4}-\d{2}$/),
+        raw: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+        manual: Joi.boolean().optional(),
+      }).optional(),
+    }),
+  ),
+  supportedDataUpdatedAt: Joi.date().allow(null),
 
   params: Joi.array().items(Joi.object({
     name: Joi.string().trim(),
