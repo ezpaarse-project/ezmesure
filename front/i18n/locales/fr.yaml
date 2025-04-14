@@ -146,6 +146,8 @@ activity:
     sushi: Identifiants COUNTER
     endpoints: Points d'accès COUNTER
     reporting: Reporting
+    spaces: Espaces Kibana
+    harvest: Moissonnage
   actions:
     user/register: Enregistrement
     user/refresh: Mise à jour de profil
@@ -159,6 +161,7 @@ activity:
     institutions/delete: Suppression d'un établissement
     institutions/addMember: Ajout d'un membre
     institutions/removeMember: Révocation d'un membre
+    institutions/import: Import d'établissements
     export/aggregate: Export d'agrégation
     export/counter5: Export COUNTER 5
     events/delete: Suppression partielle d'index
@@ -175,6 +178,7 @@ activity:
     sushi/harvest: Moissonnage COUNTER
     sushi/import: Import d'identifiants COUNTER
     sushi/check-connection: Test de connexion COUNTER
+    spaces/import: Import d'espaces Kibana
     endpoint/create: Création de point d'accès
     endpoint/update: Mise à jour de point d'accès
     endpoint/delete: Suppression de point d'accès
@@ -186,6 +190,11 @@ activity:
     reporting/update: Mise à jour d'une tâche de reporting
     reporting/delete: Suppression d'une tâche de reporting
     reporting/history: Consultation de l'historique d'une tâche de reporting
+    harvest-sessions/create: Création d'une session de moissonnage
+    harvest-sessions/upsert: Insertion d'une session de moissonnage
+    harvest-sessions/start: Démarrage d'une session de moissonnage
+    harvest-sessions/delete: Suppression d'une session de moissonnage
+    harvest-sessions/stop: Arrêt d'une session de moissonnage
 endpoints:
   endpoint: Point d'accès
   toolbarTitle: Point d'accès COUNTER ({count})

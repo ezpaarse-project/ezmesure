@@ -168,6 +168,16 @@
         </v-hover>
       </template>
 
+      <template #[`item.response.status`]="{ value }">
+        <v-chip
+          v-if="value"
+          :text="`${value}`"
+          :color="httpStatusColors.get(value)?.color"
+          :prepend-icon="httpStatusColors.get(value)?.icon"
+          size="small"
+        />
+      </template>
+
       <template #[`item.details`]="{ item }">
         <ActivityItemDetails :model-value="item" />
       </template>
@@ -295,6 +305,11 @@ const headers = computed(() => [
     sortable: true,
   },
   {
+    title: t('status'),
+    value: 'response.status',
+    width: '85px',
+  },
+  {
     title: t('activity.details'),
     value: 'details',
     sortable: false,
@@ -325,6 +340,9 @@ const availableActions = computed(() => {
     'institutions/delete',
     'institutions/addMember',
     'institutions/removeMember',
+    'institutions/import',
+    { header: 'spaces' },
+    'spaces/import',
     { header: 'exports' },
     'export/aggregate',
     'export/counter5',
@@ -349,6 +367,12 @@ const availableActions = computed(() => {
     'endpoint/update',
     'endpoint/delete',
     'endpoint/import',
+    { header: 'harvest' },
+    'harvest-sessions/create',
+    'harvest-sessions/upsert',
+    'harvest-sessions/start',
+    'harvest-sessions/delete',
+    'harvest-sessions/stop',
     { header: 'reporting' },
     'reporting/index',
     'reporting/getDashboards',

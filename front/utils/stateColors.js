@@ -37,3 +37,18 @@ export const counterVersionsColors = new Map([
   ['5', 'rgb(205, 233, 250)'],
   ['5.1', 'rgb(203, 252, 220)'],
 ]);
+
+export const httpStatusColors = {
+  get: (code) => {
+    if (code < 200) {
+      return { color: 'blue', icon: 'mdi-information' };
+    }
+    if (code < 400) {
+      return { color: 'green', icon: 'mdi-check' };
+    }
+    if (code < 600) {
+      return { color: 'red', icon: 'mdi-close' };
+    }
+    return undefined;
+  },
+};
