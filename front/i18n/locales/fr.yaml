@@ -360,6 +360,8 @@ institutions:
     facebookUrl: URL Facebook
     customProperties: Propriétés personnalisées
     propertyName: Nom de propriété
+    noCustomProps: Aucune propriété personnalisée
+    addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
   members:
     noMembers: Aucun membre
     title: Membres ({count})
@@ -1026,3 +1028,5 @@ nbOthers: (+{count} autres)
 unknown: Inconnu
 looseFilter: Les résultats correspondront à l'une des valeurs
 strictFilter: Les résultats correspondront à toutes les valeurs
+loading: Chargement...
+retry: Réessayer
