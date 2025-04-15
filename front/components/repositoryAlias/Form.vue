@@ -17,7 +17,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="alias.pattern"
-                  :label="`${$t('repositories.pattern')} *`"
+                  :label="`${$t('repositoryAliases.alias')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),

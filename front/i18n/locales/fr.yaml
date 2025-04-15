@@ -797,7 +797,8 @@ repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
     |Gérer {count} alias
-  target: Pattern de l'entrepôt
+  alias: Alias
+  target: Pattern de l'entrepôt cible
   filtered: Filtré ?
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
