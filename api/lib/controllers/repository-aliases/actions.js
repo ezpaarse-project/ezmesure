@@ -1,6 +1,7 @@
 const { Prisma } = require('@prisma/client');
 
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
+const RepositoriesService = require('../../entities/repositories.service');
 
 const {
   schema,
@@ -92,13 +93,22 @@ exports.createOne = async (ctx) => {
     configUpsert.update.institutions = { connect: { id: body?.institutionId } };
   }
 
-  const repositoryAliasesService = new RepositoryAliasesService();
-
   try {
-    repository = await repositoryAliasesService.upsert({
-      where: { pattern: body.pattern },
-      ...configUpsert,
-    });
+    repository = await RepositoryAliasesService.$transaction(
+      async (repositoryAliasesService) => {
+        const repositoriesService = new RepositoriesService(repositoryAliasesService);
+        const repo = await repositoriesService.findUnique({ where: { pattern: body.target } });
+
+        if (!repo) {
+          ctx.throw(404, ctx.$t('errors.repository.notFound'));
+        }
+
+        return repositoryAliasesService.upsert({
+          where: { pattern: body.pattern },
+          ...configUpsert,
+        });
+      },
+    );
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       switch (e?.code) {
@@ -123,18 +133,29 @@ exports.updateOne = async (ctx) => {
 
   let updatedRepository;
 
-  const repositoryAliasesService = new RepositoryAliasesService();
-
   try {
-    updatedRepository = await repositoryAliasesService.update({
-      where: {
-        pattern: params.pattern,
+    updatedRepository = await RepositoryAliasesService.$transaction(
+      async (repositoryAliasesService) => {
+        if (body?.target) {
+          const repositoriesService = new RepositoriesService(repositoryAliasesService);
+          const repo = await repositoriesService.findUnique({ where: { pattern: body.target } });
+
+          if (!repo) {
+            ctx.throw(404, ctx.$t('errors.repository.notFound'));
+          }
+        }
+
+        return repositoryAliasesService.update({
+          where: {
+            pattern: params.pattern,
+          },
+          data: {
+            filters: Prisma.DbNull,
+            ...body,
+          },
+        });
       },
-      data: {
-        filters: Prisma.DbNull,
-        ...body,
-      },
-    });
+    );
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       switch (e?.code) {
