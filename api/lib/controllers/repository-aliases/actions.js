@@ -164,9 +164,9 @@ exports.updateOne = async (ctx) => {
           break;
         default:
       }
-    } else {
-      throw e;
     }
+
+    throw e;
   }
 
   ctx.status = 200;
