@@ -94,7 +94,8 @@ export default async function useServerSidePagination(params = {}) {
         const res = await $fetch.raw(url, fetchOpts);
 
         // Update item length
-        itemLength.value.current = res.headers.get('x-total-count');
+        itemLength.value.current = Number.parseInt(res.headers.get('x-total-count'), 10) || 0;
+
         if (!itemLength.value.total) {
           itemLength.value.total = itemLength.value.current;
         }
