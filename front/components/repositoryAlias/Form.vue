@@ -105,10 +105,6 @@ const permissions = ref(new Map());
 const formRef = useTemplateRef('formRef');
 
 function applyRepository(item) {
-  if (!item) {
-    return;
-  }
-
   if (!item || typeof item === 'string') {
     repository.value.pattern = item;
   } else {
