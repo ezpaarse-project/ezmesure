@@ -216,7 +216,7 @@ model RepositoryAlias {
   createdAt              DateTime                               @default(now())
   /// Latest update date
   updatedAt              DateTime                               @updatedAt
-  /// The alias pattern (ex: b-bibcnrs*)
+  /// The alias pattern (ex: b-bibcnrs)
   pattern                String                                 @id
   /// The repository's pattern targeted by alias
   target                 String
