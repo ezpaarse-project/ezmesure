@@ -662,9 +662,6 @@
           "institutionId": {
             "$ref": "#/components/schemas/ItemID"
           },
-          "type": {
-            "type": "string"
-          },
           "filters": {
             "type": "array",
             "items": {
@@ -6424,7 +6421,7 @@
           "name": "id",
           "in": "path",
           "required": true,
-          "description": "ID of the repository"
+          "description": "ID of the alias"
         },
         {
           "name": "include",
@@ -6442,10 +6439,10 @@
           }
         }
       ],
-      "patch": {
-        "summary": "Update a data alias",
-        "description": "Update a data alias",
-        "operationId": "patch-repository-aliases-id",
+      "put": {
+        "summary": "Update a repository alias",
+        "description": "Update a repository alias",
+        "operationId": "put-repository-aliases-id",
         "responses": {
           "200": {
             "description": "OK",
