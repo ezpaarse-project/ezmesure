@@ -15,7 +15,7 @@ const {
 const { execThrottledPromises } = require('../../promises');
 
 const { upsertRole, deleteRole } = require('../../elastic/roles');
-const { upsertAlias } = require('../../elastic/indices');
+const { upsertAlias, deleteAlias } = require('../../elastic/indices');
 const { filtersToESQuery } = require('../../elastic/filters');
 
 /**
@@ -43,6 +43,13 @@ const unmountAlias = async (alias) => {
     appLogger.verbose(`[elastic] Role [${readOnlyRole}] has been deleted`);
   } catch (error) {
     appLogger.error(`[elastic] Role [${readOnlyRole}] cannot be deleted:\n${error}`);
+  }
+
+  try {
+    await deleteAlias(alias.pattern, { ignore: [404] });
+    appLogger.verbose(`[elastic] Alias [${alias.pattern}] has been deleted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Alias [${alias.pattern}] cannot be deleted:\n${error}`);
   }
 };
 
