@@ -118,10 +118,6 @@ const types = computed(() => {
 });
 
 function applyRepository(item) {
-  if (!item) {
-    return;
-  }
-
   if (!item || typeof item === 'string') {
     repository.value.pattern = item;
     repository.value.exist = undefined;
