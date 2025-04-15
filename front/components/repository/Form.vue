@@ -173,8 +173,8 @@ async function save() {
     }
 
     emit('submit', newRepository);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (e) {
+    snacks.error(e?.data?.error || t('anErrorOccurred'));
   }
 
   loading.value = false;

@@ -156,8 +156,8 @@ async function save() {
     }
 
     emit('submit', newAlias);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (e) {
+    snacks.error(e?.data?.error || t('anErrorOccurred'));
   }
 
   loading.value = false;
