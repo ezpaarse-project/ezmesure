@@ -121,7 +121,7 @@ exports.importRoles = async (ctx) => {
       const role = await elasticRoleService.findUnique({ where: { name: item.name } });
 
       if (role && !overwrite) {
-        addResponseItem(item, 'conflict', ctx.$t('errors.repository.alreadyExists', role.pattern));
+        addResponseItem(item, 'conflict', ctx.$t('errors.role.alreadyExists', role.name));
         return;
       }
     }
