@@ -13,6 +13,7 @@ const ElasticRoleService = require('../../entities/elastic-roles.service');
 const {
   generateRoleNameFromSpace,
   generateKibanaFeatures,
+  generateElasticPermissions,
 } = require('../../hooks/utils');
 
 const { execThrottledPromises } = require('../promises');
@@ -219,6 +220,8 @@ async function syncCustomRole(roleName) {
   const role = await prisma.client.elasticRole.findUnique({
     where: { name: roleName },
     include: {
+      repositoryPermissions: true,
+      repositoryAliasPermissions: true,
       spacePermissions: true,
     },
   });
@@ -229,15 +232,25 @@ async function syncCustomRole(roleName) {
 
   try {
     /** @type {[string, { privileges: string[] }][]} */
+    const repositoryPermissions = role.repositoryPermissions.map(
+      (p) => [p.repositoryPattern, generateElasticPermissions(p)],
+    );
+    /** @type {[string, { privileges: string[] }][]} */
+    const aliasPermissions = role.repositoryAliasPermissions.map(
+      (p) => [p.aliasPattern, generateElasticPermissions({ readonly: true })],
+    );
+    /** @type {[string, { features: Record<string, string[]> }][]} */
     const spacePermissions = role.spacePermissions.map(
       (p) => [p.spaceId, generateKibanaFeatures(p)],
     );
 
-    await kibana.putRole(role.name, new Map(spacePermissions));
+    await kibana.putRole(
+      role.name,
+      new Map(spacePermissions),
+      new Map([...repositoryPermissions, ...aliasPermissions]),
+    );
     appLogger.verbose(`[kibana] Role [${role.name}] has been upserted`);
   } catch (error) {
-    console.log(error.response.data);
-
     appLogger.error(`[kibana] Role [${role.name}] cannot be upserted:\n${error}`);
   }
 }

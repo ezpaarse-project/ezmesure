@@ -6,7 +6,7 @@ const { appLogger } = require('../../services/logger');
 const {
   syncCustomRole,
   unmountCustomRole,
-} = require('../../services/sync/elastic');
+} = require('../../services/sync/kibana');
 
 /**
  * @typedef {import('@prisma/client').ElasticRole} ElasticRole
@@ -30,7 +30,7 @@ const onRoleUpsert = async (role) => {
  */
 const onRoleDelete = async (role) => {
   try {
-    await unmountCustomRole(role);
+    await unmountCustomRole(role?.name);
   } catch (error) {
     appLogger.error(
       `[elastic][hooks] elastic role [${role?.name}] could not be unmounted:\n${error}`,

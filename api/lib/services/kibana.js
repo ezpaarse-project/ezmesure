@@ -163,12 +163,21 @@ const deleteSpace = (spaceId) => {
  * @param {string} name - Name of role.
  * @param {Map<string, { features: Record<string, string[]> }>} spaces - Map of rights,
  * key is the index value and value are the rights.
+ * @param {Map<string, { privileges: string[] }>} [indices] - Map of rights,
+ * key is the index value and value are the rights.
  *
  * @returns {Promise<AxiosResponse<null>>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-api-put.html
  */
-const putRole = (name, spaces) => axiosClient.put(`/api/security/role/${name}`, {
+const putRole = (name, spaces, indices) => axiosClient.put(`/api/security/role/${name}`, {
+  elasticsearch: {
+    cluster: [],
+    indices: [...(indices ?? [])].map(([index, { privileges }]) => ({
+      names: [index],
+      privileges,
+    })),
+  },
   kibana: [...spaces].map(([id, { features }]) => ({
     spaces: [id],
     feature: features,

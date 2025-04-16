@@ -5,7 +5,6 @@ const { appLogger } = require('../../logger');
 
 const { syncRepositories, syncRepository, unmountRepository } = require('./repositories');
 const { syncRepositoryAlias, syncRepositoryAliases, unmountAlias } = require('./alias');
-const { syncCustomRoles, syncCustomRole, unmountCustomRole } = require('./roles');
 const { syncUser, syncUsers } = require('./users');
 
 const { syncSchedule } = config.get('elasticsearch');
@@ -13,7 +12,6 @@ const { syncSchedule } = config.get('elasticsearch');
 const sync = async () => {
   await syncRepositories();
   await syncRepositoryAliases();
-  await syncCustomRoles();
   await syncUsers();
 };
 
@@ -48,9 +46,6 @@ module.exports = {
   syncRepositoryAlias,
   unmountAlias,
   syncRepositoryAliases,
-  syncCustomRoles,
-  syncCustomRole,
-  unmountCustomRole,
   syncUser,
   syncUsers,
 };

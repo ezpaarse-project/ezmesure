@@ -5,7 +5,7 @@ const { appLogger } = require('../../services/logger');
 
 const {
   syncCustomRole,
-} = require('../../services/sync/elastic');
+} = require('../../services/sync/kibana');
 
 /* eslint-disable max-len */
 /**
