@@ -1014,3 +1014,6 @@ nbOthers: (+{count} autres)
 unknown: Inconnu
 looseFilter: Les résultats correspondront à l'une des valeurs
 strictFilter: Les résultats correspondront à toutes les valeurs
+applyToAll: Appliquer à tous
+minValueError: "La valeur est trop petite. Minimum: {min}"
+maxValueError: "La valeur est trop grande. Maximum: {max}"
