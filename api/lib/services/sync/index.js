@@ -5,11 +5,11 @@ const {
   syncRepositories,
   syncRepositoryAliases,
   syncUsers,
-  syncCustomRoles,
 } = require('./elastic');
 
 const {
   syncSpaces,
+  syncCustomRoles,
 } = require('./kibana');
 
 const ezr = require('./ezreeport');
