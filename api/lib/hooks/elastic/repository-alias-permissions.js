@@ -14,7 +14,7 @@ const { generateUserRoles } = require('../utils');
 /**
  * @param { RepositoryPermission } permission
  */
-const onRepositoryPermissionModified = async (permission) => {
+const onAliasPermissionModified = async (permission) => {
   let user;
   try {
     user = await elasticUsers.getUserByUsername(permission.username);
@@ -40,9 +40,9 @@ const onRepositoryPermissionModified = async (permission) => {
   }
 };
 
-const hookOptions = { uniqueResolver: (permission) => `${permission.username}_${permission.repositoryPattern}` };
+const hookOptions = { uniqueResolver: (permission) => `${permission.username}_${permission.aliasPattern}` };
 
-registerHook('repository_alias_permission:create', onRepositoryPermissionModified, hookOptions);
-registerHook('repository_alias_permission:update', onRepositoryPermissionModified, hookOptions);
-registerHook('repository_alias_permission:upsert', onRepositoryPermissionModified, hookOptions);
-registerHook('repository_alias_permission:delete', onRepositoryPermissionModified, hookOptions);
+registerHook('repository_alias_permission:create', onAliasPermissionModified, hookOptions);
+registerHook('repository_alias_permission:update', onAliasPermissionModified, hookOptions);
+registerHook('repository_alias_permission:upsert', onAliasPermissionModified, hookOptions);
+registerHook('repository_alias_permission:delete', onAliasPermissionModified, hookOptions);

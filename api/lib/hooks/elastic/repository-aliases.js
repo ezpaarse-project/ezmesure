@@ -4,7 +4,7 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const {
-  syncAlias,
+  syncRepositoryAlias,
   unmountAlias,
 } = require('../../services/sync/elastic');
 
@@ -17,7 +17,7 @@ const {
  */
 const onRepositoryAliasUpsert = async (repositoryAlias) => {
   try {
-    await syncAlias(repositoryAlias);
+    await syncRepositoryAlias(repositoryAlias);
   } catch (error) {
     appLogger.error(
       `[elastic][hooks] RepositoryAlias [${repositoryAlias?.pattern}] could not be synchronized:\n${error}`,

@@ -8,7 +8,7 @@
       <v-row>
         <v-col>
           <v-form
-            id="repositoryForm"
+            id="aliasForm"
             ref="formRef"
             v-model="valid"
             @submit.prevent="save()"
@@ -17,8 +17,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="alias.pattern"
-                  :placeholder="institution?.namespace"
-                  :label="`${$t('repositories.pattern')} *`"
+                  :label="`${$t('repositoryAliases.alias')} *`"
                   :rules="[
                     v => !!v || $t('fieldIsRequired'),
                     v => /^[a-z0-9_-]+$/i.test(v) || $t('invalidFormat'),
@@ -42,11 +41,10 @@
 
             <v-row>
               <v-col>
-                <RepositoryAliasFilterForm
-                  :alias="alias"
-                  :repository="repository"
+                <FiltersForm
+                  v-model="alias.filters"
+                  :title="$t('repositoryAliases.filtersForm.title')"
                   variant="outlined"
-                  @[`update:alias.filters`]="alias.filters = $event"
                 />
               </v-col>
             </v-row>
@@ -70,7 +68,7 @@
         :disabled="!valid"
         :loading="loading"
         type="submit"
-        form="repositoryForm"
+        form="aliasForm"
         variant="elevated"
         color="primary"
       />
@@ -107,10 +105,6 @@ const permissions = ref(new Map());
 const formRef = useTemplateRef('formRef');
 
 function applyRepository(item) {
-  if (!item) {
-    return;
-  }
-
   if (!item || typeof item === 'string') {
     repository.value.pattern = item;
   } else {
@@ -162,8 +156,8 @@ async function save() {
     }
 
     emit('submit', newAlias);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (e) {
+    snacks.error(e?.data?.error || t('anErrorOccurred'));
   }
 
   loading.value = false;

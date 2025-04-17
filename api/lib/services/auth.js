@@ -138,7 +138,7 @@ function fetchModel(modelName, opts = {}) {
         break;
       }
 
-      case 'repository-alias': {
+      case 'repositoryAlias': {
         const repositoryAliasesService = new RepositoryAliasesService();
         findOptions.where = { pattern: modelId };
         item = modelId && await repositoryAliasesService.findUnique(findOptions);
@@ -239,6 +239,6 @@ module.exports = {
   fetchSushi: (opts = {}) => fetchModel('sushi', { state: 'sushi', ...opts }),
   fetchSushiEndpoint: (opts = {}) => fetchModel('sushi-endpoint', { state: 'endpoint', params: 'endpointId', ...opts }),
   fetchRepository: (opts = {}) => fetchModel('repository', { state: 'repository', params: 'pattern', ...opts }),
-  fetchRepositoryAlias: (opts = {}) => fetchModel('repository-alias', { state: 'alias', params: 'pattern', ...opts }),
+  fetchRepositoryAlias: (opts = {}) => fetchModel('repositoryAlias', { state: 'alias', params: 'pattern', ...opts }),
   fetchSpace: (opts = {}) => fetchModel('space', { state: 'space', params: 'spaceId', ...opts }),
 };

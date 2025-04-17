@@ -118,10 +118,6 @@ const types = computed(() => {
 });
 
 function applyRepository(item) {
-  if (!item) {
-    return;
-  }
-
   if (!item || typeof item === 'string') {
     repository.value.pattern = item;
     repository.value.exist = undefined;
@@ -173,8 +169,8 @@ async function save() {
     }
 
     emit('submit', newRepository);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (e) {
+    snacks.error(e?.data?.error || t('anErrorOccurred'));
   }
 
   loading.value = false;

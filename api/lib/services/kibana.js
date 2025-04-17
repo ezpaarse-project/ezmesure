@@ -160,22 +160,29 @@ const deleteSpace = (spaceId) => {
 /**
  * Create or update role using given name
  *
- * @param {Object} opts
- * @param {string} opts.name The name of the role
- * @param {Omit<KibanaRole, 'name'>} opts.body Content of the request
+ * @param {string} name - Name of role.
+ * @param {Map<string, { features: Record<string, string[]> }>} spaces - Map of rights,
+ * key is the index value and value are the rights.
+ * @param {Map<string, { privileges: string[] }>} [indices] - Map of rights,
+ * key is the index value and value are the rights.
  *
  * @returns {Promise<AxiosResponse<null>>}
  *
  * @see https://www.elastic.co/guide/en/kibana/7.17/role-management-api-put.html
  */
-const putRole = (opts) => {
-  const options = opts || {};
-
-  if (!options.name) {
-    throw new Error('Missing required parameter: name');
-  }
-  return axiosClient.put(`/api/security/role/${options.name}`, options.body || {});
-};
+const putRole = (name, spaces, indices) => axiosClient.put(`/api/security/role/${name}`, {
+  elasticsearch: {
+    cluster: [],
+    indices: [...(indices ?? [])].map(([index, { privileges }]) => ({
+      names: [index],
+      privileges,
+    })),
+  },
+  kibana: [...spaces].map(([id, { features }]) => ({
+    spaces: [id],
+    feature: features,
+  })),
+});
 
 /**
  * Delete role using given name

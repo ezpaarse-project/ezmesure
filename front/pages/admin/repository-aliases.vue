@@ -9,7 +9,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #filters-panel="props">
-        <RepositoryAliasFilters v-bind="props" />
+        <RepositoryAliasApiFilters v-bind="props" />
       </template>
 
       <v-btn
@@ -70,10 +70,10 @@
 
           <v-list>
             <v-list-item
-              v-if="filterFormDialogRef"
+              v-if="filtersFormDialogRef"
               :title="$t('repositoryAliases.filtersForm.editFilter')"
               prepend-icon="mdi-filter"
-              @click="filterFormDialogRef.open(item, { repository: item.repository })"
+              @click="openFiltersDialog(item)"
             />
 
             <v-list-item
@@ -118,10 +118,19 @@
       @update:model-value="refresh()"
     />
 
-    <RepositoryAliasFilterFormDialog
-      ref="filterFormDialogRef"
+    <FiltersFormDialog
+      ref="filtersFormDialogRef"
+      :title="$t('repositoryAliases.filtersForm.title')"
       @submit="onAliasUpdate($event)"
-    />
+    >
+      <template v-if="updatedAlias" #subtitle>
+        <span class="mr-2">
+          {{ updatedAlias.pattern }}
+        </span>
+
+        <RepositoryTypeChip :model-value="updatedAlias.repository" />
+      </template>
+    </FiltersFormDialog>
   </div>
 </template>
 
@@ -137,10 +146,12 @@ const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
 const selectedAliases = ref([]);
+/** @type {Ref<object|undefined>} */
+const updatedAlias = ref();
 
 const aliasFormDialogRef = useTemplateRef('aliasFormDialogRef');
 const aliasInstitutionsDialogRef = useTemplateRef('aliasInstitutionsDialogRef');
-const filterFormDialogRef = useTemplateRef('filterFormDialogRef');
+const filtersFormDialogRef = useTemplateRef('filtersFormDialogRef');
 
 const {
   refresh,
@@ -213,6 +224,11 @@ const toolbarTitle = computed(() => {
  */
 const debouncedRefresh = useDebounceFn(refresh, 250);
 
+function openFiltersDialog(alias) {
+  updatedAlias.value = alias;
+  filtersFormDialogRef.value?.open(alias.filters);
+}
+
 /**
  * Delete multiple repositoryAliases
  *
@@ -275,13 +291,13 @@ async function copyAliasPattern({ pattern }) {
   snacks.info(t('clipboard.textCopied'));
 }
 
-async function onAliasUpdate(alias) {
+async function onAliasUpdate(filters) {
   try {
-    await $fetch(`/api/repository-aliases/${alias.pattern}`, {
+    await $fetch(`/api/repository-aliases/${updatedAlias.value.pattern}`, {
       method: 'PUT',
       body: {
-        target: alias.target,
-        filters: alias.filters,
+        target: updatedAlias.value.target,
+        filters,
       },
     });
 

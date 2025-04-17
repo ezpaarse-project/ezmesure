@@ -86,9 +86,22 @@
                 :loading="isSynchronizing"
               />
             </v-col>
+
+            <v-col>
+              <SyncCard
+                :title="$t('sync.elasticRoles')"
+                :value="syncState?.data?.result?.elasticRoles ?? {}"
+                :expected="syncState?.expected?.elasticRoles ?? 0"
+                :loading="isSynchronizing"
+              />
+            </v-col>
           </v-row>
         </v-col>
+      </v-row>
 
+      <v-spacer class="py-4" />
+
+      <v-row>
         <v-col cols="3">
           <div class="text-overline primary--text">
             Kibana
@@ -105,11 +118,7 @@
             </v-col>
           </v-row>
         </v-col>
-      </v-row>
 
-      <v-spacer class="py-4" />
-
-      <v-row>
         <v-col cols="6">
           <div class="text-overline primary--text">
             ezREEPORT
