@@ -36,7 +36,7 @@ exports.getOne = async (ctx) => {
   const role = await elasticRoleService.findUnique(prismaQuery);
 
   if (!role) {
-    ctx.throw(404, ctx.$t('errors.roles.notFound'));
+    ctx.throw(404, ctx.$t('errors.role.notFound'));
     return;
   }
 
