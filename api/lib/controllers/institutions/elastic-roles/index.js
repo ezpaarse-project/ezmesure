@@ -32,6 +32,7 @@ router.route({
   validate: {
     params: {
       institutionId: Joi.string().trim().required(),
+      name: schema.name,
     },
   },
 });
