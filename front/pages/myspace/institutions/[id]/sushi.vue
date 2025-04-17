@@ -18,7 +18,7 @@
       </template>
 
       <template #filters-panel="props">
-        <SushiFilters :institution="institution" v-bind="props" />
+        <SushiApiFilters :institution="institution" v-bind="props" />
       </template>
 
       <v-btn

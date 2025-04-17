@@ -14,12 +14,7 @@
     </template>
 
     <template #subtitle>
-      <v-chip
-        :text="$te(`spaces.types.${space.type}`) ? $t(`spaces.types.${space.type}`) : space.type"
-        :color="repoColors.get(space.type)"
-        size="x-small"
-        density="comfortable"
-      />
+      <RepositoryTypeChip :model-value="space" />
     </template>
   </v-list-item>
 </template>

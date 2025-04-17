@@ -107,6 +107,7 @@ errors:
 
   role:
     notFound: Role [%s] not found
+    alreadyExists: Role [%s] already exists
 
   space:
     notFound: Space [%s] not found

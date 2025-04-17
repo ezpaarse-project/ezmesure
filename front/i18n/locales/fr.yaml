@@ -18,6 +18,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
+  elasticRoles: Rôles Elastic
   logout: Déconnexion
   contact: Contact
   report: Rapports
@@ -499,6 +500,7 @@ components:
   components: Composantes
   count: "{count} composante|{count} composantes"
   noComponent: Aucune composante
+  add: Ajouter une composante
 group:
   group: Regroupé dans
   noGroup: Aucun groupe
@@ -809,7 +811,8 @@ repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
     |Gérer {count} alias
-  target: Pattern de l'entrepôt
+  alias: Alias
+  target: Pattern de l'entrepôt cible
   filtered: Filtré ?
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
@@ -902,6 +905,23 @@ harvest:
       de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+elasticRoles:
+  toolbarTitle: Rôles Elastic ({count})
+  newRole: Nouveau rôle
+  filtersForm.title: Filtres du rôle
+  institutions: Établissements
+  addInstitution: Ajouter un établissement
+  noInstitutions: Aucun établissement n'utilise ce rôle
+  readonly: Lecture seule
+  users: Utilisateurs
+  addUser: Ajouter un utilisateur
+  noUsers: Aucun utilisateur n'utilise ce rôle
+  manageElasticRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  deleteNbRoles: >
+    Vous êtes sur le point de supprimer {n} rôle
+    |Vous êtes sur le point de supprimer {n} rôles
 sync:
   status:
     notSynced: Pas encore synchronisé
@@ -924,6 +944,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements
   unableToRetrieveInformation: Impossible de récupérer les informations de la synchronisation

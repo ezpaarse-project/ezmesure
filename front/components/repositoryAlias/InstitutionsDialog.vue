@@ -8,56 +8,30 @@
       <template v-if="alias" #subtitle>
         {{ alias.pattern }}
 
-        <v-chip
+        <RepositoryTypeChip
           v-if="alias.repository"
-          :text="alias.repository.type"
-          :color="repoColors.get(alias.repository.type)"
-          size="x-small"
-          density="comfortable"
+          :model-value="alias.repository"
           class="ml-2"
         />
       </template>
 
       <template #append>
-        <v-menu
-          v-model="isSearchOpen"
-          :persistent="isLinkLoading"
-          :close-on-content-click="false"
-          width="300"
+        <InstitutionAddMenu
+          :model-value="institutions"
+          :title="$t('repository.addInstitution')"
+          @institution-add="linkInstitution($event)"
         >
-          <template #activator="{ props }">
+          <template #activator="{ props: menu }">
             <v-btn
-              :text="$t('add')"
-              prepend-icon="mdi-plus"
+              v-tooltip="$t('add')"
+              icon="mdi-plus"
               variant="text"
-              color="primary"
-              v-bind="props"
+              color="success"
+              density="comfortable"
+              v-bind="menu"
             />
           </template>
-
-          <v-card>
-            <template #text>
-              <InstitutionAutoComplete v-model="institutionToLink" />
-            </template>
-
-            <template #actions>
-              <v-spacer />
-
-              <v-btn variant="text" @click="isSearchOpen = false">
-                {{ $t('cancel') }}
-              </v-btn>
-
-              <v-btn
-                color="primary"
-                :loading="isLinkLoading"
-                :disabled="!institutionToLink"
-                @click="linkInstitution()"
-              >
-                {{ $t('add') }}
-              </v-btn>
-            </template>
-          </v-card>
-        </v-menu>
+        </InstitutionAddMenu>
       </template>
 
       <template #text>
@@ -124,14 +98,11 @@ const { t } = useI18n();
 const snacks = useSnacksStore();
 
 const isOpen = ref(false);
-const isSearchOpen = ref(false);
 const isLinkLoading = ref(false);
 const hasChanged = ref(false);
 /** @type {Ref<object|null>} */
 const alias = ref(null);
 const institutions = ref([]);
-/** @type {Ref<object|null>} */
-const institutionToLink = ref(null);
 
 const sortedInstitutions = computed(
   () => institutions.value.toSorted((a, b) => a.name.localeCompare(b.name)),
@@ -165,23 +136,21 @@ async function unlinkInstitution(item) {
   }
 }
 
-async function linkInstitution() {
-  if (!institutionToLink.value || !alias.value) {
+async function linkInstitution(item) {
+  if (!item || !alias.value) {
     return;
   }
 
   isLinkLoading.value = true;
   try {
-    await $fetch(`/api/institutions/${institutionToLink.value.id}/repository-aliases/${alias.value.pattern}`, {
+    await $fetch(`/api/institutions/${item.id}/repository-aliases/${alias.value.pattern}`, {
       method: 'PUT',
       body: { target: alias.value.target, filters: alias.value.filters },
     });
 
-    institutions.value.push(institutionToLink.value);
-    institutionToLink.value = null;
+    institutions.value.push(item);
 
     hasChanged.value = true;
-    isSearchOpen.value = false;
   } catch {
     snacks.error(t('anErrorOccurred'));
   }
