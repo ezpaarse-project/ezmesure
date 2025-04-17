@@ -245,10 +245,6 @@
         />
       </template>
 
-      <template #[`item.updatedAt`]="{ item }">
-        <LocalDate :model-value="item.updatedAt" />
-      </template>
-
       <template #[`item.active`]="{ item }">
         <div class="d-flex align-center">
           <v-switch
@@ -523,11 +519,6 @@ const headers = computed(() => [
     title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
-  },
-  {
-    title: t('institutions.sushi.updatedAt'),
-    value: 'updatedAt',
-    sortable: true,
   },
   {
     title: t('endpoints.active'),

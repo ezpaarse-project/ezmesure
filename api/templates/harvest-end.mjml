@@ -11,16 +11,16 @@
 
 <mj-section>
   <mj-column>
-    <mj-text mj-class="headline">Chers utilisateurs-ices ezCOUNTER,</mj-text>
+    <mj-text mj-class="headline">Cher·es utilisateurs·ices,</mj-text>
   </mj-column>
 </mj-section>
 
 <mj-section>
   <mj-column>
     <mj-text>
-      Nous vous informons que nous avons procédé au moissonnage des données COUNTER 5 concernant
-      la période <strong>{{ periodStart }}</strong> ~ <strong>{{ periodEnd }}</strong>
-      pour "<strong>{{ institution }}</strong>".
+      Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de
+      "<strong>{{ institution }}</strong>" et couvrant la période
+      <strong>{{ periodStart }}</strong> ~ <strong>{{ periodEnd }}</strong>.
     </mj-text>
 
     <mj-text>
@@ -41,18 +41,19 @@
 
     <mj-text>
       Si vous remarquez des données qui vous paraissent manquantes ou non valides,
-      merci de nous contacter
+      merci de nous contacter rapidement
       {% if recipients %}
       à <a href="mailto:{{ recipients }}">{{ recipients }}</a>
       {% endif %}
-      rapidement pour nous permettre de le signaler aux éditeurs.
+      pour nous permettre de le signaler aux éditeurs.
     </mj-text>
 
     <mj-text>
-      Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER.
-      A l’issue de cette saisie, merci de cliquer à nouveau sur le bouton
-      “VALIDER DES IDENTIFIANTS” si vous souhaitez être moissonné pour ces nouvelles données.
-      Nous procéderons à des moissonnages réguliers (au moins une fois par mois).
+      Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER ou en
+      déclarer de nouveaux dans le formulaire ezCOUNTER. A l’issue de cette saisie, merci de
+      cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les rapports
+      soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement à des
+      moissonnages réguliers, au moins une fois par mois.
     </mj-text>
 
     <mj-text>

@@ -146,6 +146,8 @@ activity:
     sushi: COUNTER credentials
     endpoints: COUNTER endpoints
     reporting: Reporting
+    spaces: Kibana spaces
+    harvest: Harvesting
   actions:
     user/register: Registering
     user/refresh: Profile refresh
@@ -159,6 +161,7 @@ activity:
     institutions/delete: Institution deletion
     institutions/addMember: Member addition
     institutions/removeMember: Member revocation
+    institutions/import: Institution import
     export/aggregate: Aggregated export
     export/counter5: COUNTER 5 export
     events/delete: Partial index deletion
@@ -175,6 +178,7 @@ activity:
     sushi/harvest: COUNTER harvest
     sushi/import: COUNTER credentials import
     sushi/check-connection: COUNTER connection test
+    spaces/import: Kibana spaces import
     endpoint/create: Endpoint creation
     endpoint/update: Endpoint update
     endpoint/delete: Endpoint deletion
@@ -186,6 +190,11 @@ activity:
     reporting/update: Reporting task update
     reporting/delete: Reporting task deletion
     reporting/history: Reporting task history consultation
+    harvest-sessions/create: Harvest session creation
+    harvest-sessions/upsert: Harvest session insertion
+    harvest-sessions/start: Harvest session start
+    harvest-sessions/delete: Harvest session deletion
+    harvest-sessions/stop: Harvest session stop
 endpoints:
   endpoint: Endpoint
   toolbarTitle: COUNTER endpoints ({count})
@@ -228,6 +237,7 @@ endpoints:
   firstMonthAvailable: First available month
   lastMonthAvailable: Last available month
   addAdditionalReport: Add an additional report
+  undefinedAvailable: Undefined
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
@@ -987,3 +997,6 @@ nbOthers: (+{count} others)
 unknown: Unknown
 looseFilter: Results will match one of the values
 strictFilter: Results will mach all the values
+applyToAll: Apply to all
+minValueError: "The value is too small. Minimum: {min}"
+maxValueError: "The value is too big. Maximum: {max}"
