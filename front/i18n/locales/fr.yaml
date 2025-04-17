@@ -236,6 +236,7 @@ endpoints:
   noSupportedDataDesc: La liste des rapports supportés est mise à jour tous les mois avant un moissonnage. Pour remplir cette liste, vous devez d'abord moissonner le point d'accès. Vous pouvez aussi ajouter des rapports additionnels avec le bouton ci-dessous.
   firstMonthAvailable: Premier mois disponible
   lastMonthAvailable: Dernier mois disponible
+  undefinedAvailable: Indéfini
   addAdditionalReport: Ajouter un rapport additionnel
   undoReport: Annuler les modifications
   manuallyEdited: Modification manuelles

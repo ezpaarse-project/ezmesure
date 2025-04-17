@@ -237,6 +237,7 @@ endpoints:
   firstMonthAvailable: First available month
   lastMonthAvailable: Last available month
   addAdditionalReport: Add an additional report
+  undefinedAvailable: Undefined
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation

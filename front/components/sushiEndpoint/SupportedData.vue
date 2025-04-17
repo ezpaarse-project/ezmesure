@@ -1,7 +1,9 @@
 <template>
-  <v-table max-height="300px" style="overflow-y: auto;">
+  <v-table style="max-height: 625px; overflow-y: auto;">
     <template v-if="rows.length > 0" #top>
-      {{ $t('endpoints.supportedDataDesc') }}
+      <p class="pb-4">
+        {{ $t('endpoints.supportedDataDesc') }}
+      </p>
     </template>
 
     <v-empty-state
@@ -12,6 +14,38 @@
     />
 
     <tbody v-else>
+      <tr height="75px">
+        <th width="25%">
+          {{ $t('harvest.jobs.reportType') }}
+        </th>
+        <th width="25%" class="text-center">
+          <div>{{ $t('endpoints.firstMonthAvailable') }}</div>
+          <MonthPickerField
+            :title="$t('endpoints.firstMonthAvailable')"
+            :placeholder="$t('applyToAll')"
+            variant="underlined"
+            density="compact"
+            prepend-icon="mdi-calendar-start"
+            hide-details
+            clearable
+            @update:model-value="patchToAll({ firstMonthAvailable: $event })"
+          />
+        </th>
+        <th width="25%" class="text-center">
+          <div>{{ $t('endpoints.lastMonthAvailable') }}</div>
+          <MonthPickerField
+            :title="$t('endpoints.lastMonthAvailable')"
+            :placeholder="$t('applyToAll')"
+            variant="underlined"
+            density="compact"
+            prepend-icon="mdi-calendar-end"
+            hide-details
+            clearable
+            @update:model-value="patchToAll({ lastMonthAvailable: $event })"
+          />
+        </th>
+      </tr>
+
       <tr v-for="[reportId, data] in rows" :key="reportId">
         <td width="25%">
           <v-checkbox
@@ -40,8 +74,9 @@
             <MonthPickerField
               v-if="data.supported?.value"
               :model-value="data.firstMonthAvailable?.value"
-              :label="$t('endpoints.firstMonthAvailable')"
               :max="data.lastMonthAvailable?.value"
+              :title="$t('endpoints.firstMonthAvailable')"
+              :placeholder="$t('endpoints.undefinedAvailable')"
               variant="underlined"
               density="compact"
               prepend-icon="mdi-calendar-start"
@@ -67,8 +102,9 @@
             <MonthPickerField
               v-if="data.supported?.value"
               :model-value="data.lastMonthAvailable?.value"
-              :label="$t('endpoints.lastMonthAvailable')"
               :min="data.firstMonthAvailable?.value"
+              :title="$t('endpoints.lastMonthAvailable')"
+              :placeholder="$t('endpoints.undefinedAvailable')"
               variant="underlined"
               density="compact"
               prepend-icon="mdi-calendar-end"
@@ -219,6 +255,26 @@ function undoSupportedData(reportId, field) {
   data[field] = value != null ? { raw: value, value, manual: false } : undefined;
   innerSupportedData.value[reportId] = data;
 
+  emit('update:modelValue', innerSupportedData.value);
+}
+
+function patchToAll(params) {
+  const data = { ...innerSupportedData.value };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const reportId of Object.keys(data)) {
+    if ('supported' in params) {
+      data[reportId].supported = { value: params.supported, manual: true };
+    }
+    if ('firstMonthAvailable' in params) {
+      data[reportId].firstMonthAvailable = { value: params.firstMonthAvailable, manual: true };
+    }
+    if ('lastMonthAvailable' in params) {
+      data[reportId].lastMonthAvailable = { value: params.lastMonthAvailable, manual: true };
+    }
+  }
+
+  innerSupportedData.value = data;
   emit('update:modelValue', innerSupportedData.value);
 }
 </script>
