@@ -66,6 +66,7 @@
             <v-text-field
               v-model="customField.helpUrl"
               :label="$t('customFields.helpUrl')"
+              placeholder="https://example.com/about"
               prepend-icon="mdi-link-variant"
               variant="underlined"
               hide-details
@@ -76,6 +77,7 @@
             <v-text-field
               v-model="customField.itemUrl"
               :label="$t('customFields.itemUrl')"
+              placeholder="https://example.com/org/{value}"
               prepend-icon="mdi-link-variant"
               variant="underlined"
               hide-details
