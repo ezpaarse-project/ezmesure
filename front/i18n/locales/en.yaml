@@ -18,6 +18,7 @@ menu:
   profile: Profile
   members: Members
   users: Users
+  elasticRoles: Elastic Roles
   logout: Logout
   contact: Contact
   report: Reports
@@ -147,6 +148,8 @@ activity:
     sushi: COUNTER credentials
     endpoints: COUNTER endpoints
     reporting: Reporting
+    spaces: Kibana spaces
+    harvest: Harvesting
   actions:
     user/register: Registering
     user/refresh: Profile refresh
@@ -160,6 +163,7 @@ activity:
     institutions/delete: Institution deletion
     institutions/addMember: Member addition
     institutions/removeMember: Member revocation
+    institutions/import: Institution import
     export/aggregate: Aggregated export
     export/counter5: COUNTER 5 export
     events/delete: Partial index deletion
@@ -176,6 +180,7 @@ activity:
     sushi/harvest: COUNTER harvest
     sushi/import: COUNTER credentials import
     sushi/check-connection: COUNTER connection test
+    spaces/import: Kibana spaces import
     endpoint/create: Endpoint creation
     endpoint/update: Endpoint update
     endpoint/delete: Endpoint deletion
@@ -187,6 +192,11 @@ activity:
     reporting/update: Reporting task update
     reporting/delete: Reporting task deletion
     reporting/history: Reporting task history consultation
+    harvest-sessions/create: Harvest session creation
+    harvest-sessions/upsert: Harvest session insertion
+    harvest-sessions/start: Harvest session start
+    harvest-sessions/delete: Harvest session deletion
+    harvest-sessions/stop: Harvest session stop
 endpoints:
   endpoint: Endpoint
   toolbarTitle: COUNTER endpoints ({count})
@@ -229,6 +239,7 @@ endpoints:
   firstMonthAvailable: First available month
   lastMonthAvailable: Last available month
   addAdditionalReport: Add an additional report
+  undefinedAvailable: Undefined
   undoReport: Undo changes
   manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
@@ -489,6 +500,7 @@ components:
   components: Components
   count: "{count} components"
   noComponent: No components
+  add: Add component
 group:
   group: Grouped in
   noGroup: No group
@@ -787,7 +799,8 @@ repositoryAliases:
   manageRepositoryAliases: >
     Manage aliases
     |Manage {count} aliases
-  target: Repository pattern
+  alias: Alias
+  target: Target repository pattern
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -877,6 +890,21 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+elasticRoles:
+  toolbarTitle: Elastic Roles ({count})
+  newRole: New role
+  filtersForm.title: Filters of the role
+  institutions: Institutions
+  addInstitution: Add institution
+  noInstitutions: No institutions is using this role
+  readonly: Readonly
+  users: Users
+  addUser: Add user
+  noUsers: No users is using this role
+  manageElasticRoles: >
+    Manage roles
+    |Manage {count} roles
+  deleteNbRoles: You are about to delete {n} roles
 sync:
   status:
     notSynced: Not yet synchronized
@@ -902,6 +930,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
+  elasticRoles: Elastic Roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
@@ -1013,3 +1042,6 @@ looseFilter: Results will match one of the values
 strictFilter: Results will mach all the values
 loading: Loading...
 retry: Retry
+applyToAll: Apply to all
+minValueError: "The value is too small. Minimum: {min}"
+maxValueError: "The value is too big. Maximum: {max}"

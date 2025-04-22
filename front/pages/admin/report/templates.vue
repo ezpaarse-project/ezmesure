@@ -9,7 +9,6 @@
     />
 
     <div v-else>
-      {{ itemsPerPage }}
       <ezr-template-table
         v-model:items-per-page="itemsPerPage"
         :title-prefix="`${$t('menu.adminReport')} / `"

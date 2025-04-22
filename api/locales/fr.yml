@@ -108,6 +108,7 @@ errors:
 
   role:
     notFound: Rôle [%s] introuvable
+    alreadyExists: Le rôle [%s] existe déjà
 
   space:
     notFound: Espace [%s] introuvable

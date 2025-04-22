@@ -8,7 +8,7 @@
     <template #text>
       <v-row>
         <v-col>
-          <OpenDataSearch
+          <InstitutionOpenDataSearch
             v-model="openData"
             @update:model-value="applyOpenData()"
           />

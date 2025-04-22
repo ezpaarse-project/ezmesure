@@ -127,7 +127,6 @@ module.exports = class UsersService extends BasePrismaService {
    * @returns {Promise<User>}
    */
   async update(params) {
-    // TODO manage role
     const user = await usersPrisma.update(params, this.prisma);
     this.triggerHooks('user:update', user);
     return user;
@@ -239,5 +238,31 @@ module.exports = class UsersService extends BasePrismaService {
       return transaction(this);
     }
     return UsersService.$transaction(transaction);
+  }
+
+  async connectRole(username, roleName) {
+    const { elasticRoles, ...user } = await usersPrisma.update({
+      where: { username },
+      data: {
+        elasticRoles: { connect: { name: roleName } },
+      },
+      include: { elasticRoles: true },
+    }, this.prisma);
+    this.triggerHooks('user:connect:elastic_role', { user, role: elasticRoles.find((r) => r.name === roleName) });
+
+    return user;
+  }
+
+  async disconnectRole(username, roleName) {
+    const { elasticRoles, ...user } = await usersPrisma.update({
+      where: { username },
+      data: {
+        elasticRoles: { disconnect: { name: roleName } },
+      },
+      include: { elasticRoles: true },
+    }, this.prisma);
+    this.triggerHooks('user:disconnect:elastic_role', { user, role: elasticRoles.find((r) => r.name === roleName) });
+
+    return user;
   }
 };

@@ -1,8 +1,8 @@
 Des nouvelles données COUNTER pour "{{ institution }}" ont été moissonnées !
 
-Chers utilisateurs-ices ezCOUNTER,
+Cher·es utilisateurs·ices,
 
-Nous vous informons que nous avons procédé au moissonnage des données COUNTER 5 concernant la période : {{ periodStart }} ~ {{ periodEnd }} pour "{{ institution }}".
+Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de "{{ institution }}" et couvrant la période {{ periodStart }} ~ {{ periodEnd }}
 
 Les données sont accessibles via vos tableaux de bords habituels, à condition d'en régler la temporalité à la période voulue.
 
@@ -10,9 +10,9 @@ Les données sont accessibles via vos tableaux de bords habituels, à condition 
 https://ezmesure.couperin.org/kibana/s/{{ space }}
 {% endif %}
 
-Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter à {% if recipients %}{{ recipients }}{% endif %} rapidement pour nous permettre de le signaler aux éditeurs.
+Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement{% if recipients %} à {{ recipients }}{% endif %} pour nous permettre de le signaler aux éditeurs.
 
-Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER. A l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez être moissonné pour ces nouvelles données. Nous procéderons à des moissonnages réguliers (au moins une fois par mois).
+Vous pouvez continuer à saisir de nouveaux identifiants dans le formulaire ezCOUNTER ou en déclarer de nouveaux dans le formulaire ezCOUNTER. A l’issue de cette saisie, merci de cliquer à nouveau sur le bouton “VALIDER DES IDENTIFIANTS” si vous souhaitez que les rapports soient à nouveau moissonnés pour votre établissement : nous procéderons régulièrement à des moissonnages réguliers, au moins une fois par mois.
 
 Cordialement,
 L'équipe ezMESURE.

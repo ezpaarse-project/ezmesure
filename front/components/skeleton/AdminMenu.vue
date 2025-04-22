@@ -6,31 +6,43 @@
         to="/admin/institutions"
         prepend-icon="mdi-domain"
       />
+
       <v-list-item
         :title="$t('menu.repositories')"
         to="/admin/repositories"
         prepend-icon="mdi-database"
       />
+
       <v-list-item
         :title="$t('menu.repositoryAliases')"
         to="/admin/repository-aliases"
         prepend-icon="mdi-database-eye"
       />
+
       <v-list-item
         :title="$t('menu.spaces')"
         to="/admin/spaces"
         prepend-icon="mdi-tab"
       />
+
       <v-list-item
         :title="$t('menu.users')"
         to="/admin/users"
         prepend-icon="mdi-account-multiple"
       />
+
+      <v-list-item
+        :title="$t('menu.elasticRoles')"
+        to="/admin/elastic-roles"
+        prepend-icon="mdi-account-tag"
+      />
+
       <v-list-item
         :title="$t('menu.sushiEndpoints')"
         to="/admin/endpoints"
         prepend-icon="mdi-api"
       />
+
       <v-list-item
         :title="$t('menu.customFields')"
         to="/admin/custom-fields"
@@ -41,6 +53,7 @@
         to="/admin/harvests"
         prepend-icon="mdi-tractor"
       />
+
       <v-list-group value="ezREEPORT">
         <template #activator="{ props }">
           <v-list-item
@@ -80,11 +93,13 @@
           prepend-icon="mdi-history"
         />
       </v-list-group>
+
       <v-list-item
         :title="$t('menu.sync')"
         to="/admin/sync"
         prepend-icon="mdi-sync"
       />
+
       <v-list-item
         :title="$t('menu.activity')"
         to="/admin/activity"

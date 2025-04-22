@@ -21,6 +21,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     const data = await $fetch('/api/profile/memberships', {
       query: {
         include: ['institution', 'spacePermissions.space', 'repositoryPermissions.repository'],
+        size: 0,
       },
     });
 

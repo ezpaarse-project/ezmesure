@@ -1,11 +1,11 @@
 <template>
   <v-combobox
-    :value="modelValue?.pattern"
+    :model-value="modelValue?.pattern"
     :label="`${$t('repositories.pattern')} *`"
     :items="availableRepositories ?? []"
     :rules="[
-      () => !!modelValue.pattern || $t('fieldIsRequired'),
-      () => /^[a-z0-9*_-]+$/i.test(modelValue.pattern) || $t('invalidFormat'),
+      () => !!modelValue?.pattern || $t('fieldIsRequired'),
+      () => /^[a-z0-9*_-]+$/i.test(modelValue?.pattern) || $t('invalidFormat'),
     ]"
     :loading="status === 'pending' && 'primary'"
     :error="!!error"
@@ -27,13 +27,7 @@
         v-bind="listItem"
       >
         <template #subtitle>
-          <v-chip
-            :text="item.type"
-            :color="repoColors.get(item.type)"
-            size="x-small"
-            density="comfortable"
-            class="ml-2"
-          />
+          <RepositoryTypeChip :model-value="item" class="ml-1" />
         </template>
       </v-list-item>
     </template>
@@ -44,7 +38,7 @@
 const props = defineProps({
   modelValue: {
     type: Object,
-    required: true,
+    default: () => undefined,
   },
 });
 

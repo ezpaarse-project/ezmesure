@@ -18,6 +18,7 @@ menu:
   profile: Profil
   members: Membres
   users: Utilisateurs
+  elasticRoles: Rôles Elastic
   logout: Déconnexion
   contact: Contact
   report: Rapports
@@ -147,6 +148,8 @@ activity:
     sushi: Identifiants COUNTER
     endpoints: Points d'accès COUNTER
     reporting: Reporting
+    spaces: Espaces Kibana
+    harvest: Moissonnage
   actions:
     user/register: Enregistrement
     user/refresh: Mise à jour de profil
@@ -160,6 +163,7 @@ activity:
     institutions/delete: Suppression d'un établissement
     institutions/addMember: Ajout d'un membre
     institutions/removeMember: Révocation d'un membre
+    institutions/import: Import d'établissements
     export/aggregate: Export d'agrégation
     export/counter5: Export COUNTER 5
     events/delete: Suppression partielle d'index
@@ -176,6 +180,7 @@ activity:
     sushi/harvest: Moissonnage COUNTER
     sushi/import: Import d'identifiants COUNTER
     sushi/check-connection: Test de connexion COUNTER
+    spaces/import: Import d'espaces Kibana
     endpoint/create: Création de point d'accès
     endpoint/update: Mise à jour de point d'accès
     endpoint/delete: Suppression de point d'accès
@@ -187,6 +192,11 @@ activity:
     reporting/update: Mise à jour d'une tâche de reporting
     reporting/delete: Suppression d'une tâche de reporting
     reporting/history: Consultation de l'historique d'une tâche de reporting
+    harvest-sessions/create: Création d'une session de moissonnage
+    harvest-sessions/upsert: Insertion d'une session de moissonnage
+    harvest-sessions/start: Démarrage d'une session de moissonnage
+    harvest-sessions/delete: Suppression d'une session de moissonnage
+    harvest-sessions/stop: Arrêt d'une session de moissonnage
 endpoints:
   endpoint: Point d'accès
   toolbarTitle: Point d'accès COUNTER ({count})
@@ -228,6 +238,7 @@ endpoints:
   noSupportedDataDesc: La liste des rapports supportés est mise à jour tous les mois avant un moissonnage. Pour remplir cette liste, vous devez d'abord moissonner le point d'accès. Vous pouvez aussi ajouter des rapports additionnels avec le bouton ci-dessous.
   firstMonthAvailable: Premier mois disponible
   lastMonthAvailable: Dernier mois disponible
+  undefinedAvailable: Indéfini
   addAdditionalReport: Ajouter un rapport additionnel
   undoReport: Annuler les modifications
   manuallyEdited: Modification manuelles
@@ -494,6 +505,7 @@ components:
   components: Composantes
   count: "{count} composante|{count} composantes"
   noComponent: Aucune composante
+  add: Ajouter une composante
 group:
   group: Regroupé dans
   noGroup: Aucun groupe
@@ -804,7 +816,8 @@ repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
     |Gérer {count} alias
-  target: Pattern de l'entrepôt
+  alias: Alias
+  target: Pattern de l'entrepôt cible
   filtered: Filtré ?
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
@@ -897,6 +910,23 @@ harvest:
       de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+elasticRoles:
+  toolbarTitle: Rôles Elastic ({count})
+  newRole: Nouveau rôle
+  filtersForm.title: Filtres du rôle
+  institutions: Établissements
+  addInstitution: Ajouter un établissement
+  noInstitutions: Aucun établissement n'utilise ce rôle
+  readonly: Lecture seule
+  users: Utilisateurs
+  addUser: Ajouter un utilisateur
+  noUsers: Aucun utilisateur n'utilise ce rôle
+  manageElasticRoles: >
+    Gérer les rôles
+    |Gérer {count} rôles
+  deleteNbRoles: >
+    Vous êtes sur le point de supprimer {n} rôle
+    |Vous êtes sur le point de supprimer {n} rôles
 sync:
   status:
     notSynced: Pas encore synchronisé
@@ -919,6 +949,7 @@ sync:
   repositories: Entrepôts
   repositoryAliases: Alias
   users: Utilisateurs
+  elasticRoles: Rôles Elastic
   ezreeportUsers: Utilisateurs
   ezreeportNamespaces: Établissements
   unableToRetrieveInformation: Impossible de récupérer les informations de la synchronisation
@@ -1030,3 +1061,6 @@ looseFilter: Les résultats correspondront à l'une des valeurs
 strictFilter: Les résultats correspondront à toutes les valeurs
 loading: Chargement...
 retry: Réessayer
+applyToAll: Appliquer à tous
+minValueError: "La valeur est trop petite. Minimum: {min}"
+maxValueError: "La valeur est trop grande. Maximum: {max}"

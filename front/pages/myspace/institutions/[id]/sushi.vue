@@ -18,7 +18,7 @@
       </template>
 
       <template #filters-panel="props">
-        <SushiFilters :institution="institution" v-bind="props" />
+        <SushiApiFilters :institution="institution" v-bind="props" />
       </template>
 
       <v-btn
@@ -243,10 +243,6 @@
           :current-year="currentHarvestYear"
           @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
         />
-      </template>
-
-      <template #[`item.updatedAt`]="{ item }">
-        <LocalDate :model-value="item.updatedAt" />
       </template>
 
       <template #[`item.active`]="{ item }">
@@ -523,11 +519,6 @@ const headers = computed(() => [
     title: t('institutions.sushi.harvest'),
     value: 'harvests',
     align: 'center',
-  },
-  {
-    title: t('institutions.sushi.updatedAt'),
-    value: 'updatedAt',
-    sortable: true,
   },
   {
     title: t('endpoints.active'),
