@@ -104,6 +104,7 @@ exports.createInstitution = async (ctx) => {
   const { addAsMember } = ctx.query;
   const { username, isAdmin } = user;
   let memberships;
+  let customProps;
 
   ctx.metadata = {
     institutionName: body?.name,
@@ -125,6 +126,14 @@ exports.createInstitution = async (ctx) => {
     };
   }
 
+  if (isAdmin && Array.isArray(body.customProps)) {
+    customProps = {
+      createMany: {
+        data: body.customProps.map(({ fieldId, value } = {}) => ({ fieldId, value })),
+      },
+    };
+  }
+
   const institutionsService = new InstitutionsService();
 
   if (body?.logo) {
@@ -132,7 +141,7 @@ exports.createInstitution = async (ctx) => {
   }
 
   const institution = await institutionsService.create({
-    data: { ...institutionData, memberships },
+    data: { ...institutionData, memberships, customProps },
   });
   appLogger.verbose(`Institution [${institution.id}] is created`);
 
@@ -174,12 +183,51 @@ exports.updateInstitution = async (ctx) => {
     institutionData.logoId = await ImagesService.storeLogo(body.logo);
   }
 
-  // FIXME: handle admin restricted fields
+  const currentCustomProps = new Map(
+    (institution.customProps ?? []).map((prop) => [prop.fieldId, prop]),
+  );
+  const newCustomProps = new Map(
+    (body.customProps ?? []).map((prop) => [prop.fieldId, prop]),
+  );
+
+  const allFieldIds = new Set([...currentCustomProps.keys(), ...newCustomProps.keys()]);
+
+  const customProps = {
+    deleteMany: [],
+    upsert: [],
+  };
+
+  allFieldIds.forEach((fieldId) => {
+    const currentProp = currentCustomProps.get(fieldId);
+    const newProp = newCustomProps.get(fieldId);
+
+    if (!user.isAdmin && currentProp?.field?.editable !== true) {
+      return;
+    }
+
+    if (!newProp) {
+      if (user.isAdmin) { customProps.deleteMany.push({ fieldId }); }
+      return;
+    }
+
+    customProps.upsert.push({
+      where: {
+        fieldId_institutionId: {
+          fieldId,
+          institutionId: institution.id,
+        },
+      },
+      create: { fieldId, value: newProp.value },
+      update: { fieldId, value: newProp.value },
+    });
+  });
+
   const updatedInstitution = await institutionsService.update({
     where: { id: institution.id },
     data: {
       ...institutionData,
       logo: undefined,
+      customProps,
     },
   });
   appLogger.verbose(`Institution [${institution.id}] is updated`);
