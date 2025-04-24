@@ -1041,6 +1041,7 @@ invalidFormat: Format invalide
 areYouSure: Êtes-vous sûr ?
 fieldIsRequired: Ce champ est requis
 fieldMustMatch: 'Ce champ doit correspondre à : {pattern}'
+notEditable: Non éditable
 maxLength: 'Longueur maximale : {n} caractères'
 open: Ouvrir
 send: Envoyer

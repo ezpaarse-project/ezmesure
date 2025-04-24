@@ -153,14 +153,13 @@
               variant="outlined"
               class="mt-4"
             >
-              <template #append>
+              <template v-if="user?.isAdmin" #append>
                 <v-menu
                   v-model="showCustomPropMenu"
                   location="left center"
                   :offset="10"
                   :close-on-content-click="false"
                   width="250px"
-                  @update:model-value="customPropKey = ''"
                 >
                   <template #activator="{ props }">
                     <v-btn
@@ -170,25 +169,25 @@
                     />
                   </template>
 
-                  <v-form class="d-flex align-center ga-3" @submit.prevent="addCustomProp(customPropKey)">
-                    <v-text-field
-                      ref="customPropInput"
-                      v-model="customPropKey"
-                      :label="$t('institutions.institution.propertyName')"
-                      variant="outlined"
-                      autofocus
-                      hide-details
-                      density="compact"
-                      class="flex-grow-1"
-                    />
-
-                    <v-btn
-                      type="submit"
-                      color="primary"
-                      density="compact"
-                      icon="mdi-check"
-                    />
-                  </v-form>
+                  <v-autocomplete
+                    ref="customPropInput"
+                    v-model="customField"
+                    :label="$t('institutions.institution.propertyName')"
+                    :items="availableCustomFields ?? []"
+                    item-title="labelFr"
+                    return-object
+                    autofocus
+                    hide-details
+                    auto-select-first
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
+                    @update:model-value="addCustomProp"
+                  >
+                    <template #item="{ props: itemProps, item }">
+                      <v-list-item v-bind="itemProps" :subtitle="item.raw.id" />
+                    </template>
+                  </v-autocomplete>
                 </v-menu>
               </template>
 
@@ -196,31 +195,32 @@
                 <v-empty-state
                   v-if="!hasCustomProps"
                   color="red"
-                  title="Aucune propriété"
-                  text="Ajoutez en une en cliquant sur le + en haut à droite"
+                  :title="$t('institutions.institution.noCustomProps')"
+                  :text="user?.isAdmin ? $t('institutions.institution.addNewCustomProp') : undefined"
                 />
 
                 <div
-                  v-for="(_propValue, propKey) in institution.customProps"
-                  :key="propKey"
-                  class="d-flex align-center ga-3"
+                  v-for="(customProp, index) in institution.customProps"
+                  :key="customProp.fieldId"
+                  class="d-flex align-center ga-2 pt-3"
                 >
                   <div class="flex-grow-1">
-                    <v-text-field
-                      :ref="(el) => customPropInputRefs[propKey] = el"
-                      v-model="institution.customProps[propKey]"
-                      :label="propKey"
+                    <InstitutionCustomProp
+                      :ref="(el) => customPropInputRefs[customProp.fieldId] = el"
+                      v-model="institution.customProps[index]"
                       variant="outlined"
                       density="compact"
                       hide-details
+                      :readonly="!user?.isAdmin && (customProp.field?.editable !== true)"
                     />
                   </div>
 
-                  <div class="flex-shrink-1">
+                  <div v-if="user?.isAdmin" class="flex-shrink-1">
                     <v-btn
                       icon="mdi-delete"
                       variant="text"
-                      @click="removeCustomProp(propKey)"
+                      density="comfortable"
+                      @click="removeCustomProp(customProp.fieldId)"
                     />
                   </div>
                 </div>
@@ -409,9 +409,15 @@ const addAsMember = ref(false);
 /** @type {Ref<Object | null>} */
 const customPropInputRef = useTemplateRef('customPropInput');
 const showCustomPropMenu = ref(false);
-const customPropKey = ref('');
+const customField = ref(null);
 const customPropInputRefs = ref({});
 const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+const {
+  data: availableCustomFields,
+  error: customFieldsError,
+  execute: fetchCustomFields,
+  status: customFieldsStatus,
+} = useLazyFetch('/api/custom-fields', { immediate: false });
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -425,25 +431,36 @@ const logoSrc = computed(() => {
 
 watch(showCustomPropMenu, (v) => {
   if (v) {
-    customPropKey.value = '';
+    customField.value = null;
     nextTick().then(() => { customPropInputRef.value?.focus(); });
+
+    if (customFieldsStatus.value === 'idle') {
+      fetchCustomFields();
+    }
   }
 });
 
-function removeCustomProp(name) {
-  delete institution.value.customProps[name];
+function removeCustomProp(fieldId) {
+  institution.value.customProps = institution.value.customProps.filter(
+    (prop) => prop.fieldId !== fieldId,
+  );
 }
 
-function addCustomProp(name) {
-  if (!institution.value.customProps?.[name]) {
-    institution.value.customProps = {
-      ...institution.value.customProps || {},
-      [name]: '',
-    };
+function addCustomProp(field) {
+  const customProps = institution.value.customProps ?? [];
+
+  if (!customProps.find((prop) => prop.fieldId === field.id)) {
+    customProps.push({
+      field,
+      fieldId: field.id,
+      value: field.multiple ? [] : '',
+    });
+
+    institution.value.customProps = customProps;
   }
 
   showCustomPropMenu.value = false;
-  nextTick().then(() => { customPropInputRefs.value[name]?.focus(); });
+  nextTick().then(() => { customPropInputRefs.value[field.id]?.focus(); });
 }
 
 /**
@@ -458,6 +475,7 @@ function init(item, opts) {
   originalName.value = item?.name;
   institution.value = {
     social: {},
+    customProps: [],
     ...(item ?? {}),
   };
   logoPreview.value = null;
