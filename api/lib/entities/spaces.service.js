@@ -95,6 +95,7 @@ module.exports = class SpacesService extends BasePrismaService {
 
     this.triggerHooks('space:delete', deletedSpace);
     deletedSpace.permissions.forEach((spacePerm) => { this.triggerHooks('space_permission:delete', spacePerm); });
+    deletedSpace.elasticRolePermissions.forEach((rolePerm) => { this.triggerHooks('elastic_role_space_permission:delete', rolePerm); });
     return deleteResult;
   }
 

@@ -170,14 +170,14 @@ const DEFAULT_REPORT_TYPE = 'tr';
  */
 function getSushiURL({ sushiUrl }, version = '5') {
   const versionPrefixRegex = /(\/?r51?)?\/*$/;
-  const baseUrl = sushiUrl.trim().replace(versionPrefixRegex, '');
+  const domain = sushiUrl.trim().replace(versionPrefixRegex, '');
   const versionPrefix = versionPrefixRegex.exec(sushiUrl)?.[1];
 
   switch (version) {
     case '5':
-      return `${baseUrl}${versionPrefix || ''}`;
+      return { domain, baseUrl: `${domain}${versionPrefix || ''}` };
     case '5.1':
-      return `${baseUrl}/r51`;
+      return { domain, baseUrl: `${domain}/r51` };
 
     default:
       throw new Error(`Unsupported COUNTER version: ${version}`);
@@ -220,7 +220,7 @@ function getSushiParams(sushiItem, scopes = []) {
  * @returns {Promise<any>} The endpoint response
  */
 async function getAvailableReports(sushi, version = '5') {
-  const baseUrl = getSushiURL(sushi?.endpoint || {}, version);
+  const { baseUrl } = getSushiURL(sushi?.endpoint || {}, version);
 
   const allowedScopes = [undefined, 'all', 'report_list'];
   const params = getSushiParams(sushi, allowedScopes);
@@ -634,6 +634,7 @@ async function startCleanCron() {
 }
 
 module.exports = {
+  getSushiURL,
   getReportDownloadConfig,
   validateReport,
   getReportFilename,

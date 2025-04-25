@@ -11,7 +11,7 @@ errors:
 
   harvest:
     noTarget: Please provide a target index, or associate a prefix to the institution [%s]
-    taskExists: "SUSHI item [%s] already have an associated task (status: [%s])"
+    taskExists: "COUNTER credentials [%s] already have an associated task (status: [%s])"
     invalidDate: The date [%s] is invalid
     invalidPeriod: The period [from %s to %s] is invalid
     failedToUpdateSupportedReports: Failed to update the list of supported reports
@@ -31,25 +31,25 @@ errors:
     noUserFound: No user found
 
   sushi-endpoint:
-    notFound: Endpoint not found
+    notFound: COUNTER endpoint not found
 
     import:
-      alreadyExists: Endpoint [%s] already exists
+      alreadyExists: COUNTER endpoint [%s] already exists
 
   sushi:
     unauthorized: You are not authorized to manage sushi credentials
     institutionNotValidated: "Cannot manage sushi credentials : institution is not validated"
-    notFound: SUSHI item not found
-    emptyEndpointResponse: SUSHI endpoint returned an empty response
-    invalidResponse: The SUSHI endpoint responded with invalid data
+    notFound: COUNTER credentials not found
+    emptyEndpointResponse: COUNTER endpoint returned an empty response
+    invalidResponse: The COUNTER endpoint responded with invalid data
     notJsonResponse: "The endpoint response is not in JSON format (type: %s)"
     badStatus: The endpoint responded with %s %s
     requestFailed: Request failed for an unknown reason
-    managementLocked: SUSHI credentials management is currently locked
+    managementLocked: COUNTER credentials management is currently locked
 
     import:
-      belongsToAnother: SUSHI item [%s] belongs to an other institution
-      alreadyExists: SUSHI item [%s] already exists
+      belongsToAnother: COUNTER credentials [%s] belongs to an other institution
+      alreadyExists: COUNTER credentials [%s] already exists
 
   task:
     notFound: Tâche introuvable
@@ -107,6 +107,7 @@ errors:
 
   role:
     notFound: Role [%s] not found
+    alreadyExists: Role [%s] already exists
 
   space:
     notFound: Space [%s] not found

@@ -36,7 +36,7 @@ model Institution {
   logoId              String?
   /// Institution type (ex: university)
   type                String?
-  /// Institution acrynom
+  /// Institution acronym
   acronym             String?
   /// Institution website URL
   websiteUrl          String?
@@ -50,6 +50,8 @@ model Institution {
   sushiReadySince     DateTime?
   /// Institution members
   memberships         Membership[]
+  /// Additional roles to give to each member
+  elasticRoles        ElasticRole[]
   /// Institution spaces
   spaces              Space[]
   /// Actions that were triggered in the scope of the institution
@@ -61,55 +63,57 @@ model Institution {
   /// Institution repositories
   repositories        Repository[]
   /// Institution aliases
-  repositoryAliases        RepositoryAlias[]
+  repositoryAliases   RepositoryAlias[]
 }
 
 /// A user
 model User {
   /// The username
-  username    String       @id
+  username     String        @id
   /// Full name
-  fullName    String
+  fullName     String
   /// Email
-  email       String
+  email        String
   /// Creation date
-  createdAt   DateTime     @default(now())
+  createdAt    DateTime      @default(now())
   /// Latest update date
-  updatedAt   DateTime     @updatedAt
+  updatedAt    DateTime      @updatedAt
   /// Whether the user has admin access or not
-  isAdmin     Boolean      @default(false)
+  isAdmin      Boolean       @default(false)
   /// Arbitrary metadata
-  metadata    Json         @default("{}")
+  metadata     Json          @default("{}")
   /// User memberships
-  memberships Membership[]
+  memberships  Membership[]
+  /// User additional roles specific to elastic
+  elasticRoles ElasticRole[]
   /// Actions that were triggered by the user
-  actions     Action[]
+  actions      Action[]
 }
 
 /// A membership (a user belonging to an institution)
 model Membership {
   /// Username of the member
-  username              String
+  username                   String
   /// The member
-  user                  User                   @relation(fields: [username], references: [username], onDelete: Cascade)
+  user                       User                        @relation(fields: [username], references: [username], onDelete: Cascade)
   /// ID of the institution
-  institutionId         String
+  institutionId              String
   /// The institution
-  institution           Institution            @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution                Institution                 @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Roles of the member inside the institution
-  roles                 String[]
+  roles                      String[]
   /// Permissions of the user for the institution (members management, SUSHI, ezREEPORT...)
-  permissions           String[]
+  permissions                String[]
   /// Permissions of the user for the institution spaces
-  spacePermissions      SpacePermission[]
+  spacePermissions           SpacePermission[]
   /// Permissions of the user for the institution repositories
-  repositoryPermissions RepositoryPermission[]
+  repositoryPermissions      RepositoryPermission[]
   /// Permissions of the user for the institution aliases
   repositoryAliasPermissions RepositoryAliasPermission[]
   /// Whether the membership can be modified or not by non-admins
-  locked                Boolean                @default(false)
+  locked                     Boolean                     @default(false)
   /// Abritrary comment about the membership
-  comment         String?
+  comment                    String?
 
   @@id([username, institutionId])
 }
@@ -117,29 +121,31 @@ model Membership {
 /// A kibana space
 model Space {
   /// ID of the space (as used in Kibana)
-  id            String            @id
+  id                     String                       @id
   /// ID of the institution this space is associated to
-  institutionId String
+  institutionId          String
   /// The institution this space is associated to
-  institution   Institution       @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institution            Institution                  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   /// Creation date (in the DB, not in Kibana)
-  createdAt     DateTime          @default(now())
+  createdAt              DateTime                     @default(now())
   /// Latest update date (in the DB, not in Kibana)
-  updatedAt     DateTime          @updatedAt
+  updatedAt              DateTime                     @updatedAt
   /// Space name
-  name          String
+  name                   String
   /// Space description
-  description   String?
+  description            String?
   /// Space initials
-  initials      String?
+  initials               String?
   /// Space color
-  color         String?
+  color                  String?
   /// Space type (ezpaarse, counter5)
-  type          String            @db.VarChar(50)
+  type                   String                       @db.VarChar(50)
   /// A list of index patterns that should be available in the space
-  indexPatterns Json[]
+  indexPatterns          Json[]
   /// Member permissions associated to this space
-  permissions   SpacePermission[]
+  permissions            SpacePermission[]
+  /// Permissions granted by role for this space
+  elasticRolePermissions ElasticRoleSpacePermission[]
 }
 
 /// A space permission (access rights of a member for a specific space)
@@ -165,19 +171,21 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions Institution[]
+  institutions           Institution[]
   /// Creation date
-  createdAt    DateTime               @default(now())
+  createdAt              DateTime                          @default(now())
   /// Latest update date
-  updatedAt    DateTime               @updatedAt
+  updatedAt              DateTime                          @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern      String                 @id
+  pattern                String                            @id
   /// The repository type (ezpaarse, counter5)
-  type         String                 @db.VarChar(50)
+  type                   String                            @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions  RepositoryPermission[]
+  permissions            RepositoryPermission[]
   /// Aliases associated to this repository
-  aliases RepositoryAlias[]
+  aliases                RepositoryAlias[]
+  /// Permissions granted by role for this repository
+  elasticRolePermissions ElasticRoleRepositoryPermission[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -203,39 +211,107 @@ model RepositoryPermission {
 /// A repository alias (alias for a section of elasticsearch)
 model RepositoryAlias {
   /// The institution this repository is associated to
-  institutions Institution[]
+  institutions           Institution[]
   /// Creation date
-  createdAt    DateTime               @default(now())
+  createdAt              DateTime                               @default(now())
   /// Latest update date
-  updatedAt    DateTime               @updatedAt
-  /// The alias pattern (ex: b-bibcnrs*)
-  pattern      String                 @id
+  updatedAt              DateTime                               @updatedAt
+  /// The alias pattern (ex: b-bibcnrs)
+  pattern                String                                 @id
   /// The repository's pattern targeted by alias
-  target       String
+  target                 String
   /// The repository
-  repository        Repository @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  repository             Repository                             @relation(fields: [target], references: [pattern], onDelete: Cascade)
   /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
-  filters      Json?
+  filters                Json?
   /// Member permissions associated to this alias
-  permissions  RepositoryAliasPermission[]
+  permissions            RepositoryAliasPermission[]
+  /// Permissions granted by role for this alias
+  elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
 }
 
 /// A alias permission (access rights of a member for a specific alias)
 model RepositoryAliasPermission {
   /// Username of the member
-  username          String
+  username      String
   /// Institution of the member
-  institutionId     String
+  institutionId String
   /// The member
-  membership        Membership @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
+  membership    Membership      @relation(fields: [username, institutionId], references: [username, institutionId], onDelete: Cascade)
   /// Pattern of the alias
-  aliasPattern String
+  aliasPattern  String
   /// The alias
-  alias        RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+  alias         RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
   /// Whether the permission can be modified or not
-  locked            Boolean    @default(false)
+  locked        Boolean         @default(false)
 
   @@id([username, institutionId, aliasPattern])
+}
+
+/// Custom role to give to users
+model ElasticRole {
+  /// Name of the role
+  name                       String                                 @id
+  /// Users using this roles
+  users                      User[]
+  /// Institutions using this roles
+  institutions               Institution[]
+  /// Creation date
+  createdAt                  DateTime                               @default(now())
+  /// Latest update date
+  updatedAt                  DateTime                               @updatedAt
+  /// Permissions that role give to repositories
+  repositoryPermissions      ElasticRoleRepositoryPermission[]
+  /// Permissions that role gives to repository aliases
+  repositoryAliasPermissions ElasticRoleRepositoryAliasPermission[]
+  /// Permissions that role gives to spaces
+  spacePermissions           ElasticRoleSpacePermission[]
+}
+
+/// Permission on repository granted by a role
+model ElasticRoleRepositoryPermission {
+  /// Name of the concerned role
+  elasticRoleName   String
+  /// The concerned role
+  elasticRole       ElasticRole @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Pattern of the concerned repository
+  repositoryPattern String
+  /// The concerned repository
+  repository        Repository  @relation(fields: [repositoryPattern], references: [pattern], onDelete: Cascade)
+  /// Whether the member has a readonly access to the repository
+  readonly          Boolean     @default(false)
+
+  @@id([elasticRoleName, repositoryPattern])
+}
+
+/// Permission on repository alias granted by a role
+model ElasticRoleRepositoryAliasPermission {
+  /// Name of the concerned role
+  elasticRoleName String
+  /// The concerned role
+  elasticRole     ElasticRole     @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Pattern of the concerned alias
+  aliasPattern    String
+  /// The concerned alias
+  alias           RepositoryAlias @relation(fields: [aliasPattern], references: [pattern], onDelete: Cascade)
+
+  @@id([elasticRoleName, aliasPattern])
+}
+
+/// Permission on space granted by a role
+model ElasticRoleSpacePermission {
+  /// Name of the concerned role
+  elasticRoleName String
+  /// The concerned role
+  elasticRole     ElasticRole @relation(fields: [elasticRoleName], references: [name], onDelete: Cascade)
+  /// Id of the concerned space
+  spaceId         String
+  /// The concerned space
+  space           Space       @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  /// Whether the member has a readonly access to the space
+  readonly        Boolean     @default(false)
+
+  @@id([elasticRoleName, spaceId])
 }
 
 /// Represent the actions that are triggered
@@ -332,6 +408,10 @@ model HarvestJob {
   sessionId       String
   /// Session that created the job
   session         HarvestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// Beginning of the requested period, may differ from session's cause of supported periods
+  beginDate       String
+  /// End of the requested period, may differ from session's cause of supported periods
+  endDate         String
   /// Index where the harvested data should be inserted
   index           String
   /// Job running time
@@ -347,7 +427,7 @@ model HarvestJob {
   /// Job steps
   steps           Step[]
   /// States affected by current job
-  harvests         Harvest[]
+  harvests        Harvest[]
 }
 
 /// Harvest state of a SUSHI item, for a specific month and report ID
@@ -465,14 +545,18 @@ model SushiEndpoint {
   defaultApiKey             String?
   /// Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")
   paramSeparator            String?
-  /// List report IDs that are supported by the endpoint
+  /// [Deprecated] List report IDs that are supported by the endpoint
   supportedReports          String[]
-  /// List of report IDs that should be ignored, even if the endpoint indicates that they are supported
+  /// [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported
   ignoredReports            String[]
-  /// Additional report IDs to be added to the list of supported reports provided by the endpoint
+  /// [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint
   additionalReports         String[]
-  /// Date on which the list of supported reports was last updated
+  /// [Deprecated] Date on which the list of supported reports was last updated
   supportedReportsUpdatedAt DateTime?
+  /// List of reports that are supported (or unsupported) by the endpoint, with periods available
+  supportedData             Json               @default("{}")
+  /// Date on which the list of supported data was last updated
+  supportedDataUpdatedAt    DateTime?
   /// Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")
   harvestDateFormat         String?
   /// Report used when testing endpoint

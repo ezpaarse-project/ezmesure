@@ -23,7 +23,7 @@
               icon
             >
               <template #panel="panel">
-                <SushiHarvestSessionBodyFilters :session-id="modelValue.id" v-bind="panel" />
+                <SushiHarvestSessionBodyApiFilters :session-id="modelValue.id" v-bind="panel" />
               </template>
             </SkeletonFilterButton>
           </template>
@@ -255,7 +255,7 @@ async function cancelJob(job) {
   }
 
   try {
-    await $fetch(`/tasks/${job.id}/_cancel`, {
+    await $fetch(`/api/tasks/${job.id}/_cancel`, {
       method: 'POST',
     });
     refresh();
@@ -276,7 +276,7 @@ async function deleteJob(job) {
   }
 
   try {
-    await $fetch(`/tasks/${job.id}`, {
+    await $fetch(`/api/tasks/${job.id}`, {
       method: 'DELETE',
     });
     refresh();

@@ -1,9 +1,10 @@
 <template>
   <v-combobox
     v-model:search="search"
-    :model-value="modelValue ?? []"
-    :items="endpoint?.supportedReports ?? []"
-    @update:model-value="$emit('update:modelValue', $event ?? undefined)"
+    :model-value="modelValue?.toUpperCase() ?? ''"
+    :items="supportedReports"
+    :return-object="false"
+    @update:model-value="$emit('update:modelValue', $event?.toLowerCase() ?? undefined)"
   >
     <template #prepend-item>
       <v-list-item :subtitle="$t('reports.supportedReportsOnPlatform')" />
@@ -28,7 +29,7 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   modelValue: {
     type: [String, Array],
     default: () => undefined,
@@ -44,4 +45,17 @@ defineEmits({
 });
 
 const search = ref('');
+
+const supportedReports = computed(() => {
+  const legacy = (props.endpoint?.supportedReports ?? []).map((r) => r);
+  const supported = Object.entries(props.endpoint?.supportedData ?? {}).flatMap(
+    ([r, data]) => (data?.supported?.value ? [r] : []),
+  );
+
+  const reports = Array.from(new Set([...legacy, ...supported]));
+  return reports.map((value) => ({
+    value: value.toLowerCase(),
+    title: value.toUpperCase(),
+  }));
+});
 </script>

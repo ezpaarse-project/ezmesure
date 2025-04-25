@@ -13,12 +13,12 @@ menu:
   myInstitution: My institution
   myInstitutions: My institutions
   institutions: Institutions
-  sushiEndpoints: SUSHI endpoints
+  sushiEndpoints: COUNTER endpoints
   activity: Activity
   profile: Profile
   members: Members
-  sushi: Sushi
   users: Users
+  elasticRoles: Elastic Roles
   logout: Logout
   contact: Contact
   report: Reports
@@ -131,7 +131,6 @@ partners:
     ezcounter: ezCOUNTER
     ezreeport: ezREEPORT
     report: Reporting
-    sushi: SUSHI
 activity:
   action: Action
   user: User
@@ -145,9 +144,11 @@ activity:
     institutions: Institutions
     exports: Exports
     indices: Indices
-    sushi: SUSHI credentials
-    endpoints: SUSHI endpoints
+    sushi: COUNTER credentials
+    endpoints: COUNTER endpoints
     reporting: Reporting
+    spaces: Kibana spaces
+    harvest: Harvesting
   actions:
     user/register: Registering
     user/refresh: Profile refresh
@@ -161,6 +162,7 @@ activity:
     institutions/delete: Institution deletion
     institutions/addMember: Member addition
     institutions/removeMember: Member revocation
+    institutions/import: Institution import
     export/aggregate: Aggregated export
     export/counter5: COUNTER 5 export
     events/delete: Partial index deletion
@@ -169,14 +171,15 @@ activity:
     indices/delete: Index deletion
     indices/search: Search
     indices/insert: Data load
-    sushi/create: SUSHI credentials creation
-    sushi/update: SUSHI credentials update
-    sushi/delete: SUSHI credentials deletion
-    sushi/delete-many: Bulk SUSHI credentials deletion
-    sushi/download-report: SUSHI report download
-    sushi/harvest: SUSHI harvest
-    sushi/import: SUSHI credentials import
-    sushi/check-connection: SUSHI connection test
+    sushi/create: COUNTER credentials creation
+    sushi/update: COUNTER credentials update
+    sushi/delete: COUNTER credentials deletion
+    sushi/delete-many: Bulk COUNTER credentials deletion
+    sushi/download-report: COUNTER report download
+    sushi/harvest: COUNTER harvest
+    sushi/import: COUNTER credentials import
+    sushi/check-connection: COUNTER connection test
+    spaces/import: Kibana spaces import
     endpoint/create: Endpoint creation
     endpoint/update: Endpoint update
     endpoint/delete: Endpoint deletion
@@ -188,17 +191,22 @@ activity:
     reporting/update: Reporting task update
     reporting/delete: Reporting task deletion
     reporting/history: Reporting task history consultation
+    harvest-sessions/create: Harvest session creation
+    harvest-sessions/upsert: Harvest session insertion
+    harvest-sessions/start: Harvest session start
+    harvest-sessions/delete: Harvest session deletion
+    harvest-sessions/stop: Harvest session stop
 endpoints:
   endpoint: Endpoint
-  toolbarTitle: SUSHI endpoints ({count})
-  pageDescription: Here you can manage the list of the available SUSHI endpoints.
-  pageDescription2: Only version 5 of the SUSHI protocol is supported.
+  toolbarTitle: COUNTER endpoints ({count})
+  pageDescription: Here you can manage the list of the available COUNTER endpoints.
+  pageDescription2: Only version 5 of the COUNTER protocol is supported.
   manageEndpoints: >
     Manage endpoint
     |Manage {count} endpoints
-  unableToRetriveEndpoints: Unable to retrieve SUSHI endpoints
-  soapWarning: The URL seems to point to an unsupported SUSHI endpoint (version 4 or below)
-  sushiNotRootDetected: It seems that the SUSHI URL does not point to the root of the service. It should not contain /reports, /status ou /member.
+  unableToRetriveEndpoints: Unable to retrieve COUNTER endpoints
+  soapWarning: The URL seems to point to an unsupported COUNTER endpoint (version 4 or below)
+  sushiNotRootDetected: It seems that the COUNTER URL does not point to the root of the service. It should not contain /reports, /status ou /member.
   validated: Validated
   addEndpoint: Add an endpoint
   updateEndpoint: Update endpoint
@@ -222,12 +230,17 @@ endpoints:
   requireCustomerId: Customer ID is required
   requireRequestorId: Requestor ID is required
   requireApiKey: An API key is required
-  isSushiCompliant: The endpoint is SUSHI compliant
+  isSushiCompliant: The endpoint is COUNTER compliant
   harvestedReports: Harvested reports
-  ignoredReportsDesc: The reports listed below will be considered as unsupported, even if they are present in the list provided by the endpoint.
-  ignoredReports: Ignored reports
-  additionalReportsDesc: The reports listed below will be considered as supported, even if they are not present in the list provided by the endpoint.
-  additionalReports: Additional reports
+  supportedDataDesc: The table below represents the list of supported (or unsupported) reports by the endpoint. The checked reports will be harvested, even if they are not in the list provided by the endpoint. The unchecked reports will not be harvested, even if they are in the list provided by the endpoint. You can modify this list at any time.
+  noSupportedData: No supported report
+  noSupportedDataDesc: The list of supported reports is updated every month before a harvest. To fill this list, you must first harvest the endpoint. You can also add additional reports with the button below.
+  firstMonthAvailable: First available month
+  lastMonthAvailable: Last available month
+  addAdditionalReport: Add an additional report
+  undefinedAvailable: Undefined
+  undoReport: Undo changes
+  manuallyEdited: Manual changes
   ignoreReportValidation: Ignore report validation
   description: Description
   paramSeparatorDesc: ezMESURE automatically adds {0}, {1} and {2} parameters while harvesting. If the endpoint does not accept the standard separator {separator} for this multivalued fields, please enter the separator here.
@@ -274,6 +287,7 @@ institutions:
   joinInstitution: Would you join {institution} ?
   joinInstitutionEmail: A message will be sent to the correspondents of this institution to let them know.
   createMailContactList: Copy the emails of the correspondents
+  modify: Modify my institution
   reports:
     reports: Reports
   filters:
@@ -341,7 +355,7 @@ institutions:
       ezpaarse: Log processing with ezPAARSE
       ezmesure: Transfers into ezMESURE
       reporting: Periodic usage reports
-      sushi: SUSHI harvesting
+      sushi: COUNTER harvesting
     mustMatch: "Must match: {pattern}"
     searchOpenData: Search among known institutions
     searchOpenDataHint: Search an institution by name, location, UAI code, siret number...
@@ -401,25 +415,21 @@ institutions:
     featureLabels:
       institution: Institution card
       memberships: Members
-      sushi: SUSHI credentials
+      sushi: COUNTER credentials
   sushi:
-    title: SUSHI credentials ({count})
-    pageDescription:
-      Here you can enter the SUSHI credentials that will be used to
-      automatically harvest your COUNTER reports.
-    pageDescription2: Only version 5 of the SUSHI protocol is supported.
+    title: COUNTER credentials ({count})
+    pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
+    pageDescription2: Only version 5 of the COUNTER protocol is supported.
     addCredentials: Add credentials
     updateCredentials: Update credentials
     unabletToRetriveSushiInformations: Unable to retrieve information from sushi platforms
     label: Label
     tags: Tags
-    packages: Packages
-    packagesHint: Profiles, accounts, funds, antennas, etc. that include the credentials.
-    packagesDescription:
-      Profiles, accounts, funds, antennas, etc. that include the
-      credentials. The packages will be usable in your dashboards, using the X_Package
-      field
+    packages: Package
+    packagesHint: Profile, account, fund, antenna, etc. that include the credentials.
+    packagesDescription: Profile, account, fund, antenna, etc. that include the credentials. The package will be usable in your dashboards, using the X_Package field
     unableToRetriveSushiData: Unable to retrieve sushi information
+    onlyOnePackage: You must choose one package.
     endpoint: Endpoint
     requestorId: Requestor ID
     customerId: Customer ID
@@ -437,7 +447,7 @@ institutions:
     enterCustomerId: Please enter a Customer Id.
     enterAPIKey: Please enter an API Key.
     comment: Comment
-    credentials: Sushi credentials
+    credentials: COUNTER
     manageN: >
       Manage credentials
       |Manage {count} credentials
@@ -450,7 +460,7 @@ institutions:
     cannotResetCheck: Failed to reset connection status for {name}
     connection: Connection
     untested: Untested
-    operational: Operational
+    operational: Valid credentials
     invalidCredentials: Invalid credentials
     invalidCredentialsShort: Invalid
     connectionSuccessful:
@@ -473,7 +483,7 @@ institutions:
     validateMyCredentials: Validate my credentials
     resumeEntryQuestion: Resume your entry ?
     resumeEntryDesc: You have declared the completion of your credentials on {date}. Do you want to resume your entry ?
-    lastHarvest: Last harvest
+    harvest: Harvest
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
@@ -485,6 +495,7 @@ components:
   components: Components
   count: "{count} components"
   noComponent: No components
+  add: Add component
 group:
   group: Grouped in
   noGroup: No group
@@ -539,7 +550,7 @@ tasks:
       invalid_json: The downloaded report is not in the good format (JSON), or has syntax issues.
       max_defferals_exceeded: After several attempts, the report was still not ready.
       unauthorized: Authentication to the endpoint failed. Check that your credentials are entered correctly.
-      invalid_report: The downloaded report is not valid, or include changes that are not SUSHI compliant.
+      invalid_report: The downloaded report is not valid, or include changes that are not COUNTER compliant.
       sushi:1000: The report could not be harvested because the endpoint is unreachable.
       sushi:1010: The endpoint is unable to provide the report because it's under heavy load.
       sushi:1020: The endpoint refuses to provide the report because the number of requests is too high.
@@ -587,13 +598,13 @@ sushi:
   latestImport: Latest import
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
-  managementIsLocked: SUSHI credentials management is currently locked.
+  managementIsLocked: COUNTER credentials management is currently locked.
   nInstitutions: >
     1 institution use this endpoint
     |{count} institutions use this endpoint
   nUntestedCredentials: "{count} untested credentials"
   nInvalidCredentials: "{count} invalid credentials"
-  nOperationalCredentials: "{count} operational credentials"
+  nOperationalCredentials: "{count} valid credentials"
   nProblematicEndpoints: >
     1 problematic endpoint
     |{count} problematic endpoints
@@ -601,7 +612,7 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
-  deleteNbCredentials: You are about to delete {number} SUSHI credentials.
+  deleteNbCredentials: You are about to delete {number} COUNTER credentials.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
@@ -622,7 +633,7 @@ sushi:
     ignored: Report not supported (ezMESURE finding)
   noMatrix:
     title: No harvested report for these credentials on this period
-    description: These credentials have not yet been harvested for this period. Please validate your SUSHI credentials to be harvested in the future by the administration team.
+    description: These credentials have not yet been harvested for this period. Please validate your COUNTER credentials to be harvested in the future by the administration team.
   paramScopes:
     all: All requests to the endpoint
     report_list: Report list
@@ -636,7 +647,7 @@ sushi:
     noFilesAvailable: No files available
     nbFiles: 1 file|{count} files
 reports:
-  sushiReturnedErrors: The SUSHI endpoint responded with errors.
+  sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
   supportedReports: Supported reports
   supportedReportsOnPlatform: Reports supported by the publisher platform
@@ -687,14 +698,14 @@ contact:
   failed: Sending the contact form failed.
   requestInformation: Information request
   bugReport: Bug report
-  declareSushiEndpoint: Declare a SUSHI endpoint
+  declareSushiEndpoint: Declare a COUNTER endpoint
   emailIsRequired: The email address is required
   emailMustBeValid: The email address must be valid
   contentIsRequired: A message is required
   subjectIsRequired: Subject is required
-  sushiIsRequired: SUSHI credentials are required
+  sushiIsRequired: COUNTER credentials are required
   endpointVendor: Vendor name
-  endpointUrl: URL of the SUSHI endpoint
+  endpointUrl: URL of the COUNTER endpoint
   pleaseEnterFullVendorName: Please enter the full name (possibly with its acronym)
   sushiDetails: Please provide credentials to be used to test this endpoint, admin team will use them to confirm that the endpoint is valid and COUNTER5 compliant.
   endpointDetails: If you have knowledge of other elements (required authentication keys, technical provider, etc.), please indicate them below.
@@ -783,7 +794,8 @@ repositoryAliases:
   manageRepositoryAliases: >
     Manage aliases
     |Manage {count} aliases
-  target: Repository pattern
+  alias: Alias
+  target: Target repository pattern
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -873,6 +885,21 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+elasticRoles:
+  toolbarTitle: Elastic Roles ({count})
+  newRole: New role
+  filtersForm.title: Filters of the role
+  institutions: Institutions
+  addInstitution: Add institution
+  noInstitutions: No institutions is using this role
+  readonly: Readonly
+  users: Users
+  addUser: Add user
+  noUsers: No users is using this role
+  manageElasticRoles: >
+    Manage roles
+    |Manage {count} roles
+  deleteNbRoles: You are about to delete {n} roles
 sync:
   status:
     notSynced: Not yet synchronized
@@ -898,6 +925,7 @@ sync:
   repositories: Repositories
   repositoryAliases: Aliases
   users: Users
+  elasticRoles: Elastic Roles
   ezreeportUsers: Users
   ezreeportNamespaces: Institutions
   unableToRetrieveInformation: Unable to retrieve information about synchronization
@@ -988,3 +1016,6 @@ nbOthers: (+{count} others)
 unknown: Unknown
 looseFilter: Results will match one of the values
 strictFilter: Results will mach all the values
+applyToAll: Apply to all
+minValueError: "The value is too small. Minimum: {min}"
+maxValueError: "The value is too big. Maximum: {max}"

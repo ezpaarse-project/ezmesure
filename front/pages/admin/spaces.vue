@@ -9,7 +9,7 @@
       @update:model-value="debouncedRefresh()"
     >
       <template #filters-panel="props">
-        <SpaceFilters v-bind="props" />
+        <SpaceApiFilters v-bind="props" />
       </template>
     </SkeletonPageBar>
 

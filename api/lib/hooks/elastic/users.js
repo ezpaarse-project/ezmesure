@@ -4,9 +4,11 @@ const { registerHook } = require('../hookEmitter');
 const { appLogger } = require('../../services/logger');
 
 const elasticUsers = require('../../services/elastic/users');
+const { syncUser } = require('../../services/sync/elastic');
 
 /**
  * @typedef {import('@prisma/client').User} User
+ * @typedef {import('@prisma/client').ElasticRole} ElasticRole
  */
 
 /**
@@ -54,12 +56,7 @@ const onUserUpdate = async (user) => {
   }
 
   try {
-    await elasticUsers.updateUser({
-      username: user.username,
-      email: user.email,
-      fullName: user.fullName,
-      roles: elasticUser.roles,
-    });
+    await syncUser(user);
     appLogger.verbose(`[elastic][hooks] User [${user.username}] is updated`);
   } catch (error) {
     appLogger.error(`[elastic][hooks] User [${user.username}] cannot be updated: ${error.message}`);
@@ -94,6 +91,17 @@ const onUserUpsert = async (user) => {
   }
 };
 
+/**
+ * @param {{ user: User, role: ElasticRole }} param0
+ */
+const onUserRoleUpdate = async ({ user }) => {
+  try {
+    await syncUser(user);
+  } catch (error) {
+    appLogger.error(`[elastic][hooks] User [${user.username}] cannot be sync: ${error.message}`);
+  }
+};
+
 const hookOptions = { uniqueResolver: (user) => user.username };
 
 registerHook('user:create-admin', onAdminUserCreate, hookOptions);
@@ -101,3 +109,5 @@ registerHook('user:create', onUserCreate, hookOptions);
 registerHook('user:update', onUserUpdate, hookOptions);
 registerHook('user:upsert', onUserUpsert, hookOptions);
 registerHook('user:delete', onUserDelete, hookOptions);
+registerHook('user:connect:elastic_role', onUserRoleUpdate, hookOptions);
+registerHook('user:disconnect:elastic_role', onUserRoleUpdate, hookOptions);

@@ -446,7 +446,7 @@ const checkConnection = async (sushi, params) => {
     }
   }
 
-  if (response?.status === 401) {
+  if (response?.status === 401 || response?.status === 403) {
     status = 'unauthorized';
     errorCode = ERROR_CODES.unauthorized;
   }
@@ -473,7 +473,7 @@ const checkConnection = async (sushi, params) => {
     }
   });
 
-  if (report && exceptions?.length === 0) {
+  if (!endpoint.ignoreReportValidation && report && exceptions?.length === 0) {
     const { valid } = sushiService.validateReport(report);
 
     if (!valid) {

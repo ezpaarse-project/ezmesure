@@ -29,7 +29,8 @@ module.exports = async function process(params) {
     credentials,
     credentialsId,
     reportType,
-    session: { beginDate, endDate },
+    beginDate,
+    endDate,
   } = task;
 
   if (!credentials) {

@@ -64,7 +64,7 @@ exports.delete = async function deleteIndex(indexName, requestConfig) {
 };
 
 /**
- * Delete an alias in elastic.
+ * Delete an alias from all indices in elastic.
  *
  * @param {string} aliasName The name of the alias
  * @param {object} [requestConfig] config of request (timeouts, headers, ignore, and so on).
@@ -72,7 +72,7 @@ exports.delete = async function deleteIndex(indexName, requestConfig) {
  * @returns {Promise<>} alias deleted
  */
 exports.deleteAlias = async function deleteAlias(aliasName, requestConfig) {
-  return elastic.indices.deleteAlias({ name: aliasName }, requestConfig);
+  return elastic.indices.deleteAlias({ index: '*', name: aliasName }, requestConfig);
 };
 
 /**

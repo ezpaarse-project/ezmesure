@@ -17,9 +17,10 @@
         <InstitutionBreadcrumbs :institution="institution" :current="toolbarTitle" />
       </template>
 
-      <MembershipAddMenu
-        :institution="institution"
-        @update:model-value="membershipFormDialogRef?.open($event, { institution })"
+      <UserAddMenu
+        :model-value="institution.memberships"
+        :title="$t('institutions.members.addMember')"
+        @user-add="addMember($event)"
       >
         <template #activator="{ props }">
           <v-btn
@@ -32,7 +33,7 @@
             v-bind="props"
           />
         </template>
-      </MembershipAddMenu>
+      </UserAddMenu>
     </SkeletonPageBar>
 
     <v-data-table-server
@@ -247,6 +248,7 @@ const headers = computed(() => [
   {
     title: t('institutions.members.accessRights'),
     value: 'accessRights',
+    align: 'center',
     children: [
       {
         title: t('repositories.repositories'),
@@ -295,6 +297,25 @@ const debouncedRefresh = useDebounceFn(refresh, 250);
  */
 function openMembershipFormDialog(item) {
   membershipFormDialogRef.value?.open(item, { institution: institution.value });
+}
+
+/**
+ * Add member to institution
+ *
+ * @param {Object} item
+ */
+async function addMember(item) {
+  try {
+    const membership = await $fetch(`/api/institutions/${institution.value.id}/memberships/${item.username}`, {
+      method: 'PUT',
+      body: {},
+    });
+
+    openMembershipFormDialog(membership);
+    refresh();
+  } catch {
+    snacks.error(t('institutions.members.cannotAddMember'));
+  }
 }
 
 /**
