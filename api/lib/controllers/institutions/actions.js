@@ -76,13 +76,14 @@ exports.getInstitutions = async (ctx) => {
 exports.getInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
   const { user } = ctx.state;
+  const queryOpts = {};
 
   if (!user?.isAdmin && Array.isArray(ctx.query?.include)) {
-    const allowedIncludes = new Set(['customProps', 'customProps.field']);
-    ctx.query.include = ctx.query.include.filter((include) => allowedIncludes.has(include));
+    queryOpts.includableFields = ['customProps', 'customProps.field'];
+    queryOpts.includeFilters = { customProps: { field: { visible: true } } };
   }
 
-  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId });
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId }, queryOpts);
 
   const institutionsService = new InstitutionsService();
   const institution = await institutionsService.findUnique(prismaQuery);
