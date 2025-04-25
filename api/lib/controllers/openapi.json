@@ -335,6 +335,52 @@
             "items": {
               "$ref": "#/components/schemas/Repository"
             }
+          },
+          "customProps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstitutionProperty"
+            }
+          }
+        }
+      },
+      "InstitutionProperty": {
+        "description": "Institution property, ie. a value associated with a custom field",
+        "type": "object",
+        "properties": {
+          "fieldId": {
+            "description": "ID of the custom field",
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "institutionId": {
+            "description": "ID of the institution",
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "field": {
+            "$ref": "#/components/schemas/CustomField"
+          },
+          "institution": {
+            "$ref": "#/components/schemas/Institution"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "value": {
+            "description": "Value of the property",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
           }
         }
       },
@@ -473,6 +519,14 @@
           },
           "multiple": {
             "description": "Whether the field accept multiple values",
+            "type": "boolean"
+          },
+          "editable": {
+            "description": "Whether the field can be edited by regular users",
+            "type": "boolean"
+          },
+          "visible": {
+            "description": "Whether the field should be visible to regular users",
             "type": "boolean"
           },
           "labelFr": {
