@@ -35,13 +35,14 @@ An institution
 | tags              | `String[]`           | A list of tags associated to the institution                      |            |          |
 | logoId            | `String?`            | ID of the institution logo                                        |            |          |
 | type              | `String?`            | Institution type (ex: university)                                 |            |          |
-| acronym           | `String?`            | Institution acrynom                                               |            |          |
+| acronym           | `String?`            | Institution acronym                                               |            |          |
 | websiteUrl        | `String?`            | Institution website URL                                           |            |          |
 | city              | `String?`            | Institution city                                                  |            |          |
 | uai               | `String?`            | Institution UAI (Unité Administrative Immatriculée)               |            |          |
 | social            | `Json?`              | Social links of the institution                                   |            |          |
 | sushiReadySince   | `DateTime?`          | Date when SUSHI credentials have been marked as ready for harvest |            |          |
 | memberships       | `Membership[]`       | Institution members                                               |            |          |
+| elasticRoles      | `ElasticRole[]`      | Additional roles to give to each member                           |            |          |
 | spaces            | `Space[]`            | Institution spaces                                                |            |          |
 | actions           | `Action[]`           | Actions that were triggered in the scope of the institution       |            |          |
 | sushiCredentials  | `SushiCredentials[]` | Institution SUSHI credentials                                     |            |          |
@@ -53,17 +54,18 @@ An institution
 
 A user
 
-| Property    | Type           | Description                              | Attributes | Default |
-|-------------|----------------|------------------------------------------|------------|---------|
-| username    | `String`       | The username                             | Id         |         |
-| fullName    | `String`       | Full name                                |            |         |
-| email       | `String`       | Email                                    |            |         |
-| createdAt   | `DateTime`     | Creation date                            |            | `now()` |
-| updatedAt   | `DateTime`     | Latest update date                       |            |         |
-| isAdmin     | `Boolean`      | Whether the user has admin access or not |            | `false` |
-| metadata    | `Json`         | Arbitrary metadata                       |            | `{}`    |
-| memberships | `Membership[]` | User memberships                         |            |         |
-| actions     | `Action[]`     | Actions that were triggered by the user  |            |         |
+| Property     | Type            | Description                               | Attributes | Default |
+|--------------|-----------------|-------------------------------------------|------------|---------|
+| username     | `String`        | The username                              | Id         |         |
+| fullName     | `String`        | Full name                                 |            |         |
+| email        | `String`        | Email                                     |            |         |
+| createdAt    | `DateTime`      | Creation date                             |            | `now()` |
+| updatedAt    | `DateTime`      | Latest update date                        |            |         |
+| isAdmin      | `Boolean`       | Whether the user has admin access or not  |            | `false` |
+| metadata     | `Json`          | Arbitrary metadata                        |            | `{}`    |
+| memberships  | `Membership[]`  | User memberships                          |            |         |
+| elasticRoles | `ElasticRole[]` | User additional roles specific to elastic |            |         |
+| actions      | `Action[]`      | Actions that were triggered by the user   |            |         |
 
 ### Membership
 
@@ -85,19 +87,20 @@ A membership (a user belonging to an institution)
 
 A kibana space
 
-| Property      | Type                | Description                                                    | Attributes | Default |
-|---------------|---------------------|----------------------------------------------------------------|------------|---------|
-| id            | `String`            | ID of the space (as used in Kibana)                            | Id         |         |
-| institution   | `Institution`       | The institution this space is associated to                    |            |         |
-| createdAt     | `DateTime`          | Creation date (in the DB, not in Kibana)                       |            | `now()` |
-| updatedAt     | `DateTime`          | Latest update date (in the DB, not in Kibana)                  |            |         |
-| name          | `String`            | Space name                                                     |            |         |
-| description   | `String?`           | Space description                                              |            |         |
-| initials      | `String?`           | Space initials                                                 |            |         |
-| color         | `String?`           | Space color                                                    |            |         |
-| type          | `String`            | Space type (ezpaarse, counter5)                                |            |         |
-| indexPatterns | `Json[]`            | A list of index patterns that should be available in the space |            |         |
-| permissions   | `SpacePermission[]` | Member permissions associated to this space                    |            |         |
+| Property               | Type                           | Description                                                    | Attributes | Default |
+|------------------------|--------------------------------|----------------------------------------------------------------|------------|---------|
+| id                     | `String`                       | ID of the space (as used in Kibana)                            | Id         |         |
+| institution            | `Institution`                  | The institution this space is associated to                    |            |         |
+| createdAt              | `DateTime`                     | Creation date (in the DB, not in Kibana)                       |            | `now()` |
+| updatedAt              | `DateTime`                     | Latest update date (in the DB, not in Kibana)                  |            |         |
+| name                   | `String`                       | Space name                                                     |            |         |
+| description            | `String?`                      | Space description                                              |            |         |
+| initials               | `String?`                      | Space initials                                                 |            |         |
+| color                  | `String?`                      | Space color                                                    |            |         |
+| type                   | `String`                       | Space type (ezpaarse, counter5)                                |            |         |
+| indexPatterns          | `Json[]`                       | A list of index patterns that should be available in the space |            |         |
+| permissions            | `SpacePermission[]`            | Member permissions associated to this space                    |            |         |
+| elasticRolePermissions | `ElasticRoleSpacePermission[]` | Permissions granted by role for this space                     |            |         |
 
 ### SpacePermission
 
@@ -114,15 +117,16 @@ A space permission (access rights of a member for a specific space)
 
 A repository (a section of elasticsearch allocated to an institution)
 
-| Property     | Type                     | Description                                      | Attributes | Default |
-|--------------|--------------------------|--------------------------------------------------|------------|---------|
-| institutions | `Institution[]`          | The institution this repository is associated to |            |         |
-| createdAt    | `DateTime`               | Creation date                                    |            | `now()` |
-| updatedAt    | `DateTime`               | Latest update date                               |            |         |
-| pattern      | `String`                 | The index pattern (ex: b-bibcnrs*)               | Id         |         |
-| type         | `String`                 | The repository type (ezpaarse, counter5)         |            |         |
-| permissions  | `RepositoryPermission[]` | Member permissions associated to this repository |            |         |
-| aliases      | `RepositoryAlias[]`      | Aliases associated to this repository            |            |         |
+| Property               | Type                                | Description                                      | Attributes | Default |
+|------------------------|-------------------------------------|--------------------------------------------------|------------|---------|
+| institutions           | `Institution[]`                     | The institution this repository is associated to |            |         |
+| createdAt              | `DateTime`                          | Creation date                                    |            | `now()` |
+| updatedAt              | `DateTime`                          | Latest update date                               |            |         |
+| pattern                | `String`                            | The index pattern (ex: b-bibcnrs*)               | Id         |         |
+| type                   | `String`                            | The repository type (ezpaarse, counter5)         |            |         |
+| permissions            | `RepositoryPermission[]`            | Member permissions associated to this repository |            |         |
+| aliases                | `RepositoryAlias[]`                 | Aliases associated to this repository            |            |         |
+| elasticRolePermissions | `ElasticRoleRepositoryPermission[]` | Permissions granted by role for this repository  |            |         |
 
 ### RepositoryPermission
 
@@ -139,15 +143,16 @@ A repository permission (access rights of a member for a specific repository)
 
 A repository alias (alias for a section of elasticsearch)
 
-| Property     | Type                          | Description                                                                 | Attributes | Default |
-|--------------|-------------------------------|-----------------------------------------------------------------------------|------------|---------|
-| institutions | `Institution[]`               | The institution this repository is associated to                            |            |         |
-| createdAt    | `DateTime`                    | Creation date                                                               |            | `now()` |
-| updatedAt    | `DateTime`                    | Latest update date                                                          |            |         |
-| pattern      | `String`                      | The alias pattern (ex: b-bibcnrs*)                                          | Id         |         |
-| repository   | `Repository`                  | The repository                                                              |            |         |
-| filters      | `Json?`                       | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }]) |            |         |
-| permissions  | `RepositoryAliasPermission[]` | Member permissions associated to this alias                                 |            |         |
+| Property               | Type                                     | Description                                                                 | Attributes | Default |
+|------------------------|------------------------------------------|-----------------------------------------------------------------------------|------------|---------|
+| institutions           | `Institution[]`                          | The institution this repository is associated to                            |            |         |
+| createdAt              | `DateTime`                               | Creation date                                                               |            | `now()` |
+| updatedAt              | `DateTime`                               | Latest update date                                                          |            |         |
+| pattern                | `String`                                 | The alias pattern (ex: b-bibcnrs)                                           | Id         |         |
+| repository             | `Repository`                             | The repository                                                              |            |         |
+| filters                | `Json?`                                  | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }]) |            |         |
+| permissions            | `RepositoryAliasPermission[]`            | Member permissions associated to this alias                                 |            |         |
+| elasticRolePermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions granted by role for this alias                                  |            |         |
 
 ### RepositoryAliasPermission
 
@@ -158,6 +163,50 @@ A alias permission (access rights of a member for a specific alias)
 | membership | `Membership`      | The member                                    |            |         |
 | alias      | `RepositoryAlias` | The alias                                     |            |         |
 | locked     | `Boolean`         | Whether the permission can be modified or not |            | `false` |
+
+### ElasticRole
+
+Custom role to give to users
+
+| Property                   | Type                                     | Description                                       | Attributes | Default |
+|----------------------------|------------------------------------------|---------------------------------------------------|------------|---------|
+| name                       | `String`                                 | Name of the role                                  | Id         |         |
+| users                      | `User[]`                                 | Users using this roles                            |            |         |
+| institutions               | `Institution[]`                          | Institutions using this roles                     |            |         |
+| createdAt                  | `DateTime`                               | Creation date                                     |            | `now()` |
+| updatedAt                  | `DateTime`                               | Latest update date                                |            |         |
+| repositoryPermissions      | `ElasticRoleRepositoryPermission[]`      | Permissions that role give to repositories        |            |         |
+| repositoryAliasPermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions that role gives to repository aliases |            |         |
+| spacePermissions           | `ElasticRoleSpacePermission[]`           | Permissions that role gives to spaces             |            |         |
+
+### ElasticRoleRepositoryPermission
+
+Permission on repository granted by a role
+
+| Property    | Type          | Description                                                | Attributes | Default |
+|-------------|---------------|------------------------------------------------------------|------------|---------|
+| elasticRole | `ElasticRole` | The concerned role                                         |            |         |
+| repository  | `Repository`  | The concerned repository                                   |            |         |
+| readonly    | `Boolean`     | Whether the member has a readonly access to the repository |            | `false` |
+
+### ElasticRoleRepositoryAliasPermission
+
+Permission on repository alias granted by a role
+
+| Property    | Type              | Description         | Attributes | Default |
+|-------------|-------------------|---------------------|------------|---------|
+| elasticRole | `ElasticRole`     | The concerned role  |            |         |
+| alias       | `RepositoryAlias` | The concerned alias |            |         |
+
+### ElasticRoleSpacePermission
+
+Permission on space granted by a role
+
+| Property    | Type          | Description                                           | Attributes | Default |
+|-------------|---------------|-------------------------------------------------------|------------|---------|
+| elasticRole | `ElasticRole` | The concerned role                                    |            |         |
+| space       | `Space`       | The concerned space                                   |            |         |
+| readonly    | `Boolean`     | Whether the member has a readonly access to the space |            | `false` |
 
 ### Action
 
@@ -208,6 +257,8 @@ Represent the execution of a harvest job
 | status          | `HarvestJobStatus` | Job status                                                                                              |            |          |
 | reportType      | `String`           | ID of the harvested report (ex: tr_j1)                                                                  |            |          |
 | session         | `HarvestSession`   | Session that created the job                                                                            |            |          |
+| beginDate       | `String`           | Beginning of the requested period, may differ from session's cause of supported periods                 |            |          |
+| endDate         | `String`           | End of the requested period, may differ from session's cause of supported periods                       |            |          |
 | index           | `String`           | Index where the harvested data should be inserted                                                       |            |          |
 | runningTime     | `Int?`             | Job running time                                                                                        |            |          |
 | result          | `Json?`            | Job result                                                                                              |            |          |
@@ -267,37 +318,39 @@ A job step
 
 A SUSHI endpoint
 
-| Property                  | Type                 | Description                                                                                       | Attributes | Default  |
-|---------------------------|----------------------|---------------------------------------------------------------------------------------------------|------------|----------|
-| id                        | `String`             | ID of the endpoint                                                                                | Id         | `cuid()` |
-| createdAt                 | `DateTime`           | Creation date                                                                                     |            | `now()`  |
-| updatedAt                 | `DateTime`           | Latest update date                                                                                |            |          |
-| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                                     |            |          |
-| vendor                    | `String`             | Vendor name of the endpoint                                                                       |            |          |
-| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                                     |            |          |
-| description               | `String?`            | Description of the endpoint                                                                       |            |          |
-| counterVersions           | `String[]`           | Counter versions of the SUSHI service                                                             |            |          |
-| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                   |            |          |
-| active                    | `Boolean`            | Whether the endpoint is active and can be harvested                                               |            | `true`   |
-| activeUpdatedAt           | `DateTime`           | Date on which the active status was last modified                                                 |            | `now()`  |
-| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                                       |            | `false`  |
-| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                                      |            | `false`  |
-| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                          |            | `false`  |
-| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                                |            | `false`  |
-| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                                    |            |          |
-| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                                       |            |          |
-| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                                      |            |          |
-| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                           |            |          |
-| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")           |            |          |
-| supportedReports          | `String[]`           | List report IDs that are supported by the endpoint                                                |            |          |
-| ignoredReports            | `String[]`           | List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
-| additionalReports         | `String[]`           | Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
-| supportedReportsUpdatedAt | `DateTime?`          | Date on which the list of supported reports was last updated                                      |            |          |
-| harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")             |            |          |
-| testedReport              | `String?`            | Report used when testing endpoint                                                                 |            |          |
-| registryId                | `String?`            | Id of platform in https://registry.countermetrics.org                                             |            |          |
-| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                    |            |          |
-| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                      |            |          |
+| Property                  | Type                 | Description                                                                                                    | Attributes | Default  |
+|---------------------------|----------------------|----------------------------------------------------------------------------------------------------------------|------------|----------|
+| id                        | `String`             | ID of the endpoint                                                                                             | Id         | `cuid()` |
+| createdAt                 | `DateTime`           | Creation date                                                                                                  |            | `now()`  |
+| updatedAt                 | `DateTime`           | Latest update date                                                                                             |            |          |
+| sushiUrl                  | `String`             | Base URL of the SUSHI service                                                                                  |            |          |
+| vendor                    | `String`             | Vendor name of the endpoint                                                                                    |            |          |
+| tags                      | `String[]`           | Abritrary tag list associated to the endpoint                                                                  |            |          |
+| description               | `String?`            | Description of the endpoint                                                                                    |            |          |
+| counterVersions           | `String[]`           | Counter versions of the SUSHI service                                                                          |            |          |
+| technicalProvider         | `String?`            | Technical provider of the endpoint (ex: Atypon)                                                                |            |          |
+| active                    | `Boolean`            | Whether the endpoint is active and can be harvested                                                            |            | `true`   |
+| activeUpdatedAt           | `DateTime`           | Date on which the active status was last modified                                                              |            | `now()`  |
+| requireCustomerId         | `Boolean`            | Whether the endpoint requires a customer ID                                                                    |            | `false`  |
+| requireRequestorId        | `Boolean`            | Whether the endpoint requires a requestor ID                                                                   |            | `false`  |
+| requireApiKey             | `Boolean`            | Whether the endpoint requires an API key                                                                       |            | `false`  |
+| ignoreReportValidation    | `Boolean`            | Whether report validation errors should be ignored                                                             |            | `false`  |
+| disabledUntil             | `DateTime?`          | Date until which the endpoint is disabled (no harvest allowed)                                                 |            |          |
+| defaultCustomerId         | `String?`            | Default value for the customer_id parameter                                                                    |            |          |
+| defaultRequestorId        | `String?`            | Default value for the requestor_id parameter                                                                   |            |          |
+| defaultApiKey             | `String?`            | Default value for the api_key parameter                                                                        |            |          |
+| paramSeparator            | `String?`            | Separator used for multivaluated sushi params like Attributes_To_Show (defaults to "|")                        |            |          |
+| supportedReports          | `String[]`           | [Deprecated] List report IDs that are supported by the endpoint                                                |            |          |
+| ignoredReports            | `String[]`           | [Deprecated] List of report IDs that should be ignored, even if the endpoint indicates that they are supported |            |          |
+| additionalReports         | `String[]`           | [Deprecated] Additional report IDs to be added to the list of supported reports provided by the endpoint       |            |          |
+| supportedReportsUpdatedAt | `DateTime?`          | [Deprecated] Date on which the list of supported reports was last updated                                      |            |          |
+| supportedData             | `Json`               | List of reports that are supported (or unsupported) by the endpoint, with periods available                    |            | `{}`     |
+| supportedDataUpdatedAt    | `DateTime?`          | Date on which the list of supported data was last updated                                                      |            |          |
+| harvestDateFormat         | `String?`            | Date format to use for the begin_date and end_date parameters (defaults to "yyyy-MM")                          |            |          |
+| testedReport              | `String?`            | Report used when testing endpoint                                                                              |            |          |
+| registryId                | `String?`            | Id of platform in https://registry.countermetrics.org                                                          |            |          |
+| credentials               | `SushiCredentials[]` | SUSHI credentials associated with the endpoint                                                                 |            |          |
+| params                    | `Json[]`             | Additionnal default parameters. Each param has a name, a value, and a scope.                                   |            |          |
 
 ### SushiCredentials
 
