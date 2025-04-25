@@ -2585,8 +2585,7 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "membership",
-                  "space"
+                  "institutionProperties"
                 ]
               }
             }
@@ -2742,7 +2741,22 @@
           "Administration",
           "CustomFields"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institutionProperties"
+                ]
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
