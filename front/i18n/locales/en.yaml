@@ -466,6 +466,7 @@ institutions:
     connection: Connection
     untested: Untested
     operational: Valid credentials
+    operationalShort: Valid
     invalidCredentials: Invalid credentials
     invalidCredentialsShort: Invalid
     connectionSuccessful:

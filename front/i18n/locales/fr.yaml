@@ -471,6 +471,7 @@ institutions:
     connection: Connexion
     untested: Non testé
     operational: Identifiants valides
+    operationalShort: Valides
     invalidCredentials: Identifiants invalides
     invalidCredentialsShort: Invalides
     connectionSuccessful:
