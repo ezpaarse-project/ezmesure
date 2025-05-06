@@ -41,6 +41,19 @@ function findUnique(params, tx = prisma) {
 }
 
 /**
+ * @param {string} id
+ * @param {Object | null} [includes]
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<CustomField | null>}
+ */
+function findById(id, includes, tx = prisma) {
+  return tx.customField.findUnique({
+    where: { id },
+    include: includes ? { ...includes } : undefined,
+  });
+}
+
+/**
  * @param {CustomFieldCountArgs} params
  * @param {TransactionClient} [tx]
  * @returns {Promise<number>}
@@ -81,12 +94,43 @@ function remove(params, tx = prisma) {
   });
 }
 
+/**
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<CustomField[] | null>}
+ */
+async function removeAll(tx) {
+  if (process.env.NODE_ENV !== 'dev') { return null; }
+
+  /** @param {TransactionClient} txx */
+  const transaction = async (txx) => {
+    const customFields = await findMany({}, txx);
+
+    if (customFields.length === 0) { return null; }
+
+    await Promise.all(
+      customFields.map((sushiEndpoint) => remove(
+        { where: { id: sushiEndpoint.id } },
+        txx,
+      )),
+    );
+
+    return customFields;
+  };
+
+  if (tx) {
+    return transaction(tx);
+  }
+  return prisma.$transaction(transaction);
+}
+
 module.exports = {
   create,
   findMany,
   findUnique,
+  findById,
   count,
   update,
   upsert,
   remove,
+  removeAll,
 };
