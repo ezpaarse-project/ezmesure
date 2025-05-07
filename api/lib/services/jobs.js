@@ -24,7 +24,9 @@ async function checkTask(taskId, jobId) {
 
   const task = await harvestJobService.findUnique({ where: { id: taskId } });
 
-  if (!task || HarvestJobService.isDone(task)) { return; }
+  if (!task) { return; }
+  if (HarvestJobService.isDone(task)) { return; }
+  if (HarvestJobService.isDelayed(task)) { return; }
 
   appLogger.verbose(`${logPrefix} Job [${jobId}] stopped unexpectedly, setting task from status [${task.status}] to [failed]...`);
 
