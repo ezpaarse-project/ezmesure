@@ -22,7 +22,10 @@ module.exports = class HarvestJobsService extends BasePrismaService {
   static $transaction = super.$transaction;
 
   /** @type {HarvestJobStatus[]} */
-  static endStatuses = ['finished', 'failed', 'cancelled', 'delayed'];
+  static endStatuses = ['finished', 'failed', 'cancelled', 'interrupted'];
+
+  /** @type {HarvestJobStatus} */
+  static delayedStatus = 'delayed';
 
   /**
    * Returns whether the job is terminated or not by checking its status
@@ -30,6 +33,14 @@ module.exports = class HarvestJobsService extends BasePrismaService {
    */
   static isDone(job) {
     return this.endStatuses.includes(job?.status);
+  }
+
+  /**
+   * Returns whether the job has been delayed
+   * @param {HarvestJob} job - The job to check
+   */
+  static isDelayed(job) {
+    return job?.status === this.delayedStatus;
   }
 
   /**
