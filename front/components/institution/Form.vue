@@ -148,6 +148,86 @@
             </v-card>
 
             <v-card
+              :title="$t('institutions.institution.customProperties')"
+              prepend-icon="mdi-tag-text-outline"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template v-if="user?.isAdmin" #append>
+                <v-menu
+                  v-model="showCustomPropMenu"
+                  location="left center"
+                  :offset="10"
+                  :close-on-content-click="false"
+                  width="250px"
+                >
+                  <template #activator="{ props }">
+                    <v-btn
+                      v-bind="props"
+                      variant="text"
+                      :icon="showCustomPropMenu ? 'mdi-close' : 'mdi-plus'"
+                    />
+                  </template>
+
+                  <v-autocomplete
+                    ref="customPropInput"
+                    v-model="customField"
+                    :label="$t('institutions.institution.propertyName')"
+                    :items="availableCustomFields ?? []"
+                    item-title="labelFr"
+                    return-object
+                    autofocus
+                    hide-details
+                    auto-select-first
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
+                    @update:model-value="addCustomProp"
+                  >
+                    <template #item="{ props: itemProps, item }">
+                      <v-list-item v-bind="itemProps" :subtitle="item.raw.id" />
+                    </template>
+                  </v-autocomplete>
+                </v-menu>
+              </template>
+
+              <template #text>
+                <v-empty-state
+                  v-if="!hasCustomProps"
+                  color="red"
+                  :title="$t('institutions.institution.noCustomProps')"
+                  :text="user?.isAdmin ? $t('institutions.institution.addNewCustomProp') : undefined"
+                />
+
+                <div
+                  v-for="(customProp, index) in institution.customProps"
+                  :key="customProp.fieldId"
+                  class="d-flex align-center ga-2 pt-3"
+                >
+                  <div class="flex-grow-1">
+                    <InstitutionCustomProp
+                      :ref="(el) => customPropInputRefs[customProp.fieldId] = el"
+                      v-model="institution.customProps[index]"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      :readonly="!user?.isAdmin && (customProp.field?.editable !== true)"
+                    />
+                  </div>
+
+                  <div v-if="user?.isAdmin" class="flex-shrink-1">
+                    <v-btn
+                      icon="mdi-delete"
+                      variant="text"
+                      density="comfortable"
+                      @click="removeCustomProp(customProp.fieldId)"
+                    />
+                  </div>
+                </div>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('institutions.institution.logo')"
               :subtitle="$t('institutions.institution.logoHint', LOGO_RATIO)"
               prepend-icon="mdi-image"
@@ -327,6 +407,19 @@ const openData = ref(null);
 const addAsMember = ref(false);
 
 /** @type {Ref<Object | null>} */
+const customPropInputRef = useTemplateRef('customPropInput');
+const showCustomPropMenu = ref(false);
+const customField = ref(null);
+const customPropInputRefs = ref({});
+const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+const {
+  data: availableCustomFields,
+  error: customFieldsError,
+  execute: fetchCustomFields,
+  status: customFieldsStatus,
+} = useLazyFetch('/api/custom-fields', { immediate: false });
+
+/** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
 const isEditing = computed(() => !!institution.value.id);
@@ -335,6 +428,40 @@ const logoSrc = computed(() => {
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
 });
+
+watch(showCustomPropMenu, (v) => {
+  if (v) {
+    customField.value = null;
+    nextTick().then(() => { customPropInputRef.value?.focus(); });
+
+    if (customFieldsStatus.value === 'idle') {
+      fetchCustomFields();
+    }
+  }
+});
+
+function removeCustomProp(fieldId) {
+  institution.value.customProps = institution.value.customProps.filter(
+    (prop) => prop.fieldId !== fieldId,
+  );
+}
+
+function addCustomProp(field) {
+  const customProps = institution.value.customProps ?? [];
+
+  if (!customProps.find((prop) => prop.fieldId === field.id)) {
+    customProps.push({
+      field,
+      fieldId: field.id,
+      value: field.multiple ? [] : '',
+    });
+
+    institution.value.customProps = customProps;
+  }
+
+  showCustomPropMenu.value = false;
+  nextTick().then(() => { customPropInputRefs.value[field.id]?.focus(); });
+}
 
 /**
  * Init the form, if `institution` is provided, pre-populate the form and will
@@ -348,6 +475,7 @@ function init(item, opts) {
   originalName.value = item?.name;
   institution.value = {
     social: {},
+    customProps: [],
     ...(item ?? {}),
   };
   logoPreview.value = null;
