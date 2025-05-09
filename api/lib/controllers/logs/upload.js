@@ -315,7 +315,7 @@ module.exports = async function upload(ctx) {
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
-    return appLogger.info(`Insert into [${index}]`, ctx.body);
+    return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
   }
 
   let total = 0;
@@ -377,5 +377,5 @@ module.exports = async function upload(ctx) {
     failed,
     errors,
   };
-  return appLogger.info(`Insert into [${index}]`, ctx.body);
+  return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
 };
