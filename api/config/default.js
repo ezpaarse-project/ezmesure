@@ -74,6 +74,13 @@ module.exports = {
   storage: {
     path: path.resolve(__dirname, '../storage'),
   },
+  ezpaarse: {
+    upload: {
+      bulkSize: 2000,
+      bulkMaxTries: 5,
+      bulkBaseRetryDelay: 1000,
+    },
+  },
   jobs: {
     harvest: {
       concurrency: 1,
