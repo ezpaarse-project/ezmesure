@@ -26,11 +26,17 @@ const bulkBaseRetryDelay = Number.parseInt(config.get('ezpaarse.upload.bulkBaseR
  * @param  {String}  index
  * @return {Promise}
  */
-function createIndex(index) {
-  return elastic.indices.create({
-    index,
-    body: indexTemplate,
-  }).then((res) => res.body);
+async function createIndex(index) {
+  let body;
+
+  try {
+    ({ body } = await elastic.indices.create({ index, body: indexTemplate }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to create index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
+
+  return body;
 }
 
 /**
@@ -160,7 +166,7 @@ function readStream(stream, index, username, splittedFields) {
 
       // eslint-disable-next-line no-use-before-define
       bulkInsert((err) => {
-        if (err) { return reject(err); }
+        if (err) { return reject(new Error(err)); }
         busy = false;
 
         if (!doneReading) {
@@ -245,15 +251,21 @@ module.exports = async function upload(ctx) {
 
   const startTime = process.hrtime.bigint();
   const { username, email } = ctx.state.user;
+  let perm;
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': username },
-  });
+  try {
+    ({ body: perm } = await elastic.security.hasPrivileges({
+      username,
+      body: {
+        index: [{ names: [index], privileges: ['write'] }],
+      },
+    }, {
+      headers: { 'es-security-runas-user': username },
+    }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to get privileges of [${username}] on index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
 
   const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
 
@@ -265,7 +277,14 @@ module.exports = async function upload(ctx) {
     return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
-  const { body: exists } = await elastic.indices.exists({ index });
+  let exists;
+
+  try {
+    ({ body: exists } = await elastic.indices.exists({ index }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to check existence of index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
 
   if (!exists) {
     await createIndex(index);
