@@ -23,12 +23,12 @@
         <v-row>
           <v-col cols="12" sm="6">
             <v-text-field
-              v-model="sushi.requestorId"
-              :label="authFields.requestorId.label"
-              :required="authFields.requestorId.required"
-              :rules="authFields.requestorId.rules"
-              :persistent-hint="authFields.requestorId.required"
-              prepend-icon="mdi-account-arrow-down"
+              v-model="sushi.customerId"
+              :label="authFields.customerId.label"
+              :required="authFields.customerId.required"
+              :rules="authFields.customerId.rules"
+              :persistent-hint="authFields.customerId.required"
+              prepend-icon="mdi-account"
               variant="underlined"
               hide-details="auto"
               @update:model-value="connection = undefined"
@@ -37,12 +37,12 @@
 
           <v-col cols="12" sm="6">
             <v-text-field
-              v-model="sushi.customerId"
-              :label="authFields.customerId.label"
-              :required="authFields.customerId.required"
-              :rules="authFields.customerId.rules"
-              :persistent-hint="authFields.customerId.required"
-              prepend-icon="mdi-account"
+              v-model="sushi.requestorId"
+              :label="authFields.requestorId.label"
+              :required="authFields.requestorId.required"
+              :rules="authFields.requestorId.rules"
+              :persistent-hint="authFields.requestorId.required"
+              prepend-icon="mdi-account-arrow-down"
               variant="underlined"
               hide-details="auto"
               @update:model-value="connection = undefined"

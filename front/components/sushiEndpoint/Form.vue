@@ -65,8 +65,8 @@
 
                   <v-col cols="12" sm="6">
                     <v-checkbox
-                      v-model="endpoint.requireRequestorId"
-                      :label="$t('endpoints.requireRequestorId')"
+                      v-model="endpoint.requireCustomerId"
+                      :label="$t('endpoints.requireCustomerId')"
                       density="compact"
                       color="primary"
                       hide-details
@@ -75,8 +75,8 @@
 
                   <v-col cols="12" sm="6">
                     <v-checkbox
-                      v-model="endpoint.requireCustomerId"
-                      :label="$t('endpoints.requireCustomerId')"
+                      v-model="endpoint.requireRequestorId"
+                      :label="$t('endpoints.requireRequestorId')"
                       density="compact"
                       color="primary"
                       hide-details

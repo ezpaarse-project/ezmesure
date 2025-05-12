@@ -33,13 +33,13 @@
                 <v-row>
                   <v-col cols="12" sm="6">
                     <v-text-field
-                      v-model="sushi.requestorId"
-                      :label="authFields.requestorId.label"
-                      :required="authFields.requestorId.required"
-                      :rules="authFields.requestorId.rules"
-                      :persistent-hint="authFields.requestorId.required"
+                      v-model="sushi.customerId"
+                      :label="authFields.customerId.label"
+                      :required="authFields.customerId.required"
+                      :rules="authFields.customerId.rules"
+                      :persistent-hint="authFields.customerId.required"
                       :disabled="!sushi.endpoint"
-                      prepend-icon="mdi-account-arrow-down"
+                      prepend-icon="mdi-account"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="sushi.connection = undefined"
@@ -48,13 +48,13 @@
 
                   <v-col cols="12" sm="6">
                     <v-text-field
-                      v-model="sushi.customerId"
-                      :label="authFields.customerId.label"
-                      :required="authFields.customerId.required"
-                      :rules="authFields.customerId.rules"
-                      :persistent-hint="authFields.customerId.required"
+                      v-model="sushi.requestorId"
+                      :label="authFields.requestorId.label"
+                      :required="authFields.requestorId.required"
+                      :rules="authFields.requestorId.rules"
+                      :persistent-hint="authFields.requestorId.required"
                       :disabled="!sushi.endpoint"
-                      prepend-icon="mdi-account"
+                      prepend-icon="mdi-account-arrow-down"
                       variant="underlined"
                       hide-details="auto"
                       @update:model-value="sushi.connection = undefined"

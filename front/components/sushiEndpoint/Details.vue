@@ -61,8 +61,8 @@ const fields = computed(() => [
   { value: props.modelValue.sushiUrl || '', label: t('endpoints.url'), cols: 8 },
   { value: props.modelValue.technicalProvider || '-', label: t('endpoints.technicalProvider'), cols: 4 },
 
-  { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('endpoints.requireRequestorId'), cols: 4 },
-  { value: props.modelValue.requireRequestorId ? t('yes') : t('no'), label: t('endpoints.requireCustomerId'), cols: 4 },
+  { value: props.modelValue.requireCustomerId ? t('yes') : t('no'), label: t('endpoints.requireCustomerId'), cols: 4 },
+  { value: props.modelValue.requireRequestorId ? t('yes') : t('no'), label: t('endpoints.requireRequestorId'), cols: 4 },
   { value: props.modelValue.requireApiKey ? t('yes') : t('no'), label: t('endpoints.requireApiKey'), cols: 4 },
 
   {
