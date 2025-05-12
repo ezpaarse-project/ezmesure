@@ -121,8 +121,6 @@ module.exports = {
     index: 'opendata',
     cron: '0 0 0 * * *',
   },
-  reportingActivityIndex: '.ezreporting-activity',
-  reportingIndex: '.ezreporting',
   cypher: {
     secret: 'some-secret',
   },
