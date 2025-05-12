@@ -19,7 +19,7 @@
             </v-col>
           </v-row>
 
-          <v-row>
+          <v-row v-if="user?.isAdmin">
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.members.roles')"
