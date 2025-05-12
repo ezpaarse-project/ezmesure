@@ -324,13 +324,13 @@ institutions:
     domains: Domains
     general: General
     logo: Logo
-    logoHint: Ratio {0}:{1}
+    logoHint: 'Ratio {ratioW}:{ratioH} - Formats: {accept}'
     links: Links
     localisation: Localisation
     automations: Automations
     monitor: Monitoring
     dropImageHere: Drop your image here
-    invalidImageFile: "Invalid image file. Accepted file types: JPEG, PNG, SVG"
+    invalidImageFile: "Invalid image file. Accepted file types: {accept}"
     imageTooLarge: "Image is too large. Maximum allowed size: 2mb"
     noDataFound: Your institution's information could not be retrieved.
     dataSent: Institution informations transmitted
