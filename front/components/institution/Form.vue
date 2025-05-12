@@ -229,7 +229,7 @@
 
             <v-card
               :title="$t('institutions.institution.logo')"
-              :subtitle="$t('institutions.institution.logoHint', LOGO_RATIO)"
+              :subtitle="$t('institutions.institution.logoHint', { ratioW: LOGO_RATIO.w, ratioH: LOGO_RATIO.h, accept: LOGO_ACCEPT })"
               prepend-icon="mdi-image"
               variant="outlined"
               class="mt-4"
@@ -277,7 +277,7 @@
                       max-width="500"
                       class="mx-auto"
                       :style="{
-                        aspectRatio: `${LOGO_RATIO[0]}/${LOGO_RATIO[1]}`,
+                        aspectRatio: `${LOGO_RATIO.w}/${LOGO_RATIO.h}`,
                       }"
                     />
                   </v-col>
@@ -378,7 +378,8 @@ const emit = defineEmits({
 });
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9_.-]*$/;
-const LOGO_RATIO = [3, 1];
+const LOGO_RATIO = { w: 3, h: 1 };
+const LOGO_ACCEPT = 'JPEG, PNG, SVG';
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 
 const { t } = useI18n();
@@ -566,7 +567,7 @@ async function save() {
  */
 async function updateLogo(file) {
   if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
-    logoError.value = t('institutions.institution.invalidImageFile');
+    logoError.value = t('institutions.institution.invalidImageFile', { accept: LOGO_ACCEPT });
     return;
   }
 

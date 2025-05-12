@@ -19,7 +19,7 @@
             </v-col>
           </v-row>
 
-          <v-row>
+          <v-row v-if="user?.isAdmin">
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.members.roles')"
@@ -211,6 +211,7 @@
                         v-model="comment"
                         :label="$t('institutions.sushi.comment')"
                         :loading="loading && 'primary'"
+                        :readonly="!canEdit"
                         prepend-icon="mdi-image-text"
                         variant="underlined"
                         hide-details="auto"
@@ -414,7 +415,7 @@ function saveMembership() {
     method: 'PUT',
     body: {
       roles: Array.from(roles.value),
-      comment: comment.value || undefined,
+      comment: comment.value || '',
       locked: user.value?.isAdmin ? locked.value : undefined,
       permissions: perms.flat(),
     },

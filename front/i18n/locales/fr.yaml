@@ -327,13 +327,13 @@ institutions:
     domains: Domaines
     general: Général
     logo: Logo
-    logoHint: Ratio {0}:{1}
+    logoHint: 'Ratio {ratioW}:{ratioH} - Formats : {accept}'
     links: Liens
     localisation: Localisation
     automations: Automatisations
     monitor: Contrôle
     dropImageHere: Déposez votre image ici
-    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : JPEG, PNG, SVG'
+    invalidImageFile: 'Format de fichier invalide. Types de fichiers supportés : {accept}'
     imageTooLarge: 'L''image est trop volumineuse. Taille maximale autorisée : 2mb'
     noDataFound: Les informations de votre établissement n'ont pas pu être récupérées.
     dataSent: Informations d'établissement transmises
