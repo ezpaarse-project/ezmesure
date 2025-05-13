@@ -129,7 +129,8 @@ const itemsUrl = computed(() => {
   }
 
   return fieldValues
-    .map((fieldValue) => field?.value?.itemUrl?.replace('{value}', encodeURIComponent(fieldValue ?? '')))
+    .filter((value) => !!value)
+    .map((fieldValue) => field.value?.itemUrl?.replace('{value}', encodeURIComponent(fieldValue ?? '')))
     .filter((url) => !!url);
 });
 
