@@ -6,9 +6,7 @@ Nous avons procédé au moissonnage de rapports COUNTER 5 pour le compte de "{{ 
 
 Les données sont accessibles via vos tableaux de bords habituels, à condition d'en régler la temporalité à la période voulue.
 
-{% if space %}
-https://ezmesure.couperin.org/kibana/s/{{ space }}
-{% endif %}
+{% if spaceURL %}{{ spaceURL }}{% endif %}
 
 Si vous remarquez des données qui vous paraissent manquantes ou non valides, merci de nous contacter rapidement{% if recipients %} à {{ recipients }}{% endif %} pour nous permettre de le signaler aux éditeurs.
 
