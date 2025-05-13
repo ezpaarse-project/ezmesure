@@ -24,7 +24,7 @@
 
     <template #append>
       <v-menu>
-        <template #activator="{ props: menuProps }">
+        <template #activator="{ props: menu }">
           <v-slide-x-reverse-transition>
             <v-btn
               v-if="hasItemsUrls"
@@ -32,7 +32,7 @@
               density="comfortable"
               color="accent"
               variant="text"
-              v-bind="menuProps"
+              v-bind="menu"
             />
           </v-slide-x-reverse-transition>
         </template>
@@ -102,22 +102,19 @@ const props = defineProps({
   },
 });
 
-const comboRef = useTemplateRef('combobox');
-const textRef = useTemplateRef('textfield');
-
 const emit = defineEmits({
   'update:modelValue': (value) => !!value,
 });
 
-const focus = () => {
-  if (comboRef.value) { comboRef.value.focus(); }
-  if (textRef.value) { textRef.value.focus(); }
-};
-
 const { locale } = useI18n();
 
+const comboRef = useTemplateRef('combobox');
+const textRef = useTemplateRef('textfield');
+
 const field = computed(() => props.modelValue.field);
+
 const label = computed(() => (locale.value === 'fr' ? field.value.labelFr : field.value.labelEn));
+
 const isMultiple = computed(() => field.value.multiple);
 
 const itemsUrl = computed(() => {
@@ -132,12 +129,16 @@ const itemsUrl = computed(() => {
   }
 
   return fieldValues
-    .filter((value) => value)
-    .map((fieldValue) => field.value.itemUrl?.replace('{value}', encodeURIComponent(fieldValue ?? '')))
-    .filter((url) => url);
+    .map((fieldValue) => field?.value?.itemUrl?.replace('{value}', encodeURIComponent(fieldValue ?? '')))
+    .filter((url) => !!url);
 });
 
 const hasItemsUrls = computed(() => itemsUrl.value.length > 0);
+
+function focus() {
+  if (comboRef.value) { comboRef.value.focus(); }
+  if (textRef.value) { textRef.value.focus(); }
+}
 
 defineExpose({ focus });
 </script>

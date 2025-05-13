@@ -20,8 +20,12 @@
       />
     </SkeletonPageBar>
 
-    <v-container>
-      <p>{{ $t('customFields.pageDesc') }}</p>
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <p>{{ $t('customFields.pageDesc') }}</p>
+        </v-col>
+      </v-row>
     </v-container>
 
     <v-data-table-server
@@ -32,34 +36,44 @@
       v-bind="vDataTableOptions"
     >
       <template #[`item.properties`]="{ item }">
-        <v-icon v-tooltip:top="$t('customFields.multivalued')" class="ml-1" :color="item.multiple ? 'primary' : 'grey-lighten-2'">
-          mdi-label-multiple
-        </v-icon>
+        <v-icon
+          v-tooltip:top="$t('customFields.multivalued')"
+          :color="item.multiple ? 'primary' : 'grey-lighten-2'"
+          icon="mdi-label-multiple"
+          class="ml-1"
+        />
 
-        <v-icon v-tooltip:top="$t('customFields.editableByUsers')" class="ml-1" :color="item.editable ? 'primary' : 'grey-lighten-2'">
-          mdi-pencil
-        </v-icon>
+        <v-icon
+          v-tooltip:top="$t('customFields.editableByUsers')"
+          :color="item.editable ? 'primary' : 'grey-lighten-2'"
+          icon="mdi-pencil"
+          class="ml-1"
+        />
 
-        <v-icon v-tooltip:top="$t('customFields.visibleToUsers')" class="ml-1" :color="item.visible ? 'primary' : 'grey-lighten-2'">
-          mdi-eye
-        </v-icon>
+        <v-icon
+          v-tooltip:top="$t('customFields.visibleToUsers')"
+          :color="item.visible ? 'primary' : 'grey-lighten-2'"
+          icon="mdi-eye"
+          class="ml-1"
+        />
       </template>
 
       <template #[`item.actions`]="{ item }">
         <v-btn
+          v-tooltip:top="$t('modify')"
           :disabled="!customFieldFormDialogRef"
-          :title="$t('modify')"
           icon="mdi-pencil"
           variant="text"
           density="comfortable"
+          color="blue"
           @click="customFieldFormDialogRef.open(item)"
         />
         <v-btn
-          :title="$t('delete')"
+          v-tooltip:top="$t('delete')"
           icon="mdi-delete"
           variant="text"
           density="comfortable"
-          color="error"
+          color="red"
           @click="deleteCustomField([item])"
         />
       </template>
@@ -91,7 +105,7 @@ definePageMeta({
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
 
@@ -112,8 +126,6 @@ const {
     sortBy: [{ key: 'id', order: 'asc' }],
   },
 });
-
-const { locale } = useI18n();
 
 /**
  * Table headers
@@ -145,6 +157,7 @@ const headers = computed(() => [
     align: 'center',
   },
 ]);
+
 /**
  * Toolbar title
  */
