@@ -370,6 +370,7 @@ institutions:
     youtubeUrl: URL Youtube
     facebookUrl: URL Facebook
     customProperties: Propriétés personnalisées
+    failedToGetCustomProperties: Impossible de charger les propriétés personnalisées
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite

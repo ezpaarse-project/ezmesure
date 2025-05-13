@@ -161,11 +161,14 @@
                   :close-on-content-click="false"
                   width="250px"
                 >
-                  <template #activator="{ props }">
+                  <template #activator="{ props: menu }">
                     <v-btn
-                      v-bind="props"
-                      variant="text"
+                      v-tooltip="showCustomPropMenu ? $t('close') : $t('add')"
                       :icon="showCustomPropMenu ? 'mdi-close' : 'mdi-plus'"
+                      variant="tonal"
+                      :color="showCustomPropMenu ? undefined : 'green'"
+                      density="comfortable"
+                      v-bind="menu"
                     />
                   </template>
 
@@ -192,8 +195,15 @@
               </template>
 
               <template #text>
+                <v-alert
+                  v-if="customFieldsError"
+                  :title="$t('institutions.institution.failedToGetCustomProperties')"
+                  :text="customFieldsError?.message"
+                  type="error"
+                />
+
                 <v-empty-state
-                  v-if="!hasCustomProps"
+                  v-else-if="!hasCustomProps"
                   color="red"
                   :title="$t('institutions.institution.noCustomProps')"
                   :text="user?.isAdmin ? $t('institutions.institution.addNewCustomProp') : undefined"
@@ -220,6 +230,8 @@
                       icon="mdi-delete"
                       variant="text"
                       density="comfortable"
+                      size="small"
+                      color="red"
                       @click="removeCustomProp(customProp.fieldId)"
                     />
                   </div>
@@ -242,7 +254,6 @@
                   v-if="logoPreview || institution.logoId"
                   :text="$t('delete')"
                   prepend-icon="mdi-delete"
-                  size="small"
                   variant="tonal"
                   color="red"
                   class="mr-2"
@@ -251,7 +262,6 @@
                 <v-btn
                   :text="$t('modify')"
                   prepend-icon="mdi-pencil"
-                  size="small"
                   variant="tonal"
                   color="primary"
                   @click="openFileDialog()"
@@ -406,39 +416,33 @@ const isDraggingLogo = ref(false);
 /** @type {Ref<Object | null>} */
 const openData = ref(null);
 const addAsMember = ref(false);
-
-/** @type {Ref<Object | null>} */
-const customPropInputRef = useTemplateRef('customPropInput');
 const showCustomPropMenu = ref(false);
 const customField = ref(null);
 const customPropInputRefs = ref({});
-const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+
 const {
   data: availableCustomFields,
   error: customFieldsError,
   execute: fetchCustomFields,
-  status: customFieldsStatus,
-} = useLazyFetch('/api/custom-fields', { immediate: false });
+} = useFetch('/api/custom-fields', { // Don't await cause we need defineExpose
+  lazy: true,
+  immediate: false,
+  dedupe: 'defer',
+});
 
+/** @type {Ref<Object | null>} */
+const customPropInputRef = useTemplateRef('customPropInput');
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
+const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+
 const isEditing = computed(() => !!institution.value.id);
+
 const logoSrc = computed(() => {
   if (logoPreview.value) { return logoPreview.value; }
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
-});
-
-watch(showCustomPropMenu, (v) => {
-  if (v) {
-    customField.value = null;
-    nextTick().then(() => { customPropInputRef.value?.focus(); });
-
-    if (customFieldsStatus.value === 'idle') {
-      fetchCustomFields();
-    }
-  }
 });
 
 function removeCustomProp(fieldId) {
@@ -461,7 +465,7 @@ function addCustomProp(field) {
   }
 
   showCustomPropMenu.value = false;
-  nextTick().then(() => { customPropInputRefs.value[field.id]?.focus(); });
+  nextTick(() => { customPropInputRefs.value[field.id]?.focus(); });
 }
 
 /**
@@ -488,7 +492,7 @@ function init(item, opts) {
   }
 
   if (formRef.value) {
-    formRef.value?.validate();
+    formRef.value.validate();
   }
 }
 
@@ -602,6 +606,19 @@ async function removeLogo() {
   institution.value.logo = null;
   institution.value.logoId = null;
 }
+
+watch(showCustomPropMenu, (v) => {
+  if (!v) {
+    return;
+  }
+
+  customField.value = null;
+  nextTick(() => { customPropInputRef.value?.focus(); });
+
+  if (!availableCustomFields.value) {
+    fetchCustomFields();
+  }
+});
 
 /**
  * Update the institution's logo on file dialog change

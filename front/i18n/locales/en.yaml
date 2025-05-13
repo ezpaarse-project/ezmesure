@@ -368,6 +368,7 @@ institutions:
     youtubeUrl: Youtube URL
     facebookUrl: Facebook URL
     customProperties: Custom properties
+    failedToGetCustomProperties: Unable to retrieve custom properties
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
