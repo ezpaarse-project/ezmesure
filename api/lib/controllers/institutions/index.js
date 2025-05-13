@@ -100,7 +100,14 @@ router.route({
   method: 'PUT',
   path: '/:institutionId',
   handler: [
-    fetchInstitution(),
+    fetchInstitution({
+      include: {
+        memberships: true,
+        customProps: {
+          include: { field: true },
+        },
+      },
+    }),
     requireMemberPermissions(FEATURES.institution.write),
     updateInstitution,
   ],

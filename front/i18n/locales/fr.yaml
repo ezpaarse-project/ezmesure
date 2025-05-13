@@ -28,6 +28,7 @@ menu:
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
+  customFields: Champs personnalisés
 home:
   whatDoesEzMESURE: Qu'est-ce qu'ezMESURE ?
   supportedBy: Ce service est soutenu par
@@ -368,6 +369,11 @@ institutions:
     linkedinUrl: URL Linkedin
     youtubeUrl: URL Youtube
     facebookUrl: URL Facebook
+    customProperties: Propriétés personnalisées
+    failedToGetCustomProperties: Impossible de charger les propriétés personnalisées
+    propertyName: Nom de propriété
+    noCustomProps: Aucune propriété personnalisée
+    addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
   members:
     noMembers: Aucun membre
     title: Membres ({count})
@@ -960,6 +966,22 @@ social:
   linkedin: LinkedIn
   youtube: Youtube
   facebook: Facebook
+customFields:
+  toolbarTitle: Champs personnalisés ({count})
+  pageDesc: Entrez ici les champs personnalisés que vous souhaitez pouvoir associer aux établissements.
+  newField: Nouveau champ personnalisé
+  editField: Modifier le champ personnalisé
+  deleteNbCustomField: Supprimer 1 champ personnalisé|Supprimer {count} champs personnalisés
+  editableByUsers: Modifiable par les utilisateurs
+  visibleToUsers: Visible par les utilisateurs
+  multivalued: Multivalué
+  helpUrl: URL d'aide
+  itemUrl: URL de la page de l'établissement
+  labelFr: Label en français
+  labelEn: Label en anglais
+  descriptionFr: Description en français
+  descriptionEn: Description en anglais
+  manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -974,6 +996,8 @@ value: Valeur
 status: Statut
 date: Date
 duration: Durée
+label: Label
+properties: Propriétés
 description: Description
 initials: Initiales
 language: Langue
@@ -1019,6 +1043,7 @@ invalidFormat: Format invalide
 areYouSure: Êtes-vous sûr ?
 fieldIsRequired: Ce champ est requis
 fieldMustMatch: 'Ce champ doit correspondre à : {pattern}'
+notEditable: Non éditable
 maxLength: 'Longueur maximale : {n} caractères'
 open: Ouvrir
 send: Envoyer
@@ -1037,6 +1062,8 @@ nbOthers: (+{count} autres)
 unknown: Inconnu
 looseFilter: Les résultats correspondront à l'une des valeurs
 strictFilter: Les résultats correspondront à toutes les valeurs
+loading: Chargement...
+retry: Réessayer
 applyToAll: Appliquer à tous
 minValueError: "La valeur est trop petite. Minimum: {min}"
 maxValueError: "La valeur est trop grande. Maximum: {max}"

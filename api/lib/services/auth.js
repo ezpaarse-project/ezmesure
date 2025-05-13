@@ -107,15 +107,12 @@ function fetchModel(modelName, opts = {}) {
 
     switch (modelName) {
       case 'institution': {
+        findOptions.include = findOptions.include ?? {
+          memberships: { where: { username } },
+        };
+
         const institutionsService = new InstitutionsService();
-        item = modelId && (await institutionsService.findUnique({
-          where: { id: modelId },
-          include: {
-            memberships: {
-              where: { username },
-            },
-          },
-        }));
+        item = modelId && (await institutionsService.findUnique(findOptions));
         break;
       }
 

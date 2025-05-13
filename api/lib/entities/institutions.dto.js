@@ -37,6 +37,7 @@ const schema = {
   parentInstitutionId: Joi.string().allow(null),
   parentInstitution: Joi.object(),
 
+  customProps: Joi.array().items(Joi.object()),
   memberships: Joi.array().items(Joi.object()),
   spaces: Joi.array().items(Joi.object()),
   historyEntries: Joi.array().items(Joi.object()),
@@ -54,6 +55,7 @@ const adminFields = [
   'hidePartner',
   'tags',
   'namespace',
+  'customProps',
 ];
 
 /**
@@ -70,6 +72,7 @@ const immutableFields = [
   'sushiCredentials',
   'childInstitutions',
   'repositories',
+  'customProps',
   'repositoryAliases',
 ];
 
@@ -84,6 +87,8 @@ const includableFields = [
   'sushiCredentials',
   'childInstitutions',
   'repositories',
+  'customProps',
+  'customProps.field',
   'repositoryAliases',
   'repositoryAliases.repository',
 ];

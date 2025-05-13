@@ -54,6 +54,25 @@ exports.requireFields = function requireFields(fields = []) {
 };
 
 /**
+ * Creates a schema modifier that defaults to null for a list of fields (if no default is set)
+ * @param {string[]} fields  fields that should default to null
+ * @returns {Modifier} the modifier
+ */
+exports.nullMissing = function nullMissing(fields = []) {
+  return Object.fromEntries(
+    fields.map(
+      (field) => [
+        field,
+        (schema) => {
+          const flags = schema.describe()?.flags || {};
+          return 'default' in flags ? schema : schema.default(null);
+        },
+      ],
+    ),
+  );
+};
+
+/**
  * Creates a schema modifier that set default values for a list of fields
  * @param {Object} defaults  an object associating field names to default values
  * @returns {Modifier} the modifier
