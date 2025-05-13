@@ -221,7 +221,7 @@ exports.updateInstitution = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {
@@ -264,7 +264,7 @@ exports.updateInstitutionSushiReady = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {
