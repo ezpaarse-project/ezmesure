@@ -24,7 +24,7 @@ module.exports = class CustomFieldsService extends BasePrismaService {
    */
   async create(params) {
     const customField = await customFieldsPrisma.create(params, this.prisma);
-    this.triggerHooks('customField:create', customField);
+    this.triggerHooks('custom-field:create', customField);
     return customField;
   }
 
@@ -50,7 +50,7 @@ module.exports = class CustomFieldsService extends BasePrismaService {
    */
   async update(params) {
     const customField = await customFieldsPrisma.update(params, this.prisma);
-    this.triggerHooks('customField:update', customField);
+    this.triggerHooks('custom-field:update', customField);
     return customField;
   }
 
@@ -60,7 +60,7 @@ module.exports = class CustomFieldsService extends BasePrismaService {
    */
   async upsert(params) {
     const customField = await customFieldsPrisma.upsert(params, this.prisma);
-    this.triggerHooks('customField:upsert', customField);
+    this.triggerHooks('custom-field:upsert', customField);
     return customField;
   }
 
@@ -78,7 +78,7 @@ module.exports = class CustomFieldsService extends BasePrismaService {
    */
   async delete(params) {
     const customField = await customFieldsPrisma.remove(params, this.prisma);
-    this.triggerHooks('customField:delete', customField);
+    this.triggerHooks('custom-field:delete', customField);
     return customField;
   }
 };
