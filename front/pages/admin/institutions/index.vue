@@ -197,12 +197,12 @@
 
     <InstitutionComponentsDialog
       ref="institutionComponentsDialogRef"
-      @submit="refresh()"
+      @update:model-value="refresh()"
     />
 
     <InstitutionRepositoriesDialog
       ref="institutionRepositoriesDialogRef"
-      @submit="refresh()"
+      @update:model-value="refresh()"
     />
 
     <InstitutionRepositoryAliasesDialog
@@ -212,7 +212,7 @@
 
     <InstitutionSpacesDialog
       ref="institutionSpacesDialogRef"
-      @submit="refresh()"
+      @update:model-value="refresh()"
     />
   </div>
 </template>
@@ -263,7 +263,7 @@ const {
     sortBy: [{ key: 'name', order: 'asc' }],
     include: [
       'repositories',
-      'repositoryAliases',
+      'repositoryAliases.repository',
       'spaces',
       'memberships',
       'childInstitutions',
