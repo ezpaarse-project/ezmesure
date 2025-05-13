@@ -100,5 +100,6 @@
       }
     }
   },
-  "appName": "EZMESURE_APP_NAME"
+  "appName": "EZMESURE_APP_NAME",
+  "publicUrl": "EZMESURE_PUBLIC_URL"
 }
