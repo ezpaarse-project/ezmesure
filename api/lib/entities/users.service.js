@@ -115,8 +115,11 @@ module.exports = class UsersService extends BasePrismaService {
   }
 
   /**
+   * @typedef {{ id: string, name: string, acronym: string | null }} CorrespondantInstitution
+   * @typedef {{ institution: CorrespondantInstitution }} CorrespondantMembership
+   *
    * @param {string} domain
-   * @returns {Promise<{email: string}[]> | null}
+   * @returns {Promise<{ email: string, memberships: CorrespondantMembership[] }[]> | null}
    */
   findEmailOfCorrespondentsWithDomain(domain) {
     return usersPrisma.findEmailOfCorrespondentsWithDomain(domain, this.prisma);

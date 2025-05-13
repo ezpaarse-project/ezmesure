@@ -1,6 +1,9 @@
 {{ data.newUser }} vient de créer son compte sur ezMESURE
-Vous pouvez dès à présent l'intégrer à votre établissement depuis l'interface de gestion des membres
+Vous pouvez dès à présent l'intégrer à vos établissements depuis l'interface de gestion des membres :
 
+{% for link in data.manageMemberLinks %}
+{{ link.label }}: {{ link.href }}
+{% endfor %}
 
 Cordialement,
 L'équipe ezMESURE.
