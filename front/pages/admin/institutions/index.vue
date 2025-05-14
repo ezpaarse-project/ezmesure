@@ -192,7 +192,7 @@
 
     <InstitutionFormDialog
       ref="institutionFormDialogRef"
-      @update:model-value="refresh()"
+      @submit="refresh()"
     />
 
     <InstitutionComponentsDialog
@@ -268,6 +268,7 @@ const {
       'memberships',
       'childInstitutions',
       'sushiCredentials',
+      'customProps.field',
     ],
   },
 });

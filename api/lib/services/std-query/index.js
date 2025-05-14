@@ -27,11 +27,15 @@ const { propsToPrismaInclude, propsToPrismaSort } = require('./prisma-query');
  * @prop {JoiObjectSchema} validations
  * @prop {Record<string, (value: any) => any>} filters
  *
+ * @typedef {object} getQueryOptions
+ * @prop {string[]} [includableFields]
+ * @prop {Record<string, any>} [includeFilters]
+ *
  * @typedef {object} StandardQueryParams
  * @prop {JoiObjectSchema} manyValidation
  * @prop {(ctx: KoaContext) => object} getPrismaManyQuery
  * @prop {JoiObjectSchema} oneValidation
- * @prop {(ctx: KoaContext, where: object) => object} getPrismaOneQuery
+ * @prop {(ctx: KoaContext, where: object, options: getQueryOptions) => object} getPrismaOneQuery
  */
 
 /**
@@ -248,11 +252,20 @@ const prepareStandardQueryParams = ({
     },
 
     oneValidation: baseValidation,
-    getPrismaOneQuery: (ctx, where = {}) => {
+    getPrismaOneQuery: (ctx, where = {}, options = {}) => {
       const { include: propsToInclude } = ctx.query;
+      const include = propsToPrismaInclude(stringToArray(propsToInclude ?? ''), options?.includableFields ?? includableFields);
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [propName, whereClause] of Object.entries(options.includeFilters ?? {})) {
+        if (!whereClause) { return; }
+        if (!include?.[propName]) { return; }
+        if (typeof include[propName] !== 'object') { include[propName] = {}; }
+        include[propName].where = whereClause;
+      }
 
       return {
-        include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFields),
+        include,
         where,
       };
     },

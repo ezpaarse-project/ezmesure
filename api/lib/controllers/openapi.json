@@ -335,6 +335,52 @@
             "items": {
               "$ref": "#/components/schemas/Repository"
             }
+          },
+          "customProps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstitutionProperty"
+            }
+          }
+        }
+      },
+      "InstitutionProperty": {
+        "description": "Institution property, ie. a value associated with a custom field",
+        "type": "object",
+        "properties": {
+          "fieldId": {
+            "description": "ID of the custom field",
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "institutionId": {
+            "description": "ID of the institution",
+            "$ref": "#/components/schemas/ItemID"
+          },
+          "field": {
+            "$ref": "#/components/schemas/CustomField"
+          },
+          "institution": {
+            "$ref": "#/components/schemas/Institution"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "value": {
+            "description": "Value of the property",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
           }
         }
       },
@@ -444,6 +490,88 @@
           },
           "comment": {
             "description": "Comment about the membership",
+            "type": "string"
+          }
+        }
+      },
+      "CustomField": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.-]+$",
+            "example": "istexId",
+            "description": "ID of the custom field."
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "institutionProperties": {
+            "description": "The institution associated to this space",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Institution"
+            }
+          },
+          "multiple": {
+            "description": "Whether the field accept multiple values",
+            "type": "boolean"
+          },
+          "editable": {
+            "description": "Whether the field can be edited by regular users",
+            "type": "boolean"
+          },
+          "visible": {
+            "description": "Whether the field should be visible to regular users",
+            "type": "boolean"
+          },
+          "labelFr": {
+            "description": "Field label in French",
+            "type": "string",
+            "example": "ISTEX ID"
+          },
+          "labelEn": {
+            "description": "Field label in English",
+            "type": "string",
+            "example": "ISTEX ID"
+          },
+          "descriptionFr": {
+            "description": "Field description in French",
+            "type": "string",
+            "example": "L'identifiant ISTEX de l'établissement"
+          },
+          "descriptionEn": {
+            "description": "Field description in English",
+            "type": "string",
+            "example": "The ISTEX identifier of the institution"
+          },
+          "helpUrl": {
+            "description": "URL (if any) to a page containing explanations about that field",
+            "example": "https://example.com/faq/fields",
+            "type": "string"
+          },
+          "itemUrl": {
+            "description": "URL (if any) to the page dedicated to the institution",
+            "example": "https://example.com/items/{{id}}",
+            "type": "string"
+          },
+          "autocomplete": {
+            "description": "Configuration used to autocomplete values",
+            "$ref": "#/components/schemas/CustomFieldAutocomplete"
+          }
+        }
+      },
+      "CustomFieldAutocomplete": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "string"
+          },
+          "field": {
             "type": "string"
           }
         }
@@ -2415,6 +2543,316 @@
         "operationId": "ping",
         "tags": [
           "Basics"
+        ]
+      }
+    },
+    "/custom-fields": {
+      "get": {
+        "summary": "Get custom fields",
+        "operationId": "get-custom-fields",
+        "description": "Get custom institution fields",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "CustomFields"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institutionProperties"
+                ]
+              }
+            }
+          },
+          { "$ref": "#/components/parameters/search" },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "updatedAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "updatedAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAt:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "initials",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomField"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/custom-fields/{fieldId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "fieldId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get a custom field",
+        "operationId": "get-custom-fields-fieldid",
+        "description": "Get a custom institution field by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "CustomFields"
+        ],
+        "parameters": [
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "institutionProperties"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "summary": "Upsert a custom field",
+        "description": "Create or update a custom institution field",
+        "operationId": "put-custom-fields-fieldid",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomField"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Administration",
+          "CustomFields"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomField"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a custom field",
+        "description": "Delete a custom institution field",
+        "operationId": "delete-custom-fields-fieldid",
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "CustomFields"
         ]
       }
     },
