@@ -253,8 +253,8 @@ exports.updateInstitution = async (ctx) => {
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
         await sendValidateInstitution(contacts, {
-          manageMemberLink: `${origin}/institutions/self/memberships`,
-          manageSushiLink: `${origin}/institutions/self/sushi`,
+          manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
+          manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         });
       } catch (err) {
         appLogger.error(`Failed to send validate institution mail: ${err}`);
@@ -273,7 +273,7 @@ exports.updateInstitution = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {
@@ -316,7 +316,7 @@ exports.updateInstitutionSushiReady = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {

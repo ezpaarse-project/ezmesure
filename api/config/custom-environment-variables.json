@@ -90,8 +90,6 @@
     "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",
     "cron": "EZMESURE_DEPOSITORS_CRON"
   },
-  "reportingActivityIndex": "REPORTING_ACTIVITY_INDEX",
-  "reportingIndex": "REPORTING_INDEX",
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
   },
@@ -102,5 +100,6 @@
       }
     }
   },
-  "appName": "EZMESURE_APP_NAME"
+  "appName": "EZMESURE_APP_NAME",
+  "publicUrl": "EZMESURE_PUBLIC_URL"
 }

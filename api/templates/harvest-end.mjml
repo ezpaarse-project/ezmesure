@@ -28,9 +28,9 @@
       la temporalité à la période voulue.
     </mj-text>
 
-    {% if space %}
+    {% if spaceURL %}
     <mj-button 
-      href="https://ezmesure.couperin.org/kibana/s/{{ space }}"
+      href="{{ spaceURL }}"
       font-family="Helvetica"
       background-color="#9c27b0"
       color="white"

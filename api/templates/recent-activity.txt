@@ -19,9 +19,6 @@ Activité récente
 {% if insertions.length -%}
 - {{ insertions.length }} chargements
 {% endif -%}
-{% if reportings.length -%}
-- {{ reportings.length }} mises à jour de tâches de reporting
-{% endif -%}
 {% endif %}
 
 {% if users.length -%}
@@ -67,10 +64,3 @@ Chargements ({{ insertions.length }})
   {% endfor %}
 {% endif -%}
 
-
-{% if reportings.length -%}
-Rapports ({{ reportings.length }})
-  {% for action in reportings -%}
-    [{{ "+" if action.action == 'reporting/store' }}{{ "*" if action.action == 'reporting/update' }}{{ "-" if action.action == 'reporting/delete' }}] {{ action.user.name }} {{ action.metadata.space }} {{ action.metadata.dashboardName }} {{ action.datetime }}
-  {% endfor %}
-{% endif -%}

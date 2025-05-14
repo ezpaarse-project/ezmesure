@@ -5,7 +5,6 @@ const { format, isValid } = require('date-fns');
 const { CronJob } = require('cron');
 const { sendMail, generateMail } = require('./mail');
 const elastic = require('./elastic');
-const kibana = require('./kibana');
 const { appLogger } = require('./logger');
 
 const {
@@ -124,110 +123,6 @@ async function getEzMesureMetrics() {
   };
 }
 
-async function getReportingActivity() {
-  const index = config.reportingActivityIndex || '.ezreporting-activity';
-  const { body: exists } = await elastic.indices.exists({ index });
-
-  if (!exists) {
-    return [];
-  }
-
-  const { body: result } = await elastic.search({
-    index,
-    size: 10000,
-    sort: 'datetime:desc',
-    body: {
-      query: {
-        bool: {
-          must_not: [
-            { exists: { field: 'metadata.broadcasted' } },
-          ],
-          filter: [
-            {
-              range: {
-                datetime: { gte: 'now-1w' },
-              },
-            },
-            {
-              terms: {
-                action: [
-                  'reporting/store',
-                  'reporting/update',
-                  'reporting/delete',
-                ],
-              },
-            },
-          ],
-        },
-      },
-    },
-  });
-
-  const actions = result && result.hits && result.hits.hits;
-
-  if (actions.length === 0) {
-    return {};
-  }
-
-  const reportings = actions.map(({ _source }) => ({
-    ..._source,
-    datetime: toLocaleDate(_source.datetime),
-  }));
-
-  return { actions, reportings };
-}
-
-async function getSentReports() {
-  const index = config.reportingIndex || '.ezreporting';
-  const { body: exists } = await elastic.indices.exists({ index });
-
-  if (!exists) {
-    return [];
-  }
-
-  const { body: result } = await elastic.search({
-    index,
-    size: 10000,
-    body: {
-      query: {
-        bool: {
-          filter: [
-            {
-              range: {
-                sentAt: { gte: 'now-1w' },
-              },
-            },
-          ],
-        },
-      },
-    },
-  });
-
-  const reportings = result?.hits?.hits || [];
-
-  for (let i = 0; i < reportings.length; i += 1) {
-    let dashboard;
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const { data: res } = await kibana.getObject({
-        type: 'dashboard',
-        id: reportings[i]._source.dashboardId,
-        spaceId: reportings[i]._source.space,
-      });
-      dashboard = res;
-    } catch (err) {
-      appLogger.error(`Cannot get dashboard for space [${reportings[i]._source.space}]`);
-      appLogger.error(err);
-    }
-
-    const dashboardName = dashboard?.attributes?.title || reportings[i]._source.dashboardId;
-    reportings[i]._source.dashboardName = dashboardName;
-    reportings[i]._source.sentAt = toLocaleDate(reportings[i]._source.sentAt);
-  }
-
-  return reportings.map((reporting) => reporting._source);
-}
-
 /**
  * Set metadata.broacasted to the current date for a list of action documents
  * @param {Array<Object>} actions a set of action documents from the metrics index
@@ -249,18 +144,13 @@ function setBroadcasted(actions) {
  */
 async function sendNotifications(logger = appLogger) {
   const {
-    actions: ezMesureActions = [],
+    actions = [],
     files,
     users,
     insertions,
     institutions,
     sushi,
   } = await getEzMesureMetrics();
-  const { actions: reportingActions = [], reportings } = await getReportingActivity();
-
-  const reportingsSend = await getSentReports();
-
-  const actions = [...ezMesureActions, ...reportingActions];
 
   if (actions.length === 0 && !sendEmptyActivity) {
     logger.info('No recent activity to be broadcasted');
@@ -276,10 +166,8 @@ async function sendNotifications(logger = appLogger) {
       files,
       users,
       insertions,
-      reportings,
       institutions,
       sushi,
-      reportingsSend,
     }),
   });
 

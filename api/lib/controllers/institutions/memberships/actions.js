@@ -220,7 +220,7 @@ exports.requestMembership = async (ctx) => {
 
   const members = await institutionsService.getContacts(ctx.state.institution.id);
   const emails = members.map((member) => member.user.email);
-  const link = `${ctx.request.header.origin}/institutions/${ctx.state.institution.id}/members`;
+  const linkInstitution = `${ctx.get('origin')}/myspace/institutions/${ctx.state.institution.id}/members`;
 
   await sendMail({
     from: sender,
@@ -230,7 +230,7 @@ exports.requestMembership = async (ctx) => {
     ...generateMail('request-membership', {
       user: ctx.state.user.username,
       institution: ctx.state.institution.name,
-      linkInstitution: link,
+      linkInstitution,
     }),
   });
 

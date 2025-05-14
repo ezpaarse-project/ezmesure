@@ -213,17 +213,25 @@ exports.activate = async (ctx) => {
   }
 
   if (Array.isArray(correspondents) && correspondents.length > 0) {
-    const emails = correspondents.map((c) => c?.email).filter((x) => x);
+    await Promise.all(
+      correspondents.map(async ({ email: userMail, memberships }) => {
+        if (!userMail || memberships.length <= 0) {
+          return;
+        }
 
-    // TODO manage this if the user belongs to several institutions
-    try {
-      await sendNewUserToContacts(emails, {
-        manageMemberLink: `${origin}/institutions/self/members`,
-        newUser: user.username,
-      });
-    } catch (err) {
-      appLogger.error(`Failed to send mail: ${err}`);
-    }
+        try {
+          await sendNewUserToContacts(userMail, {
+            manageMemberLinks: memberships.map(({ institution }) => ({
+              href: `${origin}/myspace/institutions/${institution.id}/members`,
+              label: institution.name,
+            })),
+            newUser: user.username,
+          });
+        } catch (err) {
+          appLogger.error(`Failed to send mail to ${userMail}: ${err}`);
+        }
+      }),
+    );
   }
 
   const token = generateToken(user);

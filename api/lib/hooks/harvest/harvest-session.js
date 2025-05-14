@@ -55,11 +55,14 @@ const onHarvestSessionEnd = async (session) => {
       institutions.map(async (institution) => {
         const contacts = institution.memberships.map((m) => m.user.email);
 
+        const spaceID = institution.spaces.at(0)?.id;
+        const spaceURL = new URL(`kibana/s/${spaceID}`, config.get('publicUrl')).href;
+
         const data = {
           periodStart: session.beginDate,
           periodEnd: session.endDate,
           institution: institution.name,
-          space: institution.spaces.at(0)?.id,
+          spaceURL,
           recipients,
         };
 
