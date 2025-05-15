@@ -1,4 +1,5 @@
 import { defineStore, ref } from '#imports';
+import { getErrorMessage } from '@/lib/errors';
 
 /**
  * @typedef {object} SnackMessage
@@ -46,23 +47,7 @@ export const useSnacksStore = defineStore('snacks', () => {
       return;
     }
 
-    let text;
-    if (err.data?.error) {
-      // is a API error
-      text = err.data?.error;
-    }
-    if (!text && err.cause) {
-      text = err.cause?.message ?? `${err.cause}`;
-    }
-    if (!text) {
-      text = 'Unknown Error';
-    }
-
-    if (err.status) {
-      text = `${text} (${err.status} - ${err.statusMessage})`;
-    }
-
-    addMessage({ title: friendly, text, color: 'error' });
+    addMessage({ title: friendly, text: getErrorMessage(err), color: 'error' });
   }
 
   /**

@@ -22,11 +22,12 @@
               <v-row v-if="errorMessage">
                 <v-col>
                   <v-alert
-                    :text="errorMessage"
+                    :title="errorMessage.title"
+                    :text="errorMessage.text"
                     type="error"
                     density="compact"
                     closable
-                    @update:model-value="() => (errorMessage = '')"
+                    @update:model-value="() => (errorMessage = undefined)"
                   />
                 </v-col>
               </v-row>
@@ -169,6 +170,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 definePageMeta({
   layout: 'space',
   middleware: ['sidebase-auth', 'terms'],
@@ -188,7 +191,7 @@ const actualPassword = ref('');
 const password = ref('');
 const passwordRepeat = ref('');
 const showPassword = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref(undefined);
 
 const refreshShibUrl = computed(() => {
   if (config.shibbolethDisabled) {
@@ -219,7 +222,7 @@ const fields = computed(
 
 async function replacePassword() {
   loading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = undefined;
   success.value = false;
   try {
     await $fetch('/api/profile/password', {
@@ -233,11 +236,12 @@ async function replacePassword() {
     success.value = true;
   } catch (err) {
     if (err?.statusCode === 401) {
-      errorMessage.value = t('authenticate.loginFailed');
-    } else if (err?.data?.error) {
-      errorMessage.value = err?.data?.error;
+      errorMessage.value = { text: t('authenticate.loginFailed') };
     } else {
-      errorMessage.value = t('anErrorOccurred');
+      errorMessage.value = {
+        title: t('anErrorOccurred'),
+        text: getErrorMessage(err),
+      };
     }
   }
   loading.value = false;

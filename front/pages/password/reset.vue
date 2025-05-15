@@ -15,11 +15,12 @@
             <v-row v-if="errorMessage">
               <v-col>
                 <v-alert
-                  :text="errorMessage"
+                  :title="errorMessage.title"
+                  :text="errorMessage.text"
                   type="error"
                   density="compact"
                   closable
-                  @update:model-value="() => (errorMessage = '')"
+                  @update:model-value="() => (errorMessage = undefined)"
                 />
               </v-col>
             </v-row>
@@ -96,16 +97,19 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const { t } = useI18n();
 const { data: user } = useAuthState();
 
 const valid = ref(false);
 const loading = ref(false);
 const success = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref(undefined);
 const username = ref(user.value?.username);
 
 async function resetPassword() {
+  errorMessage.value = undefined;
   loading.value = true;
   try {
     await $fetch('/api/profile/password/_get_token', {
@@ -117,15 +121,13 @@ async function resetPassword() {
 
     success.value = true;
   } catch (err) {
-    if (!(err instanceof Error)) {
-      errorMessage.value = t('authenticate.failed');
-      return;
-    }
-
     if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = t('authenticate.loginFailed');
+      errorMessage.value = { text: t('authenticate.loginFailed') };
     } else {
-      errorMessage.value = t('authenticate.failed');
+      errorMessage.value = {
+        title: t('authenticate.failed'),
+        text: getErrorMessage(err),
+      };
     }
   }
   loading.value = false;
