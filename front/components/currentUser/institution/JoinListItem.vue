@@ -102,8 +102,8 @@ async function askToJoinAnInstitution(institution) {
         });
         snacks.info(t('institutions.sendMailToJoin'));
         isOpen.value = false;
-      } catch {
-        snacks.error(t('anErrorOccurred'));
+      } catch (err) {
+        snacks.error(t('anErrorOccurred'), err);
       }
     },
   });

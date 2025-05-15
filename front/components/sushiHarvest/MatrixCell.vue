@@ -124,8 +124,8 @@ async function openTaskHistoryFromHarvest() {
 
     await nextTick(); // Wait for task.value to propagate, allowing ref to be resolved
     await historyRef.value?.open(task.value);
-  } catch {
-    snacks.error(t('tasks.failedToFetchTasks'));
+  } catch (err) {
+    snacks.error(t('tasks.failedToFetchTasks'), err);
   }
 }
 </script>

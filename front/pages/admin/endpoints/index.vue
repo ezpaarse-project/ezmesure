@@ -277,8 +277,8 @@ async function toggleActiveStates(items) {
         item.active = active;
         activeLoadingMap.value.set(item.id, false);
         return item;
-      } catch {
-        snacks.error(t('endpoints.unableToUpdate'));
+      } catch (err) {
+        snacks.error(t('endpoints.unableToUpdate'), err);
         activeLoadingMap.value.set(item.id, false);
         return null;
       }
@@ -314,8 +314,8 @@ function deleteEndpoints(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/sushi-endpoints/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -346,8 +346,8 @@ async function copyEndpointId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

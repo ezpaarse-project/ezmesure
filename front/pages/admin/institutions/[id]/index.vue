@@ -127,8 +127,8 @@ async function activateInstitution() {
       body: { value },
     });
     institution.value.validated = value;
-  } catch {
-    snacks.error(t('cannotUpdateItem', { id: institution.value.name || institution.value.id }));
+  } catch (err) {
+    snacks.error(t('cannotUpdateItem', { id: institution.value.name || institution.value.id }), err);
   }
   validatedLoading.value = false;
 }

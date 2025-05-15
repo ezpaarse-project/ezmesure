@@ -313,8 +313,8 @@ async function addMember(item) {
 
     openMembershipFormDialog(membership);
     refresh();
-  } catch {
-    snacks.error(t('institutions.members.cannotAddMember'));
+  } catch (err) {
+    snacks.error(t('institutions.members.cannotAddMember'), err);
   }
 }
 
@@ -343,8 +343,8 @@ function deleteMembers(items) {
             return $fetch(`/api/institutions/${institution.value.id}/memberships/${item.username}`, {
               method: 'DELETE',
             });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.name || item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -371,8 +371,8 @@ async function copyEmails(items) {
 
   try {
     await copy(emails.join(';'));
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

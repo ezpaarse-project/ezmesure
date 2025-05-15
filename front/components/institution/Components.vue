@@ -109,8 +109,8 @@ async function unlinkComponent(item) {
     components.value = components.value.filter((i) => i.id !== item.id);
 
     emit('update:modelValue', components.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -128,8 +128,8 @@ async function linkComponent(item) {
     components.value.push(item);
 
     emit('update:modelValue', components.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
   isLinkLoading.value = false;
 }

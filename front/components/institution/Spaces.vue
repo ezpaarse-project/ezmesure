@@ -163,8 +163,8 @@ async function removeSpace(item) {
     spaces.value = spaces.value.filter((i) => i.id !== item.id);
 
     emit('update:modelValue', spaces.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

@@ -154,8 +154,8 @@ async function removeAlias(item) {
     aliases.value = aliases.value.filter((i) => i.pattern !== item.pattern);
 
     emit('update:modelValue', aliases.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -175,8 +175,8 @@ async function onAliasUpdate(filters) {
     }
 
     emit('update:modelValue', aliases.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>
