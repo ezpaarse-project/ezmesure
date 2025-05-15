@@ -14,7 +14,7 @@
   </v-app>
 </template>
 
-<script setup lang="ts">
+<script setup>
 useHead({
   title: 'ezMESURE - Plateforme des tableaux de bord ezPAARSE de l’ESR',
   meta: [

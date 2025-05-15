@@ -11,27 +11,29 @@
     "lintfix": "npm run lint --fix"
   },
   "devDependencies": {
-    "@ezpaarse-project/ezreeport-vue": "2.2.0",
     "@mdi/font": "^7.4.47",
-    "@nuxt/devtools": "^1.7.0",
+    "@nuxt/devtools": "^2.4.1",
     "@nuxt/eslint-config": "^0.7.4",
-    "@nuxtjs/i18n": "^9.1.1",
-    "@pinia/nuxt": "^0.9.0",
-    "@sidebase/nuxt-auth": "^0.10.0",
-    "@types/node": "^22.10.5",
+    "@pinia/nuxt": "^0.11.0",
+    "@sidebase/nuxt-auth": "^0.10.1",
+    "@types/node": "^22.15.18",
     "@vue/eslint-config-airbnb": "^8.0.0",
-    "@vueuse/core": "^12.3.0",
-    "@vueuse/nuxt": "^12.3.0",
+    "@vueuse/core": "^13.2.0",
+    "@vueuse/nuxt": "^13.2.0",
     "date-fns": "^4.1.0",
     "eslint": "^8.57.0",
-    "nuxt": "^3.15.1",
-    "pinia": "^2.3.0",
-    "pretty-bytes": "^6.1.1",
-    "sass": "^1.83.1",
-    "vue-i18n": "^11.0.1",
-    "vuetify-nuxt-module": "^0.18.3"
+    "nuxt": "^3.17.3",
+    "pinia": "^3.0.2",
+    "pretty-bytes": "^7.0.0",
+    "sass": "^1.88.0",
+    "vuetify": "^3.8.5",
+    "vuetify-nuxt-module": "^0.18.6"
   },
   "overrides": {
     "vue": "^3"
+  },
+  "dependencies": {
+    "@ezpaarse-project/ezreeport-vue": "^2.2.0",
+    "@nuxtjs/i18n": "^9.5.4"
   }
 }
