@@ -30,17 +30,22 @@
                 <v-col>
                   <v-alert
                     :title="$t('password.updated')"
-                    :text="$t('password.youCanNowLogin')"
                     type="success"
                     density="compact"
                   >
-                    <template #append>
-                      <v-btn
-                        :text="$t('authenticate.logIn')"
-                        prepend-icon="mdi-arrow-left"
-                        to="/authenticate"
-                        variant="tonal"
-                      />
+                    <template #text>
+                      <p class="pt-2">
+                        {{ $t('password.youCanNowLogin') }}
+                      </p>
+
+                      <div class="d-flex justify-end">
+                        <v-btn
+                          :text="$t('authenticate.logIn')"
+                          prepend-icon="mdi-arrow-left"
+                          to="/authenticate"
+                          variant="tonal"
+                        />
+                      </div>
                     </template>
                   </v-alert>
                 </v-col>

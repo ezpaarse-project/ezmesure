@@ -29,17 +29,22 @@
               <v-col>
                 <v-alert
                   :title="$t('password.checkYourEmail')"
-                  :text="$t('password.waitFewMinutes')"
                   type="success"
                   density="compact"
                 >
-                  <template #append>
-                    <v-btn
-                      :text="$t('password.backToLogin')"
-                      prepend-icon="mdi-arrow-left"
-                      to="/authenticate"
-                      variant="tonal"
-                    />
+                  <template #text>
+                    <p class="pt-2">
+                      {{ $t('password.waitFewMinutes') }}
+                    </p>
+
+                    <div class="d-flex justify-end">
+                      <v-btn
+                        :text="$t('password.backToLogin')"
+                        prepend-icon="mdi-arrow-left"
+                        to="/authenticate"
+                        variant="tonal"
+                      />
+                    </div>
                   </template>
                 </v-alert>
               </v-col>
