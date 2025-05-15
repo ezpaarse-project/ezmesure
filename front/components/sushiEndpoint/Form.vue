@@ -469,8 +469,8 @@ async function save() {
       });
     }
     emit('submit', newEndpoint);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   saving.value = false;

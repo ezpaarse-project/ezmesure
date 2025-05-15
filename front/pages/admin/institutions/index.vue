@@ -390,8 +390,8 @@ function deleteInstitutions(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/institutions/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.name || item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -430,8 +430,8 @@ function toggleInstitutions(items) {
               method: 'PUT',
               body: { value },
             });
-          } catch {
-            snacks.error(t('cannotUpdateItem', { id: item.name || item.id }));
+          } catch (err) {
+            snacks.error(t('cannotUpdateItem', { id: item.name || item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -462,8 +462,8 @@ async function copyInstitutionId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

@@ -257,8 +257,8 @@ async function editRepositoryLink(item, level) {
     }
 
     emit('update:modelValue');
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -292,8 +292,8 @@ async function editAliasLink(item, level) {
     }
 
     emit('update:modelValue');
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -335,8 +335,8 @@ async function editSpaceLink(item, level) {
     }
 
     emit('update:modelValue');
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

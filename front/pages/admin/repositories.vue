@@ -205,8 +205,8 @@ function deleteRepositories(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/repositories/${item.pattern}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.pattern }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.pattern }), err);
             return Promise.resolve(null);
           }
         }),
@@ -237,8 +237,8 @@ async function copyRepositoryPattern({ pattern }) {
 
   try {
     await copy(pattern);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

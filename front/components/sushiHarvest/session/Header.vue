@@ -123,8 +123,8 @@ const runningTime = useTimeAgo(() => status.value?.runningTime ?? 0);
 async function copyId() {
   try {
     await copy(props.modelValue.id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

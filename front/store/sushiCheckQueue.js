@@ -20,10 +20,10 @@ export const useSushiCheckQueueStore = defineStore('sushiCheckQueue', () => {
       const { connection } = await $fetch(`/api/sushi/${item.id}/_check_connection`, { method: 'POST' });
       testing.value.status = connection.status;
       await item.onComplete(undefined, connection);
-    } catch (e) {
+    } catch (err) {
       testing.value.status = 'failed';
-      await item.onComplete(e);
-      snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: item.vendor }));
+      await item.onComplete(err);
+      snacks.error(t('institutions.sushi.cannotCheckCredentials', { name: item.vendor }), err);
     }
     await new Promise((resolve) => { setTimeout(() => resolve(), 1000); });
     testing.value = undefined;

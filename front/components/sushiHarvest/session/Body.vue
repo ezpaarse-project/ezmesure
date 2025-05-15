@@ -236,8 +236,8 @@ async function copyId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -259,8 +259,8 @@ async function cancelJob(job) {
       method: 'POST',
     });
     refresh();
-  } catch {
-    snacks.error(t('harvest.jobs.unableToStop'));
+  } catch (err) {
+    snacks.error(t('harvest.jobs.unableToStop'), err);
   }
 }
 
@@ -280,8 +280,8 @@ async function deleteJob(job) {
       method: 'DELETE',
     });
     refresh();
-  } catch {
-    snacks.error(t('harvest.jobs.unableToDelete'));
+  } catch (err) {
+    snacks.error(t('harvest.jobs.unableToDelete'), err);
   }
 }
 </script>

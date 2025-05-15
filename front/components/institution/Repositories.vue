@@ -111,8 +111,8 @@ async function removeRepository(item) {
     repositories.value = repositories.value.filter((i) => i.pattern !== item.pattern);
 
     emit('update:modelValue', repositories.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

@@ -138,8 +138,8 @@ async function save() {
       body: { ...user.value },
     });
     emit('submit', newUser);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   saving.value = false;

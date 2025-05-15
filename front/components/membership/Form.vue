@@ -521,8 +521,8 @@ async function save(actions) {
   try {
     await Promise.all(toDo.map((action) => action()));
     emit('update:modelValue', props.modelValue);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   loading.value = false;

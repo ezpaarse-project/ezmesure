@@ -197,8 +197,8 @@ function deleteCustomField(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/custom-fields/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.id }), err);
             return Promise.resolve(null);
           }
         }),

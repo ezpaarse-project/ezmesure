@@ -252,8 +252,8 @@ function deleteAliases(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/repository-aliases/${item.pattern}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.pattern }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.pattern }), err);
             return Promise.resolve(null);
           }
         }),
@@ -284,8 +284,8 @@ async function copyAliasPattern({ pattern }) {
 
   try {
     await copy(pattern);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -302,8 +302,8 @@ async function onAliasUpdate(filters) {
     });
 
     refresh();
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

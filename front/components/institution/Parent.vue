@@ -47,8 +47,8 @@ async function unlinkParent() {
     parent.value = undefined;
 
     emit('update:modelValue', parent.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 
@@ -67,8 +67,8 @@ async function linkParent(item) {
     parent.value = { ...item };
 
     emit('update:modelValue', parent.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
   isLinkLoading.value = false;
 }

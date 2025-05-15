@@ -295,8 +295,8 @@ async function sendMail() {
     snacks.success(t('contact.emailSent'));
 
     resetForm();
-  } catch {
-    snacks.error(t('contact.failed'));
+  } catch (err) {
+    snacks.error(t('contact.failed'), err);
   }
   loading.value = false;
 }

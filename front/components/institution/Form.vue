@@ -544,15 +544,10 @@ async function save() {
       });
     }
   } catch (err) {
-    if (!(err instanceof Error)) {
-      snacks.error(t('institutions.institution.unableToUpate'));
-      return;
-    }
-
     if (err.statusCode === 413) {
       snacks.error(t('institutions.institution.imageTooLarge'));
     } else {
-      snacks.error(err);
+      snacks.error(t('institutions.institution.unableToUpate'), err);
     }
 
     loading.value = false;
