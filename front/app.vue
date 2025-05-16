@@ -1,6 +1,8 @@
 <template>
   <v-app>
     <ClientOnly>
+      <NuxtLoadingIndicator color="#3B8070" />
+
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
       <SkeletonSnacks />
       <SkeletonConfirmDialog />
