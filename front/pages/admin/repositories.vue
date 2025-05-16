@@ -231,7 +231,7 @@ function deleteRepositories(items) {
  * @param {object} param0 Repository
  */
 async function copyRepositoryPattern({ pattern }) {
-  if (!id) {
+  if (!pattern) {
     return;
   }
 
