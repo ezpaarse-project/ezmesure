@@ -13,6 +13,7 @@
           <v-chip
             :text="$t('harvest.sessions.counts.credentials', status?._count?.credentials?.harvestable ?? status?._count?.credentials?.all ?? 0)"
             :color="(status?._count?.credentials?.harvestable ?? 0) > 0 ? 'success' : 'error'"
+            :disabled="!status"
             prepend-icon="mdi-key"
             size="small"
             variant="flat"

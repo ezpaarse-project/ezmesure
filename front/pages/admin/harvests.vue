@@ -62,7 +62,7 @@ const { t } = useI18n();
 
 const {
   data: sessions,
-  refresh: refreshSessions,
+  refresh,
   itemLength,
   query,
   itemsPerPage,
@@ -77,15 +77,27 @@ const {
   },
 });
 
-const {
-  data: statuses,
-  refresh: refreshStatuses,
-} = await useFetch('/api/harvests-sessions/status', {
-  immediate: false,
-  params: {
-    harvestIds: computed(() => sessions.value?.map((s) => s.id)),
+const sessionsIds = computed(() => sessions.value?.map((s) => s.id));
+
+const statuses = computedAsync(
+  async (onCancel) => {
+    if (!sessionsIds.value?.length) {
+      return {};
+    }
+
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
+    return $fetch('/api/harvests-sessions/status', {
+      signal: abortController.signal,
+      params: {
+        harvestIds: sessionsIds.value,
+      },
+    });
   },
-});
+  undefined,
+  { lazy: true },
+);
 
 const sessionsWithStatus = computed(() => sessions.value?.map(
   (s) => ({
@@ -104,11 +116,6 @@ const toolbarTitle = computed(() => {
   }
   return t('harvest.toolbarTitle', { count: count ?? '?' });
 });
-
-async function refresh() {
-  await refreshSessions();
-  await refreshStatuses();
-}
 
 const debouncedRefresh = useDebounceFn(refresh, 500);
 </script>
