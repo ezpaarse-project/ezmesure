@@ -388,8 +388,12 @@ const endpoint = ref({ ...(props.modelValue ?? { counterVersions: ['5'] }) });
 const formRef = useTemplateRef('formRef');
 
 const availableTags = computedAsync(
-  async () => {
+  async (onCancel) => {
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
     const endpointItems = await $fetch('/api/sushi-endpoints', {
+      signal: abortController.signal,
       query: {
         size: 0,
         distinct: 'tags',

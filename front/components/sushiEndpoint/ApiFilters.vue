@@ -105,8 +105,12 @@ const {
 const loadingTags = ref(false);
 
 const availableTags = computedAsync(
-  async () => {
+  async (onCancel) => {
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
     const sushiItems = await $fetch('/api/sushi-endpoints', {
+      signal: abortController.signal,
       query: {
         size: 0,
         distinct: 'tags',

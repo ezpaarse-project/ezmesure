@@ -32,13 +32,6 @@ export default defineNuxtConfig({
 
   vuetify: vuetifyOptions,
 
-  // pageTransition: 'fade-transition',
-  // loading: { color: '#3B8070' },
-  // loadingIndicator: {
-  //   name: 'folding-cube',
-  //   color: '#9c27b0',
-  // },
-
   ssr: false,
   telemetry: false,
 

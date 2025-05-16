@@ -105,6 +105,29 @@ const loadingEndpoints = ref(false);
 const loadingPackages = ref(false);
 
 const availableEndpoints = computedAsync(
+  async (onCancel) => {
+    if (!props.institution) {
+      return [];
+    }
+
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
+    loadingEndpoints.value = true;
+    try {
+      const data = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+        signal: abortController.signal,
+        query: {
+          size: 0,
+          distinct: 'endpointId',
+          include: ['endpoint'],
+        },
+      });
+      return data;
+    } finally {
+      loadingEndpoints.value = false;
+    }
+  },
   async () => {
     if (!props.institution) {
       return [];
@@ -130,12 +153,16 @@ const availableEndpoints = computedAsync(
 );
 
 const availablePackages = computedAsync(
-  async () => {
+  async (onCancel) => {
     if (!props.institution) {
       return [];
     }
 
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
     const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+      signal: abortController.signal,
       query: {
         size: 0,
         distinct: 'packages',

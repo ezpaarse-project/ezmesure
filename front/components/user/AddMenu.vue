@@ -35,7 +35,7 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="users.length <= 0">
+        <v-row v-if="!users || users.length <= 0">
           <v-col>
             <v-empty-state
               icon="mdi-account-question"

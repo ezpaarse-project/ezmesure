@@ -222,8 +222,12 @@ const sushi = ref({ ...(props.modelValue ?? {}) });
 const formRef = useTemplateRef('formRef');
 
 const availablePackages = computedAsync(
-  async () => {
+  async (onCancel) => {
+    const abortController = new AbortController();
+    onCancel(() => abortController.abort());
+
     const sushiItems = await $fetch(`/api/institutions/${props.institution.id}/sushi`, {
+      signal: abortController.signal,
       query: {
         size: 0,
         distinct: 'packages',
