@@ -570,7 +570,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
                 firstMonthAvailable = {},
                 lastMonthAvailable = {},
               } = supportedData[reportId] ?? {};
-              if (!params || !supported.value) {
+
+              if (!params || supported.value === false) {
                 return [reportId, undefined];
               }
 

@@ -14,6 +14,7 @@ const harvestConfig = config.get('jobs.harvest');
 function cancelPendingHarvest() {
   return HarvestsService.$transaction(async (harvestsService) => {
     const harvestJobService = new HarvestJobsService(harvestsService);
+
     // Get all pending/running harvests older than 1 day (rounded)
     const harvests = await harvestsService.findMany({
       where: {
@@ -32,6 +33,20 @@ function cancelPendingHarvest() {
 
     await Promise.all(
       harvests.map(async (harvest) => {
+        if (!harvest.harvestedById) {
+          // If the harvest state is active but no job has been linked to it, mark it as interrupted
+          return harvestsService.update({
+            data: { status: HarvestJobStatus.interrupted },
+            where: {
+              credentialsId_reportId_period: {
+                credentialsId: harvest.credentialsId,
+                reportId: harvest.reportId,
+                period: harvest.period,
+              },
+            },
+          });
+        }
+
         // If the job is still in the queue, it means it is still running so don't cancel it
         const job = await harvestQueue.getJob(harvest.harvestedById);
         if (job) {

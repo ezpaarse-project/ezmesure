@@ -17,8 +17,6 @@
             variant="text"
             density="comfortable"
             color="green"
-            size="small"
-            class="ml-2"
             v-bind="menu"
           />
         </template>

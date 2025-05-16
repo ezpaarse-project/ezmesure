@@ -59,6 +59,13 @@
   "storage": {
     "path": "EZMESURE_STORAGE_PATH"
   },
+  "ezpaarse": {
+    "upload": {
+      "bulkSize": "EZMESURE_EZPAARSE_UPLOAD_BULK_SIZE",
+      "bulkMaxTries": "EZMESURE_EZPAARSE_UPLOAD_BULK_MAX_TRIES",
+      "bulkBaseRetryDelay": "EZMESURE_EZPAARSE_UPLOAD_BULK_BASE_RETRY_DELAY"
+    }
+  },
   "jobs": {
     "harvest": {
       "concurrency": "EZMESURE_HARVEST_CONCURRENCY",

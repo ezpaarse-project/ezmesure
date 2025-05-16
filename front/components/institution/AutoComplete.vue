@@ -15,7 +15,6 @@
     hide-no-data
     clearable
     required
-    autofocus
     return-object
     @update:model-value="$emit('update:modelValue', $event)"
     @click:clear="$emit('update:modelValue', undefined)"

@@ -103,6 +103,36 @@
             <v-divider />
 
             <v-list-item
+              :title="$t('menu.users')"
+              prepend-icon="mdi-account-multiple"
+              @click="usersDialogRef?.open(item)"
+            />
+
+            <v-list-item
+              :title="$t('repositories.institutions')"
+              prepend-icon="mdi-domain"
+              @click="institutionsDialogRef?.open(item)"
+            />
+
+            <v-list-item
+              :title="$t('repositories.repositories')"
+              prepend-icon="mdi-database-outline"
+              @click="permissionsDialogRef?.open(item)"
+            />
+
+            <v-list-item
+              :title="$t('repositoryAliases.aliases')"
+              prepend-icon="mdi-database-eye-outline"
+              @click="permissionsDialogRef?.open(item)"
+            />
+
+            <v-list-item
+              :title="$t('spaces.spaces')"
+              prepend-icon="mdi-tab"
+              @click="permissionsDialogRef?.open(item)"
+            />
+
+            <v-list-item
               v-if="clipboard"
               :title="$t('copyId')"
               prepend-icon="mdi-identifier"
@@ -176,6 +206,9 @@ const {
   sortMapping: {
     institutions: 'institutions._count',
     users: 'institutions._count',
+    repositoryPermissions: 'repositoryPermissions._count',
+    repositoryAliasPermissions: 'repositoryAliasPermissions._count',
+    spacePermissions: 'spacePermissions._count',
   },
   data: {
     sortBy: [{ key: 'name', order: 'asc' }],
@@ -190,6 +223,7 @@ const headers = computed(() => [
   {
     title: t('name'),
     value: 'name',
+    sortable: true,
   },
   {
     title: t('menu.users'),

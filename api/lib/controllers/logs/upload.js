@@ -13,18 +13,30 @@ const indexTemplate = require('../../utils/index-template');
 const { appLogger } = require('../../services/logger');
 
 const storagePath = config.get('storage.path');
-const bulkSize = 4000; // NB: 2000 docs at once (1 insert = 2 ops)
+
+// Number of operations in each bulk request (1 document = 2 ops)
+const bulkSize = Number.parseInt(config.get('ezpaarse.upload.bulkSize'), 10) * 2;
+// Maximum number of tries when indexing docs in bulk
+const bulkMaxTries = Number.parseInt(config.get('ezpaarse.upload.bulkMaxTries'), 10);
+// Base wait time in ms before retrying, with exponential backoff
+const bulkBaseRetryDelay = Number.parseInt(config.get('ezpaarse.upload.bulkBaseRetryDelay'), 10);
 
 /**
  * Create an index with a default mapping
  * @param  {String}  index
  * @return {Promise}
  */
-function createIndex(index) {
-  return elastic.indices.create({
-    index,
-    body: indexTemplate,
-  }).then((res) => res.body);
+async function createIndex(index) {
+  let body;
+
+  try {
+    ({ body } = await elastic.indices.create({ index, body: indexTemplate }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to create index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
+
+  return body;
 }
 
 /**
@@ -154,7 +166,7 @@ function readStream(stream, index, username, splittedFields) {
 
       // eslint-disable-next-line no-use-before-define
       bulkInsert((err) => {
-        if (err) { return reject(err); }
+        if (err) { return reject(new Error(err)); }
         busy = false;
 
         if (!doneReading) {
@@ -170,38 +182,57 @@ function readStream(stream, index, username, splittedFields) {
         return callback();
       }
 
-      elastic.bulk({
-        body: buffer.splice(0, bulkSize),
-      }, {
-        headers: { 'es-security-runas-user': username },
-      }, (err, { body }) => {
-        if (err) { return callback(err); }
+      const docsToInsert = buffer.splice(0, bulkSize);
+      let nbTries = 0;
 
-        (body.items || []).forEach((i) => {
-          if (!i.index) {
+      const tryBulk = () => {
+        nbTries += 1;
+
+        elastic.bulk({
+          body: docsToInsert,
+        }, {
+          headers: { 'es-security-runas-user': username },
+        }, (err, { body }) => {
+          if (err) {
+            if (nbTries > bulkMaxTries) {
+              appLogger.error(`[ec-upload] Bulk operation reached maximum number of attempts:\n${err}`);
+              return callback(err);
+            }
+
+            const waitTime = bulkBaseRetryDelay * (2 ** (nbTries - 1));
+            appLogger.error(`[ec-upload] Bulk operation failed (attempt: ${nbTries}, retrying in ${waitTime}ms):\n${err}`);
+
+            return setTimeout(() => tryBulk(), waitTime);
+          }
+
+          (body.items || []).forEach((i) => {
+            if (!i.index) {
+              result.failed += 1;
+              return result.failed;
+            }
+
+            if (i.index.result === 'created') {
+              result.inserted += 1;
+              return result.inserted;
+            }
+            if (i.index.result === 'updated') {
+              result.updated += 1;
+              return result.updated;
+            }
+
+            if (i.index.error) {
+              // eslint-disable-next-line no-use-before-define
+              addError(i.index.error);
+            }
+
             result.failed += 1;
-            return result.failed;
-          }
+          });
 
-          if (i.index.result === 'created') {
-            result.inserted += 1;
-            return result.inserted;
-          }
-          if (i.index.result === 'updated') {
-            result.updated += 1;
-            return result.updated;
-          }
-
-          if (i.index.error) {
-            // eslint-disable-next-line no-use-before-define
-            addError(i.index.error);
-          }
-
-          result.failed += 1;
+          bulkInsert(callback);
         });
+      };
 
-        bulkInsert(callback);
-      });
+      tryBulk();
     }
   });
 
@@ -220,15 +251,21 @@ module.exports = async function upload(ctx) {
 
   const startTime = process.hrtime.bigint();
   const { username, email } = ctx.state.user;
+  let perm;
 
-  const { body: perm } = await elastic.security.hasPrivileges({
-    username,
-    body: {
-      index: [{ names: [index], privileges: ['write'] }],
-    },
-  }, {
-    headers: { 'es-security-runas-user': username },
-  });
+  try {
+    ({ body: perm } = await elastic.security.hasPrivileges({
+      username,
+      body: {
+        index: [{ names: [index], privileges: ['write'] }],
+      },
+    }, {
+      headers: { 'es-security-runas-user': username },
+    }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to get privileges of [${username}] on index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
 
   const canWrite = perm && perm.index && perm.index[index] && perm.index[index].write;
 
@@ -240,7 +277,14 @@ module.exports = async function upload(ctx) {
     return ctx.throw(400, ctx.$t('errors.user.noEmail'));
   }
 
-  const { body: exists } = await elastic.indices.exists({ index });
+  let exists;
+
+  try {
+    ({ body: exists } = await elastic.indices.exists({ index }));
+  } catch (err) {
+    appLogger.error(`[ec-upload] Failed to check existence of index [${index}]:\n${err}`);
+    throw new Error(err);
+  }
 
   if (!exists) {
     await createIndex(index);
@@ -290,7 +334,7 @@ module.exports = async function upload(ctx) {
       }
       return ctx.throw(e.type === 'validation' ? 400 : 500, e.message);
     }
-    return appLogger.info(`Insert into [${index}]`, ctx.body);
+    return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
   }
 
   let total = 0;
@@ -352,5 +396,5 @@ module.exports = async function upload(ctx) {
     failed,
     errors,
   };
-  return appLogger.info(`Insert into [${index}]`, ctx.body);
+  return appLogger.info(`[ec-upload] Insert into [${index}]`, ctx.body);
 };

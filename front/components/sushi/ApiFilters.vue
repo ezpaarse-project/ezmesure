@@ -27,12 +27,14 @@
         <v-col v-if="institution" cols="12">
           <ApiFiltersSelect
             v-model="filters.endpointId"
-            :search="filters.search"
             :disabled="!!filters.search"
             :messages="filters.search ? $t('users.filters.searchHint') : undefined"
             :items="availableEndpoints"
             :label="$t('institutions.sushi.endpoint')"
             :loading="loadingEndpoints && 'primary'"
+            chips
+            closable-chips
+            multiple
             prepend-icon="mdi-api"
             clearable
           />
@@ -156,7 +158,7 @@ const statuses = computed(() => {
     let text = 'institutions.sushi';
     switch (key) {
       case 'success':
-        text = `${text}.operational`;
+        text = `${text}.operationalShort`;
         break;
       case 'unauthorized':
         text = `${text}.invalidCredentialsShort`;
