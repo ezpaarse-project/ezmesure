@@ -328,7 +328,7 @@ institutions:
     domains: Domains
     general: General
     logo: Logo
-    logoHint: 'Ratio {ratioW}:{ratioH} - Formats: {accept}'
+    logoHint: "Ratio {ratioW}:{ratioH} - Formats: {accept}"
     links: Links
     localisation: Localisation
     automations: Automations
@@ -425,6 +425,7 @@ institutions:
       institution: Institution card
       memberships: Members
       sushi: COUNTER credentials
+      reporting: ezREEPORT
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -679,11 +680,13 @@ authenticate:
   impersonate: Impersonate
 password:
   forgot: Forgout your password ?
-  email: Email address *
   reset: Reset password
   save: Save password
   user: User
   password: Password
+  actualPassword: Actual Kibana password
+  newPassword: New Kibana password
+  repeatNewPassword: Repeat new Kibana password
   repeatPassword: Repeat password
   passwordIsRequired: Password required
   backToLogin: Back to login
@@ -857,7 +860,9 @@ spaces:
   manageSpaces: >
     Manage spaces
     |Manage {count} spaces
-  deleteNbRepositories: You are about to delete {number} spaces
+  deleteNbSpaces: >
+    Vous allez supprimer 1 espace.
+    |Vous allez supprimer {count} espaces.
   xSpaces: >
     1 space
     |{count} spaces
@@ -1012,6 +1017,7 @@ close: Close
 confirm: Confirm
 cancel: Cancel
 canceled: Canceled
+clear: Clear
 error: Error
 reset: Reset
 copy: Copy

@@ -1004,6 +1004,7 @@ customFields:
   descriptionFr: Description en français
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
+  restrictToAdmins: Restreindre aux administrateurs
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
