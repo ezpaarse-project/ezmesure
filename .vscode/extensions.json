@@ -8,12 +8,22 @@
 		"dbaeumer.vscode-eslint",
 		// npm import autocompletion
 		"christian-kohler.npm-intellisense",
+		// pretty TS errors
+		"YoavBls.pretty-ts-errors",
 		// Tools to work with Vue
-		"vue.volar",
+		"Vue.volar",
 		// Prisma support
-		"prisma.prisma",
+		"Prisma.prisma",
 		// Conventional commits
 		"vivaxy.vscode-conventional-commits",
+		// Dockerfile lint
+		"exiasr.hadolint",
+		// I18N support
+		"lokalise.i18n-ally",
+		// MJML support
+		"attilabuti.vscode-mjml",
+		// Code Spell Checker,
+		"streetsidesoftware.code-spell-checker",
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [
