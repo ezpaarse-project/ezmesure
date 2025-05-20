@@ -496,6 +496,7 @@ institutions:
     resumeEntryQuestion: Reprendre votre saisie ?
     resumeEntryDesc: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Souhaitez-vous la reprendre ?
     harvest: Moissonnage
+    archiveSwitch: Archiver/Désarchiver
     readyPopup:
       inProgress: Vos identifiants sont encore en cours de saisie. Lorsque ces derniers seront prêts à être moissonnés, déclarez la fin de votre saisie en cliquant sur le bouton ci-dessous.
       completed: Vous avez déclaré la fin de saisie de vos identifiants le {date}. Ces derniers pourront faire partie des prochaines vagues de moissonnage. Si des ajustements sont encore nécessaires, déclarez-le en cliquant sur le bouton ci-dessous.
@@ -603,6 +604,13 @@ sushi:
   credentialsCount: >
     1 identifiant
     |{count} identifiants
+  tabs:
+    active:
+      title: Identifiants actifs
+      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+    archived:
+      title: Identifiants archivés
+      description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
   auth: Authentification
   copyId: Copier l'ID
   showFiles: Voir les fichiers
@@ -632,8 +640,9 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant COUNTER.
-    |Vous allez supprimer {count} identifiants COUNTER.
+  archiveNbCredentials: >
+    Vous allez archiver {count} identifiant COUNTER. Les données liées à cet identifiant seront conservées.
+    |Vous allez archiver {count} identifiants COUNTER. Les données liées à cet identifiant seront conservées.
   problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
@@ -650,6 +659,8 @@ sushi:
   updatedItems: "{count} éléments du rapport ont été mis à jour."
   failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  cannotArchiveItems: Impossible d'archiver les identifiants.
+  itemsArchived: "{count} élement(s) archivé(s)"
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)
@@ -1047,6 +1058,8 @@ notEditable: Non éditable
 maxLength: 'Longueur maximale : {n} caractères'
 open: Ouvrir
 send: Envoyer
+archive: Archiver
+unarchive: Désarchiver
 'yes': Oui
 'no': Non
 validate: Valider

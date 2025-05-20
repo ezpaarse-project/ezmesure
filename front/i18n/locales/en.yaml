@@ -596,6 +596,13 @@ sushi:
     title: Filters credentials
   credentials: Credentials
   credentialsCount: "{count} credentials"
+  tabs:
+    active:
+      title: Active credentials
+      description: This list contains the active credentials that will be used for harvesting.
+    archived:
+      title: Archived credentials
+      description: This list contains the archived credentials that will be NOT used for harvesting.
   auth: Authentication
   copyId: Copy ID
   showFiles: View files
@@ -619,7 +626,7 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
-  deleteNbCredentials: You are about to delete {number} COUNTER credentials.
+  archiveNbCredentials: You are about to archive {number} COUNTER credentials. Associated data will be kept.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
@@ -634,6 +641,8 @@ sushi:
   updatedItems: "{count} report items have been updated."
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: "Messages from the endpoint:"
+  cannotArchiveItems: Unable to archive the credentials.
+  itemsArchived: "{count} credential(s) archived."
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
@@ -1028,6 +1037,8 @@ notEditable: Not editable
 maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
+archive: Archive
+unarchive: Unarchive
 "yes": "Yes"
 "no": "No"
 validate: Validate

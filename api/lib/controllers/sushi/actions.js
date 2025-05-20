@@ -153,7 +153,7 @@ exports.updateSushi = async (ctx) => {
     institutionName: institution.name,
   };
 
-  if (typeof body.active === 'boolean') {
+  if (typeof body.active === 'boolean' || typeof body.archived === 'boolean') {
     if (Object.keys(body).length === 1) {
       // If only the active state is toggled, no need to change update date
       data.updatedAt = sushi.updatedAt;
@@ -161,6 +161,9 @@ exports.updateSushi = async (ctx) => {
     }
     if (sushi.active !== body.active) {
       data.activeUpdatedAt = new Date();
+    }
+    if (sushi.active !== body.active) {
+      data.archivedUpdatedAt = new Date();
     }
   }
 

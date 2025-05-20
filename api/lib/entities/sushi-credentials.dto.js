@@ -18,6 +18,9 @@ const schema = {
   active: Joi.boolean(),
   activeUpdatedAt: Joi.date(),
 
+  archivedUpdatedAt: Joi.date(),
+  archived: Joi.boolean(),
+
   customerId: Joi.string().trim().allow(''),
   requestorId: Joi.string().trim().allow(''),
   apiKey: Joi.string().trim().allow(''),
@@ -54,6 +57,8 @@ const schema = {
 const immutableFields = [
   'id',
   'updatedAt',
+  'archivedUpdatedAt',
+  'activeUpdatedAt',
   'createdAt',
   'institution',
   'endpoint',

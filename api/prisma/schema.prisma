@@ -644,7 +644,11 @@ model SushiCredentials {
   /// Whether the credentials are active and can be harvested
   active          Boolean       @default(true)
   /// Date on which the active status was last modified
-  activeUpdatedAt DateTime      @default(now())
+  activeUpdatedAt   DateTime                      @default(now())
+  /// Whether the credentials are archived
+  archived          Boolean                       @default(false)
+  /// Date on which the archived status was last modified
+  archivedUpdatedAt DateTime                      @default(now())
   /// Packages (profiles, accounts, funds...) that include the credentials
   packages        String[]
   /// Abritrary tag list associated to the credentials
