@@ -52,6 +52,16 @@
       />
 
       <v-chip
+        v-if="modelValue.sendEndMail"
+        v-tooltip:top="$t('harvest.sessions.sendEndMail')"
+        size="small"
+        variant="outlined"
+        class="mr-2 mt-1"
+      >
+        <v-icon icon="mdi-email" />
+      </v-chip>
+
+      <v-chip
         v-if="status?.runningTime"
         v-tooltip:top="$t('harvest.sessions.startedAt', { date: dateFormat(modelValue?.startedAt, locale) })"
         :text="runningTime"
