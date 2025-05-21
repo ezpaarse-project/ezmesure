@@ -11,16 +11,10 @@ const { client: prisma } = require('../../services/prisma');
 const sender = config.get('notifications.sender');
 const recipients = config.get('notifications.recipients');
 
-/* eslint-disable max-len */
-/**
- * @typedef {import('@prisma/client').HarvestSession} HarvestSession
-*/
-/* eslint-enable max-len */
-
 /**
  * @param {HarvestSession} session
  */
-const onHarvestSessionEnd = async (session) => {
+async function sendEndMail(session) {
   const institutions = await prisma.institution.findMany({
     where: {
       sushiCredentials: {
@@ -79,6 +73,21 @@ const onHarvestSessionEnd = async (session) => {
     );
   } catch (error) {
     appLogger.error(`[harvest-session][hooks] Error while sending mail: ${error}`);
+  }
+}
+
+/* eslint-disable max-len */
+/**
+ * @typedef {import('@prisma/client').HarvestSession} HarvestSession
+*/
+/* eslint-enable max-len */
+
+/**
+ * @param {HarvestSession} session
+ */
+const onHarvestSessionEnd = async (session) => {
+  if (session.sendEndMail) {
+    await sendEndMail(session);
   }
 };
 
