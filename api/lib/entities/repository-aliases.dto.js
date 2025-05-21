@@ -14,6 +14,9 @@ const schema = {
   updatedAt: Joi.date(),
   createdAt: Joi.date(),
 
+  templateId: Joi.string().trim().allow(null),
+  template: Joi.object(),
+
   pattern: Joi.string().trim().min(1),
   target: Joi.string().trim().min(1),
 
@@ -41,6 +44,7 @@ const immutableFields = [
   'updatedAt',
   'createdAt',
   'institutions',
+  'template',
   'repository',
   'permissions',
   'elasticRolePermissions',

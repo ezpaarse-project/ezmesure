@@ -68,6 +68,10 @@ errors:
     alreadyExists: L'alias [%s] est déjà associé à l'établissement
     targetMismatch: Un alias [%s] représentant un entrepôt différent existe déjà
 
+  repoAliasTemplate:
+    notFound: Template d'alias introuvable
+    alreadyExists: Le template d'alias [%s] existe déjà
+
   institution:
     notFound: Établissement introuvable
     unauthorized: Vous n'êtes pas autorisé à accéder à cet établissement
