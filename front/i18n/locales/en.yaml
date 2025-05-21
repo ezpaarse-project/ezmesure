@@ -874,6 +874,7 @@ harvest:
       reportTypes: "{n} report type|{n} report types"
       credentials: "{n} credentials"
     credentialsTooltip: "{harvestable} harvestable credentials out of {all} declared credentials"
+    sendEndMail: A mail will be sent on harvest end
     notStarted: Not started
     unableToRetrive: Unable to retrieve harvests
   jobs:
