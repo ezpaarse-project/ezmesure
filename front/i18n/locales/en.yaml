@@ -24,7 +24,10 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
-  repositoryAliases: Repository aliases
+  repositoryAliases:
+    group: Repository aliases
+    aliases: Aliases
+    templates: Templates
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
@@ -828,6 +831,24 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+repoAliasTemplates:
+  toolbarTitle: Alias templates ({count})
+  manageTemplates: >
+    Manage templates
+    |Manage {count} templates
+  target: Target repository
+  conditions: Conditions
+  conditionsDescription: What conditions must meet institutions ?
+  filters: Filters
+  filtersTitle: Filter templates
+  aliases: Repository aliases
+  aliasesPattern: Aliases pattern
+  noFilters: No filters
+  noConditions: No conditions
+  noTemplates: No template has been created yet
+  deleteNbTemplates: You are about to delete {number} alias templates.
+  newTemplate: New alias template
+  modifyTemplate: Modify an alias template
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -1030,6 +1051,9 @@ open: Open
 send: Send
 "yes": "Yes"
 "no": "No"
+active: Active
+inactive: Inactive
+activeSwitch: Activate/Deactivate
 validate: Validate
 invalidate: Invalidate
 reason: "Reason: {reason}"

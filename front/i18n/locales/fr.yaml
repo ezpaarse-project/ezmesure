@@ -24,7 +24,10 @@ menu:
   report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
-  repositoryAliases: Alias d'entrepôts
+  repositoryAliases:
+    group: Alias d'entrepôts
+    aliases: Alias
+    templates: Modèles
   spaces: Espaces
   harvest: Moissonnage
   sync: Synchronisation
@@ -845,6 +848,25 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} est {valueText}"
       is:not: "{field} n'est pas {valueText}"
+repoAliasTemplates:
+  toolbarTitle: Modèles d'alias ({count})
+  manageTemplates: >
+    Gérer les modèles
+    |Gérer {count} modèles
+  target: Entrepôt cible
+  conditions: Conditions
+  conditionsDescription: Quelles conditions doivent remplir les établissements ?
+  filters: Filtres
+  filtersTitle: Filtrer les modèles
+  aliases: Alias d'entrepôts
+  aliasesPattern: Pattern des alias
+  noFilters: Pas de filtres
+  noConditions: Pas de conditions
+  noTemplates: Aucun modèle d'alias n'a encore été créé
+  deleteNbTemplates: Vous allez supprimer {count} modèles d'alias.
+  newTemplate: Nouveau modèle d'alias
+  modifyTemplate: Modifier un modèle d'alias
+
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})
@@ -1049,6 +1071,9 @@ open: Ouvrir
 send: Envoyer
 'yes': Oui
 'no': Non
+active: Actif
+inactive: Inactif
+activeSwitch: Activer/Desactiver
 validate: Valider
 invalidate: Invalider
 reason: 'Raison : {reason}'
