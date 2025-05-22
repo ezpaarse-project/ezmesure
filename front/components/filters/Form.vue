@@ -1,7 +1,7 @@
 <template>
   <v-card
     :title="title"
-    prepend-icon="mdi-filter"
+    :prepend-icon="prependIcon"
   >
     <template v-if="$slots.subtitle" #subtitle>
       <slot name="subtitle" />
@@ -163,7 +163,7 @@ const props = defineProps({
   },
   prependIcon: {
     type: String,
-    default: undefined,
+    default: () => 'mdi-filter',
   },
 });
 

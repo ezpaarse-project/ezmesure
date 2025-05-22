@@ -9,10 +9,11 @@ const { stringToArray } = require('../utils');
  *
  * @param {string[]} props
  * @param {(string[] | Set<string>)?} [includableFields]
+ * @param {Boolean?} [isCountContext]
  *
  * @returns {Record<string, any> | undefined}
  */
-const propsToPrismaInclude = (props, includableFields) => {
+const propsToPrismaInclude = (props, includableFields, isCountContext) => {
   if (!Array.isArray(props)) {
     return undefined;
   }
@@ -34,10 +35,11 @@ const propsToPrismaInclude = (props, includableFields) => {
     ...propsToMap.map((prop) => {
       const [parent, ...children] = prop.split('.');
 
-      /** @type {true | { include?: Record<string, any> }} */
+      /** @type {true | { include?: Record<string, any>, select?: Record<string, any> }} */
       let value = true;
       if (children?.length > 0) {
-        value = { include: propsToPrismaInclude([children.join('.')]) };
+        const key = isCountContext ? 'select' : 'include';
+        value = { [key]: propsToPrismaInclude([children.join('.')], undefined, isCountContext) };
       }
 
       return { [parent]: value };

@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3">
+  <v-navigation-drawer v-model="isOpen" color="grey-lighten-3" width="300">
     <v-list density="compact" class="text-grey-darken-3 pa-0">
       <v-list-item
         :title="$t('menu.institutions')"
@@ -13,11 +13,27 @@
         prepend-icon="mdi-database"
       />
 
-      <v-list-item
-        :title="$t('menu.repositoryAliases')"
-        to="/admin/repository-aliases"
-        prepend-icon="mdi-database-eye"
-      />
+      <v-list-group value="aliases">
+        <template #activator="{ props }">
+          <v-list-item
+            :title="$t('menu.repositoryAliases.group')"
+            prepend-icon="mdi-database-eye"
+            v-bind="props"
+          />
+        </template>
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.aliases')"
+          to="/admin/repository-aliases"
+          prepend-icon="mdi-database-eye"
+        />
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.templates')"
+          to="/admin/repository-alias-templates"
+          prepend-icon="mdi-view-grid"
+        />
+      </v-list-group>
 
       <v-list-item
         :title="$t('menu.spaces')"

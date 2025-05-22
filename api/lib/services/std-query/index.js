@@ -190,7 +190,16 @@ const prepareStandardQueryParams = ({
   includableFields = undefined,
   queryFields = ['name'],
 }) => {
-  const allowedIncludes = includableFields ? Joi.string().valid(...includableFields) : Joi.string();
+  let includableFieldsWithCounts;
+
+  if (includableFields) {
+    const countFields = includableFields?.filter((f) => (schema[f]?.type === 'array')).map((f) => `_count.${f}`);
+    includableFieldsWithCounts = [...includableFields, ...countFields];
+  }
+
+  const allowedIncludes = includableFieldsWithCounts
+    ? Joi.string().valid(...includableFieldsWithCounts)
+    : Joi.string();
 
   const baseValidation = Joi.object({
     include: Joi.array().single().items(allowedIncludes),
@@ -230,7 +239,7 @@ const prepareStandardQueryParams = ({
       const order = stringToArray(ctx.query.order ?? []);
 
       const query = {
-        include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFields),
+        include: propsToPrismaInclude(stringToArray(propsToInclude ?? ''), includableFieldsWithCounts),
         orderBy: propsToPrismaSort(stringToArray(sort ?? ''), order),
         take: Number.isInteger(size) && size > 0 ? size : undefined,
         skip: Number.isInteger(size) ? size * (page - 1) : undefined,
@@ -254,7 +263,7 @@ const prepareStandardQueryParams = ({
     oneValidation: baseValidation,
     getPrismaOneQuery: (ctx, where = {}, options = {}) => {
       const { include: propsToInclude } = ctx.query;
-      const include = propsToPrismaInclude(stringToArray(propsToInclude ?? ''), options?.includableFields ?? includableFields);
+      const include = propsToPrismaInclude(stringToArray(propsToInclude ?? ''), options?.includableFields ?? includableFieldsWithCounts);
 
       // eslint-disable-next-line no-restricted-syntax
       for (const [propName, whereClause] of Object.entries(options.includeFilters ?? {})) {
