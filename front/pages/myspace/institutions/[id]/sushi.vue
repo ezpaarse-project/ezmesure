@@ -264,7 +264,7 @@
 
       <template #[`item.harvests`]="{ item }">
         <SushiHarvestStateChip
-          v-if="item.harvests?.length > 0"
+          v-if="item.harvests?.length > 0 && !item.deletedAt"
           :model-value="item.harvests"
           :endpoint="item.endpoint"
           :current-year="currentHarvestYear"
@@ -299,6 +299,22 @@
         </div>
       </template>
 
+      <template #[`item.deletionTask`]="{ value, item }">
+        <v-progress-circular
+          v-if="item.deletedAt"
+          v-tooltip:top="value?.error ? $t('sushi.deleting') : $t('sushi.deletingError', value)"
+          :value="value?.progress * 100"
+          :color="value?.canceled ? 'red' : 'primary'"
+          :indeterminate="!value"
+          size="35"
+          width="2"
+        >
+          <div class="d-flex align-center justify-center">
+            <v-icon icon="mdi-trash-can-outline" />
+          </div>
+        </v-progress-circular>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -314,14 +330,14 @@
             <v-list-item
               v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('modify')"
-              :disabled="!canEdit"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-pencil"
               @click="sushiFormRef?.open(item, { institution })"
             />
             <v-list-item
               v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('duplicate')"
-              :disabled="!canEdit"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-content-copy"
               @click="sushiFormRef?.open({ ...item, id: null }, { institution })"
             />
@@ -334,7 +350,7 @@
             <v-list-item
               v-if="currentTab === 'archived'"
               :title="$t('delete')"
-              :disabled="!canEdit"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-delete"
               @click="deleteSushis([item])"
             />
@@ -343,42 +359,49 @@
 
             <v-list-item
               :title="$t('institutions.sushi.checkCredentials')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-connection"
               @click="checkConnections([item])"
             />
             <v-list-item
               v-if="user?.isAdmin"
               :title="$t('institutions.sushi.resetChecks')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-restore"
               @click="resetConnections([item])"
             />
             <v-list-item
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-table-headers-eye"
               @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
               :title="$t('reports.supportedReports')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-file-search"
               @click="reportsRef?.open(item)"
             />
             <v-list-item
               v-if="filesRef"
               :title="$t('sushi.showFiles')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-file-tree"
               @click="filesRef?.open(item)"
             />
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-identifier"
               @click="copySushiId(item)"
             />
@@ -513,6 +536,7 @@ const {
   },
   data: {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
+    include: ['endpoint', 'harvests', 'deletionTask'],
     archived: computed(() => currentTab.value === 'archived'),
   },
 });
@@ -587,7 +611,13 @@ const headers = computed(() => [
     align: 'center',
     minWidth: '130px',
     sortable: true,
-    hide: query.value.archived,
+    hide: currentTab.value !== 'active',
+  },
+  {
+    title: t('sushi.deletionTask'),
+    value: 'deletionTask',
+    align: 'center',
+    hide: currentTab.value !== 'archived',
   },
   {
     title: t('actions'),
@@ -908,7 +938,7 @@ async function deleteSushis(items) {
       );
 
       if (!results.some((r) => !r)) {
-        snacks.success(t('itemsDeleted', { count: toDelete.length }));
+        snacks.success(t('sushi.itemsDeleted', { count: toDelete.length }));
       }
 
       if (!items) {

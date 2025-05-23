@@ -621,6 +621,9 @@ sushi:
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants COUNTER est actuellement verrouillée.
+  deleting: Suppression en cours
+  deletingError: "Impossible de supprimer l'identifiant: {error}"
+  deletionTask: État de suppression
   nInstitutions: >
     1 établissement utilise cet endpoint
     |{count} établissements utilisent cet endpoint
@@ -640,6 +643,8 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
+    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données liées à cet identifiant. Cette action est irréversible.
+    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données liées à cet identifiant. Cette action est irréversible.
   archiveNbCredentials: >
     Vous allez archiver {count} identifiant COUNTER. Les données liées à cet identifiant seront conservées.
     |Vous allez archiver {count} identifiants COUNTER. Les données liées à cet identifiant seront conservées.
@@ -661,6 +666,7 @@ sushi:
   messagesFromEndpoint: 'Messages du point d''accès :'
   cannotArchiveItems: Impossible d'archiver les identifiants.
   itemsArchived: "{count} élement(s) archivé(s)"
+  itemsDeleted: "{count} élement(s) supprimé(s), les données liées aux identifiants seront supprimée prochainement."
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)

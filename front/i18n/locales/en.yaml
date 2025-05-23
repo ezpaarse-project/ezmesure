@@ -325,7 +325,7 @@ institutions:
     domains: Domains
     general: General
     logo: Logo
-    logoHint: 'Ratio {ratioW}:{ratioH} - Formats: {accept}'
+    logoHint: "Ratio {ratioW}:{ratioH} - Formats: {accept}"
     links: Links
     localisation: Localisation
     automations: Automations
@@ -613,6 +613,9 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: COUNTER credentials management is currently locked.
+  deleting: Deletion in progress
+  deletingError: "Unable to delete credentials: {error}"
+  deletionTask: Deletion state
   nInstitutions: >
     1 institution use this endpoint
     |{count} institutions use this endpoint
@@ -626,6 +629,7 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
+  deleteNbCredentials: You are about to delete {number} COUNTER credentials. This will delete associated data. This operation cannot be undone.
   archiveNbCredentials: You are about to archive {number} COUNTER credentials. Associated data will be kept.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
@@ -643,6 +647,7 @@ sushi:
   messagesFromEndpoint: "Messages from the endpoint:"
   cannotArchiveItems: Unable to archive the credentials.
   itemsArchived: "{count} credential(s) archived."
+  itemsDeleted: "{count} credential(s) deleted, associated data will be deleted soon."
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
