@@ -10,6 +10,7 @@
     <SkeletonPageBar
       v-model="query"
       :refresh="refresh"
+      :omit-from-filter-count="['search', 'archived']"
       search
       @update:model-value="debouncedRefresh()"
     >
@@ -161,6 +162,32 @@
             </template>
           </ConfirmPopover>
         </div>
+
+        <div class="mb-2">
+          <v-divider />
+
+          <v-tabs
+            v-model="currentTab"
+            :items="tabs"
+            color="primary"
+            grow
+            @update:model-value="refresh()"
+          >
+            <template #tab="{ item }">
+              <v-tab
+                :prepend-icon="item.icon"
+                :text="item.text"
+                :value="item.value"
+              />
+            </template>
+
+            <template #item="{ item }">
+              <v-tabs-window-item :value="item.value" class="pa-4">
+                {{ item.description }}
+              </v-tabs-window-item>
+            </template>
+          </v-tabs>
+        </div>
       </template>
 
       <template #[`header.harvests`]="{ column: { title } }">
@@ -237,7 +264,7 @@
 
       <template #[`item.harvests`]="{ item }">
         <SushiHarvestStateChip
-          v-if="item.harvests?.length > 0"
+          v-if="item.harvests?.length > 0 && !item.deletedAt"
           :model-value="item.harvests"
           :endpoint="item.endpoint"
           :current-year="currentHarvestYear"
@@ -272,6 +299,22 @@
         </div>
       </template>
 
+      <template #[`item.deletionTask`]="{ value, item }">
+        <v-progress-circular
+          v-if="item.deletedAt"
+          v-tooltip:top="value?.error ? $t('sushi.deleting') : $t('sushi.deletingError', value)"
+          :value="value?.progress * 100"
+          :color="value?.canceled ? 'red' : 'primary'"
+          :indeterminate="!value"
+          size="35"
+          width="2"
+        >
+          <div class="d-flex align-center justify-center">
+            <v-icon icon="mdi-trash-can-outline" />
+          </div>
+        </v-progress-circular>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-menu>
           <template #activator="{ props: menu }">
@@ -285,22 +328,29 @@
 
           <v-list>
             <v-list-item
-              v-if="sushiFormRef"
+              v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('modify')"
-              :disabled="!canEdit"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-pencil"
               @click="sushiFormRef?.open(item, { institution })"
             />
             <v-list-item
-              v-if="sushiFormRef"
+              v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('duplicate')"
-              :disabled="!canEdit"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-content-copy"
               @click="sushiFormRef?.open({ ...item, id: null }, { institution })"
             />
             <v-list-item
-              :title="$t('delete')"
+              :title="item.archived ? $t('unarchive') : $t('archive')"
               :disabled="!canEdit"
+              :prepend-icon="item.archived ? 'mdi-archive-off' : 'mdi-archive'"
+              @click="toggleArchiveStates([item])"
+            />
+            <v-list-item
+              v-if="currentTab === 'archived'"
+              :title="$t('delete')"
+              :disabled="!canEdit || item.deletedAt"
               prepend-icon="mdi-delete"
               @click="deleteSushis([item])"
             />
@@ -309,42 +359,49 @@
 
             <v-list-item
               :title="$t('institutions.sushi.checkCredentials')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-connection"
               @click="checkConnections([item])"
             />
             <v-list-item
               v-if="user?.isAdmin"
               :title="$t('institutions.sushi.resetChecks')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-restore"
               @click="resetConnections([item])"
             />
             <v-list-item
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-table-headers-eye"
               @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
               :title="$t('reports.supportedReports')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-file-search"
               @click="reportsRef?.open(item)"
             />
             <v-list-item
               v-if="filesRef"
               :title="$t('sushi.showFiles')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-file-tree"
               @click="filesRef?.open(item)"
             />
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
+              :disabled="item.deletedAt"
               prepend-icon="mdi-identifier"
               @click="copySushiId(item)"
             />
@@ -367,6 +424,14 @@
     >
       <template #actions>
         <v-list-item
+          :title="$t('institutions.sushi.archiveSwitch')"
+          :disabled="!canEdit"
+          prepend-icon="mdi-archive"
+          @click="toggleArchiveStates()"
+        />
+
+        <v-list-item
+          v-if="currentTab === 'archived'"
           :title="$t('delete')"
           :disabled="!canEdit"
           prepend-icon="mdi-delete"
@@ -376,6 +441,7 @@
         <v-divider />
 
         <v-list-item
+          v-if="currentTab === 'active'"
           :title="$t('institutions.sushi.activeSwitch')"
           :disabled="!canEdit"
           prepend-icon="mdi-toggle-switch"
@@ -429,6 +495,7 @@ const { hasPermission } = useCurrentUserStore();
 const { addToCheck } = useSushiCheckQueueStore();
 const snacks = useSnacksStore();
 
+const currentTab = ref('');
 const selectedSushi = ref([]);
 const activeLoadingMap = ref(new Map());
 const currentHarvestYear = ref(maxHarvestYear);
@@ -469,7 +536,8 @@ const {
   },
   data: {
     sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
-    include: ['endpoint', 'harvests'],
+    include: ['endpoint', 'harvests', 'deletionTask'],
+    archived: computed(() => currentTab.value === 'archived'),
   },
 });
 
@@ -491,6 +559,23 @@ const canEdit = computed(() => {
   }
   return !isLocked.value && hasPermission(params.id, 'sushi:write', { throwOnNoMembership: true });
 });
+/**
+ * Tabs
+ */
+const tabs = computed(() => [
+  {
+    text: t('sushi.tabs.active.title'),
+    description: t('sushi.tabs.active.description'),
+    value: 'active',
+    icon: 'mdi-key-wireless',
+  },
+  {
+    text: t('sushi.tabs.archived.title'),
+    description: t('sushi.tabs.archived.description'),
+    value: 'archived',
+    icon: 'mdi-archive',
+  },
+]);
 /**
  * Table headers
  */
@@ -526,13 +611,20 @@ const headers = computed(() => [
     align: 'center',
     minWidth: '130px',
     sortable: true,
+    hide: currentTab.value !== 'active',
+  },
+  {
+    title: t('sushi.deletionTask'),
+    value: 'deletionTask',
+    align: 'center',
+    hide: currentTab.value !== 'archived',
   },
   {
     title: t('actions'),
     value: 'actions',
     align: 'center',
   },
-]);
+].filter((h) => h.hide !== true));
 /**
  * Toolbar title
  */
@@ -703,12 +795,12 @@ async function toggleActiveStates(items) {
 
         // eslint-disable-next-line no-param-reassign
         item.active = active;
-        activeLoadingMap.value.set(item.id, false);
         return item;
       } catch (err) {
         snacks.error(t('sushi.unableToUpdate'), err);
-        activeLoadingMap.value.set(item.id, false);
         return null;
+      } finally {
+        activeLoadingMap.value.set(item.id, false);
       }
     }),
   );
@@ -716,6 +808,58 @@ async function toggleActiveStates(items) {
   if (!items) {
     selectedSushi.value = [];
   }
+}
+
+/**
+ * Toggle archive states for selected sushi
+ *
+ * @param {any[]} items Sushi to toggle, defaults to selected
+ */
+async function toggleArchiveStates(items) {
+  const toArchive = items || selectedSushi.value;
+  if (toArchive.length <= 0) {
+    return;
+  }
+
+  openConfirm({
+    text: t(
+      'sushi.archiveNbCredentials',
+      toArchive.length,
+    ),
+    agreeText: t('archive'),
+    agreeIcon: 'mdi-archive',
+    onAgree: async () => {
+      const results = await Promise.all(
+        toArchive.map(async (item) => {
+          activeLoadingMap.value.set(item.id, true);
+          try {
+            const archived = !item.archived;
+            await $fetch(`/api/sushi/${item.id}`, {
+              method: 'PATCH',
+              body: { archived },
+            });
+
+            // eslint-disable-next-line no-param-reassign
+            item.active = false; // Shows as inactive to show progress
+          } catch (err) {
+            snacks.error(t('sushi.cannotArchiveItems', { id: item.name || item.id }), err);
+          } finally {
+            activeLoadingMap.value.set(item.id, false);
+          }
+        }),
+      );
+
+      if (!results.some((r) => !r)) {
+        snacks.success(t('sushi.itemsArchived', { count: toArchive.length }));
+      }
+
+      if (!items) {
+        selectedSushi.value = [];
+      }
+
+      await refresh();
+    },
+  });
 }
 
 /**
@@ -763,7 +907,6 @@ async function resetConnections(items) {
     },
   });
 }
-
 /**
  * Delete selected sushi
  *
@@ -795,7 +938,7 @@ async function deleteSushis(items) {
       );
 
       if (!results.some((r) => !r)) {
-        snacks.success(t('itemsDeleted', { count: toDelete.length }));
+        snacks.success(t('sushi.itemsDeleted', { count: toDelete.length }));
       }
 
       if (!items) {

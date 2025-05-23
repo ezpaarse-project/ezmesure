@@ -122,9 +122,26 @@ function formatDate(date) {
 }
 
 const fields = computed(() => [
-  { value: formatDate(props.modelValue.createdAt) || '-', label: t('institutions.sushi.createdAt'), cols: 4 },
-  { value: formatDate(props.modelValue.updatedAt) || '-', label: t('institutions.sushi.updatedAt'), cols: 4 },
-  { value: formatDate(props.modelValue.connection?.date) || '-', label: t('institutions.sushi.testedAt'), cols: 4 },
+  {
+    value: formatDate(props.modelValue.createdAt) || '-',
+    label: t('institutions.sushi.createdAt'),
+    cols: props.modelValue.archived ? 3 : 4,
+  },
+  {
+    value: formatDate(props.modelValue.updatedAt) || '-',
+    label: t('institutions.sushi.updatedAt'),
+    cols: props.modelValue.archived ? 3 : 4,
+  },
+  {
+    value: formatDate(props.modelValue.connection?.date) || '-',
+    label: t('institutions.sushi.testedAt'),
+    cols: props.modelValue.archived ? 3 : 4,
+  },
+  {
+    value: props.modelValue.archived ? formatDate(props.modelValue.archivedUpdatedAt) : undefined,
+    label: t('institutions.sushi.archivedAt'),
+    cols: 3,
+  },
 
   { value: props.modelValue.customerId, label: t('institutions.sushi.customerId'), cols: 4 },
   { value: props.modelValue.requestorId, label: t('institutions.sushi.requestorId'), cols: 4 },
