@@ -17,6 +17,7 @@ const notifications = require('./lib/services/notifications');
 const opendata = require('./lib/services/opendata');
 const elastic = require('./lib/services/elastic');
 const sushi = require('./lib/services/sushi');
+const sushiCredentials = require('./lib/services/sushi-credentials');
 const harvest = require('./lib/services/harvest');
 
 const ezreeportSync = require('./lib/services/sync/ezreeport');
@@ -146,6 +147,7 @@ function start() {
   opendata.startCron(appLogger);
   ezreeportSync.startCron();
   sushi.startCleanCron();
+  sushiCredentials.startCron();
   harvest.startCancelCron();
   cronMetrics.start();
 

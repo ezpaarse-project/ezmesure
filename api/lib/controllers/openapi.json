@@ -151,6 +151,14 @@
         "description": "ID of the item",
         "readOnly": true
       },
+      "ItemDeleteDate": {
+        "type": "string",
+        "nullable": true,
+        "format": "date-time",
+        "example": "2020-11-05T17:07:31.967Z",
+        "description": "When item was marked for deletion",
+        "readOnly": true
+      },
       "ItemUpdateDate": {
         "type": "string",
         "format": "date-time",
@@ -1452,6 +1460,9 @@
           },
           "updatedAt": {
             "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "deletedAt": {
+            "$ref": "#/components/schemas/ItemDeleteDate"
           },
           "institution": {
             "description": "The institution that owns the credentials",
