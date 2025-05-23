@@ -234,8 +234,8 @@ function deleteUsers(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/users/${item.username}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.username }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.username }), err);
             return Promise.resolve(null);
           }
         }),
@@ -266,8 +266,8 @@ async function copyUserUsername({ username }) {
 
   try {
     await copy(username);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -288,8 +288,8 @@ async function copyMailList(items) {
 
   try {
     await copy(addresses.join('; '));
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('emailsCopied'));
@@ -299,8 +299,8 @@ async function impersonateUser(item) {
   try {
     await $fetch(`/api/users/${item.username}/_impersonate`, { method: 'POST' });
     await getSession();
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
     return;
   }
   await navigateTo('/myspace');

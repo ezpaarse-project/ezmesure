@@ -199,8 +199,8 @@ async function save() {
     });
 
     emit('submit', newSpace);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 
   loading.value = false;

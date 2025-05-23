@@ -544,8 +544,8 @@ async function copySushiId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -564,8 +564,8 @@ async function toggleActiveStates() {
     });
 
     endpointRefresh();
-  } catch {
-    snacks.error(t('endpoints.unableToUpdate'));
+  } catch (err) {
+    snacks.error(t('endpoints.unableToUpdate'), err);
   }
   loading.value = false;
 }
@@ -590,8 +590,8 @@ async function copyMailListOfInstitutions(ids) {
 
   try {
     await copy(addresses.join('; '));
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('emailsCopied'));
@@ -650,8 +650,8 @@ async function resetConnections(items) {
         toReset.map((item) => {
           try {
             return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }));
+          } catch (err) {
+            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
             return Promise.resolve(null);
           }
         }),

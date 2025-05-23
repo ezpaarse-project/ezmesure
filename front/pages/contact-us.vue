@@ -105,10 +105,10 @@
 
                         <v-col cols="12" sm="6">
                           <v-text-field
-                            v-model="additionalData.requestorId"
-                            :label="$t('institutions.sushi.requestorId')"
+                            v-model="additionalData.customerId"
+                            :label="$t('institutions.sushi.customerId')"
                             :error-messages="sushiRule"
-                            prepend-icon="mdi-account-arrow-down"
+                            prepend-icon="mdi-account"
                             variant="underlined"
                             hide-details="auto"
                             required
@@ -117,10 +117,10 @@
 
                         <v-col cols="12" sm="6">
                           <v-text-field
-                            v-model="additionalData.customerId"
-                            :label="$t('institutions.sushi.customerId')"
+                            v-model="additionalData.requestorId"
+                            :label="$t('institutions.sushi.requestorId')"
                             :error-messages="sushiRule"
-                            prepend-icon="mdi-account"
+                            prepend-icon="mdi-account-arrow-down"
                             variant="underlined"
                             hide-details="auto"
                             required
@@ -295,8 +295,8 @@ async function sendMail() {
     snacks.success(t('contact.emailSent'));
 
     resetForm();
-  } catch {
-    snacks.error(t('contact.failed'));
+  } catch (err) {
+    snacks.error(t('contact.failed'), err);
   }
   loading.value = false;
 }

@@ -2,7 +2,7 @@
   <div v-if="show" class="d-flex flex-column" style="height: 100%;">
     <v-row v-if="error">
       <v-col>
-        <v-alert :text="error.message || error" type="error" rounded="0" />
+        <v-alert :text="errorMessage" type="error" rounded="0" />
       </v-col>
     </v-row>
 
@@ -20,7 +20,7 @@
           <v-empty-state
             icon="mdi-emoticon-sad-outline"
             :title="$t('errors.generic')"
-            :text="$te(`errors.${error.statusCode}`) ? $t(`errors.${error.statusCode}`) : undefined"
+            :text="$te(`errors.${error.statusCode}`) ? $t(`errors.${error.statusCode}`) : error.statusMessage"
             :action-text="showRefresh ? $t('refresh') : undefined"
             @click:action="$emit('click:refresh')"
           />
@@ -31,7 +31,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { getErrorMessage } from '@/lib/errors';
+
+const props = defineProps({
   show: {
     type: Boolean,
     required: true,
@@ -53,4 +55,6 @@ defineProps({
 defineEmits({
   'click:refresh': () => true,
 });
+
+const errorMessage = computed(() => getErrorMessage(props.error));
 </script>

@@ -18,7 +18,7 @@
         <mj-image
           height="35px"
           width="150px"
-          href="https://ezmesure.couperin.org"
+          href="{{PUBLIC_URL}}"
           src="cid:ezmesure_logo_white.png"
         />
       </mj-column>
@@ -39,7 +39,7 @@
             <mj-image
               align="left"
               width="150px"
-              href="https://ezmesure.couperin.org"
+              href="{{PUBLIC_URL}}"
               src="cid:ezmesure_logo.png"
             />
           </mj-column>

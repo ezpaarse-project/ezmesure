@@ -126,6 +126,7 @@ services:
       - EZMESURE_SEND_EMPTY_ACTIVITY
       - EZMESURE_ENCRYPTION_SECRET
       - EZMESURE_LOG_LEVEL
+      - EZMESURE_PUBLIC_URL
       - NODE_ENV
       - NODE_CONFIG
     volumes:

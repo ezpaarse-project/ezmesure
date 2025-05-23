@@ -126,8 +126,8 @@ const fields = computed(() => [
   { value: formatDate(props.modelValue.updatedAt) || '-', label: t('institutions.sushi.updatedAt'), cols: 4 },
   { value: formatDate(props.modelValue.connection?.date) || '-', label: t('institutions.sushi.testedAt'), cols: 4 },
 
-  { value: props.modelValue.requestorId, label: t('institutions.sushi.requestorId'), cols: 4 },
   { value: props.modelValue.customerId, label: t('institutions.sushi.customerId'), cols: 4 },
+  { value: props.modelValue.requestorId, label: t('institutions.sushi.requestorId'), cols: 4 },
   { value: props.modelValue.apiKey, label: t('institutions.sushi.apiKey'), cols: 4 },
 ].filter((f) => f.value));
 </script>

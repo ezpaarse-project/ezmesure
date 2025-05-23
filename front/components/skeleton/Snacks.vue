@@ -6,7 +6,13 @@
     :timeout="currentMessages?.timeout"
     transition="slide-y-reverse-transition"
   >
-    {{ currentMessages?.text }}
+    <div v-if="currentMessages?.title" class="text-h6 pb-2">
+      {{ currentMessages.title }}
+    </div>
+
+    <div class="text-body-2">
+      {{ currentMessages?.text }}
+    </div>
 
     <template #actions>
       <v-btn

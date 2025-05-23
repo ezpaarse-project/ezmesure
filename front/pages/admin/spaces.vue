@@ -201,8 +201,8 @@ function deleteSpaces(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/kibana-spaces/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -233,8 +233,8 @@ async function copySpaceId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

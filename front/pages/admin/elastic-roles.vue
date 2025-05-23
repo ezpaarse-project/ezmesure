@@ -307,8 +307,8 @@ function deleteRoles(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/elastic-roles/${item.name}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItem', { id: item.name }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItem', { id: item.name }), err);
             return Promise.resolve(null);
           }
         }),
@@ -339,8 +339,8 @@ async function copyRoleName({ name }) {
 
   try {
     await copy(name);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));

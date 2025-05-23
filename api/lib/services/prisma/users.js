@@ -80,13 +80,29 @@ function findUniqueOrThrow(params, tx = prisma) {
 }
 
 /**
+ * @typedef {{ id: string, name: string, acronym: string | null }} CorrespondantInstitution
+ * @typedef {{ institution: CorrespondantInstitution }} CorrespondantMembership
+ *
  * @param {string} domain
  * @param {TransactionClient} [tx]
- * @returns {Promise<{email: string}[]> | null}
+ * @returns {Promise<{ email: string, memberships: CorrespondantMembership[] }[]> | null}
  */
 function findEmailOfCorrespondentsWithDomain(domain, tx = prisma) {
   return tx.user.findMany({
-    select: { email: true },
+    select: {
+      email: true,
+      memberships: {
+        select: {
+          institution: {
+            select: {
+              id: true,
+              name: true,
+              acronym: true,
+            },
+          },
+        },
+      },
+    },
     where: {
       email: { endsWith: `@${domain}` },
       memberships: {

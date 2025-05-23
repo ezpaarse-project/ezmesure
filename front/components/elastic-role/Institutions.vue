@@ -93,8 +93,8 @@ async function addInstitution(item) {
     });
     institutions.value.push(updatedInstitution);
     emit('update:modelValue', institutions.value);
-  } catch {
-    snacks.error(t('institutions.members.cannotAddMember'));
+  } catch (err) {
+    snacks.error(t('institutions.members.cannotAddMember'), err);
   }
 }
 
@@ -107,8 +107,8 @@ async function removeInstitution(item) {
     institutions.value = institutions.value.filter((institution) => institution.id !== item.id);
 
     emit('update:modelValue', institutions.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

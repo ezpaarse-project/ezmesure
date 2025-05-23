@@ -75,11 +75,15 @@ exports.getInstitutions = async (ctx) => {
 
 exports.getInstitution = async (ctx) => {
   const { institutionId } = ctx.params;
+  const { user } = ctx.state;
+  const queryOpts = {};
 
-  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId });
-  if (!ctx.state?.user?.isAdmin) {
-    prismaQuery.include = undefined;
+  if (!user?.isAdmin && Array.isArray(ctx.query?.include)) {
+    queryOpts.includableFields = ['customProps', 'customProps.field'];
+    queryOpts.includeFilters = { customProps: { field: { visible: true } } };
   }
+
+  const prismaQuery = standardQueryParams.getPrismaOneQuery(ctx, { id: institutionId }, queryOpts);
 
   const institutionsService = new InstitutionsService();
   const institution = await institutionsService.findUnique(prismaQuery);
@@ -101,6 +105,7 @@ exports.createInstitution = async (ctx) => {
   const { addAsMember } = ctx.query;
   const { username, isAdmin } = user;
   let memberships;
+  let customProps;
 
   ctx.metadata = {
     institutionName: body?.name,
@@ -122,6 +127,14 @@ exports.createInstitution = async (ctx) => {
     };
   }
 
+  if (isAdmin && Array.isArray(body.customProps)) {
+    customProps = {
+      createMany: {
+        data: body.customProps.map(({ fieldId, value } = {}) => ({ fieldId, value })),
+      },
+    };
+  }
+
   const institutionsService = new InstitutionsService();
 
   if (body?.logo) {
@@ -129,7 +142,7 @@ exports.createInstitution = async (ctx) => {
   }
 
   const institution = await institutionsService.create({
-    data: { ...institutionData, memberships },
+    data: { ...institutionData, memberships, customProps },
   });
   appLogger.verbose(`Institution [${institution.id}] is created`);
 
@@ -171,12 +184,51 @@ exports.updateInstitution = async (ctx) => {
     institutionData.logoId = await ImagesService.storeLogo(body.logo);
   }
 
-  // FIXME: handle admin restricted fields
+  const currentCustomProps = new Map(
+    (institution.customProps ?? []).map((prop) => [prop.fieldId, prop]),
+  );
+  const newCustomProps = new Map(
+    (body.customProps ?? []).map((prop) => [prop.fieldId, prop]),
+  );
+
+  const allFieldIds = new Set([...currentCustomProps.keys(), ...newCustomProps.keys()]);
+
+  const customProps = {
+    deleteMany: [],
+    upsert: [],
+  };
+
+  allFieldIds.forEach((fieldId) => {
+    const currentProp = currentCustomProps.get(fieldId);
+    const newProp = newCustomProps.get(fieldId);
+
+    if (!user.isAdmin && currentProp?.field?.editable !== true) {
+      return;
+    }
+
+    if (!newProp) {
+      if (user.isAdmin) { customProps.deleteMany.push({ fieldId }); }
+      return;
+    }
+
+    customProps.upsert.push({
+      where: {
+        fieldId_institutionId: {
+          fieldId,
+          institutionId: institution.id,
+        },
+      },
+      create: { fieldId, value: newProp.value },
+      update: { fieldId, value: newProp.value },
+    });
+  });
+
   const updatedInstitution = await institutionsService.update({
     where: { id: institution.id },
     data: {
       ...institutionData,
       logo: undefined,
+      customProps,
     },
   });
   appLogger.verbose(`Institution [${institution.id}] is updated`);
@@ -201,8 +253,8 @@ exports.updateInstitution = async (ctx) => {
     if (Array.isArray(contacts) && contacts.length > 0) {
       try {
         await sendValidateInstitution(contacts, {
-          manageMemberLink: `${origin}/institutions/self/memberships`,
-          manageSushiLink: `${origin}/institutions/self/sushi`,
+          manageMemberLink: `${origin}/myspace/institutions/${institution.id}/memberships`,
+          manageSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         });
       } catch (err) {
         appLogger.error(`Failed to send validate institution mail: ${err}`);
@@ -221,7 +273,7 @@ exports.updateInstitution = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {
@@ -264,7 +316,7 @@ exports.updateInstitutionSushiReady = async (ctx) => {
       subject: sushiReadySince ? 'Fin de saisie SUSHI' : 'Reprise de saisie SUSHI',
       ...generateMail('sushi-ready-change', {
         institutionName: institution.name,
-        institutionSushiLink: `${origin}/institutions/${institution.id}/sushi`,
+        institutionSushiLink: `${origin}/myspace/institutions/${institution.id}/sushi`,
         sushiReadySince,
       }),
     }).catch((err) => {

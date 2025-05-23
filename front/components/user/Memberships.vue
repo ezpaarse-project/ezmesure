@@ -148,8 +148,8 @@ async function removeMembership(item) {
     memberships.value = memberships.value.filter((i) => i.institutionId !== item.institutionId);
 
     emit('update:modelValue', memberships.value);
-  } catch {
-    snacks.error(t('anErrorOccurred'));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
   }
 }
 </script>

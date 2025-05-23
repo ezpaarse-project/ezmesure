@@ -36,11 +36,12 @@
                   <v-row v-if="errorMessage">
                     <v-col>
                       <v-alert
-                        :text="errorMessage"
+                        :title="errorMessage.title"
+                        :text="errorMessage.text"
                         type="error"
                         density="compact"
                         closable
-                        @update:model-value="() => (errorMessage = '')"
+                        @update:model-value="() => (errorMessage = undefined)"
                       />
                     </v-col>
                   </v-row>
@@ -138,6 +139,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
@@ -161,7 +164,7 @@ if (query?.provider === 'kibana') {
 const valid = ref(false);
 const loading = ref(false);
 const showPassword = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref(undefined);
 const credentials = ref({
   username: '',
   password: '',
@@ -169,19 +172,18 @@ const credentials = ref({
 
 async function login() {
   loading.value = true;
+  errorMessage.value = undefined;
 
   try {
     await signIn(credentials.value, { callbackUrl: query?.redirect || '/myspace' });
   } catch (err) {
-    if (!(err instanceof Error)) {
-      errorMessage.value = t('authenticate.failed');
-      return;
-    }
-
     if (err.statusCode >= 400 && err.statusCode < 500) {
-      errorMessage.value = t('authenticate.loginFailed');
+      errorMessage.value = { text: t('authenticate.loginFailed') };
     } else {
-      errorMessage.value = t('authenticate.failed');
+      errorMessage.value = {
+        title: t('authenticate.failed'),
+        text: getErrorMessage(err),
+      };
     }
   }
 

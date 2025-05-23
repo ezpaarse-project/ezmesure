@@ -627,8 +627,8 @@ async function toggleSushiReady() {
       body: { value },
     });
     return institutionRefresh();
-  } catch {
-    snacks.error(t('errors.generic'));
+  } catch (err) {
+    snacks.error(t('errors.generic'), err);
   }
   return Promise.resolve();
 }
@@ -645,8 +645,8 @@ async function copySushiId({ id }) {
 
   try {
     await copy(id);
-  } catch {
-    snacks.error(t('clipboard.unableToCopy'));
+  } catch (err) {
+    snacks.error(t('clipboard.unableToCopy'), err);
     return;
   }
   snacks.info(t('clipboard.textCopied'));
@@ -705,8 +705,8 @@ async function toggleActiveStates(items) {
         item.active = active;
         activeLoadingMap.value.set(item.id, false);
         return item;
-      } catch {
-        snacks.error(t('sushi.unableToUpdate'));
+      } catch (err) {
+        snacks.error(t('sushi.unableToUpdate'), err);
         activeLoadingMap.value.set(item.id, false);
         return null;
       }
@@ -748,8 +748,8 @@ async function resetConnections(items) {
         toReset.map((item) => {
           try {
             return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }));
+          } catch (err) {
+            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
             return Promise.resolve(null);
           }
         }),
@@ -787,8 +787,8 @@ async function deleteSushis(items) {
         toDelete.map((item) => {
           try {
             return $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' });
-          } catch {
-            snacks.error(t('cannotDeleteItems', { id: item.name || item.id }));
+          } catch (err) {
+            snacks.error(t('cannotDeleteItems', { id: item.name || item.id }), err);
             return Promise.resolve(null);
           }
         }),

@@ -28,6 +28,7 @@ menu:
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
+  customFields: Custom fields
 home:
   whatDoesEzMESURE: What does ezMESURE ?
   supportedBy: This service is supported by
@@ -324,13 +325,13 @@ institutions:
     domains: Domains
     general: General
     logo: Logo
-    logoHint: Ratio {0}:{1}
+    logoHint: "Ratio {ratioW}:{ratioH} - Formats: {accept}"
     links: Links
     localisation: Localisation
     automations: Automations
     monitor: Monitoring
     dropImageHere: Drop your image here
-    invalidImageFile: "Invalid image file. Accepted file types: JPEG, PNG, SVG"
+    invalidImageFile: "Invalid image file. Accepted file types: {accept}"
     imageTooLarge: "Image is too large. Maximum allowed size: 2mb"
     noDataFound: Your institution's information could not be retrieved.
     dataSent: Institution informations transmitted
@@ -366,6 +367,11 @@ institutions:
     linkedinUrl: Linkedin URL
     youtubeUrl: Youtube URL
     facebookUrl: Facebook URL
+    customProperties: Custom properties
+    failedToGetCustomProperties: Unable to retrieve custom properties
+    propertyName: Property name
+    noCustomProps: No custom properties
+    addNewCustomProp: Add a new one by clicking on the + in the top right corner
   members:
     noMembers: No members
     title: Members ({count})
@@ -416,6 +422,7 @@ institutions:
       institution: Institution card
       memberships: Members
       sushi: COUNTER credentials
+      reporting: ezREEPORT
   sushi:
     title: COUNTER credentials ({count})
     pageDescription: Here you can enter the COUNTER credentials that will be used to automatically harvest your COUNTER reports.
@@ -670,11 +677,13 @@ authenticate:
   impersonate: Impersonate
 password:
   forgot: Forgout your password ?
-  email: Email address *
   reset: Reset password
   save: Save password
   user: User
   password: Password
+  actualPassword: Actual Kibana password
+  newPassword: New Kibana password
+  repeatNewPassword: Repeat new Kibana password
   repeatPassword: Repeat password
   passwordIsRequired: Password required
   backToLogin: Back to login
@@ -830,7 +839,9 @@ spaces:
   manageSpaces: >
     Manage spaces
     |Manage {count} spaces
-  deleteNbRepositories: You are about to delete {number} spaces
+  deleteNbSpaces: >
+    Vous allez supprimer 1 espace.
+    |Vous allez supprimer {count} espaces.
   xSpaces: >
     1 space
     |{count} spaces
@@ -941,6 +952,23 @@ social:
   linkedin: LinkedIn
   youtube: Youtube
   facebook: Facebook
+customFields:
+  toolbarTitle: Custom fields ({count})
+  pageDesc: Enter here the custom fields that you want to be able to associate with institutions.
+  newField: New custom field
+  editField: Edit custom field
+  deleteNbCustomField: Delete 1 custom field|Delete {count} custom fields
+  restrictToAdmins: Restrict to administrators
+  editableByUsers: Editable by users
+  visibleToUsers: Visible to users
+  multivalued: Multivalued
+  helpUrl: Help URL
+  itemUrl: URL of the institution page
+  labelFr: French label
+  labelEn: English label
+  descriptionFr: French description
+  descriptionEn: English description
+  manageCustomField: Manage custom field|Manage {count} custom fields
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -955,6 +983,8 @@ value: Value
 status: Status
 date: Date
 duration: Duration
+label: Label
+properties: Properties
 description: Description
 initials: Initials
 language: Language
@@ -966,6 +996,7 @@ close: Close
 confirm: Confirm
 cancel: Cancel
 canceled: Canceled
+clear: Clear
 error: Error
 reset: Reset
 copy: Copy
@@ -999,6 +1030,7 @@ invalidFormat: Invalid format
 areYouSure: Are you sure ?
 fieldIsRequired: This field is required
 fieldMustMatch: "This field must match : {pattern}"
+notEditable: Not editable
 maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
@@ -1017,6 +1049,8 @@ nbOthers: (+{count} others)
 unknown: Unknown
 looseFilter: Results will match one of the values
 strictFilter: Results will mach all the values
+loading: Loading...
+retry: Retry
 applyToAll: Apply to all
 minValueError: "The value is too small. Minimum: {min}"
 maxValueError: "The value is too big. Maximum: {max}"

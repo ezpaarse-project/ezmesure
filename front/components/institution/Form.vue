@@ -148,8 +148,100 @@
             </v-card>
 
             <v-card
+              :title="$t('institutions.institution.customProperties')"
+              prepend-icon="mdi-tag-text-outline"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template v-if="user?.isAdmin" #append>
+                <v-menu
+                  v-model="showCustomPropMenu"
+                  location="left center"
+                  :offset="10"
+                  :close-on-content-click="false"
+                  width="250px"
+                >
+                  <template #activator="{ props: menu }">
+                    <v-btn
+                      v-tooltip="showCustomPropMenu ? $t('close') : $t('add')"
+                      :icon="showCustomPropMenu ? 'mdi-close' : 'mdi-plus'"
+                      variant="tonal"
+                      :color="showCustomPropMenu ? undefined : 'green'"
+                      density="comfortable"
+                      v-bind="menu"
+                    />
+                  </template>
+
+                  <v-autocomplete
+                    ref="customPropInput"
+                    v-model="customField"
+                    :label="$t('institutions.institution.propertyName')"
+                    :items="availableCustomFields ?? []"
+                    item-title="labelFr"
+                    return-object
+                    autofocus
+                    hide-details
+                    auto-select-first
+                    variant="outlined"
+                    density="compact"
+                    class="flex-grow-1"
+                    @update:model-value="addCustomProp"
+                  >
+                    <template #item="{ props: itemProps, item }">
+                      <v-list-item v-bind="itemProps" :subtitle="item.raw.id" />
+                    </template>
+                  </v-autocomplete>
+                </v-menu>
+              </template>
+
+              <template #text>
+                <v-alert
+                  v-if="customFieldsError"
+                  :title="$t('institutions.institution.failedToGetCustomProperties')"
+                  :text="customFieldsError?.message"
+                  type="error"
+                />
+
+                <v-empty-state
+                  v-else-if="!hasCustomProps"
+                  color="red"
+                  :title="$t('institutions.institution.noCustomProps')"
+                  :text="user?.isAdmin ? $t('institutions.institution.addNewCustomProp') : undefined"
+                />
+
+                <div
+                  v-for="(customProp, index) in institution.customProps"
+                  :key="customProp.fieldId"
+                  class="d-flex align-center ga-2 pt-3"
+                >
+                  <div class="flex-grow-1">
+                    <InstitutionCustomProp
+                      :ref="(el) => customPropInputRefs[customProp.fieldId] = el"
+                      v-model="institution.customProps[index]"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      :readonly="!user?.isAdmin && (customProp.field?.editable !== true)"
+                    />
+                  </div>
+
+                  <div v-if="user?.isAdmin" class="flex-shrink-1">
+                    <v-btn
+                      icon="mdi-delete"
+                      variant="text"
+                      density="comfortable"
+                      size="small"
+                      color="red"
+                      @click="removeCustomProp(customProp.fieldId)"
+                    />
+                  </div>
+                </div>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('institutions.institution.logo')"
-              :subtitle="$t('institutions.institution.logoHint', LOGO_RATIO)"
+              :subtitle="$t('institutions.institution.logoHint', { ratioW: LOGO_RATIO.w, ratioH: LOGO_RATIO.h, accept: LOGO_ACCEPT })"
               prepend-icon="mdi-image"
               variant="outlined"
               class="mt-4"
@@ -162,7 +254,6 @@
                   v-if="logoPreview || institution.logoId"
                   :text="$t('delete')"
                   prepend-icon="mdi-delete"
-                  size="small"
                   variant="tonal"
                   color="red"
                   class="mr-2"
@@ -171,7 +262,6 @@
                 <v-btn
                   :text="$t('modify')"
                   prepend-icon="mdi-pencil"
-                  size="small"
                   variant="tonal"
                   color="primary"
                   @click="openFileDialog()"
@@ -197,7 +287,7 @@
                       max-width="500"
                       class="mx-auto"
                       :style="{
-                        aspectRatio: `${LOGO_RATIO[0]}/${LOGO_RATIO[1]}`,
+                        aspectRatio: `${LOGO_RATIO.w}/${LOGO_RATIO.h}`,
                       }"
                     />
                   </v-col>
@@ -298,7 +388,8 @@ const emit = defineEmits({
 });
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9_.-]*$/;
-const LOGO_RATIO = [3, 1];
+const LOGO_RATIO = { w: 3, h: 1 };
+const LOGO_ACCEPT = 'JPEG, PNG, SVG';
 const LOGO_MAX_SIZE = 2 * 1024 * 1024; // 2mb
 
 const { t } = useI18n();
@@ -325,16 +416,57 @@ const isDraggingLogo = ref(false);
 /** @type {Ref<Object | null>} */
 const openData = ref(null);
 const addAsMember = ref(false);
+const showCustomPropMenu = ref(false);
+const customField = ref(null);
+const customPropInputRefs = ref({});
 
+const {
+  data: availableCustomFields,
+  error: customFieldsError,
+  execute: fetchCustomFields,
+} = useFetch('/api/custom-fields', { // Don't await cause we need defineExpose
+  lazy: true,
+  immediate: false,
+  dedupe: 'defer',
+});
+
+/** @type {Ref<Object | null>} */
+const customPropInputRef = useTemplateRef('customPropInput');
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
 
+const hasCustomProps = computed(() => Object.keys(institution.value.customProps || {}).length > 0);
+
 const isEditing = computed(() => !!institution.value.id);
+
 const logoSrc = computed(() => {
   if (logoPreview.value) { return logoPreview.value; }
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
 });
+
+function removeCustomProp(fieldId) {
+  institution.value.customProps = institution.value.customProps.filter(
+    (prop) => prop.fieldId !== fieldId,
+  );
+}
+
+function addCustomProp(field) {
+  const customProps = institution.value.customProps ?? [];
+
+  if (!customProps.find((prop) => prop.fieldId === field.id)) {
+    customProps.push({
+      field,
+      fieldId: field.id,
+      value: field.multiple ? [] : '',
+    });
+
+    institution.value.customProps = customProps;
+  }
+
+  showCustomPropMenu.value = false;
+  nextTick(() => { customPropInputRefs.value[field.id]?.focus(); });
+}
 
 /**
  * Init the form, if `institution` is provided, pre-populate the form and will
@@ -348,6 +480,7 @@ function init(item, opts) {
   originalName.value = item?.name;
   institution.value = {
     social: {},
+    customProps: [],
     ...(item ?? {}),
   };
   logoPreview.value = null;
@@ -359,7 +492,7 @@ function init(item, opts) {
   }
 
   if (formRef.value) {
-    formRef.value?.validate();
+    formRef.value.validate();
   }
 }
 
@@ -411,15 +544,10 @@ async function save() {
       });
     }
   } catch (err) {
-    if (!(err instanceof Error)) {
-      snacks.error(t('institutions.institution.unableToUpate'));
-      return;
-    }
-
     if (err.statusCode === 413) {
       snacks.error(t('institutions.institution.imageTooLarge'));
     } else {
-      snacks.error(err);
+      snacks.error(t('institutions.institution.unableToUpate'), err);
     }
 
     loading.value = false;
@@ -438,7 +566,7 @@ async function save() {
  */
 async function updateLogo(file) {
   if (!/\.(jpe?g|png|svg)$/.exec(file.name)) {
-    logoError.value = t('institutions.institution.invalidImageFile');
+    logoError.value = t('institutions.institution.invalidImageFile', { accept: LOGO_ACCEPT });
     return;
   }
 
@@ -473,6 +601,19 @@ async function removeLogo() {
   institution.value.logo = null;
   institution.value.logoId = null;
 }
+
+watch(showCustomPropMenu, (v) => {
+  if (!v) {
+    return;
+  }
+
+  customField.value = null;
+  nextTick(() => { customPropInputRef.value?.focus(); });
+
+  if (!availableCustomFields.value) {
+    fetchCustomFields();
+  }
+});
 
 /**
  * Update the institution's logo on file dialog change

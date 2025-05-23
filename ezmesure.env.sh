@@ -36,6 +36,7 @@ export EZMESURE_ES_INITIAL_MASTER_NODES=""
 
 # these values are overwriten by ezmesure.local.env.sh values
 export NODE_ENV="dev"
+export EZMESURE_PUBLIC_URL="https://${EZMESURE_DOMAIN}"
 export EZMESURE_ES_NODE_MASTER="true"
 export EZMESURE_ES_NODE_DATA="true"
 export EZMESURE_ES_NODE_INGEST="true"

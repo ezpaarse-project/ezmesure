@@ -61,9 +61,9 @@
   },
   "ezpaarse": {
     "upload": {
-      "bulkSize": "EZMESURE_EZPAARSE_UPLOAD_BULK_SIZE",
-      "bulkMaxTries": "EZMESURE_EZPAARSE_UPLOAD_BULK_MAX_TRIES",
-      "bulkBaseRetryDelay": "EZMESURE_EZPAARSE_UPLOAD_BULK_BASE_RETRY_DELAY"
+      "bulkSize": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_SIZE", "__format": "number" },
+      "bulkMaxTries": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_MAX_TRIES", "__format": "number" },
+      "bulkBaseRetryDelay": { "__name": "EZMESURE_EZPAARSE_UPLOAD_BULK_BASE_RETRY_DELAY", "__format": "number" }
     }
   },
   "jobs": {
@@ -90,8 +90,6 @@
     "spreadsheetId": "EZMESURE_DEPOSITORS_SPREADSHEET",
     "cron": "EZMESURE_DEPOSITORS_CRON"
   },
-  "reportingActivityIndex": "REPORTING_ACTIVITY_INDEX",
-  "reportingIndex": "REPORTING_INDEX",
   "cypher": {
     "secret": "EZMESURE_ENCRYPTION_SECRET"
   },
@@ -102,5 +100,6 @@
       }
     }
   },
-  "appName": "EZMESURE_APP_NAME"
+  "appName": "EZMESURE_APP_NAME",
+  "publicUrl": "EZMESURE_PUBLIC_URL"
 }
