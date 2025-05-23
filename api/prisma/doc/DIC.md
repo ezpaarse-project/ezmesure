@@ -22,33 +22,63 @@ Possible statuses of a harvest job
 
 An institution
 
-| Property          | Type                 | Description                                                       | Attributes | Default  |
-|-------------------|----------------------|-------------------------------------------------------------------|------------|----------|
-| id                | `String`             | ID of the institution                                             | Id         | `cuid()` |
-| parentInstitution | `Institution?`       | The parent institution                                            |            |          |
-| createdAt         | `DateTime`           | Creation date                                                     |            | `now()`  |
-| updatedAt         | `DateTime`           | Latest update date                                                |            |          |
-| name              | `String`             | Institution name                                                  |            |          |
-| namespace         | `String?`            | Institution namespace (ex: b-bibcnrs)                             |            |          |
-| validated         | `Boolean`            | Whether the institution has been validated or not                 |            | `false`  |
-| hidePartner       | `Boolean`            | Whether the institution should appear in the partner list or not  |            | `false`  |
-| tags              | `String[]`           | A list of tags associated to the institution                      |            |          |
-| logoId            | `String?`            | ID of the institution logo                                        |            |          |
-| type              | `String?`            | Institution type (ex: university)                                 |            |          |
-| acronym           | `String?`            | Institution acronym                                               |            |          |
-| websiteUrl        | `String?`            | Institution website URL                                           |            |          |
-| city              | `String?`            | Institution city                                                  |            |          |
-| uai               | `String?`            | Institution UAI (Unité Administrative Immatriculée)               |            |          |
-| social            | `Json?`              | Social links of the institution                                   |            |          |
-| sushiReadySince   | `DateTime?`          | Date when SUSHI credentials have been marked as ready for harvest |            |          |
-| memberships       | `Membership[]`       | Institution members                                               |            |          |
-| elasticRoles      | `ElasticRole[]`      | Additional roles to give to each member                           |            |          |
-| spaces            | `Space[]`            | Institution spaces                                                |            |          |
-| actions           | `Action[]`           | Actions that were triggered in the scope of the institution       |            |          |
-| sushiCredentials  | `SushiCredentials[]` | Institution SUSHI credentials                                     |            |          |
-| childInstitutions | `Institution[]`      | Child institutions                                                |            |          |
-| repositories      | `Repository[]`       | Institution repositories                                          |            |          |
-| repositoryAliases | `RepositoryAlias[]`  | Institution aliases                                               |            |          |
+| Property          | Type                    | Description                                                       | Attributes | Default  |
+|-------------------|-------------------------|-------------------------------------------------------------------|------------|----------|
+| id                | `String`                | ID of the institution                                             | Id         | `cuid()` |
+| parentInstitution | `Institution?`          | The parent institution                                            |            |          |
+| createdAt         | `DateTime`              | Creation date                                                     |            | `now()`  |
+| updatedAt         | `DateTime`              | Latest update date                                                |            |          |
+| name              | `String`                | Institution name                                                  |            |          |
+| namespace         | `String?`               | Institution namespace (ex: b-bibcnrs)                             |            |          |
+| validated         | `Boolean`               | Whether the institution has been validated or not                 |            | `false`  |
+| hidePartner       | `Boolean`               | Whether the institution should appear in the partner list or not  |            | `false`  |
+| tags              | `String[]`              | A list of tags associated to the institution                      |            |          |
+| logoId            | `String?`               | ID of the institution logo                                        |            |          |
+| type              | `String?`               | Institution type (ex: university)                                 |            |          |
+| acronym           | `String?`               | Institution acronym                                               |            |          |
+| websiteUrl        | `String?`               | Institution website URL                                           |            |          |
+| city              | `String?`               | Institution city                                                  |            |          |
+| uai               | `String?`               | Institution UAI (Unité Administrative Immatriculée)               |            |          |
+| social            | `Json?`                 | Social links of the institution                                   |            |          |
+| sushiReadySince   | `DateTime?`             | Date when SUSHI credentials have been marked as ready for harvest |            |          |
+| memberships       | `Membership[]`          | Institution members                                               |            |          |
+| elasticRoles      | `ElasticRole[]`         | Additional roles to give to each member                           |            |          |
+| spaces            | `Space[]`               | Institution spaces                                                |            |          |
+| actions           | `Action[]`              | Actions that were triggered in the scope of the institution       |            |          |
+| sushiCredentials  | `SushiCredentials[]`    | Institution SUSHI credentials                                     |            |          |
+| childInstitutions | `Institution[]`         | Child institutions                                                |            |          |
+| repositories      | `Repository[]`          | Institution repositories                                          |            |          |
+| repositoryAliases | `RepositoryAlias[]`     | Institution aliases                                               |            |          |
+| customProps       | `InstitutionProperty[]` | Custom properties                                                 |            |          |
+
+### InstitutionProperty
+
+| Property    | Type          | Description                                | Attributes | Default |
+|-------------|---------------|--------------------------------------------|------------|---------|
+| field       | `CustomField` | The custom field                           |            |         |
+| institution | `Institution` | The institution                            |            |         |
+| createdAt   | `DateTime`    | Creation date                              |            | `now()` |
+| updatedAt   | `DateTime`    | Latest update date                         |            |         |
+| value       | `Json?`       | The value of the field for the institution |            |         |
+
+### CustomField
+
+| Property              | Type                    | Description                                                                                  | Attributes | Default |
+|-----------------------|-------------------------|----------------------------------------------------------------------------------------------|------------|---------|
+| id                    | `String`                | ID of the field                                                                              | Id         |         |
+| createdAt             | `DateTime`              | Creation date                                                                                |            | `now()` |
+| updatedAt             | `DateTime`              | Latest update date                                                                           |            |         |
+| multiple              | `Boolean`               | Whether the field should accept multiple values                                              |            | `false` |
+| editable              | `Boolean`               | Whether the values of this field can be edited by regular users                              |            | `false` |
+| visible               | `Boolean`               | Whether the field should be visible by regular users                                         |            | `false` |
+| labelFr               | `String?`               | Field label in French                                                                        |            |         |
+| labelEn               | `String?`               | Field label in English                                                                       |            |         |
+| descriptionFr         | `String?`               | Field description in French                                                                  |            |         |
+| descriptionEn         | `String?`               | Field description in English                                                                 |            |         |
+| helpUrl               | `String?`               | URL (if any) to a page containing explanations about that field                              |            |         |
+| itemUrl               | `String?`               | URL (if any) to the page dedicated to the institution (use {{id}} to insert the field value) |            |         |
+| autocomplete          | `Json?`                 | Source to be used to autocomplete values (format: { index: String, field: String })          |            |         |
+| institutionProperties | `InstitutionProperty[]` | Institution properties that reference the field                                              |            |         |
 
 ### User
 
