@@ -158,7 +158,7 @@ services:
         - http_proxy
         - https_proxy
     ports:
-      - 443:443
+      - ${EZMESURE_PORT:-443}:443
     environment:
       - http_proxy
       - https_proxy
