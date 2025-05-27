@@ -29,6 +29,9 @@ const schema = {
     severity: Joi.string().trim(),
   })),
 
+  beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+  endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+
   credentials: Joi.object(),
   session: Joi.object(),
   logs: Joi.array().items(Joi.object()),
