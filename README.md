@@ -173,7 +173,7 @@ If you want to start ezmesure in docker mode, you need to install `sharp` in the
 
 ```bash
 $ rm -rf ./api/node_modules
-$ docker compose -f docker-compose.debug.yml run --rm api npm i
+$ docker compose -f docker-compose.dev.yml run --rm api npm i
 ```
 
 ### 2. Source environnement variable
@@ -240,14 +240,14 @@ Don't forget to restore the environment variables after the modification.
 Before launching ezmesure, you have to create the elastic container and launch the database migration, for that you have to use these commands :
 
 ```bash
-docker compose -f docker-compose.debug.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
+docker compose -f docker-compose.dev.yml run --rm elastic chown -R elasticsearch /usr/share/elasticsearch/
 docker compose -f docker-compose.migrate.yml up
 docker compose -f docker-compose.migrate.yml down
 ```
 ### 7. Start
 
 ```bash
-docker-compose -f docker-compose.debug.yml up -d
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 ### 8. Database update
@@ -258,7 +258,7 @@ If you have updated the database schema, you need to migrate your database :
 # node
 npx prisma db push
 # docker
-docker compose -f docker-compose.debug.yml run --rm api npx prisma db push
+docker compose -f docker-compose.dev.yml run --rm api npx prisma db push
 ```
 
 ### 9. Test
