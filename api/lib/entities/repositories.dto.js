@@ -8,7 +8,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   updatedAt: Joi.date(),
