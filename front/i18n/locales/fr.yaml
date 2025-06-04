@@ -905,6 +905,7 @@ harvest:
       reportTypes: "{n} type de rapport|{n} types de rapport"
       credentials: "{n} identifiant|{n} identifiants"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
+    sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
   jobs:
@@ -999,6 +1000,7 @@ customFields:
   descriptionFr: Description en français
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
+  restrictToAdmins: Restreindre aux administrateurs
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type

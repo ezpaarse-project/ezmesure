@@ -494,11 +494,12 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             const list = new Map(data.map((report) => [report.Report_ID.toLowerCase(), report]));
 
             // Remove unsupported reports
-            Object.entries(supportedData).forEach(([reportId, params]) => {
+            Array.from(DEFAULT_HARVESTED_REPORTS).forEach((reportId) => {
+              const params = supportedData[reportId];
               const { supported = {} } = params ?? {};
 
-              supported.raw = false;
-              if (!list.has(reportId) && !supported.manual) {
+              supported.raw = list.has(reportId);
+              if (!supported.raw && !supported.manual) {
                 supported.value = false;
               }
 
@@ -684,7 +685,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       yield* createdJobs;
     }
 
-    this.triggerHooks('harvest-session:start', session);
+    if (!options.dryRun) {
+      this.triggerHooks('harvest-session:start', session);
+    }
   }
 
   /**

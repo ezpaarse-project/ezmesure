@@ -153,6 +153,7 @@ function start() {
 
   const server = app.listen(config.port);
   server.setTimeout(1000 * 60 * 30);
+  server.requestTimeout = 1000 * 60 * 30;
 
   appLogger.info(`API server listening on port ${config.port}`);
   appLogger.info('Press CTRL+C to stop server');

@@ -3,6 +3,7 @@ const CustomFieldsService = require('../../entities/custom-fields.service');
 const {
   schema,
   includableFields,
+  adminImportSchema,
 } = require('../../entities/custom-fields.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
@@ -67,4 +68,79 @@ exports.deleteOne = async (ctx) => {
   await service.delete({ where: { id: fieldId } });
 
   ctx.status = 204;
+};
+
+exports.importFields = async (ctx) => {
+  ctx.action = 'custom-fields/import';
+
+  const { body = [] } = ctx.request;
+  const { overwrite } = ctx.query;
+
+  const response = {
+    errors: 0,
+    conflicts: 0,
+    created: 0,
+    items: [],
+  };
+
+  const addResponseItem = (data, status, message) => {
+    if (status === 'error') { response.errors += 1; }
+    if (status === 'conflict') { response.conflicts += 1; }
+    if (status === 'created') { response.created += 1; }
+
+    response.items.push({
+      status,
+      message,
+      data,
+    });
+  };
+
+  /**
+   * @param {CustomFieldsService} customFieldsService
+   * @param {*} itemData
+   * @returns
+   */
+  const importItem = async (customFieldsService, itemData = {}) => {
+    const { value: item, error } = adminImportSchema.validate(itemData);
+
+    if (error) {
+      addResponseItem(item, 'error', error.message);
+      return;
+    }
+
+    if (item.id) {
+      const field = await customFieldsService.findUnique({
+        where: { id: item.id },
+      });
+
+      if (field && !overwrite) {
+        addResponseItem(item, 'conflict', ctx.$t('errors.customFields.import.alreadyExists', field.id));
+        return;
+      }
+    }
+
+    const institution = await customFieldsService.upsert({
+      where: { id: item?.id },
+      create: item,
+      update: item,
+    });
+
+    addResponseItem(institution, 'created');
+  };
+
+  await CustomFieldsService.$transaction(async (customFieldsService) => {
+    for (let i = 0; i < body.length; i += 1) {
+      const fieldData = body[i] || {};
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await importItem(customFieldsService, fieldData);
+      } catch (e) {
+        addResponseItem(fieldData, 'error', e.message);
+      }
+    }
+  });
+
+  ctx.type = 'json';
+  ctx.body = response;
 };

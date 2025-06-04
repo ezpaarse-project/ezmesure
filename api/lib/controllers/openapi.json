@@ -1036,6 +1036,11 @@
             "default": false,
             "description": "Whether to download the report even if a local copy exists"
           },
+          "sendEndMail": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether a mail should be sent when session ended"
+          },
           "ignoreValidation": {
             "type": "boolean",
             "default": null,
