@@ -26,7 +26,11 @@ menu:
   repositories: Entrepôts
   repositoryAliases: Alias d'entrepôts
   spaces: Espaces
-  harvest: Moissonnage
+  harvest:
+    title: Moissonnage
+    tabs:
+      sessions: Sessions
+      dashboard: Tableau de bord
   sync: Synchronisation
   customFields: Champs personnalisés
 home:
@@ -872,7 +876,7 @@ spaces:
   filters:
     title: Filtrer les espaces
 harvest:
-  toolbarTitle: Moissonnage ({count})
+  toolbarTitle: Sessions ({count})
   sessions:
     pendingSession: Moissonnage en attente...
     startedAt: Moissonnage lancé le {date}
@@ -913,6 +917,14 @@ harvest:
       de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+  dashboard:
+    title: Tableau de bord
+    unsupportedButHarvested:
+      title: Rapports moissonnés mais non supportés
+      severity: Sévérité
+      error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
+      empty: Aucun rapport non supporté n'a été moissonné !
+      deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
 elasticRoles:
   toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle

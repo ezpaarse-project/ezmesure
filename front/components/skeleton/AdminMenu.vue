@@ -48,11 +48,29 @@
         to="/admin/custom-fields"
         prepend-icon="mdi-tag-outline"
       />
-      <v-list-item
-        :title="$t('menu.harvest')"
-        to="/admin/harvests"
-        prepend-icon="mdi-tractor"
-      />
+
+      <v-list-group value="harvests">
+        <template #activator="{ props }">
+          <v-list-item
+            :title="$t('menu.harvest.title')"
+            prepend-icon="mdi-tractor"
+            v-bind="props"
+          />
+        </template>
+
+        <v-list-item
+          :title="$t('menu.harvest.tabs.sessions')"
+          to="/admin/harvests"
+          prepend-icon="mdi-file-tree"
+          exact
+        />
+
+        <v-list-item
+          :title="$t('menu.harvest.tabs.dashboard')"
+          to="/admin/harvests/dashboard"
+          prepend-icon="mdi-view-dashboard"
+        />
+      </v-list-group>
 
       <v-list-group value="ezREEPORT">
         <template #activator="{ props }">
