@@ -105,6 +105,10 @@ module.exports = {
       schedule: '0 0 0 * * *',
       maxDayAge: 7,
     },
+    deleteSushi: {
+      schedule: '0 */15 * * * *',
+      followInterval: 10000,
+    },
   },
   notifications: {
     sender: 'ezMESURE',

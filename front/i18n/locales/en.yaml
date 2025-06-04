@@ -597,6 +597,13 @@ sushi:
     title: Filters credentials
   credentials: Credentials
   credentialsCount: "{count} credentials"
+  tabs:
+    active:
+      title: Active credentials
+      description: This list contains the active credentials that will be used for harvesting.
+    archived:
+      title: Archived credentials
+      description: This list contains the archived credentials that will be NOT used for harvesting.
   auth: Authentication
   copyId: Copy ID
   showFiles: View files
@@ -607,6 +614,9 @@ sushi:
   unableToUpdate: Unable to update credentials
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: COUNTER credentials management is currently locked.
+  deleting: Deletion in progress
+  deletingError: "Unable to delete credentials: {error}"
+  deletionTask: Deletion state
   nInstitutions: >
     1 institution use this endpoint
     |{count} institutions use this endpoint
@@ -620,7 +630,8 @@ sushi:
     1 credential show that endpoint is problematic
     |{count} credentials show that endpoint is problematic
   problematicEndpoint: Problematic endpoint
-  deleteNbCredentials: You are about to delete {number} COUNTER credentials.
+  deleteNbCredentials: You are about to delete {number} COUNTER credentials. This will delete associated data. This operation cannot be undone.
+  archiveNbCredentials: You are about to archive {number} COUNTER credentials. Associated data will be kept.
   scope: Scope
   unchangeableParam: Unchangeable parameter defined at the access point level.
   harvestState: Harvest state
@@ -635,6 +646,9 @@ sushi:
   updatedItems: "{count} report items have been updated."
   failedItems: "{count} report items could not be retrieved."
   messagesFromEndpoint: "Messages from the endpoint:"
+  cannotArchiveItems: Unable to archive the credentials.
+  itemsArchived: "{count} credential(s) archived."
+  itemsDeleted: "{count} credential(s) deleted, associated data will be deleted soon."
   checkBeforeSave: Check credentials before saving
   matrix:
     unsupported: Report not supported (editor declaration)
@@ -1035,6 +1049,8 @@ notEditable: Not editable
 maxLength: "Maximum length: {n} characters"
 open: Open
 send: Send
+archive: Archive
+unarchive: Unarchive
 "yes": "Yes"
 "no": "No"
 validate: Validate
