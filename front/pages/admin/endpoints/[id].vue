@@ -647,14 +647,13 @@ async function resetConnections(items) {
     agreeIcon: 'mdi-restore',
     onAgree: async () => {
       await Promise.all(
-        toReset.map((item) => {
-          try {
-            return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toReset.map(
+          (item) => $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       await refresh();

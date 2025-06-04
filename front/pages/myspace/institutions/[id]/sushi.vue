@@ -745,14 +745,13 @@ async function resetConnections(items) {
     agreeIcon: 'mdi-restore',
     onAgree: async () => {
       await Promise.all(
-        toReset.map((item) => {
-          try {
-            return $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toReset.map(
+          (item) => $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!items) {
@@ -784,14 +783,13 @@ async function deleteSushis(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItems', { id: item.name || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {
