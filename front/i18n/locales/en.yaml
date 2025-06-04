@@ -809,6 +809,7 @@ repositoryAliases:
     |Manage {count} aliases
   alias: Alias
   target: Target repository pattern
+  template: Template
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -852,6 +853,13 @@ repoAliasTemplates:
   deleteNbTemplates: You are about to delete {number} alias templates.
   newTemplate: New alias template
   modifyTemplate: Modify an alias template
+  applyTemplate: Apply template [{id}]
+  applyTemplateDesc: This will trigger the creation of repository aliases for all institutions matching the conditions.
+  dryRun: Dry run
+  applyToSeeAliases: Apply the template to see the affected aliases
+  noAliasCreated: No alias has been created
+  applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
+
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -991,6 +999,11 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+statuses:
+  created: Created
+  updated: Updated
+  deleted: Deleted
+  error: Error
 anErrorOccurred: An error occurred
 url: URL
 type: Type

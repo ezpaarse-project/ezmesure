@@ -93,6 +93,13 @@
           <v-list>
             <v-list-item
               v-if="templateFormDialogRef"
+              :title="$t('apply')"
+              prepend-icon="mdi-play-circle-outline"
+              @click="templateApplyDialogRef.open(item.id)"
+            />
+
+            <v-list-item
+              v-if="templateFormDialogRef"
               :title="$t('modify')"
               prepend-icon="mdi-pencil"
               @click="templateFormDialogRef.open(item.id)"
@@ -119,7 +126,6 @@
       <template #[`item.active`]="{ item }">
         <v-switch
           :model-value="item.active"
-          :label="item.active ? $t('active') : $t('inactive')"
           :loading="activeLoading.has(item.id)"
           density="compact"
           color="primary"
@@ -155,6 +161,11 @@
       ref="templateFormDialogRef"
       @submit="refresh()"
     />
+
+    <RepositoryAliasTemplateApplyDialog
+      ref="templateApplyDialogRef"
+      @close="refresh()"
+    />
   </div>
 </template>
 
@@ -172,6 +183,7 @@ const snacks = useSnacksStore();
 const activeLoading = ref(new Set());
 const selectedTemplates = ref([]);
 const templateFormDialogRef = useTemplateRef('templateFormDialogRef');
+const templateApplyDialogRef = useTemplateRef('templateApplyDialogRef');
 
 const {
   refresh,

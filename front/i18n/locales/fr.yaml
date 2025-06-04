@@ -823,6 +823,7 @@ repositoryAliases:
     |Gérer {count} alias
   alias: Alias
   target: Pattern de l'entrepôt cible
+  template: Modèle
   filtered: Filtré ?
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
@@ -866,6 +867,12 @@ repoAliasTemplates:
   deleteNbTemplates: Vous allez supprimer {count} modèles d'alias.
   newTemplate: Nouveau modèle d'alias
   modifyTemplate: Modifier un modèle d'alias
+  applyTemplate: Appliquer le modèle [{id}]
+  applyTemplateDesc: Cela entraînera la création d'alias d'entrepôts pour tous les établissements répondant aux conditions.
+  dryRun: Simulation
+  applyToSeeAliases: Appliquez le template pour voir les alias impactés
+  noAliasCreated: Aucun alias n'a été créé
+  applyHadNoEffect: L'application du template n'a pas eu d'effet. Aucun établissement ne remplit les conditions.
 
 spaces:
   spaces: Espaces
@@ -1006,6 +1013,11 @@ customFields:
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
   restrictToAdmins: Restreindre aux administrateurs
+statuses:
+  created: Créé
+  updated: Mis à jour
+  deleted: Supprimé
+  error: Erreur
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
