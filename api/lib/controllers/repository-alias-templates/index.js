@@ -15,6 +15,7 @@ const {
   upsertOne,
   deleteOne,
   updateOneProperty,
+  applyOne,
 } = require('./actions');
 
 const {
@@ -86,6 +87,20 @@ router.route({
     params: {
       id: Joi.string().trim().required(),
       field: Joi.string().trim().valid(...mutableFields).required(),
+    },
+  },
+});
+
+router.route({
+  method: 'GET',
+  path: '/:id/_apply',
+  handler: applyOne,
+  validate: {
+    params: {
+      id: Joi.string().trim().required(),
+    },
+    query: {
+      dryRun: Joi.boolean().default(false),
     },
   },
 });
