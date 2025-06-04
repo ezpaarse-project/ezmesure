@@ -197,6 +197,14 @@ const headers = computed(() => [
     sortable: true,
   },
   {
+    title: t('repositoryAliases.template'),
+    value: 'templateId',
+    align: 'center',
+    sortable: true,
+    nowrap: true,
+    width: 50,
+  },
+  {
     title: t('repositories.institutions'),
     value: 'institutions',
     align: 'center',
