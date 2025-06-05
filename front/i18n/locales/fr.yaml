@@ -643,11 +643,11 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données liées à cet identifiant. Cette action est irréversible.
-    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données liées à cet identifiant. Cette action est irréversible.
+    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
+    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
   archiveNbCredentials: >
-    Vous allez archiver {count} identifiant COUNTER. Les données liées à cet identifiant seront conservées.
-    |Vous allez archiver {count} identifiants COUNTER. Les données liées à cet identifiant seront conservées.
+    Vous allez archiver {count} identifiant COUNTER. Les données d'usage liées à cet identifiant seront conservées.
+    |Vous allez archiver {count} identifiants COUNTER. Les données d'usage liées à cet identifiant seront conservées.
   problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
@@ -685,6 +685,11 @@ sushi:
     title: Fichiers disponibles
     noFilesAvailable: Aucun fichier disponible
     nbFiles: 1 fichier|{count} fichiers
+  deleteReason: Raison de la suppression
+  deleteReasons:
+    mistake: J'ai entré(e) ces identifiants par erreur
+    neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
+    duplicate: Cet identifiant est en doublon avec un autre
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants

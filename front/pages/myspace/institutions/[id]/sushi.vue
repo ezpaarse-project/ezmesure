@@ -474,6 +474,8 @@
     <SushiHarvestHistoryDialog v-if="user?.isAdmin" ref="historyRef" />
 
     <SushiReportsDialog ref="reportsRef" />
+
+    <SushiDeleteConfirmDialog v-if="currentTab === 'archived'" ref="deleteConfirmRef" />
   </div>
 </template>
 
@@ -505,6 +507,7 @@ const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
 const reportsRef = useTemplateRef('reportsRef');
 const filesRef = useTemplateRef('filesRef');
 const historyRef = useTemplateRef('historyRef');
+const deleteConfirmRef = useTemplateRef('deleteConfirmRef');
 
 const {
   error,
@@ -918,29 +921,9 @@ async function deleteSushis(items) {
     return;
   }
 
-  openConfirm({
-    text: t(
-      'sushi.deleteNbCredentials',
-      toDelete.length,
-    ),
-    agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
+  deleteConfirmRef.value?.openConfirm({
+    toDelete,
     onAgree: async () => {
-      const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItems', { id: item.name || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
-      );
-
-      if (!results.some((r) => !r)) {
-        snacks.success(t('sushi.itemsDeleted', { count: toDelete.length }));
-      }
-
       if (!items) {
         selectedSushi.value = [];
       }
