@@ -9709,8 +9709,24 @@
       },
       "delete": {
         "summary": "Delete a SUSHI item",
-        "description": "GDeleteet a SUSHI item",
+        "description": "Delete a SUSHI item",
         "operationId": "delete-sushi-id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for deletion",
+                    "example": "I don't like sushi"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "SUSHI item successfully deleted"

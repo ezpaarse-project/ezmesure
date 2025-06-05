@@ -15,6 +15,7 @@ const { appLogger } = require('../../services/logger');
 
 const { SUSHI_CODES, ERROR_CODES } = sushiService;
 
+const ActionsService = require('../../entities/actions.service');
 const SushiCredentialsService = require('../../entities/sushi-credentials.service');
 const HarvestJobsService = require('../../entities/harvest-job.service');
 const HarvestsService = require('../../entities/harvest.service');
@@ -180,14 +181,60 @@ exports.updateSushi = async (ctx) => {
 exports.deleteOne = async (ctx) => {
   ctx.action = 'sushi/delete';
   const { sushi } = ctx.state;
+  const { reason } = ctx.request.body;
+
+  if (!sushi) {
+    ctx.status = 204;
+    return;
+  }
 
   ctx.metadata = {
-    sushiId: sushi?.id,
-    endpointVendor: sushi?.endpoint?.vendor,
+    sushiId: sushi.id,
+    endpointVendor: sushi.endpoint?.vendor,
   };
 
-  const sushiCredentialsService = new SushiCredentialsService();
-  await sushiCredentialsService.delete({ where: { id: sushi?.id } });
+  await SushiCredentialsService.$transaction(async (sushiCredentialsService) => {
+    const actionService = new ActionsService();
+
+    await sushiCredentialsService.delete({ where: { id: sushi.id } });
+    await actionService.create({
+      data: {
+        type: 'sushi/delete',
+        data: {
+          reason,
+          oldState: {
+            ...sushi,
+            institution: undefined,
+            // Keep only relevant info about endpoint
+            endpoint: sushi.endpoint ? {
+              id: sushi.endpoint.id,
+              vendor: sushi.endpoint.vendor,
+              description: sushi.endpoint.description,
+              technicalProvider: sushi.endpoint.technicalProvider,
+              sushiUrl: sushi.endpoint.sushiUrl,
+              registryId: sushi.endpoint.registryId,
+              requireApiKey: sushi.endpoint.requireApiKey,
+              defaultApiKey: sushi.endpoint.defaultApiKey,
+              requireCustomerId: sushi.endpoint.requireCustomerId,
+              defaultCustomerId: sushi.endpoint.defaultCustomerId,
+              requireRequestorId: sushi.endpoint.requireRequestorId,
+              defaultRequestorId: sushi.endpoint.defaultRequestorId,
+              paramSeparator: sushi.endpoint.paramSeparator,
+              harvestDateFormat: sushi.endpoint.harvestDateFormat,
+            } : undefined,
+          },
+        },
+
+        institution: {
+          connect: { id: sushi.institutionId },
+        },
+
+        author: {
+          connect: { username: ctx.state.user.username },
+        },
+      },
+    });
+  });
 
   ctx.status = 204;
 };
