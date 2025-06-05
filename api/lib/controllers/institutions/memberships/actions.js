@@ -127,6 +127,7 @@ exports.addInstitutionMember = async (ctx) => {
   }
 
   const membershipData = {
+    permissions: ['institution:read'],
     ...body,
     user: { connect: { username } },
     institution: { connect: { id: institutionId } },

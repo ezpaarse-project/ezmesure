@@ -382,6 +382,28 @@ exports.importInstitutions = async (ctx) => {
       logo: undefined,
       logoId: item.logo ? await ImagesService.storeLogo(item.logo) : item.logoId,
 
+      customProps: {
+        connectOrCreate: item.customProps?.map?.((customPropData) => ({
+          where: {
+            fieldId_institutionId: {
+              fieldId: customPropData.fieldId,
+              institutionId: customPropData.institutionId,
+            },
+          },
+          create: {
+            ...customPropData,
+            institutionId: undefined,
+
+            fieldId: undefined,
+            field: {
+              connect: {
+                id: customPropData.fieldId,
+              },
+            },
+          },
+        })),
+      },
+
       spaces: {
         connectOrCreate: item.spaces?.map?.((spaceData) => ({
           where: { id: spaceData.id },
