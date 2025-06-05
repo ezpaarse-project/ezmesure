@@ -113,14 +113,14 @@
 
 <script setup>
 const props = defineProps({
-  initialData: {
+  modelValue: {
     type: Object,
     default: () => undefined,
   },
 });
 
 const emit = defineEmits({
-  submit: (item) => !!item,
+  'update:modelValue': (item) => !!item,
 });
 
 const { t } = useI18n();
@@ -131,8 +131,7 @@ const valid = ref(false);
 const template = ref({});
 const repository = ref({});
 
-const originalId = computed(() => props.initialData?.id);
-const isEditing = computed(() => !!originalId.value);
+const isEditing = computed(() => !!props.modelValue?.id);
 
 /** @type {Ref<Object | null>} */
 const formRef = useTemplateRef('formRef');
@@ -147,9 +146,9 @@ function applyRepository(item) {
 }
 
 watch(
-  () => props.initialData,
+  () => props.modelValue,
   () => {
-    template.value = JSON.parse(JSON.stringify(props.initialData || { active: true }));
+    template.value = JSON.parse(JSON.stringify(props.modelValue || { active: true }));
     applyRepository(template.value?.repository);
   },
   { immediate: true },
@@ -159,7 +158,7 @@ async function save() {
   loading.value = true;
 
   try {
-    const newTemplate = await $fetch(`/api/repository-alias-templates/${originalId.value || template.value.id}`, {
+    const newTemplate = await $fetch(`/api/repository-alias-templates/${props.modelValue?.id || template.value.id}`, {
       method: 'PUT',
       body: {
         ...template.value,
@@ -167,7 +166,7 @@ async function save() {
       },
     });
 
-    emit('submit', newTemplate);
+    emit('update:modelValue', newTemplate);
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
   }

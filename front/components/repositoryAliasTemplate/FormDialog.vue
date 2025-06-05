@@ -32,9 +32,8 @@
 
     <RepositoryAliasTemplateForm
       v-else
-      :initial-data="item"
-      :form-options="formOptions"
-      @submit="onSave($event)"
+      :model-value="item"
+      @update:model-value="onSave($event)"
     >
       <template #actions>
         <v-btn
@@ -56,7 +55,6 @@ const { t } = useI18n();
 
 const isOpen = ref(false);
 const itemId = ref(null);
-const formOptions = ref(null);
 
 const {
   data: item,
@@ -89,10 +87,9 @@ async function refreshForm() {
   }
 }
 
-async function open(id, opts) {
+async function open(id) {
   clear();
   itemId.value = id;
-  formOptions.value = opts;
   isOpen.value = true;
   await refreshForm();
 }
