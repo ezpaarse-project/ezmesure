@@ -42,7 +42,7 @@
           prepend-icon="mdi-filter-plus"
           variant="outlined"
         >
-          <template #append>
+          <template v-if="!disableAdvanced" #append>
             <v-btn
               v-tooltip="$t('repositoryAliases.filtersForm.advanced')"
               :color="isRawMode ? 'orange' : 'grey'"
@@ -164,6 +164,10 @@ const props = defineProps({
   prependIcon: {
     type: String,
     default: () => 'mdi-filter',
+  },
+  disableAdvanced: {
+    type: Boolean,
+    default: false,
   },
 });
 

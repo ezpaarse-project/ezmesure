@@ -73,6 +73,7 @@
                   :subtitle="$t('repoAliasTemplates.conditionsDescription')"
                   variant="outlined"
                   prepend-icon="mdi-format-list-checks"
+                  disable-advanced
                 />
               </v-col>
             </v-row>
