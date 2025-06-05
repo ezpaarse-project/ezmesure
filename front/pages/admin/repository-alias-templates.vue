@@ -301,14 +301,13 @@ function deleteItems(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map(async (item) => {
-          try {
-            return await $fetch(`/api/repository-alias-templates/${item.id}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/repository-alias-templates/${item.id}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {
