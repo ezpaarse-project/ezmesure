@@ -93,7 +93,7 @@ const {
   execute,
   clear,
 } = useFetch(() => `/api/repository-alias-templates/${templateId.value}/_apply`, {
-  method: 'GET',
+  method: 'POST',
   lazy: true,
   immediate: false,
   watch: false,

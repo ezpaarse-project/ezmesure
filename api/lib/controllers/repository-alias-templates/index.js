@@ -92,7 +92,7 @@ router.route({
 });
 
 router.route({
-  method: 'GET',
+  method: 'POST',
   path: '/:id/_apply',
   handler: applyOne,
   validate: {
