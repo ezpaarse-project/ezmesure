@@ -10,7 +10,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim().min(1).pattern(/^[a-zA-Z0-9_-]+$/),

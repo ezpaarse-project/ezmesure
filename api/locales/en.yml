@@ -67,6 +67,11 @@ errors:
     notFound: Repository alias not found
     alreadyExists: The repository alias [%s] is already associated to the institution
     targetMismatch: A repository alias [%s] with a different target already exists
+    invalidPattern: Pattern [%s] is invalid
+
+  repoAliasTemplate:
+    notFound: Alias template not found
+    alreadyExists: The alias template [%s] already exists
 
   institution:
     notFound: Institution not found

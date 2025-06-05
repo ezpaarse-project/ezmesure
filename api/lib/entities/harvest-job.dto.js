@@ -2,7 +2,7 @@ const { Joi } = require('koa-joi-router');
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),

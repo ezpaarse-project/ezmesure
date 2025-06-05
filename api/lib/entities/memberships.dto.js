@@ -35,7 +35,7 @@ const PERMISSIONS = Object.values(FEATURES).flatMap((feature) => Object.values(f
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   username: Joi.string().trim(),

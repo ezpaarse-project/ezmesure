@@ -24,7 +24,10 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
-  repositoryAliases: Repository aliases
+  repositoryAliases:
+    group: Repository aliases
+    aliases: Aliases
+    templates: Templates
   spaces: Spaces
   harvest: Harvest
   sync: Synchronisation
@@ -806,6 +809,7 @@ repositoryAliases:
     |Manage {count} aliases
   alias: Alias
   target: Target repository pattern
+  template: Template
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -831,6 +835,31 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+repoAliasTemplates:
+  toolbarTitle: Alias templates ({count})
+  manageTemplates: >
+    Manage templates
+    |Manage {count} templates
+  target: Target repository
+  conditions: Conditions
+  conditionsDescription: What conditions must meet institutions ?
+  filters: Filters
+  filtersTitle: Filter templates
+  aliases: Repository aliases
+  aliasesPattern: Aliases pattern
+  noFilters: No filters
+  noConditions: No conditions
+  noTemplates: No template has been created yet
+  deleteNbTemplates: You are about to delete {number} alias templates.
+  newTemplate: New alias template
+  modifyTemplate: Modify an alias template
+  applyTemplate: Apply template [{id}]
+  applyTemplateDesc: This will trigger the creation of repository aliases for all institutions matching the conditions.
+  dryRun: Dry run
+  applyToSeeAliases: Apply the template to see the affected aliases
+  noAliasCreated: No alias has been created
+  applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
+
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -970,6 +999,11 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+statuses:
+  created: Created
+  updated: Updated
+  deleted: Deleted
+  error: Error
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -1037,6 +1071,9 @@ open: Open
 send: Send
 "yes": "Yes"
 "no": "No"
+active: Active
+inactive: Inactive
+activeSwitch: Activate/Deactivate
 validate: Validate
 invalidate: Invalidate
 reason: "Reason: {reason}"
