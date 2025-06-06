@@ -89,10 +89,14 @@ async function refreshForm() {
     errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
     errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
   }
+
+  institutionFormRef.value?.init(institutionData.value, formOptions.value);
+
+  loading.value = false;
 }
 
 async function open(institution, opts) {
-  item.value = null;
+  institutionData.value = null;
   loading.value = false;
   errorMessage.value = '';
   errorIcon.value = '';
