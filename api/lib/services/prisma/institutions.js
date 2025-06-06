@@ -28,9 +28,8 @@ const {
  * @typedef {import('@prisma/client').RepositoryPermission} RepositoryPermission
  * @typedef {import('@prisma/client').SpacePermission} SpacePermission
  *
- * @typedef {Repository & { institutions: Institution[] }} OldInstitutionRepository
- * @typedef {Membership & { repositoryPermissions: RepositoryPermission[], spacePermissions: SpacePermission[] }} OldInstitutionMembership
- * @typedef {Institution & { memberships: OldInstitutionMembership[], repositories: OldInstitutionRepository[], sushiCredentials: SushiCredentials[], spaces: Space[] }} OldInstitution
+ * @typedef {{ memberships: { include: { repositoryPermissions: true, spacePermissions: true }, repositories: { institutions: true }, sushiCredentials: true, spaces: true } }} OldInstitutionInclude
+ * @typedef {import('@prisma/client').Prisma.InstitutionGetPayload<{ include: OldInstitutionInclude }>} OldInstitution
  * @typedef {{deletedInstitution: Institution, deletedRepos: Repository[], institution: OldInstitution }} InstitutionRemoved
  */
 /* eslint-enable max-len */

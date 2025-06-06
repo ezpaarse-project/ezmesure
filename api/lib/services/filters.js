@@ -5,6 +5,7 @@ const { getPrismaManyQuery } = require('../controllers/institutions/actions').st
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
  * @typedef {import('@prisma/client').Prisma.JsonValue} JsonValue
+ * @typedef {import('koa').Context['query']} KoaQuery
  *
  * @typedef {object} Filter
  * @property {string} field

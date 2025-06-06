@@ -17,7 +17,7 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.HarvestSessionCountArgs} HarvestSessionCountArgs
  * @typedef {import('@prisma/client').Prisma.HarvestSessionCreateArgs} HarvestSessionCreateArgs
  *
- * @typedef {HarvestSession & { jobs: import('@prisma/client').HarvestJob[] }} OldSession
+ * @typedef {import('@prisma/client').Prisma.HarvestSessionGetPayload<{ include: { jobs: true } }>} OldSession
  *
  * @typedef {{deleteResult: HarvestSession, deletedSession: OldSession }} SessionRemoved
  */
