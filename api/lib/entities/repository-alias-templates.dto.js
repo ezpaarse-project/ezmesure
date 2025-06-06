@@ -4,7 +4,7 @@ const {
   withModifiers,
   ignoreFields,
   requireFields,
-  filterSchema,
+  filtersSchema,
 } = require('./schema.utils');
 
 /**
@@ -20,8 +20,8 @@ const schema = {
   pattern: Joi.string().trim().min(1),
   target: Joi.string().trim().min(1),
 
-  conditions: Joi.array().items(filterSchema).allow(null),
-  filters: Joi.array().items(filterSchema).allow(null),
+  conditions: Joi.array().items(filtersSchema).allow(null),
+  filters: Joi.array().items(filtersSchema).allow(null),
 
   repository: Joi.object(),
   aliases: Joi.array().items(Joi.object()),
