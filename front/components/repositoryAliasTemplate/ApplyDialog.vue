@@ -31,16 +31,16 @@
         :loading="loading"
         density="compact"
       >
-        <template #[`item.status`]="{ item }">
-          <ApplyStatusChip :item="item" />
+        <template #[`item.status`]="{ item: template }">
+          <RepositoryAliasTemplateApplyStatusChip :item="template" />
         </template>
 
-        <template #[`item.data.institutions`]="{ item }">
-          {{ item.data.institutions?.length ?? 0 }}
+        <template #[`item.data.institutions`]="{ item: template }">
+          {{ template.data.institutions?.length ?? 0 }}
         </template>
 
         <template #no-data>
-          <span v-if="idle" v-text="$t('repoAliasTemplates.applyToSeeAliases')" />
+          <span v-if="!loading" v-text="$t('repoAliasTemplates.applyToSeeAliases')" />
           <span v-else v-text="$t('repoAliasTemplates.applyHadNoEffect')" />
         </template>
       </v-data-table>
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import ApplyStatusChip from './ApplyStatusChip.vue';
+import { getErrorMessage } from '@/lib/errors';
 
 const emit = defineEmits({
   close: (applied) => typeof applied === 'boolean',
@@ -86,26 +86,11 @@ const isOpen = ref(false);
 const dryRun = ref(false);
 const templateId = ref(null);
 
-const {
-  data: result,
-  status,
-  error,
-  execute,
-  clear,
-} = useFetch(() => `/api/repository-alias-templates/${templateId.value}/_apply`, {
-  method: 'POST',
-  lazy: true,
-  immediate: false,
-  watch: false,
-  query: {
-    dryRun,
-  },
-});
+const result = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
 
 const createdAliases = computed(() => result.value?.items ?? []);
-const idle = computed(() => status.value === 'idle');
-const loading = computed(() => status.value === 'pending');
-const errorMessage = computed(() => error.value && (error.value?.data?.error || t('anErrorOccurred')));
 
 /**
  * Table headers
@@ -133,13 +118,31 @@ const headers = computed(() => [
 ]);
 
 async function applyTemplate() {
-  if (templateId.value) {
-    await execute();
+  if (!templateId.value) {
+    return;
   }
+
+  loading.value = true;
+
+  try {
+    item.value = await $fetch(`/api/repository-alias-templates/${templateId.value}/_apply`, {
+      method: 'POST',
+      query: {
+        dryRun: dryRun.value,
+      },
+    });
+  } catch (err) {
+    errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
+  }
+
+  loading.value = false;
 }
 
 function open(id) {
-  clear();
+  item.value = null;
+  loading.value = false;
+  errorMessage.value = '';
+
   templateId.value = id;
   isOpen.value = true;
   dryRun.value = false;

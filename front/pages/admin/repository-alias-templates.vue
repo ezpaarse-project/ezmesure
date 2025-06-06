@@ -67,7 +67,7 @@
           :variant="!value ? 'outlined' : undefined"
           prepend-icon="mdi-database-eye"
           size="small"
-          @click="templateFormDialogRef?.open(item)"
+          @click="templateFormDialogRef?.open(item.id)"
         />
       </template>
 
