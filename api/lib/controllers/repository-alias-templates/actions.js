@@ -3,11 +3,13 @@
 const RepoAliasTemplatesService = require('../../entities/repository-alias-templates.service');
 const RepositoryAliasesService = require('../../entities/repository-aliases.service');
 const RepositoriesService = require('../../entities/repositories.service');
+const InstitutionsService = require('../../entities/institutions.service');
 
 const repoAliasTemplateDto = require('../../entities/repository-alias-templates.dto');
 
+const { getPrismaManyQuery } = require('../institutions/actions').standardQueryParams;
+
 const { interpolateString, interpolateObject } = require('../../services/utils');
-const { getInstitutionsMatchingConditions } = require('../../services/filters');
 
 const {
   adminUpdateSingleFieldSchema,
@@ -129,7 +131,11 @@ exports.applyOne = async (ctx) => {
     pattern: templatePattern,
   } = aliasTemplate;
 
-  const institutions = await getInstitutionsMatchingConditions(conditions);
+  const institutionService = new InstitutionsService();
+  const institutions = await institutionService.findManyByConditions(
+    conditions,
+    getPrismaManyQuery,
+  );
 
   /** @type {Map<string, Partial<RepoAliasWithInstitutions>>} */
   const aliases = new Map();

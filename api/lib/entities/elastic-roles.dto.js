@@ -17,6 +17,8 @@ const schema = {
 
   name: Joi.string().trim().min(1).regex(roleNamePattern),
 
+  conditions: Joi.array().items(Joi.object()),
+
   users: Joi.array().items(Joi.object()),
   institutions: Joi.array().items(Joi.object()),
   repositoryPermissions: Joi.array().items(Joi.object()),

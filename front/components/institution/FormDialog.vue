@@ -48,6 +48,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const emit = defineEmits({
   submit: (item) => !!item,
 });
@@ -59,22 +61,10 @@ const institutionId = ref(null);
 const institutionFormRef = useTemplateRef('institutionFormRef');
 const formOptions = ref(null);
 
-const {
-  data: institutionData,
-  status,
-  error,
-  refresh,
-  clear,
-} = useFetch(() => `/api/institutions/${institutionId.value}`, {
-  lazy: true,
-  immediate: false,
-  watch: false,
-  query: { include: 'customProps.field' },
-});
-
-const loading = computed(() => status.value === 'pending');
-const errorMessage = computed(() => error.value && (error.value?.data?.error || t('anErrorOccurred')));
-const errorIcon = computed(() => (error.value?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle'));
+const institutionData = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
+const errorIcon = ref('');
 
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
@@ -83,15 +73,34 @@ const dialogMaxWidth = computed(() => {
 });
 
 async function refreshForm() {
-  if (institutionId.value) {
-    await refresh();
+  if (!institutionId.value) {
+    return;
+  }
+
+  loading.value = true;
+
+  try {
+    institutionData.value = await $fetch(`/api/repository-alias-templates/${itemId.value}`, {
+      query: {
+        include: 'customProps.field',
+      },
+    });
+  } catch (err) {
+    errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
+    errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
   }
 
   institutionFormRef.value?.init(institutionData.value, formOptions.value);
+
+  loading.value = false;
 }
 
 async function open(institution, opts) {
-  clear();
+  institutionData.value = null;
+  loading.value = false;
+  errorMessage.value = '';
+  errorIcon.value = '';
+
   institutionId.value = institution?.id;
   formOptions.value = opts;
   isOpen.value = true;

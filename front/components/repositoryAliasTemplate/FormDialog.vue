@@ -47,6 +47,8 @@
 </template>
 
 <script setup>
+import { getErrorMessage } from '@/lib/errors';
+
 const emit = defineEmits({
   submit: (item) => !!item,
 });
@@ -56,24 +58,10 @@ const { t } = useI18n();
 const isOpen = ref(false);
 const itemId = ref(null);
 
-const {
-  data: item,
-  status,
-  error,
-  refresh,
-  clear,
-} = useFetch(() => `/api/repository-alias-templates/${itemId.value}`, {
-  lazy: true,
-  immediate: false,
-  watch: false,
-  query: {
-    include: 'repository',
-  },
-});
-
-const loading = computed(() => status.value === 'pending');
-const errorMessage = computed(() => error.value && (error.value?.data?.error || t('anErrorOccurred')));
-const errorIcon = computed(() => (error.value?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle'));
+const item = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
+const errorIcon = ref('');
 
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
@@ -82,13 +70,32 @@ const dialogMaxWidth = computed(() => {
 });
 
 async function refreshForm() {
-  if (itemId.value) {
-    await refresh();
+  if (!itemId.value) {
+    return;
   }
+
+  loading.value = true;
+
+  try {
+    item.value = await $fetch(`/api/repository-alias-templates/${itemId.value}`, {
+      query: {
+        include: 'repository',
+      },
+    });
+  } catch (err) {
+    errorMessage.value = getErrorMessage(err) || t('anErrorOccurred');
+    errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
+  }
+
+  loading.value = false;
 }
 
 async function open(id) {
-  clear();
+  item.value = null;
+  loading.value = false;
+  errorMessage.value = '';
+  errorIcon.value = '';
+
   itemId.value = id;
   isOpen.value = true;
   await refreshForm();

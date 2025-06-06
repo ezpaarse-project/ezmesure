@@ -342,6 +342,8 @@ model ElasticRole {
   createdAt                  DateTime                               @default(now())
   /// Latest update date
   updatedAt                  DateTime                               @updatedAt
+  /// A list of conditions used to populate the institutions
+  conditions                 Json[]
   /// Permissions that role give to repositories
   repositoryPermissions      ElasticRoleRepositoryPermission[]
   /// Permissions that role gives to repository aliases

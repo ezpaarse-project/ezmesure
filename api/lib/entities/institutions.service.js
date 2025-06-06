@@ -1,10 +1,15 @@
 // @ts-check
 const BasePrismaService = require('./base-prisma.service');
 const institutionsPrisma = require('../services/prisma/institutions');
+const elasticRolesPrisma = require('../services/prisma/elastic-roles');
+
+const { isFilter, customPropFilter } = require('../services/filters');
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Prisma.JsonValue} JsonValue
  * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('@prisma/client').Prisma.InstitutionWhereInput} InstitutionWhereInput
  * @typedef {import('@prisma/client').Prisma.InstitutionUpdateArgs} InstitutionUpdateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionUpsertArgs} InstitutionUpsertArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionFindUniqueArgs} InstitutionFindUniqueArgs
@@ -12,7 +17,11 @@ const institutionsPrisma = require('../services/prisma/institutions');
  * @typedef {import('@prisma/client').Prisma.InstitutionFindManyArgs} InstitutionFindManyArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionCreateArgs} InstitutionCreateArgs
  * @typedef {import('@prisma/client').Prisma.InstitutionDeleteArgs} InstitutionDeleteArgs
- */
+ * @typedef {import('@prisma/client').Prisma.InstitutionGetPayload<{ include: { customProps: true } }>} InstitutionWithProps
+ * @typedef {import('@prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
+ * @typedef {import('koa').Context['query']} KoaQuery
+ * @typedef {import('../services/filters').Filter} Filter
+*/
 /* eslint-enable max-len */
 
 module.exports = class InstitutionsService extends BasePrismaService {
@@ -186,7 +195,82 @@ module.exports = class InstitutionsService extends BasePrismaService {
     return institutionsPrisma.getContacts(institutionId, this.prisma);
   }
 
+  /**
+   * Get institutions matching given conditions
+   * @param {Filter[] | JsonValue[]} conditions
+   * @returns {Promise<Institution[]>}
+   */
+  async findManyByConditions(conditions, getPrismaManyQuery) {
+    /** @type {InstitutionWhereInput[]} */
+    const propsFilters = [];
+    /** @type {KoaQuery} */
+    const query = {};
+    /** @type {KoaQuery} */
+    const notQuery = {};
+
+    conditions.forEach((condition) => {
+      if (!isFilter(condition)) { return; }
+
+      const { field, value, isNot } = condition;
+
+      if (condition.field.startsWith('customProps.')) {
+        propsFilters.push({
+          customProps: {
+            [isNot ? 'none' : 'some']: customPropFilter(field.slice(12), value),
+          },
+        });
+      } else if (isNot) {
+        notQuery[field] = value;
+      } else {
+        query[field] = value;
+      }
+    });
+
+    // TODO: need refactor
+    /** @type {InstitutionWhereInput} */
+    const institutionsQuery = getPrismaManyQuery({ query: { ...query } })?.where;
+    /** @type {InstitutionWhereInput} */
+    const institutionsNotQuery = getPrismaManyQuery({ query: { ...notQuery } })?.where;
+
+    if (!Array.isArray(institutionsQuery.AND)) {
+      institutionsQuery.AND = institutionsQuery.AND ? [institutionsQuery.AND] : [];
+    }
+
+    if (propsFilters.length > 0) {
+      institutionsQuery.AND = [
+        ...institutionsQuery.AND,
+        ...propsFilters,
+        { NOT: institutionsNotQuery.AND },
+      ];
+    }
+
+    /** @type {InstitutionWithProps[]} */
+    let institutions = [];
+
+    if (Object.keys(institutionsQuery).length > 0) {
+      // @ts-ignore
+      institutions = await this.findMany({
+        where: institutionsQuery,
+        include: { customProps: true },
+      });
+    }
+
+    return institutions;
+  }
+
   async connectRole(id, roleName) {
+    const role = await elasticRolesPrisma.findUnique({
+      where: { name: roleName },
+    });
+
+    if (!role) {
+      throw new Error(`Role ${roleName} doesn't exists`);
+    }
+
+    if (role.conditions.length > 0) {
+      throw new Error(`Role ${roleName} is managed by conditions, you can't connect an institution to that role`);
+    }
+
     const { elasticRoles, ...institution } = await institutionsPrisma.update({
       where: { id },
       data: {
@@ -200,6 +284,18 @@ module.exports = class InstitutionsService extends BasePrismaService {
   }
 
   async disconnectRole(id, roleName) {
+    const role = await elasticRolesPrisma.findUnique({
+      where: { name: roleName },
+    });
+
+    if (!role) {
+      throw new Error(`Role ${roleName} doesn't exists`);
+    }
+
+    if (role.conditions.length > 0) {
+      throw new Error(`Role ${roleName} is managed by conditions, you can't disconnect an institution to that role`);
+    }
+
     const { elasticRoles, ...institution } = await institutionsPrisma.update({
       where: { id },
       data: {

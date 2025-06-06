@@ -1,10 +1,8 @@
-const InstitutionsService = require('../entities/institutions.service');
-const { getPrismaManyQuery } = require('../controllers/institutions/actions').standardQueryParams;
-
 /* eslint-disable max-len */
 /**
  * @typedef {import('@prisma/client').Prisma.InstitutionPropertyWhereInput} InstitutionPropertyWhereInput
  * @typedef {import('@prisma/client').Prisma.JsonValue} JsonValue
+ * @typedef {import('koa').Context['query']} KoaQuery
  *
  * @typedef {object} Filter
  * @property {string} field
@@ -52,72 +50,7 @@ const customPropFilter = (fieldId, value) => {
   };
 };
 
-/**
- * Get institutions matching given conditions
- * @param {Filter[]|JsonValue[]} conditions
- * @returns {Promise<Institution[]>}
- */
-const getInstitutionsMatchingConditions = async (conditions) => {
-  /** @type {InstitutionWhereInput[]} */
-  const propsFilters = [];
-  /** @type {KoaQuery} */
-  const query = {};
-  /** @type {KoaQuery} */
-  const notQuery = {};
-
-  conditions.forEach((condition) => {
-    if (!isFilter(condition)) { return; }
-
-    const { field, value, isNot } = condition;
-
-    if (condition.field.startsWith('customProps.')) {
-      propsFilters.push({
-        customProps: {
-          [isNot ? 'none' : 'some']: customPropFilter(field.slice(12), value),
-        },
-      });
-    } else if (isNot) {
-      notQuery[field] = value;
-    } else {
-      query[field] = value;
-    }
-  });
-
-  /** @type {InstitutionWhereInput} */
-  const institutionsQuery = getPrismaManyQuery({ query: { ...query } })?.where;
-  /** @type {InstitutionWhereInput} */
-  const institutionsNotQuery = getPrismaManyQuery({ query: { ...notQuery } })?.where;
-
-  if (!Array.isArray(institutionsQuery.AND)) {
-    institutionsQuery.AND = institutionsQuery.AND ? [institutionsQuery.AND] : [];
-  }
-
-  if (propsFilters.length > 0) {
-    institutionsQuery.AND = [
-      ...institutionsQuery.AND,
-      ...propsFilters,
-      { NOT: institutionsNotQuery.AND },
-    ];
-  }
-
-  /** @type {InstitutionWithProps[]} */
-  let institutions = [];
-
-  if (Object.keys(institutionsQuery).length > 0) {
-    const institutionsService = new InstitutionsService();
-
-    // @ts-ignore
-    institutions = await institutionsService.findMany({
-      where: institutionsQuery,
-      include: { customProps: true },
-    });
-  }
-
-  return institutions;
-};
-
 module.exports = {
   isFilter,
   customPropFilter,
-  getInstitutionsMatchingConditions,
 };
