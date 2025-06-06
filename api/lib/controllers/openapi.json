@@ -1714,7 +1714,8 @@
           "status": {
             "type": "integer",
             "minimum": 100,
-            "exclusiveMaximum": 600,
+            "maximum": 600,
+            "exclusiveMaximum": true,
             "readOnly": true
           }
         }
@@ -2503,7 +2504,8 @@
         "operationId": "ping",
         "tags": [
           "Basics"
-        ]
+        ],
+        "security": []
       }
     },
     "/custom-fields": {
@@ -3092,6 +3094,107 @@
             "description": "Override existing objects"
           }
         ]
+      }
+    },
+    "/elastic-roles/{name}/_sync": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "post-elastic-roles-name-_sync",
+        "summary": "Sync an Elastic Role",
+        "description": "Sync an Elastic Role by populating institutions depending on condititons",
+        "tags": [
+          "Elastic Roles"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dryRun",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "description": "The total number of institutions affected by the operation"
+                    },
+                    "created": {
+                      "type": "integer",
+                      "description": "The number of created institutions"
+                    },
+                    "updated": {
+                      "type": "integer",
+                      "description": "The number of updated institutions"
+                    },
+                    "deleted": {
+                      "type": "integer",
+                      "description": "The number of old institutions that were deleted"
+                    },
+                    "errors": {
+                      "type": "integer",
+                      "description": "The number of institutions that failed to be updated"
+                    },
+                    "items": {
+                      "description": "The list of affected institutions",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "description": "The status of the operation",
+                            "enum": ["created", "updated", "deleted", "error"]
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "An error message, if any"
+                          },
+                          "data": {
+                            "description": "The affected institution",
+                            "$ref": "#/components/schemas/Institution"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
       }
     },
     "/files": {
@@ -4090,6 +4193,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "operationId": "get-institutions-:id-members",
         "description": "Get the memberships of an institution. Must be either admin or institution contact."
       },
@@ -4499,6 +4607,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "operationId": "get-institutions-:id-repositories",
         "description": "Get the repositories of an institution. Must be either admin or have read access to members."
       },
@@ -4515,12 +4628,35 @@
       ]
     },
     "/institutions/{id}/repositories/{pattern}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "pattern",
+          "in": "path",
+          "required": true
+        }
+      ],
       "delete": {
         "summary": "Unlink a repository from an institution",
         "operationId": "delete-institutions-id-repositories-pattern",
         "tags": [
           "Institutions",
           "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "204": {
@@ -4540,6 +4676,11 @@
         "tags": [
           "Institutions",
           "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "requestBody": {
           "content": {
@@ -4576,6 +4717,24 @@
       }
     },
     "/institutions/{id}/repositories/{pattern}/permissions": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "pattern",
+          "in": "path",
+          "required": true
+        }
+      ],
       "put": {
         "summary": "Set repository permissions",
         "operationId": "put-institutions-id-repositories-pattern-permissions",
@@ -4609,6 +4768,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4630,12 +4794,43 @@
       }
     },
     "/institutions/{id}/repositories/{pattern}/permissions/{username}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "pattern",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "username",
+          "in": "path",
+          "required": true
+        }
+      ],
       "delete": {
         "summary": "Remove repository permission",
         "operationId": "delete-institutions-id-repositories-pattern-permissions-username",
         "tags": [
           "Institutions",
           "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "204": {
@@ -4655,6 +4850,11 @@
         "tags": [
           "Institutions",
           "Repositories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
@@ -4715,6 +4915,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "operationId": "get-institutions-:id-repository-aliases",
         "description": "Get the repository aliases of an institution. Must be either admin or have read access to members."
       },
@@ -4731,12 +4936,35 @@
       ]
     },
     "/institutions/{id}/repository-aliases/{pattern}": {
+      "parameters": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "pattern",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        }
+      ],
       "delete": {
         "summary": "Unlink a repository from an institution",
         "operationId": "delete-institutions-id-repository-aliases-pattern",
         "tags": [
           "Institutions",
           "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "204": {
@@ -4756,6 +4984,11 @@
         "tags": [
           "Institutions",
           "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "requestBody": {
           "content": {
@@ -4792,12 +5025,35 @@
       }
     },
     "/institutions/{id}/repository-aliases/{pattern}/permissions": {
+      "parameters": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "pattern",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        }
+      ],
       "put": {
         "summary": "Set repository permissions",
         "operationId": "put-institutions-id-repository-aliases-pattern-permissions",
         "tags": [
           "Institutions",
           "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "requestBody": {
           "content": {
@@ -4846,12 +5102,43 @@
       }
     },
     "/institutions/{id}/repository-aliases/{pattern}/permissions/{username}": {
+      "parameters": [
+        {
+          "name": "id",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "pattern",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "username",
+          "schema": {
+            "type": "string"
+          },
+          "in": "path",
+          "required": true
+        }
+      ],
       "delete": {
         "summary": "Remove repository alias permission",
         "operationId": "delete-institutions-id-repository-aliases-pattern-permissions-username",
         "tags": [
           "Institutions",
           "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "204": {
@@ -4871,6 +5158,11 @@
         "tags": [
           "Institutions",
           "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "200": {
@@ -5554,6 +5846,11 @@
             "$ref": "#/components/responses/UnauthorizedError"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "operationId": "getMetrics"
       }
     },
@@ -5674,6 +5971,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "operationId": "getInstitutions"
       }
     },
@@ -6472,6 +6774,16 @@
         "tags": [
           "Repositories"
         ],
+        "parameters": [
+          {
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -6503,7 +6815,12 @@
           "403": {
             "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/repository-alias-templates": {
@@ -6879,7 +7196,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RepositoryAliases"
+                    "$ref": "#/components/schemas/RepositoryAlias"
                   }
                 }
               }
@@ -11455,6 +11772,11 @@
           }
         },
         "description": "Cancel a task, and interrupt the associated job if it's active.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "tags": [
           "Tasks"
         ]
