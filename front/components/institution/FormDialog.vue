@@ -82,7 +82,7 @@ async function refreshForm() {
   try {
     institutionData.value = await $fetch(`/api/repository-alias-templates/${itemId.value}`, {
       query: {
-        include: 'repository',
+        include: 'customProps.field',
       },
     });
   } catch (err) {
