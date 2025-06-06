@@ -345,18 +345,7 @@ exports.syncRole = async (ctx) => {
         addResponseItem(institution, 'deleted', null);
       }
     });
-
-    // Throw a special error to rollback transaction
-    // if (dryRun) {
-    //   throw new Error('dry run requested', { cause: { dryRun: true } });
-    // }
-  })
-  // .catch((err) => {
-  //   if (err?.cause?.dryRun) {
-  //     return Promise.resolve();
-  //   }
-  //   throw err;
-  // });
+  });
 
   ctx.type = 'json';
   ctx.body = response;
