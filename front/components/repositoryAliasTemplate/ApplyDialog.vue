@@ -125,7 +125,7 @@ async function applyTemplate() {
   loading.value = true;
 
   try {
-    item.value = await $fetch(`/api/repository-alias-templates/${templateId.value}/_apply`, {
+    result.value = await $fetch(`/api/repository-alias-templates/${templateId.value}/_apply`, {
       method: 'POST',
       query: {
         dryRun: dryRun.value,
