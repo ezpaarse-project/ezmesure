@@ -4,9 +4,8 @@
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-domain"
   >
-    <template #append>
+    <template v-if="!hasConditions" #append>
       <InstitutionAddMenu
-        v-if="!hasConditions"
         :model-value="institutions"
         :title="$t('elasticRoles.addInstitution')"
         @institution-add="addInstitution($event)"
@@ -26,9 +25,7 @@
 
     <template #text>
       <v-expansion-panels>
-        <v-expansion-panel
-          :title="$t('repoAliasTemplates.conditions')"
-        >
+        <v-expansion-panel :title="$t('repoAliasTemplates.conditions')">
           <template #text>
             <FiltersForm
               v-model="conditions"
@@ -91,7 +88,7 @@
             <InstitutionAvatar :institution="institution" />
           </template>
 
-          <template #append>
+          <template v-if="!hasConditions" #append>
             <v-btn
               v-tooltip="$t('revoke')"
               icon="mdi-office-building-remove"
