@@ -29,7 +29,10 @@ menu:
     aliases: Aliases
     templates: Templates
   spaces: Spaces
-  harvest: Harvest
+  harvest:
+    group: Harvest
+    sessions: Sessions
+    alerts: Alertes
   sync: Synchronisation
   customFields: Custom fields
 home:
@@ -657,6 +660,14 @@ sushi:
     title: Available files
     noFilesAvailable: No files available
     nbFiles: 1 file|{count} files
+  alerts:
+    title: Alerts
+    unsupportedButHarvested:
+      title: Unsupported reports but still harvested
+      severity: Severity
+      error: An error occurred while searching for harvested but unsupported reports
+      empty: No unsupported reports have been harvested!
+      deletePeriod: "You'll delete the harvested report \"{reportId}\" of the matrix from \"{institutionName}\" for the period \"{beginDate} - {endDate}\". This won't delete the data. This action is irreversible."
 reports:
   sushiReturnedErrors: The COUNTER endpoint responded with errors.
   checkCredentials: Check credentials
@@ -887,7 +898,7 @@ spaces:
   filters:
     title: Filter spaces
 harvest:
-  toolbarTitle: Harvests ({count})
+  toolbarTitle: Sessions ({count})
   sessions:
     pendingSession: Pending harvest...
     startedAt: Harvest started {date}

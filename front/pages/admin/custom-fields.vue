@@ -66,7 +66,7 @@
           variant="text"
           density="comfortable"
           color="blue"
-          @click="customFieldFormDialogRef.open(item)"
+          @click="customFieldFormDialogRef?.open(item)"
         />
         <v-btn
           v-tooltip:top="$t('delete')"
