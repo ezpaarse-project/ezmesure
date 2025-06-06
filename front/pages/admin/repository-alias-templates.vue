@@ -39,34 +39,26 @@
         />
       </template>
 
-      <template #[`item.filters`]="{ value: filters }">
-        <span v-if="filters.length === 0" class="font-italic">
-          {{ $t('repoAliasTemplates.noFilters') }}
-        </span>
-        <div v-else class="d-flex flex-wrap ga-1 my-1">
-          <v-chip
-            v-for="filter in filters"
-            :key="filter.name"
-            :text="filter.name"
-            :color="filter.isNot ? 'red' : 'blue'"
-            density="compact"
-          />
-        </div>
+      <template #[`item.filters`]="{ value }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!templateFormDialogRef"
+          prepend-icon="mdi-filter"
+          size="small"
+          @click="templateFormDialogRef?.open(item.id)"
+        />
       </template>
 
-      <template #[`item.conditions`]="{ value: filters }">
-        <span v-if="filters.length === 0" class="font-italic">
-          {{ $t('repoAliasTemplates.noConditions') }}
-        </span>
-        <div v-else class="d-flex flex-wrap ga-1 my-1">
-          <v-chip
-            v-for="filter in filters"
-            :key="filter.name"
-            :text="filter.name"
-            :color="filter.isNot ? 'red' : 'blue'"
-            density="compact"
-          />
-        </div>
+      <template #[`item.conditions`]="{ value, item }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!templateFormDialogRef"
+          prepend-icon="mdi-format-list-checks"
+          size="small"
+          @click="templateFormDialogRef?.open(item.id)"
+        />
       </template>
 
       <template #[`item._count.aliases`]="{ value, item }">
@@ -75,7 +67,7 @@
           :variant="!value ? 'outlined' : undefined"
           prepend-icon="mdi-database-eye"
           size="small"
-          @click="aliasInstitutionsDialogRef?.open(item)"
+          @click="templateFormDialogRef?.open(item)"
         />
       </template>
 
@@ -228,17 +220,17 @@ const headers = computed(() => [
   {
     title: t('repoAliasTemplates.conditions'),
     value: 'conditions',
-    align: 'start',
+    align: 'center',
   },
   {
     title: t('repoAliasTemplates.filters'),
     value: 'filters',
-    align: 'start',
+    align: 'center',
   },
   {
     title: t('repoAliasTemplates.aliases'),
     value: '_count.aliases',
-    align: 'start',
+    align: 'center',
     sortable: true,
     width: 10,
     nowrap: true,

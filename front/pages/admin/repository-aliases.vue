@@ -39,11 +39,14 @@
         />
       </template>
 
-      <template #[`item.filters`]="{ value }">
-        <v-icon
-          v-if="!!value"
-          icon="mdi-filter"
+      <template #[`item.filters`]="{ value, item }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!aliasFormDialogRef"
+          prepend-icon="mdi-filter"
           size="small"
+          @click="openFiltersDialog(item)"
         />
       </template>
 
@@ -186,7 +189,7 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('repositoryAliases.filtered'),
+    title: t('repoAliasTemplates.filters'),
     value: 'filters',
     align: 'center',
   },
