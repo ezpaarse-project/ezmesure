@@ -12,6 +12,25 @@ const sender = config.get('notifications.sender');
 const recipients = config.get('notifications.recipients');
 
 /**
+ * @typedef {object} SushiConnection
+ * @property {number} date
+ * @property {string} status
+ * @property {import('../../services/sushi').SushiException[]} [exceptions]
+ * @property {string} [errorCode]
+ */
+
+/**
+ * @param {unknown} c
+ * @return {c is SushiConnection}
+ */
+const isConnection = (c) => {
+  if (!c || typeof c !== 'object' || Array.isArray(c)) {
+    return false;
+  }
+  return 'date' in c && 'status' in c;
+};
+
+/**
  * @param {HarvestSession} session
  */
 async function sendEndMail(session) {
@@ -28,6 +47,7 @@ async function sendEndMail(session) {
       },
     },
     include: {
+      // Get current contacts
       memberships: {
         where: {
           roles: { hasSome: ['contact:doc', 'contact:tech'] },
@@ -36,6 +56,21 @@ async function sendEndMail(session) {
           user: true,
         },
       },
+      // Get harvested credentials
+      sushiCredentials: {
+        where: {
+          harvestJobs: {
+            some: {
+              sessionId: session.id,
+            },
+          },
+        },
+        include: {
+          endpoint: true,
+        },
+      },
+      // Get spaces of institutions
+      // TODO: what if contact doesn't have access to space ?
       spaces: {
         where: {
           type: 'counter5',
@@ -50,13 +85,26 @@ async function sendEndMail(session) {
         const contacts = institution.memberships.map((m) => m.user.email);
 
         const spaceID = institution.spaces.at(0)?.id;
-        const spaceURL = new URL(`kibana/s/${spaceID}`, config.get('publicUrl')).href;
+        const publicUrl = new URL(config.get('publicUrl'));
 
         const data = {
           periodStart: session.beginDate,
           periodEnd: session.endDate,
           institution: institution.name,
-          spaceURL,
+          credentials: institution.sushiCredentials.map((c) => {
+            let status;
+            if (isConnection(c.connection)) {
+              status = c.connection.status;
+            }
+
+            return ({
+              endpoint: c.endpoint.vendor,
+              packages: c.packages.join(', '),
+              expired: status === 'unauthorized',
+            });
+          }),
+          credentialsURL: new URL(`myspace/institutions/${institution.id}/sushi`, publicUrl).href,
+          spaceURL: spaceID ? new URL(`kibana/s/${spaceID}`, publicUrl).href : undefined,
           recipients,
         };
 
