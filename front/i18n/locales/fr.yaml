@@ -1106,3 +1106,4 @@ retry: Réessayer
 applyToAll: Appliquer à tous
 minValueError: "La valeur est trop petite. Minimum: {min}"
 maxValueError: "La valeur est trop grande. Maximum: {max}"
+synchronize: Synchroniser

@@ -144,8 +144,6 @@
     </template>
 
     <template v-if="$slots.actions" #actions>
-      <v-spacer />
-
       <slot name="actions" />
     </template>
   </v-card>
