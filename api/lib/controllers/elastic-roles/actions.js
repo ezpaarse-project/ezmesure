@@ -2,6 +2,9 @@ const ElasticRoleService = require('../../entities/elastic-roles.service');
 const ElasticRoleRepositoryPermissionService = require('../../entities/elastic-role-repository-permissions.service');
 const ElasticRoleRepositoryAliasPermissionService = require('../../entities/elastic-role-repository-alias-permissions.service');
 const ElasticRoleSpacePermissionService = require('../../entities/elastic-role-space-permissions.service');
+const InstitutionsService = require('../../entities/institutions.service');
+
+const { getPrismaManyQuery } = require('../institutions/actions').standardQueryParams;
 
 const { schema, includableFields, adminImportSchema } = require('../../entities/elastic-roles.dto');
 
@@ -16,7 +19,34 @@ exports.standardQueryParams = standardQueryParams;
 
 /* eslint-disable max-len */
 /**
+ * @typedef {import('@prisma/client').Institution} Institution
  * @typedef {import('@prisma/client').Prisma.ElasticRoleCreateInput} ElasticRoleCreateInput
+  *
+ * @typedef {object} ImportResponse
+ * @property {number} errors
+ * @property {number} conflicts
+ * @property {number} created
+ * @property {ImportResponseItem[]} items
+ *
+ * @typedef {object} ImportResponseItem
+ * @property {string} status
+ * @property {string} message
+ * @property {RepositoryAliasTemplate[]} data
+ *
+ * @typedef {object} ApplyResponse
+ * @property {number} total - The total number of aliases affected by the operation
+ * @property {number} created - The number of created aliases
+ * @property {number} updated - The number of updated aliases
+ * @property {number} deleted - The number of old aliases that were deleted
+ * @property {number} errors - The number of aliases that failed to be updated
+ * @property {ApplyResponseItem[]} items - The list of affected aliases
+ *
+ * @typedef {'created' | 'updated' | 'deleted' | 'error'} ApplyResponseItemStatus
+ *
+ * @typedef {object} ApplyResponseItem
+ * @property {ApplyResponseItemStatus | null} status - The status of the operation
+ * @property {string | null} message - An error message, if any
+ * @property {Partial<Institution>} data - The affected alias
 */
 /* eslint-enable max-len */
 
@@ -220,6 +250,113 @@ exports.importRoles = async (ctx) => {
       }
     }
   });
+
+  ctx.type = 'json';
+  ctx.body = response;
+};
+
+exports.syncRole = async (ctx) => {
+  const { name: elasticRoleName } = ctx.params;
+  const { dryRun } = ctx.request.query;
+
+  const response = {
+    total: 0,
+    created: 0,
+    updated: 0,
+    deleted: 0,
+    errors: 0,
+    items: [],
+  };
+
+  /**
+   * Add an institution to the response and increment the counters
+   * @param {Partial<Institution>} data
+   * @param {ApplyResponseItemStatus} status
+   * @param {string | null} message
+   */
+  const addResponseItem = (data, status, message) => {
+    response.total += 1;
+
+    if (status === 'created') { response.created += 1; }
+    if (status === 'updated') { response.updated += 1; }
+    if (status === 'deleted') { response.deleted += 1; }
+    if (status === 'error') { response.errors += 1; }
+
+    response.items.push({ status, message, data });
+  };
+
+  await ElasticRoleService.$transaction(async (elasticRoleService) => {
+    const role = await elasticRoleService.findUnique({
+      where: { name: elasticRoleName },
+      include: { institutions: true },
+    });
+
+    if (!role) {
+      ctx.throw(404, ctx.$t('errors.role.notFound', elasticRoleName));
+      return;
+    }
+
+    if (role.conditions.length === 0) {
+      return;
+    }
+
+    const originalInstitutionMap = new Map(role.institutions.map(((i) => [i.id, i])));
+
+    const institutionsService = new InstitutionsService(elasticRoleService);
+
+    const institutions = await institutionsService.findManyByConditions(
+      role.conditions,
+      getPrismaManyQuery,
+    );
+
+    let institutionsList = institutions;
+
+    if (!dryRun) {
+      const newRole = await elasticRoleService.update({
+        where: { name: elasticRoleName },
+        data: {
+          institutions: {
+            set: institutions.map((institution) => ({ id: institution.id })),
+          },
+        },
+        include: {
+          institutions: true,
+        },
+      });
+
+      institutionsList = newRole.institutions;
+    }
+
+    const institutionMap = new Map(institutionsList.map((i) => [i.id, i]));
+
+    institutionMap.forEach((institution, id) => {
+      const originalInstitution = originalInstitutionMap.get(id);
+
+      if (!originalInstitution) {
+        addResponseItem(institution, 'created', null);
+        return;
+      }
+
+      addResponseItem(institution, 'updated', null);
+    });
+
+    originalInstitutionMap.forEach((institution, id) => {
+      if (!institutionMap.has(id)) {
+        addResponseItem(institution, 'deleted', null);
+      }
+    });
+
+    // Throw a special error to rollback transaction
+    // if (dryRun) {
+    //   throw new Error('dry run requested', { cause: { dryRun: true } });
+    // }
+  })
+  // .catch((err) => {
+  //   if (err?.cause?.dryRun) {
+  //     return Promise.resolve();
+  //   }
+  //   throw err;
+  // });
 
   ctx.type = 'json';
   ctx.body = response;

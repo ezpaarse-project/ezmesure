@@ -16,6 +16,7 @@ const {
   upsertRole,
   deleteRole,
   importRoles,
+  syncRole,
   connectRepository,
   disconnectRepository,
   connectRepositoryAlias,
@@ -68,6 +69,20 @@ router.route({
       name: schema.name,
     },
     body: adminUpdateSchema,
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/:name/_sync',
+  handler: syncRole,
+  validate: {
+    params: {
+      name: schema.name,
+    },
+    query: {
+      dryRun: Joi.boolean().default(false),
+    },
   },
 });
 
