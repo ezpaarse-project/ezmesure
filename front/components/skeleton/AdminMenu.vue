@@ -52,23 +52,23 @@
       <v-list-group value="harvests">
         <template #activator="{ props }">
           <v-list-item
-            :title="$t('menu.harvest.title')"
+            :title="$t('menu.harvest.group')"
             prepend-icon="mdi-tractor"
             v-bind="props"
           />
         </template>
 
         <v-list-item
-          :title="$t('menu.harvest.tabs.sessions')"
+          :title="$t('menu.harvest.sessions')"
           to="/admin/harvests"
           prepend-icon="mdi-file-tree"
           exact
         />
 
         <v-list-item
-          :title="$t('menu.harvest.tabs.dashboard')"
-          to="/admin/harvests/dashboard"
-          prepend-icon="mdi-view-dashboard"
+          :title="$t('menu.harvest.alerts')"
+          to="/admin/harvests/alerts"
+          prepend-icon="mdi-bell-outline"
         />
       </v-list-group>
 

@@ -27,10 +27,9 @@ menu:
   repositoryAliases: Alias d'entrepôts
   spaces: Espaces
   harvest:
-    title: Moissonnage
-    tabs:
-      sessions: Sessions
-      dashboard: Tableau de bord
+    group: Moissonnage
+    sessions: Sessions
+    alerts: Alertes
   sync: Synchronisation
   customFields: Champs personnalisés
 home:
@@ -672,6 +671,14 @@ sushi:
     title: Fichiers disponibles
     noFilesAvailable: Aucun fichier disponible
     nbFiles: 1 fichier|{count} fichiers
+  alerts:
+    title: Alertes
+    unsupportedButHarvested:
+      title: Rapports moissonnés mais non supportés
+      severity: Sévérité
+      error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
+      empty: Aucun rapport non supporté n'a été moissonné !
+      deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -917,14 +924,6 @@ harvest:
       de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
-  dashboard:
-    title: Tableau de bord
-    unsupportedButHarvested:
-      title: Rapports moissonnés mais non supportés
-      severity: Sévérité
-      error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
-      empty: Aucun rapport non supporté n'a été moissonné !
-      deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
 elasticRoles:
   toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle

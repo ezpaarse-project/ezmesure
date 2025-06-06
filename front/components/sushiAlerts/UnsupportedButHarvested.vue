@@ -8,13 +8,13 @@
 
     <v-alert
       v-if="error"
-      :text="$t('harvest.dashboard.unsupportedButHarvested.error', { error: error.message })"
+      :text="$t('sushi.alerts.unsupportedButHarvested.error', { error: error.message })"
       type="error"
     />
 
     <v-empty-state
       v-if="unsupportedButHarvested.length <= 0"
-      :title="$t('harvest.dashboard.unsupportedButHarvested.empty')"
+      :title="$t('sushi.alerts.unsupportedButHarvested.empty')"
       icon="mdi-check"
       color="green"
     />
@@ -259,7 +259,7 @@ const unsupportedButHarvested = computed(() => {
 
 const headers = computed(() => [
   {
-    title: t('harvest.dashboard.unsupportedButHarvested.severity'),
+    title: t('sushi.alerts.unsupportedButHarvested.severity'),
     value: 'severity',
     align: 'center',
     sortable: true,
@@ -322,7 +322,7 @@ async function openHarvestMatrix(item) {
 
 function deleteHarvestedPeriod(item) {
   openConfirm({
-    text: t('harvest.dashboard.unsupportedButHarvested.deletePeriod', {
+    text: t('sushi.alerts.unsupportedButHarvested.deletePeriod', {
       reportId: item.reportId.toUpperCase(),
       institutionName: item.institution.name,
       beginDate: item.beginDate,

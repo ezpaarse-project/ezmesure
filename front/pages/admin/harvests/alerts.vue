@@ -1,7 +1,7 @@
 <template>
   <div>
     <SkeletonPageBar
-      :title="`${$t('menu.harvest.title')} / ${$t('harvest.dashboard.title')}`"
+      :title="`${$t('menu.harvest.group')} / ${$t('sushi.alerts.title')}`"
       icons
     />
 
@@ -11,7 +11,7 @@
           <template #title>
             <v-icon icon="mdi-file-alert" start />
 
-            {{ $t('harvest.dashboard.unsupportedButHarvested.title') }}
+            {{ $t('sushi.alerts.unsupportedButHarvested.title') }}
 
             <v-spacer />
 
@@ -28,7 +28,7 @@
           </template>
 
           <template #text>
-            <HarvestDashboardUnsupportedButHarvested
+            <SushiAlertsUnsupportedButHarvested
               :define-refresh="(def) => panelsRefresh.unsupportedButHarvested = def"
             />
           </template>
@@ -43,8 +43,6 @@ definePageMeta({
   layout: 'admin',
   middleware: ['sidebase-auth', 'terms', 'admin'],
 });
-
-const { t } = useI18n();
 
 const panelsRefresh = ref({});
 </script>
