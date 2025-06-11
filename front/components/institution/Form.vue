@@ -376,7 +376,15 @@
 import { fileToBase64 } from '@/lib/base64';
 import defaultLogo from '@/static/images/logo-etab.png';
 
-defineProps({
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default: () => undefined,
+  },
+  formOptions: {
+    type: Object,
+    default: () => undefined,
+  },
   showInstitution: {
     type: Boolean,
     default: false,
@@ -466,34 +474,6 @@ function addCustomProp(field) {
 
   showCustomPropMenu.value = false;
   nextTick(() => { customPropInputRefs.value[field.id]?.focus(); });
-}
-
-/**
- * Init the form, if `institution` is provided, pre-populate the form and will
- * update it.
- *
- * @param {Object} [item]
- * @param {Object} [opts]
- * @param {boolean} [opts.addAsMember]
- */
-function init(item, opts) {
-  originalName.value = item?.name;
-  institution.value = {
-    social: {},
-    customProps: [],
-    ...(item ?? {}),
-  };
-  logoPreview.value = null;
-  logoError.value = null;
-  openData.value = null;
-
-  if (!item) {
-    addAsMember.value = opts?.addAsMember !== false;
-  }
-
-  if (formRef.value) {
-    formRef.value.validate();
-  }
 }
 
 /**
@@ -602,6 +582,36 @@ async function removeLogo() {
   institution.value.logoId = null;
 }
 
+/**
+ * Init the form, if `institution` is provided, pre-populate the form and will
+ * update it.
+ */
+watch(props.modelValue, () => {
+  /**
+   * @type {Object} [opts]
+   * @property {boolean} [opts.addAsMember]
+   */
+  const opts = props.formOptions;
+
+  originalName.value = props.modelValue?.name;
+  institution.value = {
+    social: {},
+    customProps: [],
+    ...(props.modelValue ?? {}),
+  };
+  logoPreview.value = null;
+  logoError.value = null;
+  openData.value = null;
+
+  if (!props.modelValue) {
+    addAsMember.value = opts?.addAsMember !== false;
+  }
+
+  if (formRef.value) {
+    formRef.value.validate();
+  }
+}, { immediate: true });
+
 watch(showCustomPropMenu, (v) => {
   if (!v) {
     return;
@@ -629,9 +639,6 @@ onMounted(() => {
   formRef.value?.validate();
 });
 
-defineExpose({
-  init,
-});
 </script>
 
 <style scoped lang="scss">

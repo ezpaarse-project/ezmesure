@@ -19,7 +19,7 @@
             </v-col>
           </v-row>
 
-          <v-row v-if="user?.isAdmin">
+          <v-row>
             <v-col cols="12">
               <v-card
                 :title="$t('institutions.members.roles')"
@@ -31,7 +31,7 @@
                     :model-value="roles.has('guest')"
                     :label="$t('institutions.members.roleNames.guest')"
                     :append-icon="roleColors.get('guest').icon"
-                    :disabled="loading"
+                    :disabled="loading || !canEdit"
                     density="comfortable"
                     hide-details
                     @click="toggleRole('guest')"
@@ -47,7 +47,7 @@
                         :model-value="roles.has('contact:doc')"
                         :label="$t('institutions.members.documentary')"
                         :append-icon="roleColors.get('contact:doc').icon"
-                        :disabled="loading"
+                        :disabled="loading || !canEdit || !isAdmin"
                         density="comfortable"
                         hide-details
                         @click="toggleRole('contact:doc')"
@@ -56,7 +56,7 @@
                         :model-value="roles.has('contact:tech')"
                         :label="$t('institutions.members.technical')"
                         :append-icon="roleColors.get('contact:tech').icon"
-                        :disabled="loading"
+                        :disabled="loading || !canEdit || !isAdmin"
                         density="comfortable"
                         hide-details
                         @click="toggleRole('contact:tech')"
@@ -571,6 +571,9 @@ function toggleRole(role) {
     spacePermissions.value = new Map((spaces.value ?? []).map((s) => [s.id, preset.spaces]));
     actions.push(saveSpacePermissions);
   }
+
+  locked.value = preset.locked;
+
   save(actions);
 }
 

@@ -31,7 +31,7 @@ const schema = {
   itemUrl: Joi.string().trim().empty(null),
 
   autocomplete: Joi.object().empty(null),
-  institutionProperties: Joi.object(),
+  institutionProperties: Joi.array().items(Joi.object()),
 };
 
 /**

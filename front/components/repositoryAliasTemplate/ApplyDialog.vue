@@ -139,7 +139,7 @@ async function applyTemplate() {
 }
 
 function open(id) {
-  item.value = null;
+  result.value = null;
   loading.value = false;
   errorMessage.value = '';
 

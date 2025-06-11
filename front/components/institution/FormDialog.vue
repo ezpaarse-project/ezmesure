@@ -32,7 +32,8 @@
 
     <InstitutionForm
       v-else
-      ref="institutionFormRef"
+      :model-value="institutionData"
+      :form-options="formOptions"
       show-institution
       @submit="onSave($event)"
     >
@@ -58,14 +59,12 @@ const { t } = useI18n();
 
 const isOpen = ref(false);
 const institutionId = ref(null);
-const institutionFormRef = useTemplateRef('institutionFormRef');
 const formOptions = ref(null);
 
 const institutionData = ref(null);
 const loading = ref(false);
 const errorMessage = ref('');
 const errorIcon = ref('');
-
 const dialogMaxWidth = computed(() => {
   if (loading.value) { return 200; }
   if (errorMessage.value) { return 500; }
@@ -80,7 +79,7 @@ async function refreshForm() {
   loading.value = true;
 
   try {
-    institutionData.value = await $fetch(`/api/repository-alias-templates/${itemId.value}`, {
+    institutionData.value = await $fetch(`/api/institutions/${institutionId.value}`, {
       query: {
         include: 'customProps.field',
       },
@@ -89,8 +88,6 @@ async function refreshForm() {
     errorMessage.value = getErrorMessage(err, t('anErrorOccurred'));
     errorIcon.value = err?.statusCode === 404 ? 'mdi-file-hidden' : 'mdi-alert-circle';
   }
-
-  institutionFormRef.value?.init(institutionData.value, formOptions.value);
 
   loading.value = false;
 }

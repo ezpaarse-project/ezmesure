@@ -7,6 +7,7 @@ const guestPreset = {
   repositories: 'read',
   repositoryAliases: 'read',
   spaces: 'read',
+  locked: false,
 };
 
 const techContactPreset = {
@@ -14,6 +15,7 @@ const techContactPreset = {
   repositories: 'write',
   repositoryAliases: 'read',
   spaces: 'write',
+  locked: true,
 };
 
 const docContactPreset = {
@@ -21,6 +23,7 @@ const docContactPreset = {
   repositories: 'read',
   repositoryAliases: 'read',
   spaces: 'write',
+  locked: true,
 };
 
 export default new Map([

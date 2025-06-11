@@ -127,7 +127,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { getSession } = useAuth();
+const { refresh: refreshSession } = useAuth();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -297,7 +297,7 @@ async function copyMailList(items) {
 async function impersonateUser(item) {
   try {
     await $fetch(`/api/users/${item.username}/_impersonate`, { method: 'POST' });
-    await getSession();
+    await refreshSession();
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
     return;
