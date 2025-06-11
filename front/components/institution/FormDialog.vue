@@ -80,7 +80,7 @@ async function refreshForm() {
   loading.value = true;
 
   try {
-    institutionData.value = await $fetch(`/api/repository-alias-templates/${itemId.value}`, {
+    institutionData.value = await $fetch(`/api/repository-alias-templates/${institutionId.value}`, {
       query: {
         include: 'customProps.field',
       },
