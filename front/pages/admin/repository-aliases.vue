@@ -41,8 +41,8 @@
 
       <template #[`item.filters`]="{ value, item }">
         <v-chip
-          :text="`${value.length}`"
-          :variant="!value.length ? 'outlined' : undefined"
+          :text="`${value?.length ?? 0}`"
+          :variant="!value?.length ? 'outlined' : undefined"
           :disabled="!aliasFormDialogRef"
           prepend-icon="mdi-filter"
           size="small"
