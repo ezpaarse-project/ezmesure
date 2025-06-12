@@ -8,7 +8,7 @@
 
     <v-card
       v-else
-      :title="$t('institutions.toolbarTitle', { count: fieldData.length })"
+      :title="$t('institutions.toolbarTitle', { count: institutionProperties.length })"
       :subtitle="fieldLabel"
     >
       <v-empty-state
@@ -37,7 +37,7 @@
         v-else
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items="fieldData?.institutionProperties ?? []"
+        :items="institutionProperties"
         :loading="loading"
         :sort-by="['institution.name']"
         density="comfortable"
@@ -60,6 +60,7 @@ const errorMessage = ref('');
 const errorIcon = ref('');
 
 const fieldLabel = computed(() => (fieldData.value?.[locale.value === 'en' ? 'labelEn' : 'labelFr']));
+const institutionProperties = computed(() => fieldData.value?.institutionProperties ?? []);
 
 const sortBy = ref([{ key: 'institution.name', order: 'asc' }]);
 
