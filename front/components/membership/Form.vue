@@ -47,7 +47,7 @@
                         :model-value="roles.has('contact:doc')"
                         :label="$t('institutions.members.documentary')"
                         :append-icon="roleColors.get('contact:doc').icon"
-                        :disabled="loading || !canEdit || !isAdmin"
+                        :disabled="loading || !canEdit || !user?.isAdmin"
                         density="comfortable"
                         hide-details
                         @click="toggleRole('contact:doc')"
@@ -56,7 +56,7 @@
                         :model-value="roles.has('contact:tech')"
                         :label="$t('institutions.members.technical')"
                         :append-icon="roleColors.get('contact:tech').icon"
-                        :disabled="loading || !canEdit || !isAdmin"
+                        :disabled="loading || !canEdit || !user?.isAdmin"
                         density="comfortable"
                         hide-details
                         @click="toggleRole('contact:tech')"
