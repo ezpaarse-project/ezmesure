@@ -163,7 +163,7 @@ exports.updateSushi = async (ctx) => {
     if (sushi.active !== body.active) {
       data.activeUpdatedAt = new Date();
     }
-    if (sushi.active !== body.active) {
+    if (sushi.archived !== body.archived) {
       data.archivedUpdatedAt = new Date();
     }
   }
