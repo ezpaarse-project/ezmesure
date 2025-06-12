@@ -75,6 +75,9 @@
       "name": "Logs"
     },
     {
+      "name": "Activity"
+    },
+    {
       "name": "Users"
     }
   ],
@@ -2517,6 +2520,168 @@
           "Basics"
         ],
         "security": []
+      }
+    },
+    "/actions": {
+      "get": {
+        "summary": "Get actions",
+        "operationId": "get-actions",
+        "description": "Get actions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Actions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "author",
+                  "author.memberships",
+                  "author.memberships.repositoryPermissions",
+                  "author.memberships.repositoryAliasPermissions",
+                  "author.memberships.spacePermissions",
+                  "author.elasticRoles",
+                  "institution"
+                ]
+              }
+            }
+          },
+          {
+            "name": "date:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "date:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "authorId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Action"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actions/:id": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get an action",
+        "operationId": "get-action",
+        "description": "Get an action",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Actions"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Action"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/custom-fields": {
