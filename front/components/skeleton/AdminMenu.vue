@@ -135,6 +135,17 @@
       />
 
       <v-list-item
+        v-tooltip="$t('menu.actions.tooltip')"
+        :title="$t('menu.actions.title')"
+        to="/admin/actions"
+        prepend-icon="mdi-history"
+      >
+        <template #append>
+          <v-badge content="BETA" color="primary" inline />
+        </template>
+      </v-list-item>
+
+      <v-list-item
         :title="$t('menu.activity')"
         to="/admin/activity"
         prepend-icon="mdi-history"

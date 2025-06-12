@@ -15,6 +15,9 @@ menu:
   institutions: Établissements
   sushiEndpoints: Points d'accès COUNTER
   activity: Activité
+  actions:
+    title: Actions
+    tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
   profile: Profil
   members: Membres
   users: Utilisateurs

@@ -15,6 +15,9 @@ menu:
   institutions: Institutions
   sushiEndpoints: COUNTER endpoints
   activity: Activity
+  actions:
+    title: Actions
+    tooltip: New version of the activity, actions will being rolled out progressively
   profile: Profile
   members: Members
   users: Users
