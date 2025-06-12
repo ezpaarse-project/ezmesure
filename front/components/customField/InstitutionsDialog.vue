@@ -8,7 +8,7 @@
 
     <v-card
       v-else
-      :title="$t('repositories.institutions')"
+      :title="$t('institutions.toolbarTitle', { count: fieldData.length })"
       :subtitle="fieldLabel"
     >
       <v-empty-state
