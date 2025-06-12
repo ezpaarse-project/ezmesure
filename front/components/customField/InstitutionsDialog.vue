@@ -41,7 +41,14 @@
         :loading="loading"
         :sort-by="['institution.name']"
         density="comfortable"
-      />
+      >
+        <template #[`item.institution.name`]="{ item }">
+          <InstitutionAvatar :institution="item.institution" size="x-small" class="mr-2" />
+          <NuxtLink :to="`/admin/institutions/${item.institution.id}`">
+            {{ item.institution.name }}
+          </NuxtLink>
+        </template>
+      </v-data-table>
     </v-card>
   </v-dialog>
 </template>
@@ -65,6 +72,11 @@ const institutionProperties = computed(() => fieldData.value?.institutionPropert
 const sortBy = ref([{ key: 'institution.name', order: 'asc' }]);
 
 const headers = computed(() => [
+  // {
+  //   title: '',
+  //   value: 'logo',
+  //   width: 0,
+  // },
   {
     title: t('name'),
     value: 'institution.name',
