@@ -1,8 +1,8 @@
-const { schema, includableFields } = require('../../../entities/actions.dto');
+const { schema, includableFields } = require('../../entities/actions.dto');
 
-const { prepareStandardQueryParams } = require('../../../services/std-query');
+const { prepareStandardQueryParams } = require('../../services/std-query');
 
-const ActionsService = require('../../../entities/actions.service');
+const ActionsService = require('../../entities/actions.service');
 
 const standardQueryParams = prepareStandardQueryParams({
   schema,
@@ -12,7 +12,19 @@ const standardQueryParams = prepareStandardQueryParams({
 exports.standardQueryParams = standardQueryParams;
 
 exports.getAll = async (ctx) => {
+  const {
+    'date:from': from,
+    'date:to': to,
+  } = ctx.query;
+
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+
+  if (from || to) {
+    prismaQuery.where.date = {
+      gte: from,
+      lte: to,
+    };
+  }
 
   const actionsService = new ActionsService();
 

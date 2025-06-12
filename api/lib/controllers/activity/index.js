@@ -6,11 +6,7 @@ const handleElasticErrors = require('../../utils/elastic-error-handler');
 const { requireJwt, requireUser, requireAdmin } = require('../../services/auth');
 const { search, getOne } = require('./actions');
 
-const postgresActions = require('./_postgres');
-
 router.use(requireJwt, requireUser, requireAdmin);
-
-router.use(postgresActions.prefix('/_postgres').middleware());
 
 const stringOrArray = Joi.alternatives().try(
   Joi.string().trim().min(1),
