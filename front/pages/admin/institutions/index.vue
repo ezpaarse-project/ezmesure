@@ -387,14 +387,13 @@ function deleteInstitutions(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/institutions/${item.id}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/institutions/${item.id}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {
@@ -423,18 +422,15 @@ function toggleInstitutions(items) {
     ),
     onAgree: async () => {
       const results = await Promise.all(
-        toActivate.map((item) => {
-          try {
-            const value = !item.validated;
-            return $fetch(`/api/institutions/${item.id}/validated`, {
-              method: 'PUT',
-              body: { value },
-            });
-          } catch (err) {
+        toActivate.map(
+          (item) => $fetch(`/api/institutions/${item.id}/validated`, {
+            method: 'PUT',
+            body: { value: !item.validated },
+          }).catch((err) => {
             snacks.error(t('cannotUpdateItem', { id: item.name || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+            return null;
+          }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

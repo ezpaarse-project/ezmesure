@@ -39,11 +39,14 @@
         />
       </template>
 
-      <template #[`item.filters`]="{ value }">
-        <v-icon
-          v-if="!!value"
-          icon="mdi-filter"
+      <template #[`item.filters`]="{ value, item }">
+        <v-chip
+          :text="`${value.length}`"
+          :variant="!value.length ? 'outlined' : undefined"
+          :disabled="!aliasFormDialogRef"
+          prepend-icon="mdi-filter"
           size="small"
+          @click="openFiltersDialog(item)"
         />
       </template>
 
@@ -186,7 +189,7 @@ const headers = computed(() => [
     sortable: true,
   },
   {
-    title: t('repositoryAliases.filtered'),
+    title: t('repoAliasTemplates.filters'),
     value: 'filters',
     align: 'center',
   },
@@ -195,6 +198,14 @@ const headers = computed(() => [
     value: 'repository.type',
     align: 'center',
     sortable: true,
+  },
+  {
+    title: t('repositoryAliases.template'),
+    value: 'templateId',
+    align: 'center',
+    sortable: true,
+    nowrap: true,
+    width: 50,
   },
   {
     title: t('repositories.institutions'),
@@ -249,14 +260,13 @@ function deleteAliases(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/repository-aliases/${item.pattern}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.pattern }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/repository-aliases/${item.pattern}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.pattern }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

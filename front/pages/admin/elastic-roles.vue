@@ -40,13 +40,19 @@
 
       <template #[`item.institutions`]="{ item, value }">
         <v-chip
-          :text="`${value.length}`"
           :variant="!value.length ? 'outlined' : undefined"
           :disabled="!institutionsDialogRef"
-          prepend-icon="mdi-domain"
           size="small"
           @click="institutionsDialogRef?.open(item)"
-        />
+        >
+          <v-icon icon="mdi-domain" start />
+          {{ value.length }}
+
+          <template v-if="(item.conditions?.length ?? 0) > 0">
+            <v-icon icon="mdi-format-list-checks" start class="ml-2" />
+            {{ item.conditions.length }}
+          </template>
+        </v-chip>
       </template>
 
       <template #[`item.repositoryPermissions`]="{ value, item }">
@@ -304,14 +310,13 @@ function deleteRoles(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/elastic-roles/${item.name}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.name }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/elastic-roles/${item.name}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.name }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

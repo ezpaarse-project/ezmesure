@@ -20,8 +20,8 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').RepositoryAlias} RepositoryAlias
  * @typedef {import('@prisma/client').RepositoryAliasPermission} RepositoryAliasPermission
  *
- * @typedef {RepositoryAlias & { permissions: RepositoryAliasPermission[] }} OldRepositoryAlias
- * @typedef {Repository & { permissions: RepositoryPermission[], institutions: Institution[], aliases: OldRepositoryAlias[], elasticRolePermissions: ElasticRoleRepositoryPermission[] }} OldRepository
+ * @typedef {{ permissions: true, institutions: true, elasticRolePermissions: true, aliases: { include: { permissions: true } } }} OldRepositoryInclude
+ * @typedef {import('@prisma/client').Prisma.RepositoryGetPayload<{ include: OldRepositoryInclude }>} OldRepository
  * @typedef {{deleteResult: Repository, deletedRepository: OldRepository }} RepositoryRemoved
  * @typedef {{newRepository: Repository, oldRepository: OldRepository }} RepositoryUpdated
  */

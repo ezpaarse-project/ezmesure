@@ -66,7 +66,7 @@
           variant="text"
           density="comfortable"
           color="blue"
-          @click="customFieldFormDialogRef.open(item)"
+          @click="customFieldFormDialogRef?.open(item)"
         />
         <v-btn
           v-tooltip:top="$t('delete')"
@@ -194,14 +194,13 @@ function deleteCustomField(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/custom-fields/${item.id}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/custom-fields/${item.id}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.id }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

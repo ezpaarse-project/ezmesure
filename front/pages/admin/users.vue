@@ -127,7 +127,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
-const { getSession } = useAuth();
+const { refresh: refreshSession } = useAuth();
 const { isSupported: clipboard, copy } = useClipboard();
 const { openConfirm } = useDialogStore();
 const snacks = useSnacksStore();
@@ -231,14 +231,13 @@ function deleteUsers(items) {
     agreeIcon: 'mdi-delete',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/users/${item.username}`, { method: 'DELETE' });
-          } catch (err) {
-            snacks.error(t('cannotDeleteItem', { id: item.username }), err);
-            return Promise.resolve(null);
-          }
-        }),
+        toDelete.map(
+          (item) => $fetch(`/api/users/${item.username}`, { method: 'DELETE' })
+            .catch((err) => {
+              snacks.error(t('cannotDeleteItem', { id: item.username }), err);
+              return null;
+            }),
+        ),
       );
 
       if (!results.some((r) => !r)) {
@@ -298,7 +297,7 @@ async function copyMailList(items) {
 async function impersonateUser(item) {
   try {
     await $fetch(`/api/users/${item.username}/_impersonate`, { method: 'POST' });
-    await getSession();
+    await refreshSession();
   } catch (err) {
     snacks.error(t('anErrorOccurred'), err);
     return;

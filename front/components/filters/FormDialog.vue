@@ -14,6 +14,8 @@
       </template>
 
       <template #actions>
+        <v-spacer />
+
         <v-btn
           :text="$t('cancel')"
           variant="text"

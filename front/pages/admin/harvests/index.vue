@@ -102,7 +102,7 @@ const toolbarTitle = computed(() => {
   if (itemLength.value.current !== itemLength.value.total) {
     count = `${itemLength.value.current}/${itemLength.value.total}`;
   }
-  return t('harvest.toolbarTitle', { count: count ?? '?' });
+  return `${t('menu.harvest.title')} / ${t('harvest.toolbarTitle', { count: count ?? '?' })}`;
 });
 
 async function refresh() {

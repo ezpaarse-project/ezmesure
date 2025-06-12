@@ -24,9 +24,15 @@ menu:
   report: Reports
   adminReport: ezREEPORT
   repositories: Repositories
-  repositoryAliases: Repository aliases
+  repositoryAliases:
+    group: Repository aliases
+    aliases: Aliases
+    templates: Templates
   spaces: Spaces
-  harvest: Harvest
+  harvest:
+    group: Harvest
+    sessions: Sessions
+    alerts: Alertes
   sync: Synchronisation
   customFields: Custom fields
 home:
@@ -668,6 +674,14 @@ sushi:
     title: Available files
     noFilesAvailable: No files available
     nbFiles: 1 file|{count} files
+  alerts:
+    title: Alerts
+    unsupportedButHarvested:
+      title: Unsupported reports but still harvested
+      severity: Severity
+      error: An error occurred while searching for harvested but unsupported reports
+      empty: No unsupported reports have been harvested!
+      deletePeriod: "You'll delete the harvested report \"{reportId}\" of the matrix from \"{institutionName}\" for the period \"{beginDate} - {endDate}\". This won't delete the data. This action is irreversible."
   deleteReason: Reason for deletion
   deleteReasons:
     mistake: I entered the identifiers by mistake
@@ -825,6 +839,7 @@ repositoryAliases:
     |Manage {count} aliases
   alias: Alias
   target: Target repository pattern
+  template: Template
   filtered: Filtered ?
   aliases: Repository aliases
   noAliases: No repository alias has been assigned yet
@@ -850,6 +865,31 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+repoAliasTemplates:
+  toolbarTitle: Alias templates ({count})
+  manageTemplates: >
+    Manage templates
+    |Manage {count} templates
+  target: Target repository
+  conditions: Conditions
+  conditionsDescription: What conditions must meet institutions ?
+  filters: Filters
+  filtersTitle: Filter templates
+  aliases: Repository aliases
+  aliasesPattern: Aliases pattern
+  noFilters: No filters
+  noConditions: No conditions
+  noTemplates: No template has been created yet
+  deleteNbTemplates: You are about to delete {number} alias templates.
+  newTemplate: New alias template
+  modifyTemplate: Modify an alias template
+  applyTemplate: Apply template [{id}]
+  applyTemplateDesc: This will trigger the creation of repository aliases for all institutions matching the conditions.
+  dryRun: Dry run
+  applyToSeeAliases: Apply the template to see the affected aliases
+  noAliasCreated: No alias has been created
+  applyHadNoEffect: The application of the template had no effect. No institution matched the conditions.
+
 spaces:
   spaces: Spaces
   toolbarTitle: Spaces ({count})
@@ -877,7 +917,7 @@ spaces:
   filters:
     title: Filter spaces
 harvest:
-  toolbarTitle: Harvests ({count})
+  toolbarTitle: Sessions ({count})
   sessions:
     pendingSession: Pending harvest...
     startedAt: Harvest started {date}
@@ -989,6 +1029,11 @@ customFields:
   descriptionFr: French description
   descriptionEn: English description
   manageCustomField: Manage custom field|Manage {count} custom fields
+statuses:
+  created: Created
+  updated: Updated
+  deleted: Deleted
+  error: Error
 anErrorOccurred: An error occurred
 url: URL
 type: Type
@@ -1058,6 +1103,9 @@ archive: Archive
 unarchive: Unarchive
 "yes": "Yes"
 "no": "No"
+active: Active
+inactive: Inactive
+activeSwitch: Activate/Deactivate
 validate: Validate
 invalidate: Invalidate
 reason: "Reason: {reason}"
@@ -1076,3 +1124,4 @@ retry: Retry
 applyToAll: Apply to all
 minValueError: "The value is too small. Minimum: {min}"
 maxValueError: "The value is too big. Maximum: {max}"
+synchronize: Synchronize

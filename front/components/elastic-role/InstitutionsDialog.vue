@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :model-value="isOpen"
-    width="500"
+    width="700"
     @update:model-value="close()"
   >
     <ElasticRoleInstitutions

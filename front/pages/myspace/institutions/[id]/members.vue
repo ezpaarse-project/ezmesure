@@ -338,16 +338,14 @@ function deleteMembers(items) {
     agreeIcon: 'mdi-account-off',
     onAgree: async () => {
       const results = await Promise.all(
-        toDelete.map((item) => {
-          try {
-            return $fetch(`/api/institutions/${institution.value.id}/memberships/${item.username}`, {
-              method: 'DELETE',
-            });
-          } catch (err) {
+        toDelete.map(
+          (item) => $fetch(`/api/institutions/${institution.value.id}/memberships/${item.username}`, {
+            method: 'DELETE',
+          }).catch((err) => {
             snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
-            return Promise.resolve(null);
-          }
-        }),
+            return null;
+          }),
+        ),
       );
 
       if (!results.some((r) => !r)) {

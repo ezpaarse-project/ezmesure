@@ -5,6 +5,7 @@
     <mj-attributes>
       <mj-all font-family="Roboto, Helvetica, sans-serif"></mj-all>
       <mj-text font-weight="400" font-size="14px" color="#616161" line-height="24px"></mj-text>
+      <mj-table font-weight="400" color="#616161"></mj-table>
       <mj-section padding="0px" />
       <mj-class name="headline" font-weight="500" font-size="20px" />
       <mj-class name="subheading" font-weight="500" font-size="16px" />
