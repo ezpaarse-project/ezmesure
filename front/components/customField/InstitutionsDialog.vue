@@ -35,18 +35,18 @@
 
       <v-data-table
         v-else
-        v-model:sort-by="sortBy"
         :headers="headers"
         :items="institutionProperties"
         :loading="loading"
-        :sort-by="['institution.name']"
+        :sort-by="[{ key: 'institution.name', order: 'asc' }]"
         density="comfortable"
       >
         <template #[`item.institution.name`]="{ item }">
           <InstitutionAvatar :institution="item.institution" size="x-small" class="mr-2" />
-          <NuxtLink :to="`/admin/institutions/${item.institution.id}`">
+
+          <nuxt-link :to="`/admin/institutions/${item.institution.id}`">
             {{ item.institution.name }}
-          </NuxtLink>
+          </nuxt-link>
         </template>
       </v-data-table>
     </v-card>
@@ -69,22 +69,17 @@ const errorIcon = ref('');
 const fieldLabel = computed(() => (fieldData.value?.[locale.value === 'en' ? 'labelEn' : 'labelFr']));
 const institutionProperties = computed(() => fieldData.value?.institutionProperties ?? []);
 
-const sortBy = ref([{ key: 'institution.name', order: 'asc' }]);
-
 const headers = computed(() => [
-  // {
-  //   title: '',
-  //   value: 'logo',
-  //   width: 0,
-  // },
   {
     title: t('name'),
     value: 'institution.name',
     sortable: true,
+    maxWidth: '700px',
   },
   {
     title: t('value'),
     value: 'value',
+    maxWidth: '200px',
   },
 ]);
 
