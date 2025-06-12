@@ -1533,6 +1533,30 @@
           "deletedAt": {
             "$ref": "#/components/schemas/ItemDeleteDate"
           },
+          "active": {
+            "description": "Whether the credentials are active",
+            "type": "boolean"
+          },
+          "archived": {
+            "description": "Whether the credentials are archived",
+            "type": "boolean"
+          },
+          "activeUpdatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Date of the last change of the credentials active state",
+            "readOnly": true
+          },
+          "archivedUpdatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Date of the last change of the credentials archived state",
+            "readOnly": true
+          },
           "institution": {
             "description": "The institution that owns the credentials",
             "$ref": "#/components/schemas/Institution"
