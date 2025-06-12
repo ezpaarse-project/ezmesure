@@ -202,6 +202,7 @@ exports.deleteOne = async (ctx) => {
         type: 'sushi/delete',
         data: {
           reason,
+          vendor: sushi.endpoint?.vendor,
           oldState: {
             ...sushi,
             institution: undefined,
