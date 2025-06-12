@@ -621,6 +621,7 @@ sushi:
   unableToGetLockStatus: Failed to retrieve credentials lock status
   managementIsLocked: COUNTER credentials management is currently locked.
   deleting: Deletion in progress
+  deletingWaiting: Waiting for deletion
   deletingError: "Unable to delete credentials: {error}"
   deletionTask: Deletion state
   nInstitutions: >

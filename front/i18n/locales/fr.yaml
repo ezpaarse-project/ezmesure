@@ -628,6 +628,7 @@ sushi:
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants COUNTER est actuellement verrouillée.
   deleting: Suppression en cours
+  deletingWaiting: En attente de suppression
   deletingError: "Impossible de supprimer l'identifiant: {error}"
   deletionTask: État de suppression
   nInstitutions: >

@@ -302,7 +302,7 @@
       <template #[`item.deletionTask`]="{ value, item }">
         <v-progress-circular
           v-if="item.deletedAt"
-          v-tooltip:top="value?.error ? $t('sushi.deleting') : $t('sushi.deletingError', value)"
+          v-tooltip:top="value ? (value.error ? $t('sushi.deleting') : $t('sushi.deletingError', { ...value })) : $t('sushi.deletingWaiting')"
           :value="value?.progress * 100"
           :color="value?.canceled ? 'red' : 'primary'"
           :indeterminate="!value"
@@ -316,7 +316,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-menu>
+        <v-menu v-if="!item.deletedAt">
           <template #activator="{ props: menu }">
             <v-btn
               icon="mdi-cog"
@@ -330,14 +330,14 @@
             <v-list-item
               v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('modify')"
-              :disabled="!canEdit || item.deletedAt"
+              :disabled="!canEdit"
               prepend-icon="mdi-pencil"
               @click="sushiFormRef?.open(item, { institution })"
             />
             <v-list-item
               v-if="sushiFormRef && currentTab === 'active'"
               :title="$t('duplicate')"
-              :disabled="!canEdit || item.deletedAt"
+              :disabled="!canEdit"
               prepend-icon="mdi-content-copy"
               @click="sushiFormRef?.open({ ...item, id: null }, { institution })"
             />
@@ -350,7 +350,7 @@
             <v-list-item
               v-if="currentTab === 'archived'"
               :title="$t('delete')"
-              :disabled="!canEdit || item.deletedAt"
+              :disabled="!canEdit"
               prepend-icon="mdi-delete"
               @click="deleteSushis([item])"
             />
@@ -359,49 +359,42 @@
 
             <v-list-item
               :title="$t('institutions.sushi.checkCredentials')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-connection"
               @click="checkConnections([item])"
             />
             <v-list-item
               v-if="user?.isAdmin"
               :title="$t('institutions.sushi.resetChecks')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-restore"
               @click="resetConnections([item])"
             />
             <v-list-item
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-table-headers-eye"
               @click="harvestMatrixRef?.open(item)"
             />
             <v-list-item
               v-if="reportsRef"
               :title="$t('reports.supportedReports')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-file-search"
               @click="reportsRef?.open(item)"
             />
             <v-list-item
               v-if="filesRef"
               :title="$t('sushi.showFiles')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-file-tree"
               @click="filesRef?.open(item)"
             />
             <v-list-item
               v-if="historyRef"
               :title="$t('tasks.history')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-history"
               @click="historyRef?.open(item)"
             />
             <v-list-item
               v-if="clipboard"
               :title="$t('sushi.copyId')"
-              :disabled="item.deletedAt"
               prepend-icon="mdi-identifier"
               @click="copySushiId(item)"
             />
