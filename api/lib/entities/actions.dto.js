@@ -29,6 +29,11 @@ const schema = {
  */
 const includableFields = [
   'author',
+  'author.memberships',
+  'author.memberships.repositoryPermissions',
+  'author.memberships.repositoryAliasPermissions',
+  'author.memberships.spacePermissions',
+  'author.elasticRoles',
   'institution',
 ];
 
