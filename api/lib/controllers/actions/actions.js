@@ -1,3 +1,5 @@
+const { startOfDay, endOfDay } = require('date-fns');
+
 const { schema, includableFields } = require('../../entities/actions.dto');
 
 const { prepareStandardQueryParams } = require('../../services/std-query');
@@ -18,11 +20,15 @@ exports.getAll = async (ctx) => {
   } = ctx.query;
 
   const prismaQuery = standardQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where = prismaQuery.where || {};
+
+  // Remove date filters as handled later
+  prismaQuery.where.AND = prismaQuery.where.AND.filter((filter) => !filter.date);
 
   if (from || to) {
     prismaQuery.where.date = {
-      gte: from,
-      lte: to,
+      gte: from && startOfDay(from),
+      lte: to && endOfDay(to),
     };
   }
 

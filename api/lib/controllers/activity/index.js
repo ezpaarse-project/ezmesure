@@ -25,8 +25,8 @@ router.route({
       order: Joi.string().valid('asc', 'desc'),
       action: stringOrArray,
       username: stringOrArray,
-      'datetime:from': Joi.date().iso().raw(),
-      'datetime:to': Joi.date().iso().raw(),
+      'datetime:from': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
+      'datetime:to': Joi.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/),
     },
   },
 });
