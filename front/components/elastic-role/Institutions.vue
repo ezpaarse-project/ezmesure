@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :title="$t('elasticRoles.institutions')"
+    :title="$t('institutions.toolbarTitle', { count: institutions.length })"
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-domain"
   >
@@ -76,31 +76,34 @@
         {{ $t('elasticRoles.noInstitutions') }}
       </div>
 
-      <v-list v-else density="compact" lines="two">
-        <v-list-item
-          v-for="institution in institutions"
-          :key="institution.id"
-          :title="institution.name"
-          :subtitle="institution.acronym"
-          :to="`/admin/institutions/${institution.id}`"
-        >
-          <template #prepend>
-            <InstitutionAvatar :institution="institution" />
-          </template>
+      <v-data-table
+        v-else
+        :items="institutions"
+        :headers="headers"
+        :sort-by="[{ key: 'institution.name', order: 'asc' }]"
+        density="comfortable"
+      >
+        <template #[`item.name`]="{ item }">
+          <InstitutionAvatar :institution="item" size="small" class="mr-4" />
 
-          <template v-if="!hasConditions" #append>
-            <v-btn
-              v-tooltip="$t('revoke')"
-              icon="mdi-office-building-remove"
-              variant="text"
-              size="small"
-              density="comfortable"
-              color="red"
-              @click.prevent="removeInstitution(institution)"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
+          <nuxt-link :to="`/admin/institutions/${item.id}`">
+            {{ item.name }}
+          </nuxt-link>
+        </template>
+
+        <template #[`item.actions`]="{ item }">
+          <v-btn
+            v-if="!hasConditions"
+            v-tooltip="$t('revoke')"
+            icon="mdi-office-building-remove"
+            variant="text"
+            size="small"
+            density="comfortable"
+            color="red"
+            @click.prevent="removeInstitution(item)"
+          />
+        </template>
+      </v-data-table>
     </template>
 
     <template v-if="$slots.actions" #actions>
@@ -138,11 +141,19 @@ const dryRun = ref(false);
 const conditions = ref([]);
 const hasConditions = computed(() => (conditions.value || []).length > 0);
 
-watch(
-  () => props.role?.conditions,
-  (v) => { conditions.value = JSON.parse(JSON.stringify(v ?? [])); },
-  { immediate: true },
-);
+const headers = computed(() => [
+  {
+    title: t('name'),
+    value: 'name',
+    sortable: true,
+    maxWidth: '700px',
+  },
+  {
+    title: t('actions'),
+    value: 'actions',
+    align: 'center',
+  },
+]);
 
 async function saveConditions() {
   loading.value = true;
@@ -212,4 +223,10 @@ async function removeInstitution(item) {
     snacks.error(t('anErrorOccurred'), err);
   }
 }
+
+watch(
+  () => props.role?.conditions,
+  (v) => { conditions.value = JSON.parse(JSON.stringify(v ?? [])); },
+  { immediate: true },
+);
 </script>

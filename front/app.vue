@@ -1,16 +1,16 @@
 <template>
   <v-app>
-    <ClientOnly>
+    <client-only>
       <SkeletonAppBar @model-value:menu="updateVisibleMenu()" />
       <SkeletonSnacks />
       <SkeletonConfirmDialog />
 
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
+      <nuxt-layout>
+        <nuxt-page />
+      </nuxt-layout>
 
       <SkeletonSushiQueueStatus />
-    </ClientOnly>
+    </client-only>
   </v-app>
 </template>
 
