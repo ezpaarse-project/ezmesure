@@ -406,44 +406,34 @@ async function unarchiveSushis(items) {
     return;
   }
 
-  openConfirm({
-    text: t(
-      'sushi.archiveNbCredentials',
-      toArchive.length,
-    ),
-    agreeText: t('archive'),
-    agreeIcon: 'mdi-archive',
-    onAgree: async () => {
-      const results = await Promise.all(
-        toArchive.map(async (item) => {
-          activeLoadingMap.value.set(item.id, true);
-          try {
-            await $fetch(`/api/sushi/${item.id}`, {
-              method: 'PATCH',
-              body: { archived: false },
-            });
+  const results = await Promise.all(
+    toArchive.map(async (item) => {
+      activeLoadingMap.value.set(item.id, true);
+      try {
+        await $fetch(`/api/sushi/${item.id}`, {
+          method: 'PATCH',
+          body: { archived: false },
+        });
 
-            // eslint-disable-next-line no-param-reassign
-            item.active = false; // Shows as inactive to show progress
-          } catch (err) {
-            snacks.error(t('sushi.cannotArchiveItems', { id: item.name || item.id }), err);
-          } finally {
-            activeLoadingMap.value.set(item.id, false);
-          }
-        }),
-      );
-
-      if (!results.some((r) => !r)) {
-        snacks.success(t('sushi.itemsArchived', { count: toArchive.length }));
+        // eslint-disable-next-line no-param-reassign
+        item.active = false; // Shows as inactive to show progress
+      } catch (err) {
+        snacks.error(t('sushi.cannotArchiveItems', { id: item.name || item.id }), err);
+      } finally {
+        activeLoadingMap.value.set(item.id, false);
       }
+    }),
+  );
 
-      if (!items) {
-        selectedSushi.value = [];
-      }
+  if (!results.some((r) => !r)) {
+    snacks.success(t('sushi.itemsArchived', { count: toArchive.length }));
+  }
 
-      await refresh();
-    },
-  });
+  if (!items) {
+    selectedSushi.value = [];
+  }
+
+  await refresh();
 }
 
 /**
