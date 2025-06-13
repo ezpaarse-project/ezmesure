@@ -502,6 +502,7 @@ institutions:
     resumeEntryQuestion: Resume your entry ?
     resumeEntryDesc: You have declared the completion of your credentials on {date}. Do you want to resume your entry ?
     harvest: Harvest
+    archiveSwitch: Archive/Unarchive
     readyPopup:
       inProgress: Your credentials are still being entered. When they are ready to be harvested, declare the completion of your entry by clicking on the button below.
       completed: You have declared the completion of your credentials on {date}. These will be eligible to be included in future harvesting rounds. If adjustments are still needed, please declare it by clicking on the button below.
