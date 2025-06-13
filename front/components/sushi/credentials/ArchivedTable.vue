@@ -298,10 +298,12 @@ const {
   },
 });
 
-props.defineTab?.({
-  refresh,
-  itemLength,
-  query,
+onMounted(() => {
+  props.defineTab?.({
+    refresh,
+    itemLength,
+    query,
+  });
 });
 
 /**
