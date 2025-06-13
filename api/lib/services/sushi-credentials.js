@@ -110,7 +110,7 @@ async function startCredentialsDataDeletion(sushiCredentials, indexPattern, oldI
   // Start deletion of data
   const { body } = await deleteByQuery(indexPattern, {
     bool: {
-      should: ids.map((id) => ({ term: { X_Sushi_ID: id } })),
+      filter: [{ terms: { X_Sushi_ID: ids } }],
     },
   });
 
