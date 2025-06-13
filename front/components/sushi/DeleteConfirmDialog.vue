@@ -146,7 +146,7 @@ async function deleteSushis() {
 
 async function cancel() {
   disagreeLoading.value = true;
-  await data.onDisagree?.();
+  await data.value.onDisagree?.();
   closeConfirm(false);
   disagreeLoading.value = false;
 }
@@ -154,7 +154,7 @@ async function cancel() {
 async function agree() {
   agreeLoading.value = true;
   await deleteSushis();
-  await data.onAgree?.();
+  await data.value.onAgree?.();
   closeConfirm(true);
   agreeLoading.value = false;
 }
