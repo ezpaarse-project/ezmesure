@@ -605,7 +605,7 @@ tasks:
 sushi:
   filters:
     title: Filtrer les identifiants
-  credentials: Identifiants
+  credentials: Identifiants COUNTER
   credentialsCount: >
     1 identifiant
     |{count} identifiants

@@ -601,7 +601,7 @@ tasks:
 sushi:
   filters:
     title: Filters credentials
-  credentials: Credentials
+  credentials: COUNTER Credentials
   credentialsCount: "{count} credentials"
   auth: Authentication
   copyId: Copy ID
