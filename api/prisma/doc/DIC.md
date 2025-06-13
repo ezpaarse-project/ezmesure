@@ -157,6 +157,7 @@ A repository (a section of elasticsearch allocated to an institution)
 | permissions            | `RepositoryPermission[]`            | Member permissions associated to this repository |            |         |
 | aliases                | `RepositoryAlias[]`                 | Aliases associated to this repository            |            |         |
 | elasticRolePermissions | `ElasticRoleRepositoryPermission[]` | Permissions granted by role for this repository  |            |         |
+| aliasTemplates         | `RepositoryAliasTemplate[]`         | Alias templates that target this repository      |            |         |
 
 ### RepositoryPermission
 
@@ -175,6 +176,7 @@ A repository alias (alias for a section of elasticsearch)
 
 | Property               | Type                                     | Description                                                                 | Attributes | Default |
 |------------------------|------------------------------------------|-----------------------------------------------------------------------------|------------|---------|
+| template               | `RepositoryAliasTemplate?`               | The template of the alias                                                   |            |         |
 | institutions           | `Institution[]`                          | The institution this repository is associated to                            |            |         |
 | createdAt              | `DateTime`                               | Creation date                                                               |            | `now()` |
 | updatedAt              | `DateTime`                               | Latest update date                                                          |            |         |
@@ -183,6 +185,22 @@ A repository alias (alias for a section of elasticsearch)
 | filters                | `Json?`                                  | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }]) |            |         |
 | permissions            | `RepositoryAliasPermission[]`            | Member permissions associated to this alias                                 |            |         |
 | elasticRolePermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions granted by role for this alias                                  |            |         |
+
+### RepositoryAliasTemplate
+
+A repository alias template (used to generate repository aliases)
+
+| Property   | Type                | Description                                                                        | Attributes | Default |
+|------------|---------------------|------------------------------------------------------------------------------------|------------|---------|
+| id         | `String`            | ID                                                                                 | Id         |         |
+| createdAt  | `DateTime`          | Creation date                                                                      |            | `now()` |
+| updatedAt  | `DateTime`          | Latest update date                                                                 |            |         |
+| pattern    | `String`            | The alias pattern (ex: x-alias-istex-{id}-ezpaarse)                                |            |         |
+| active     | `Boolean`           | Whether the template is active or not                                              |            | `true`  |
+| repository | `Repository`        | The repository                                                                     |            |         |
+| filters    | `Json[]`            | Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])        |            |         |
+| conditions | `Json[]`            | Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }]) |            |         |
+| aliases    | `RepositoryAlias[]` | The aliases that were generated with this template                                 |            |         |
 
 ### RepositoryAliasPermission
 
@@ -198,16 +216,17 @@ A alias permission (access rights of a member for a specific alias)
 
 Custom role to give to users
 
-| Property                   | Type                                     | Description                                       | Attributes | Default |
-|----------------------------|------------------------------------------|---------------------------------------------------|------------|---------|
-| name                       | `String`                                 | Name of the role                                  | Id         |         |
-| users                      | `User[]`                                 | Users using this roles                            |            |         |
-| institutions               | `Institution[]`                          | Institutions using this roles                     |            |         |
-| createdAt                  | `DateTime`                               | Creation date                                     |            | `now()` |
-| updatedAt                  | `DateTime`                               | Latest update date                                |            |         |
-| repositoryPermissions      | `ElasticRoleRepositoryPermission[]`      | Permissions that role give to repositories        |            |         |
-| repositoryAliasPermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions that role gives to repository aliases |            |         |
-| spacePermissions           | `ElasticRoleSpacePermission[]`           | Permissions that role gives to spaces             |            |         |
+| Property                   | Type                                     | Description                                            | Attributes | Default |
+|----------------------------|------------------------------------------|--------------------------------------------------------|------------|---------|
+| name                       | `String`                                 | Name of the role                                       | Id         |         |
+| users                      | `User[]`                                 | Users using this roles                                 |            |         |
+| institutions               | `Institution[]`                          | Institutions using this roles                          |            |         |
+| createdAt                  | `DateTime`                               | Creation date                                          |            | `now()` |
+| updatedAt                  | `DateTime`                               | Latest update date                                     |            |         |
+| conditions                 | `Json[]`                                 | A list of conditions used to populate the institutions |            |         |
+| repositoryPermissions      | `ElasticRoleRepositoryPermission[]`      | Permissions that role give to repositories             |            |         |
+| repositoryAliasPermissions | `ElasticRoleRepositoryAliasPermission[]` | Permissions that role gives to repository aliases      |            |         |
+| spacePermissions           | `ElasticRoleSpacePermission[]`           | Permissions that role gives to spaces                  |            |         |
 
 ### ElasticRoleRepositoryPermission
 
@@ -267,6 +286,7 @@ Represent a harvest session
 | allowFaulty         | `Boolean`      | Whether the reports should be fetched even if credentials aren't verified or wrong  |            | `false`  |
 | downloadUnsupported | `Boolean`      | Whether the reports should be downloaded even if not supported by the endpoint      |            | `false`  |
 | forceDownload       | `Boolean`      | Whether the reports should be downloaded even if a local copy already exists        |            | `false`  |
+| sendEndMail         | `Boolean`      | Whether a mail should be sent when session ended                                    |            | `true`   |
 | ignoreValidation    | `Boolean?`     | Whether the reports should be inserted even if it does not pass the validation step |            |          |
 | params              | `Json?`        | Parameters to pass to jobs                                                          |            | `{}`     |
 | startedAt           | `DateTime?`    | Start date                                                                          |            |          |
