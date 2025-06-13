@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/prefer-default-export
-export function getErrorMessage(err) {
+export function getErrorMessage(err, fallback = 'Unknown Error') {
   let text;
   if (err.data?.error) {
     // is a API error
@@ -12,7 +12,7 @@ export function getErrorMessage(err) {
     text = err.message ?? `${err}`;
   }
   if (!text) {
-    text = 'Unknown Error';
+    text = fallback;
   }
 
   if (err.status) {

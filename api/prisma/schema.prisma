@@ -223,21 +223,23 @@ model SpacePermission {
 /// A repository (a section of elasticsearch allocated to an institution)
 model Repository {
   /// The institution this repository is associated to
-  institutions           Institution[]
+  institutions            Institution[]
   /// Creation date
-  createdAt              DateTime                          @default(now())
+  createdAt               DateTime                          @default(now())
   /// Latest update date
-  updatedAt              DateTime                          @updatedAt
+  updatedAt               DateTime                          @updatedAt
   /// The index pattern (ex: b-bibcnrs*)
-  pattern                String                            @id
+  pattern                 String                            @id
   /// The repository type (ezpaarse, counter5)
-  type                   String                            @db.VarChar(50)
+  type                    String                            @db.VarChar(50)
   /// Member permissions associated to this repository
-  permissions            RepositoryPermission[]
+  permissions             RepositoryPermission[]
   /// Aliases associated to this repository
-  aliases                RepositoryAlias[]
+  aliases                 RepositoryAlias[]
   /// Permissions granted by role for this repository
-  elasticRolePermissions ElasticRoleRepositoryPermission[]
+  elasticRolePermissions  ElasticRoleRepositoryPermission[]
+  /// Alias templates that target this repository
+  aliasTemplates RepositoryAliasTemplate[]
 }
 
 /// A repository permission (access rights of a member for a specific repository)
@@ -262,6 +264,10 @@ model RepositoryPermission {
 
 /// A repository alias (alias for a section of elasticsearch)
 model RepositoryAlias {
+  /// ID of the template
+  templateId             String?
+  /// The template of the alias
+  template               RepositoryAliasTemplate?               @relation(fields: [templateId], onUpdate: Cascade, onDelete: Cascade, references: [id])
   /// The institution this repository is associated to
   institutions           Institution[]
   /// Creation date
@@ -280,6 +286,30 @@ model RepositoryAlias {
   permissions            RepositoryAliasPermission[]
   /// Permissions granted by role for this alias
   elasticRolePermissions ElasticRoleRepositoryAliasPermission[]
+}
+
+/// A repository alias template (used to generate repository aliases)
+model RepositoryAliasTemplate {
+  /// ID
+  id         String            @id
+  /// Creation date
+  createdAt  DateTime          @default(now())
+  /// Latest update date
+  updatedAt  DateTime          @updatedAt
+  /// The alias pattern (ex: x-alias-istex-{id}-ezpaarse)
+  pattern    String
+  /// The repository's pattern targeted by alias
+  target     String
+  /// Whether the template is active or not
+  active     Boolean           @default(true)
+  /// The repository
+  repository Repository        @relation(fields: [target], references: [pattern], onDelete: Cascade)
+  /// Filters linked to repository (format: [{ "field": "foo", "value": "bar" }])
+  filters    Json[]
+  /// Conditions for creating a new alias (format: [{ "field": "foo", "value": "bar" }])
+  conditions Json[]
+  /// The aliases that were generated with this template
+  aliases    RepositoryAlias[]
 }
 
 /// A alias permission (access rights of a member for a specific alias)
@@ -312,6 +342,8 @@ model ElasticRole {
   createdAt                  DateTime                               @default(now())
   /// Latest update date
   updatedAt                  DateTime                               @updatedAt
+  /// A list of conditions used to populate the institutions
+  conditions                 Json[]
   /// Permissions that role give to repositories
   repositoryPermissions      ElasticRoleRepositoryPermission[]
   /// Permissions that role gives to repository aliases
@@ -408,6 +440,8 @@ model HarvestSession {
   downloadUnsupported Boolean      @default(false)
   /// Whether the reports should be downloaded even if a local copy already exists
   forceDownload       Boolean      @default(false)
+  /// Whether a mail should be sent when session ended
+  sendEndMail            Boolean      @default(true)
   /// Whether the reports should be inserted even if it does not pass the validation step
   ignoreValidation    Boolean?
   /// Parameters to pass to jobs

@@ -15,9 +15,9 @@ const { client: prisma } = require('./index');
  * @typedef {import('@prisma/client').Prisma.ElasticRoleDeleteArgs} ElasticRoleDeleteArgs
  *
  * @typedef {import('@prisma/client').User} User
- * @typedef {import('@prisma/client').Institution} Institution
+ * @typedef {import('@prisma/client').Institution} institution
  *
- * @typedef {ElasticRole & { users: User[], institutions: Institution[] }} OldElasticRole
+ * @typedef {import('@prisma/client').Prisma.ElasticRoleGetPayload<{ include: { users: true, institutions: true } }>} OldElasticRole
  * @typedef {{deleteResult: ElasticRole, deletedElasticRole: OldElasticRole }} ElasticRoleRemoved
  * @typedef {{newElasticRole: ElasticRole, oldElasticRole: OldElasticRole }} ElasticRoleUpdated
  */

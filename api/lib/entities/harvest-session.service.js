@@ -42,6 +42,8 @@ const { queryToPrismaFilter } = require('../services/std-query/prisma-query');
 /** @typedef {import('@prisma/client').SushiEndpoint} SushiEndpoint */
 /** @typedef {import('@prisma/client').Institution} Institution */
 /** @typedef {import('@prisma/client').HarvestJob} HarvestJob */
+/** @typedef {{ credentials: { include: { endpoint: true, institution: true } } }} HarvestJobCredentialsInclude */
+/** @typedef {import('@prisma/client').Prisma.HarvestJobGetPayload<{ include: HarvestJobCredentialsInclude }>} HarvestJobCredentials */
 /* eslint-enable max-len */
 
 const JOB_BATCH_SIZE = 100; // Number of jobs to process per batch
@@ -354,14 +356,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
 
     // TODO: get credentials from service with scroll (maybe later)
     // Get all jobs of session
-    /**
-     * @type {(HarvestJob & {
-     *   credentials: (SushiCredentials & {
-     *     endpoint: SushiEndpoint;
-     *     institution: Institution;
-     *   })
-     * })[]}
-       */
+    /** @type {HarvestJobCredentials[]} */
     // @ts-expect-error
     const sessionJobs = harvestJobsService.findMany({
       include: {

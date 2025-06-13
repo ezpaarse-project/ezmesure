@@ -84,3 +84,14 @@ exports.withDefaults = function withDefaults(defaults = {}) {
     ),
   );
 };
+
+exports.filtersSchema = Joi.object({
+  name: Joi.string().trim().min(1).required(),
+  field: Joi.string().trim().min(1).required(),
+  isNot: Joi.boolean().default(false),
+  value: Joi.alternatives([
+    // Null values are allowed to check if empty
+    Joi.string().trim().min(1), // Exact match
+    Joi.array().items(Joi.string().trim().min(1)), // One of
+  ]).allow(null),
+});

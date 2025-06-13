@@ -10,6 +10,7 @@ const { client: prisma } = require('./index');
 /** @typedef {import('@prisma/client').Prisma.HarvestFindManyArgs} HarvestFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs */
 /* eslint-enable max-len */
 
 /**
@@ -66,6 +67,16 @@ function upsert(params, tx = prisma) {
   return tx.harvest.upsert(params);
 }
 
+/**
+ * @param {HarvestDeleteManyArgs} params
+ * @param {TransactionClient} [tx]
+ * @returns {Promise<number>}
+ */
+async function removeMany(params, tx = prisma) {
+  const { count: c } = await tx.harvest.deleteMany(params);
+  return c;
+}
+
 module.exports = {
   create,
   findMany,
@@ -73,4 +84,5 @@ module.exports = {
   count,
   update,
   upsert,
+  removeMany,
 };

@@ -9,7 +9,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),
@@ -145,6 +145,7 @@ const adminImportSchema = withModifiers(
     repositories: () => schema.repositories,
     sushiCredentials: () => schema.sushiCredentials,
     memberships: () => schema.memberships,
+    customProps: () => schema.customProps,
     logo: () => Joi.string().base64(),
   },
 );

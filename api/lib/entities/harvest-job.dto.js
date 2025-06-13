@@ -2,7 +2,7 @@ const { Joi } = require('koa-joi-router');
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   id: Joi.string().trim(),
@@ -28,6 +28,9 @@ const schema = {
     message: Joi.string().trim(),
     severity: Joi.string().trim(),
   })),
+
+  beginDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
+  endDate: Joi.string().regex(/^[0-9]{4}-[0-9]{2}$/),
 
   credentials: Joi.object(),
   session: Joi.object(),

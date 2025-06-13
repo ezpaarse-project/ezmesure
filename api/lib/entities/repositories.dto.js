@@ -8,7 +8,7 @@ const {
 
 /**
  * Base schema
- * @type {import('joi').SchemaLike}
+ * @type {Record<string, import('joi').AnySchema>}
  */
 const schema = {
   updatedAt: Joi.date(),
@@ -22,6 +22,7 @@ const schema = {
   permissions: Joi.array().items(Joi.object()),
   elasticRolePermissions: Joi.array().items(Joi.object()),
   aliases: Joi.array().items(Joi.object()),
+  aliasTemplates: Joi.array().items(Joi.object()),
 };
 
 /**
@@ -33,6 +34,7 @@ const immutableFields = [
   'institutions',
   'permissions',
   'aliases',
+  'aliasTemplates',
   'elasticRolePermissions',
 ];
 
@@ -42,6 +44,7 @@ const immutableFields = [
 const includableFields = [
   'permissions',
   'aliases',
+  'aliasTemplates',
   'institutions',
   'elasticRolePermissions',
 ];

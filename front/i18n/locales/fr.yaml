@@ -24,9 +24,15 @@ menu:
   report: Rapports
   adminReport: ezREEPORT
   repositories: Entrepôts
-  repositoryAliases: Alias d'entrepôts
+  repositoryAliases:
+    group: Alias d'entrepôts
+    aliases: Alias
+    templates: Modèles
   spaces: Espaces
-  harvest: Moissonnage
+  harvest:
+    group: Moissonnage
+    sessions: Sessions
+    alerts: Alertes
   sync: Synchronisation
   customFields: Champs personnalisés
 home:
@@ -668,6 +674,14 @@ sushi:
     title: Fichiers disponibles
     noFilesAvailable: Aucun fichier disponible
     nbFiles: 1 fichier|{count} fichiers
+  alerts:
+    title: Alertes
+    unsupportedButHarvested:
+      title: Rapports moissonnés mais non supportés
+      severity: Sévérité
+      error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
+      empty: Aucun rapport non supporté n'a été moissonné !
+      deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -820,6 +834,7 @@ repositoryAliases:
     |Gérer {count} alias
   alias: Alias
   target: Pattern de l'entrepôt cible
+  template: Modèle
   filtered: Filtré ?
   aliases: Alias d'entrepôts
   noAliases: Aucun alias d'entrepôt n'est encore attribué
@@ -845,6 +860,31 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} est {valueText}"
       is:not: "{field} n'est pas {valueText}"
+repoAliasTemplates:
+  toolbarTitle: Modèles d'alias ({count})
+  manageTemplates: >
+    Gérer les modèles
+    |Gérer {count} modèles
+  target: Entrepôt cible
+  conditions: Conditions
+  conditionsDescription: Quelles conditions doivent remplir les établissements ?
+  filters: Filtres
+  filtersTitle: Filtrer les modèles
+  aliases: Alias d'entrepôts
+  aliasesPattern: Pattern des alias
+  noFilters: Pas de filtres
+  noConditions: Pas de conditions
+  noTemplates: Aucun modèle d'alias n'a encore été créé
+  deleteNbTemplates: Vous allez supprimer {count} modèles d'alias.
+  newTemplate: Nouveau modèle d'alias
+  modifyTemplate: Modifier un modèle d'alias
+  applyTemplate: Appliquer le modèle [{id}]
+  applyTemplateDesc: Cela entraînera la création d'alias d'entrepôts pour tous les établissements répondant aux conditions.
+  dryRun: Simulation
+  applyToSeeAliases: Appliquez le template pour voir les alias impactés
+  noAliasCreated: Aucun alias n'a été créé
+  applyHadNoEffect: L'application du template n'a pas eu d'effet. Aucun établissement ne remplit les conditions.
+
 spaces:
   spaces: Espaces
   toolbarTitle: Espace ({count})
@@ -872,7 +912,7 @@ spaces:
   filters:
     title: Filtrer les espaces
 harvest:
-  toolbarTitle: Moissonnage ({count})
+  toolbarTitle: Sessions ({count})
   sessions:
     pendingSession: Moissonnage en attente...
     startedAt: Moissonnage lancé le {date}
@@ -888,6 +928,7 @@ harvest:
       reportTypes: "{n} type de rapport|{n} types de rapport"
       credentials: "{n} identifiant|{n} identifiants"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
+    sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
   jobs:
@@ -983,6 +1024,11 @@ customFields:
   descriptionEn: Description en anglais
   manageCustomField: Gérer le champ personnalisé|Gérer {count} champs personnalisés
   restrictToAdmins: Restreindre aux administrateurs
+statuses:
+  created: Créé
+  updated: Mis à jour
+  deleted: Supprimé
+  error: Erreur
 anErrorOccurred: Une erreur est survenue
 url: URL
 type: Type
@@ -1050,6 +1096,9 @@ open: Ouvrir
 send: Envoyer
 'yes': Oui
 'no': Non
+active: Actif
+inactive: Inactif
+activeSwitch: Activer/Desactiver
 validate: Valider
 invalidate: Invalider
 reason: 'Raison : {reason}'
@@ -1068,3 +1117,4 @@ retry: Réessayer
 applyToAll: Appliquer à tous
 minValueError: "La valeur est trop petite. Minimum: {min}"
 maxValueError: "La valeur est trop grande. Maximum: {max}"
+synchronize: Synchroniser

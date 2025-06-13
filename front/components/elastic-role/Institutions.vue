@@ -4,7 +4,7 @@
     :subtitle="showRole ? role.name : undefined"
     prepend-icon="mdi-domain"
   >
-    <template #append>
+    <template v-if="!hasConditions" #append>
       <InstitutionAddMenu
         :model-value="institutions"
         :title="$t('elasticRoles.addInstitution')"
@@ -24,6 +24,54 @@
     </template>
 
     <template #text>
+      <v-expansion-panels>
+        <v-expansion-panel :title="$t('repoAliasTemplates.conditions')">
+          <template #text>
+            <FiltersForm
+              v-model="conditions"
+              :title="$t('repoAliasTemplates.conditions')"
+              :subtitle="$t('repoAliasTemplates.conditionsDescription')"
+              variant="flat"
+              prepend-icon="mdi-format-list-checks"
+              disable-advanced
+            >
+              <template #actions>
+                <v-btn
+                  variant="elevated"
+                  prepend-icon="mdi-sync"
+                  size="small"
+                  :loading="loading"
+                  @click="sync()"
+                >
+                  {{ $t('synchronize') }}
+                </v-btn>
+
+                <v-switch
+                  v-model="dryRun"
+                  :label="$t('repoAliasTemplates.dryRun')"
+                  color="primary"
+                  density="comfortable"
+                  hide-details
+                />
+
+                <v-spacer />
+
+                <v-btn
+                  variant="elevated"
+                  prepend-icon="mdi-content-save"
+                  color="secondary"
+                  size="small"
+                  :loading="loading"
+                  @click="saveConditions()"
+                >
+                  {{ $t('save') }}
+                </v-btn>
+              </template>
+            </FiltersForm>
+          </template>
+        </v-expansion-panel>
+      </v-expansion-panels>
+
       <div v-if="institutions.length <= 0" class="text-center text-grey pt-5">
         {{ $t('elasticRoles.noInstitutions') }}
       </div>
@@ -40,7 +88,7 @@
             <InstitutionAvatar :institution="institution" />
           </template>
 
-          <template #append>
+          <template v-if="!hasConditions" #append>
             <v-btn
               v-tooltip="$t('revoke')"
               icon="mdi-office-building-remove"
@@ -84,6 +132,59 @@ const emit = defineEmits({
 
 /** @type {Ref<object[]>} */
 const institutions = ref(props.role.institutions || []);
+
+const loading = ref(false);
+const dryRun = ref(false);
+const conditions = ref([]);
+const hasConditions = computed(() => (conditions.value || []).length > 0);
+
+watch(
+  () => props.role?.conditions,
+  (v) => { conditions.value = JSON.parse(JSON.stringify(v ?? [])); },
+  { immediate: true },
+);
+
+async function saveConditions() {
+  loading.value = true;
+
+  try {
+    await $fetch(`/api/elastic-roles/${props.role.name}`, {
+      method: 'PUT',
+      body: {
+        ...props.role,
+        conditions: conditions.value,
+      },
+    });
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  }
+
+  loading.value = false;
+}
+
+async function sync() {
+  loading.value = true;
+
+  try {
+    const result = await $fetch(`/api/elastic-roles/${props.role.name}/_sync`, {
+      method: 'POST',
+      query: {
+        dryRun: dryRun.value,
+      },
+    });
+
+    const newInstitutionList = result?.items
+      ?.filter((item) => (item.status === 'created' || item.status === 'updated'))
+      ?.map((item) => item.data);
+
+    institutions.value = newInstitutionList ?? [];
+    emit('update:modelValue', institutions.value);
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  }
+
+  loading.value = false;
+}
 
 async function addInstitution(item) {
   try {

@@ -12,6 +12,7 @@ const {
   getOne,
   upsertOne,
   deleteOne,
+  importFields,
 } = require('./actions');
 
 const {
@@ -61,6 +62,21 @@ router.route({
     params: {
       fieldId: Joi.string().trim().required(),
     },
+  },
+});
+
+router.route({
+  method: 'POST',
+  path: '/_import',
+  handler: [
+    importFields,
+  ],
+  validate: {
+    type: 'json',
+    query: {
+      overwrite: Joi.boolean().default(false),
+    },
+    body: Joi.array(),
   },
 });
 

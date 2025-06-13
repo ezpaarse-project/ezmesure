@@ -1,0 +1,72 @@
+include:
+  - docker-compose.common.yml
+services:
+  api:
+    image: node:18.18.2-alpine3.18
+    ports:
+      - 3000:3000
+      - 9229:9229 # Debug port
+    volumes:
+      - "./api:/usr/src/app"
+      - "${EZMESURE_API_STORAGE_DIR:-./data/api/storage}:/usr/src/app/storage"
+      - "${EZMESURE_API_UPLOADS_DIR:-./data/api/uploads}:/usr/src/app/uploads"
+    working_dir: /usr/src/app
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=localhost,kibana
+      - EZMESURE_ELASTIC_HOST=${EZMESURE_ELASTIC_HOST:-elastic}
+      - EZMESURE_ELASTIC_PORT=${EZMESURE_ELASTIC_PORT:-9200}
+      - EZMESURE_KIBANA_HOST=${EZMESURE_KIBANA_HOST:-kibana}
+      - EZMESURE_KIBANA_PORT=${EZMESURE_KIBANA_PORT:-5601}
+      - EZMESURE_REDIS_HOST=${EZMESURE_REDIS_HOST:-redis}
+      - EZMESURE_REDIS_PASSWORD=${EZMESURE_REDIS_PASSWORD:-changeme}
+      - EZMESURE_POSTGRES_URL=postgresql://${EZMESURE_POSTGRES_USER:-postgres}:${EZMESURE_POSTGRES_PASSWORD:-changeme}@${EZMESURE_POSTGRES_HOST:-postgres}:${EZMESURE_POSTGRES_PORT:-5432}/${EZMESURE_POSTGRES_DB:-ezmesure}
+      - EZMESURE_HARVEST_CONCURRENCY
+      - EZMESURE_MAX_DEFERRALS
+      - EZMESURE_DEFERRAL_BACKOFF_DURATION
+      - EZMESURE_BUSY_BACKOFF_DURATION
+      - ELASTICSEARCH_PASSWORD
+      - KIBANA_PASSWORD
+      - EZMESURE_ADMIN_USERNAME
+      - EZMESURE_ADMIN_PASSWORD
+      - EZMESURE_ADMIN_EMAIL
+      - EZMESURE_AUTH_SECRET
+      - EZMESURE_SMTP_HOST=maildev
+      - EZMESURE_SMTP_PORT=25
+      - EZMESURE_SMTP_SECURE=false
+      - EZMESURE_SMTP_IGNORE_TLS=true
+      - EZMESURE_SMTP_REJECT_UNAUTHORIZED
+      - EZMESURE_NOTIFICATIONS_SENDER
+      - EZMESURE_NOTIFICATIONS_CRON
+      - EZMESURE_NOTIFICATIONS_RECIPIENTS
+      - EZMESURE_NOTIFICATIONS_SUPPORT_RECIPIENTS
+      - EZMESURE_SEND_EMPTY_ACTIVITY
+      - EZMESURE_ENCRYPTION_SECRET
+      - EZMESURE_LOG_LEVEL
+      - EZMESURE_PUBLIC_URL
+      - NODE_ENV
+      - NODE_CONFIG
+    restart: "no"
+    command: npm run dev
+
+  front:
+    image: node:22.8.0-alpine3.20
+    ports:
+      - 8080:8080
+    volumes:
+      - "./front:/usr/src/app"
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV
+      - NUXT_PUBLIC_CURRENT_INSTANCE
+      - NUXT_PUBLIC_SUPPORT_MAIL
+      - NUXT_PUBLIC_SHIBBOLETH_DISABLED
+    tmpfs: /tmp
+    command: npm run dev
+    restart: "no"
+
+  maildev:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
