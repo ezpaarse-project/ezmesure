@@ -137,13 +137,31 @@ const credentials = computedAsync(async () => {
     return undefined;
   }
 
+  const groups = credentialsIds.value.split(',').reduce((acc, id) => {
+    let current = acc.at(-1);
+    if (!current || current.length > 25) {
+      acc.push([]);
+      current = acc.at(-1);
+    }
+
+    current.push(id);
+    return acc;
+  }, []);
+
   try {
-    const values = await $fetch('/api/sushi', {
-      query: {
-        size: 0,
-        id: credentialsIds.value.split(','),
-      },
-    });
+    // TODO: move server side
+    const values = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const group of groups) {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await $fetch('/api/sushi', {
+        query: {
+          size: 0,
+          id: group,
+        },
+      });
+      values.push(...res);
+    }
 
     return new Map(values.map((c) => [c.id, c]));
   } catch (err) {
@@ -161,13 +179,31 @@ const endpoints = computedAsync(async () => {
     return undefined;
   }
 
+  const groups = credentialsIds.value.split(',').reduce((acc, id) => {
+    let current = acc.at(-1);
+    if (!current || current.length > 25) {
+      acc.push([]);
+      current = acc.at(-1);
+    }
+
+    current.push(id);
+    return acc;
+  }, []);
+
   try {
-    const values = await $fetch('/api/sushi-endpoints', {
-      query: {
-        size: 0,
-        id: endpointsIds.value.split(','),
-      },
-    });
+    // TODO: move server side
+    const values = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const group of groups) {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await $fetch('/api/sushi-endpoints', {
+        query: {
+          size: 0,
+          id: group,
+        },
+      });
+      values.push(...res);
+    }
 
     return new Map(values.map((e) => [e.id, e]));
   } catch (err) {
