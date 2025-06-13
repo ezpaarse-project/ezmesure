@@ -17,7 +17,8 @@ const props = defineProps({
 
 const metadata = computed(() => {
   const metadataItems = Object
-    .entries(props.modelValue?.metadata || {})
+    .entries(props.modelValue?.metadata || props.modelValue?.data || {})
+    .filter(([, value]) => typeof value !== 'object')
     .map(([name, value]) => ({ name, value }));
 
   if (props.modelValue?.index) {

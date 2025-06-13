@@ -75,6 +75,9 @@
       "name": "Logs"
     },
     {
+      "name": "Activity"
+    },
+    {
       "name": "Users"
     }
   ],
@@ -149,6 +152,14 @@
         "format": "cuid",
         "example": "cjld2cyuq0000t3rmniod1foy",
         "description": "ID of the item",
+        "readOnly": true
+      },
+      "ItemDeleteDate": {
+        "type": "string",
+        "nullable": true,
+        "format": "date-time",
+        "example": "2020-11-05T17:07:31.967Z",
+        "description": "When item was marked for deletion",
         "readOnly": true
       },
       "ItemUpdateDate": {
@@ -1519,6 +1530,33 @@
           "updatedAt": {
             "$ref": "#/components/schemas/ItemUpdateDate"
           },
+          "deletedAt": {
+            "$ref": "#/components/schemas/ItemDeleteDate"
+          },
+          "active": {
+            "description": "Whether the credentials are active",
+            "type": "boolean"
+          },
+          "archived": {
+            "description": "Whether the credentials are archived",
+            "type": "boolean"
+          },
+          "activeUpdatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Date of the last change of the credentials active state",
+            "readOnly": true
+          },
+          "archivedUpdatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": "2020-11-05T17:07:31.967Z",
+            "description": "Date of the last change of the credentials archived state",
+            "readOnly": true
+          },
           "institution": {
             "description": "The institution that owns the credentials",
             "$ref": "#/components/schemas/Institution"
@@ -2506,6 +2544,168 @@
           "Basics"
         ],
         "security": []
+      }
+    },
+    "/actions": {
+      "get": {
+        "summary": "Get actions",
+        "operationId": "get-actions",
+        "description": "Get actions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Actions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/order"
+          },
+          {
+            "$ref": "#/components/parameters/distinct"
+          },
+          {
+            "name": "include",
+            "description": "",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "author",
+                  "author.memberships",
+                  "author.memberships.repositoryPermissions",
+                  "author.memberships.repositoryAliasPermissions",
+                  "author.memberships.spacePermissions",
+                  "author.elasticRoles",
+                  "institution"
+                ]
+              }
+            }
+          },
+          {
+            "name": "date:from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "date:to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "authorId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Action"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actions/:id": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get an action",
+        "operationId": "get-action",
+        "description": "Get an action",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Administration",
+          "Actions"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Action"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/custom-fields": {
@@ -10327,8 +10527,24 @@
       },
       "delete": {
         "summary": "Delete a SUSHI item",
-        "description": "GDeleteet a SUSHI item",
+        "description": "Delete a SUSHI item",
         "operationId": "delete-sushi-id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for deletion",
+                    "example": "I don't like sushi"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "SUSHI item successfully deleted"

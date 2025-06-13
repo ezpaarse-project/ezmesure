@@ -83,6 +83,10 @@
     "clean": {
       "schedule": "EZMESURE_CLEAN_COUNTER_SCHEDULE",
       "maxDayAge": "EZMESURE_COUNTER_MAX_AGE"
+    },
+    "deleteSushi": {
+      "schedule": "EZMESURE_DELETE_SUSHI_COUNTER_SCHEDULE",
+      "maxDayAge": "EZMESURE_DELETE_SUSHI_COUNTER_FOLLOW_INTERVAL"
     }
   },
   "depositors": {

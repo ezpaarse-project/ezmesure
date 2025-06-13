@@ -9,6 +9,21 @@ const port = config.get('elasticsearch.port');
 const scheme = config.get('elasticsearch.scheme');
 const url = config.get('elasticsearch.url');
 
+/* eslint-disable max-len */
+/**
+ * @template T
+ * @typedef {import('@elastic/elasticsearch/lib/Transport.d.ts').TransportRequestPromise<T>} TransportRequestPromise
+*/
+/**
+ * @template T
+ * @typedef {import('@elastic/elasticsearch/lib/Transport.d.ts').ApiResponse<T, unknown>} ApiResponse
+  */
+/**
+ * @template T
+ * @typedef {TransportRequestPromise<ApiResponse<T>>} ESResponse
+  */
+/* eslint-enable max-len */
+
 const client = new Client({
   node: {
     url: url ? new URL(url) : new URL(`${scheme}://${host}:${port}`),

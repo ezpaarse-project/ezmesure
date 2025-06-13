@@ -15,6 +15,9 @@ menu:
   institutions: Établissements
   sushiEndpoints: Points d'accès COUNTER
   activity: Activité
+  actions:
+    title: Actions
+    tooltip: Nouvelle version de l'activité, les actions seront mises en place progressivement
   profile: Profil
   members: Membres
   users: Utilisateurs
@@ -456,6 +459,7 @@ institutions:
     createdAt: Date de création
     updatedAt: Dernière mise à jour
     testedAt: Dernier test
+    archivedAt: Date d'archivage
     sushiUrl: URL Sushi
     enterUrl: Veuillez saisir une URL
     enterRequestorId: Veuillez saisir un Requestor Id.
@@ -609,6 +613,13 @@ sushi:
   credentialsCount: >
     1 identifiant
     |{count} identifiants
+  tabs:
+    active:
+      title: Identifiants actifs
+      description: Cette liste contient les identifiants actifs qui seront utilisés pour le moissonnage.
+    archived:
+      title: Identifiants archivés
+      description: Cette liste contient les identifiants archivés qui ne seront PAS utilisés pour le moissonnage.
   auth: Authentification
   copyId: Copier l'ID
   showFiles: Voir les fichiers
@@ -619,6 +630,10 @@ sushi:
   unableToUpdate: Impossible de modifier l'identifiant
   unableToGetLockStatus: Impossible de récupérer l'état de verrouillage des identifiants
   managementIsLocked: La gestion des identifiants COUNTER est actuellement verrouillée.
+  deleting: Suppression en cours
+  deletingWaiting: En attente de suppression
+  deletingError: "Impossible de supprimer l'identifiant: {error}"
+  deletionTask: État de suppression
   nInstitutions: >
     1 établissement utilise cet endpoint
     |{count} établissements utilisent cet endpoint
@@ -638,8 +653,11 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant COUNTER.
-    |Vous allez supprimer {count} identifiants COUNTER.
+    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
+    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
+  archiveNbCredentials: >
+    Vous allez archiver {count} identifiant COUNTER. Les données d'usage liées à cet identifiant seront conservées.
+    |Vous allez archiver {count} identifiants COUNTER. Les données d'usage liées à cet identifiant seront conservées.
   problematicEndpoint: Point d'accès problématique
   scope: Périmètre
   unchangeableParam: Paramètre non modifiable défini au niveau du point d'accès.
@@ -656,6 +674,9 @@ sushi:
   updatedItems: "{count} éléments du rapport ont été mis à jour."
   failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
   messagesFromEndpoint: 'Messages du point d''accès :'
+  cannotArchiveItems: Impossible d'archiver les identifiants.
+  itemsArchived: "{count} élement(s) archivé(s)"
+  itemsDeleted: "{count} élement(s) supprimé(s), les données liées aux identifiants seront supprimée prochainement."
   matrix:
     unsupported: Rapport non supporté (déclaration éditeur)
     ignored: Rapport non supporté (constat ezMESURE)
@@ -682,6 +703,11 @@ sushi:
       error: Une erreur est survenue lors de la recherche des rapports moissonnées mais non supportés
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
+  deleteReason: Raison de la suppression
+  deleteReasons:
+    mistake: J'ai entré(e) ces identifiants par erreur
+    neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
+    duplicate: Cet identifiant est en doublon avec un autre
 reports:
   sushiReturnedErrors: Le point d'accès COUNTER a retourné des erreurs.
   checkCredentials: Vérifier les identifiants
@@ -1094,6 +1120,8 @@ notEditable: Non éditable
 maxLength: 'Longueur maximale : {n} caractères'
 open: Ouvrir
 send: Envoyer
+archive: Archiver
+unarchive: Désarchiver
 'yes': Oui
 'no': Non
 active: Actif

@@ -110,22 +110,9 @@
           </v-col>
         </template>
       </v-row>
-    </v-container>
 
-    <v-data-table-server
-      v-model="selectedSushi"
-      :headers="headers"
-      :row-props="({ item }) => ({ class: !(item.active && item.endpoint.active) && 'bg-grey-lighten-4 text-grey' })"
-      density="comfortable"
-      show-select
-      show-expand
-      single-expand
-      return-object
-      v-bind="vDataTableOptions"
-      class="mt-4"
-    >
-      <template #top>
-        <div class="d-flex px-4 mb-2">
+      <v-row class="mt-4">
+        <v-col>
           <v-chip
             :text="sushiReadyLabels.status.text"
             :color="sushiReadyLabels.status.color"
@@ -136,9 +123,9 @@
               <v-icon :icon="sushiReadyLabels.status.icon" start />
             </template>
           </v-chip>
+        </v-col>
 
-          <v-spacer />
-
+        <v-col class="text-end">
           <ConfirmPopover
             v-if="canEdit"
             :title="sushiReadyLabels.confirm.title"
@@ -160,284 +147,79 @@
               />
             </template>
           </ConfirmPopover>
-        </div>
-      </template>
+        </v-col>
+      </v-row>
+    </v-container>
 
-      <template #[`header.harvests`]="{ column: { title } }">
-        <div>{{ title }}</div>
+    <v-divider />
 
-        <div class="d-flex justify-center align-center">
-          <v-btn
-            :disabled="status === 'pending'"
-            color="primary"
-            variant="text"
-            density="comfortable"
-            icon="mdi-arrow-left"
-            @click="currentHarvestYear -= 1"
+    <div class="mb-2">
+      <v-tabs
+        v-model="currentTabId"
+        :items="tabs"
+        color="primary"
+        grow
+        @update:model-value="refresh()"
+      >
+        <template #tab="{ item }">
+          <v-tab
+            :prepend-icon="item.icon"
+            :text="item.text"
+            :value="item.value"
           />
+        </template>
 
-          <span class="mx-3">
-            {{ currentHarvestYear }}
-          </span>
+        <template #item="{ item }">
+          <v-tabs-window-item :value="item.value" class="pa-4">
+            {{ item.description }}
 
-          <v-btn
-            :disabled="status === 'pending' || currentHarvestYear >= maxHarvestYear"
-            color="primary"
-            variant="text"
-            density="comfortable"
-            icon="mdi-arrow-right"
-            @click="currentHarvestYear += 1"
-          />
-        </div>
-      </template>
-
-      <template #[`item.endpoint.vendor`]="{ item }">
-        <div class="my-2">
-          <div>
-            <nuxt-link v-if="user?.isAdmin" :to="`/admin/endpoints/${item.endpoint.id}`" :class="[!item.active ? 'text-grey' : '']">
-              {{ item.endpoint.vendor }}
-            </nuxt-link>
-            <span v-else>{{ item.endpoint.vendor }}</span>
-          </div>
-
-          <SushiEndpointVersionsChip :model-value="item.endpoint" size="small" />
-
-          <v-chip
-            v-for="tag in item.endpoint.tags ?? []"
-            :key="tag"
-            :text="tag"
-            color="accent"
-            density="comfortable"
-            variant="outlined"
-            size="small"
-            label
-            class="mr-2"
-          />
-        </div>
-      </template>
-
-      <template #[`item.packages`]="{ value }">
-        <v-chip
-          v-for="(pkg, index) in value"
-          :key="index"
-          :text="pkg"
-          size="small"
-          label
-          class="mr-1"
-        />
-      </template>
-
-      <template #[`item.connection`]="{ item }">
-        <SushiConnectionChip
-          :sushi="{ ...item, institution }"
-          :disabled="isLocked"
-          @update:model-value="item.connection = $event; debouncedRefresh()"
-        />
-      </template>
-
-      <template #[`item.harvests`]="{ item }">
-        <SushiHarvestStateChip
-          v-if="item.harvests?.length > 0"
-          :model-value="item.harvests"
-          :endpoint="item.endpoint"
-          :current-year="currentHarvestYear"
-          @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
-        />
-      </template>
-
-      <template #[`item.active`]="{ item }">
-        <div class="d-flex align-center">
-          <v-switch
-            v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-            :model-value="item.active"
-            :label="item.active ? $t('endpoints.active') : $t('endpoints.inactive')"
-            :loading="activeLoadingMap.get(item.id)"
-            :readonly="!canEdit"
-            density="compact"
-            color="primary"
-            hide-details
-            class="mt-0"
-            style="transform: scale(0.8);"
-            @update:model-value="toggleActiveStates([item])"
-          />
-
-          <v-spacer />
-
-          <v-icon
-            v-if="!item.endpoint.active"
-            v-tooltip="$t('endpoints.inactiveDescription')"
-            icon="mdi-api-off"
-            color="warning"
-          />
-        </div>
-      </template>
-
-      <template #[`item.actions`]="{ item }">
-        <v-menu>
-          <template #activator="{ props: menu }">
-            <v-btn
-              icon="mdi-cog"
-              variant="plain"
-              density="compact"
-              v-bind="menu"
-            />
-          </template>
-
-          <v-list>
-            <v-list-item
-              v-if="sushiFormRef"
-              :title="$t('modify')"
-              :disabled="!canEdit"
-              prepend-icon="mdi-pencil"
-              @click="sushiFormRef?.open(item, { institution })"
-            />
-            <v-list-item
-              v-if="sushiFormRef"
-              :title="$t('duplicate')"
-              :disabled="!canEdit"
-              prepend-icon="mdi-content-copy"
-              @click="sushiFormRef?.open({ ...item, id: null }, { institution })"
-            />
-            <v-list-item
-              :title="$t('delete')"
-              :disabled="!canEdit"
-              prepend-icon="mdi-delete"
-              @click="deleteSushis([item])"
-            />
-
-            <v-divider />
-
-            <v-list-item
-              :title="$t('institutions.sushi.checkCredentials')"
-              prepend-icon="mdi-connection"
-              @click="checkConnections([item])"
-            />
-            <v-list-item
-              v-if="user?.isAdmin"
-              :title="$t('institutions.sushi.resetChecks')"
-              prepend-icon="mdi-restore"
-              @click="resetConnections([item])"
-            />
-            <v-list-item
-              v-if="harvestMatrixRef"
-              :title="$t('sushi.harvestState')"
-              prepend-icon="mdi-table-headers-eye"
-              @click="harvestMatrixRef?.open(item)"
-            />
-            <v-list-item
-              v-if="reportsRef"
-              :title="$t('reports.supportedReports')"
-              prepend-icon="mdi-file-search"
-              @click="reportsRef?.open(item)"
-            />
-            <v-list-item
-              v-if="filesRef"
-              :title="$t('sushi.showFiles')"
-              prepend-icon="mdi-file-tree"
-              @click="filesRef?.open(item)"
-            />
-            <v-list-item
-              v-if="historyRef"
-              :title="$t('tasks.history')"
-              prepend-icon="mdi-history"
-              @click="historyRef?.open(item)"
-            />
-            <v-list-item
-              v-if="clipboard"
-              :title="$t('sushi.copyId')"
-              prepend-icon="mdi-identifier"
-              @click="copySushiId(item)"
-            />
-          </v-list>
-        </v-menu>
-      </template>
-
-      <template #expanded-row="{ columns, item }">
-        <tr>
-          <td :colspan="columns.length">
-            <SushiDetails :model-value="item" />
-          </td>
-        </tr>
-      </template>
-    </v-data-table-server>
-
-    <SelectionMenu
-      v-model="selectedSushi"
-      :text="$t('institutions.sushi.manageN', selectedSushi.length)"
-    >
-      <template #actions>
-        <v-list-item
-          :title="$t('delete')"
-          :disabled="!canEdit"
-          prepend-icon="mdi-delete"
-          @click="deleteSushis()"
-        />
-
-        <v-divider />
-
-        <v-list-item
-          :title="$t('institutions.sushi.activeSwitch')"
-          :disabled="!canEdit"
-          prepend-icon="mdi-toggle-switch"
-          @click="toggleActiveStates()"
-        />
-        <v-list-item
-          :title="$t('institutions.sushi.checkCredentials')"
-          prepend-icon="mdi-connection"
-          @click="checkConnections()"
-        />
-        <v-list-item
-          v-if="user?.isAdmin"
-          :title="$t('institutions.sushi.resetChecks')"
-          prepend-icon="mdi-restore"
-          @click="resetConnections()"
-        />
-      </template>
-    </SelectionMenu>
+            <template v-if="TABS_COMPONENTS[item.value]">
+              <component
+                :is="TABS_COMPONENTS[item.value]"
+                :institution="institution"
+                :is-locked="lockStatus?.locked"
+                :can-edit="canEdit"
+                :define-tab="(tab) => { tabsData.set(item.value, tab); }"
+              />
+            </template>
+          </v-tabs-window-item>
+        </template>
+      </v-tabs>
+    </div>
 
     <SushiFormDialog
       ref="sushiFormRef"
       @submit="refresh()"
-      @update:model-value="onSushiUpdate($event)"
+      @update:model-value="refresh()"
     />
-
-    <SushiHarvestMatrixDialog ref="harvestMatrixRef" />
-
-    <SushiHarvestFilesDialog v-if="user?.isAdmin" ref="filesRef" />
-
-    <SushiHarvestHistoryDialog v-if="user?.isAdmin" ref="historyRef" />
-
-    <SushiReportsDialog ref="reportsRef" />
   </div>
 </template>
 
 <script setup>
+import ActiveTable from '@/components/sushi/credentials/ActiveTable.vue';
+import ArchivedTable from '@/components/sushi/credentials/ArchivedTable.vue';
+
 definePageMeta({
   layout: 'space',
   middleware: ['sidebase-auth', 'terms'],
   alias: ['/admin/institutions/:id/sushi'],
 });
 
-const maxHarvestYear = new Date().getFullYear();
+const TABS_COMPONENTS = {
+  active: ActiveTable,
+  archived: ArchivedTable,
+};
 
 const { params } = useRoute();
+const { t } = useI18n();
 const { data: user } = useAuthState();
-const { t, locale } = useI18n();
-const { isSupported: clipboard, copy } = useClipboard();
-const { openConfirm } = useDialogStore();
 const { hasPermission } = useCurrentUserStore();
-const { addToCheck } = useSushiCheckQueueStore();
 const snacks = useSnacksStore();
 
-const selectedSushi = ref([]);
-const activeLoadingMap = ref(new Map());
-const currentHarvestYear = ref(maxHarvestYear);
+const tabsData = ref(new Map());
+const currentTabId = ref('');
 
 const sushiFormRef = useTemplateRef('sushiFormRef');
-const harvestMatrixRef = useTemplateRef('harvestMatrixRef');
-const reportsRef = useTemplateRef('reportsRef');
-const filesRef = useTemplateRef('filesRef');
-const historyRef = useTemplateRef('historyRef');
 
 const {
   error,
@@ -454,23 +236,6 @@ const {
   refresh: sushiMetricsRefresh,
 } = await useFetch(`/api/institutions/${params.id}/sushi/_metrics`, {
   lazy: true,
-});
-
-const {
-  refresh: sushisRefresh,
-  itemLength,
-  query,
-  data: sushis,
-  status,
-  vDataTableOptions,
-} = await useServerSidePagination({
-  fetch: {
-    url: `/api/institutions/${params.id}/sushi`,
-  },
-  data: {
-    sortBy: [{ key: 'endpoint.vendor', order: 'asc' }],
-    include: ['endpoint', 'harvests'],
-  },
 });
 
 /**
@@ -492,54 +257,47 @@ const canEdit = computed(() => {
   return !isLocked.value && hasPermission(params.id, 'sushi:write', { throwOnNoMembership: true });
 });
 /**
- * Table headers
+ * Tabs
  */
-const headers = computed(() => [
+const tabs = computed(() => [
   {
-    title: t('institutions.sushi.endpoint'),
-    value: 'endpoint.vendor',
-    sortable: true,
-    maxWidth: '350px',
-  },
-  {
-    title: t('institutions.sushi.packages'),
-    value: 'packages',
-    sortable: true,
-    align: 'end',
-  },
-  {
-    title: t('status'),
-    value: 'connection',
-    minWidth: '200px',
-    maxWidth: '200px',
-    sortable: true,
-    align: 'center',
-  },
-  {
-    title: t('institutions.sushi.harvest'),
-    value: 'harvests',
-    align: 'center',
-  },
-  {
-    title: t('endpoints.active'),
+    text: t('sushi.tabs.active.title'),
+    description: t('sushi.tabs.active.description'),
     value: 'active',
-    align: 'center',
-    minWidth: '130px',
-    sortable: true,
+    icon: 'mdi-key-wireless',
   },
   {
-    title: t('actions'),
-    value: 'actions',
-    align: 'center',
+    text: t('sushi.tabs.archived.title'),
+    description: t('sushi.tabs.archived.description'),
+    value: 'archived',
+    icon: 'mdi-archive',
   },
 ]);
+/**
+ * Current tab
+ */
+const currentTabData = computed(() => tabsData.value.get(currentTabId.value));
+/**
+ * Current query
+ */
+const query = computed({
+  get: () => currentTabData.value?.query ?? {},
+  set: (value) => {
+    if (!currentTabData.value) {
+      return;
+    }
+    currentTabData.value.query = value;
+  },
+});
 /**
  * Toolbar title
  */
 const toolbarTitle = computed(() => {
-  let count = `${itemLength.value.current}`;
-  if (itemLength.value.current !== itemLength.value.total) {
-    count = `${itemLength.value.current}/${itemLength.value.total}`;
+  const itemLength = currentTabData.value?.itemLength ?? {};
+
+  let count = itemLength.current != null ? `${itemLength.current}` : null;
+  if (itemLength.current !== itemLength.total) {
+    count = `${itemLength.current}/${itemLength.total}`;
   }
   return t('institutions.sushi.title', { count: count ?? '?' });
 });
@@ -596,21 +354,12 @@ const sushiReadyLabels = computed(() => {
 /**
  * Refresh sushis
  */
-const refresh = () => Promise.all([sushisRefresh(), sushiMetricsRefresh()]);
+const refresh = () => Promise.all([currentTabData.value?.refresh?.(), sushiMetricsRefresh()]);
 
 /**
  * Debounced refresh
  */
 const debouncedRefresh = useDebounceFn(refresh, 250);
-
-function onSushiUpdate(item) {
-  const index = sushis.value.findIndex((sushi) => sushi.id === item.id);
-  if (index < 0) {
-    return;
-  }
-
-  sushis.value[index] = item;
-}
 
 /**
  * Toggle sushi ready status
@@ -632,190 +381,4 @@ async function toggleSushiReady() {
   }
   return Promise.resolve();
 }
-
-/**
- * Put sushi ID into clipboard
- *
- * @param {object} param0 Sushi
- */
-async function copySushiId({ id }) {
-  if (!id) {
-    return;
-  }
-
-  try {
-    await copy(id);
-  } catch (err) {
-    snacks.error(t('clipboard.unableToCopy'), err);
-    return;
-  }
-  snacks.info(t('clipboard.textCopied'));
-}
-
-/**
- * Check connections for selected sushi
- *
- * @param {any[]} items Sushi to check, defaults to selected
- */
-function checkConnections(items) {
-  const toCheck = items || selectedSushi.value;
-  if (toCheck.length <= 0) {
-    return;
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (const item of toCheck) {
-    addToCheck({ ...item, institution: institution.value }, {
-      onComplete: (err, connection) => {
-        if (connection) {
-          item.connection = connection;
-          debouncedRefresh();
-        }
-      },
-    });
-  }
-
-  if (!items) {
-    selectedSushi.value = [];
-  }
-}
-
-/**
- * Toggle active states for selected sushi
- *
- * @param {any[]} items Sushi to toggle, defaults to selected
- */
-async function toggleActiveStates(items) {
-  const toToggle = items || selectedSushi.value;
-  if (toToggle.length <= 0) {
-    return;
-  }
-
-  await Promise.all(
-    toToggle.map(async (item) => {
-      activeLoadingMap.value.set(item.id, true);
-      try {
-        const active = !item.active;
-        // eslint-disable-next-line no-await-in-loop
-        await $fetch(`/api/sushi/${item.id}`, {
-          method: 'PATCH',
-          body: { active },
-        });
-
-        // eslint-disable-next-line no-param-reassign
-        item.active = active;
-        activeLoadingMap.value.set(item.id, false);
-        return item;
-      } catch (err) {
-        snacks.error(t('sushi.unableToUpdate'), err);
-        activeLoadingMap.value.set(item.id, false);
-        return null;
-      }
-    }),
-  );
-
-  if (!items) {
-    selectedSushi.value = [];
-  }
-}
-
-/**
- * Reset connections for selected sushi
- *
- * @param {any[]} items Sushi to reset, defaults to selected
- */
-async function resetConnections(items) {
-  let toReset = items || selectedSushi.value;
-  if (toReset.length <= 0) {
-    return;
-  }
-
-  toReset = toReset.filter((item) => !!item?.connection?.status);
-  // No reset needed, simulate like we just did
-  if (!items && toReset.length <= 0) {
-    selectedSushi.value = [];
-    return;
-  }
-
-  openConfirm({
-    text: t(
-      'institutions.sushi.resetNbChecks',
-      toReset.length,
-    ),
-    agreeText: t('reset'),
-    agreeIcon: 'mdi-restore',
-    onAgree: async () => {
-      await Promise.all(
-        toReset.map(
-          (item) => $fetch(`/api/sushi/${item.id}/connection`, { method: 'DELETE' })
-            .catch((err) => {
-              snacks.error(t('institutions.sushi.cannotResetCheck', { id: item.endpoint?.vendor || item.id }), err);
-              return null;
-            }),
-        ),
-      );
-
-      if (!items) {
-        selectedSushi.value = [];
-      }
-
-      await refresh();
-    },
-  });
-}
-
-/**
- * Delete selected sushi
- *
- * @param {any[]} items Sushi to delete, defaults to selected
- */
-async function deleteSushis(items) {
-  const toDelete = items || selectedSushi.value;
-  if (toDelete.length <= 0) {
-    return;
-  }
-
-  openConfirm({
-    text: t(
-      'sushi.deleteNbCredentials',
-      toDelete.length,
-    ),
-    agreeText: t('delete'),
-    agreeIcon: 'mdi-delete',
-    onAgree: async () => {
-      const results = await Promise.all(
-        toDelete.map(
-          (item) => $fetch(`/api/sushi/${item.id}`, { method: 'DELETE' })
-            .catch((err) => {
-              snacks.error(t('cannotDeleteItem', { id: item.name || item.id }), err);
-              return null;
-            }),
-        ),
-      );
-
-      if (!results.some((r) => !r)) {
-        snacks.success(t('itemsDeleted', { count: toDelete.length }));
-      }
-
-      if (!items) {
-        selectedSushi.value = [];
-      }
-
-      await refresh();
-    },
-  });
-}
-
-watchOnce(
-  sushis,
-  (v) => {
-    const harvests = v
-      .flatMap((s) => s.harvests || [])
-      .sort((a, b) => a.period.localeCompare(b.period));
-
-    const lastYear = harvests.at(-1)?.period?.replace(/(-[0-9]{2})*$/, '');
-    if (lastYear) {
-      currentHarvestYear.value = Number.parseInt(lastYear, 10);
-    }
-  },
-);
 </script>

@@ -714,7 +714,18 @@ function toggleAllGroups(state) {
 
 watchOnce(
   sushis,
-  () => calcSushiMetrics(),
+  (v) => {
+    calcSushiMetrics();
+
+    const harvests = v
+      .flatMap((s) => s.harvests || [])
+      .sort((a, b) => a.period.localeCompare(b.period));
+
+    const lastYear = harvests.at(-1)?.period?.replace(/(-[0-9]{2})*$/, '');
+    if (lastYear) {
+      currentHarvestYear.value = Number.parseInt(lastYear, 10);
+    }
+  },
 );
 
 watchOnce(

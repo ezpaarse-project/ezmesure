@@ -123,9 +123,11 @@ const {
 });
 
 // Allow parent component to refresh
-props.defineRefresh({
-  execute: refresh,
-  status,
+onMounted(() => {
+  props.defineRefresh({
+    execute: refresh,
+    status,
+  });
 });
 
 /** Key to cache credentials data */

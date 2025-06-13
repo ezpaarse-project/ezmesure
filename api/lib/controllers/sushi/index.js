@@ -328,9 +328,13 @@ router.route({
     deleteOne,
   ],
   validate: {
+    type: 'json',
     params: {
       sushiId: Joi.string().trim().required(),
     },
+    body: Joi.object({
+      reason: Joi.string().trim(),
+    }),
   },
 });
 

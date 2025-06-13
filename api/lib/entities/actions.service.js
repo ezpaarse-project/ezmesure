@@ -9,6 +9,7 @@ const actionsPrisma = require('../services/prisma/actions');
 /** @typedef {import('@prisma/client').Prisma.ActionFindUniqueArgs} ActionFindUniqueArgs */
 /** @typedef {import('@prisma/client').Prisma.ActionFindManyArgs} ActionFindManyArgs */
 /** @typedef {import('@prisma/client').Prisma.ActionCreateArgs} ActionCreateArgs */
+/** @typedef {import('@prisma/client').Prisma.ActionCountArgs} ActionCountArgs */
 /* eslint-enable max-len */
 
 module.exports = class ActionsService extends BasePrismaService {
@@ -53,5 +54,13 @@ module.exports = class ActionsService extends BasePrismaService {
    */
   upsert(params) {
     return actionsPrisma.upsert(params, this.prisma);
+  }
+
+  /**
+   * @param {ActionCountArgs} params
+   * @returns {Promise<number>}
+   */
+  count(params) {
+    return actionsPrisma.count(params, this.prisma);
   }
 };
