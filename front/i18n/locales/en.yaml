@@ -457,6 +457,7 @@ institutions:
     createdAt: Creation date
     updatedAt: Last updated
     testedAt: Last tested
+    archivedAt: Archive date
     sushiUrl: Sushi URL
     enterUrl: Please enter an URL
     enterRequestorId: Please enter a Requestor Id.
