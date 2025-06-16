@@ -1146,3 +1146,7 @@ applyToAll: Appliquer à tous
 minValueError: "La valeur est trop petite. Minimum: {min}"
 maxValueError: "La valeur est trop grande. Maximum: {max}"
 synchronize: Synchroniser
+archived: Archivé
+archivedSince: Archivé depuis le {date}
+deleted: Supprimé
+deletedSince: Supprimé depuis le {date}
