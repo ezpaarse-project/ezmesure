@@ -418,6 +418,7 @@ const {
     q: debouncedSearch,
     connection: computed(() => filters.value.connection),
     active: computed(() => filters.value.active),
+    archived: computed(() => filters.value.archived),
     include: ['harvests', 'institution.memberships.user'],
     sort: 'institution.name',
     order: 'asc',

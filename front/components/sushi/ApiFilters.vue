@@ -71,6 +71,14 @@
             prepend-icon="mdi-toggle-switch"
           />
         </v-col>
+
+        <v-col v-if="!institution" cols="6">
+          <ApiFiltersButtonsGroup
+            v-model="filters.archived"
+            :label="$t('archived')"
+            prepend-icon="mdi-archive"
+          />
+        </v-col>
       </v-row>
     </v-container>
   </div>
