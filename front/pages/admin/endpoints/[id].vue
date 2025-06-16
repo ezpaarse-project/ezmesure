@@ -139,7 +139,7 @@
       :headers="headers"
       :group-by="[{ key: 'institution.id' }]"
       :loading="status === 'pending' && 'primary'"
-      :row-props="({ item }) => ({ class: !item.active && 'bg-grey-lighten-4 text-grey' })"
+      :row-props="({ item }) => ({ class: shouldGreyRow(item) && 'bg-grey-lighten-4 text-grey' })"
       items-per-page="0"
       density="comfortable"
       hide-default-footer
@@ -263,13 +263,8 @@
         <LocalDate :model-value="item.updatedAt" />
       </template>
 
-      <template #[`item.active`]="{ item }">
-        <span
-          v-tooltip:left="$t(`endpoints.${item.active ? 'activeSince' : 'inactiveSince'}`, { date: dateFormat(item.activeUpdatedAt, locale) })"
-          :class="[`text-${item.active ? 'green' : 'red-lighten-3'}`]"
-        >
-          {{ item.active ? $t('endpoints.active') : $t('endpoints.inactive') }}
-        </span>
+      <template #[`item.status`]="{ item }">
+        <SushiStateText :model-value="item" />
       </template>
 
       <template #[`item.actions`]="{ item }">
@@ -455,7 +450,7 @@ const headers = computed(() => [
   },
   {
     title: t('status'),
-    value: 'active',
+    value: 'status',
     align: 'center',
     width: '130px',
   },
@@ -480,6 +475,10 @@ const institutionsSelectionStatus = computed(() => {
   }
   return 'partial';
 });
+
+function shouldGreyRow(item) {
+  return item.deletedAt || item.archived || !item.active;
+}
 
 function calcSushiMetrics() {
   if (!sushis.value) {
