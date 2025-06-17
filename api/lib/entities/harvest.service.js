@@ -1,5 +1,6 @@
 // @ts-check
 const harvestPrisma = require('../services/prisma/harvest');
+
 const BasePrismaService = require('./base-prisma.service');
 
 /* eslint-disable max-len */
@@ -11,6 +12,7 @@ const BasePrismaService = require('./base-prisma.service');
 /** @typedef {import('@prisma/client').Prisma.HarvestCountArgs} HarvestCountArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestCreateArgs} HarvestCreateArgs */
 /** @typedef {import('@prisma/client').Prisma.HarvestDeleteManyArgs} HarvestDeleteManyArgs */
+/** @typedef {import('@prisma/client').Prisma.HarvestInclude} HarvestInclude */
 /* eslint-enable max-len */
 
 module.exports = class HarvestsService extends BasePrismaService {
@@ -71,5 +73,47 @@ module.exports = class HarvestsService extends BasePrismaService {
    */
   deleteMany(params) {
     return harvestPrisma.removeMany(params, this.prisma);
+  }
+
+  /**
+   * Scroll through harvests
+   *
+   * @param {Omit<HarvestFindManyArgs, 'skip' | 'cursor' | 'orderBy'>} [query]
+   *
+   * @returns {AsyncGenerator<Harvest>}
+   */
+  async* scroll(query = {}) {
+    let cursor;
+
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const data = await this.prisma?.harvest.findMany({
+        ...query,
+        // Cursor pagination
+        take: query.take || 5000,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { credentialsId_reportId_period: cursor } : undefined,
+        // Sort by cursor
+        orderBy: [
+          { credentialsId: 'asc' },
+          { reportId: 'asc' },
+          { period: 'asc' },
+        ],
+      });
+
+      yield* data;
+
+      cursor = undefined;
+
+      // Update cursor
+      const lastItem = data.at(-1);
+      if (lastItem) {
+        cursor = {
+          credentialsId: lastItem.credentialsId,
+          reportId: lastItem.reportId,
+          period: lastItem.period,
+        };
+      }
+    } while (cursor);
   }
 };
