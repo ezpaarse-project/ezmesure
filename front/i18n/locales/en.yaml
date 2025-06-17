@@ -31,6 +31,7 @@ menu:
     group: Repository aliases
     aliases: Aliases
     templates: Templates
+    orphans: Orphans
   spaces: Spaces
   harvest:
     group: Harvest
@@ -870,6 +871,11 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} is {valueText}"
       is:not: "{field} is not {valueText}"
+
+orphanAliases:
+  toolbarTitle: Orphan aliases ({count})
+  pageDescription: Aliases shown here are found in Elasticsearch but are not managed by ezMESURE.
+
 repoAliasTemplates:
   toolbarTitle: Alias templates ({count})
   manageTemplates: >
