@@ -30,8 +30,14 @@
 
         <v-list-item
           :title="$t('menu.repositoryAliases.templates')"
-          to="/admin/repository-alias-templates"
+          to="/admin/repository-aliases/templates"
           prepend-icon="mdi-view-grid"
+        />
+
+        <v-list-item
+          :title="$t('menu.repositoryAliases.orphans')"
+          to="/admin/repository-aliases/orphans"
+          prepend-icon="mdi-bell-outline"
         />
       </v-list-group>
 

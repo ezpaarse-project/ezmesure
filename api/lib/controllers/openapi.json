@@ -7698,6 +7698,61 @@
         }
       }
     },
+    "/repository-aliases/_orphans": {
+      "get": {
+        "summary": "Get orphan ES aliases",
+        "description": "Get aliases that are found in Elasticsearch but not the database",
+        "operationId": "get-repository-aliases-_orphans",
+        "tags": [
+          "Repository Aliases"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "an orphan alias",
+                    "required": [
+                      "alias",
+                      "index"
+                    ],
+                    "properties": {
+                      "alias": {
+                        "type": "string",
+                        "description": "The alias name"
+                      },
+                      "index": {
+                        "type": "string",
+                        "description": "The target index of the alias"
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "The filter of the alias"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/repository-aliases/{id}": {
       "parameters": [
         {

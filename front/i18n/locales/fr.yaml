@@ -31,6 +31,7 @@ menu:
     group: Alias d'entrepôts
     aliases: Alias
     templates: Modèles
+    orphans: Orphelins
   spaces: Espaces
   harvest:
     group: Moissonnage
@@ -886,6 +887,11 @@ repositoryAliases:
       values: "{0}|{0} {1}, etc."
       is: "{field} est {valueText}"
       is:not: "{field} n'est pas {valueText}"
+
+orphanAliases:
+  toolbarTitle: Alias orphelins ({count})
+  pageDescription: Les alias affichés ici sont présents dans Elasticsearch mais ne sont pas gérés par ezMESURE.
+
 repoAliasTemplates:
   toolbarTitle: Modèles d'alias ({count})
   manageTemplates: >
