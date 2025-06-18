@@ -83,37 +83,32 @@ module.exports = class HarvestsService extends BasePrismaService {
    * @returns {AsyncGenerator<Harvest>}
    */
   async* scroll(query = {}) {
-    let cursor;
+    let skip = 0;
+    const take = query.take || 5000;
 
-    do {
+    while (true) {
       // eslint-disable-next-line no-await-in-loop
-      const data = await this.prisma?.harvest.findMany({
+      const data = await harvestPrisma.findMany({
         ...query,
         // Cursor pagination
-        take: query.take || 5000,
-        skip: cursor ? 1 : 0,
-        cursor: cursor ? { credentialsId_reportId_period: cursor } : undefined,
+        take,
+        skip,
         // Sort by cursor
         orderBy: [
           { credentialsId: 'asc' },
           { reportId: 'asc' },
           { period: 'asc' },
         ],
-      });
+      }, this.prisma);
 
       yield* data;
 
-      cursor = undefined;
+      if (data.length < take) {
+        break;
+      }
 
       // Update cursor
-      const lastItem = data.at(-1);
-      if (lastItem) {
-        cursor = {
-          credentialsId: lastItem.credentialsId,
-          reportId: lastItem.reportId,
-          period: lastItem.period,
-        };
-      }
-    } while (cursor);
+      skip += data.length;
+    }
   }
 };
