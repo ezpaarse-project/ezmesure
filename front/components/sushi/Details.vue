@@ -31,22 +31,49 @@
       </DetailsField>
 
       <DetailsField
-        v-if="credentialUrl"
         :label="$t('institutions.sushi.sushiUrl')"
         cols="12"
       >
-        <a
-          :href="credentialUrl.href"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {{ credentialUrl.href }}<v-icon
-            icon="mdi-open-in-new"
-            color="secondary"
-            size="small"
-            class="ml-1"
-          />
-        </a>
+        <v-progress-circular v-if="sushiUrls.loading === true" size="16" width="2" indeterminate />
+
+        <v-alert
+          v-if="!!sushiUrls.error"
+          :title="$t('errors.generic')"
+          :text="sushiUrls.error"
+          density="comfortable"
+          type="error"
+        />
+
+        <template v-if="!!sushiUrls.urls">
+          <div
+            v-for="[version, url] in sushiUrls.urls"
+            :key="version"
+            class="d-flex  mb-1"
+          >
+            <v-chip
+              :text="version"
+              :color="counterVersionsColors.get(version) || 'secondary'"
+              size="small"
+              density="comfortable"
+              variant="flat"
+              label
+              class="mr-1"
+            />
+
+            <a
+              :href="url"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {{ url }}<v-icon
+                icon="mdi-open-in-new"
+                color="secondary"
+                size="small"
+                class="ml-1"
+              />
+            </a>
+          </div>
+        </template>
       </DetailsField>
 
       <DetailsField
@@ -60,13 +87,7 @@
 </template>
 
 <script setup>
-import { joinURL } from 'ufo'; // ufo is used by $fetch (https://nuxt.com/docs/api/composables/use-fetch#usage)
-import {
-  subMonths,
-  format,
-  startOfMonth,
-  endOfMonth,
-} from 'date-fns';
+import { getErrorMessage } from '@/lib/errors';
 
 const props = defineProps({
   modelValue: {
@@ -77,45 +98,15 @@ const props = defineProps({
 
 const { t, locale } = useI18n();
 
-const credentialUrl = computed(() => {
-  if (!props.modelValue?.endpoint) {
-    return undefined;
+const sushiUrls = computedAsync(async () => {
+  try {
+    const urls = await $fetch(`/api/sushi/${props.modelValue.id}/_sushiUrls`);
+
+    return { urls: new Map(Object.entries(urls)) };
+  } catch (err) {
+    return { error: getErrorMessage(err) };
   }
-
-  const {
-    requestorId,
-    customerId,
-    apiKey,
-    params: sushiParams,
-    endpoint,
-  } = props.modelValue;
-
-  const {
-    sushiUrl,
-    params: endpointParams,
-  } = endpoint;
-
-  const testedReport = endpoint.testedReport || 'pr';
-  const harvestDateFormat = endpoint.harvestDateFormat || 'yyyy-MM';
-
-  const url = new URL(joinURL(sushiUrl, `reports/${testedReport}`));
-
-  const threeMonthAgo = subMonths(new Date(), 3);
-  url.search = new URLSearchParams(
-    [
-      ['begin_date', format(startOfMonth(threeMonthAgo), harvestDateFormat)],
-      ['end_date', format(endOfMonth(threeMonthAgo), harvestDateFormat)],
-      ['requestor_id', requestorId],
-      ['customer_id', customerId],
-      ['api_key', apiKey],
-      ...[...endpointParams, ...sushiParams]
-        .filter((param) => param.scope === 'report_download' || param.scope === `report_download_${testedReport}`)
-        .map((param) => [param.name, param.value]),
-    ].filter(([, value]) => !!value),
-  ).toString();
-
-  return url;
-});
+}, { loading: true });
 
 function formatDate(date) {
   return dateFormat(date, locale.value, 'PPPpp');
