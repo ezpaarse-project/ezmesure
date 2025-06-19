@@ -726,3 +726,35 @@ exports.importSushiItems = async (ctx) => {
   ctx.type = 'json';
   ctx.body = response;
 };
+
+exports.getSushiUrls = async (ctx) => {
+  const { endpoint, ...sushi } = ctx.state.sushi;
+
+  const threeMonthAgo = subMonths(new Date(), 3);
+
+  const options = {
+    reportType: endpoint.testedReport,
+    beginDate: format(threeMonthAgo, 'yyyy-MM'),
+    endDate: format(threeMonthAgo, 'yyyy-MM'),
+  };
+
+  ctx.type = 'json';
+  ctx.body = Object.fromEntries(
+    endpoint.counterVersions.map((version) => {
+      const downloadConfig = sushiService.getReportDownloadConfig(
+        endpoint,
+        sushi,
+        version,
+        options,
+      );
+
+      const url = new URL(downloadConfig.url);
+      url.search = new URLSearchParams(downloadConfig.params);
+
+      return [
+        version,
+        url.href,
+      ];
+    }),
+  );
+};
