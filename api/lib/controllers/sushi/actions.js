@@ -454,13 +454,19 @@ const checkConnection = async (sushi, params) => {
 
   const threeMonthAgo = format(subMonths(new Date(), 3), 'yyyy-MM');
 
+  const counterVersion = params.counterVersion || '5';
+  if (endpoint.counterVersions && !endpoint.counterVersions.includes(counterVersion)) {
+    throw new Error(`Counter version ${counterVersion} is not supported by endpoint ${endpoint.vendor}`);
+  }
+
   const sushiData = {
     sushi,
     institution: sushi.institution,
     endpoint,
     beginDate: params.beginDate || params.endDate || threeMonthAgo,
     endDate: params.endDate || params.beginDate || threeMonthAgo,
-    reportType: endpoint.testedReport || 'pr',
+    reportType: endpoint.testedReport,
+    counterVersion,
   };
 
   const reportPath = sushiService.getReportPath(sushiData);
@@ -525,7 +531,8 @@ const checkConnection = async (sushi, params) => {
   });
 
   if (!endpoint.ignoreReportValidation && report && exceptions?.length === 0) {
-    const { valid } = sushiService.validateReport(report);
+    const { valid, errors } = sushiService.validateReport(report);
+    console.log(errors);
 
     if (!valid) {
       errorCode = ERROR_CODES.invalidReport;

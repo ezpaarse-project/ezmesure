@@ -158,6 +158,7 @@ router.route({
     query: {
       beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
       endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      counterVersion: Joi.string().trim().optional(),
     },
     body: Joi.object({
       id: Joi.string().trim().min(1).empty(null),
@@ -248,6 +249,7 @@ router.route({
     query: {
       beginDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
       endDate: Joi.string().regex(/^\d{4}-\d{2}$/).optional(),
+      counterVersion: Joi.string().trim().optional(),
     },
   },
 });
