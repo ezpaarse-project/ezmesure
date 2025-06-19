@@ -1,54 +1,7 @@
-// @ts-check
-
-const {
-  format,
-  isSameMonth,
-  isLastDayOfMonth,
-  isFirstDayOfMonth,
-} = require('date-fns');
-
-const crypto = require('node:crypto');
-
 const { appLogger } = require('../../../logger');
 const elastic = require('../../../elastic');
 
-/**
- * Transform a list of attributes into an object
- *
- * @param {Array<Object>} list an array of { Type, Value } or { Name, Value } objects
- * @param {Object} opts
- * @param {string} [opts.splitValuesBy] the string used to split the values
- *
- * @returns an object representation of the list where each type becomes a property
- *          if a type appears multiple times, the value of the resulting property is an array
- */
-function list2object(list, opts = {}) {
-  const obj = {};
-  const { splitValuesBy } = opts;
-
-  if (!Array.isArray(list)) { return obj; }
-
-  list.forEach((el) => {
-    const elementKey = el?.Type || el?.Name;
-    let elementValue = el?.Value;
-
-    if (!elementKey || !elementValue) { return; }
-
-    const valuesSoFar = obj[elementKey];
-
-    if (splitValuesBy && typeof elementValue === 'string') {
-      elementValue = elementValue.split(splitValuesBy);
-    }
-
-    if (valuesSoFar) {
-      obj[elementKey] = [].concat(valuesSoFar).concat(elementValue);
-    } else {
-      obj[elementKey] = elementValue;
-    }
-  });
-
-  return obj;
-}
+const transformers = require('../../../../utils/sushi-transformers');
 
 /**
  * Insert SUSHI report into Elasticsearch
@@ -66,7 +19,7 @@ module.exports = async function process(params) {
       logs,
     },
     timeout,
-    data: { report },
+    data: { report, version },
   } = params;
 
   const {
@@ -75,38 +28,34 @@ module.exports = async function process(params) {
     sessionId,
   } = task;
 
+  // Prepare step
   const insertStep = await steps.create('insert');
   await saveTask();
   logs.add('info', `Importing report into [${index}]`);
   timeout.reset();
 
+  // Ensure step have data
   if (!insertStep.data || !(insertStep.data instanceof Object) || Array.isArray(insertStep.data)) {
     insertStep.data = {};
   }
 
+  // Prepare bulk
   const bulkSize = 2000;
   const bulkItems = [];
   const coveredPeriods = new Set();
 
-  const reportHeader = {
-    Created: report?.Report_Header?.Created,
-    Created_By: report?.Report_Header?.Created_By,
-    Customer_ID: report?.Report_Header?.Customer_ID,
-    Report_ID: report?.Report_Header?.Report_ID,
-    Release: report?.Report_Header?.Release,
-    Report_Name: report?.Report_Header?.Report_Name,
-    Institution_Name: report?.Report_Header?.Institution_Name,
+  // Get transformer specific to version
+  const prepareTransformer = transformers.get(version);
+  if (typeof prepareTransformer !== 'function') {
+    throw new Error(`Unsupported report version: ${version}`);
+  }
 
-    Institution_ID: list2object(report?.Report_Header?.Institution_ID),
-    Report_Filters: list2object(report?.Report_Header?.Report_Filters),
-    Report_Attributes: list2object(report?.Report_Header?.Report_Attributes, { splitValuesBy: '|' }),
-  };
+  // Init transformer
+  const transformer = prepareTransformer(report);
   timeout.reset();
 
-  const reportItems = Array.isArray(report?.Report_Items) ? report.Report_Items : [];
-  const totalItems = reportItems.length;
-
-  insertStep.data.totalReportItems = totalItems;
+  // Prepare progress
+  insertStep.data.totalReportItems = transformer.totalItems;
   insertStep.data.processedReportItems = 0;
   insertStep.data.progress = 0;
   let lastSaveDate = Date.now();
@@ -128,7 +77,7 @@ module.exports = async function process(params) {
   };
 
   /**
-   * Add an error
+   * Add an error to response
    *
    * @param {string} message the error message
    */
@@ -139,6 +88,11 @@ module.exports = async function process(params) {
     }
   };
 
+  /**
+   * Insert items in elastic
+   *
+   * @param {*} bulkOps
+   */
   const insertItems = async (bulkOps) => {
     const { body: bulkResult } = await elastic.bulk({ body: bulkOps });
 
@@ -159,156 +113,90 @@ module.exports = async function process(params) {
     });
   };
 
-  for (let i = 0; i < reportItems.length; i += 1) {
-    const reportItem = reportItems[i];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const result of transformer.extract()) {
+    // An error occurred
+    if (result.error) {
+      addError(result.error);
+      timeout.reset();
+      // eslint-disable-next-line no-continue
+      continue;
+    }
 
-    const item = {
-      X_Sushi_ID: credentials.id,
-      X_Institution_ID: credentials.institutionId,
-      X_Endpoint_ID: credentials.endpoint.id,
-      X_Package: credentials.packages,
-      X_Tags: credentials.tags,
-      X_Harvested_At: now,
-      X_Endpoint_Name: credentials.endpoint.vendor,
-      X_Endpoint_Tags: credentials.endpoint.tags,
-      X_Harvest_ID: sessionId,
-
-      Report_Header: reportHeader,
-
-      Item_ID: list2object(reportItem.Item_ID),
-      Item_Dates: list2object(reportItem.Item_Dates),
-      Item_Attributes: list2object(reportItem.Item_Attributes),
-      Publisher_ID: list2object(reportItem.Publisher_ID),
-
-      Title: reportItem.Title,
-      Item: reportItem.Item,
-      Database: reportItem.Database,
-      Platform: reportItem.Platform,
-      Publisher: reportItem.Publisher,
-      Data_Type: reportItem.Data_Type,
-      YOP: reportItem.YOP,
-      Section_Type: reportItem.Section_Type,
-      Access_Type: reportItem.Access_Type,
-      Access_Method: reportItem.Access_Method,
-      Item_Contributors: reportItem.Item_Contributors,
-    };
-    timeout.reset();
-
-    const itemParent = reportItem.Item_Parent;
-
-    if (itemParent) {
-      item.Item_Parent = {
-        Item_ID: list2object(itemParent.Item_ID),
-        Item_Dates: list2object(itemParent.Item_Dates),
-        Item_Attributes: list2object(itemParent.Item_Attributes),
-
-        Item_Name: itemParent.Item_Name,
-        Data_Type: itemParent.Data_Type,
-        Item_Contributors: itemParent.Item_Contributors,
-      };
+    // A date linked to a metric was found, if not covered yet, add it
+    if (result.date && !coveredPeriods.has(result.date)) {
+      coveredPeriods.add(result.date);
+      response.coveredPeriods = Array.from(coveredPeriods).sort();
       timeout.reset();
     }
 
-    const identifiers = Object.entries(item.Item_ID)
-      .map(([key, value]) => `${key}:${value}`)
-      .sort();
-    timeout.reset();
+    // A metric was found
+    if (result.metric) {
+      const {
+        index: i,
+        metricType,
+        reportId,
+        idComponents,
+        item: baseItem,
+      } = result.metric;
 
-    reportItem.Performance.forEach((performance) => {
-      if (!Array.isArray(performance?.Instance)) { return; }
+      // Prepare item
+      const item = {
+        X_Sushi_ID: credentials.id,
+        X_Institution_ID: credentials.institutionId,
+        X_Endpoint_ID: credentials.endpoint.id,
+        X_Package: credentials.packages,
+        X_Tags: credentials.tags,
+        X_Harvested_At: now,
+        X_Endpoint_Name: credentials.endpoint.vendor,
+        X_Endpoint_Tags: credentials.endpoint.tags,
+        X_Harvest_ID: sessionId,
 
-      const period = performance.Period;
-      const perfBeginDate = new Date(period.Begin_Date);
-      const perfEndDate = new Date(period.End_Date);
+        X_Date_Month: result.date,
+        ...baseItem,
+      };
 
-      if (!isSameMonth(perfBeginDate, perfEndDate)) {
-        addError(
-          `Item #${i} performance cover more than a month`
-          + ` [${perfBeginDate} -> ${perfEndDate}]`
-          + ` [ID: ${identifiers.join(', ')}]`
-          + ` [Title: ${item.Title}]`,
-        );
-        return;
-      }
-      if (!isFirstDayOfMonth(perfBeginDate) || !isLastDayOfMonth(perfEndDate)) {
-        addError(
-          `Item #${i} performance does not cover the entire month`
-          + ` [${perfBeginDate} -> ${perfEndDate}]`
-          + ` [ID: ${identifiers.join(', ')}]`
-          + ` [Title: ${item.Title}]`,
-        );
-        return;
-      }
+      // Generate id
+      const id = [
+        result.date,
+        reportId.toLowerCase(),
+        metricType.toLowerCase(),
+        item.X_Sushi_ID,
+        crypto.createHash('sha256').update(idComponents).digest('hex'),
+      ].join(':');
 
-      const date = format(perfBeginDate, 'yyyy-MM');
-
-      if (!coveredPeriods.has(date)) {
-        coveredPeriods.add(date);
-        response.coveredPeriods = Array.from(coveredPeriods).sort();
-      }
-
-      performance.Instance.forEach((instance) => {
-        if (typeof instance?.Metric_Type !== 'string') { return; }
-
-        const metricType = instance.Metric_Type;
-        const metricCount = instance.Count;
-        const reportId = reportHeader?.Report_ID || '';
-
-        const id = [
-          date,
-          reportId.toLowerCase(),
-          metricType.toLowerCase(),
-          item.X_Sushi_ID,
-          crypto
-            .createHash('sha256')
-            .update([
-              item.YOP,
-              item.Access_Method,
-              item.Access_Type,
-              item.Section_Type,
-              item.Data_Type,
-              item.Platform,
-              item.Publisher,
-              item.Title,
-              item.Database,
-              ...identifiers].join('|'))
-            .digest('hex'),
-        ].join(':');
-
-        bulkItems.push({ index: { _index: index, _id: id } });
-        bulkItems.push({
-          ...item,
-          X_Date_Month: date,
-          Metric_Type: metricType,
-          Count: metricCount,
-          Period: period,
-        });
-      });
-    });
-    timeout.reset();
-
-    if (bulkItems.length >= bulkSize) {
-      // eslint-disable-next-line no-await-in-loop
-      await insertItems(bulkItems.splice(0, bulkSize));
-      insertStep.data.processedReportItems = i + 1;
-      insertStep.data.progress = Math.floor(((i + 1) / totalItems) * 100);
+      // Buffer item
+      bulkItems.push({ index: { _index: index, _id: id } });
+      bulkItems.push(item);
       timeout.reset();
 
-      if ((Date.now() - lastSaveDate) > 5000) {
+      // If buffer is full, insert into elastic
+      if (bulkItems.length >= bulkSize) {
         // eslint-disable-next-line no-await-in-loop
-        await steps.update(insertStep);
-        lastSaveDate = Date.now();
+        await insertItems(bulkItems.splice(0, bulkSize));
+        insertStep.data.processedReportItems = i + 1;
+        insertStep.data.progress = Math.floor(((i + 1) / transformer.totalItems) * 100);
         timeout.reset();
+
+        // Save step if it's been 5 seconds since last save
+        if ((Date.now() - lastSaveDate) > 5000) {
+          // eslint-disable-next-line no-await-in-loop
+          await steps.update(insertStep);
+          lastSaveDate = Date.now();
+          timeout.reset();
+        }
       }
     }
   }
 
+  // Flush buffer
   if (bulkItems.length > 0) {
     await insertItems(bulkItems);
     timeout.reset();
   }
 
-  insertStep.data.processedReportItems = totalItems;
+  // Force 100% progress
+  insertStep.data.processedReportItems = transformer.totalItems;
   insertStep.data.progress = 100;
 
   logs.add('info', 'Sushi harvesting terminated');
@@ -317,6 +205,7 @@ module.exports = async function process(params) {
   logs.add('info', `Updated items: ${response.updated}`);
   logs.add('info', `Failed insertions: ${response.failed}`);
 
+  // End step
   await steps.end(insertStep);
   task.result = response;
   task.status = 'finished';

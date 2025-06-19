@@ -47,6 +47,7 @@ module.exports = async function process(params) {
     },
     credentials,
     reportType = sushiService.DEFAULT_REPORT_TYPE,
+    counterVersion,
   } = task;
 
   const {
@@ -61,6 +62,7 @@ module.exports = async function process(params) {
     institution,
     beginDate,
     endDate,
+    counterVersion: counterVersion || '5',
   };
 
   const reportPath = sushiService.getReportPath(sushiData);
@@ -165,6 +167,7 @@ module.exports = async function process(params) {
             // @ts-ignore
             downloadStep.data.statusCode = response?.status;
 
+            // Handle HTTP status codes
             if (response?.status === 202) {
               logs.add('warning', `Endpoint responded with status [${response?.status}]`);
               deferred = true;
@@ -218,6 +221,7 @@ module.exports = async function process(params) {
   const exceptions = sushiService.getExceptions(report);
   timeout.reset();
 
+  // Handle exceptions
   if (exceptions.length > 0) {
     let hasError = false;
     let isDelayed = false;

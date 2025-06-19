@@ -39,6 +39,7 @@ module.exports = async function process(params) {
     errors,
     reportId: foundReportId,
     unsupported,
+    version: foundVersion,
   } = sushiService.validateReport(report);
   timeout.reset();
 
@@ -46,6 +47,25 @@ module.exports = async function process(params) {
     logs.add('info', `Report_ID is [${foundReportId}]`);
   } else {
     logs.add('error', 'Report_ID is missing from the report header');
+  }
+
+  if (foundVersion) {
+    logs.add('info', `Release is [${foundVersion}]`);
+  } else {
+    logs.add('error', 'Release is missing from the report header');
+  }
+
+  if (foundVersion !== task.counterVersion) {
+    logs.add('error', `Report version is [${foundVersion}]`);
+    if (task.counterVersion) {
+      logs.add('error', `Expected version is [${task.counterVersion}]`);
+    }
+
+    if (!ignoreReportValidation) {
+      throw new HarvestError('The report is not in the expected version');
+    } else {
+      logs.add('info', 'Ignoring report validation check');
+    }
   }
 
   if (!valid) {
@@ -69,4 +89,9 @@ module.exports = async function process(params) {
   }
 
   await steps.end(validationStep);
+
+  // eslint-disable-next-line no-param-reassign
+  params.data.reportId = foundReportId;
+  // eslint-disable-next-line no-param-reassign
+  params.data.version = foundVersion;
 };
