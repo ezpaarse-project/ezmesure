@@ -109,8 +109,16 @@ exports.createOne = async (ctx) => {
   ctx.status = 200;
   ctx.body = await harvestSessionService.create({
     data: {
-      ignoreValidation: null,
+      // Default values
+      timeout: 600,
+      allowFaulty: false,
+      downloadUnsupported: false,
+      forceDownload: false,
+      sendEndMail: true,
+      params: {},
+      // Provided values
       ...body,
+      // Provided id
       id: harvestId,
     },
     include: {
