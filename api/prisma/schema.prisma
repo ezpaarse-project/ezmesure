@@ -432,6 +432,8 @@ model HarvestSession {
   jobs                HarvestJob[]
   /// IDs of the requested reports (ex: tr_j1)
   reportTypes         String[]
+  /// Allowed COUNTER versions (ex: ['5.1', '5'])
+  allowedCounterVersions         String[]
   /// Maximum execution time of a job
   timeout             Int          @default(600)
   /// Whether the reports should be fetched even if credentials aren't verified or wrong
@@ -490,6 +492,8 @@ model HarvestJob {
   status          HarvestJobStatus
   /// ID of the harvested report (ex: tr_j1)
   reportType      String
+  /// Version of COUNTER to harvest (ex: 5.1)
+  counterVersion         String
   /// ID of the harvest session
   sessionId       String
   /// Session that created the job

@@ -115,6 +115,7 @@ exports.createOne = async (ctx) => {
       downloadUnsupported: false,
       forceDownload: false,
       sendEndMail: true,
+      allowedCounterVersions: ['5.1', '5'],
       params: {},
       // Provided values
       ...body,
@@ -162,6 +163,7 @@ exports.upsertOne = async (ctx) => {
         downloadUnsupported: false,
         forceDownload: false,
         sendEndMail: true,
+        allowedCounterVersions: ['5.1', '5'],
         params: {},
         // Provided values
         ...body,

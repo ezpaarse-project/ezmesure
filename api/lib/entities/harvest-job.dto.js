@@ -12,6 +12,7 @@ const schema = {
   startedAt: Joi.date(),
   status: Joi.string().trim(),
   reportType: Joi.string().trim(),
+  counterVersion: Joi.string().trim(),
   sessionId: Joi.string().trim(),
   index: Joi.string().trim(),
   runningTime: Joi.number().integer(),

@@ -25,6 +25,7 @@ const schema = {
   beginDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   endDate: Joi.string().regex(/^\d{4}-\d{2}$/),
   reportTypes: Joi.array().items(Joi.string().lowercase().trim()),
+  allowedCounterVersions: Joi.array().items(Joi.string().trim()).min(1),
   timeout: Joi.number(),
   allowFaulty: Joi.boolean(),
   downloadUnsupported: Joi.boolean(),

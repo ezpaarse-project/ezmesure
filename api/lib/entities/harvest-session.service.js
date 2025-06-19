@@ -181,7 +181,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
   /**
    * Returns credentials to harvest based on session params
    * @param {HarvestSession} session - The session to check
-   * @param {object} [options]
+   * @param {object} [options] - Options on how to get credentials
    * @returns {Promise<{ all: SushiCredentials[], harvestable: SushiCredentials[] }>}
    */
   async getCredentials(session, options = {}) {
@@ -189,21 +189,31 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       throw new HTTPError(400, 'errors.harvest.invalidQuery', [session.id]);
     }
 
-    /** @type {SushiCredentialsWhereInput} */
-    const where = {
-      id: queryToPrismaFilter(session.credentialsQuery.sushiIds?.toString()),
-      institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
-      endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
-      active: true,
-      endpoint: {
-        active: true,
-      },
-    };
-
     const sushiCredentialsService = new SushiCredentialsService(this);
-    const credentials = await sushiCredentialsService.findMany({ where, include: options.include });
+    const credentials = await sushiCredentialsService.findMany({
+      where: {
+        id: queryToPrismaFilter(session.credentialsQuery.sushiIds?.toString()),
+        institutionId: queryToPrismaFilter(session.credentialsQuery.institutionIds?.toString()),
+        endpointId: queryToPrismaFilter(session.credentialsQuery.endpointIds?.toString()),
+        active: true,
+        endpoint: {
+          active: true,
+        },
+      },
+      include: {
+        endpoint: { select: { counterVersions: true } },
+        ...options.include,
+      },
+    });
 
     let harvestable = credentials;
+    // Remove credentials that doesn't support at least one of the requested versions
+    const allowedVersions = new Set(session.allowedCounterVersions);
+    harvestable = harvestable.filter(
+      // @ts-ignore
+      (c) => c.endpoint.counterVersions.some((v) => allowedVersions.has(v)),
+    );
+    // Remove credentials that have a invalid connection status
     if (!session.allowFaulty) {
       harvestable = harvestable.filter(
         // @ts-ignore
@@ -341,7 +351,10 @@ module.exports = class HarvestSessionService extends BasePrismaService {
    * Start a session by creating linked jobs
    *
    * @param {HarvestSession} session - The session to check
-   * @param {object} [options]
+   * @param {object} [options] - Options on how to start the session
+   * @param {boolean} [options.restartAll] - Restart all jobs instead of the ones that are failed
+   * @param {boolean} [options.forceRefreshSupported] - Force refresh of supported reports
+   * @param {boolean} [options.dryRun] - Do not create any jobs
    */
   async* start({ id }, options = {}) {
     const session = await this.findUnique({ where: { id } });
@@ -402,6 +415,8 @@ module.exports = class HarvestSessionService extends BasePrismaService {
       credentialsToHarvest = harvestable;
     }
 
+    const allowedVersions = new Set(session.allowedCounterVersions);
+
     // Create index cache
     const institutionIndices = new Map();
 
@@ -416,6 +431,12 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             endDate: session.endDate,
           }]),
         );
+
+        // Get version that will be used, if no suitable version is found, skip this credential
+        const counterVersion = endpoint.counterVersions.find((v) => allowedVersions.has(v));
+        if (!counterVersion) {
+          return [];
+        }
 
         // Get index for institution
         let index = institutionIndices.get(institution.id) || '';
@@ -595,6 +616,7 @@ module.exports = class HarvestSessionService extends BasePrismaService {
             session: { id: session.id },
             reportType,
             index,
+            counterVersion,
           }));
       }),
     );
