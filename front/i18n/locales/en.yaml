@@ -963,6 +963,7 @@ harvest:
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
     counterVersionTooltip: Harvest a COUNTER {version} report
+    noData: No data in the harvested report
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role
