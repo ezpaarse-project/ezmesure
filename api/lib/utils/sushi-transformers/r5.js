@@ -161,7 +161,7 @@ module.exports = function prepareC5Transformer(report) {
             yield {
               error: '',
               date,
-              metric: {
+              performance: {
                 index: i,
                 metricType: instance.Metric_Type,
                 reportId: reportHeader?.Report_ID || '',

@@ -1,3 +1,5 @@
+const crypto = require('node:crypto');
+
 const { appLogger } = require('../../../logger');
 const elastic = require('../../../elastic');
 
@@ -51,11 +53,11 @@ module.exports = async function process(params) {
   }
 
   // Init transformer
-  const transformer = prepareTransformer(report);
+  const reportTransformer = prepareTransformer(report);
   timeout.reset();
 
   // Prepare progress
-  insertStep.data.totalReportItems = transformer.totalItems;
+  insertStep.data.totalReportItems = reportTransformer.totalItems;
   insertStep.data.processedReportItems = 0;
   insertStep.data.progress = 0;
   let lastSaveDate = Date.now();
@@ -92,29 +94,33 @@ module.exports = async function process(params) {
    * Insert items in elastic
    *
    * @param {*} bulkOps
+   * @param {number} i
    */
-  const insertItems = async (bulkOps) => {
+  const insertItems = async (bulkOps, i) => {
     const { body: bulkResult } = await elastic.bulk({ body: bulkOps });
 
     if (!Array.isArray(bulkResult?.items)) { return; }
 
-    bulkResult?.items.forEach((i) => {
-      if (i?.index?.result === 'created') {
+    bulkResult?.items.forEach((item) => {
+      if (item?.index?.result === 'created') {
         response.inserted += 1;
-      } else if (i?.index?.result === 'updated') {
+      } else if (item?.index?.result === 'updated') {
         response.updated += 1;
       } else {
         response.failed += 1;
 
-        if (i?.index?.error && response.errors.length < 10) {
-          response.errors.push(i.index.error);
+        if (item?.index?.error && response.errors.length < 10) {
+          response.errors.push(item.index.error);
         }
       }
     });
+
+    insertStep.data.processedReportItems = i + 1;
+    insertStep.data.progress = Math.floor(((i + 1) / reportTransformer.totalItems) * 100);
   };
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const result of transformer.extract()) {
+  for (const result of reportTransformer.transform()) {
     // An error occurred
     if (result.error) {
       addError(result.error);
@@ -131,14 +137,14 @@ module.exports = async function process(params) {
     }
 
     // A metric was found
-    if (result.metric) {
+    if (result.performance) {
       const {
         index: i,
         metricType,
         reportId,
         idComponents,
         item: baseItem,
-      } = result.metric;
+      } = result.performance;
 
       // Prepare item
       const item = {
@@ -162,7 +168,9 @@ module.exports = async function process(params) {
         reportId.toLowerCase(),
         metricType.toLowerCase(),
         item.X_Sushi_ID,
-        crypto.createHash('sha256').update(idComponents).digest('hex'),
+        crypto.createHash('sha256')
+          .update(idComponents.join('|'))
+          .digest('hex'),
       ].join(':');
 
       // Buffer item
@@ -173,9 +181,7 @@ module.exports = async function process(params) {
       // If buffer is full, insert into elastic
       if (bulkItems.length >= bulkSize) {
         // eslint-disable-next-line no-await-in-loop
-        await insertItems(bulkItems.splice(0, bulkSize));
-        insertStep.data.processedReportItems = i + 1;
-        insertStep.data.progress = Math.floor(((i + 1) / transformer.totalItems) * 100);
+        await insertItems(bulkItems.splice(0, bulkSize), i);
         timeout.reset();
 
         // Save step if it's been 5 seconds since last save
@@ -191,13 +197,9 @@ module.exports = async function process(params) {
 
   // Flush buffer
   if (bulkItems.length > 0) {
-    await insertItems(bulkItems);
+    await insertItems(bulkItems, reportTransformer.totalItems);
     timeout.reset();
   }
-
-  // Force 100% progress
-  insertStep.data.processedReportItems = transformer.totalItems;
-  insertStep.data.progress = 100;
 
   logs.add('info', 'Sushi harvesting terminated');
   logs.add('info', `Covered periods: ${response.coveredPeriods.join(', ')}`);

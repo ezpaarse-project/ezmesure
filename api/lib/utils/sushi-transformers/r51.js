@@ -67,12 +67,12 @@ module.exports = function prepareC51Transformer(report) {
         // }
 
         // Extract item identifiers
-        const identifiers = Object.entries(baseItem.Item_ID)
+        const identifiers = Object.entries(baseItem.Item_ID ?? {})
           .map(([key, value]) => `${key}:${value}`)
           .sort();
 
-        const attributes = Array.isArray(report?.Attribute_Performance)
-          ? report.Attribute_Performance
+        const attributes = Array.isArray(reportItem?.Attribute_Performance)
+          ? reportItem.Attribute_Performance
           : [];
 
         // eslint-disable-next-line no-restricted-syntax

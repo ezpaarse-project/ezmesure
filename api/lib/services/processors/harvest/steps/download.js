@@ -93,6 +93,11 @@ module.exports = async function process(params) {
       logs.add('warning', 'The report is not a valid JSON, it will be re-downloaded');
     }
 
+    if (report?.Report_Header?.Release !== sushiData.counterVersion) {
+      logs.add('warning', 'The report was generated with a different COUNTER version, it will be re-downloaded');
+      report = null;
+    }
+
     const exceptions = sushiService.getExceptions(report);
     timeout.reset();
 
