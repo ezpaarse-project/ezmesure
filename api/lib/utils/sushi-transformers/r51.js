@@ -26,110 +26,160 @@ module.exports = function prepareC51Transformer(report) {
     totalItems,
     * transform() {
       for (let i = 0; i < reportItems.length; i += 1) {
-        const reportItem = reportItems[i];
+        const parent = reportItems[i];
+        let items = [parent];
+        let itemParent;
 
-        // Prepare base item
-        /** @type {Record<string, any>} */
-        const baseItem = {
-          Report_Header: reportHeader,
+        // IR-based reports have a different structure,
+        // and items are nested cause some may have a parent
+        if (parent.Items) {
+          items = parent.Items;
 
-          Item_ID: reportItem.Item_ID,
-          // TODO: check doc (and test) and look for that
-          // Item_Dates: reportItem.Item_Dates,
-          // Item_Attributes: reportItem.Item_Attributes,
-          // Publisher_ID: reportItem.Publisher_ID,
+          // If parent item exists
+          if (parent.Item_ID) {
+            itemParent = {
+              Item_ID: parent.Item_ID,
+              // Item_Dates was renamed into Publication_Date
+              // // Item_Dates: parent.Item_Dates,
+              Publication_Date: parent.Publication_Date,
 
-          // TODO: check doc (and test) and look for that
-          Title: reportItem.Title,
-          // Item: reportItem.Item,
-          // Database: reportItem.Database,
-          Platform: reportItem.Platform,
-          Publisher: reportItem.Publisher,
-          // YOP: reportItem.YOP,
-          // Section_Type: reportItem.Section_Type,
-          // Access_Type: reportItem.Access_Type,
-          // Item_Contributors: reportItem.Item_Contributors,
-        };
+              Item: parent.Item,
+              // ? Item_Name was renamed into Item
+              // // Item_Name: parent.Item_Name,
+              Data_Type: parent.Data_Type,
+              // Item_Contributors was renamed into Authors
+              // // Item_Contributors: parent.Item_Contributors,
+              Authors: parent.Authors,
+              // Item_Attributes.Article_Version was renamed into Article_Version
+              // // Item_Attributes.Article_Version: parent.Item_Attributes.Article_Version,
+              Article_Version: parent.Article_Version,
 
-        // Extract item parent
-        // TODO: check doc (and test) and look for that
-        // const itemParent = reportItem.Item_Parent;
-        // if (itemParent) {
-        //   item.Item_Parent = {
-        //     Item_ID: itemParent.Item_ID,
-        //     Item_Dates: itemParent.Item_Dates,
-        //     Item_Attributes: itemParent.Item_Attributes,
-
-        //     Item_Name: itemParent.Item_Name,
-        //     Data_Type: itemParent.Data_Type,
-        //     Item_Contributors: itemParent.Item_Contributors,
-        //   };
-        // }
-
-        // Extract item identifiers
-        const identifiers = Object.entries(baseItem.Item_ID ?? {})
-          .map(([key, value]) => `${key}:${value}`)
-          .sort();
-
-        const attributes = Array.isArray(reportItem?.Attribute_Performance)
-          ? reportItem.Attribute_Performance
-          : [];
+              // Item_Attributes was deleted, and now is spread
+              // // Item_Attributes: parent.Item_Attributes,
+              // Item_Attributes.Article_Type was deleted
+              // // Item_Attributes.Article_Type: parent.Item_Attributes.Article_Type,
+              // Item_Attributes.Qualification_Name was deleted
+              // // Item_Attributes.Qualification_Name: parent.Item_Attributes.Qualification_Name,
+              // Item_Attributes.Qualification_Level was deleted
+              // // Item_Attributes.Qualification_Level: parent.Item_Attributes.Qualification_Level,
+              // Item_Attributes.Proprietary was deleted
+              // // Item_Attributes.Proprietary: parent.Item_Attributes.Proprietary,
+            };
+          }
+        }
 
         // eslint-disable-next-line no-restricted-syntax
-        for (const attr of attributes) {
-          // Prepare item
-          /** @type {Record<string, any>} */
-          const item = {
-            ...baseItem,
+        for (const reportItem of items) {
+          // ? Handle reportItem.Components
 
-            Access_Method: attr.Access_Method,
-            Data_Type: attr.Data_Type,
+          // Prepare base item
+          /** @type {Record<string, any>} */
+          const baseItem = {
+            Report_Header: reportHeader,
+            Item_Parent: itemParent,
+
+            Item_ID: reportItem.Item_ID,
+            // Item_Dates was renamed into Publication_Date
+            // // Item_Dates: reportItem.Item_Dates,
+            Publication_Date: reportItem.Publication_Date,
+            Publisher_ID: reportItem.Publisher_ID,
+
+            Title: reportItem.Title,
+            Item: reportItem.Item,
+            Database: reportItem.Database,
+            Platform: reportItem.Platform,
+            Publisher: reportItem.Publisher,
+            // Item_Contributors was renamed into Authors
+            // // Item_Contributors: reportItem.Item_Contributors,
+            Authors: reportItem.Authors,
+
+            // Item_Attributes.Article_Version was renamed into Article_Version
+            // // Item_Attributes.Article_Version: reportItem.Item_Attributes.Article_Version,
+            Article_Version: reportItem.Article_Version,
+
+            // Item_Attributes was deleted, and now is spread
+            // // Item_Attributes: reportItem.Item_Attributes,
+            // Item_Attributes.Article_Type was deleted
+            // // Item_Attributes.Article_Type: reportItem.Item_Attributes.Article_Type,
+            // Item_Attributes.Qualification_Name was deleted
+            // // Item_Attributes.Qualification_Name: reportItem.Item_Attributes.Qualification_Name,
+            // Item_Attributes.Qualification_Level was deleted
+            // // Item_Attributes.Qualification_Level: reportItem.Item_Attributes.Qualification_Level,
+            // Item_Attributes.Proprietary was deleted
+            // // Item_Attributes.Proprietary: reportItem.Item_Attributes.Proprietary,
+            // Section_Type was deleted
+            // // Section_Type: reportItem.Section_Type,
           };
 
-          // TODO: safe entries
-          const performances = Object.entries(attr.Performance ?? {});
+          // Extract item identifiers
+          const identifiers = Object.entries(baseItem.Item_ID ?? {})
+            .map(([key, value]) => `${key}:${value}`)
+            .sort();
+
+          const attributes = Array.isArray(reportItem?.Attribute_Performance)
+            ? reportItem.Attribute_Performance
+            : [];
+
           // eslint-disable-next-line no-restricted-syntax
-          for (const [metricType, performance] of performances) {
-            // eslint-disable-next-line no-continue
-            if (!metricType) { continue; }
+          for (const attr of attributes) {
+            // Prepare item
+            /** @type {Record<string, any>} */
+            const item = {
+              ...baseItem,
+
+              Access_Method: attr.Access_Method,
+              Access_Type: attr.Access_Type,
+              Data_Type: attr.Data_Type,
+
+              YOP: attr.YOP,
+            };
 
             // TODO: safe entries
-            const instances = Object.entries(performance ?? {});
-
+            const performances = Object.entries(attr.Performance ?? {});
             // eslint-disable-next-line no-restricted-syntax
-            for (const [instanceDate, instance] of instances) {
+            for (const [metricType, performance] of performances) {
               // eslint-disable-next-line no-continue
-              if (!instanceDate) { continue; }
+              if (!metricType) { continue; }
 
-              const date = new Date(instanceDate);
+              // TODO: safe entries
+              const instances = Object.entries(performance ?? {});
 
-              yield {
-                error: '',
-                date: format(date, 'yyyy-MM'),
-                performance: {
-                  index: i,
-                  metricType,
-                  reportId: reportHeader?.Report_ID || '',
-                  idComponents: [
-                    item.YOP,
-                    item.Access_Method,
-                    item.Access_Type,
-                    item.Section_Type,
-                    item.Data_Type,
-                    item.Platform,
-                    item.Publisher,
-                    item.Title,
-                    item.Database,
-                    ...identifiers,
-                  ],
-                  item: {
-                    ...item,
-                    Metric_Type: metricType,
-                    Count: instance,
-                    // Period: period,
+              // eslint-disable-next-line no-restricted-syntax
+              for (const [instanceDate, instance] of instances) {
+              // eslint-disable-next-line no-continue
+                if (!instanceDate) { continue; }
+
+                const date = new Date(instanceDate);
+
+                yield {
+                  error: '',
+                  date: format(date, 'yyyy-MM'),
+                  performance: {
+                    index: i,
+                    metricType,
+                    reportId: reportHeader?.Report_ID || '',
+                    idComponents: [
+                      item.YOP,
+                      item.Access_Method,
+                      item.Access_Type,
+                      item.Section_Type,
+                      item.Data_Type,
+                      item.Platform,
+                      item.Publisher,
+                      item.Title,
+                      item.Database,
+                      ...identifiers,
+                    ],
+                    item: {
+                      ...item,
+                      Metric_Type: metricType,
+                      Count: instance,
+                      // Period was deleted
+                      // // Period: period,
+                    },
                   },
-                },
-              };
+                };
+              }
             }
           }
         }
