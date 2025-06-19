@@ -1,4 +1,4 @@
-const defSchema = require('./sushi-definitions.json');
+const defSchema = require('./schema.json');
 
 const {
   SUSHI_error_model: errorSchema,
