@@ -433,7 +433,9 @@ module.exports = class HarvestSessionService extends BasePrismaService {
         );
 
         // Get version that will be used, if no suitable version is found, skip this credential
-        const counterVersion = endpoint.counterVersions.find((v) => allowedVersions.has(v));
+        const counterVersion = endpoint.counterVersions
+          .sort().reverse() // Sort from most recent to oldest
+          .find((v) => allowedVersions.has(v));
         if (!counterVersion) {
           return [];
         }
