@@ -29,12 +29,23 @@
         single-expand
         v-bind="vDataTableOptions"
       >
-        <template #[`item.createdAt`]="{ item }">
-          <LocalDate :model-value="item.createdAt" />
+        <template #[`item.createdAt`]="{ value }">
+          <LocalDate :model-value="value" />
         </template>
 
-        <template #[`item.runningTime`]="{ item }">
-          <LocalDuration v-if="item.runningTime" :model-value="item.runningTime" />
+        <template #[`item.runningTime`]="{ value }">
+          <LocalDuration v-if="value" :model-value="value" />
+        </template>
+
+        <template #[`item.counterVersion`]="{ value }">
+          <v-chip
+            v-tooltip:top="$t('harvest.jobs.counterVersionTooltip', { version: value })"
+            :text="value"
+            :color="counterVersionsColors.get(value) || 'secondary'"
+            variant="flat"
+            size="small"
+            label
+          />
         </template>
 
         <template #[`item.status`]="{ item }">
@@ -101,6 +112,11 @@ const headers = computed(() => [
     value: 'runningTime',
     align: 'start',
     sortable: true,
+  },
+  {
+    title: t('endpoints.counterVersion'),
+    value: 'counterVersion',
+    align: 'center',
   },
   {
     title: t('type'),

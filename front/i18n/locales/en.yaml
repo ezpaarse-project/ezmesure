@@ -962,6 +962,7 @@ harvest:
     unableToRetriveMeta: Unable to retrieve information about harvesting tasks
     unableToStop: Unable to stop the harvesting task
     unableToDelete: Unable to delete the harvesting task
+    counterVersionTooltip: Harvest a COUNTER {version} report
 elasticRoles:
   toolbarTitle: Elastic Roles ({count})
   newRole: New role

@@ -953,7 +953,9 @@ harvest:
       endpoints: "{n} point d'accès|{n} points d'accès"
       reportTypes: "{n} type de rapport|{n} types de rapport"
       credentials: "{n} identifiant|{n} identifiants"
+      counterVersions: "{n} version de COUNTER|{n} versions de COUNTER"
     credentialsTooltip: "{harvestable} identifiants moissonnable alors que {all} identifiants ont été déclarés"
+    reportsMenuTitle: Rapports COUNTER
     sendEndMail: Un mail sera envoyé lors de la fin du moissonnage
     notStarted: Pas encore lancé
     unableToRetrive: Impossible de récupérer les moissonnages
@@ -975,10 +977,10 @@ harvest:
     updated: Éléments mis à jour
     failed: Éléments non récupérés
     unableToRetrive: Impossible de récupérer les tâches de moissonnage
-    unableToRetriveMeta: Impossible de récupérer les informations à propos des tâches
-      de moissonnage
+    unableToRetriveMeta: Impossible de récupérer les informations à propos des tâches de moissonnage
     unableToStop: Impossible de stopper la tâche de moissonnage
     unableToDelete: Impossible de supprimer la tâche de moissonnage
+    counterVersionTooltip: Moissonne un rapport COUNTER {version}
 elasticRoles:
   toolbarTitle: Rôles Elastic ({count})
   newRole: Nouveau rôle

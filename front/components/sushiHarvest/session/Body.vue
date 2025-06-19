@@ -53,6 +53,17 @@
         />
       </template>
 
+      <template #[`item.counterVersion`]="{ value }">
+        <v-chip
+          v-tooltip:top="$t('harvest.jobs.counterVersionTooltip', { version: value })"
+          :text="value"
+          :color="counterVersionsColors.get(value) || 'secondary'"
+          variant="flat"
+          size="small"
+          label
+        />
+      </template>
+
       <template #[`item.status`]="{ item }">
         <v-menu location="end center" width="400" open-on-hover>
           <template #activator="{ props: menu }">
@@ -202,6 +213,11 @@ const headers = computed(() => [
     cellProps: {
       class: ['text-uppercase'],
     },
+  },
+  {
+    title: t('endpoints.counterVersion'),
+    value: 'counterVersion',
+    align: 'center',
   },
   {
     title: t('status'),

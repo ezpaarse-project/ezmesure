@@ -121,19 +121,10 @@
 <script setup>
 import { parse } from 'date-fns';
 
+import { DEFAULT_REPORTS_IDS } from '@/lib/sushi';
+
 // eslint-disable-next-line vue/max-len
 /** * @typedef {{ supported: boolean, manual: boolean, harvests: Map<string, object[]> }} ReportDef */
-
-const DEFAULT_REPORTS_IDS = [
-  'DR',
-  'DR_D1',
-  'IR',
-  'PR',
-  'PR_P1',
-  'TR',
-  'TR_B1',
-  'TR_J1',
-];
 
 const props = defineProps({
   modelValue: {
