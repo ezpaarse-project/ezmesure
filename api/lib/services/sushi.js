@@ -163,7 +163,7 @@ function getReportDownloadConfig(endpoint, sushi, version, opts = {}) {
     `report_download_${reportType}`,
   ];
 
-  const params = getSushiParams(sushi, allowedScopes);
+  const params = getSushiParams({ endpoint, ...sushi }, allowedScopes);
   const paramNames = new Set(Object.keys(params).map((k) => k.toLowerCase()));
   const { defaultParameters } = definitions.get(version) ?? {};
   const paramsForReport = defaultParameters?.get(reportType) ?? {};
