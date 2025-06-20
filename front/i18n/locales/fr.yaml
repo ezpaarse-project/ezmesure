@@ -210,7 +210,7 @@ endpoints:
   endpoint: Point d'accès
   toolbarTitle: Point d'accès COUNTER ({count})
   pageDescription: Gérez ici la liste des points d'accès COUNTER disponibles.
-  pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
+  pageDescription2: Seule les version 5 et 5.1 du protocole COUNTER est supportée.
   manageEndpoints: >
     Gérer le point d'accès
     |Gérer {count} points d'accès
@@ -437,7 +437,7 @@ institutions:
   sushi:
     title: Identifiants COUNTER ({count})
     pageDescription: Entrez ici les identifiants COUNTER qui serviront à moissonner automatiquement vos rapports.
-    pageDescription2: Seule la version 5 du protocole COUNTER est supportée.
+    pageDescription2: Seule la version 5 et 5.1 du protocole COUNTER est supportée.
     addCredentials: Ajouter des identifiants
     updateCredentials: Mettre à jour des identifiants
     unabletToRetriveSushiInformations: Impossible de récupérer les informations des plateformes sushi
