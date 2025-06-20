@@ -50,7 +50,7 @@
           />
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="6">
           <ApiFiltersSelect
             v-model="filters.counterVersion"
             :items="['5.1', '5']"
@@ -86,7 +86,7 @@
           />
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="6">
           <ApiFiltersSelect
             v-model="filters.errorCode"
             :empty-symbol="emptySymbol"
