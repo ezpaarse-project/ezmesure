@@ -543,7 +543,7 @@ tasks:
     error: Error
     cancelled: Cancelled
     delayed: Delayed
-    missing: Missing
+    missing: Empty report
     exceptions:
       network_error: Unreachable service
       unreadable_report: Unreadable report

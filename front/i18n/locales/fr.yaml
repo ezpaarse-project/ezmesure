@@ -547,7 +547,7 @@ tasks:
     error: Erreur
     cancelled: Annulé
     delayed: Reporté
-    missing: Manquant
+    missing: Rapport vide
     exceptions:
       network_error: Service injoignable
       unreadable_report: Rapport illisible
