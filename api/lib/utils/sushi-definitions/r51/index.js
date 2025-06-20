@@ -1,7 +1,7 @@
 const { default: Ajv } = require('ajv');
 const { default: addFormats } = require('ajv-formats');
 
-const definitions = require('./schema.json');
+const definitions = require('./patch');
 const { REPORT_IDS } = require('../constants');
 
 const ajv = new Ajv({ schemas: [definitions], strict: false });
@@ -17,7 +17,6 @@ module.exports.defaultParameters = new Map([
   [
     'pr', {
       attributes_to_show: [
-        'Data_Type',
         'Access_Method',
       ],
     },
@@ -25,7 +24,6 @@ module.exports.defaultParameters = new Map([
   [
     'dr', {
       attributes_to_show: [
-        'Data_Type',
         'Access_Method',
       ],
     },
@@ -33,8 +31,6 @@ module.exports.defaultParameters = new Map([
   [
     'tr', {
       attributes_to_show: [
-        'Data_Type',
-        'Section_Type',
         'YOP',
         'Access_Type',
         'Access_Method',
@@ -49,7 +45,6 @@ module.exports.defaultParameters = new Map([
         'Authors',
         'Publication_Date',
         'Article_Version',
-        'Data_Type',
         'YOP',
         'Access_Type',
         'Access_Method',
