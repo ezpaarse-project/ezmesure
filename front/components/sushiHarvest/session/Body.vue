@@ -194,12 +194,12 @@ const headers = computed(() => [
   {
     title: t('endpoints.vendor'),
     value: 'credentials.endpoint.vendor',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('institutions.title'),
     value: 'credentials.institution.name',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('institutions.sushi.packages'),
@@ -209,7 +209,7 @@ const headers = computed(() => [
     title: t('harvest.jobs.reportType'),
     value: 'reportType',
     align: 'center',
-    sortable: 'true',
+    sortable: true,
     cellProps: {
       class: ['text-uppercase'],
     },
@@ -218,6 +218,7 @@ const headers = computed(() => [
     title: t('endpoints.counterVersion'),
     value: 'counterVersion',
     align: 'center',
+    sortable: true,
   },
   {
     title: t('status'),
@@ -227,12 +228,12 @@ const headers = computed(() => [
   {
     title: t('harvest.jobs.startedAt'),
     value: 'startedAt',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('harvest.jobs.updatedAt'),
     value: 'updatedAt',
-    sortable: 'true',
+    sortable: true,
   },
   {
     title: t('actions'),
