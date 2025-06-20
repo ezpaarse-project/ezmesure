@@ -102,7 +102,17 @@ const sushiUrls = computedAsync(async () => {
   try {
     const urls = await $fetch(`/api/sushi/${props.modelValue.id}/_sushiUrls`);
 
-    return { urls: new Map(Object.entries(urls)) };
+    return {
+      urls: new Map(Object.entries(urls).map(([version, baseURL]) => {
+        const url = new URL(baseURL);
+        // Delete standard optional attributes
+        url.searchParams.delete('attributes_to_show');
+        url.searchParams.delete('include_parent_details');
+        url.searchParams.delete('include_component_details');
+
+        return [version, url];
+      })),
+    };
   } catch (err) {
     return { error: getErrorMessage(err) };
   }
