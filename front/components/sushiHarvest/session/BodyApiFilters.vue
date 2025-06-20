@@ -50,6 +50,18 @@
           />
         </v-col>
 
+        <v-col cols="12">
+          <ApiFiltersSelect
+            v-model="filters.counterVersion"
+            :items="['5.1', '5']"
+            :label="$t('endpoints.counterVersion')"
+            prepend-icon="mdi-numeric"
+            chips
+            closable-chips
+            multiple
+          />
+        </v-col>
+
         <v-col cols="6">
           <ApiFiltersSelect
             v-model="filters.reportType"
