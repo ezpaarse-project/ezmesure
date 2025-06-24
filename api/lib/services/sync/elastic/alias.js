@@ -81,7 +81,7 @@ const syncRepositoryAlias = async (alias) => {
   }
 
   try {
-    await upsertAlias(alias.pattern, repo.pattern, filters);
+    await upsertAlias(alias.pattern, repo.pattern, filters, { ignore: [404] });
     appLogger.verbose(`[elastic] Alias [${alias.pattern}] has been upserted`);
   } catch (error) {
     appLogger.error(`[elastic] Alias [${alias.pattern}] cannot be upserted:\n${error}`);
