@@ -61,6 +61,35 @@
           </v-list-item>
         </v-list>
       </template>
+
+      <template v-if="(foreignSpaces?.length ?? 0) > 0">
+        <v-divider class="mt-1 mb-2" />
+
+        <v-list lines="two" density="compact" class="pa-0">
+          <v-list-subheader>
+            <v-icon icon="mdi-tab-plus" start />
+            {{ $t('spaces.foreignSpaces') }}
+          </v-list-subheader>
+
+          <v-list-item
+            v-for="space in foreignSpaces"
+            :key="space.id"
+            v-tooltip="space.name"
+            :title="space.name"
+            :href="`/kibana/s/${space.id}`"
+            append-icon="mdi-open-in-app"
+            @click.prevent="openInTab(`/kibana/s/${space.id}`, space.id)"
+          >
+            <template #subtitle>
+              <RepositoryTypeChip
+                :model-value="space"
+                size="small"
+                density="compact"
+              />
+            </template>
+          </v-list-item>
+        </v-list>
+      </template>
     </v-card-text>
   </v-card>
 </template>
@@ -85,6 +114,12 @@ const { data: user } = useAuthState();
 const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
 const spaces = computed(() => props.spacePermissions?.map(({ space }) => space));
+
+const foreignSpaces = computed(
+  () => (props.institution.elasticRoles ?? [])?.flatMap(
+    (r) => r.spacePermissions.map((p) => p.space),
+  ),
+);
 
 const allowedActions = computed(() => {
   const perms = new Set(props.permissions);

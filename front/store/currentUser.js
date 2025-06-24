@@ -11,16 +11,22 @@ export const useCurrentUserStore = defineStore('current-user', () => {
   const hasMemberships = computed(() => !!memberships.value?.length);
   const institutions = computed(() => memberships.value.map((m) => m.institution));
   const spacesPermissions = computed(
-    () => memberships.value.map((m) => m.spacePermissions ?? []).flat(),
+    () => memberships.value.flatMap((m) => m.spacePermissions ?? []),
   );
   const reposPermissions = computed(
-    () => memberships.value.map((m) => m.repositoryPermissions ?? []).flat(),
+    () => memberships.value.flatMap((m) => m.repositoryPermissions ?? []),
   );
 
   async function fetchMemberships() {
     const data = await $fetch('/api/profile/memberships', {
       query: {
-        include: ['institution', 'spacePermissions.space', 'repositoryPermissions.repository'],
+        include: [
+          'institution.customProps.field', // Used to show details in institution page
+          'spacePermissions.space', // Used to show spaces in menu & institution page
+          'repositoryPermissions.repository', // Used to show repositories in institution page
+          'institution.elasticRoles.spacePermissions.space', // Used to show spaces in menu & institution page
+          'institution.elasticRoles.repositoryPermissions.repository', // Used to show repositories in institution page
+        ],
         size: 0,
       },
     });
