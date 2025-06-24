@@ -855,6 +855,8 @@ repositories:
     title: Filtrer les entrepôts
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
+  ownedRepositories: Entrepôts d'établissement
+  foreignRepositories: Entrepôts externe
 repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
@@ -869,6 +871,8 @@ repositoryAliases:
   deleteNbAliases: Vous allez supprimer {count} alias.
   newAlias: Nouvel alias d'entrepôt
   noInstitutions: Aucun établissement n'utilise cet alias
+  ownedAliases: Alias d'établissement
+  foreignAliases: Alias externe
   filters:
     title: Filtrer les alias
   filtersForm:
@@ -922,6 +926,8 @@ spaces:
   toolbarTitle: Espace ({count})
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
+  ownedSpaces: Espaces établissement
+  foreignSpaces: Espaces externe
   manageSpaces: >
     Gérer les espaces
     |Gérer {count} espaces
@@ -1002,6 +1008,7 @@ elasticRoles:
   deleteNbRoles: >
     Vous êtes sur le point de supprimer {n} rôle
     |Vous êtes sur le point de supprimer {n} rôles
+  grantedBy: Droits accordés par un role
 sync:
   status:
     notSynced: Pas encore synchronisé

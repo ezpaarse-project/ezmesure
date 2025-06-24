@@ -983,6 +983,7 @@ elasticRoles:
     Manage roles
     |Manage {count} roles
   deleteNbRoles: You are about to delete {n} roles
+  grantedBy: Rights granted by a role
 sync:
   status:
     notSynced: Not yet synchronized
