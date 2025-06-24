@@ -8,7 +8,6 @@ const SpacesService = require('../../../entities/spaces.service');
 const { syncIndexPatterns } = require('../kibana');
 
 const {
-  generateRoleNameFromRepository,
   generateRoleNameFromAlias,
   generateElasticPermissions,
 } = require('../../../hooks/utils');
@@ -36,7 +35,7 @@ const unmountAlias = async (alias) => {
     return;
   }
 
-  const readOnlyRole = generateRoleNameFromRepository(repo, 'readonly');
+  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
 
   try {
     await deleteRole(readOnlyRole);
