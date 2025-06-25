@@ -83,7 +83,7 @@
           </v-col>
 
           <v-col
-            v-for="space in sortedForeignSpaces"
+            v-for="{ space, elasticRole } in sortedForeignSpaces"
             :key="space.id"
             cols="12"
           >
@@ -91,7 +91,7 @@
               <template v-if="!userSpaced" #append>
                 <v-chip
                   v-tooltip:left="$t('elasticRoles.grantedBy')"
-                  :text="space.elasticRole.name"
+                  :text="elasticRole.name"
                   append-icon="mdi-account-tag"
                   color="secondary"
                   variant="outlined"
@@ -153,12 +153,13 @@ const spaceFormDialogRef = useTemplateRef('spaceFormDialogRef');
 const sortedSpaces = computed(() => spaces.value.toSorted((a, b) => a.name.localeCompare(b.name)));
 
 const sortedForeignSpaces = computed(() => {
-  const data = elasticRoles.value.flatMap(
-    (r) => r.spacePermissions.map(
-      (p) => ({ ...p.space, elasticRole: r }),
-    ),
-  );
-  return data.toSorted((a, b) => a.name.localeCompare(b.name));
+  const entries = elasticRoles.value.flatMap((elasticRole) => {
+    const perms = elasticRole.spacePermissions ?? [];
+    return perms.map(({ space }) => [space.id, { space, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.space.name.localeCompare(b.space.name));
 });
 
 const spaceCount = computed(() => sortedSpaces.value.length + sortedForeignSpaces.value.length);

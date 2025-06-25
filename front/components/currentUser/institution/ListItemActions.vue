@@ -33,7 +33,7 @@
         />
       </v-list>
 
-      <template v-if="(spaces?.length ?? 0) > 0">
+      <template v-if="spaces.length > 0">
         <v-divider class="mt-1 mb-2" />
 
         <v-list lines="two" density="compact" class="pa-0">
@@ -62,7 +62,7 @@
         </v-list>
       </template>
 
-      <template v-if="(foreignSpaces?.length ?? 0) > 0">
+      <template v-if="foreignSpaces.length > 0">
         <v-divider class="mt-1 mb-2" />
 
         <v-list lines="two" density="compact" class="pa-0">
@@ -72,7 +72,7 @@
           </v-list-subheader>
 
           <v-list-item
-            v-for="space in foreignSpaces"
+            v-for="{ space } in foreignSpaces"
             :key="space.id"
             v-tooltip="space.name"
             :title="space.name"
@@ -115,11 +115,17 @@ const { openInTab } = useSingleTabLinks('kibanaSpaces');
 
 const spaces = computed(() => props.spacePermissions?.map(({ space }) => space));
 
-const foreignSpaces = computed(
-  () => (props.institution.elasticRoles ?? [])?.flatMap(
-    (r) => r.spacePermissions.map((p) => p.space),
-  ),
-);
+const foreignSpaces = computed(() => {
+  const elasticRoles = props.institution.elasticRoles ?? [];
+
+  const entries = elasticRoles.flatMap((elasticRole) => {
+    const perms = elasticRole.spacePermissions ?? [];
+    return perms.map(({ space }) => [space.id, { space, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.space.name.localeCompare(b.space.name));
+});
 
 const allowedActions = computed(() => {
   const perms = new Set(props.permissions);

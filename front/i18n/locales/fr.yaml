@@ -12,6 +12,7 @@ menu:
   administration: Administration
   myInstitution: Mon établissement
   myInstitutions: Mes établissements
+  myForeignAccess: Partagé avec vous
   institutions: Établissements
   sushiEndpoints: Points d'accès COUNTER
   activity: Activité
@@ -856,7 +857,7 @@ repositories:
   givePermissions: Attribuer les permissions
   nPermissions: "{count} accès"
   ownedRepositories: Entrepôts d'établissement
-  foreignRepositories: Entrepôts externe
+  foreignRepositories: Entrepôts partagés
 repositoryAliases:
   manageRepositoryAliases: >
     Gérer les alias
@@ -872,7 +873,7 @@ repositoryAliases:
   newAlias: Nouvel alias d'entrepôt
   noInstitutions: Aucun établissement n'utilise cet alias
   ownedAliases: Alias d'établissement
-  foreignAliases: Alias externe
+  foreignAliases: Alias partagés
   filters:
     title: Filtrer les alias
   filtersForm:
@@ -927,7 +928,7 @@ spaces:
   newSpace: Nouvel espace
   editSpace: Mise à jour de l'espace
   ownedSpaces: Espaces établissement
-  foreignSpaces: Espaces externe
+  foreignSpaces: Espaces partagés
   manageSpaces: >
     Gérer les espaces
     |Gérer {count} espaces

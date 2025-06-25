@@ -7,18 +7,31 @@ import {
 
 export const useCurrentUserStore = defineStore('current-user', () => {
   const memberships = ref([]);
+  const elasticRoles = ref([]);
 
   const hasMemberships = computed(() => !!memberships.value?.length);
   const institutions = computed(() => memberships.value.map((m) => m.institution));
-  const spacesPermissions = computed(
-    () => memberships.value.flatMap((m) => m.spacePermissions ?? []),
-  );
-  const reposPermissions = computed(
-    () => memberships.value.flatMap((m) => m.repositoryPermissions ?? []),
-  );
+
+  const spacesPermissions = computed(() => {
+    const entries = memberships.value.flatMap((m) => m.spacePermissions ?? []);
+    return Array.from(new Map(entries).values());
+  });
+
+  const reposPermissions = computed(() => {
+    const entries = memberships.value.flatMap((m) => m.repositoryPermissions ?? []);
+    return Array.from(new Map(entries).values());
+  });
+
+  const foreignSpacesPermissions = computed(() => {
+    const entries = elasticRoles.value.flatMap((elasticRole) => {
+      const perms = (elasticRole.spacePermissions ?? []);
+      return perms.map(({ space }) => [space.id, { space, elasticRole }]);
+    });
+    return Array.from(new Map(entries).values());
+  });
 
   async function fetchMemberships() {
-    const data = await $fetch('/api/profile/memberships', {
+    const mems = await $fetch('/api/profile/memberships', {
       query: {
         include: [
           'institution.customProps.field', // Used to show details in institution page
@@ -31,7 +44,18 @@ export const useCurrentUserStore = defineStore('current-user', () => {
       },
     });
 
-    memberships.value = data ?? [];
+    const roles = await $fetch('/api/profile/elastic-roles', {
+      query: {
+        include: [
+          'spacePermissions.space', // Used to show spaces in menu
+        ],
+        size: 0,
+      },
+    });
+
+    memberships.value = mems ?? [];
+    elasticRoles.value = roles ?? [];
+
     return true;
   }
 
@@ -58,6 +82,7 @@ export const useCurrentUserStore = defineStore('current-user', () => {
     memberships,
     institutions,
     spacesPermissions,
+    foreignSpacesPermissions,
     reposPermissions,
     fetchMemberships,
     getMembership,

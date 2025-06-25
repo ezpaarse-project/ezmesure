@@ -70,7 +70,7 @@
           </v-list-subheader>
 
           <v-list-item
-            v-for="repository in sortedForeignRepositories"
+            v-for="{ repository, elasticRole } in sortedForeignRepositories"
             :key="repository.pattern"
             :title="repository.pattern"
             lines="two"
@@ -82,7 +82,7 @@
             <template v-if="!userSpaced" #append>
               <v-chip
                 v-tooltip:left="$t('elasticRoles.grantedBy')"
-                :text="repository.elasticRole.name"
+                :text="elasticRole.name"
                 append-icon="mdi-account-tag"
                 color="secondary"
                 variant="outlined"
@@ -144,12 +144,13 @@ const sortedRepositories = computed(
 );
 
 const sortedForeignRepositories = computed(() => {
-  const data = elasticRoles.value.flatMap(
-    (r) => r.repositoryPermissions.map(
-      (p) => ({ ...p.repository, elasticRole: r }),
-    ),
-  );
-  return data.toSorted((a, b) => a.pattern.localeCompare(b.pattern));
+  const entries = elasticRoles.value.flatMap((elasticRole) => {
+    const perms = elasticRole.repositoryPermissions ?? [];
+    return perms.map(({ repository }) => [repository.pattern, { repository, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.repository.pattern.localeCompare(b.repository.pattern));
 });
 
 const repositoryCount = computed(

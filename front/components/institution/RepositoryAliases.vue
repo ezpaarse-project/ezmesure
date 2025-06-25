@@ -87,7 +87,7 @@
           </v-list-subheader>
 
           <v-list-item
-            v-for="alias in sortedForeignAliases"
+            v-for="{ alias, elasticRole } in sortedForeignAliases"
             :key="alias.pattern"
             :title="alias.pattern"
             lines="two"
@@ -99,7 +99,7 @@
             <template v-if="!userSpaced" #append>
               <v-chip
                 v-tooltip:left="$t('elasticRoles.grantedBy')"
-                :text="alias.elasticRole.name"
+                :text="elasticRole.name"
                 append-icon="mdi-account-tag"
                 color="secondary"
                 variant="outlined"
@@ -181,12 +181,13 @@ const sortedAliases = computed(
 );
 
 const sortedForeignAliases = computed(() => {
-  const data = elasticRoles.value.flatMap(
-    (r) => r.repositoryAliasPermissions.map(
-      (p) => ({ ...p.alias, elasticRole: r }),
-    ),
-  );
-  return data.toSorted((a, b) => a.pattern.localeCompare(b.pattern));
+  const entries = elasticRoles.value.flatMap((elasticRole) => {
+    const perms = elasticRole.repositoryAliasPermissions ?? [];
+    return perms.map(({ alias }) => [alias.pattern, { alias, elasticRole }]);
+  });
+
+  return Array.from(new Map(entries).values())
+    .toSorted((a, b) => a.alias.pattern.localeCompare(b.alias.pattern));
 });
 
 const aliasCount = computed(() => sortedAliases.value.length + sortedForeignAliases.value.length);
