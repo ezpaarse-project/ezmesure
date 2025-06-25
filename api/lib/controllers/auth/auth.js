@@ -5,12 +5,17 @@ const elastic = require('../../services/elastic');
 
 const usersElastic = require('../../services/elastic/users');
 const ezrUsers = require('../../services/ezreeport/users');
+
 const UsersService = require('../../entities/users.service');
 const MembershipsService = require('../../entities/memberships.service');
-const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
+const ElasticRoleService = require('../../entities/elastic-roles.service');
+
 const { prepareStandardQueryParams } = require('../../services/std-query');
 const { appLogger } = require('../../services/logger');
 const { sendPasswordRecovery, sendWelcomeMail, sendNewUserToContacts } = require('./mail');
+
+const { schema: membershipSchema, includableFields: includableMembershipFields } = require('../../entities/memberships.dto');
+const { schema: elasticRoleSchema, includableFields: includableElasticRoleFields } = require('../../entities/elastic-roles.dto');
 
 const secret = config.get('auth.secret');
 const cookie = config.get('auth.cookie');
@@ -23,6 +28,13 @@ const standardMembershipsQueryParams = prepareStandardQueryParams({
   queryFields: [],
 });
 exports.standardMembershipsQueryParams = standardMembershipsQueryParams;
+
+const standardElasticRolesQueryParams = prepareStandardQueryParams({
+  schema: elasticRoleSchema,
+  includableFields: includableElasticRoleFields,
+  queryFields: [],
+});
+exports.standardElasticRolesQueryParams = standardElasticRolesQueryParams;
 
 function generateToken(user) {
   if (!user) { return null; }
@@ -392,6 +404,17 @@ exports.getMemberships = async (ctx) => {
 
   ctx.status = 200;
   const membershipsService = new MembershipsService();
+  ctx.body = await membershipsService.findMany(prismaQuery);
+};
+
+exports.getElasticRoles = async (ctx) => {
+  const { username } = ctx.state.user;
+
+  const prismaQuery = standardElasticRolesQueryParams.getPrismaManyQuery(ctx);
+  prismaQuery.where.users = { some: { username } };
+
+  ctx.status = 200;
+  const membershipsService = new ElasticRoleService();
   ctx.body = await membershipsService.findMany(prismaQuery);
 };
 

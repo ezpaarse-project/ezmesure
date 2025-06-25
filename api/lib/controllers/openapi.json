@@ -2137,6 +2137,44 @@
           "createdAt"
         ]
       },
+      "ElasticRole": {
+        "title": "Elastic Role",
+        "type": "object",
+        "required": ["name", "conditions", "createdAt", "updatedAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the Elastic Role"
+          },
+          "conditions": {
+            "description": "A list of condition to select the institutions used to generate the aliases",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Filter"
+            }
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/ItemCreationDate"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/ItemUpdateDate"
+          },
+          "users": {
+            "description": "Users using this role",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "institutions": {
+            "description": "Insititutions using this role",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Institution"
+            }
+          }
+        }
+      },
       "IndexPattern": {
         "allOf": [
           {
