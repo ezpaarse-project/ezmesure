@@ -7,7 +7,7 @@ const elastic = require('.');
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesGetResponse} GetIndexResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesCreateResponse} IndicesCreateResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutAliasResponse} IndicesPutAliasResponse
- * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutIndexTemplateRequest} IndicesPutIndexTemplateRequest
+ * @typedef {import('@elastic/elasticsearch/api/requestParams.d.ts').IndicesPutIndexTemplate<import('@elastic/elasticsearch').default.estypes.IndicesPutIndexTemplateRequest['body']>} IndicesPutIndexTemplateRequest
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutIndexTemplateResponse} IndicesPutIndexTemplateResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteIndexTemplateResponse} IndicesDeleteIndexTemplateResponse
  * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteResponse} IndicesDeleteResponse
