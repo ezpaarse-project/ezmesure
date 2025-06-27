@@ -1009,7 +1009,7 @@ elasticRoles:
   deleteNbRoles: >
     Vous êtes sur le point de supprimer {n} rôle
     |Vous êtes sur le point de supprimer {n} rôles
-  grantedBy: Droits accordés par un role
+  grantedBy: Droits accordés par un rôle
 sync:
   status:
     notSynced: Pas encore synchronisé
