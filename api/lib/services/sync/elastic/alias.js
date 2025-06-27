@@ -28,14 +28,7 @@ const { filtersToESQuery } = require('../../elastic/filters');
  * @returns {Promise<void>}
  */
 const unmountAlias = async (alias) => {
-  const repositoryService = new RepositoriesService();
-  const repo = await repositoryService.findUnique({ where: { pattern: alias.target } });
-  if (!repo) {
-    appLogger.error(`[elastic] Cannot unmount alias [${alias.pattern}], repository [${alias.target}] not found`);
-    return;
-  }
-
-  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
+  const readOnlyRole = generateRoleNameFromAlias(alias);
 
   try {
     await deleteRole(readOnlyRole);
@@ -59,13 +52,19 @@ const unmountAlias = async (alias) => {
  */
 const syncRepositoryAlias = async (alias) => {
   const repositoryService = new RepositoriesService();
-  const repo = await repositoryService.findUnique({ where: { pattern: alias.target } });
+
+  const repo = await repositoryService.findUnique({
+    where: { pattern: alias.target },
+    select: { pattern: true, type: true, aliases: true },
+  });
+
   if (!repo) {
-    appLogger.error(`[elastic] Cannot create alias [${alias.pattern}], repository [${alias.target}] not found`);
+    appLogger.verbose(`[elastic] Unmounting alias [${alias.pattern}]: repository [${alias.target}] not found`);
+    await unmountAlias(alias);
     return;
   }
 
-  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
+  const readOnlyRole = generateRoleNameFromAlias(alias);
 
   try {
     const permissions = new Map([[alias.pattern, generateElasticPermissions({ readonly: true })]]);
@@ -81,7 +80,7 @@ const syncRepositoryAlias = async (alias) => {
   }
 
   try {
-    await upsertAlias(alias.pattern, repo.pattern, filters);
+    await upsertAlias(alias.pattern, repo.pattern, filters, { ignore: [404] });
     appLogger.verbose(`[elastic] Alias [${alias.pattern}] has been upserted`);
   } catch (error) {
     appLogger.error(`[elastic] Alias [${alias.pattern}] cannot be upserted:\n${error}`);
