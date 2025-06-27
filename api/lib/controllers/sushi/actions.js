@@ -29,6 +29,7 @@ const { schema, includableFields } = require('../../entities/sushi-credentials.d
  */
 /* eslint-enable max-len */
 
+const { propsToPrismaInclude } = require('../../services/std-query/prisma-query');
 const { prepareStandardQueryParams } = require('../../services/std-query');
 
 const standardQueryParams = prepareStandardQueryParams({
@@ -250,6 +251,7 @@ exports.getHarvests = async (ctx) => {
     sort,
     order = 'asc',
     page = 1,
+    include,
   } = ctx.request.query;
 
   /** @type {HarvestFindManyArgs} */
@@ -261,6 +263,7 @@ exports.getHarvests = async (ctx) => {
       credentialsId: sushiId,
       reportId,
     },
+    include: propsToPrismaInclude(Array.isArray(include) ? include : [include]),
   };
 
   if (from || to) {
