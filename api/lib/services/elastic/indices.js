@@ -2,9 +2,18 @@ const elastic = require('.');
 
 /* eslint-disable max-len */
 /**
- * @typedef {import('@elastic/elasticsearch/index.js').ApiResponse} ApiResponse
+ * @typedef {import('.').ESResponse} ESResponse
  * @typedef {import('@elastic/elasticsearch/lib/Transport.d.ts').TransportRequestOptions} TransportRequestOptions
- * @typedef {import('@elastic/elasticsearch/api/requestParams.d.ts').IndicesPutIndexTemplate} IndicesPutIndexTemplate
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesGetResponse} GetIndexResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesCreateResponse} IndicesCreateResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutAliasResponse} IndicesPutAliasResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutIndexTemplateRequest} IndicesPutIndexTemplateRequest
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesPutIndexTemplateResponse} IndicesPutIndexTemplateResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteIndexTemplateResponse} IndicesDeleteIndexTemplateResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteResponse} IndicesDeleteResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesDeleteAliasResponse} IndicesDeleteAliasResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesStatsResponse} IndicesStatsResponse
+ * @typedef {import('@elastic/elasticsearch').default.estypes.IndicesExistsResponse} IndicesExistsResponse
 */
 /* eslint-enable max-len */
 
@@ -15,7 +24,7 @@ const elastic = require('.');
  * @param {Object} opts - options.
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index.
+ * @return {Promise<ESResponse<GetIndexResponse>>} index.
  */
 exports.get = async function getIndex(indexName, opts, requestConfig) {
   return elastic.indices.get({
@@ -31,7 +40,7 @@ exports.get = async function getIndex(indexName, opts, requestConfig) {
  * @param {string} mapping - mapping of index.
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index created.
+ * @return {Promise<IndicesCreateResponse>} index created.
  */
 exports.create = async function createIndex(indexName, mapping, requestConfig) {
   return elastic.indices.create({
@@ -48,7 +57,7 @@ exports.create = async function createIndex(indexName, mapping, requestConfig) {
  * @param {object} [filter] The filter for the alias
  * @param {TransportRequestOptions} [requestConfig] - Request config (timeouts, headers, ignore...)
  *
- * @returns {Promise<>} alias created
+ * @returns {Promise<ESResponse<IndicesPutAliasResponse>>} alias created
  */
 exports.upsertAlias = async function upsertAlias(aliasName, indexName, filter, requestConfig) {
   return elastic.indices.putAlias({
@@ -60,9 +69,9 @@ exports.upsertAlias = async function upsertAlias(aliasName, indexName, filter, r
 
 /**
  * Upsert an index template
- * @param {IndicesPutIndexTemplate} body The template definition
+ * @param {IndicesPutIndexTemplateRequest} body The template definition
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
- * @returns {Promise<ApiResponse>}
+ * @returns {Promise<ApiResponse<IndicesPutIndexTemplateResponse>>}
  */
 exports.upsertTemplate = async function upsertTemplate(body, requestConfig) {
   return elastic.indices.putIndexTemplate(body, requestConfig);
@@ -72,7 +81,7 @@ exports.upsertTemplate = async function upsertTemplate(body, requestConfig) {
  * Delete an index template
  * @param {string} templateName The template name
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
- * @returns {Promise<ApiResponse>}
+ * @returns {Promise<ApiResponse<IndicesDeleteIndexTemplateResponse>>}
  */
 exports.deleteTemplate = async function deleteTemplate(templateName, requestConfig) {
   return elastic.indices.deleteIndexTemplate({ name: templateName }, requestConfig);
@@ -84,7 +93,7 @@ exports.deleteTemplate = async function deleteTemplate(templateName, requestConf
  * @param {string} indexName - index name.
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index.
+ * @return {Promise<ApiResponse<IndicesDeleteResponse>>} index.
  */
 exports.delete = async function deleteIndex(indexName, requestConfig) {
   return elastic.indices.delete({
@@ -98,7 +107,7 @@ exports.delete = async function deleteIndex(indexName, requestConfig) {
  * @param {string} aliasName The name of the alias
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @returns {Promise<>} alias deleted
+ * @returns {Promise<ApiResponse<IndicesDeleteAliasResponse>>} alias deleted
  */
 exports.deleteAlias = async function deleteAlias(aliasName, requestConfig) {
   return elastic.indices.deleteAlias({ index: '*', name: aliasName }, requestConfig);
@@ -109,7 +118,7 @@ exports.deleteAlias = async function deleteAlias(aliasName, requestConfig) {
  *
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index.
+ * @return {Promise<ApiResponse<IndicesDeleteResponse>>} index.
  */
 exports.removeAll = async function removeAllIndices(requestConfig) {
   if (process.env.NODE_ENV !== 'dev') { return null; }
@@ -132,7 +141,7 @@ exports.removeAll = async function removeAllIndices(requestConfig) {
  * @param {Object} body - body of search.
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index.
+ * @return {Promise<ApiResponse<IndicesStatsResponse>>} index.
  */
 exports.stats = async function statsIndices(body, requestConfig) {
   return elastic.indices.stats(body, requestConfig);
@@ -144,7 +153,7 @@ exports.stats = async function statsIndices(body, requestConfig) {
  * @param {string} indexName - index name.
  * @param {TransportRequestOptions} [requestConfig] Request config (timeouts, headers, ignore...)
  *
- * @return {Promise<>} index.
+ * @return {Promise<ApiResponse<IndicesExistsResponse>>} index.
  */
 exports.exists = async function existIndex(indexName, requestConfig) {
   return elastic.indices.exists({

@@ -16,7 +16,6 @@ const { execThrottledPromises } = require('../../promises');
 const { upsertRole, deleteRole } = require('../../elastic/roles');
 const { upsertAlias, deleteAlias } = require('../../elastic/indices');
 const { filtersToESQuery } = require('../../elastic/filters');
-const { triggerHooks } = require('../../../hooks/hookEmitter');
 
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
@@ -86,7 +85,6 @@ const syncRepositoryAlias = async (alias) => {
   } catch (error) {
     appLogger.error(`[elastic] Alias [${alias.pattern}] cannot be upserted:\n${error}`);
   }
-
 
   const spacesService = new SpacesService();
 
