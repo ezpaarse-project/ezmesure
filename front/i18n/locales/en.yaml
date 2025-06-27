@@ -654,9 +654,9 @@ sushi:
   checking: Checking connection with {vendor} for {name}
   report: Report
   openHelpPage: Open help page
-  insertedItems: "{count} report items have been inserted."
-  updatedItems: "{count} report items have been updated."
-  failedItems: "{count} report items could not be retrieved."
+  insertedItems: "{count} report items have been inserted for the period {beignDate} ~ {endDate}."
+  updatedItems: "{count} report items have been updated for the period {beignDate} ~ {endDate}."
+  failedItems: "{count} report items could not be retrieved for the period {beignDate} ~ {endDate}."
   messagesFromEndpoint: "Messages from the endpoint:"
   cannotArchiveItems: Unable to archive the credentials.
   itemsArchived: "{count} credential(s) archived."

@@ -671,9 +671,9 @@ sushi:
   report: Rapport
   checkBeforeSave: Vérifier les identifiants avant de sauvegarder
   openHelpPage: Ouvrir page d'aide
-  insertedItems: "{count} éléments du rapport ont été insérés."
-  updatedItems: "{count} éléments du rapport ont été mis à jour."
-  failedItems: "{count} éléments du rapport n'ont pas pu être récupérés."
+  insertedItems: "{count} éléments du rapport ont été insérés pour la période {beignDate} ~ {endDate}."
+  updatedItems: "{count} éléments du rapport ont été mis à jour pour la période {beignDate} ~ {endDate}."
+  failedItems: "{count} éléments du rapport n'ont pas pu être récupérés pour la période {beignDate} ~ {endDate}."
   messagesFromEndpoint: 'Messages du point d''accès :'
   cannotArchiveItems: Impossible d'archiver les identifiants.
   itemsArchived: "{count} élement(s) archivé(s)"
