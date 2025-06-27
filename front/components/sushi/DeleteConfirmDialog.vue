@@ -11,9 +11,21 @@
       <template #text>
         <v-row>
           <v-col>
-            <p>
-              {{ t('sushi.deleteNbCredentials', data.toDelete.length) }}
-            </p>
+            <i18n-t keypath="sushi.deleteNbCredentials" tag="p">
+              <template #count>
+                {{ data.toDelete.length }}
+              </template>
+
+              <template #cantCancel>
+                <span class="font-weight-bold">{{ $t('cantCancel') }}</span>
+              </template>
+            </i18n-t>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            {{ $t('sushi.deleteReasonDescription') }}
           </v-col>
         </v-row>
 
@@ -45,7 +57,7 @@
           @click="cancel()"
         />
         <v-btn
-          :text="t('delete')"
+          :text="$t('delete')"
           :disabled="disagreeLoading || !isValid"
           :loading="agreeLoading"
           prepend-icon="mdi-delete"

@@ -654,8 +654,8 @@ sushi:
     1 identifiant indique que le point d'accès est problématique
     |{count} identifiants indiquent que le point d'accès est problématique
   deleteNbCredentials: >
-    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
-    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données d'usage liées à cet identifiant. Cette action est irréversible.
+    Vous allez supprimer {count} identifiant COUNTER. Cela supprimera les données d'usage liées à cet identifiant d'ici quelques minutes. {cantCancel}.
+    |Vous allez supprimer {count} identifiants COUNTER. Cela supprimera les données d'usage liées à cet identifiant d'ici quelques minutes. {cantCancel}.
   archiveNbCredentials: >
     Vous allez archiver {count} identifiant COUNTER. Les données d'usage liées à cet identifiant seront conservées.
     |Vous allez archiver {count} identifiants COUNTER. Les données d'usage liées à cet identifiant seront conservées.
@@ -705,6 +705,7 @@ sushi:
       empty: Aucun rapport non supporté n'a été moissonné !
       deletePeriod: "Vous allez supprimer le rapport moissonné \"{reportId}\" de la matrice de \"{institutionName}\" pour la période \"{beginDate} - {endDate}\". Cela n’entraînera pas la suppression des données. Cette action est irréversible."
   deleteReason: Raison de la suppression
+  deleteReasonDescription: Merci de préciser la raison de la suppression de ces identifiants. Vous pouvez choisir une raison prédéfinie ou indiquer une raison personalisée ci-dessous.
   deleteReasons:
     mistake: J'ai entré(e) ces identifiants par erreur
     neverWorked: Le point d'accès n'a jamais fonctionné pour notre établissement
@@ -1156,3 +1157,4 @@ archived: Archivé
 archivedSince: Archivé depuis le {date}
 deleted: Supprimé
 deletedSince: Supprimé depuis le {date}
+cantCancel: Cette action est irreversible
