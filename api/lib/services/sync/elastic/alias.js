@@ -87,21 +87,7 @@ const upsertIndexTemplate = (name, repo) => upsertTemplate({
  * @returns {Promise<void>}
  */
 const unmountAlias = async (alias) => {
-  const repositoryService = new RepositoriesService();
-
-  /** @type {RepositoryWithAliases} */
-  // @ts-ignore
-  const repo = await repositoryService.findUnique({
-    where: { pattern: alias.target },
-    select: { pattern: true, type: true, aliases: true },
-  });
-
-  if (!repo) {
-    appLogger.error(`[elastic] Cannot unmount alias [${alias.pattern}], repository [${alias.target}] not found`);
-    return;
-  }
-
-  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
+  const readOnlyRole = generateRoleNameFromAlias(alias);
 
   try {
     await deleteRole(readOnlyRole);
@@ -156,7 +142,7 @@ const syncRepositoryAlias = async (alias) => {
     return;
   }
 
-  const readOnlyRole = generateRoleNameFromAlias(alias, repo);
+  const readOnlyRole = generateRoleNameFromAlias(alias);
 
   try {
     const permissions = new Map([[alias.pattern, generateElasticPermissions({ readonly: true })]]);
