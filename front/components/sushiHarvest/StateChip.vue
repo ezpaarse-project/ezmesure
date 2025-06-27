@@ -83,12 +83,32 @@ defineEmits({
 
 const { t, locale } = useI18n();
 
+const supportedReports = computed(() => {
+  if (!props.endpoint?.supportedData) {
+    return undefined;
+  }
+
+  const entries = Object.entries(props.endpoint.supportedData)
+    .filter(([, data]) => !!data?.supported?.value);
+
+  // Legacy way to handle supported reports
+  if (props.endpoint?.supportedReports?.length > 0) {
+    entries.push(...props.endpoint.supportedReports.map((reportId) => [reportId]));
+  }
+
+  // Legacy way to handle additional reports
+  if (props.endpoint?.additionalReports?.length > 0) {
+    entries.push(...props.endpoint.additionalReports.map((reportId) => [reportId]));
+  }
+
+  return new Set(entries.map(([reportId]) => reportId));
+});
+
 const harvests = computed(() => {
   let value = props.modelValue;
 
-  if (Array.isArray(props.endpoint?.ignoredReports)) {
-    const ignoredSet = new Set(props.endpoint.ignoredReports);
-    value = value.filter((h) => !ignoredSet.has(h.reportId));
+  if (supportedReports.value) {
+    value = value.filter((h) => supportedReports.value.has(h.reportId));
   }
 
   if (props.currentYear) {

@@ -255,7 +255,7 @@
           :model-value="item.harvests"
           :endpoint="endpoint"
           :current-year="currentHarvestYear"
-          @click:harvest="harvestMatrixRef?.open(item, { period: $event.period })"
+          @click:harvest="harvestMatrixRef?.open({ ...item, endpoint }, { period: $event.period })"
         />
       </template>
 
@@ -293,7 +293,7 @@
               v-if="harvestMatrixRef"
               :title="$t('sushi.harvestState')"
               prepend-icon="mdi-table-headers-eye"
-              @click="harvestMatrixRef?.open(item)"
+              @click="harvestMatrixRef?.open({ ...item, endpoint })"
             />
             <v-list-item
               v-if="reportsRef"
