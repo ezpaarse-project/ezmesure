@@ -4,7 +4,6 @@
     ref="combobox"
     v-bind="$attrs"
     :model-value="modelValue.value"
-    :label="label"
     :readonly="readonly"
     multiple
     chips
@@ -20,6 +19,10 @@
       >
         {{ $t('notEditable') }}
       </v-chip>
+    </template>
+
+    <template #label>
+      <CustomFieldLabel :model-value="field" />
     </template>
 
     <template #append>
@@ -57,7 +60,6 @@
     ref="textfield"
     v-bind="$attrs"
     :model-value="modelValue.value"
-    :label="label"
     :readonly="readonly"
     @update:model-value="emit('update:modelValue', { ...modelValue, value: $event })"
   >
@@ -70,6 +72,10 @@
       >
         {{ $t('notEditable') }}
       </v-chip>
+    </template>
+
+    <template #label>
+      <CustomFieldLabel :model-value="field" />
     </template>
 
     <template #append>
@@ -106,14 +112,10 @@ const emit = defineEmits({
   'update:modelValue': (value) => !!value,
 });
 
-const { locale } = useI18n();
-
 const comboRef = useTemplateRef('combobox');
 const textRef = useTemplateRef('textfield');
 
 const field = computed(() => props.modelValue.field);
-
-const label = computed(() => (locale.value === 'fr' ? field.value.labelFr : field.value.labelEn));
 
 const isMultiple = computed(() => field.value.multiple);
 

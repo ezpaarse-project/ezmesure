@@ -7,12 +7,14 @@ const { requireJwt, requireUser } = require('../../services/auth');
 
 const {
   standardMembershipsQueryParams,
+  standardElasticRolesQueryParams,
   getToken,
   getUser,
   getResetToken,
   resetPassword,
   changePassword,
   getMemberships,
+  getElasticRoles,
   getReportingToken,
   activate,
 } = require('./auth');
@@ -74,6 +76,14 @@ router.route({
   handler: getMemberships,
   validate: {
     query: standardMembershipsQueryParams.manyValidation,
+  },
+});
+router.route({
+  method: 'GET',
+  path: '/elastic-roles',
+  handler: getElasticRoles,
+  validate: {
+    query: standardElasticRolesQueryParams.manyValidation,
   },
 });
 router.get('/token', getToken);
