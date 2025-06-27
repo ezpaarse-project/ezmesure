@@ -414,8 +414,8 @@ exports.getElasticRoles = async (ctx) => {
   prismaQuery.where.users = { some: { username } };
 
   ctx.status = 200;
-  const membershipsService = new ElasticRoleService();
-  ctx.body = await membershipsService.findMany(prismaQuery);
+  const elasticRolesService = new ElasticRoleService();
+  ctx.body = await elasticRolesService.findMany(prismaQuery);
 };
 
 exports.logout = async (ctx) => {
