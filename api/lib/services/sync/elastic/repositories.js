@@ -1,4 +1,5 @@
 // @ts-check
+const { createHash } = require('node:crypto');
 const { appLogger } = require('../../logger');
 
 const RepositoriesService = require('../../../entities/repositories.service');
@@ -10,11 +11,114 @@ const { generateRoleNameFromRepository, generateElasticPermissions } = require('
 const { execThrottledPromises } = require('../../promises');
 
 const { upsertRole, deleteRole } = require('../../elastic/roles');
+const { upsertTemplate, deleteTemplate } = require('../../elastic/indices');
+const { filtersToESQuery } = require('../../elastic/filters');
 
+/* eslint-disable max-len */
 /**
  * @typedef {import('../../promises').ThrottledPromisesResult} ThrottledPromisesResult
  * @typedef {import('@prisma/client').Repository} Repository
+ * @typedef {import('@prisma/client').Prisma.RepositoryGetPayload<{ include: { aliases: true } }>} RepositoryWithAliases
  */
+/* eslint-enable max-len */
+
+// Namespace for index templates dedicated to repositories
+const indexTemplatePrefix = 'ezm-tpl';
+// Random high priority for index templates
+// An index pattern cannot match multiple templates with the same priority
+const indexTemplatePriority = 679;
+// Metadata added to the templates created by ezMESURE so that we can easily recognize them
+const indexTemplateMeta = {
+  createdBy: 'ezmesure',
+  description: 'Created by the ezMESURE API to keep indices in sync',
+};
+
+/**
+ * Get the name of the index template for a given repository pattern
+ * @param {string} pattern - The repository pattern
+ * @returns {string}
+ */
+const getIndexTemplateName = (pattern) => {
+  // Adding a short hash to make sure there cannot be any conflict on index template name
+  const hash = createHash('sha1').update(pattern).digest('hex').substring(0, 10);
+
+  return [
+    indexTemplatePrefix,
+    pattern.replace(/\*/g, ''), // Asterisk not allowed in template names
+    hash,
+  ].join('_');
+};
+
+/**
+ * Upsert an index template that contains aliases for a repository
+ * @param {string} name - The name of the index template
+ * @param {RepositoryWithAliases} repo - The repository with its aliases
+ * @returns {Promise<import('@elastic/elasticsearch/index.js').ApiResponse>}
+ */
+const upsertIndexTemplate = (name, repo) => upsertTemplate({
+  name,
+  create: false,
+  body: {
+    priority: indexTemplatePriority,
+    index_patterns: [repo.pattern],
+    _meta: indexTemplateMeta,
+    template: {
+      aliases: Object.fromEntries(
+        repo.aliases.map((a) => [
+          a.pattern,
+          Array.isArray(a.filters) && a.filters.length > 0
+            ? { filter: filtersToESQuery(a.filters) }
+            : {},
+        ]),
+      ),
+    },
+  },
+});
+
+/**
+ * Delete the index template of the given repository
+ * @param {string} pattern - The repository pattern
+ * @returns {Promise<void>}
+ */
+const deleteRepositoryIndexTemplate = async (pattern) => {
+  const indexTemplateName = getIndexTemplateName(pattern);
+
+  try {
+    await deleteTemplate(indexTemplateName, { ignore: [404] });
+    appLogger.verbose(`[elastic] Index template [${indexTemplateName}] has been deleted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Index template [${indexTemplateName}] cannot be deleted:\n${error}`);
+  }
+};
+
+/**
+ * Synchronize the index template for the given repository pattern
+ * @param {string} pattern - The repository pattern
+ * @returns {Promise<void>}
+ */
+const syncRepositoryIndexTemplate = async (pattern) => {
+  const repositoriesService = new RepositoriesService();
+
+  /** @type {RepositoryWithAliases} */
+  // @ts-ignore
+  const repository = await repositoriesService.findUnique({
+    where: { pattern },
+    select: { pattern: true, aliases: true },
+  });
+
+  if (!repository) {
+    return deleteRepositoryIndexTemplate(pattern);
+  }
+
+  const indexTemplateName = getIndexTemplateName(pattern);
+
+  try {
+    await upsertIndexTemplate(indexTemplateName, repository);
+    appLogger.verbose(`[elastic] Index template [${indexTemplateName}] has been upserted`);
+  } catch (error) {
+    appLogger.error(`[elastic] Index template [${indexTemplateName}] cannot be upserted:\n${error}`);
+  }
+};
 
 /**
  * Remove roles associated to a repository
@@ -38,6 +142,8 @@ const unmountRepository = async (repo) => {
   } catch (error) {
     appLogger.error(`[elastic] Role [${allRole}] cannot be deleted:\n${error}`);
   }
+
+  await deleteRepositoryIndexTemplate(repo.pattern);
 };
 
 /**
@@ -64,6 +170,8 @@ const syncRepository = async (repo) => {
   } catch (error) {
     appLogger.error(`[elastic] Role [${allRole}] cannot be upserted:\n${error}`);
   }
+
+  await syncRepositoryIndexTemplate(repo.pattern);
 
   const spacesService = new SpacesService();
 
@@ -105,5 +213,6 @@ const syncRepositories = async () => {
 module.exports = {
   syncRepository,
   syncRepositories,
+  syncRepositoryIndexTemplate,
   unmountRepository,
 };

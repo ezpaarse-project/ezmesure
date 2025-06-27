@@ -3,7 +3,12 @@ const config = require('config');
 const { CronJob } = require('cron');
 const { appLogger } = require('../../logger');
 
-const { syncRepositories, syncRepository, unmountRepository } = require('./repositories');
+const {
+  syncRepositories,
+  syncRepository,
+  unmountRepository,
+  syncRepositoryIndexTemplate,
+} = require('./repositories');
 const { syncRepositoryAlias, syncRepositoryAliases, unmountAlias } = require('./alias');
 const { syncUser, syncUsers } = require('./users');
 
@@ -46,6 +51,7 @@ module.exports = {
   syncRepositoryAlias,
   unmountAlias,
   syncRepositoryAliases,
+  syncRepositoryIndexTemplate,
   syncUser,
   syncUsers,
 };
