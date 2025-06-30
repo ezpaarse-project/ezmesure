@@ -148,6 +148,51 @@
             </v-card>
 
             <v-card
+              v-if="user?.isAdmin"
+              :title="$t('institutions.institution.tags')"
+              prepend-icon="mdi-tag-outline"
+              variant="outlined"
+              class="mt-4"
+            >
+              <template #text>
+                <p class="mb-3">
+                  {{ $t('institutions.institution.tagsDescription') }}
+                </p>
+
+                <v-combobox
+                  v-model="institution.tags"
+                  v-model:search="tagSearch"
+                  v-model:focused="tagInputFocused"
+                  :label="$t('institutions.institution.tags')"
+                  :items="availableTags"
+                  :loading="loadingTags && 'primary'"
+                  :hide-no-data="!tagSearch"
+                  variant="solo"
+                  multiple
+                  chips
+                  closable-chips
+                  hide-details
+                >
+                  <template #no-data>
+                    <v-list-item>
+                      <v-list-item-title>
+                        <i18n-t keypath="noMatchFor">
+                          <template #search>
+                            <strong>{{ tagSearch }}</strong>
+                          </template>
+
+                          <template #key>
+                            <kbd>{{ $t('enterKey') }}</kbd>
+                          </template>
+                        </i18n-t>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </template>
+                </v-combobox>
+              </template>
+            </v-card>
+
+            <v-card
               :title="$t('institutions.institution.customProperties')"
               prepend-icon="mdi-tag-text-outline"
               variant="outlined"
@@ -428,6 +473,11 @@ const showCustomPropMenu = ref(false);
 const customField = ref(null);
 const customPropInputRefs = ref({});
 
+const loadingTags = ref(false);
+const availableTags = ref([]);
+const tagSearch = ref('');
+const tagInputFocused = ref(false);
+
 const {
   data: availableCustomFields,
   error: customFieldsError,
@@ -452,6 +502,32 @@ const logoSrc = computed(() => {
   if (institution.value.logoId) { return `/api/assets/logos/${institution.value.logoId}`; }
   return defaultLogo;
 });
+
+async function getAvailableTags() {
+  loadingTags.value = true;
+
+  try {
+    const items = await $fetch('/api/institutions', {
+      query: {
+        size: 0,
+        distinct: 'tags',
+      },
+    });
+
+    // Merge all tags in one array then make unique
+    const tags = new Set(items.flatMap((item) => item.tags ?? []));
+
+    availableTags.value = Array.from(tags).toSorted((a, b) => (
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    ));
+  } catch (err) {
+    snacks.error(t('anErrorOccurred'), err);
+  } finally {
+    loadingTags.value = false;
+  }
+}
+
+watch(tagInputFocused, getAvailableTags, { once: true });
 
 function removeCustomProp(fieldId) {
   institution.value.customProps = institution.value.customProps.filter(
