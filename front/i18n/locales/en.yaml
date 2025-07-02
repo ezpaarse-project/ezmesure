@@ -383,6 +383,8 @@ institutions:
     propertyName: Property name
     noCustomProps: No custom properties
     addNewCustomProp: Add a new one by clicking on the + in the top right corner
+    tags: Tags
+    tagsDescription: Tags allow you to organize institutions by associating them with keywords.
   members:
     noMembers: No members
     title: Members ({count})

@@ -385,6 +385,8 @@ institutions:
     propertyName: Nom de propriété
     noCustomProps: Aucune propriété personnalisée
     addNewCustomProp: Ajoutez en une en cliquant sur le + en haut à droite
+    tags: Étiquettes
+    tagsDescription: Les étiquettes permettent d'organiser les établissements en leur associant des mots-clés.
   members:
     noMembers: Aucun membre
     title: Membres ({count})
