@@ -2,6 +2,7 @@
 const { registerHook } = require('../hookEmitter');
 
 const MembershipsService = require('../../entities/memberships.service');
+const RepositoryAliasPermissionsService = require('../../entities/repository-alias-permissions.service');
 
 const { appLogger } = require('../../services/logger');
 
@@ -28,6 +29,7 @@ const {
  */
 const givePermissionsToContacts = async (alias, institutionId) => {
   const membershipsService = new MembershipsService();
+  const repositoryAliasPermissionsService = new RepositoryAliasPermissionsService();
 
   const contacts = await membershipsService.findMany({
     where: {
@@ -48,31 +50,21 @@ const givePermissionsToContacts = async (alias, institutionId) => {
   for (const contact of contacts) {
     try {
       // eslint-disable-next-line no-await-in-loop
-      await membershipsService.update({
+      await repositoryAliasPermissionsService.upsert({
         where: {
-          username_institutionId: {
-            username: contact.username,
+          username_institutionId_aliasPattern: {
+            aliasPattern: alias.pattern,
             institutionId: contact.institutionId,
+            username: contact.username,
           },
         },
-        data: {
-          repositoryAliasPermissions: {
-            upsert: {
-              where: {
-                username_institutionId_aliasPattern: {
-                  aliasPattern: alias.pattern,
-                  institutionId: contact.institutionId,
-                  username: contact.username,
-                },
-              },
-              update: {
-                aliasPattern: alias.pattern,
-              },
-              create: {
-                aliasPattern: alias.pattern,
-              },
-            },
-          },
+        update: {
+          aliasPattern: alias.pattern,
+        },
+        create: {
+          username: contact.username,
+          institutionId: contact.institutionId,
+          aliasPattern: alias.pattern,
         },
       });
     } catch (e) {
